@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PromptCraft – AI Trainer for Educators</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --white: #ffffff;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --accent: #3b6fe0;
+    --accent-light: #ebf0fc;
+    --accent-dark: #2451b3;
+    --green: #2d7d46;
+    --green-light: #e8f5ec;
+    --yellow: #92580a;
+    --yellow-light: #fef8ec;
+    --red: #c0392b;
+    --red-light: #fdf0ef;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --text-light: #94a3b8;
+    --user-bg: #ebf0fc;
+    --ai-bg: #f8fafc;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-name {
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  .logo-name span { color: var(--accent); }
+
+  .logo-sub {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: -2px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .level-tag {
+    background: var(--accent-light);
+    color: var(--accent-dark);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 99px;
+    border: 1px solid #c7d8f8;
+  }
+
+  .xp-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .xp-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .xp-track {
+    width: 90px;
+    height: 8px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .xp-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    width: 20%;
+    transition: width 0.5s ease;
+  }
+
+  /* ── SCENARIO TABS ── */
+  .scenario-tabs {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .tab-btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover { color: var(--accent); }
+
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-btn.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* ── SCENARIO CARD ── */
+  .scenario-card {
+    background: var(--accent-light);
+    border-bottom: 1px solid #c7d8f8;
+    padding: 12px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    flex-shrink: 0;
+  }
+
+  .scenario-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    background: white;
+    border: 1px solid #c7d8f8;
+    padding: 3px 8px;
+    border-radius: 5px;
+    white-space: nowrap;
+    margin-top: 1px;
+  }
+
+  .scenario-desc {
+    font-size: 0.85rem;
+    color: var(--accent-dark);
+    line-height: 1.55;
+    font-weight: 500;
+  }
+
+  /* ── OSCQR ── */
+  .oscqr-row {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  .oscqr-heading {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-right: 4px;
+  }
+
+  .oscqr-chip {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    border: 1.5px solid var(--border);
+    color: var(--text-muted);
+    background: var(--bg);
+    transition: all 0.3s ease;
+  }
+
+  .oscqr-chip.active {
+    border-color: var(--green);
+    color: var(--green);
+    background: var(--green-light);
+  }
+
+  .oscqr-chip.partial {
+    border-color: #d4a017;
+    color: var(--yellow);
+    background: var(--yellow-light);
+  }
+
+  /* ── CHAT ── */
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .message {
+    display: flex;
+    gap: 10px;
+    animation: slideUp 0.25s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .avatar.user-av {
+    background: var(--accent);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .avatar.ai-av {
+    background: #e2e8f0;
+    font-size: 16px;
+  }
+
+  .bubble-wrap { max-width: 78%; display: flex; flex-direction: column; gap: 4px; }
+  .message.user .bubble-wrap { align-items: flex-end; }
+
+  .bubble-sender {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    padding: 0 4px;
+  }
+
+  .bubble {
+    padding: 12px 16px;
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    line-height: 1.7;
+    border: 1px solid var(--border);
+  }
+
+  .message.user .bubble {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    border-top-right-radius: 4px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.82rem;
+  }
+
+  .message.ai .bubble {
+    background: var(--white);
+    border-top-left-radius: 4px;
+    color: var(--text);
+  }
+
+  /* feedback panel */
+  .feedback-panel {
+    margin-top: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    font-size: 0.8rem;
+  }
+
+  .fp-header {
+    background: var(--bg);
+    padding: 8px 14px;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .fp-body { padding: 12px 14px; background: var(--white); }
+
+  .score-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .score-chip {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    border: 1.5px solid;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .score-chip.good  { color: var(--green); border-color: var(--green); background: var(--green-light); }
+  .score-chip.needs { color: var(--yellow); border-color: #d4a017; background: var(--yellow-light); }
+
+  .fp-tips {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .fp-tips li {
+    margin-left: 16px;
+    margin-bottom: 2px;
+  }
+
+  .fp-success {
+    font-size: 0.8rem;
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  /* typing */
+  .typing-dots { display: flex; align-items: center; gap: 4px; padding: 4px 0; }
+  .typing-dots span {
+    width: 7px; height: 7px;
+    background: var(--border-strong);
+    border-radius: 50%;
+    animation: blink 1.2s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink {
+    0%,60%,100% { opacity: 0.3; transform: scale(1); }
+    30% { opacity: 1; transform: scale(1.2); }
+  }
+
+  /* ── INPUT ── */
+  .input-area {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+    flex-shrink: 0;
+  }
+
+  .input-box {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  textarea {
+    flex: 1;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.875rem;
+    padding: 10px 14px;
+    resize: none;
+    min-height: 46px;
+    max-height: 120px;
+    line-height: 1.55;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: var(--accent); background: var(--white); }
+  textarea::placeholder { color: var(--text-light); }
+
+  .send-btn {
+    width: 46px; height: 46px;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, transform 0.1s;
+    flex-shrink: 0;
+  }
+
+  .send-btn:hover { background: var(--accent-dark); }
+  .send-btn:active { transform: scale(0.96); }
+  .send-btn:disabled { background: var(--border-strong); cursor: not-allowed; }
+
+  .input-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+
+  .input-hint {
+    font-size: 0.7rem;
+    color: var(--text-light);
+  }
+
+  .attempt-badge {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .attempt-badge span { color: var(--accent); }
+
+  /* ── WELCOME CARD ── */
+  .welcome-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    max-width: 520px;
+  }
+
+  .welcome-title {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .welcome-body {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .tip-row {
+    margin-top: 12px;
+    background: var(--accent-light);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    color: var(--accent-dark);
+    font-weight: 600;
+  }
+
+  /* ── MODAL ── */
+  .modal-bg {
+    position: fixed; inset: 0;
+    background: rgba(15,23,42,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 50;
+    padding: 20px;
+  }
+
+  .modal-box {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+
+  .modal-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .modal-title {
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .modal-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+    margin-bottom: 18px;
+  }
+
+  .modal-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .modal-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.78rem;
+    padding: 10px 14px;
+    outline: none;
+    margin-bottom: 14px;
+    transition: border-color 0.2s;
+  }
+
+  .modal-input:focus { border-color: var(--accent); background: var(--white); }
+
+  .modal-cta {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .modal-cta:hover { background: var(--accent-dark); }
+
+  .modal-footnote {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    text-align: center;
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal-box">
+    <span class="modal-icon">🎓</span>
+    <div class="modal-title">Welcome to PromptCraft</div>
+    <p class="modal-desc">A training tool that helps educators learn how to work effectively with AI. You'll practice writing prompts, evaluate the results, and refine your approach through real instructional challenges.<br><br>To get started, enter your Anthropic API key below.</p>
+    <label class="modal-label">Anthropic API Key</label>
+    <input class="modal-input" type="password" id="keyInput" placeholder="sk-ant-..." />
+    <button class="modal-cta" onclick="launch()">Begin Training</button>
+    <p class="modal-footnote">Your key is only used in your browser to talk directly to Anthropic's API.<br>Get a key at console.anthropic.com</p>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎯</div>
+    <div>
+      <div class="logo-name">Prompt<span>Craft</span></div>
+      <div class="logo-sub">AI Training for Educators</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="level-tag" id="levelTag">Level 1 · Novice</div>
+    <div class="xp-group">
+      <span class="xp-label">XP</span>
+      <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+    </div>
+  </div>
+</header>
+
+<!-- SCENARIO TABS -->
+<div class="scenario-tabs">
+  <button class="tab-btn active" onclick="switchScenario(0, this)">Scenario 1: Engagement</button>
+  <button class="tab-btn" onclick="switchScenario(1, this)">Scenario 2: Differentiation</button>
+  <button class="tab-btn" onclick="switchScenario(2, this)">Scenario 3: Assessment</button>
+  <button class="tab-btn locked" disabled>Scenario 4 🔒</button>
+</div>
+
+<!-- SCENARIO CARD -->
+<div class="scenario-card">
+  <span class="scenario-label">Your Challenge</span>
+  <span class="scenario-desc" id="scenarioText"></span>
+</div>
+
+<!-- OSCQR ROW -->
+<div class="oscqr-row">
+  <span class="oscqr-heading">OSCQR Alignment</span>
+  <div id="oscqrChips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+</div>
+
+<!-- CHAT -->
+<div class="chat-area" id="chat"></div>
+
+<!-- INPUT -->
+<div class="input-area">
+  <div class="input-box">
+    <textarea id="promptInput"
+      placeholder="Write your prompt here. Try to be specific — include who your learners are, what you want them to do, and any constraints."
+      oninput="autoGrow(this)"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+    <button class="send-btn" id="sendBtn" onclick="send()">↑</button>
+  </div>
+  <div class="input-footer">
+    <span class="input-hint">Shift + Enter for a new line</span>
+    <span class="attempt-badge">Attempts this scenario: <span id="attNum">0</span></span>
+  </div>
+</div>
+
+<script>
+let key = '';
+let xp = 0;
+let attempts = 0;
+let scenarioIndex = 0;
+let history = [];
+
+const scenarios = [
+  {
+    desc: "Your rural online students are disengaged during discussion board activities. Use AI to help you design a more compelling discussion prompt for a general education course.",
+    oscqr: [
+      { id: "obj",  label: "Clear Objectives" },
+      { id: "int",  label: "Student Interaction" },
+      { id: "rwc",  label: "Real-World Context" },
+      { id: "inc",  label: "Inclusive Design" },
+      { id: "out",  label: "Measurable Outcomes" },
+    ],
+    system: `You are a supportive instructional design coach helping a rural or distance educator improve student engagement in online courses.
+
+When the educator writes a prompt, respond with a practical, classroom-ready instructional activity. Be warm and encouraging.
+
+After your main response, add a short section called "OSCQR Check" that briefly notes which of these are addressed: Clear Objectives, Student Interaction, Real-World Context, Inclusive Design, Measurable Outcomes.
+
+Important coaching approach: if their prompt is vague or generic, give a mediocre output and gently note what additional context would have made it stronger. If their prompt is specific and detailed, give an excellent output and point out exactly what they did well so they can repeat it. Keep your tone encouraging, like a helpful colleague.`
+  },
+  {
+    desc: "You have a mixed-ability online class serving rural learners. Use AI to help you differentiate a reading assignment so it works for all students.",
+    oscqr: [
+      { id: "obj",  label: "Clear Objectives" },
+      { id: "acc",  label: "Accessibility" },
+      { id: "udl",  label: "Multiple Means" },
+      { id: "sca",  label: "Scaffolding" },
+      { id: "sup",  label: "Learner Support" },
+    ],
+    system: `You are a supportive instructional design coach helping a rural or distance educator differentiate instruction for mixed-ability learners.
+
+When the educator writes a prompt, respond with a practical differentiation strategy or adapted activity. Be warm and encouraging.
+
+After your main response, add a short section called "OSCQR Check" that briefly notes which of these are addressed: Clear Objectives, Accessibility, Multiple Means, Scaffolding, Learner Support.
+
+Coaching approach: vague prompts get generic outputs with gentle guidance on what to add. Specific, detailed prompts get excellent outputs with specific praise about what made the prompt work well.`
+  },
+  {
+    desc: "Your online students struggle with low-stakes assessments that feel meaningless. Use AI to help design an authentic assessment connected to a rural or community context.",
+    oscqr: [
+      { id: "obj",  label: "Clear Objectives" },
+      { id: "aut",  label: "Authentic Tasks" },
+      { id: "fb",   label: "Feedback Design" },
+      { id: "age",  label: "Student Agency" },
+      { id: "ali",  label: "Alignment" },
+    ],
+    system: `You are a supportive instructional design coach helping a rural or distance educator design authentic, meaningful assessments.
+
+When the educator writes a prompt, respond with a practical assessment design. Be warm and encouraging.
+
+After your main response, add a short section called "OSCQR Check" that briefly notes which of these are addressed: Clear Objectives, Authentic Tasks, Feedback Design, Student Agency, Alignment.
+
+Coaching approach: vague prompts get generic outputs with gentle guidance. Specific prompts get excellent outputs with explicit praise for what the educator did well in their prompting.`
+  }
+];
+
+function launch() {
+  const val = document.getElementById('keyInput').value.trim();
+  if (!val.startsWith('sk-')) { alert('Please enter a valid API key starting with sk-ant-'); return; }
+  key = val;
+  document.getElementById('modal').style.display = 'none';
+  loadScenario(0);
+}
+
+function switchScenario(i, btn) {
+  scenarioIndex = i;
+  attempts = 0;
+  history = [];
+  document.getElementById('attNum').textContent = '0';
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadScenario(i);
+}
+
+function loadScenario(i) {
+  const s = scenarios[i];
+  document.getElementById('scenarioText').textContent = s.desc;
+  renderOSCQR(s.oscqr, []);
+  document.getElementById('chat').innerHTML = '';
+  addWelcome();
+}
+
+function addWelcome() {
+  const area = document.getElementById('chat');
+  const div = document.createElement('div');
+  div.style.cssText = 'animation: slideUp 0.3s ease forwards; opacity: 0;';
+  div.innerHTML = `
+    <div class="welcome-card">
+      <div class="welcome-title">👋 Ready to practice?</div>
+      <div class="welcome-body">
+        Read the challenge above, then write a prompt in the box below. The AI will respond just like it would in a real teaching situation.<br><br>
+        After each response, you'll see a <strong>Prompt Analysis</strong> panel showing what you did well and what to try next.
+      </div>
+      <div class="tip-row">
+        💡 Tip: Include who your learners are, what you want them to achieve, and any specific constraints.
+      </div>
+    </div>`;
+  area.appendChild(div);
+}
+
+function renderOSCQR(indicators, active) {
+  const container = document.getElementById('oscqrChips');
+  container.innerHTML = indicators.map(ind => {
+    const cls = active.includes(ind.id) ? 'active' : '';
+    return `<span class="oscqr-chip ${cls}">${ind.label}</span>`;
+  }).join('');
+}
+
+function detectOSCQR(text, indicators) {
+  return indicators.filter(ind =>
+    text.toLowerCase().includes(ind.label.toLowerCase().split(' ')[0]) ||
+    text.toLowerCase().includes(ind.label.toLowerCase())
+  ).map(i => i.id);
+}
+
+function addMsg(role, html) {
+  const area = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = `message ${role}`;
+  const isUser = role === 'user';
+  wrap.innerHTML = `
+    <div class="avatar ${isUser ? 'user-av' : 'ai-av'}">${isUser ? 'YOU' : '🤖'}</div>
+    <div class="bubble-wrap">
+      <div class="bubble-sender">${isUser ? 'Your prompt' : 'AI response'}</div>
+      <div class="bubble">${html}</div>
+    </div>`;
+  area.appendChild(wrap);
+  area.scrollTop = area.scrollHeight;
+}
+
+function addTyping() {
+  const area = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'message ai';
+  wrap.id = 'typing';
+  wrap.innerHTML = `
+    <div class="avatar ai-av">🤖</div>
+    <div class="bubble-wrap">
+      <div class="bubble-sender">AI response</div>
+      <div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+    </div>`;
+  area.appendChild(wrap);
+  area.scrollTop = area.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+async function send() {
+  if (!key) return;
+  const input = document.getElementById('promptInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  attempts++;
+  document.getElementById('attNum').textContent = attempts;
+  addMsg('user', esc(text));
+  input.value = '';
+  input.style.height = 'auto';
+  history.push({ role: 'user', content: text });
+
+  document.getElementById('sendBtn').disabled = true;
+  addTyping();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: scenarios[scenarioIndex].system,
+        messages: history
+      })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    if (data.error) {
+      addMsg('ai', `<span style="color:var(--red)">Error: ${data.error.message}</span>`);
+      return;
+    }
+
+    const reply = data.content[0].text;
+    history.push({ role: 'assistant', content: reply });
+
+    const active = detectOSCQR(reply, scenarios[scenarioIndex].oscqr);
+    renderOSCQR(scenarios[scenarioIndex].oscqr, active);
+
+    const score = scorePrompt(text);
+    const feedback = buildFeedback(score);
+    addMsg('ai', fmt(reply) + feedback);
+
+    gainXP(score.total * 6);
+
+  } catch(e) {
+    removeTyping();
+    addMsg('ai', `<span style="color:var(--red)">Something went wrong. Check your API key and try again.</span>`);
+  } finally {
+    document.getElementById('sendBtn').disabled = false;
+    document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+  }
+}
+
+function scorePrompt(text) {
+  const hasLearners   = /student|learner|rural|online|class|grade|level|adult|community/i.test(text);
+  const hasGoal       = /goal|outcome|objective|learn|understand|create|design|develop|able to/i.test(text);
+  const hasContext    = /course|subject|week|unit|module|discussion|assignment|activity|topic/i.test(text);
+  const hasConstraint = /minute|hour|word|short|brief|limit|length|format|\d+ (question|step)/i.test(text);
+  const isDetailed    = text.length > 100;
+  return { hasLearners, hasGoal, hasContext, hasConstraint, isDetailed,
+    total: [hasLearners, hasGoal, hasContext, hasConstraint, isDetailed].filter(Boolean).length };
+}
+
+function buildFeedback(s) {
+  const items = [
+    { key: 'hasLearners',   label: 'Learner context' },
+    { key: 'hasGoal',       label: 'Clear goal' },
+    { key: 'hasContext',    label: 'Course/subject context' },
+    { key: 'hasConstraint', label: 'Constraints or format' },
+    { key: 'isDetailed',    label: 'Enough detail' },
+  ];
+
+  const chips = items.map(item =>
+    `<span class="score-chip ${s[item.key] ? 'good' : 'needs'}">
+      ${s[item.key] ? '✓' : '+'} ${item.label}
+    </span>`
+  ).join('');
+
+  const tips = [];
+  if (!s.hasLearners)   tips.push('Describe your learners — rural, online, grade level, subject area');
+  if (!s.hasGoal)       tips.push('State what you want students to be able to do or understand');
+  if (!s.hasContext)    tips.push('Mention the course, unit, or topic this activity belongs to');
+  if (!s.hasConstraint) tips.push('Add a constraint like time limit, word count, or format');
+
+  const tipBlock = tips.length
+    ? `<ul class="fp-tips">${tips.map(t => `<li>${t}</li>`).join('')}</ul>`
+    : `<p class="fp-success">Great prompt! Notice how much more useful the AI output is when you give it context.</p>`;
+
+  return `
+    <div class="feedback-panel">
+      <div class="fp-header">Prompt Analysis</div>
+      <div class="fp-body">
+        <div class="score-chips">${chips}</div>
+        ${tips.length ? `<p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;font-weight:600;">Try adding:</p>` : ''}
+        ${tipBlock}
+      </div>
+    </div>`;
+}
+
+function fmt(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+function esc(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function gainXP(amount) {
+  xp = Math.min(100, xp + amount);
+  document.getElementById('xpFill').style.width = xp + '%';
+  if (xp >= 40) document.getElementById('levelTag').textContent = 'Level 2 · Developing';
+  if (xp >= 75) document.getElementById('levelTag').textContent = 'Level 3 · Proficient';
+}
+</script>
+</body>
+</html>
