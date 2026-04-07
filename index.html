@@ -592,18 +592,7 @@
 </head>
 <body>
 
-<!-- MODAL -->
-<div class="modal-bg" id="modal">
-  <div class="modal-box">
-    <span class="modal-icon">🎓</span>
-    <div class="modal-title">Welcome to PromptCraft</div>
-    <p class="modal-desc">A training tool that helps educators learn how to work effectively with AI. You'll practice writing prompts, evaluate the results, and refine your approach through real instructional challenges.<br><br>To get started, enter your Anthropic API key below.</p>
-    <label class="modal-label">Anthropic API Key</label>
-    <input class="modal-input" type="password" id="keyInput" placeholder="sk-ant-..." />
-    <button class="modal-cta" onclick="launch()">Begin Training</button>
-    <p class="modal-footnote">Your key is only used in your browser to talk directly to Anthropic's API.<br>Get a key at console.anthropic.com</p>
-  </div>
-</div>
+<!-- app launches automatically -->
 
 <!-- HEADER -->
 <header>
@@ -662,7 +651,7 @@
 </div>
 
 <script>
-let key = '';
+let key = 'proxy';
 let xp = 0;
 let attempts = 0;
 let scenarioIndex = 0;
@@ -723,12 +712,10 @@ Coaching approach: vague prompts get generic outputs with gentle guidance. Speci
 ];
 
 function launch() {
-  const val = document.getElementById('keyInput').value.trim();
-  if (!val.startsWith('sk-')) { alert('Please enter a valid API key starting with sk-ant-'); return; }
-  key = val;
-  document.getElementById('modal').style.display = 'none';
   loadScenario(0);
 }
+
+window.addEventListener('DOMContentLoaded', () => launch());
 
 function switchScenario(i, btn) {
   scenarioIndex = i;
@@ -817,7 +804,6 @@ function removeTyping() {
 }
 
 async function send() {
-  if (!key) return;
   const input = document.getElementById('promptInput');
   const text = input.value.trim();
   if (!text) return;
