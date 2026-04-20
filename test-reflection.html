@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PromptCraft — Reflection Room Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    background: rgba(26,26,20,0.97);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100dvh;
+    padding: 20px 16px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+
+  .test-wrapper {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .test-label {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8b7355;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="test-wrapper">
+  <div class="test-label">⚙ Reflection Room — Test View</div>
+  <div class="reflection-room">
+    <div id="refForm">
+      <div class="ref-eyebrow">PromptCraft · Reflection Room</div>
+      <div class="ref-title">You have completed all three scenarios.</div>
+      <div class="ref-subtitle">
+        Take a few quiet minutes to reflect on your experience.<br>
+        There are no right answers here. Your honest responses are what make this research meaningful.
+      </div>
+      <form name="promptcraft-reflection" method="POST" data-netlify="true" onsubmit="handleSubmit(event)">
+        <input type="hidden" name="form-name" value="promptcraft-reflection" />
+        <div class="ref-question">
+          <label class="ref-label"><span>01</span>What surprised you most about working with AI during these scenarios?</label>
+          <textarea class="ref-textarea" name="q1_surprise" placeholder="Write freely — there is no wrong answer."></textarea>
+        </div>
+        <div class="ref-question">
+          <label class="ref-label"><span>02</span>How did the way you wrote your prompts change as you moved through the scenarios?</label>
+          <textarea class="ref-textarea" name="q2_change" placeholder="Think about your first prompt versus your last."></textarea>
+        </div>
+        <div class="ref-question">
+          <label class="ref-label"><span>03</span>What is one thing you would do differently when using AI for instructional design in your actual teaching?</label>
+          <textarea class="ref-textarea" name="q3_practice" placeholder="Be as specific as you can."></textarea>
+        </div>
+        <div class="ref-question">
+          <label class="ref-label"><span>04</span>Is there anything else you want to share about your experience today?</label>
+          <textarea class="ref-textarea" name="q4_other" style="min-height:60px;" placeholder="Optional — leave blank if nothing comes to mind."></textarea>
+        </div>
+        <div style="border-top:1px solid #d6cfc0;padding-top:16px;margin-top:4px;">
+          <div class="ref-question" style="margin-bottom:14px;">
+            <label class="ref-label">Participant ID <span style="font-style:italic;letter-spacing:0;">(only if your study protocol asks for it)</span></label>
+            <input class="ref-input" type="text" name="participant_id" placeholder="Leave blank to remain anonymous" />
+          </div>
+        </div>
+        <button class="ref-submit" type="submit" id="refSubmitBtn">Submit Reflection</button>
+        <p class="ref-note">Your responses go directly to the research team and are not connected to any account or tracking system.</p>
+      </form>
+    </div>
+
+    <div id="refSuccess" style="display:none;">
+      <div class="ref-success">
+        <span class="ref-success-icon">📚</span>
+        <div class="ref-success-title">Thank you for your reflection.</div>
+        <div class="ref-success-body">
+          Your responses have been recorded and will contribute to research on how educators can use AI more effectively in their practice.<br><br>
+          You are welcome to return to the scenarios at any time to continue practicing.
+        </div>
+        <button class="ref-close-btn" onclick="window.location.href='index.html'">Return to PromptCraft</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function handleSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('refSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  try {
+    const res = await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(new FormData(e.target)).toString()
+    });
+    if (res.ok) {
+      document.getElementById('refForm').style.display = 'none';
+      document.getElementById('refSuccess').style.display = 'block';
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Submit Reflection';
+      alert('Something went wrong. Please try again.');
+    }
+  } catch(err) {
+    btn.disabled = false;
+    btn.textContent = 'Submit Reflection';
+    alert('Could not submit. Check your connection and try again.');
+  }
+}
+</script>
+</body>
+</html>
