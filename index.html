@@ -13,6 +13,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 </head>
 <body>
+<a href="#chat" class="skip-link">Skip to main content</a>
 
 <!-- DEV BAR -->
 <div class="dev-bar" id="devBar">
@@ -26,150 +27,135 @@
 </div>
 
 <!-- MAIN GAME UI -->
-<header>
+<header role="banner">
   <div class="logo">
-    <div class="logo-icon">🌿</div>
+    <div class="logo-icon" aria-hidden="true">🌿</div>
     <div>
       <div class="logo-name">Prompt<span>Craft</span></div>
       <div class="logo-sub">The Prompt Lab</div>
     </div>
   </div>
   <div class="header-right">
-    <div class="level-tag" id="levelTag">substitute · novice</div>
-    <div class="xp-group">
-      <span class="xp-label">XP</span>
-      <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+    <div class="level-tag" id="levelTag" aria-label="Current level" aria-live="polite">substitute · novice</div>
+    <div class="xp-group" aria-label="Experience points">
+      <span class="xp-label" aria-hidden="true">XP</span>
+      <div class="xp-track" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" aria-label="XP progress">
+        <div class="xp-fill" id="xpFill"></div>
+      </div>
     </div>
   </div>
 </header>
 
-<div class="scenario-tabs">
-  <button class="tab-btn active" onclick="switchScenario(0,this)">📋 Scenario 1: Engagement</button>
-  <button class="tab-btn" onclick="switchScenario(1,this)">📋 Scenario 2: Differentiation</button>
-  <button class="tab-btn" onclick="switchScenario(2,this)">📋 Scenario 3: Assessment</button>
-  <button class="tab-btn locked" disabled>🔒 Scenario 4</button>
+<nav class="scenario-tabs" role="tablist" aria-label="Training scenarios">
+  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" onclick="switchScenario(0,this)">📋 Scenario 1: Engagement</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(1,this)">📋 Scenario 2: Differentiation</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(2,this)">📋 Scenario 3: Assessment</button>
+  <button class="tab-btn locked" role="tab" aria-selected="false" aria-disabled="true" disabled>🔒 Scenario 4 (locked)</button>
+</nav>
+
+<div class="scenario-card" role="region" aria-label="Current scenario challenge">
+  <span class="scenario-label" aria-hidden="true">Your Challenge</span>
+  <span class="scenario-desc" id="scenarioText" aria-live="polite"></span>
 </div>
 
-<div class="scenario-card">
-  <span class="scenario-label">Your Challenge</span>
-  <span class="scenario-desc" id="scenarioText"></span>
+<div class="oscqr-row" role="region" aria-label="OSCQR quality alignment indicators">
+  <span class="oscqr-heading" aria-hidden="true">OSCQR Alignment</span>
+  <div id="oscqrChips" style="display:flex;gap:6px;flex-wrap:wrap;" aria-live="polite" aria-label="Active OSCQR indicators"></div>
 </div>
 
-<div class="oscqr-row">
-  <span class="oscqr-heading">OSCQR Alignment</span>
-  <div id="oscqrChips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-</div>
+<main class="chat-area" id="chat" role="main" aria-label="Conversation with AI" aria-live="polite"></main>
 
-<div class="chat-area" id="chat"></div>
-
-<div class="input-area">
+<div class="input-area" role="region" aria-label="Prompt input">
   <div class="input-box">
+    <label for="promptInput" class="sr-only">Write your AI prompt here</label>
     <textarea id="promptInput"
+      aria-label="Write your AI prompt here"
+      aria-describedby="promptHint"
       placeholder="Write your prompt here — who are your learners, what do you need, what constraints matter?"
       oninput="autoGrow(this)"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
-    <button class="send-btn" id="sendBtn" onclick="send()" aria-label="Send">↑</button>
+    <button class="send-btn" id="sendBtn" onclick="send()" aria-label="Send prompt to AI">↑</button>
   </div>
   <div class="input-footer">
-    <span class="input-hint">Shift + Enter for a new line</span>
-    <span class="attempt-badge">Attempts: <span id="attNum">0</span></span>
+    <span class="input-hint" id="promptHint">Shift + Enter for a new line</span>
+    <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
      VISUAL NOVEL OVERLAY
      ══════════════════════════════════════════════════ -->
-<div class="vn-overlay" id="vnOverlay">
+<div class="vn-overlay" id="vnOverlay"
+     role="dialog"
+     aria-modal="true"
+     aria-label="Professor Pixel dialogue"
+     aria-live="polite">
 
   <!-- CLASSROOM SCENE -->
   <div class="vn-scene" id="vnScene">
-  <img id="vnSceneBg" class="vn-bg" />
+  <img id="vnSceneBg" class="vn-bg" alt="" aria-hidden="true" />
 
     <!-- SMARTBOARD -->
-    <div class="vn-smartboard">
-      <div class="vn-board-label">📲 Today's Challenge</div>
-      <div class="vn-board-text" id="vnBoardText"></div>
-      <img class="vn-board-img" id="vnBoardImg" alt="" />
-      <div class="vn-board-loading" id="vnBoardLoading" style="display:none;">
+    <div class="vn-smartboard" role="region" aria-label="Smartboard challenge display">
+      <div class="vn-board-label" aria-hidden="true">📲 Today's Challenge</div>
+      <div class="vn-board-text" id="vnBoardText" aria-label="Scenario challenge text"></div>
+      <img class="vn-board-img" id="vnBoardImg" alt="Scene illustration" />
+      <div class="vn-board-loading" id="vnBoardLoading" style="display:none;" aria-live="polite">
         ◌ generating scene illustration...
       </div>
     </div>
 
     <!-- PROFESSOR PIXEL PORTRAIT -->
-    <div class="vn-character" id="vnCharacter">
-      <!-- Expression badge (dev only) -->
+    <div class="vn-character" id="vnCharacter" aria-hidden="true">
       <div class="vn-expression-badge" id="vnExprBadge">neutral</div>
 
-      <!--
-        PLACEHOLDER SILHOUETTE
-        Replace each src below with your designed images:
-          images/pixel-neutral.png
-          images/pixel-thinking.png
-          images/pixel-excited.png
-          images/pixel-encouraging.png
-          images/pixel-skeptical.png
-          images/pixel-proud.png
-
-        The <picture> element automatically picks the right expression.
-        All images share the same id="vnPortrait" -- JS swaps src directly.
-      -->
       <svg id="vnPortraitPlaceholder"
            viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg"
+           aria-hidden="true"
            style="width:100%;display:block;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4))">
-        <!-- Body -->
         <ellipse cx="100" cy="280" rx="70" ry="50" fill="#3d7a54" opacity="0.9"/>
-        <!-- Cardigan/torso -->
         <rect x="60" y="160" width="80" height="100" rx="10" fill="#4a7c5e"/>
-        <!-- Neck -->
         <rect x="90" y="145" width="20" height="25" fill="#c8956c"/>
-        <!-- Head -->
         <ellipse cx="100" cy="120" rx="42" ry="48" fill="#c8956c"/>
-        <!-- Hair base -->
         <ellipse cx="100" cy="95" rx="46" ry="38" fill="#3d2b1a"/>
-        <!-- Hair detail -->
         <ellipse cx="100" cy="78" rx="40" ry="28" fill="#4a3522"/>
-        <!-- Glasses left -->
         <rect x="72" y="114" width="22" height="15" rx="5" fill="none" stroke="#2a1f14" stroke-width="2.5"/>
-        <!-- Glasses right -->
         <rect x="106" y="114" width="22" height="15" rx="5" fill="none" stroke="#2a1f14" stroke-width="2.5"/>
-        <!-- Glasses bridge -->
         <line x1="94" y1="121" x2="106" y2="121" stroke="#2a1f14" stroke-width="2"/>
-        <!-- Eyes -->
         <circle cx="83" cy="121" r="4" fill="#2a1f14"/>
         <circle cx="117" cy="121" r="4" fill="#2a1f14"/>
-        <!-- Eye shine -->
         <circle cx="85" cy="119" r="1.5" fill="white"/>
         <circle cx="119" cy="119" r="1.5" fill="white"/>
-        <!-- Smile -->
         <path d="M 88 138 Q 100 148 112 138" fill="none" stroke="#2a1f14" stroke-width="2" stroke-linecap="round"/>
-        <!-- Arms -->
         <rect x="28" y="168" width="32" height="14" rx="7" fill="#4a7c5e" transform="rotate(20,44,175)"/>
         <rect x="140" y="168" width="32" height="14" rx="7" fill="#4a7c5e" transform="rotate(-20,156,175)"/>
-        <!-- Placeholder label -->
-        <text x="100" y="310" text-anchor="middle" font-family="sans-serif" font-size="9" fill="rgba(168,213,181,0.6)">
-          [placeholder — replace with your art]
-        </text>
+        <text x="100" y="310" text-anchor="middle" font-family="sans-serif" font-size="9" fill="rgba(168,213,181,0.6)">[placeholder — replace with your art]</text>
       </svg>
 
-      <!-- Real portrait img — hidden until images/pixel-*.png files exist -->
       <img id="vnPortrait" src="images/pixel-neutral.png"
-           alt="Professor Pixel"
+           alt=""
+           aria-hidden="true"
            style="width:100%;display:none;border:none;"
            onerror="this.style.display='none';document.getElementById('vnPortraitPlaceholder').style.display='block';"
            onload="this.style.display='block';document.getElementById('vnPortraitPlaceholder').style.display='none';" />
     </div>
 
-  </div><!-- /vn-scene -->
-
-  <!-- DIALOGUE BOX -->
-  <div class="vn-dialogue" id="vnDialogue" onclick="vnAdvance()">
-    <button class="vn-skip" onclick="event.stopPropagation();vnSkipType()">SKIP</button>
-    <div class="vn-speaker" id="vnSpeaker">Professor Pixel</div>
-    <div class="vn-text" id="vnText"></div>
-    <div class="vn-advance" id="vnAdvanceHint">▼ tap to continue</div>
   </div>
 
-</div><!-- /vn-overlay -->
+  <!-- DIALOGUE BOX — keyboard focusable, Space/Enter to advance -->
+  <div class="vn-dialogue" id="vnDialogue"
+       role="button"
+       tabindex="0"
+       aria-label="Professor Pixel is speaking. Press Space or Enter to continue."
+       onclick="vnAdvance()"
+       onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();vnAdvance();}">
+    <button class="vn-skip" aria-label="Skip to end of dialogue" onclick="event.stopPropagation();vnSkipType()">SKIP</button>
+    <div class="vn-speaker" id="vnSpeaker">Professor Pixel</div>
+    <div class="vn-text" id="vnText" aria-live="polite"></div>
+    <div class="vn-advance" id="vnAdvanceHint" aria-hidden="true">▼ tap to continue</div>
+  </div>
+
+</div>
 
 <!-- REFLECTION ROOM OVERLAY -->
 <div class="reflection-overlay" id="reflectionOverlay">
@@ -232,6 +218,28 @@ let attempts = 0;
 let scenarioIndex = 0;
 let history = [];
 let scenarioCompleted = [false, false, false];
+
+// ── SCREEN READER UTILITY ─────────────────────────────
+// Inject sr-only style once
+(function() {
+  const s = document.createElement('style');
+  s.textContent = '.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}';
+  document.head.appendChild(s);
+})();
+
+// ══════════════════════════════════════════════════════
+//  SURVEY ROUTING
+//  Options:
+//    'netlify' — submissions captured in Netlify Forms dashboard
+//    'sheets'  — submissions sent to Google Sheets via Apps Script
+//    'qualtrics' — opens Qualtrics survey link after completion
+//
+//  For Google Sheets: paste your Apps Script Web App URL below
+//  For Qualtrics: paste your survey URL below
+// ══════════════════════════════════════════════════════
+const SURVEY_MODE = 'netlify'; // change to 'sheets' or 'qualtrics' when ready
+const SHEETS_URL  = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 
 // ══════════════════════════════════════════════════════
 //  AUDIO
@@ -330,11 +338,12 @@ function vnShow(expression, text, onComplete) {
 
 function vnPlayNext() {
   if (vnQueue.length === 0) {
-    // Nothing left — hide overlay after short pause
     setTimeout(() => {
       const overlay = document.getElementById('vnOverlay');
       overlay.classList.remove('active');
       document.getElementById('vnCharacter').classList.remove('visible');
+      // Return focus to prompt input when VN closes
+      document.getElementById('promptInput').focus();
     }, 300);
     vnTyping = false;
     return;
@@ -344,22 +353,19 @@ function vnPlayNext() {
   vnOnComplete = onComplete || null;
   vnTyping = true;
 
-  // Show overlay
   const overlay = document.getElementById('vnOverlay');
   overlay.classList.add('active');
 
-  // Set expression
   vnSetExpression(expression);
 
-  // Slide character in
   setTimeout(() => {
     document.getElementById('vnCharacter').classList.add('visible');
+    // Move focus to dialogue box for keyboard users
+    document.getElementById('vnDialogue').focus();
   }, 100);
 
-  // Clear advance hint
   document.getElementById('vnAdvanceHint').classList.remove('show');
 
-  // Start typewriter
   vnFullText = text;
   vnCurrentText = '';
   document.getElementById('vnText').innerHTML = '';
@@ -547,10 +553,13 @@ function switchScenario(i, btn) {
   attempts = 0;
   history = [];
   document.getElementById('attNum').textContent = '0';
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
   btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
   loadScenario(i);
-  // Play scenario intro VN
   setTimeout(() => playPixelSequence(`scenarioStart_${i}`, null), 300);
 }
 
@@ -780,6 +789,7 @@ function autoGrow(el) {
 function gainXP(amount) {
   xp = Math.min(100, xp + amount);
   document.getElementById('xpFill').style.width = xp + '%';
+  document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', Math.round(xp));
   if (xp >= 40) document.getElementById('levelTag').textContent = 'lead educator · developing';
   if (xp >= 75) document.getElementById('levelTag').textContent = 'master prompter · proficient';
 }
@@ -834,11 +844,49 @@ async function handleReflectionSubmit(e) {
   const btn = document.getElementById('refSubmitBtn');
   btn.disabled = true;
   btn.textContent = 'Submitting...';
+
+  const formData = new FormData(e.target);
+
+  // ── QUALTRICS MODE ─────────────────────────────────
+  // Opens Qualtrics in a new tab, shows success locally
+  if (SURVEY_MODE === 'qualtrics') {
+    window.open(QUALTRICS_URL, '_blank', 'noopener');
+    document.getElementById('refForm').style.display = 'none';
+    document.getElementById('refSuccess').style.display = 'block';
+    return;
+  }
+
+  // ── GOOGLE SHEETS MODE ─────────────────────────────
+  if (SURVEY_MODE === 'sheets') {
+    try {
+      const payload = {};
+      formData.forEach((v, k) => payload[k] = v);
+      payload.timestamp = new Date().toISOString();
+      payload.scenario_count = scenarioCompleted.filter(Boolean).length;
+
+      await fetch(SHEETS_URL, {
+        method: 'POST',
+        mode: 'no-cors', // Apps Script requires no-cors
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      // no-cors means we cannot read the response, assume success
+      document.getElementById('refForm').style.display = 'none';
+      document.getElementById('refSuccess').style.display = 'block';
+    } catch(err) {
+      btn.disabled = false;
+      btn.textContent = 'Submit Reflection';
+      alert('Could not submit. Please check your connection and try again.');
+    }
+    return;
+  }
+
+  // ── NETLIFY FORMS MODE (default) ───────────────────
   try {
     const res = await fetch('/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(new FormData(e.target)).toString()
+      body: new URLSearchParams(formData).toString()
     });
     if (res.ok) {
       document.getElementById('refForm').style.display = 'none';

@@ -1286,3 +1286,164 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
     font-size: 0.68rem;
   }
 }
+/* ══════════════════════════════════════════════════════
+   ACCESSIBILITY & MOBILE IMPROVEMENTS
+   ══════════════════════════════════════════════════════ */
+
+/* ── FOCUS STYLES ──────────────────────────────────── */
+/* Remove default outline and replace with visible ring */
+:focus-visible {
+  outline: 3px solid #a8d5b5;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Buttons inside dark VN overlay need different focus */
+.vn-overlay :focus-visible {
+  outline-color: #a8d5b5;
+}
+
+/* Skip to main content — hidden until focused */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  background: var(--forest);
+  color: #d4edd9;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  z-index: 9999;
+  transition: top 0.2s;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 8px;
+  outline: 3px solid #a8d5b5;
+}
+
+/* ── VN KEYBOARD SUPPORT ───────────────────────────── */
+/* Make dialogue box focusable and show focus state */
+.vn-dialogue:focus {
+  outline: none;
+}
+
+.vn-dialogue:focus-visible {
+  outline: 3px solid #a8d5b5;
+  outline-offset: -3px;
+}
+
+/* Larger touch target for advance hint area */
+.vn-advance {
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+/* ── VN MOBILE LAYOUT FIXES ────────────────────────── */
+/* Fix text getting squeezed beside portrait on narrow phones */
+@media (max-width: 420px) {
+  .vn-text {
+    max-width: 100% !important;
+    font-size: 0.95rem !important;
+  }
+
+  .vn-board-text {
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Stack portrait behind smartboard on very small screens */
+  .vn-character {
+    opacity: 0.35 !important;
+    right: -8% !important;
+    height: 55% !important;
+  }
+
+  .vn-smartboard {
+    width: 88% !important;
+    min-height: 180px !important;
+  }
+}
+
+/* ── SCENARIO CARD MOBILE ──────────────────────────── */
+@media (max-width: 480px) {
+  /* Show pushpin but hide label text on narrow screens */
+  .scenario-card::before {
+    display: none;
+  }
+
+  /* Ensure OSCQR chips wrap nicely */
+  #oscqrChips {
+    gap: 4px !important;
+  }
+
+  .oscqr-chip {
+    font-size: 0.62rem !important;
+    padding: 2px 7px !important;
+  }
+}
+
+/* ── REFLECTION ROOM MOBILE ────────────────────────── */
+@media (max-width: 480px) {
+  .reflection-overlay {
+    padding: 12px 10px;
+    align-items: flex-start;
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .reflection-room {
+    padding: 22px 18px;
+    max-height: 95vh;
+  }
+
+  .ref-title { font-size: 1rem; }
+  .ref-subtitle { font-size: 0.76rem; margin-bottom: 18px; }
+  .ref-textarea { min-height: 64px; font-size: 16px; }
+}
+
+/* ── TOUCH TARGETS ─────────────────────────────────── */
+/* All interactive elements meet 44px minimum */
+.tab-btn {
+  min-height: 44px;
+}
+
+.ref-close-btn,
+.ref-submit {
+  min-height: 48px;
+}
+
+/* Ensure scenario tabs are finger-friendly */
+@media (max-width: 480px) {
+  .tab-btn {
+    padding: 12px 12px;
+  }
+}
+
+/* ── REDUCED MOTION ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .vn-overlay {
+    transition: none !important;
+  }
+
+  .vn-character {
+    transition: none !important;
+  }
+}
+
+/* ── HIGH CONTRAST MODE SUPPORT ────────────────────── */
+@media (forced-colors: active) {
+  .vn-smartboard { border: 3px solid ButtonText; }
+  .vn-dialogue { border-top: 2px solid ButtonText; }
+  .complete-btn { border: 2px solid ButtonText; }
+  .send-btn { border: 2px solid ButtonText; }
+}
