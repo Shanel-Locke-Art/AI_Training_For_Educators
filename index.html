@@ -15,6 +15,32 @@
 <body>
 <a href="#chat" class="skip-link">Skip to main content</a>
 
+<!-- NAME ENTRY MODAL -->
+<div class="name-modal-overlay" id="nameModalOverlay" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle">
+  <div class="name-modal">
+    <span class="name-modal-icon">🌿</span>
+    <div class="name-modal-title" id="nameModalTitle">Welcome to the Prompt Lab</div>
+    <div class="name-modal-sub">
+      What should Professor Pixel call you?
+    </div>
+    <input
+      class="name-modal-input"
+      id="nameInput"
+      type="text"
+      maxlength="24"
+      placeholder="Enter your name"
+      aria-label="Your name"
+      autocomplete="given-name"
+      onkeydown="if(event.key==='Enter'){event.preventDefault();submitName()}" />
+    <button class="name-modal-btn" onclick="submitName()">
+      Let's get started →
+    </button>
+    <button class="name-modal-skip" onclick="submitName(true)">
+      Skip — just call me You
+    </button>
+  </div>
+</div>
+
 <!-- DEV BAR -->
 <div class="dev-bar" id="devBar">
   <span>DEV</span>
@@ -50,7 +76,7 @@
   <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" onclick="switchScenario(0,this)">📋 Scenario 1: Engagement</button>
   <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(1,this)">📋 Scenario 2: Differentiation</button>
   <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(2,this)">📋 Scenario 3: Assessment</button>
-  <button class="tab-btn locked" role="tab" aria-selected="false" aria-disabled="true" disabled>🔒 Scenario 4 (locked)</button>
+  <button class="tab-btn locked" id="s4Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 Scenario 4</button>
 </nav>
 
 <div class="scenario-card" role="region" aria-label="Current scenario challenge">
@@ -80,6 +106,39 @@
     <span class="input-hint" id="promptHint">Shift + Enter for a new line</span>
     <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
   </div>
+</div>
+
+<!-- ── PROFESSOR PIXEL PERSISTENT BADGE ──────────────── -->
+<div class="pixel-badge" id="pixelBadge"
+     onclick="pixelBadgeClick()"
+     role="button"
+     tabindex="0"
+     aria-label="Professor Pixel — click to see her latest feedback"
+     onkeydown="if(event.key==='Enter'||event.key===' '){pixelBadgeClick()}">
+  <!-- Real portrait — shown when images exist -->
+  <img class="pixel-badge-portrait" id="pixelBadgeImg"
+       src="images/pixel-neutral.png"
+       alt="Professor Pixel"
+       onerror="this.style.display='none';document.getElementById('pixelBadgeFallback').style.display='flex';" />
+  <!-- Fallback -->
+  <div class="pixel-badge-fallback" id="pixelBadgeFallback" style="display:none;">🧑‍🏫</div>
+  <div class="pixel-badge-label" id="pixelBadgeLabel">Pixel</div>
+</div>
+
+<!-- ── PROFESSOR PIXEL COACH CARD ──────────────────── -->
+<div class="pixel-coach-card" id="pixelCoachCard" role="status" aria-live="polite">
+  <img class="pixel-coach-portrait" id="pixelCoachImg"
+       src="images/pixel-neutral.png"
+       alt="Professor Pixel"
+       onerror="this.style.display='none';document.getElementById('pixelCoachFallback').style.display='flex';" />
+  <div class="pixel-coach-fallback" id="pixelCoachFallback" style="display:none;">🧑‍🏫</div>
+  <div class="pixel-coach-body">
+    <div class="pixel-coach-name">Professor Pixel</div>
+    <div class="pixel-coach-msg" id="pixelCoachMsg"></div>
+  </div>
+  <button class="pixel-coach-dismiss"
+          aria-label="Dismiss Professor Pixel's feedback"
+          onclick="pixelCoachDismiss()">✕</button>
 </div>
 
 <!-- ══════════════════════════════════════════════════
@@ -218,6 +277,7 @@ let attempts = 0;
 let scenarioIndex = 0;
 let history = [];
 let scenarioCompleted = [false, false, false];
+let playerName = 'You'; // updated by name entry modal
 
 // ── SCREEN READER UTILITY ─────────────────────────────
 (function() {
@@ -226,13 +286,65 @@ let scenarioCompleted = [false, false, false];
   document.head.appendChild(s);
 })();
 
+// ── NAME MODAL ────────────────────────────────────────
+function showNameModal() {
+  const overlay = document.getElementById('nameModalOverlay');
+  overlay.classList.add('visible');
+  // Focus the input after transition
+  setTimeout(() => document.getElementById('nameInput').focus(), 450);
+}
+
+function submitName(skip = false) {
+  const input = document.getElementById('nameInput');
+  const raw = skip ? '' : input.value.trim();
+
+  // Sanitise -- letters, spaces, hyphens, apostrophes, max 24 chars
+  const clean = raw.replace(/[^a-zA-Z\s'\-\.]/g, '').trim().substring(0, 24);
+  playerName = clean || 'You';
+
+  // Dismiss modal
+  const overlay = document.getElementById('nameModalOverlay');
+  overlay.style.opacity = '0';
+  overlay.style.pointerEvents = 'none';
+  setTimeout(() => overlay.style.display = 'none', 400);
+
+  // Update Pixel's welcome to use the name
+  updatePixelWelcomeForName();
+
+  // Start the game
+  startGame();
+}
+
+function updatePixelWelcomeForName() {
+  if (playerName !== 'You') {
+    // Personalise the welcome dialogue
+    pixelDialogue.welcome[0].text =
+      `Welcome to the Prompt Lab, ${playerName}! I am Professor Pixel, your AI coaching companion.`;
+  }
+}
+
+function getInitials(name) {
+  if (name === 'You') return 'YOU';
+  const parts = name.split(' ').filter(Boolean);
+  if (parts.length === 1) return parts[0].substring(0, 3).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function startGame() {
+  loadScenario(0);
+  setTimeout(() => {
+    playPixelSequence('scenarioStart_0', null);
+    setTimeout(() => playPixelSequence('welcome', null), 200);
+  }, 700);
+}
+
 // ══════════════════════════════════════════════════════
 //  SURVEY CONFIGURATION
 //  Change SURVEY_MODE to 'sheets' or 'qualtrics' when ready
 //  Paste your Google Apps Script Web App URL into SHEETS_URL
 // ══════════════════════════════════════════════════════
 const SURVEY_MODE   = 'sheets';
-const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbwkWQ6USBYgNEY0oSl7u3-jquY9aUggVwywQso4thwJe7doFukjgBl6EdGLuaQ3SOPR/exec';
+const SHEETS_URL    = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 
 // ══════════════════════════════════════════════════════
@@ -241,11 +353,12 @@ const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 // ══════════════════════════════════════════════════════
 const sessionStart = Date.now();
 
-// Per-scenario tracking object
+// Per-scenario tracking object — now includes scenario 4
 const scenarioData = [
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '' },
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '' },
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '' },
+  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', selfReport: '' },
 ];
 
 function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
@@ -268,6 +381,7 @@ function buildSessionPayload(formData) {
 
     // Participant
     participant_id:       formData.get('participant_id') || 'anonymous',
+    player_name:          playerName !== 'You' ? playerName : '',
 
     // Game summary
     scenarios_completed:  scenarioCompleted.filter(Boolean).length,
@@ -374,12 +488,427 @@ Coaching: vague prompts get generic outputs with gentle guidance. Specific promp
 When the educator writes a prompt, respond with a practical assessment design. Be warm and encouraging.
 After your main response, add a short section called "OSCQR Check" noting which are addressed: Clear Objectives, Authentic Tasks, Feedback Design, Student Agency, Alignment.
 Coaching: vague prompts get generic outputs with gentle guidance. Specific prompts get excellent outputs with explicit praise.`
+  },
+  // ── SCENARIO 4: CRITICAL THINKING CHALLENGE ──────────
+  {
+    desc: "A colleague asks you to recommend an AI-generated professional development plan for rural educators that covers AI integration across all grade levels. Use AI to help design a comprehensive PD program.",
+    imagePrompt: "A cozy professional development workshop scene: educators gathered around tables with laptops, sticky notes on windows, collaborative energy, rural school setting. Soft watercolor style, warm earthy tones.",
+    isCriticalThinking: true, // flags special behavior
+    oscqr: [
+      { id:"obj", label:"Clear Objectives" },
+      { id:"ev",  label:"Evidence-Based" },
+      { id:"ctx", label:"Rural Context" },
+      { id:"fea", label:"Feasibility" },
+      { id:"src", label:"Verified Sources" },
+    ],
+    // This system prompt deliberately produces plausible-but-flawed output
+    system: `You are an AI assistant helping design professional development programs. Respond confidently and professionally.
+
+When asked to design a PD program, provide a detailed, well-structured response that includes:
+1. A program overview with specific timeframes
+2. Concrete learning objectives
+3. Implementation strategies
+4. Supporting research citations
+
+IMPORTANT INSTRUCTIONS FOR THIS SCENARIO:
+- Include the following fabricated citation naturally within your response, formatted to look real:
+  "Johnson, M. & Reeves, T. (2019). Scaling AI integration in rural K-12 settings: A multi-district study. Journal of Rural Educational Technology, 14(2), 112-128."
+- Also recommend "concentrated intensive training" (massed practice over 2-3 days) as superior to distributed practice, which contradicts established learning science
+- Present both of these confidently as if they are well-established facts
+- Do NOT reveal that anything is wrong — respond as a normal, helpful AI assistant would
+- The rest of your response should be genuinely useful and well-structured`
   }
 ];
 
 // ══════════════════════════════════════════════════════
-//  VISUAL NOVEL ENGINE
+//  PROFESSOR PIXEL — INTEGRATED PRESENCE SYSTEM
 // ══════════════════════════════════════════════════════
+
+// Expression → image map (same as VN system)
+const PIXEL_EXPR = {
+  neutral:     'images/pixel-neutral.png',
+  thinking:    'images/pixel-thinking.png',
+  excited:     'images/pixel-excited.png',
+  encouraging: 'images/pixel-encouraging.png',
+  skeptical:   'images/pixel-skeptical.png',
+  proud:       'images/pixel-proud.png',
+};
+
+// Track last score to detect improvement
+let lastScore = -1;
+let firstAttemptDone = false;
+let coachDismissTimer = null;
+
+// ── BADGE ─────────────────────────────────────────────
+function pixelBadgeSetExpr(expr) {
+  const src = PIXEL_EXPR[expr] || PIXEL_EXPR.neutral;
+  const img = document.getElementById('pixelBadgeImg');
+  const coachImg = document.getElementById('pixelCoachImg');
+
+  // Swap badge portrait
+  img.src = src;
+  if (coachImg) coachImg.src = src;
+
+  // Pulse the badge
+  img.classList.remove('reacting');
+  void img.offsetWidth; // force reflow
+  img.classList.add('reacting');
+  setTimeout(() => img.classList.remove('reacting'), 600);
+}
+
+function pixelBadgeClick() {
+  // Show the coach card with latest message if there is one
+  const card = document.getElementById('pixelCoachCard');
+  if (card.classList.contains('visible')) {
+    pixelCoachDismiss();
+  } else if (document.getElementById('pixelCoachMsg').textContent) {
+    card.classList.add('visible');
+    clearTimeout(coachDismissTimer);
+    coachDismissTimer = setTimeout(pixelCoachDismiss, 6000);
+  }
+}
+
+// ── COACH CARD ────────────────────────────────────────
+const coachMessages = {
+  firstAttempt: {
+    expr: 'encouraging',
+    text: "Great start! Take a look at the Prompt Analysis below and try to include more context next time."
+  },
+  improved: {
+    expr: 'excited',
+    text: "Your prompt just got stronger! Notice how the AI response improved when you added more detail."
+  },
+  scenarioComplete: {
+    expr: 'proud',
+    text: "Scenario complete! Move to the next one when you are ready — each one builds on the last."
+  },
+};
+
+function pixelCoachShow(key) {
+  const msg = coachMessages[key];
+  if (!msg) return;
+
+  // Update expression everywhere
+  pixelBadgeSetExpr(msg.expr);
+
+  // Update badge label
+  document.getElementById('pixelBadgeLabel').textContent = msg.expr;
+
+  // Update and show coach card
+  document.getElementById('pixelCoachMsg').textContent = msg.text;
+  const card = document.getElementById('pixelCoachCard');
+  card.classList.add('visible');
+
+  // Auto-dismiss after 7 seconds
+  clearTimeout(coachDismissTimer);
+  coachDismissTimer = setTimeout(pixelCoachDismiss, 7000);
+}
+
+function pixelCoachDismiss() {
+  document.getElementById('pixelCoachCard').classList.remove('visible');
+}
+
+// ── KEY MOMENT TRIGGERS ───────────────────────────────
+function pixelReactToScore(score) {
+  // First ever attempt
+  if (!firstAttemptDone) {
+    firstAttemptDone = true;
+    setTimeout(() => pixelCoachShow('firstAttempt'), 800);
+    lastScore = score;
+    return;
+  }
+
+  // Score improved from previous attempt
+  if (score > lastScore && lastScore >= 0) {
+    setTimeout(() => pixelCoachShow('improved'), 800);
+  } else {
+    // Just update expression without coach card
+    if (score <= 1)      pixelBadgeSetExpr('skeptical');
+    else if (score <= 3) pixelBadgeSetExpr('thinking');
+    else                  pixelBadgeSetExpr('proud');
+  }
+
+  lastScore = score;
+}
+
+// ── AI BUBBLE AVATAR ──────────────────────────────────
+// Returns the HTML for the AI avatar -- Pixel portrait if available
+function pixelAvatarHTML(expr) {
+  const src = PIXEL_EXPR[expr] || PIXEL_EXPR.neutral;
+  return `
+    <img class="pixel-chat-avatar"
+         src="${src}"
+         alt="Professor Pixel"
+         onerror="this.outerHTML='<div class=\\'pixel-chat-avatar-fallback\\'>🧑‍🏫</div>'" />`;
+}
+
+// ══════════════════════════════════════════════════════
+//  SCENARIO 4 — CRITICAL THINKING CHALLENGE
+// ══════════════════════════════════════════════════════
+
+let s4InterruptFired = false;
+let s4SelfReportAnswer = '';
+
+function unlockScenario4() {
+  const btn = document.getElementById('s4Tab');
+  if (!btn || !btn.classList.contains('locked')) return;
+  btn.classList.remove('locked');
+  btn.classList.add('unlocked-s4');
+  btn.disabled = false;
+  btn.removeAttribute('aria-disabled');
+  btn.textContent = '⚠️ Scenario 4: Critical Thinking';
+  btn.onclick = () => switchScenario(3, btn);
+
+  pixelBadgeSetExpr('thinking');
+  document.getElementById('pixelBadgeLabel').textContent = 'curious';
+
+  // Coach card hint
+  setTimeout(() => {
+    document.getElementById('pixelCoachMsg').textContent =
+      "Scenario 4 is now unlocked. This one is different — stay sharp.";
+    document.getElementById('pixelCoachCard').classList.add('visible');
+    clearTimeout(coachDismissTimer);
+    coachDismissTimer = setTimeout(pixelCoachDismiss, 8000);
+  }, 600);
+}
+
+async function sendScenario4(text) {
+  s4InterruptFired = false;
+  scenarioData[3].attempts++;
+  scenarioData[3].prompts.push(text);
+
+  document.getElementById('attNum').textContent = scenarioData[3].attempts;
+  addMsg('user', esc(text));
+  const input = document.getElementById('promptInput');
+  input.value = '';
+  input.style.height = 'auto';
+  history.push({ role: 'user', content: text });
+  document.getElementById('sendBtn').disabled = true;
+  addTyping();
+
+  try {
+    const res = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: scenarios[3].system,
+        messages: history
+      })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    if (data.error) {
+      addMsg('ai', `<span style="color:var(--red)">Error: ${data.error.message}</span>`, 'neutral');
+      document.getElementById('sendBtn').disabled = false;
+      return;
+    }
+
+    const reply = data.content[0].text;
+    history.push({ role: 'assistant', content: reply });
+    scenarioData[3].finalResponse = reply.substring(0, 300);
+
+    addMsg('ai', fmt(reply), 'neutral');
+
+    // Pixel interrupts after the player has a moment to read
+    setTimeout(() => fireS4Interrupt(), 2000);
+
+  } catch(e) {
+    removeTyping();
+    addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`, 'neutral');
+  } finally {
+    document.getElementById('sendBtn').disabled = false;
+  }
+}
+
+function fireS4Interrupt() {
+  if (s4InterruptFired) return;
+  s4InterruptFired = true;
+  const area = document.getElementById('chat');
+
+  const interruptDiv = document.createElement('div');
+  interruptDiv.className = 'pixel-interrupt';
+  const src = PIXEL_EXPR['skeptical'] || 'images/pixel-skeptical.png';
+  interruptDiv.innerHTML = `
+    <img class="pixel-interrupt-avatar" src="${src}" alt="Professor Pixel"
+         onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
+    <div style="flex:1;min-width:0;">
+      <div class="pixel-interrupt-sender">Professor Pixel — hold on</div>
+      <div class="pixel-interrupt-bubble">
+        Wait. Before you use any of that — did something seem off to you?
+        Read it again carefully. I want you to think critically about what the AI just told you.
+      </div>
+    </div>`;
+  area.appendChild(interruptDiv);
+  area.scrollTop = area.scrollHeight;
+
+  pixelBadgeSetExpr('skeptical');
+  document.getElementById('pixelBadgeLabel').textContent = 'skeptical';
+
+  setTimeout(() => showS4SelfReport(area), 1400);
+}
+
+function showS4SelfReport(area) {
+  const div = document.createElement('div');
+  div.className = 's4-self-report';
+  div.innerHTML = `
+    <div class="s4-self-report-q">
+      Before I explain — did you notice anything that seemed questionable in that response?
+    </div>
+    <div class="s4-self-report-btns">
+      <button class="s4-btn" onclick="s4SelectReport(this,'yes_noticed')">Yes, something seemed off</button>
+      <button class="s4-btn" onclick="s4SelectReport(this,'no_missed')">It seemed fine to me</button>
+      <button class="s4-btn" onclick="s4SelectReport(this,'unsure')">I was not sure</button>
+    </div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+
+function s4SelectReport(btn, answer) {
+  s4SelfReportAnswer = answer;
+  scenarioData[3].selfReport = answer;
+  btn.closest('.s4-self-report-btns').querySelectorAll('.s4-btn').forEach(b => {
+    b.classList.remove('selected');
+    b.disabled = true;
+  });
+  btn.classList.add('selected');
+  setTimeout(() => showS4Reveal(), 700);
+}
+
+function showS4Reveal() {
+  const area = document.getElementById('chat');
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="reveal-panel">
+      <div class="reveal-header">🔍 What was wrong with that response</div>
+      <div class="reveal-body">
+        <div class="reveal-item">
+          <div class="reveal-item-label">📄 Problem 1: Fabricated Citation</div>
+          <div class="reveal-item-text">
+            The AI cited <strong>"Johnson, M. & Reeves, T. (2019). Scaling AI integration in rural K-12 settings.
+            Journal of Rural Educational Technology, 14(2), 112-128."</strong>
+            This journal does not exist. This study was never published. The authors are invented.
+            AI systems can generate citations that look completely real but lead nowhere — this is called
+            <strong>hallucination</strong>. Always verify citations independently before using them in professional or academic work.
+          </div>
+        </div>
+        <div class="reveal-item">
+          <div class="reveal-item-label">🧠 Problem 2: Contradicts Learning Science</div>
+          <div class="reveal-item-text">
+            The recommendation for <strong>"concentrated intensive training over 2-3 days"</strong> contradicts
+            decades of cognitive science research. The <strong>spacing effect</strong> consistently shows
+            that distributed practice over time produces far stronger retention than massed practice.
+            The AI presented this confidently and incorrectly. Fluency and confidence do not equal accuracy.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal-panel" style="margin-top:10px;border-left-color:var(--forest-mid);">
+      <div class="reveal-header" style="background:var(--forest-light);color:var(--forest-dark);border-color:rgba(45,90,61,0.2);">
+        ✅ How to verify AI output — your checklist
+      </div>
+      <div class="reveal-body">
+        <div class="literacy-tip">
+          <div class="literacy-tip-icon">🔎</div>
+          <div><strong>Search the citation.</strong> Paste it into Google Scholar or your library database. If it does not appear, do not use it.</div>
+        </div>
+        <div class="literacy-tip">
+          <div class="literacy-tip-icon">📚</div>
+          <div><strong>Check against known frameworks.</strong> Does this align with UDL, TPACK, or established instructional design research? If it contradicts the literature, flag it.</div>
+        </div>
+        <div class="literacy-tip">
+          <div class="literacy-tip-icon">💬</div>
+          <div><strong>Ask the AI to show its work.</strong> Try: "What is your source for this?" or "Can you provide a verifiable citation?" The response will reveal a lot.</div>
+        </div>
+        <div class="literacy-tip">
+          <div class="literacy-tip-icon">🧐</div>
+          <div><strong>Apply professional judgment.</strong> You are the expert on your learners and context. AI does not know your students. Does this advice actually fit your situation?</div>
+        </div>
+      </div>
+    </div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+
+  setTimeout(() => addPixelS4Closing(area), 900);
+}
+
+function addPixelS4Closing(area) {
+  const div = document.createElement('div');
+  div.className = 'pixel-interrupt';
+  const src = PIXEL_EXPR['proud'] || 'images/pixel-proud.png';
+  div.innerHTML = `
+    <img class="pixel-interrupt-avatar" src="${src}" alt="Professor Pixel"
+         style="border-color:var(--forest-mid);"
+         onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
+    <div style="flex:1;min-width:0;">
+      <div class="pixel-interrupt-sender">Professor Pixel</div>
+      <div class="pixel-interrupt-bubble" style="background:var(--forest-light);border-color:rgba(45,90,61,0.3);color:var(--forest-dark);">
+        This is the most important thing I can teach you about working with AI.
+        Being a great AI prompter is not just about asking better questions —
+        it is about knowing when to question the answers.
+      </div>
+    </div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+
+  pixelBadgeSetExpr('proud');
+  document.getElementById('pixelBadgeLabel').textContent = 'proud';
+
+  saveIncrementalData(3);
+
+  setTimeout(() => {
+    scenarioCompleted[3] = true;
+    const completeArea = document.getElementById('chat');
+    if (document.getElementById('completeAllBtn')) return;
+    const finDiv = document.createElement('div');
+    finDiv.style.cssText = 'text-align:center;padding:16px 0 4px;animation:slideUp 0.35s ease forwards;opacity:0;';
+    finDiv.innerHTML = `
+      <p style="font-size:0.76rem;color:var(--ink-light);margin-bottom:10px;font-weight:600;">
+        All four scenarios complete.
+      </p>
+      <button class="complete-btn" id="completeAllBtn" onclick="openReflection()">
+        Enter the Reflection Room →
+      </button>`;
+    completeArea.appendChild(finDiv);
+    pixelBadgeSetExpr('excited');
+    playPixelSequence('allComplete', null);
+    completeArea.scrollTop = completeArea.scrollHeight;
+  }, 1200);
+}
+
+// ══════════════════════════════════════════════════════
+//  INCREMENTAL DATA SAVING
+// ══════════════════════════════════════════════════════
+async function saveIncrementalData(scenarioIdx) {
+  if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
+  try {
+    const s = scenarioData[scenarioIdx];
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'incremental',
+        timestamp: new Date().toISOString(),
+        scenario_index: scenarioIdx + 1,
+        session_duration_min: ((Date.now() - sessionStart) / 60000).toFixed(1),
+        attempts: s.attempts,
+        best_score: s.bestScore,
+        prompts: s.prompts.join(' | '),
+        final_response: s.finalResponse,
+        oscqr_lit: s.oscqrLit,
+        self_report: s.selfReport || '',
+        screen_width: window.screen.width,
+      })
+    });
+  } catch(e) {
+    console.log('Incremental save skipped:', e.message);
+  }
+}
 const EXPRESSIONS = {
   neutral:     'images/pixel-neutral.png',
   thinking:    'images/pixel-thinking.png',
@@ -539,8 +1068,12 @@ const pixelDialogue = {
     { expr: 'encouraging', text: "Think about your range of learners and what kinds of flexibility would genuinely help each of them." },
   ],
   scenarioStart_2: [
-    { expr: 'neutral',     text: "Your final scenario is about authentic assessment — the kind that actually matters to students." },
+    { expr: 'neutral',     text: "Your final scored scenario is about authentic assessment — the kind that actually matters to students." },
     { expr: 'excited',     text: "Think community, real context, and student ownership. This one is really fun to design well." },
+  ],
+  scenarioStart_3: [
+    { expr: 'thinking',    text: "This last challenge is a little different from the others. I want you to stay alert." },
+    { expr: 'skeptical',   text: "Not everything an AI tells you is accurate — even when it sounds completely confident. Pay close attention to what comes back." },
   ],
 };
 
@@ -604,12 +1137,8 @@ function playPixelSequence(key, onDone) {
 //  INIT
 // ══════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  loadScenario(0);
-
-  setTimeout(() => {
-    playPixelSequence('scenarioStart_0', null);
-    setTimeout(() => playPixelSequence('welcome', null), 200);
-  }, 700);
+  // Show name modal first -- game starts after name is submitted
+  showNameModal();
 });
 
 // ══════════════════════════════════════════════════════
@@ -626,6 +1155,15 @@ function switchScenario(i, btn) {
   });
   btn.classList.add('active');
   btn.setAttribute('aria-selected', 'true');
+
+  // Scenario 4 has special card styling
+  const card = document.querySelector('.scenario-card');
+  if (i === 3) {
+    card.classList.add('s4-active');
+  } else {
+    card.classList.remove('s4-active');
+  }
+
   loadScenario(i);
   setTimeout(() => playPixelSequence(`scenarioStart_${i}`, null), 300);
 }
@@ -690,15 +1228,24 @@ function detectOSCQR(text, indicators) {
 // ══════════════════════════════════════════════════════
 //  CHAT MESSAGES
 // ══════════════════════════════════════════════════════
-function addMsg(role, html) {
+function addMsg(role, html, pixelExpr) {
   const area = document.getElementById('chat');
   const wrap = document.createElement('div');
   wrap.className = `message ${role}`;
   const isUser = role === 'user';
+
+  const initials = getInitials(playerName);
+  const hasName = playerName !== 'You';
+  const avatarHTML = isUser
+    ? `<div class="avatar user-av${hasName ? ' has-name' : ''}" aria-hidden="true">${initials}</div>`
+    : pixelAvatarHTML(pixelExpr || 'neutral');
+
+  const senderLabel = isUser ? playerName : 'Professor Pixel';
+
   wrap.innerHTML = `
-    <div class="avatar ${isUser ? 'user-av' : 'ai-av'}">${isUser ? 'YOU' : '🌿'}</div>
+    ${avatarHTML}
     <div class="bubble-wrap">
-      <div class="bubble-sender">${isUser ? 'Your prompt' : 'AI response'}</div>
+      <div class="bubble-sender">${senderLabel}</div>
       <div class="bubble">${html}</div>
     </div>`;
   area.appendChild(wrap);
@@ -710,10 +1257,12 @@ function addTyping() {
   const wrap = document.createElement('div');
   wrap.className = 'message ai';
   wrap.id = 'typing';
+  const src = PIXEL_EXPR['thinking'] || 'images/pixel-thinking.png';
   wrap.innerHTML = `
-    <div class="avatar ai-av">🌿</div>
+    <img class="pixel-chat-avatar" src="${src}" alt="Professor Pixel thinking"
+         onerror="this.outerHTML='<div class=\\'pixel-chat-avatar-fallback\\'>🧑‍🏫</div>'" />
     <div class="bubble-wrap">
-      <div class="bubble-sender">AI response</div>
+      <div class="bubble-sender">Professor Pixel</div>
       <div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>
     </div>`;
   area.appendChild(wrap);
@@ -732,6 +1281,12 @@ async function send() {
   const input = document.getElementById('promptInput');
   const text = input.value.trim();
   if (!text) return;
+
+  // Route Scenario 4 to its special handler
+  if (scenarioIndex === 3) {
+    sendScenario4(text);
+    return;
+  }
 
   attempts++;
   document.getElementById('attNum').textContent = attempts;
@@ -769,16 +1324,25 @@ async function send() {
     const active = detectOSCQR(reply, scenarios[scenarioIndex].oscqr);
     renderOSCQR(scenarios[scenarioIndex].oscqr, active);
 
-    // Track behavioral data for this attempt
+    // Track behavioral data
     trackPrompt(scenarioIndex, text, score.total, fmt(reply), active.map(id => {
       const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
       return ind ? ind.label : id;
     }));
 
-    addMsg('ai', fmt(reply) + buildFeedback(score));
+    // Pick expression for this response
+    let replyExpr = 'neutral';
+    if (score.total <= 1)      replyExpr = 'skeptical';
+    else if (score.total <= 3) replyExpr = 'encouraging';
+    else                        replyExpr = 'excited';
+
+    addMsg('ai', fmt(reply) + buildFeedback(score), replyExpr);
     gainXP(score.total * 6);
 
-    // Professor Pixel VN reaction based on score
+    // React via badge and coach card at key moments
+    pixelReactToScore(score.total);
+
+    // Full VN sequence for score-based feedback (after brief delay)
     setTimeout(() => {
       if (score.total <= 1)      playPixelSequence('vague');
       else if (score.total <= 3) playPixelSequence('decent');
@@ -872,6 +1436,14 @@ function gainXP(amount) {
 // ══════════════════════════════════════════════════════
 function markScenarioComplete() {
   scenarioCompleted[scenarioIndex] = true;
+
+  // Save incremental data for this scenario
+  saveIncrementalData(scenarioIndex);
+
+  // Unlock Scenario 4 when scenarios 1-3 are all done
+  const mainThreeDone = scenarioCompleted[0] && scenarioCompleted[1] && scenarioCompleted[2];
+  if (mainThreeDone) unlockScenario4();
+
   const allDone = scenarioCompleted.every(Boolean);
   const area = document.getElementById('chat');
   const div = document.createElement('div');
@@ -879,20 +1451,23 @@ function markScenarioComplete() {
 
   if (allDone && !document.getElementById('completeAllBtn')) {
     playSound('allComplete');
-    // Generate completion illustration
     generateSceneImage(
       "A celebratory cozy classroom scene: teacher and students celebrating success, confetti, warm light, plants, bulletin board covered in achievements. Soft watercolor, earthy tones.",
       document.getElementById('vnBoardImg'),
       document.getElementById('vnBoardLoading')
     );
     setTimeout(() => playPixelSequence('allComplete', null), 400);
+    pixelBadgeSetExpr('excited');
     div.innerHTML = `
       <p style="font-size:0.76rem;color:var(--ink-light);margin-bottom:10px;font-weight:600;">All three scenarios complete.</p>
       <button class="complete-btn" id="completeAllBtn" onclick="openReflection()">Enter the Reflection Room →</button>`;
   } else if (!allDone) {
     const done = scenarioCompleted.filter(Boolean).length;
     playSound('scenarioComplete');
-    setTimeout(() => playPixelSequence('scenarioComplete', null), 400);
+    setTimeout(() => {
+      playPixelSequence('scenarioComplete', null);
+      pixelCoachShow('scenarioComplete');
+    }, 400);
     div.innerHTML = `<p style="font-size:0.74rem;color:var(--ink-muted);">
       Scenario complete — ${3 - done} remaining before the Reflection Room unlocks.
     </p>`;

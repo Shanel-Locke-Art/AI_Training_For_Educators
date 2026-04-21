@@ -1447,3 +1447,823 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
   .complete-btn { border: 2px solid ButtonText; }
   .send-btn { border: 2px solid ButtonText; }
 }
+
+/* ══════════════════════════════════════════════════════
+   PROFESSOR PIXEL — CHAT INTEGRATION
+   ══════════════════════════════════════════════════════ */
+
+/* ── PIXEL BADGE (persistent corner portrait) ──────── */
+.pixel-badge {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 3px solid var(--forest-mid);
+  background: var(--forest-light);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(30,61,41,0.25);
+  cursor: default;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.pixel-badge:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px rgba(30,61,41,0.3);
+}
+
+.pixel-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+/* SVG fallback inside badge */
+.pixel-badge svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Expression ring — color changes with mood */
+.pixel-badge.mood-neutral     { border-color: var(--forest-mid); }
+.pixel-badge.mood-encouraging { border-color: var(--amber); }
+.pixel-badge.mood-excited     { border-color: var(--terracotta); }
+.pixel-badge.mood-skeptical   { border-color: #8b7355; }
+.pixel-badge.mood-proud       { border-color: var(--forest); }
+
+/* Pulse animation when expression changes */
+@keyframes badgePulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+.pixel-badge.pulse { animation: badgePulse 0.4s ease; }
+
+/* ── CHAT AREA — relative for badge positioning ─────── */
+.chat-area {
+  position: relative;
+}
+
+/* ── AI BUBBLE — Pixel as the responder ────────────── */
+/* Replace the plain 🌿 avatar with Pixel's portrait */
+.avatar.pixel-av {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--forest-mid);
+  background: var(--forest-light);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.avatar.pixel-av img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+.avatar.pixel-av svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── PIXEL SIDEBAR POPUP (key moment slide-in) ──────── */
+.pixel-popup {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  animation: pixelSlideIn 0.4s cubic-bezier(0.34,1.3,0.64,1) forwards;
+  opacity: 0;
+  max-width: 88%;
+}
+
+@keyframes pixelSlideIn {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.pixel-popup-portrait {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--forest-mid);
+  background: var(--forest-light);
+  flex-shrink: 0;
+  margin-top: 4px;
+  box-shadow: 0 2px 8px rgba(30,61,41,0.2);
+}
+
+.pixel-popup-portrait img,
+.pixel-popup-portrait svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+.pixel-popup-bubble {
+  background: #fef9c3;
+  border: 1.5px solid #e6d866;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg);
+  padding: 10px 14px;
+  position: relative;
+  box-shadow: 1px 2px 6px rgba(42,31,20,0.1);
+  flex: 1;
+}
+
+/* Speech bubble tail */
+.pixel-popup-bubble::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: -10px;
+  border: 5px solid transparent;
+  border-right-color: #e6d866;
+}
+
+.pixel-popup-bubble::after {
+  content: '';
+  position: absolute;
+  top: 11px;
+  left: -8px;
+  border: 4px solid transparent;
+  border-right-color: #fef9c3;
+}
+
+/* Folded corner */
+.pixel-popup-bubble .corner {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 14px; height: 14px;
+  background: linear-gradient(225deg, #cfc055 50%, #fef9c3 50%);
+  border-top-left-radius: 3px;
+}
+
+.pixel-popup-name {
+  font-family: 'Fraunces', serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6a5c00;
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+
+.pixel-popup-text {
+  font-size: 0.82rem;
+  color: #4a4000;
+  line-height: 1.55;
+  font-style: italic;
+}
+
+/* Auto-dismiss fade */
+@keyframes popupFade {
+  0%   { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; pointer-events: none; }
+}
+
+.pixel-popup.auto-dismiss {
+  animation: pixelSlideIn 0.4s cubic-bezier(0.34,1.3,0.64,1) forwards,
+             popupFade 6s ease 1s forwards;
+}
+
+/* ── MOBILE BADGE ──────────────────────────────────── */
+@media (max-width: 480px) {
+  .pixel-badge {
+    width: 44px;
+    height: 44px;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .pixel-popup-portrait {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   PROFESSOR PIXEL — INTEGRATED CHAT PRESENCE
+   ══════════════════════════════════════════════════════ */
+
+/* ── PIXEL AVATAR IN AI BUBBLES ────────────────────── */
+/* Replaces the plant emoji with her portrait thumbnail */
+.pixel-chat-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--forest-mid);
+  object-fit: cover;
+  object-position: top center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  background: var(--forest-light);
+  display: block;
+}
+
+/* Fallback emoji when image not loaded */
+.pixel-chat-avatar-fallback {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--forest-mid);
+  background: var(--forest-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ── PERSISTENT BADGE ───────────────────────────────── */
+.pixel-badge {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.pixel-badge:hover { transform: scale(1.08); }
+.pixel-badge:active { transform: scale(0.96); }
+
+.pixel-badge-portrait {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2.5px solid var(--forest-mid);
+  object-fit: cover;
+  object-position: top center;
+  background: var(--forest-light);
+  box-shadow: 0 3px 10px rgba(30,61,41,0.3);
+  display: block;
+  transition: border-color 0.3s ease;
+}
+
+.pixel-badge-portrait.reacting {
+  border-color: var(--amber);
+  animation: badgePulse 0.5s ease;
+}
+
+@keyframes badgePulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Fallback SVG badge when images not ready */
+.pixel-badge-fallback {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2.5px solid var(--forest-mid);
+  background: var(--forest-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 3px 10px rgba(30,61,41,0.3);
+}
+
+.pixel-badge-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.55rem;
+  color: var(--forest-mid);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--chalk);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 1px 7px;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(42,31,20,0.08);
+}
+
+/* ── COACH CARD POP-IN ──────────────────────────────── */
+.pixel-coach-card {
+  position: fixed;
+  right: -340px; /* starts off screen */
+  bottom: 140px;
+  width: 300px;
+  background: var(--chalk);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: -4px 4px 20px rgba(42,31,20,0.15);
+  z-index: 95;
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  transition: right 0.4s cubic-bezier(0.34,1.2,0.64,1);
+  pointer-events: none;
+}
+
+.pixel-coach-card.visible {
+  right: 16px;
+  pointer-events: all;
+}
+
+.pixel-coach-portrait {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--forest-mid);
+  object-fit: cover;
+  object-position: top center;
+  background: var(--forest-light);
+  flex-shrink: 0;
+  display: block;
+}
+
+.pixel-coach-fallback {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--forest-mid);
+  background: var(--forest-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.pixel-coach-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.pixel-coach-name {
+  font-family: 'Fraunces', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--forest-dark);
+  margin-bottom: 4px;
+}
+
+.pixel-coach-msg {
+  font-size: 0.78rem;
+  color: var(--ink-mid);
+  line-height: 1.55;
+}
+
+/* Speech bubble tail pointing right toward badge */
+.pixel-coach-card::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  bottom: 20px;
+  width: 0; height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid var(--border);
+}
+
+.pixel-coach-card::before {
+  content: '';
+  position: absolute;
+  right: -6px;
+  bottom: 21px;
+  width: 0; height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 7px solid var(--chalk);
+  z-index: 1;
+}
+
+.pixel-coach-dismiss {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.pixel-coach-dismiss:hover { color: var(--ink); }
+
+/* ── MOBILE ADJUSTMENTS ─────────────────────────────── */
+@media (max-width: 480px) {
+  .pixel-badge {
+    bottom: 74px;
+    right: 10px;
+  }
+
+  .pixel-badge-portrait,
+  .pixel-badge-fallback {
+    width: 44px;
+    height: 44px;
+  }
+
+  .pixel-coach-card {
+    width: calc(100vw - 32px);
+    right: -100vw;
+    bottom: 120px;
+  }
+
+  .pixel-coach-card.visible {
+    right: 16px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE AVATAR SIZE FIX + SCENARIO 4 STYLES
+   ══════════════════════════════════════════════════════ */
+
+/* ── LARGER CHAT AVATARS ON MOBILE ─────────────────── */
+@media (max-width: 480px) {
+  .pixel-chat-avatar,
+  .pixel-chat-avatar-fallback {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+  }
+
+  .avatar.user-av {
+    width: 44px;
+    height: 44px;
+    font-size: 10px;
+  }
+}
+
+/* ── SCENARIO 4 — CRITICAL THINKING UNLOCK ─────────── */
+
+/* Unlocked tab style — terracotta to signal something different */
+.tab-btn.unlocked-s4 {
+  color: var(--terracotta);
+  border-bottom-color: var(--terracotta);
+  position: relative;
+}
+
+.tab-btn.unlocked-s4::after {
+  content: '!';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 14px;
+  height: 14px;
+  background: var(--terracotta);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.55rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Scenario 4 card gets a warm amber tone */
+.scenario-card.s4-active {
+  background: var(--amber-light);
+  border-bottom-color: rgba(196,124,45,0.4);
+}
+
+.scenario-card.s4-active .scenario-label {
+  color: var(--amber-dark);
+  background: white;
+  border-color: rgba(196,124,45,0.3);
+}
+
+.scenario-card.s4-active .scenario-desc {
+  color: var(--amber-dark);
+}
+
+/* ── PIXEL INTERRUPT BUBBLE ─────────────────────────── */
+/* Special inline message when Pixel breaks the fourth wall */
+.pixel-interrupt {
+  display: flex;
+  gap: 10px;
+  animation: slideUp 0.35s ease forwards;
+  opacity: 0;
+  margin: 4px 0;
+}
+
+.pixel-interrupt-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2.5px solid var(--terracotta);
+  object-fit: cover;
+  object-position: top center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  box-shadow: 0 0 0 3px rgba(196,98,45,0.2);
+}
+
+.pixel-interrupt-fallback {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2.5px solid var(--terracotta);
+  background: var(--terra-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.pixel-interrupt-bubble {
+  background: var(--terra-light);
+  border: 1.5px solid rgba(196,98,45,0.35);
+  border-top-left-radius: 4px;
+  border-radius: var(--radius-lg);
+  padding: 11px 14px;
+  font-size: 0.86rem;
+  line-height: 1.65;
+  color: var(--terra-dark);
+  box-shadow: 1px 2px 6px rgba(196,98,45,0.1);
+  max-width: 82%;
+}
+
+.pixel-interrupt-sender {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.59rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--terracotta);
+  padding: 0 6px;
+  margin-bottom: 3px;
+}
+
+/* ── REVEAL PANEL ───────────────────────────────────── */
+.reveal-panel {
+  background: var(--chalk);
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--terracotta);
+  border-radius: var(--radius);
+  margin-top: 10px;
+  overflow: hidden;
+  animation: slideUp 0.4s ease 0.3s both;
+}
+
+.reveal-header {
+  background: var(--terra-light);
+  padding: 8px 14px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.63rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--terracotta);
+  border-bottom: 1px solid rgba(196,98,45,0.2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reveal-body {
+  padding: 12px 14px;
+}
+
+.reveal-item {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.reveal-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.reveal-item-label {
+  font-family: 'Fraunces', serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--terracotta);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reveal-item-text {
+  font-size: 0.8rem;
+  color: var(--ink-mid);
+  line-height: 1.65;
+}
+
+.reveal-item-text strong { color: var(--ink); }
+
+/* ── SELF-REPORT QUESTION ───────────────────────────── */
+.s4-self-report {
+  background: var(--amber-light);
+  border: 1.5px solid rgba(196,124,45,0.3);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-top: 12px;
+  animation: slideUp 0.4s ease 0.6s both;
+}
+
+.s4-self-report-q {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--amber-dark);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.s4-self-report-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.s4-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--amber);
+  background: white;
+  color: var(--amber-dark);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 44px;
+}
+
+.s4-btn:hover { background: var(--amber); color: white; }
+.s4-btn.selected { background: var(--amber); color: white; border-color: var(--amber-dark); }
+
+/* ── AI LITERACY TIPS ───────────────────────────────── */
+.literacy-tip {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.79rem;
+  color: var(--ink-mid);
+  line-height: 1.6;
+}
+
+.literacy-tip:last-child { border-bottom: none; }
+
+.literacy-tip-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+@media (max-width: 480px) {
+  .pixel-interrupt-bubble { max-width: 88%; }
+}
+
+/* ══════════════════════════════════════════════════════
+   NAME ENTRY MODAL
+   ══════════════════════════════════════════════════════ */
+.name-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(44,62,53,0.92);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background-image:
+    radial-gradient(ellipse at 25% 20%, rgba(74,124,94,0.2) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 80%, rgba(196,124,45,0.12) 0%, transparent 55%);
+}
+
+.name-modal-overlay.visible { opacity: 1; }
+
+.name-modal {
+  background: var(--chalk);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 420px;
+  padding: 32px 28px 24px;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.35);
+  text-align: center;
+  animation: pinDrop 0.45s ease;
+}
+
+.name-modal-icon {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.name-modal-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.name-modal-sub {
+  font-size: 0.8rem;
+  color: var(--ink-light);
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+.name-modal-input {
+  width: 100%;
+  background: var(--cream);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 12px 16px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 14px;
+  letter-spacing: 0.02em;
+}
+
+.name-modal-input:focus {
+  border-color: var(--forest-mid);
+  box-shadow: 0 0 0 3px rgba(45,90,61,0.12);
+  background: #fff;
+}
+
+.name-modal-input::placeholder {
+  color: var(--ink-muted);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 400;
+  font-size: 0.9rem;
+  letter-spacing: 0;
+}
+
+.name-modal-btn {
+  width: 100%;
+  padding: 13px;
+  background: var(--forest);
+  border: 2px solid var(--forest-dark);
+  border-radius: var(--radius);
+  color: #d4edd9;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 48px;
+  box-shadow: 0 2px 6px rgba(30,61,41,0.25);
+  letter-spacing: 0.01em;
+}
+
+.name-modal-btn:hover {
+  background: var(--forest-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(30,61,41,0.3);
+}
+
+.name-modal-skip {
+  display: block;
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 6px;
+  transition: color 0.15s;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.name-modal-skip:hover { color: var(--ink-light); }
+
+/* User avatar with initials when name is set */
+.avatar.user-av.has-name {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
