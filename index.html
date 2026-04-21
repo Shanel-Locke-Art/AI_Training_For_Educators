@@ -345,7 +345,7 @@ function startGame() {
 //  Paste your Google Apps Script Web App URL into SHEETS_URL
 // ══════════════════════════════════════════════════════
 const SURVEY_MODE   = 'sheets';
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwkWQ6USBYgNEY0oSl7u3-jquY9aUggVwywQso4thwJe7doFukjgBl6EdGLuaQ3SOPR/exec';
+const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbwkWQ6USBYgNEY0oSl7u3-jquY9aUggVwywQso4thwJe7doFukjgBl6EdGLuaQ3SOPR/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 
 // ══════════════════════════════════════════════════════
@@ -888,26 +888,29 @@ async function saveIncrementalData(scenarioIdx) {
   if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
   try {
     const s = scenarioData[scenarioIdx];
+    const payload = {
+      type: 'incremental',
+      timestamp: new Date().toISOString(),
+      scenario_index: scenarioIdx + 1,
+      session_duration_min: ((Date.now() - sessionStart) / 60000).toFixed(1),
+      attempts: s.attempts,
+      best_score: s.bestScore,
+      prompts: s.prompts.join(' | '),
+      final_response: s.finalResponse,
+      oscqr_lit: s.oscqrLit,
+      self_report: s.selfReport || '',
+      screen_width: window.screen.width,
+    };
+    console.log('[PromptCraft] Sending incremental data for scenario', scenarioIdx + 1, payload);
     await fetch(SHEETS_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'incremental',
-        timestamp: new Date().toISOString(),
-        scenario_index: scenarioIdx + 1,
-        session_duration_min: ((Date.now() - sessionStart) / 60000).toFixed(1),
-        attempts: s.attempts,
-        best_score: s.bestScore,
-        prompts: s.prompts.join(' | '),
-        final_response: s.finalResponse,
-        oscqr_lit: s.oscqrLit,
-        self_report: s.selfReport || '',
-        screen_width: window.screen.width,
-      })
+      body: JSON.stringify(payload)
     });
+    console.log('[PromptCraft] Incremental save sent for scenario', scenarioIdx + 1);
   } catch(e) {
-    console.log('Incremental save skipped:', e.message);
+    console.warn('[PromptCraft] Incremental save failed:', e.message);
   }
 }
 const EXPRESSIONS = {
