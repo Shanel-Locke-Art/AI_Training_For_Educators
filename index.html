@@ -220,7 +220,6 @@ let history = [];
 let scenarioCompleted = [false, false, false];
 
 // ── SCREEN READER UTILITY ─────────────────────────────
-// Inject sr-only style once
 (function() {
   const s = document.createElement('style');
   s.textContent = '.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}';
@@ -228,18 +227,86 @@ let scenarioCompleted = [false, false, false];
 })();
 
 // ══════════════════════════════════════════════════════
-//  SURVEY ROUTING
-//  Options:
-//    'netlify' — submissions captured in Netlify Forms dashboard
-//    'sheets'  — submissions sent to Google Sheets via Apps Script
-//    'qualtrics' — opens Qualtrics survey link after completion
-//
-//  For Google Sheets: paste your Apps Script Web App URL below
-//  For Qualtrics: paste your survey URL below
+//  SURVEY CONFIGURATION
+//  Change SURVEY_MODE to 'sheets' or 'qualtrics' when ready
+//  Paste your Google Apps Script Web App URL into SHEETS_URL
 // ══════════════════════════════════════════════════════
-const SURVEY_MODE = 'netlify'; // change to 'sheets' or 'qualtrics' when ready
-const SHEETS_URL  = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+const SURVEY_MODE   = 'sheets';
+const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbwkWQ6USBYgNEY0oSl7u3-jquY9aUggVwywQso4thwJe7doFukjgBl6EdGLuaQ3SOPR/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
+
+// ══════════════════════════════════════════════════════
+//  BEHAVIORAL DATA TRACKING
+//  Records rich session data for dissertation analysis
+// ══════════════════════════════════════════════════════
+const sessionStart = Date.now();
+
+// Per-scenario tracking object
+const scenarioData = [
+  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '' },
+  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '' },
+  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '' },
+];
+
+function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
+  const s = scenarioData[scenarioIdx];
+  s.attempts++;
+  s.prompts.push(promptText);
+  if (score > s.bestScore) s.bestScore = score;
+  s.finalResponse = aiResponse.replace(/<[^>]+>/g, '').substring(0, 300);
+  s.oscqrLit = oscqrActive.join(', ');
+}
+
+function buildSessionPayload(formData) {
+  const durationMin = ((Date.now() - sessionStart) / 60000).toFixed(1);
+  const totalAttempts = scenarioData.reduce((sum, s) => sum + s.attempts, 0);
+
+  return {
+    // Timing
+    timestamp:            new Date().toISOString(),
+    session_duration_min: parseFloat(durationMin),
+
+    // Participant
+    participant_id:       formData.get('participant_id') || 'anonymous',
+
+    // Game summary
+    scenarios_completed:  scenarioCompleted.filter(Boolean).length,
+    total_xp:             Math.round(xp),
+    total_attempts:       totalAttempts,
+
+    // Scenario 1
+    s1_attempts:          scenarioData[0].attempts,
+    s1_best_score:        scenarioData[0].bestScore,
+    s1_prompts:           scenarioData[0].prompts.join(' | '),
+    s1_final_response:    scenarioData[0].finalResponse,
+    s1_oscqr:             scenarioData[0].oscqrLit,
+
+    // Scenario 2
+    s2_attempts:          scenarioData[1].attempts,
+    s2_best_score:        scenarioData[1].bestScore,
+    s2_prompts:           scenarioData[1].prompts.join(' | '),
+    s2_final_response:    scenarioData[1].finalResponse,
+    s2_oscqr:             scenarioData[1].oscqrLit,
+
+    // Scenario 3
+    s3_attempts:          scenarioData[2].attempts,
+    s3_best_score:        scenarioData[2].bestScore,
+    s3_prompts:           scenarioData[2].prompts.join(' | '),
+    s3_final_response:    scenarioData[2].finalResponse,
+    s3_oscqr:             scenarioData[2].oscqrLit,
+
+    // Reflection room responses
+    q1_surprise:          formData.get('q1_surprise')  || '',
+    q2_change:            formData.get('q2_change')    || '',
+    q3_practice:          formData.get('q3_practice')  || '',
+    q4_other:             formData.get('q4_other')     || '',
+
+    // Browser/device metadata
+    user_agent:           navigator.userAgent,
+    screen_width:         window.screen.width,
+    referrer:             document.referrer || 'direct'
+  };
+}
 
 // ══════════════════════════════════════════════════════
 //  AUDIO
@@ -698,10 +765,16 @@ async function send() {
     const reply = data.content[0].text;
     history.push({ role: 'assistant', content: reply });
 
+    const score = scorePrompt(text);
     const active = detectOSCQR(reply, scenarios[scenarioIndex].oscqr);
     renderOSCQR(scenarios[scenarioIndex].oscqr, active);
 
-    const score = scorePrompt(text);
+    // Track behavioral data for this attempt
+    trackPrompt(scenarioIndex, text, score.total, fmt(reply), active.map(id => {
+      const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
+      return ind ? ind.label : id;
+    }));
+
     addMsg('ai', fmt(reply) + buildFeedback(score));
     gainXP(score.total * 6);
 
@@ -848,7 +921,6 @@ async function handleReflectionSubmit(e) {
   const formData = new FormData(e.target);
 
   // ── QUALTRICS MODE ─────────────────────────────────
-  // Opens Qualtrics in a new tab, shows success locally
   if (SURVEY_MODE === 'qualtrics') {
     window.open(QUALTRICS_URL, '_blank', 'noopener');
     document.getElementById('refForm').style.display = 'none';
@@ -858,30 +930,42 @@ async function handleReflectionSubmit(e) {
 
   // ── GOOGLE SHEETS MODE ─────────────────────────────
   if (SURVEY_MODE === 'sheets') {
+    if (!SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+      alert('Google Sheets URL is not configured yet. Check SHEETS_URL in the script.');
+      btn.disabled = false;
+      btn.textContent = 'Submit Reflection';
+      return;
+    }
     try {
-      const payload = {};
-      formData.forEach((v, k) => payload[k] = v);
-      payload.timestamp = new Date().toISOString();
-      payload.scenario_count = scenarioCompleted.filter(Boolean).length;
+      const payload = buildSessionPayload(formData);
 
       await fetch(SHEETS_URL, {
         method: 'POST',
-        mode: 'no-cors', // Apps Script requires no-cors
+        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      // no-cors means we cannot read the response, assume success
+      // no-cors means we cannot read the response status
+      // assume success and show confirmation
       document.getElementById('refForm').style.display = 'none';
       document.getElementById('refSuccess').style.display = 'block';
     } catch(err) {
-      btn.disabled = false;
-      btn.textContent = 'Submit Reflection';
-      alert('Could not submit. Please check your connection and try again.');
+      console.error('Sheets submission error:', err);
+      // Fall back to Netlify Forms silently
+      try {
+        await fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(formData).toString()
+        });
+      } catch(_) {}
+      document.getElementById('refForm').style.display = 'none';
+      document.getElementById('refSuccess').style.display = 'block';
     }
     return;
   }
 
-  // ── NETLIFY FORMS MODE (default) ───────────────────
+  // ── NETLIFY FORMS MODE (fallback) ──────────────────
   try {
     const res = await fetch('/', {
       method: 'POST',
