@@ -2687,3 +2687,236 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
   .hint-chip { font-size: 0.62rem; padding: 3px 8px; }
   .memory-hint { font-size: 0.72rem; }
 }
+
+/* ══════════════════════════════════════════════════════
+   TYPOGRAPHY — COZY ACADEMIC EDITION
+   Lora replaces Nunito for body/bubble text
+   Fraunces stays for display/character text
+   Nunito stays for UI chrome (buttons, labels, chips)
+   ══════════════════════════════════════════════════════ */
+
+/* Body text in chat bubbles — Lora gives a literary feel */
+.bubble {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+
+/* User prompt stays monospace — feels like typing a command */
+.message.user .bubble {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.8rem;
+}
+
+/* Scenario challenge text gets Lora for gravitas */
+.scenario-desc {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+/* Welcome card body text */
+.welcome-body {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.84rem;
+  line-height: 1.8;
+}
+
+/* Pixel's inline chat messages */
+.pixel-interrupt-bubble {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.86rem;
+  font-style: italic;
+}
+
+/* Reflection room body text */
+.ref-subtitle,
+.ref-label,
+.ref-success-body {
+  font-family: 'Lora', Georgia, serif;
+}
+
+/* VN dialogue box */
+.vn-text {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1.15rem;
+  line-height: 1.7;
+}
+
+/* VN speaker name stays Fraunces */
+.vn-speaker {
+  font-family: 'Fraunces', serif;
+}
+
+/* Pixel coach message */
+.pixel-coach-msg {
+  font-family: 'Lora', Georgia, serif;
+  font-style: italic;
+}
+
+/* Feedback tips */
+.fp-tips,
+.fp-success {
+  font-family: 'Lora', Georgia, serif;
+}
+
+/* Memory hint */
+.memory-hint {
+  font-family: 'Lora', Georgia, serif;
+}
+
+/* Guided builder label text */
+.guided-label {
+  font-family: 'Nunito', sans-serif; /* stays UI chrome */
+}
+
+/* ══════════════════════════════════════════════════════
+   MUSIC TOGGLE BUTTON
+   ══════════════════════════════════════════════════════ */
+.music-toggle {
+  background: rgba(74,124,94,0.2);
+  border: 1px solid var(--chalk-green);
+  border-radius: 6px;
+  color: #a8d5b5;
+  font-size: 0.9rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.music-toggle:hover {
+  background: rgba(74,124,94,0.35);
+}
+
+.music-toggle.muted {
+  opacity: 0.45;
+  border-style: dashed;
+}
+
+@media (max-width: 480px) {
+  .music-toggle {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   LORA FONT OVERRIDES — Cozy Academic Typography
+   ══════════════════════════════════════════════════════ */
+
+/* Logo — Lora gives it a worn, literary quality */
+.logo-name {
+  font-family: 'Lora', serif;
+}
+
+/* VN speaker name */
+.vn-speaker {
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+/* Scenario challenge text on smartboard */
+.vn-board-text {
+  font-family: 'Lora', serif;
+}
+
+/* Name modal title */
+.name-modal-title {
+  font-family: 'Lora', serif;
+}
+
+/* Name modal input — Lora makes entered names feel special */
+.name-modal-input {
+  font-family: 'Lora', serif;
+}
+
+/* Welcome card title */
+.welcome-title {
+  font-family: 'Lora', serif;
+}
+
+/* Completion button */
+.complete-btn {
+  font-family: 'Lora', serif;
+}
+
+/* Ref room title and submit */
+.ref-title {
+  font-family: 'Lora', serif;
+}
+
+.ref-submit {
+  font-family: 'Lora', serif;
+}
+
+.ref-close-btn {
+  font-family: 'Lora', serif;
+}
+
+/* Pixel coach name in sticky note */
+.pixel-coach-name,
+.pixel-name {
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+/* Professor Pixel inline sender label */
+.bubble-sender {
+  font-family: 'Source Code Pro', monospace;
+}
+
+/* Guided builder send button */
+.guided-send-btn {
+  font-family: 'Lora', serif;
+}
+
+/* Reveal panel headers */
+.reveal-item-label {
+  font-family: 'Lora', serif;
+}
+
+/* ══════════════════════════════════════════════════════
+   MUSIC TOGGLE BUTTON
+   ══════════════════════════════════════════════════════ */
+.music-toggle {
+  background: rgba(74,124,94,0.2);
+  border: 1px solid var(--chalk-green);
+  border-radius: 6px;
+  color: rgba(240,237,232,0.7);
+  font-size: 0.9rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.music-toggle:hover {
+  background: rgba(74,124,94,0.35);
+  color: rgba(240,237,232,0.95);
+}
+
+.music-toggle.muted {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+@media (max-width: 480px) {
+  .music-toggle {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+}

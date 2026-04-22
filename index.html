@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 </head>
@@ -72,6 +72,10 @@
         <div class="xp-fill" id="xpFill"></div>
       </div>
     </div>
+    <button class="music-toggle" id="musicToggle"
+            onclick="toggleMusic()"
+            aria-label="Toggle background music"
+            title="Toggle music">🎵</button>
   </div>
 </header>
 
@@ -323,6 +327,10 @@ function getInitials(name) {
 }
 
 function startGame() {
+  // Initialise music on first user interaction (browser autoplay policy)
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reducedMotion) initMusic();
+
   loadScenario(0);
   setTimeout(() => {
     playPixelSequence('scenarioStart_0', null);
@@ -452,6 +460,69 @@ const sounds = audioReady ? {
 
 function playSound(name) {
   if (audioReady && sounds[name]) sounds[name].play();
+}
+
+// ── BACKGROUND MUSIC SYSTEM ───────────────────────────
+// Lo-fi background track: audio/background.mp3
+// Recommended source: pixabay.com/music — search "lofi study"
+// Pick a CC0 track, download as MP3, rename to background.mp3
+// Fades in during VN moments, fades to barely-there during gameplay
+
+const MUSIC_VOL_VN   = 0.35;  // volume during VN overlay
+const MUSIC_VOL_GAME = 0.08;  // near-silent during gameplay
+const MUSIC_FADE_MS  = 2000;  // fade duration ms
+
+let bgMusic      = null;
+let musicEnabled = false;
+let musicMuted   = false;
+let musicReady   = false;
+
+function initMusic() {
+  if (bgMusic) return;
+  bgMusic = new Howl({
+    src: ['audio/background.mp3'],
+    loop: true,
+    volume: 0,
+    html5: true,        // required for mobile autoplay
+    onload: () => { musicReady = true; },
+    onloaderror: () => { bgMusic = null; }  // file not found — silent fail
+  });
+}
+
+function musicFadeTo(targetVol, durationMs) {
+  if (!bgMusic || !musicReady || musicMuted) return;
+  bgMusic.fade(bgMusic.volume(), targetVol, durationMs);
+}
+
+function musicStartVN() {
+  if (!bgMusic || musicMuted) return;
+  if (!musicEnabled) {
+    musicEnabled = true;
+    bgMusic.play();
+    bgMusic.fade(0, MUSIC_VOL_VN, MUSIC_FADE_MS);
+  } else {
+    musicFadeTo(MUSIC_VOL_VN, MUSIC_FADE_MS);
+  }
+}
+
+function musicEndVN() {
+  musicFadeTo(MUSIC_VOL_GAME, MUSIC_FADE_MS);
+}
+
+function toggleMusic() {
+  const btn = document.getElementById('musicToggle');
+  musicMuted = !musicMuted;
+  btn.classList.toggle('muted', musicMuted);
+  btn.setAttribute('aria-label', musicMuted ? 'Unmute background music' : 'Mute background music');
+  btn.textContent = musicMuted ? '🔇' : '🎵';
+  if (bgMusic && musicReady) {
+    if (musicMuted) {
+      bgMusic.fade(bgMusic.volume(), 0, 600);
+    } else if (musicEnabled) {
+      const isVNOpen = document.getElementById('vnOverlay')?.classList.contains('active');
+      bgMusic.fade(0, isVNOpen ? MUSIC_VOL_VN : MUSIC_VOL_GAME, 600);
+    }
+  }
 }
 
 // ══════════════════════════════════════════════════════
@@ -1310,8 +1381,9 @@ function vnPlayNext() {
       const overlay = document.getElementById('vnOverlay');
       overlay.classList.remove('active');
       document.getElementById('vnCharacter').classList.remove('visible');
-      // Return focus to prompt input when VN closes
-      document.getElementById('promptInput').focus();
+      document.getElementById('promptInput')?.focus();
+      // Fade music down when VN closes
+      musicEndVN();
     }, 300);
     vnTyping = false;
     return;
@@ -1324,11 +1396,13 @@ function vnPlayNext() {
   const overlay = document.getElementById('vnOverlay');
   overlay.classList.add('active');
 
+  // Fade music up when VN opens
+  musicStartVN();
+
   vnSetExpression(expression);
 
   setTimeout(() => {
     document.getElementById('vnCharacter').classList.add('visible');
-    // Move focus to dialogue box for keyboard users
     document.getElementById('vnDialogue').focus();
   }, 100);
 
