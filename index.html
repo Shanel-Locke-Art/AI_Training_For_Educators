@@ -344,7 +344,7 @@ function startGame() {
 //  Paste your Google Apps Script Web App URL into SHEETS_URL
 // ══════════════════════════════════════════════════════
 const SURVEY_MODE   = 'sheets';
-const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbwkWQ6USBYgNEY0oSl7u3-jquY9aUggVwywQso4thwJe7doFukjgBl6EdGLuaQ3SOPR/exec';
+const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbx8aj3HJRNtCEFr5dyS_9oyoQjS5N_V80ofzZVg7ajwB6ufMA85TzqBiB8PfWP3Pf17/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 
 // ══════════════════════════════════════════════════════
@@ -901,16 +901,19 @@ const SCENARIO_NAMES = [
   'Scenario 2: Differentiation',
   'Scenario 3: Assessment',
   'Scenario 4: Critical Thinking',
-  'Scenario 5: Predict the Output',
+  'Scenario 5: Predict the Output', // S4 uses its own card, but keep for reference
   'Scenario 6: Bias and Context',
-  null // S6 leads to reflection room
+  null // S6 leads to reflection room, no next
 ];
 
 const SCORE_THRESHOLD = 3; // score out of 5 needed to show nav card
 
 function maybeShowNavCard(score) {
-  // Only show for scenarios 1-5 (not S4 which has its own flow, not S6)
-  if (scenarioIndex >= 3) return;
+  // S4 has its own nav card shown in addPixelS4Closing -- skip here
+  if (scenarioIndex === 3) return;
+  // S6 is the last scenario -- no next to navigate to
+  if (scenarioIndex >= 5) return;
+
   if (navCardShown[scenarioIndex]) return;
   if (score < SCORE_THRESHOLD) return;
 
@@ -1166,6 +1169,31 @@ function addPixelS4Closing(area) {
   document.getElementById('pixelBadgeLabel').textContent = 'proud';
 
   saveIncrementalData(3);
+
+  // Nav card pointing to S5 appears after Pixel's message
+  setTimeout(() => {
+    const navDiv = document.createElement('div');
+    navDiv.style.cssText = 'margin-top:6px;';
+    navDiv.innerHTML = `
+      <div class="scenario-nav-card">
+        <div class="scenario-nav-text">
+          <div class="scenario-nav-title">Ready to keep going?</div>
+          <div class="scenario-nav-sub">Scenario 5 will test your mental model of how AI thinks.</div>
+        </div>
+        <button class="scenario-nav-btn"
+                onclick="navigateToNext(4)"
+                aria-label="Move to Scenario 5">
+          Next scenario →
+        </button>
+      </div>
+      <button class="scenario-keep-link"
+              onclick="this.closest('div').remove()"
+              aria-label="Stay here">
+        Stay and review this scenario
+      </button>`;
+    area.appendChild(navDiv);
+    area.scrollTop = area.scrollHeight;
+  }, 1400);
 
   setTimeout(() => {
     scenarioCompleted[3] = true;
