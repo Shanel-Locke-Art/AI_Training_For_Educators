@@ -49,6 +49,7 @@
   <button class="dev-btn" onclick="devVN('skeptical')">VN: Skeptical</button>
   <button class="dev-btn" onclick="devComplete()">All Complete</button>
   <button class="dev-btn" onclick="devSkip()">Reflection Room</button>
+  <button class="dev-btn" onclick="window.open('/wall.html','_blank')" style="border-color:#c47c2d;color:#c47c2d;">💡 Ideas Wall</button>
   <button class="dev-btn" onclick="devGoS4()" style="border-color:#c4622d;color:#c4622d;">⚠️ Test S4</button>
   <button class="dev-btn" onclick="devGoS5()" style="border-color:#9b59b6;color:#9b59b6;">🔮 Test S5</button>
   <button class="dev-btn" onclick="devGoS6()" style="border-color:#e67e22;color:#e67e22;">⚖️ Test S6</button>
@@ -76,6 +77,10 @@
             onclick="toggleMusic()"
             aria-label="Toggle background music"
             title="Toggle music">🎵</button>
+    <a class="ideas-wall-btn" href="/wall.html" target="_blank"
+       aria-label="Open the Ideas Wall">
+      💡 Ideas Wall
+    </a>
   </div>
 </header>
 
@@ -258,6 +263,10 @@
           Your responses will contribute to research on how educators can use AI more effectively.<br><br>
           You are welcome to return to the scenarios at any time to continue practicing.
         </div>
+        <a href="/wall.html" target="_blank"
+           style="display:inline-block;margin-top:16px;margin-bottom:10px;padding:11px 24px;background:var(--forest);border:2px solid var(--forest-dark);border-radius:var(--radius);color:#d4edd9;font-family:'Fraunces',serif;font-weight:700;font-size:0.88rem;text-decoration:none;">
+          💡 See the Ideas Wall →
+        </a>
         <button class="ref-close-btn" onclick="closeReflection()">Return to the Prompt Lab</button>
       </div>
     </div>
@@ -378,41 +387,32 @@ function buildSessionPayload(formData) {
   const totalAttempts = scenarioData.reduce((sum, s) => sum + s.attempts, 0);
 
   return {
-    // Timing
     timestamp:            new Date().toISOString(),
     session_duration_min: parseFloat(durationMin),
-
-    // Participant
-    participant_id:       formData.get('participant_id') || 'anonymous',
+    participant_id:       formData ? (formData.get('participant_id') || 'anonymous') : 'anonymous',
     player_name:          playerName !== 'You' ? playerName : '',
-
-    // Game summary
     scenarios_completed:  scenarioCompleted.filter(Boolean).length,
     total_xp:             Math.round(xp),
     total_attempts:       totalAttempts,
 
-    // Scenario 1
     s1_attempts:          scenarioData[0].attempts,
     s1_best_score:        scenarioData[0].bestScore,
     s1_prompts:           scenarioData[0].prompts.join(' | '),
     s1_final_response:    scenarioData[0].finalResponse,
     s1_oscqr:             scenarioData[0].oscqrLit,
 
-    // Scenario 2
     s2_attempts:          scenarioData[1].attempts,
     s2_best_score:        scenarioData[1].bestScore,
     s2_prompts:           scenarioData[1].prompts.join(' | '),
     s2_final_response:    scenarioData[1].finalResponse,
     s2_oscqr:             scenarioData[1].oscqrLit,
 
-    // Scenario 3
     s3_attempts:          scenarioData[2].attempts,
     s3_best_score:        scenarioData[2].bestScore,
     s3_prompts:           scenarioData[2].prompts.join(' | '),
     s3_final_response:    scenarioData[2].finalResponse,
     s3_oscqr:             scenarioData[2].oscqrLit,
 
-    // Scenario 4 (Hallucination)
     s4_attempts:          scenarioData[3].attempts,
     s4_best_score:        scenarioData[3].bestScore,
     s4_prompts:           scenarioData[3].prompts.join(' | '),
@@ -420,29 +420,46 @@ function buildSessionPayload(formData) {
     s4_oscqr:             scenarioData[3].oscqrLit,
     s4_self_report:       scenarioData[3].selfReport || '',
 
-    // Scenario 5 (Predict)
     s5_attempts:          scenarioData[4].attempts,
     s5_prediction:        scenarioData[4].prediction || '',
     s5_prediction_correct: scenarioData[4].predictionCorrect ? 'yes' : 'no',
     s5_prompts:           scenarioData[4].prompts.join(' | '),
     s5_best_score:        scenarioData[4].bestScore,
 
-    // Scenario 6 (Bias)
     s6_attempts:          scenarioData[5].attempts,
     s6_prompts:           scenarioData[5].prompts.join(' | '),
     s6_best_score:        scenarioData[5].bestScore,
 
-    // Reflection room responses
-    q1_surprise:          formData.get('q1_surprise')  || '',
-    q2_change:            formData.get('q2_change')    || '',
-    q3_practice:          formData.get('q3_practice')  || '',
-    q4_other:             formData.get('q4_other')     || '',
+    q1_surprise:          formData ? (formData.get('q1_surprise')  || '') : '',
+    q2_change:            formData ? (formData.get('q2_change')    || '') : '',
+    q3_practice:          formData ? (formData.get('q3_practice')  || '') : '',
+    q4_other:             formData ? (formData.get('q4_other')     || '') : '',
 
-    // Browser/device metadata
     user_agent:           navigator.userAgent,
     screen_width:         window.screen.width,
     referrer:             document.referrer || 'direct'
   };
+}
+
+// Auto-save session data to Sheets independently of reflection form
+// Called after each scenario completes and when reflection room opens
+async function autoSaveSession(label) {
+  if (!SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
+  if (SURVEY_MODE !== 'sheets') return;
+  try {
+    const payload = buildSessionPayload(null);
+    payload.type = 'autosave';
+    payload.autosave_trigger = label;
+    console.log(`[PromptCraft] Auto-saving session (${label})`);
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {
+    // Silent fail -- reflection form will send full data anyway
+  }
 }
 
 // ══════════════════════════════════════════════════════
@@ -2377,6 +2394,9 @@ function markScenarioComplete() {
 //  REFLECTION ROOM
 // ══════════════════════════════════════════════════════
 function openReflection() {
+  // Auto-save all behavioral data before showing reflection room
+  // This means data is captured even if participant never submits the form
+  autoSaveSession('reflection_room_opened');
   document.getElementById('reflectionOverlay').classList.add('visible');
 }
 

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PromptCraft — Ideas Wall</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Nunito:wght@400;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── CSS VARIABLES (mirrors main game) ─────────── */
+    :root {
+      --forest:       #2d5a3d;
+      --forest-dark:  #1e3d29;
+      --forest-mid:   #4a7c5e;
+      --forest-light: #e8f0eb;
+      --chalk:        #f5f0e8;
+      --cream:        #faf6ee;
+      --parchment:    #f0ead8;
+      --amber:        #c47c2d;
+      --amber-light:  #fdf3e3;
+      --amber-dark:   #8b5e1a;
+      --ink:          #2a1f14;
+      --ink-mid:      #4a3728;
+      --ink-light:    #6b5544;
+      --ink-muted:    #9b8a7a;
+      --border:       #d6cfc0;
+      --radius:       10px;
+      --radius-lg:    16px;
+      --radius-xl:    22px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--parchment);
+      background-image:
+        radial-gradient(ellipse at 15% 10%, rgba(45,90,61,0.07) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 90%, rgba(196,124,45,0.07) 0%, transparent 50%);
+      min-height: 100vh;
+      font-family: 'Lora', Georgia, serif;
+      color: var(--ink);
+    }
+
+    /* ── HEADER ───────────────────────────────────── */
+    .wall-header {
+      background: var(--forest-dark);
+      background-image: linear-gradient(135deg, #1e3d29 0%, #2d5a3d 100%);
+      padding: 32px 24px 28px;
+      text-align: center;
+      border-bottom: 3px solid var(--amber);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wall-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(168,213,181,0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 50%, rgba(196,124,45,0.06) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    .wall-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(168,213,181,0.12);
+      border: 1px solid rgba(168,213,181,0.3);
+      border-radius: 99px;
+      padding: 4px 14px;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(168,213,181,0.8);
+      margin-bottom: 14px;
+    }
+
+    .wall-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 700;
+      color: #e8f5ed;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .wall-title em {
+      font-style: italic;
+      color: #a8d5b5;
+    }
+
+    .wall-subtitle {
+      font-size: 0.88rem;
+      color: rgba(232,245,237,0.7);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .wall-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .wall-stat {
+      text-align: center;
+    }
+
+    .wall-stat-num {
+      font-family: 'Fraunces', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #a8d5b5;
+      line-height: 1;
+    }
+
+    .wall-stat-label {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(168,213,181,0.5);
+      margin-top: 3px;
+    }
+
+    /* ── FILTER BAR ───────────────────────────────── */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px 20px 0;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .filter-btn {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 99px;
+      border: 1.5px solid var(--border);
+      background: var(--chalk);
+      color: var(--ink-light);
+      cursor: pointer;
+      transition: all 0.18s;
+      min-height: 36px;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--forest-mid);
+      color: var(--forest-dark);
+      background: var(--forest-light);
+    }
+
+    .filter-btn.active {
+      background: var(--forest);
+      border-color: var(--forest-dark);
+      color: #d4edd9;
+    }
+
+    /* ── MAIN GRID ────────────────────────────────── */
+    .wall-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      padding: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── IDEA CARD ────────────────────────────────── */
+    .idea-card {
+      background: var(--chalk);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 2px 8px rgba(42,31,20,0.06);
+      animation: cardIn 0.4s ease both;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .idea-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(42,31,20,0.1);
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .idea-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .idea-scenario-tag {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 99px;
+      flex-shrink: 0;
+    }
+
+    .tag-1 { background: #e8f0eb; color: #2d5a3d; border: 1px solid rgba(45,90,61,0.2); }
+    .tag-2 { background: #ebf0fc; color: #2d3d8b; border: 1px solid rgba(45,61,139,0.2); }
+    .tag-3 { background: #fdf3e3; color: #8b5e1a; border: 1px solid rgba(139,94,26,0.2); }
+    .tag-4 { background: #fdf0ef; color: #8b2a1a; border: 1px solid rgba(139,42,26,0.2); }
+    .tag-5 { background: #f5eef8; color: #5a2a8b; border: 1px solid rgba(90,42,139,0.2); }
+    .tag-6 { background: #fef8ec; color: #7a6010; border: 1px solid rgba(122,96,16,0.2); }
+
+    .idea-score {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 0.62rem;
+      color: var(--ink-muted);
+      flex-shrink: 0;
+    }
+
+    .idea-score span {
+      color: var(--amber);
+      font-weight: 600;
+    }
+
+    .idea-text {
+      font-size: 0.84rem;
+      line-height: 1.75;
+      color: var(--ink-mid);
+      flex: 1;
+    }
+
+    /* ── EMPTY / LOADING STATES ───────────────────── */
+    .wall-state {
+      text-align: center;
+      padding: 60px 20px;
+      grid-column: 1 / -1;
+    }
+
+    .wall-state-icon {
+      font-size: 2.5rem;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .wall-state-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .wall-state-sub {
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+
+    .loading-dots {
+      display: inline-flex;
+      gap: 5px;
+    }
+
+    .loading-dots span {
+      width: 7px;
+      height: 7px;
+      background: var(--forest-mid);
+      border-radius: 50%;
+      animation: blink 1.2s infinite;
+    }
+
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.25; }
+      40%           { opacity: 1; }
+    }
+
+    /* ── BACK LINK ────────────────────────────────── */
+    .back-bar {
+      text-align: center;
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+    }
+
+    .back-link {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .back-link:hover { color: var(--forest); }
+
+    /* ── REFRESH BTN ──────────────────────────────── */
+    .refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--forest-mid);
+      background: none;
+      border: 1.5px solid var(--forest-mid);
+      border-radius: 99px;
+      padding: 6px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      min-height: 36px;
+    }
+
+    .refresh-btn:hover {
+      background: var(--forest-light);
+    }
+
+    @media (max-width: 480px) {
+      .wall-grid { grid-template-columns: 1fr; padding: 12px; gap: 12px; }
+      .wall-title { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="wall-header">
+  <div class="wall-badge">🌿 PromptCraft</div>
+  <div class="wall-title">The <em>Ideas</em> Wall</div>
+  <div class="wall-subtitle">
+    Real instructional ideas generated during the Prompt Lab —
+    submitted anonymously by educators like you.
+  </div>
+  <div class="wall-stats">
+    <div class="wall-stat">
+      <div class="wall-stat-num" id="statTotal">—</div>
+      <div class="wall-stat-label">Ideas shared</div>
+    </div>
+    <div class="wall-stat">
+      <div class="wall-stat-num" id="statScenarios">—</div>
+      <div class="wall-stat-label">Scenarios covered</div>
+    </div>
+  </div>
+</header>
+
+<div class="filter-bar" id="filterBar">
+  <button class="filter-btn active" data-filter="all" onclick="filterIdeas('all', this)">All Ideas</button>
+  <button class="filter-btn" data-filter="1" onclick="filterIdeas('1', this)">Engagement</button>
+  <button class="filter-btn" data-filter="2" onclick="filterIdeas('2', this)">Differentiation</button>
+  <button class="filter-btn" data-filter="3" onclick="filterIdeas('3', this)">Assessment</button>
+</div>
+
+<main class="wall-grid" id="wallGrid">
+  <div class="wall-state">
+    <span class="wall-state-icon">🌿</span>
+    <div class="wall-state-title">Loading ideas</div>
+    <div class="wall-state-sub">
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</main>
+
+<div class="back-bar">
+  <button class="refresh-btn" onclick="loadIdeas()">↻ Refresh</button>
+  <br><br>
+  <a class="back-link" href="/">← Back to PromptCraft</a>
+</div>
+
+<script>
+  // ── CONFIG ────────────────────────────────────────
+  // Same SHEETS_URL as index.html -- reads from the same deployment
+  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxerDUIcFTjpMEHE-yejcyWMGssBaqNbmh8gARgKqYlyhngdFesWnt9kHKDp7Cso4fd/exec';
+
+  const SCENARIO_COLORS = { 1:'tag-1', 2:'tag-2', 3:'tag-3', 4:'tag-4', 5:'tag-5', 6:'tag-6' };
+  const SCENARIO_LABELS = {
+    1: 'Engagement', 2: 'Differentiation', 3: 'Assessment',
+    4: 'Critical Thinking', 5: 'Predict the Output', 6: 'Bias and Context'
+  };
+
+  let allIdeas = [];
+  let activeFilter = 'all';
+
+  // ── DEMO DATA ─────────────────────────────────────
+  // Shown when no real data is available yet
+  const DEMO_IDEAS = [
+    { scenario: 1, scenarioLabel: 'Engagement', score: 5,
+      idea: "Here's a compelling discussion prompt for your rural online students: 'Your grandparents' generation farmed this land differently than farmers do today. Interview an elder in your community about one agricultural practice that has changed — and consider whether that change was an improvement. Share what you learn with the class and respond to two classmates whose stories differ from yours.'" },
+    { scenario: 1, scenarioLabel: 'Engagement', score: 4,
+      idea: "Discussion Prompt — 'The Invisible Infrastructure': Your rural community relies on systems most people never think about — water, power, roads, emergency services. Choose one and research what would happen if it failed for 72 hours. Present your findings as a 2-minute 'emergency briefing' to the class and discuss: which systems are most vulnerable and why?" },
+    { scenario: 2, scenarioLabel: 'Differentiation', score: 5,
+      idea: "Differentiated Reading Activity — Three-Tier Approach: Tier 1 students receive a graphic novel adaptation with visual supports and key vocabulary pre-taught. Tier 2 students use the standard text with annotated margin questions. Tier 3 students read the primary source alongside a secondary analysis and write a comparative response. All tiers discuss the same essential question together." },
+    { scenario: 2, scenarioLabel: 'Differentiation', score: 4,
+      idea: "Choice Board Assessment: Students demonstrate understanding of watershed ecology through one of three options — (A) create an annotated map of the local watershed showing human impact zones, (B) write a letter to the county water board citing three specific data points from the unit, or (C) design a 5-slide community education presentation for younger students." },
+    { scenario: 3, scenarioLabel: 'Assessment', score: 5,
+      idea: "Authentic Assessment — Community Asset Audit: Students document three underutilized community assets (natural, cultural, or economic) using photography, interviews, and data. Final product is a professional-grade report presented to a local organization. Rubric assesses research quality, community voice representation, feasibility of recommendations, and presentation clarity." },
+  ];
+
+  // ── LOAD ──────────────────────────────────────────
+  async function loadIdeas() {
+    showLoading();
+
+    try {
+      const res = await fetch(`${SHEETS_URL}?action=getIdeas&t=${Date.now()}`);
+      const data = await res.json();
+
+      if (data.ideas && data.ideas.length > 0) {
+        allIdeas = data.ideas;
+      } else {
+        // No real data yet — show demo cards with a note
+        allIdeas = DEMO_IDEAS.map(d => ({ ...d, isDemo: true }));
+      }
+    } catch(e) {
+      // Network error or CORS -- show demo data
+      allIdeas = DEMO_IDEAS.map(d => ({ ...d, isDemo: true }));
+    }
+
+    renderIdeas();
+  }
+
+  function showLoading() {
+    document.getElementById('wallGrid').innerHTML = `
+      <div class="wall-state">
+        <span class="wall-state-icon">🌿</span>
+        <div class="wall-state-title">Loading ideas</div>
+        <div class="wall-state-sub">
+          <div class="loading-dots"><span></span><span></span><span></span></div>
+        </div>
+      </div>`;
+  }
+
+  // ── FILTER ────────────────────────────────────────
+  function filterIdeas(filter, btn) {
+    activeFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderIdeas();
+  }
+
+  // ── RENDER ────────────────────────────────────────
+  function renderIdeas() {
+    const grid = document.getElementById('wallGrid');
+    const filtered = activeFilter === 'all'
+      ? allIdeas
+      : allIdeas.filter(i => String(i.scenario) === activeFilter);
+
+    // Update stats
+    const scenariosPresent = new Set(allIdeas.map(i => i.scenario)).size;
+    document.getElementById('statTotal').textContent = allIdeas.filter(i => !i.isDemo).length || '—';
+    document.getElementById('statScenarios').textContent = allIdeas.filter(i => !i.isDemo).length
+      ? scenariosPresent : '—';
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div class="wall-state">
+          <span class="wall-state-icon">📭</span>
+          <div class="wall-state-title">No ideas here yet</div>
+          <div class="wall-state-sub">Be the first to complete this scenario and add an idea to the wall.</div>
+        </div>`;
+      return;
+    }
+
+    const isDemoSet = filtered.some(i => i.isDemo);
+    let html = '';
+
+    if (isDemoSet) {
+      html += `<div style="grid-column:1/-1;text-align:center;padding:12px 0 4px;">
+        <span style="font-family:'Source Code Pro',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-muted);background:var(--cream);border:1px solid var(--border);border-radius:99px;padding:3px 12px;">
+          Sample ideas — real submissions will appear here
+        </span>
+      </div>`;
+    }
+
+    filtered.forEach((idea, idx) => {
+      const tagClass = SCENARIO_COLORS[idea.scenario] || 'tag-1';
+      const label = idea.scenarioLabel || SCENARIO_LABELS[idea.scenario] || `Scenario ${idea.scenario}`;
+      const delay = (idx % 12) * 60;
+      const stars = '★'.repeat(idea.score) + '☆'.repeat(5 - idea.score);
+
+      html += `
+        <div class="idea-card" style="animation-delay:${delay}ms">
+          <div class="idea-card-header">
+            <span class="idea-scenario-tag ${tagClass}">${label}</span>
+            <span class="idea-score"><span>${stars}</span> ${idea.score}/5</span>
+          </div>
+          <div class="idea-text">${escHtml(idea.idea)}</div>
+        </div>`;
+    });
+
+    grid.innerHTML = html;
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Load on page open
+  loadIdeas();
+</script>
+</body>
+</html>
