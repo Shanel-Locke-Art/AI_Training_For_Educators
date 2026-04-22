@@ -270,6 +270,7 @@
 // ══════════════════════════════════════════════════════
 let xp = 0;
 let attempts = 0;
+let lastPromptText = ''; // tracks last prompt for pre-filling on next attempt
 let scenarioIndex = 0;
 let history = [];
 let scenarioCompleted = [false, false, false, false, false, false];
@@ -1701,6 +1702,7 @@ window.addEventListener('DOMContentLoaded', () => {
 function switchScenario(i, btn) {
   scenarioIndex = i;
   attempts = 0;
+  lastPromptText = '';
   history = [];
   document.getElementById('attNum').textContent = '0';
   document.querySelectorAll('.tab-btn').forEach(b => {
@@ -2139,6 +2141,7 @@ async function sendMain(text) {
   if (!text) return;
 
   attempts++;
+  lastPromptText = text; // save for pre-filling next attempt
   const attEl = document.getElementById('attNum');
   if (attEl) attEl.textContent = attempts;
   addMsg('user', esc(text));
@@ -2226,15 +2229,47 @@ async function sendMain(text) {
     const btn = document.getElementById('sendBtn');
     if (btn) btn.disabled = false;
     document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+
+    // Pre-fill input with last prompt so player can refine rather than rewrite
+    if (lastPromptText && scenarioIndex < 3) {
+      const inp = document.getElementById('promptInput');
+      if (inp) {
+        inp.value = lastPromptText;
+        autoGrow(inp);
+        inp.setSelectionRange(0, inp.value.length); // select all so they can immediately overwrite or refine
+      }
+      // Pre-fill guided builder fields if in S1
+      if (scenarioIndex === 0) {
+        const s1 = playerHistory?.s1;
+        if (s1 && document.getElementById('g-learners')) {
+          document.getElementById('g-learners').value = s1.learners || '';
+          document.getElementById('g-goal').value = s1.goal || '';
+          document.getElementById('g-constraints').value = s1.constraints || '';
+          onGuidedInput(document.getElementById('g-learners'));
+        }
+      }
+    }
   }
 }
 // ══════════════════════════════════════════════════════
 function scorePrompt(text) {
-  const hasLearners   = /student|learner|rural|online|class|grade|level|adult|community/i.test(text);
-  const hasGoal       = /goal|outcome|objective|learn|understand|create|design|develop|able to/i.test(text);
-  const hasContext    = /course|subject|week|unit|module|discussion|assignment|activity|topic/i.test(text);
-  const hasConstraint = /minute|hour|word|short|brief|limit|length|format|\d+ (question|step)/i.test(text);
-  const isDetailed    = text.length > 100;
+  const t = text.toLowerCase();
+
+  // WHO: learner context — expanded to catch natural educator language
+  const hasLearners = /\b(student|learner|rural|online|class|grade|level|adult|community|educator|teacher|participant|cohort|staff|faculty|k-12|high school|middle school|elementary|college|university|higher ed|professional|beginner|advanced|novice|experienced|mixed.ability|diverse|special ed|esl|ell|english language)\b/.test(t);
+
+  // WHAT: goal or outcome — expanded
+  const hasGoal = /\b(goal|outcome|objective|learn|understand|create|design|develop|able to|skill|competency|knowledge|demonstrate|apply|analyze|evaluate|build|improve|practice|master|explore|discover|produce|complete|achieve|engage|reflect|assess|review|identify|compare|explain|describe|discuss|argue|persuade|synthesize|teach|train|support|help)\b/.test(t);
+
+  // WHERE/WHEN: course or subject context — expanded
+  const hasContext = /\b(course|subject|week|unit|module|discussion|assignment|activity|topic|lesson|project|curriculum|program|class|semester|quarter|session|workshop|training|pd|professional development|chapter|section|term|strand|standard|science|math|english|history|art|health|pe|biology|chemistry|physics|literature|writing|reading|social studies|technology|stem|steam)\b/.test(t);
+
+  // HOW/HOW MUCH: constraints or format — greatly expanded
+  const hasConstraint = /\b(minute|hour|word|short|brief|limit|length|format|timeline|deadline|week|daily|weekly|monthly|schedule|time|page|pages|slide|slides|rubric|criteria|step|steps|stage|phase|level|tier|type|style|mode|medium|tool|platform|online|in.person|synchronous|asynchronous|budget|resource|available|access|device|internet|low.tech|no.tech|free|cost|template|structure|outline|draft|version|attempt|try|iteration|cycle|round|session|period|range|number|amount|count|total|maximum|minimum|at least|no more|within|by|due|before|after)\b/.test(t) || /\d+/.test(t);
+
+  // DETAIL: just needs to be substantive
+  const isDetailed = text.length > 80;
+
   return { hasLearners, hasGoal, hasContext, hasConstraint, isDetailed,
     total: [hasLearners, hasGoal, hasContext, hasConstraint, isDetailed].filter(Boolean).length };
 }
@@ -2375,6 +2410,7 @@ async function handleReflectionSubmit(e) {
     }
     try {
       const payload = buildSessionPayload(formData);
+      console.log('[PromptCraft] Submitting full session payload:', payload);
 
       await fetch(SHEETS_URL, {
         method: 'POST',
@@ -2382,23 +2418,26 @@ async function handleReflectionSubmit(e) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      // no-cors means we cannot read the response status
-      // assume success and show confirmation
-      document.getElementById('refForm').style.display = 'none';
-      document.getElementById('refSuccess').style.display = 'block';
+      console.log('[PromptCraft] Sheets submission sent');
     } catch(err) {
-      console.error('Sheets submission error:', err);
-      // Fall back to Netlify Forms silently
-      try {
-        await fetch('/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(formData).toString()
-        });
-      } catch(_) {}
-      document.getElementById('refForm').style.display = 'none';
-      document.getElementById('refSuccess').style.display = 'block';
+      console.warn('[PromptCraft] Sheets submission error:', err);
     }
+
+    // Always also submit to Netlify Forms as a backup
+    // This ensures data is never lost even if Sheets fails silently
+    try {
+      await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData).toString()
+      });
+      console.log('[PromptCraft] Netlify fallback sent');
+    } catch(err) {
+      console.warn('[PromptCraft] Netlify fallback error:', err);
+    }
+
+    document.getElementById('refForm').style.display = 'none';
+    document.getElementById('refSuccess').style.display = 'block';
     return;
   }
 
