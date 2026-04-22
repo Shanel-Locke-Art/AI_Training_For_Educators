@@ -2426,14 +2426,17 @@ async function handleReflectionSubmit(e) {
     // Always also submit to Netlify Forms as a backup
     // This ensures data is never lost even if Sheets fails silently
     try {
+      const netlifyData = new URLSearchParams();
+      netlifyData.append('form-name', 'promptcraft-reflection');
+      formData.forEach((v, k) => netlifyData.append(k, v));
       await fetch('/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(formData).toString()
+        body: netlifyData.toString()
       });
       console.log('[PromptCraft] Netlify fallback sent');
     } catch(err) {
-      console.warn('[PromptCraft] Netlify fallback error:', err);
+      // Netlify fallback is best-effort -- Sheets is the primary
     }
 
     document.getElementById('refForm').style.display = 'none';
