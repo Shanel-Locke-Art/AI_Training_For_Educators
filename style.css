@@ -2920,3 +2920,91 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
     font-size: 0.8rem;
   }
 }
+
+/* ══════════════════════════════════════════════════════
+   SCENARIO NAVIGATION BUTTON
+   Appears in chat when player hits score threshold
+   ══════════════════════════════════════════════════════ */
+.scenario-nav-card {
+  background: var(--chalk);
+  border: 1.5px solid var(--forest-mid);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  margin: 4px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  animation: slideUp 0.4s ease forwards;
+  opacity: 0;
+  box-shadow: 0 2px 8px rgba(45,90,61,0.12);
+}
+
+.scenario-nav-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.scenario-nav-title {
+  font-family: 'Fraunces', serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--forest-dark);
+  margin-bottom: 2px;
+}
+
+.scenario-nav-sub {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.76rem;
+  color: var(--ink-light);
+  font-style: italic;
+}
+
+.scenario-nav-btn {
+  padding: 9px 18px;
+  background: var(--forest);
+  border: 2px solid var(--forest-dark);
+  border-radius: var(--radius);
+  color: #d4edd9;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  min-height: 44px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(30,61,41,0.2);
+}
+
+.scenario-nav-btn:hover {
+  background: var(--forest-dark);
+  transform: translateX(2px);
+}
+
+/* "keep practicing" link below the nav card */
+.scenario-keep-link {
+  display: block;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  margin-top: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-family: 'Nunito', sans-serif;
+  padding: 3px;
+}
+
+.scenario-keep-link:hover { color: var(--ink-light); }
+
+@media (max-width: 480px) {
+  .scenario-nav-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .scenario-nav-btn { width: 100%; text-align: center; }
+}

@@ -779,27 +779,34 @@ function showPixelRevealButton(playerPrompt, aiReply, score, scenarioDesc, area)
   btnWrap.id = 'pixelRevealWrap';
   btnWrap.style.cssText = 'display:flex;padding:2px 0;animation:slideUp 0.3s ease forwards;opacity:0;';
 
-  const rSrc = PIXEL_EXPR[score <= 1 ? 'skeptical' : score <= 3 ? 'encouraging' : 'excited'];
-  btnWrap.innerHTML = `
-    <button class="pixel-reveal-btn"
-            aria-label="Hear Professor Pixel's thoughts on your prompt"
-            onclick="triggerPixelResponse(this,
-              ${JSON.stringify(playerPrompt)},
-              ${JSON.stringify(aiReply.substring(0, 800))},
-              ${score},
-              ${JSON.stringify(scenarioDesc)})">
-      <img class="pixel-reveal-avatar" src="${rSrc}" alt="Professor Pixel"
-           onerror="this.style.display='none'" />
-      Professor Pixel has thoughts — tap to hear them
-      <span class="pixel-reveal-arrow">›</span>
-    </button>`;
+  const expr = score <= 1 ? 'skeptical' : score <= 3 ? 'encouraging' : 'excited';
+  const rSrc = PIXEL_EXPR[expr];
 
+  const btn = document.createElement('button');
+  btn.className = 'pixel-reveal-btn';
+  btn.setAttribute('aria-label', "Hear Professor Pixel's thoughts on your prompt");
+
+  // Store data directly on the element -- avoids HTML attribute escaping issues
+  btn._pixelData = { playerPrompt, aiReply: aiReply.substring(0, 800), score, scenarioDesc };
+
+  btn.innerHTML = `
+    <img class="pixel-reveal-avatar" src="${rSrc}" alt="Professor Pixel"
+         onerror="this.style.display='none'" />
+    Professor Pixel has thoughts — tap to hear them
+    <span class="pixel-reveal-arrow">›</span>`;
+
+  btn.addEventListener('click', () => triggerPixelResponse(btn));
+
+  btnWrap.appendChild(btn);
   area.appendChild(btnWrap);
   area.scrollTop = area.scrollHeight;
 }
 
-async function triggerPixelResponse(btn, playerPrompt, aiReply, score, scenarioDesc) {
-  // Replace button with loading bubble immediately
+async function triggerPixelResponse(btn) {
+  // Read data stored directly on the button element
+  const { playerPrompt, aiReply, score, scenarioDesc } = btn._pixelData || {};
+  if (!playerPrompt) return;
+
   const wrap = btn.closest('#pixelRevealWrap') || btn.parentNode;
   const area = document.getElementById('chat');
 
@@ -879,6 +886,73 @@ Do NOT use phrases like "Great job" or "Well done" as openers — get straight t
 // ══════════════════════════════════════════════════════
 //  SCENARIO 4 — CRITICAL THINKING CHALLENGE
 // ══════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════
+//  SCENARIO NAVIGATION
+//  A "Move to next scenario" card appears in the chat
+//  once the player hits a score of 3+ on any attempt.
+//  They can keep practicing or move forward.
+// ══════════════════════════════════════════════════════
+
+// Track whether nav card has been shown for current scenario
+let navCardShown = [false, false, false, false, false, false];
+
+const SCENARIO_NAMES = [
+  'Scenario 2: Differentiation',
+  'Scenario 3: Assessment',
+  'Scenario 4: Critical Thinking',
+  'Scenario 5: Predict the Output',
+  'Scenario 6: Bias and Context',
+  null // S6 leads to reflection room
+];
+
+const SCORE_THRESHOLD = 3; // score out of 5 needed to show nav card
+
+function maybeShowNavCard(score) {
+  // Only show for scenarios 1-5 (not S4 which has its own flow, not S6)
+  if (scenarioIndex >= 3) return;
+  if (navCardShown[scenarioIndex]) return;
+  if (score < SCORE_THRESHOLD) return;
+
+  navCardShown[scenarioIndex] = true;
+
+  const nextName = SCENARIO_NAMES[scenarioIndex];
+  if (!nextName) return;
+
+  const area = document.getElementById('chat');
+  const card = document.createElement('div');
+  card.style.cssText = 'margin-top:6px;';
+  card.innerHTML = `
+    <div class="scenario-nav-card">
+      <div class="scenario-nav-text">
+        <div class="scenario-nav-title">Ready to move on?</div>
+        <div class="scenario-nav-sub">Your prompts are getting stronger. ${nextName} is waiting.</div>
+      </div>
+      <button class="scenario-nav-btn"
+              onclick="navigateToNext(${scenarioIndex + 1})"
+              aria-label="Move to ${nextName}">
+        Next scenario →
+      </button>
+    </div>
+    <button class="scenario-keep-link"
+            onclick="this.closest('div').remove()"
+            aria-label="Keep practicing this scenario">
+      Keep practicing this one first
+    </button>`;
+
+  area.appendChild(card);
+  area.scrollTop = area.scrollHeight;
+}
+
+function navigateToNext(targetIndex) {
+  const tabs = document.querySelectorAll('.tab-btn');
+  const targetTab = tabs[targetIndex];
+  if (!targetTab || targetTab.disabled) return;
+
+  // Smooth scroll to top of chat, then switch
+  document.getElementById('chat').scrollTop = 0;
+  switchScenario(targetIndex, targetTab);
+}
 
 let s4InterruptFired = false;
 let s4SelfReportAnswer = '';
@@ -1608,6 +1682,9 @@ function switchScenario(i, btn) {
   btn.classList.add('active');
   btn.setAttribute('aria-selected', 'true');
 
+  // Reset nav card for this scenario so it can show again if they return
+  navCardShown[i] = false;
+
   // Special card styling
   const card = document.querySelector('.scenario-card');
   if (i === 3) {
@@ -2108,6 +2185,9 @@ async function sendMain(text) {
       score.total,
       scenarios[scenarioIndex].desc
     );
+
+    // Show scenario nav card after Pixel's thinking delay clears
+    setTimeout(() => maybeShowNavCard(score.total), 7000);
 
     markScenarioComplete();
 
