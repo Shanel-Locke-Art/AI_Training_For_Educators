@@ -50,6 +50,8 @@
   <button class="dev-btn" onclick="devComplete()">All Complete</button>
   <button class="dev-btn" onclick="devSkip()">Reflection Room</button>
   <button class="dev-btn" onclick="devGoS4()" style="border-color:#c4622d;color:#c4622d;">⚠️ Test S4</button>
+  <button class="dev-btn" onclick="devGoS5()" style="border-color:#9b59b6;color:#9b59b6;">🔮 Test S5</button>
+  <button class="dev-btn" onclick="devGoS6()" style="border-color:#e67e22;color:#e67e22;">⚖️ Test S6</button>
   <button class="dev-btn" onclick="document.getElementById('devBar').style.display='none'">Hide</button>
 </div>
 
@@ -78,6 +80,8 @@
   <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(1,this)">📋 Scenario 2: Differentiation</button>
   <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(2,this)">📋 Scenario 3: Assessment</button>
   <button class="tab-btn locked" id="s4Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 Scenario 4</button>
+  <button class="tab-btn locked" id="s5Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 Scenario 5</button>
+  <button class="tab-btn locked" id="s6Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 Scenario 6</button>
 </nav>
 
 <div class="scenario-card" role="region" aria-label="Current scenario challenge">
@@ -92,22 +96,8 @@
 
 <main class="chat-area" id="chat" role="main" aria-label="Conversation with AI" aria-live="polite"></main>
 
-<div class="input-area" role="region" aria-label="Prompt input">
-  <div class="input-box">
-    <label for="promptInput" class="sr-only">Write your AI prompt here</label>
-    <textarea id="promptInput"
-      aria-label="Write your AI prompt here"
-      aria-describedby="promptHint"
-      placeholder="Write your prompt here — who are your learners, what do you need, what constraints matter?"
-      oninput="autoGrow(this)"
-      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
-    <button class="send-btn" id="sendBtn" onclick="send()" aria-label="Send prompt to AI">↑</button>
-  </div>
-  <div class="input-footer">
-    <span class="input-hint" id="promptHint">Shift + Enter for a new line</span>
-    <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
-  </div>
-</div>
+<!-- DYNAMIC INPUT AREA — content rendered by renderInputMode() -->
+<div id="inputContainer" role="region" aria-label="Prompt input"></div>
 
 <!-- ── PROFESSOR PIXEL PERSISTENT BADGE ──────────────── -->
 <div class="pixel-badge" id="pixelBadge"
@@ -157,9 +147,10 @@
 
     <!-- SMARTBOARD -->
     <div class="vn-smartboard" role="region" aria-label="Smartboard challenge display">
+      <!-- Image first so it sits behind text via z-index -->
+      <img class="vn-board-img" id="vnBoardImg" alt="Scene illustration" aria-hidden="true" />
       <div class="vn-board-label" aria-hidden="true">📲 Today's Challenge</div>
       <div class="vn-board-text" id="vnBoardText" aria-label="Scenario challenge text"></div>
-      <img class="vn-board-img" id="vnBoardImg" alt="Scene illustration" />
       <div class="vn-board-loading" id="vnBoardLoading" style="display:none;" aria-live="polite">
         ◌ generating scene illustration...
       </div>
@@ -277,7 +268,7 @@ let xp = 0;
 let attempts = 0;
 let scenarioIndex = 0;
 let history = [];
-let scenarioCompleted = [false, false, false];
+let scenarioCompleted = [false, false, false, false, false, false];
 let playerName = 'You'; // updated by name entry modal
 
 // ── SCREEN READER UTILITY ─────────────────────────────
@@ -360,6 +351,8 @@ const scenarioData = [
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '' },
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '' },
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', selfReport: '' },
+  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', prediction: '', predictionCorrect: false },
+  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', biasItemsSpotted: [] },
 ];
 
 function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
@@ -409,6 +402,26 @@ function buildSessionPayload(formData) {
     s3_prompts:           scenarioData[2].prompts.join(' | '),
     s3_final_response:    scenarioData[2].finalResponse,
     s3_oscqr:             scenarioData[2].oscqrLit,
+
+    // Scenario 4 (Hallucination)
+    s4_attempts:          scenarioData[3].attempts,
+    s4_best_score:        scenarioData[3].bestScore,
+    s4_prompts:           scenarioData[3].prompts.join(' | '),
+    s4_final_response:    scenarioData[3].finalResponse,
+    s4_oscqr:             scenarioData[3].oscqrLit,
+    s4_self_report:       scenarioData[3].selfReport || '',
+
+    // Scenario 5 (Predict)
+    s5_attempts:          scenarioData[4].attempts,
+    s5_prediction:        scenarioData[4].prediction || '',
+    s5_prediction_correct: scenarioData[4].predictionCorrect ? 'yes' : 'no',
+    s5_prompts:           scenarioData[4].prompts.join(' | '),
+    s5_best_score:        scenarioData[4].bestScore,
+
+    // Scenario 6 (Bias)
+    s6_attempts:          scenarioData[5].attempts,
+    s6_prompts:           scenarioData[5].prompts.join(' | '),
+    s6_best_score:        scenarioData[5].bestScore,
 
     // Reflection room responses
     q1_surprise:          formData.get('q1_surprise')  || '',
@@ -502,7 +515,6 @@ Coaching: vague prompts get generic outputs with gentle guidance. Specific promp
       { id:"fea", label:"Feasibility" },
       { id:"src", label:"Verified Sources" },
     ],
-    // This system prompt deliberately produces plausible-but-flawed output
     system: `You are an AI assistant helping design professional development programs. Respond confidently and professionally.
 
 When asked to design a PD program, provide a detailed, well-structured response that includes:
@@ -518,14 +530,90 @@ IMPORTANT INSTRUCTIONS FOR THIS SCENARIO:
 - Present both of these confidently as if they are well-established facts
 - Do NOT reveal that anything is wrong — respond as a normal, helpful AI assistant would
 - The rest of your response should be genuinely useful and well-structured`
+  },
+
+  // ── SCENARIO 5: MENTAL MODEL — PREDICT THE OUTPUT ────
+  {
+    desc: "A colleague wrote this prompt to get AI help designing a quiz for their online biology class. Before you see what the AI gave them — what do you predict happened?",
+    isPrediction: true, // flags the prediction mechanic
+    badPrompt: "Help me make a quiz.",
+    // The canned "bad" AI response shown during the reveal
+    badResponse: `Sure! Here's a quiz for you:\n\n**General Knowledge Quiz**\n\n1. What is the capital of France?\n2. How many planets are in our solar system?\n3. What is 15 × 8?\n4. Name one famous painting by Leonardo da Vinci.\n5. What year did World War II end?\n\nFeel free to add more questions as needed! Let me know if you'd like me to adjust the difficulty level.`,
+    predictionOptions: [
+      { id: 'generic',    text: "The AI gave a generic quiz with no connection to biology or online learning" },
+      { id: 'refused',    text: "The AI refused because the prompt was too vague" },
+      { id: 'clarifying', text: "The AI asked clarifying questions before responding" },
+    ],
+    correctPrediction: 'generic',
+    oscqr: [
+      { id:"obj", label:"Clear Objectives" },
+      { id:"sub", label:"Subject Specific" },
+      { id:"ctx", label:"Online Context" },
+      { id:"lvl", label:"Level Appropriate" },
+      { id:"fmt", label:"Format Specified" },
+    ],
+    system: `You are a supportive instructional design coach helping a rural or distance educator design effective assessments for online biology classes.
+
+When the educator writes an improved prompt, respond with a practical, subject-specific quiz or assessment activity. Be warm and encouraging.
+
+After your main response, add a short section called "OSCQR Check" noting which are addressed: Clear Objectives, Subject Specific, Online Context, Level Appropriate, Format Specified.
+
+Coaching: reference specifically what they added to the prompt that made it better than "Help me make a quiz." Praise concrete improvements explicitly.`
+  },
+
+  // ── SCENARIO 6: BIAS AND CONTEXT ─────────────────────
+  {
+    desc: "A PD coordinator used AI to design a technology integration workshop for your rural district. Read what the AI suggested — would this actually work for your educators?",
+    isBiasScenario: true, // flags the bias reveal mechanic
+    // Pre-written AI response that assumes urban infrastructure
+    biasedResponse: `**Technology Integration Professional Development Program**
+*A Comprehensive Two-Day Workshop Series*
+
+**Program Overview**
+This intensive professional development series will transform your educators into confident technology integrators. Participants will leverage the district's high-speed fiber network and 1:1 device program to explore cutting-edge tools.
+
+**Day 1: AI Tools and Learning Management Systems**
+- Morning: Hands-on exploration of ChatGPT-4, Midjourney, and Adobe Firefly for lesson design
+- Afternoon: Deep dive into Canvas LMS advanced features including analytics dashboards
+- Evening optional session: Explore the district's new maker space and 3D printing lab
+
+**Day 2: Implementation and Assessment**
+- Morning: Build a fully digital, paperless assessment pipeline using Google Workspace
+- Afternoon: Set up individual educator tech toolkits (assumes personal device ownership)
+- Participants will need to purchase the recommended apps ($12.99/month subscription)
+
+**Infrastructure Requirements**
+- Minimum 100Mbps per classroom
+- Personal smartphones for QR code activities
+- Google Workspace Enterprise license (contact your IT department to upgrade)
+
+**Expected Outcomes**
+Research by Hamilton & Torres (2022) in the Journal of Urban Educational Technology confirms this model achieves 94% adoption rates in comparable districts.`,
+    oscqr: [
+      { id:"ctx", label:"Rural Context" },
+      { id:"acc", label:"Device Access" },
+      { id:"con", label:"Connectivity" },
+      { id:"cst", label:"No-Cost Tools" },
+      { id:"fea", label:"Feasibility" },
+    ],
+    system: `You are a supportive instructional design coach helping a rural or distance educator design technology professional development that actually works in their context.
+
+When the educator writes a revised prompt that explicitly includes rural constraints, respond with a practical, context-aware PD plan that:
+- Works with limited or inconsistent internet connectivity
+- Does not assume personal device ownership
+- Uses free or already-licensed tools
+- Is feasible on a rural school budget
+
+After your main response, add a short section called "OSCQR Check" noting which are addressed: Rural Context, Device Access, Connectivity, No-Cost Tools, Feasibility.
+
+Coaching: compare explicitly what changed between the original assumption-laden response and this one. Point to specific rural constraints they named in their prompt that produced better results.`
   }
 ];
 
 // ══════════════════════════════════════════════════════
-//  PROFESSOR PIXEL — INTEGRATED PRESENCE SYSTEM
+//  PROFESSOR PIXEL — INLINE CHAT DIALOGUE SYSTEM
 // ══════════════════════════════════════════════════════
 
-// Expression → image map (same as VN system)
 const PIXEL_EXPR = {
   neutral:     'images/pixel-neutral.png',
   thinking:    'images/pixel-thinking.png',
@@ -535,30 +623,23 @@ const PIXEL_EXPR = {
   proud:       'images/pixel-proud.png',
 };
 
-// Track last score to detect improvement
 let lastScore = -1;
-let firstAttemptDone = false;
 let coachDismissTimer = null;
 
-// ── BADGE ─────────────────────────────────────────────
+// ── BADGE (keeps the persistent corner presence) ──────
 function pixelBadgeSetExpr(expr) {
   const src = PIXEL_EXPR[expr] || PIXEL_EXPR.neutral;
   const img = document.getElementById('pixelBadgeImg');
   const coachImg = document.getElementById('pixelCoachImg');
-
-  // Swap badge portrait
   img.src = src;
   if (coachImg) coachImg.src = src;
-
-  // Pulse the badge
   img.classList.remove('reacting');
-  void img.offsetWidth; // force reflow
+  void img.offsetWidth;
   img.classList.add('reacting');
   setTimeout(() => img.classList.remove('reacting'), 600);
 }
 
 function pixelBadgeClick() {
-  // Show the coach card with latest message if there is one
   const card = document.getElementById('pixelCoachCard');
   if (card.classList.contains('visible')) {
     pixelCoachDismiss();
@@ -569,71 +650,11 @@ function pixelBadgeClick() {
   }
 }
 
-// ── COACH CARD ────────────────────────────────────────
-const coachMessages = {
-  firstAttempt: {
-    expr: 'encouraging',
-    text: "Great start! Take a look at the Prompt Analysis below and try to include more context next time."
-  },
-  improved: {
-    expr: 'excited',
-    text: "Your prompt just got stronger! Notice how the AI response improved when you added more detail."
-  },
-  scenarioComplete: {
-    expr: 'proud',
-    text: "Scenario complete! Move to the next one when you are ready — each one builds on the last."
-  },
-};
-
-function pixelCoachShow(key) {
-  const msg = coachMessages[key];
-  if (!msg) return;
-
-  // Update expression everywhere
-  pixelBadgeSetExpr(msg.expr);
-
-  // Update badge label
-  document.getElementById('pixelBadgeLabel').textContent = msg.expr;
-
-  // Update and show coach card
-  document.getElementById('pixelCoachMsg').textContent = msg.text;
-  const card = document.getElementById('pixelCoachCard');
-  card.classList.add('visible');
-
-  // Auto-dismiss after 7 seconds
-  clearTimeout(coachDismissTimer);
-  coachDismissTimer = setTimeout(pixelCoachDismiss, 7000);
-}
-
 function pixelCoachDismiss() {
   document.getElementById('pixelCoachCard').classList.remove('visible');
 }
 
-// ── KEY MOMENT TRIGGERS ───────────────────────────────
-function pixelReactToScore(score) {
-  // First ever attempt
-  if (!firstAttemptDone) {
-    firstAttemptDone = true;
-    setTimeout(() => pixelCoachShow('firstAttempt'), 800);
-    lastScore = score;
-    return;
-  }
-
-  // Score improved from previous attempt
-  if (score > lastScore && lastScore >= 0) {
-    setTimeout(() => pixelCoachShow('improved'), 800);
-  } else {
-    // Just update expression without coach card
-    if (score <= 1)      pixelBadgeSetExpr('skeptical');
-    else if (score <= 3) pixelBadgeSetExpr('thinking');
-    else                  pixelBadgeSetExpr('proud');
-  }
-
-  lastScore = score;
-}
-
 // ── AI BUBBLE AVATAR ──────────────────────────────────
-// Returns the HTML for the AI avatar -- Pixel portrait if available
 function pixelAvatarHTML(expr) {
   const src = PIXEL_EXPR[expr] || PIXEL_EXPR.neutral;
   return `
@@ -641,6 +662,147 @@ function pixelAvatarHTML(expr) {
          src="${src}"
          alt="Professor Pixel"
          onerror="this.outerHTML='<div class=\\'pixel-chat-avatar-fallback\\'>🧑‍🏫</div>'" />`;
+}
+
+// ── INLINE PIXEL CHAT RESPONSE ────────────────────────
+// Shows thinking indicator, then a tap-to-reveal button,
+// then fetches a genuine AI-generated response from Pixel
+function schedulePixelResponse(playerPrompt, aiReply, score, scenarioDesc) {
+  const area = document.getElementById('chat');
+
+  // Step 1 — thinking indicator appears after 4 seconds
+  let thinkingEl = null;
+  const thinkTimer = setTimeout(() => {
+    thinkingEl = document.createElement('div');
+    thinkingEl.className = 'pixel-thinking-row';
+    thinkingEl.id = 'pixelThinking';
+    const tSrc = PIXEL_EXPR.thinking;
+    thinkingEl.innerHTML = `
+      <img class="pixel-thinking-avatar" src="${tSrc}" alt=""
+           onerror="this.style.display='none'" />
+      <span class="pixel-thinking-text">
+        Professor Pixel is thinking
+        <span class="pixel-thinking-dots">
+          <span></span><span></span><span></span>
+        </span>
+      </span>`;
+    area.appendChild(thinkingEl);
+    area.scrollTop = area.scrollHeight;
+
+    // Step 2 — reveal button replaces thinking after 2 more seconds
+    setTimeout(() => {
+      if (thinkingEl && thinkingEl.parentNode) {
+        thinkingEl.remove();
+      }
+      showPixelRevealButton(playerPrompt, aiReply, score, scenarioDesc, area);
+    }, 2000);
+
+  }, 4000);
+
+  // Store timer so we can cancel if scenario switches
+  area._pixelThinkTimer = thinkTimer;
+}
+
+function showPixelRevealButton(playerPrompt, aiReply, score, scenarioDesc, area) {
+  const btnWrap = document.createElement('div');
+  btnWrap.id = 'pixelRevealWrap';
+  btnWrap.style.cssText = 'display:flex;padding:2px 0;animation:slideUp 0.3s ease forwards;opacity:0;';
+
+  const rSrc = PIXEL_EXPR[score <= 1 ? 'skeptical' : score <= 3 ? 'encouraging' : 'excited'];
+  btnWrap.innerHTML = `
+    <button class="pixel-reveal-btn"
+            aria-label="Hear Professor Pixel's thoughts on your prompt"
+            onclick="triggerPixelResponse(this,
+              ${JSON.stringify(playerPrompt)},
+              ${JSON.stringify(aiReply.substring(0, 800))},
+              ${score},
+              ${JSON.stringify(scenarioDesc)})">
+      <img class="pixel-reveal-avatar" src="${rSrc}" alt="Professor Pixel"
+           onerror="this.style.display='none'" />
+      Professor Pixel has thoughts — tap to hear them
+      <span class="pixel-reveal-arrow">›</span>
+    </button>`;
+
+  area.appendChild(btnWrap);
+  area.scrollTop = area.scrollHeight;
+}
+
+async function triggerPixelResponse(btn, playerPrompt, aiReply, score, scenarioDesc) {
+  // Replace button with loading bubble immediately
+  const wrap = btn.closest('#pixelRevealWrap') || btn.parentNode;
+  const area = document.getElementById('chat');
+
+  const loadExpr = score <= 1 ? 'skeptical' : score <= 3 ? 'encouraging' : 'excited';
+  const loadSrc = PIXEL_EXPR[loadExpr];
+
+  const loadWrap = document.createElement('div');
+  loadWrap.className = 'message pixel';
+  loadWrap.innerHTML = `
+    <img class="pixel-chat-avatar" src="${loadSrc}" alt="Professor Pixel"
+         onerror="this.outerHTML='<div class=\\'pixel-chat-avatar-fallback\\'>🧑‍🏫</div>'" />
+    <div class="bubble-wrap">
+      <div class="bubble-sender" style="color:var(--forest-mid);">Professor Pixel</div>
+      <div class="bubble pixel-loading-bubble">
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+      </div>
+    </div>`;
+
+  wrap.replaceWith(loadWrap);
+  area.scrollTop = area.scrollHeight;
+
+  // Update badge expression
+  pixelBadgeSetExpr(loadExpr);
+
+  try {
+    // Build a contextual system prompt for Pixel
+    const pixelSystem = `You are Professor Pixel, a warm, sharp, and genuinely helpful instructional design coach inside a training game for rural educators. You are reviewing a prompt that an educator just wrote and the AI response it generated.
+
+Your job is to give feedback that is:
+- Specific to THIS prompt and THIS response — never generic
+- Warm but honest — you notice what worked and what did not
+- Building on the conversation — reference actual words or phrases from their prompt
+- Focused on ONE main insight and ONE actionable question to push them forward
+- Short — 2 to 4 sentences maximum, then a follow-up question on a new line
+
+The scenario they are working on: "${scenarioDesc}"
+
+Their prompt score was ${score} out of 5 based on: learner context, clear goal, course context, constraints, and detail.
+
+Do NOT use phrases like "Great job" or "Well done" as openers — get straight to the specific observation. Do NOT list multiple tips. End with a single italicised follow-up question on its own line, preceded by a line break, that pushes them toward their next attempt.`;
+
+    const res = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 220,
+        system: pixelSystem,
+        messages: [{
+          role: 'user',
+          content: `Educator's prompt: "${playerPrompt}"\n\nAI response they received:\n"${aiReply}"`
+        }]
+      })
+    });
+
+    const data = await res.json();
+    if (data.error || !data.content) throw new Error(data.error?.message || 'No response');
+
+    const pixelReply = data.content[0].text;
+
+    // Render Pixel's response inline
+    loadWrap.querySelector('.pixel-loading-bubble').innerHTML = fmt(pixelReply);
+
+    // Update badge
+    pixelBadgeSetExpr(loadExpr);
+    document.getElementById('pixelBadgeLabel').textContent = loadExpr;
+
+  } catch(e) {
+    // Graceful fallback if API call fails
+    loadWrap.querySelector('.pixel-loading-bubble').textContent =
+      "Hmm, I lost my train of thought — take a look at the Prompt Analysis panel and try another attempt.";
+  }
+
+  area.scrollTop = area.scrollHeight;
 }
 
 // ══════════════════════════════════════════════════════
@@ -663,7 +825,6 @@ function unlockScenario4() {
   pixelBadgeSetExpr('thinking');
   document.getElementById('pixelBadgeLabel').textContent = 'curious';
 
-  // Coach card hint
   setTimeout(() => {
     document.getElementById('pixelCoachMsg').textContent =
       "Scenario 4 is now unlocked. This one is different — stay sharp.";
@@ -681,10 +842,10 @@ async function sendScenario4(text) {
   document.getElementById('attNum').textContent = scenarioData[3].attempts;
   addMsg('user', esc(text));
   const input = document.getElementById('promptInput');
-  input.value = '';
-  input.style.height = 'auto';
+  if (input) { input.value = ''; input.style.height = 'auto'; }
   history.push({ role: 'user', content: text });
-  document.getElementById('sendBtn').disabled = true;
+  const btn = document.getElementById('sendBtn');
+  if (btn) btn.disabled = true;
   addTyping();
 
   try {
@@ -863,22 +1024,229 @@ function addPixelS4Closing(area) {
 
   setTimeout(() => {
     scenarioCompleted[3] = true;
-    const completeArea = document.getElementById('chat');
-    if (document.getElementById('completeAllBtn')) return;
-    const finDiv = document.createElement('div');
-    finDiv.style.cssText = 'text-align:center;padding:16px 0 4px;animation:slideUp 0.35s ease forwards;opacity:0;';
-    finDiv.innerHTML = `
-      <p style="font-size:0.76rem;color:var(--ink-light);margin-bottom:10px;font-weight:600;">
-        All four scenarios complete.
-      </p>
-      <button class="complete-btn" id="completeAllBtn" onclick="openReflection()">
-        Enter the Reflection Room →
-      </button>`;
-    completeArea.appendChild(finDiv);
-    pixelBadgeSetExpr('excited');
-    playPixelSequence('allComplete', null);
-    completeArea.scrollTop = completeArea.scrollHeight;
+    markScenarioComplete();
   }, 1200);
+}
+
+// ══════════════════════════════════════════════════════
+//  SCENARIO 5 — PREDICT THE OUTPUT
+// ══════════════════════════════════════════════════════
+
+let s5PredictionDone = false;
+
+function loadScenario5() {
+  const s = scenarios[4];
+  const area = document.getElementById('chat');
+
+  // Show the bad prompt on the smartboard
+  document.getElementById('vnBoardText').textContent =
+    `The prompt: "${s.badPrompt}"`;
+
+  // Show the prediction card in the chat
+  const div = document.createElement('div');
+  div.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;';
+  div.innerHTML = `
+    <div class="welcome-card">
+      <div class="welcome-title">🔮 Predict the Output</div>
+      <div class="welcome-body">
+        Your colleague wrote this prompt to get AI help designing a quiz
+        for their online biology class:<br><br>
+        <div style="background:var(--forest-dark);color:#a8d5b5;font-family:'Source Code Pro',monospace;
+             font-size:0.82rem;padding:10px 14px;border-radius:var(--radius);margin:8px 0;line-height:1.6;">
+          "${s.badPrompt}"
+        </div>
+        <strong>Before you see what happened — what do you predict the AI gave them?</strong>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+        ${s.predictionOptions.map(opt => `
+          <button class="s4-btn" style="text-align:left;border-radius:var(--radius);padding:10px 14px;font-size:0.8rem;"
+                  onclick="s5SelectPrediction(this,'${opt.id}')">
+            ${opt.text}
+          </button>`).join('')}
+      </div>
+    </div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+
+  // Hide the normal input area until prediction is made
+  const container = document.getElementById('inputContainer');
+  container.style.display = 'none';
+}
+
+function s5SelectPrediction(btn, predictionId) {
+  const s = scenarios[4];
+  scenarioData[4].prediction = predictionId;
+  const correct = predictionId === s.correctPrediction;
+  scenarioData[4].predictionCorrect = correct;
+
+  // Disable all prediction buttons
+  btn.closest('[style*="flex-direction:column"]')
+     .querySelectorAll('.s4-btn').forEach(b => {
+    b.disabled = true;
+    b.style.opacity = '0.6';
+  });
+  btn.style.opacity = '1';
+  btn.style.background = correct ? 'var(--forest-light)' : 'var(--terra-light)';
+  btn.style.borderColor = correct ? 'var(--forest-mid)' : 'var(--terracotta)';
+  btn.style.color = correct ? 'var(--forest-dark)' : 'var(--terra-dark)';
+
+  s5PredictionDone = true;
+
+  // Reveal the actual AI response
+  setTimeout(() => s5RevealResponse(correct), 600);
+}
+
+function s5RevealResponse(predictedCorrectly) {
+  const s = scenarios[4];
+  const area = document.getElementById('chat');
+
+  // Pixel reacts to prediction
+  const pixelDiv = document.createElement('div');
+  pixelDiv.className = 'pixel-interrupt';
+  const expr = predictedCorrectly ? 'excited' : 'encouraging';
+  const src = PIXEL_EXPR[expr];
+  const pixelMsg = predictedCorrectly
+    ? "You got it — and that instinct is exactly what we are building. Now let's see the actual response."
+    : "Not quite — but that is what this exercise is for. Watch what actually came back.";
+
+  pixelDiv.innerHTML = `
+    <img class="pixel-interrupt-avatar" src="${src}" alt="Professor Pixel"
+         onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
+    <div style="flex:1;min-width:0;">
+      <div class="pixel-interrupt-sender">Professor Pixel</div>
+      <div class="pixel-interrupt-bubble">${pixelMsg}</div>
+    </div>`;
+  area.appendChild(pixelDiv);
+  pixelBadgeSetExpr(expr);
+
+  // Show the bad AI response
+  setTimeout(() => {
+    const responseDiv = document.createElement('div');
+    responseDiv.className = 'message ai';
+    responseDiv.innerHTML = `
+      ${pixelAvatarHTML('skeptical')}
+      <div class="bubble-wrap">
+        <div class="bubble-sender">AI response (to the vague prompt)</div>
+        <div class="bubble" style="opacity:0.85;border-style:dashed;">${fmt(s.badResponse)}</div>
+      </div>`;
+    area.appendChild(responseDiv);
+    area.scrollTop = area.scrollHeight;
+
+    // Now reveal the input to write a better prompt
+    setTimeout(() => {
+      const followDiv = document.createElement('div');
+      followDiv.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;';
+      followDiv.innerHTML = `
+        <div class="pixel-interrupt">
+          <img class="pixel-interrupt-avatar" src="${PIXEL_EXPR['encouraging']}" alt="Professor Pixel"
+               onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
+          <div style="flex:1;min-width:0;">
+            <div class="pixel-interrupt-sender">Professor Pixel</div>
+            <div class="pixel-interrupt-bubble">
+              Now you try. Write a better prompt for the same goal —
+              designing a quiz for an online biology class.
+              Show the AI who the learners are, what kind of quiz you need, and any constraints.
+            </div>
+          </div>
+        </div>`;
+      area.appendChild(followDiv);
+      area.scrollTop = area.scrollHeight;
+
+      // Show the input area
+      const container = document.getElementById('inputContainer');
+      container.style.display = '';
+      renderOpenPlain(container);
+      setTimeout(() => document.getElementById('promptInput')?.focus(), 100);
+    }, 1200);
+  }, 800);
+}
+
+// ══════════════════════════════════════════════════════
+//  SCENARIO 6 — BIAS AND CONTEXT
+// ══════════════════════════════════════════════════════
+
+function loadScenario6() {
+  const s = scenarios[5];
+  const area = document.getElementById('chat');
+
+  // Show the biased response on smartboard
+  document.getElementById('vnBoardText').textContent =
+    'Read the AI-generated workshop plan below.';
+
+  const div = document.createElement('div');
+  div.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;';
+  div.innerHTML = `
+    <div class="welcome-card">
+      <div class="welcome-title">⚖️ Who Is This Actually For?</div>
+      <div class="welcome-body">
+        A PD coordinator used AI to design a technology integration workshop
+        for your rural district. Read what the AI suggested — then decide
+        whether it would actually work for your educators.
+      </div>
+    </div>`;
+  area.appendChild(div);
+
+  // Show the biased response
+  setTimeout(() => {
+    const biasDiv = document.createElement('div');
+    biasDiv.className = 'message ai';
+    biasDiv.innerHTML = `
+      ${pixelAvatarHTML('neutral')}
+      <div class="bubble-wrap">
+        <div class="bubble-sender">AI-generated workshop plan</div>
+        <div class="bubble">${fmt(s.biasedResponse)}</div>
+      </div>`;
+    area.appendChild(biasDiv);
+    area.scrollTop = area.scrollHeight;
+
+    // Pixel asks them to reflect
+    setTimeout(() => {
+      const pixelDiv = document.createElement('div');
+      pixelDiv.className = 'pixel-interrupt';
+      pixelDiv.innerHTML = `
+        <img class="pixel-interrupt-avatar" src="${PIXEL_EXPR['skeptical']}" alt="Professor Pixel"
+             onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
+        <div style="flex:1;min-width:0;">
+          <div class="pixel-interrupt-sender">Professor Pixel</div>
+          <div class="pixel-interrupt-bubble">
+            This plan looks polished — but would it actually work in your district?
+            Count how many things it assumes you have that you might not.
+            Then rewrite the prompt to get something that actually fits your context.
+          </div>
+        </div>`;
+      area.appendChild(pixelDiv);
+      area.scrollTop = area.scrollHeight;
+      pixelBadgeSetExpr('skeptical');
+
+      // Show input
+      const container = document.getElementById('inputContainer');
+      container.style.display = '';
+      renderOpenPlain(container);
+      setTimeout(() => document.getElementById('promptInput')?.focus(), 100);
+    }, 1200);
+  }, 600);
+}
+
+// ══════════════════════════════════════════════════════
+//  SCENARIO UNLOCK LOGIC — updated for 6 scenarios
+// ══════════════════════════════════════════════════════
+
+function unlockScenario5() {
+  const btn = document.getElementById('s5Tab');
+  if (!btn || !btn.classList.contains('locked')) return;
+  btn.classList.remove('locked');
+  btn.disabled = false;
+  btn.textContent = '🔮 Scenario 5: Predict';
+  btn.onclick = () => switchScenario(4, btn);
+}
+
+function unlockScenario6() {
+  const btn = document.getElementById('s6Tab');
+  if (!btn || !btn.classList.contains('locked')) return;
+  btn.classList.remove('locked');
+  btn.disabled = false;
+  btn.textContent = '⚖️ Scenario 6: Bias';
+  btn.onclick = () => switchScenario(5, btn);
 }
 
 // ══════════════════════════════════════════════════════
@@ -1079,6 +1447,14 @@ const pixelDialogue = {
     { expr: 'thinking',    text: "This last challenge is a little different from the others. I want you to stay alert." },
     { expr: 'skeptical',   text: "Not everything an AI tells you is accurate — even when it sounds completely confident. Pay close attention to what comes back." },
   ],
+  scenarioStart_4: [
+    { expr: 'thinking',    text: "Scenario 5 is about understanding why AI responds the way it does." },
+    { expr: 'encouraging', text: "Before you see a response, you are going to predict what happened. This trains the mental model that makes you a better prompter." },
+  ],
+  scenarioStart_5: [
+    { expr: 'skeptical',   text: "This final scenario is about something subtle but important — AI assumes things about your context that may not be true." },
+    { expr: 'neutral',     text: "Read carefully. Count what the AI got wrong about your actual situation. Then fix it." },
+  ],
 };
 
 function playPixelSequence(key, onDone) {
@@ -1099,42 +1475,40 @@ function playPixelSequence(key, onDone) {
 }
 
 // ══════════════════════════════════════════════════════
-//  IMAGE GENERATION
+//  SCENE ILLUSTRATION LOADER
+//  Drop your illustrations into images/ and they appear
+//  automatically. No API calls needed.
+//
+//  Expected filenames:
+//    images/scene-s1.png  — Engagement
+//    images/scene-s2.png  — Differentiation
+//    images/scene-s3.png  — Assessment
+//    images/scene-s4.png  — Hallucination Hunt
+//    images/scene-s5.png  — Predict the Output
+//    images/scene-s6.png  — Bias and Context
+//    images/scene-complete.png — All scenarios complete
 // ══════════════════════════════════════════════════════
- async function generateSceneImage(prompt, targetImgEl, loadingEl) {
-  if (loadingEl) loadingEl.style.display = 'block';
+function loadSceneImage(filename) {
+  const img = document.getElementById('vnBoardImg');
+  const loading = document.getElementById('vnBoardLoading');
+  if (!img) return;
 
-  try {
-    const res = await fetch('/.netlify/functions/claude', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 1024,
-        messages: [{
-          role: 'user',
-          content: [{
-            type: 'text',
-            text: `Generate an illustration: ${prompt}. Style: soft watercolor, warm earthy tones, cozy classroom feel. Keep it simple and evocative. No text in the image.`
-          }]
-        }]
-      })
-    });
+  if (loading) loading.style.display = 'none';
+  img.classList.remove('loaded');
 
-    const data = await res.json();
-
-    if (data.content) {
-      const imgBlock = data.content.find(b => b.type === 'image');
-      if (imgBlock && imgBlock.source && targetImgEl) {
-        targetImgEl.src = `data:${imgBlock.source.media_type};base64,${imgBlock.source.data}`;
-        targetImgEl.classList.add('loaded');
-      }
-    }
-  } catch (e) {
-    console.log('Image generation unavailable:', e.message);
-  } finally {
-    if (loadingEl) loadingEl.style.display = 'none';
-  }
+  const src = `images/${filename}`;
+  const test = new Image();
+  test.onload = () => {
+    img.src = src;
+    img.alt = 'Scene illustration';
+    img.classList.add('loaded');
+  };
+  test.onerror = () => {
+    // File does not exist yet -- fail silently
+    img.src = '';
+    img.classList.remove('loaded');
+  };
+  test.src = src;
 }
 
 // ══════════════════════════════════════════════════════
@@ -1160,7 +1534,7 @@ function switchScenario(i, btn) {
   btn.classList.add('active');
   btn.setAttribute('aria-selected', 'true');
 
-  // Scenario 4 has special card styling
+  // Special card styling
   const card = document.querySelector('.scenario-card');
   if (i === 3) {
     card.classList.add('s4-active');
@@ -1169,6 +1543,15 @@ function switchScenario(i, btn) {
   }
 
   loadScenario(i);
+
+  // Cancel any pending Pixel thinking timer
+  const chatEl = document.getElementById('chat');
+  if (chatEl._pixelThinkTimer) clearTimeout(chatEl._pixelThinkTimer);
+  const existing = document.getElementById('pixelThinking');
+  if (existing) existing.remove();
+  const revealWrap = document.getElementById('pixelRevealWrap');
+  if (revealWrap) revealWrap.remove();
+
   setTimeout(() => playPixelSequence(`scenarioStart_${i}`, null), 300);
 }
 
@@ -1179,17 +1562,27 @@ function loadScenario(i) {
   renderOSCQR(s.oscqr, []);
   document.getElementById('chat').innerHTML = '';
 
-  const boardImg = document.getElementById('vnBoardImg');
-  boardImg.classList.remove('loaded');
-  boardImg.src = '';
+  loadSceneImage(`scene-s${i + 1}.png`);
 
   const sceneBg = document.getElementById('vnSceneBg');
-  if (sceneBg) {
-    sceneBg.src = 'images/classroom-bg.png';
-  }
-
+  if (sceneBg) sceneBg.src = 'images/classroom-bg.png';
   document.getElementById('vnBoardLoading').style.display = 'none';
 
+  // S5 and S6 control their own input visibility
+  if (i === 4) {
+    renderOpenPlain(document.getElementById('inputContainer'));
+    document.getElementById('inputContainer').style.display = 'none';
+    loadScenario5();
+    return;
+  }
+  if (i === 5) {
+    renderOpenPlain(document.getElementById('inputContainer'));
+    document.getElementById('inputContainer').style.display = 'none';
+    loadScenario6();
+    return;
+  }
+
+  renderInputMode(i);
   addWelcomeCard();
 }
 
@@ -1279,26 +1672,312 @@ function removeTyping() {
 }
 
 // ══════════════════════════════════════════════════════
-//  SEND
+//  SCAFFOLDED INPUT SYSTEM
 // ══════════════════════════════════════════════════════
-async function send() {
-  const input = document.getElementById('promptInput');
-  const text = input.value.trim();
-  if (!text) return;
 
-  // Route Scenario 4 to its special handler
-  if (scenarioIndex === 3) {
-    sendScenario4(text);
+// Tracks what the player wrote across scenarios for memory hints
+const playerHistory = {
+  s1: { learners: '', goal: '', constraints: '', assembled: '' },
+  s2: { bestPrompt: '' },
+};
+
+// Hint chip definitions for Scenario 2
+const S2_CHIPS = [
+  { key: 'learners',    label: 'Learners',    test: /student|learner|rural|online|class|grade|level|adult|community/i },
+  { key: 'goal',        label: 'Goal',        test: /goal|outcome|objective|learn|understand|create|design|develop|able to/i },
+  { key: 'context',     label: 'Context',     test: /course|subject|week|unit|module|discussion|assignment|activity|topic/i },
+  { key: 'constraints', label: 'Constraints', test: /minute|hour|word|short|brief|limit|length|format|\d+ (question|step)/i },
+  { key: 'detail',      label: 'Detail',      test: text => text.length > 100 },
+];
+
+// Render the correct input mode for the current scenario
+function renderInputMode(idx) {
+  const container = document.getElementById('inputContainer');
+  if (!container) return;
+
+  if (idx === 0)      renderGuidedBuilder(container);
+  else if (idx === 1) renderHintChips(container);
+  else if (idx === 2) renderOpenWithMemory(container);
+  else                renderOpenPlain(container); // S3, S4, S5, S6 all get plain open
+}
+
+// ── MODE 1: GUIDED BUILDER (Scenario 1) ──────────────
+function renderGuidedBuilder(container) {
+  container.innerHTML = `
+    <div class="scaffold-area">
+      <div class="guided-builder" id="guidedBuilder">
+
+        <div class="guided-field">
+          <label class="guided-label" for="g-learners">
+            <span class="guided-label-num">1</span>
+            Who are your learners?
+          </label>
+          <textarea class="guided-input" id="g-learners" rows="1"
+            placeholder="e.g. Rural online high school seniors in a Health class..."
+            oninput="onGuidedInput(this)" aria-label="Describe your learners"></textarea>
+        </div>
+
+        <div class="guided-field">
+          <label class="guided-label" for="g-goal">
+            <span class="guided-label-num">2</span>
+            What do you want the AI to help you design?
+          </label>
+          <textarea class="guided-input" id="g-goal" rows="1"
+            placeholder="e.g. A discussion prompt that connects to their real community..."
+            oninput="onGuidedInput(this)" aria-label="Describe your design goal"></textarea>
+        </div>
+
+        <div class="guided-field">
+          <label class="guided-label" for="g-constraints">
+            <span class="guided-label-num">3</span>
+            What constraints or context matter?
+          </label>
+          <textarea class="guided-input" id="g-constraints" rows="1"
+            placeholder="e.g. Should take 15 minutes, asynchronous, low tech access..."
+            oninput="onGuidedInput(this)" aria-label="Add any constraints or context"></textarea>
+        </div>
+
+        <div class="guided-preview" id="guidedPreview">
+          <div class="guided-preview-label">Your assembled prompt</div>
+          <div id="guidedPreviewText"></div>
+        </div>
+
+        <div class="guided-footer">
+          <button class="guided-skip-link" onclick="switchToOpen()" type="button">
+            Write it myself instead
+          </button>
+          <span class="guided-attempt-badge">Attempts: <span id="attNum">0</span></span>
+          <button class="guided-send-btn" id="sendBtn"
+                  onclick="sendGuided()" aria-label="Send assembled prompt to AI">
+            Send prompt →
+          </button>
+        </div>
+
+      </div>
+    </div>`;
+}
+
+function onGuidedInput(el) {
+  autoGrow(el);
+  const learners    = (document.getElementById('g-learners')?.value    || '').trim();
+  const goal        = (document.getElementById('g-goal')?.value        || '').trim();
+  const constraints = (document.getElementById('g-constraints')?.value || '').trim();
+
+  const parts = [];
+  if (learners)    parts.push(`My learners are ${learners}.`);
+  if (goal)        parts.push(goal);
+  if (constraints) parts.push(`Context and constraints: ${constraints}.`);
+
+  const assembled = parts.join(' ');
+  const preview = document.getElementById('guidedPreview');
+  const previewText = document.getElementById('guidedPreviewText');
+
+  if (assembled && preview && previewText) {
+    preview.classList.add('has-content');
+    previewText.textContent = assembled;
+  } else if (preview) {
+    preview.classList.remove('has-content');
+  }
+}
+
+function sendGuided() {
+  const learners    = (document.getElementById('g-learners')?.value    || '').trim();
+  const goal        = (document.getElementById('g-goal')?.value        || '').trim();
+  const constraints = (document.getElementById('g-constraints')?.value || '').trim();
+
+  const parts = [];
+  if (learners)    parts.push(`My learners are ${learners}.`);
+  if (goal)        parts.push(goal);
+  if (constraints) parts.push(`Context and constraints: ${constraints}.`);
+
+  const assembled = parts.join(' ');
+  if (!assembled.trim()) {
+    // Nudge -- at least one field needed
+    document.getElementById('g-learners')?.focus();
     return;
   }
 
+  // Save to player history for scenario 3 memory hint
+  playerHistory.s1 = { learners, goal, constraints, assembled };
+
+  sendText(assembled);
+}
+
+function switchToOpen() {
+  // Replaces guided builder with plain textarea mid-session
+  const container = document.getElementById('inputContainer');
+  renderOpenPlain(container);
+  setTimeout(() => document.getElementById('promptInput')?.focus(), 50);
+}
+
+// ── MODE 2: HINT CHIPS (Scenario 2) ──────────────────
+function renderHintChips(container) {
+  const chipsHTML = S2_CHIPS.map(c => `
+    <span class="hint-chip" id="chip-${c.key}" aria-label="${c.label} — not yet covered">
+      <span class="chip-check">✓</span>${c.label}
+    </span>`).join('');
+
+  container.innerHTML = `
+    <div class="scaffold-area">
+      <div class="hint-chip-label">Cover these elements as you write:</div>
+      <div class="hint-chip-row" role="list" aria-label="Prompt element checklist">
+        ${chipsHTML}
+      </div>
+      <div class="input-box">
+        <label for="promptInput" class="sr-only">Write your AI prompt here</label>
+        <textarea id="promptInput"
+          aria-label="Write your AI prompt"
+          placeholder="Write your prompt — the chips above light up as you cover each element."
+          oninput="onHintInput(this);autoGrow(this)"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOpen()}"></textarea>
+        <button class="send-btn" id="sendBtn"
+                onclick="sendOpen()" aria-label="Send prompt">↑</button>
+      </div>
+      <div class="input-footer-shared">
+        <span class="input-hint">Shift + Enter for a new line</span>
+        <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
+      </div>
+    </div>`;
+}
+
+function onHintInput(el) {
+  const text = el.value;
+  S2_CHIPS.forEach(c => {
+    const chip = document.getElementById(`chip-${c.key}`);
+    if (!chip) return;
+    const covered = typeof c.test === 'function' ? c.test(text) : c.test.test(text);
+    chip.classList.toggle('covered', covered);
+    chip.setAttribute('aria-label',
+      `${c.label} — ${covered ? 'covered' : 'not yet covered'}`);
+  });
+  // Save best prompt for memory hint
+  if (text.length > (playerHistory.s2.bestPrompt?.length || 0)) {
+    playerHistory.s2.bestPrompt = text;
+  }
+}
+
+function sendOpen() {
+  const input = document.getElementById('promptInput');
+  const text = input?.value?.trim();
+  if (!text) return;
+  sendText(text);
+}
+
+// ── MODE 3: OPEN WITH MEMORY HINT (Scenario 3) ───────
+function renderOpenWithMemory(container) {
+  // Build memory hint from what we know about their previous attempts
+  const hint = buildMemoryHint();
+
+  container.innerHTML = `
+    <div class="scaffold-area">
+      ${hint ? `<div class="memory-hint visible" role="note">${hint}</div>` : ''}
+      <div class="input-box">
+        <label for="promptInput" class="sr-only">Write your AI prompt here</label>
+        <textarea id="promptInput"
+          aria-label="Write your AI prompt"
+          placeholder="Write your best prompt — no hints this time, just what you have learned."
+          oninput="autoGrow(this)"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOpen()}"></textarea>
+        <button class="send-btn" id="sendBtn"
+                onclick="sendOpen()" aria-label="Send prompt">↑</button>
+      </div>
+      <div class="input-footer-shared">
+        <span class="input-hint">Shift + Enter for a new line</span>
+        <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
+      </div>
+    </div>`;
+}
+
+function buildMemoryHint() {
+  const s1 = playerHistory.s1;
+  const s2Score = scenarioData[1]?.bestScore || 0;
+
+  const parts = [];
+
+  if (s1.learners) {
+    parts.push(`In Scenario 1 you described your learners as <strong>"${s1.learners.substring(0, 60)}"</strong> — keep that specificity.`);
+  }
+
+  if (s2Score >= 4) {
+    parts.push(`Your Scenario 2 prompts were strong. See if you can push the constraint detail even further this time.`);
+  } else if (s2Score >= 2) {
+    parts.push(`In Scenario 2 you were getting more specific. This time try to include a concrete format or time constraint.`);
+  } else {
+    parts.push(`This is your final scored scenario — no chips or fields, just what you have learned. Be as specific as you can about who, what, and the context.`);
+  }
+
+  return parts.length ? `🌿 ${parts.join(' ')}` : '';
+}
+
+// ── MODE 4: PLAIN OPEN (Scenario 4 + skip target) ────
+function renderOpenPlain(container) {
+  container.innerHTML = `
+    <div class="scaffold-area">
+      <div class="input-box">
+        <label for="promptInput" class="sr-only">Write your AI prompt here</label>
+        <textarea id="promptInput"
+          aria-label="Write your AI prompt"
+          placeholder="Write your prompt here — who are your learners, what do you need, what constraints matter?"
+          oninput="autoGrow(this)"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOpen()}"></textarea>
+        <button class="send-btn" id="sendBtn"
+                onclick="sendOpen()" aria-label="Send prompt">↑</button>
+      </div>
+      <div class="input-footer-shared">
+        <span class="input-hint">Shift + Enter for a new line</span>
+        <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
+      </div>
+    </div>`;
+}
+
+// ── UNIFIED SEND ENTRY POINT ──────────────────────────
+function sendText(text) {
+  // Disable whichever send button is currently rendered
+  const btn = document.getElementById('sendBtn');
+  if (btn) btn.disabled = true;
+  // Route to the correct handler
+  if (scenarioIndex === 3) {
+    sendScenario4(text);
+  } else {
+    sendMain(text);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  SEND
+// ══════════════════════════════════════════════════════
+async function send() {
+  // Legacy entry point -- routes to correct mode
+  if (scenarioIndex === 3) {
+    const input = document.getElementById('promptInput');
+    if (input) sendScenario4(input.value.trim());
+  } else {
+    sendOpen();
+  }
+}
+
+async function sendMain(text) {
+  if (!text) return;
+
   attempts++;
-  document.getElementById('attNum').textContent = attempts;
+  const attEl = document.getElementById('attNum');
+  if (attEl) attEl.textContent = attempts;
   addMsg('user', esc(text));
-  input.value = '';
-  input.style.height = 'auto';
+
+  // Clear whichever input is active
+  const input = document.getElementById('promptInput');
+  if (input) { input.value = ''; input.style.height = 'auto'; }
+  // Also clear guided fields if in builder mode
+  ['g-learners','g-goal','g-constraints'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const preview = document.getElementById('guidedPreview');
+  if (preview) preview.classList.remove('has-content');
+
   history.push({ role: 'user', content: text });
-  document.getElementById('sendBtn').disabled = true;
+  const btn = document.getElementById('sendBtn');
+  if (btn) btn.disabled = true;
   addTyping();
 
   try {
@@ -1342,16 +2021,19 @@ async function send() {
 
     addMsg('ai', fmt(reply) + buildFeedback(score), replyExpr);
     gainXP(score.total * 6);
+    lastScore = score.total;
 
-    // React via badge and coach card at key moments
-    pixelReactToScore(score.total);
+    // Cancel any pending Pixel timer from previous attempt
+    const chatEl = document.getElementById('chat');
+    if (chatEl._pixelThinkTimer) clearTimeout(chatEl._pixelThinkTimer);
 
-    // Full VN sequence for score-based feedback (after brief delay)
-    setTimeout(() => {
-      if (score.total <= 1)      playPixelSequence('vague');
-      else if (score.total <= 3) playPixelSequence('decent');
-      else                        playPixelSequence('strong');
-    }, 500);
+    // Schedule Pixel's inline response
+    schedulePixelResponse(
+      text,
+      reply,
+      score.total,
+      scenarios[scenarioIndex].desc
+    );
 
     markScenarioComplete();
 
@@ -1359,13 +2041,11 @@ async function send() {
     removeTyping();
     addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`);
   } finally {
-    document.getElementById('sendBtn').disabled = false;
+    const btn = document.getElementById('sendBtn');
+    if (btn) btn.disabled = false;
     document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
   }
 }
-
-// ══════════════════════════════════════════════════════
-//  SCORING
 // ══════════════════════════════════════════════════════
 function scorePrompt(text) {
   const hasLearners   = /student|learner|rural|online|class|grade|level|adult|community/i.test(text);
@@ -1444,9 +2124,11 @@ function markScenarioComplete() {
   // Save incremental data for this scenario
   saveIncrementalData(scenarioIndex);
 
-  // Unlock Scenario 4 when scenarios 1-3 are all done
-  const mainThreeDone = scenarioCompleted[0] && scenarioCompleted[1] && scenarioCompleted[2];
-  if (mainThreeDone) unlockScenario4();
+  // Unlock next scenario at the right moments
+  const s1s2s3done = scenarioCompleted[0] && scenarioCompleted[1] && scenarioCompleted[2];
+  if (s1s2s3done && !scenarioCompleted[3]) unlockScenario4();
+  if (scenarioCompleted[3] && !scenarioCompleted[4]) unlockScenario5();
+  if (scenarioCompleted[4] && !scenarioCompleted[5]) unlockScenario6();
 
   const allDone = scenarioCompleted.every(Boolean);
   const area = document.getElementById('chat');
@@ -1455,25 +2137,19 @@ function markScenarioComplete() {
 
   if (allDone && !document.getElementById('completeAllBtn')) {
     playSound('allComplete');
-    generateSceneImage(
-      "A celebratory cozy classroom scene: teacher and students celebrating success, confetti, warm light, plants, bulletin board covered in achievements. Soft watercolor, earthy tones.",
-      document.getElementById('vnBoardImg'),
-      document.getElementById('vnBoardLoading')
-    );
+    loadSceneImage('scene-complete.png');
     setTimeout(() => playPixelSequence('allComplete', null), 400);
     pixelBadgeSetExpr('excited');
     div.innerHTML = `
-      <p style="font-size:0.76rem;color:var(--ink-light);margin-bottom:10px;font-weight:600;">All three scenarios complete.</p>
+      <p style="font-size:0.76rem;color:var(--ink-light);margin-bottom:10px;font-weight:600;">All six scenarios complete.</p>
       <button class="complete-btn" id="completeAllBtn" onclick="openReflection()">Enter the Reflection Room →</button>`;
   } else if (!allDone) {
     const done = scenarioCompleted.filter(Boolean).length;
     playSound('scenarioComplete');
-    setTimeout(() => {
-      playPixelSequence('scenarioComplete', null);
-      pixelCoachShow('scenarioComplete');
-    }, 400);
+    pixelBadgeSetExpr('encouraging');
+    const remaining = scenarioCompleted.length - done;
     div.innerHTML = `<p style="font-size:0.74rem;color:var(--ink-muted);">
-      Scenario complete — ${3 - done} remaining before the Reflection Room unlocks.
+      Scenario complete — ${remaining} remaining before the Reflection Room unlocks.
     </p>`;
   }
   area.appendChild(div);
@@ -1570,15 +2246,29 @@ async function handleReflectionSubmit(e) {
 //  DEV TOOLS
 // ══════════════════════════════════════════════════════
 function devGoS4() {
-  // Mark scenarios 1-3 complete and unlock S4
-  scenarioCompleted = [true, true, true, false];
+  scenarioCompleted = [true, true, true, false, false, false];
   unlockScenario4();
-
-  // Switch to S4 tab
   const s4btn = document.getElementById('s4Tab');
   switchScenario(3, s4btn);
+  document.getElementById('chat').scrollTop = 0;
+}
 
-  // Scroll to top of chat
+function devGoS5() {
+  scenarioCompleted = [true, true, true, true, false, false];
+  unlockScenario4();
+  unlockScenario5();
+  const s5btn = document.getElementById('s5Tab');
+  switchScenario(4, s5btn);
+  document.getElementById('chat').scrollTop = 0;
+}
+
+function devGoS6() {
+  scenarioCompleted = [true, true, true, true, true, false];
+  unlockScenario4();
+  unlockScenario5();
+  unlockScenario6();
+  const s6btn = document.getElementById('s6Tab');
+  switchScenario(5, s6btn);
   document.getElementById('chat').scrollTop = 0;
 }
 

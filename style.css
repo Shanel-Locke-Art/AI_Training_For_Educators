@@ -1000,20 +1000,51 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
 
   width: 72%;
   height: 60vh;
-  min-height: 420px;
-  max-height: 640px;
+  min-height: 380px;
+  max-height: 600px;
 
-  padding: 34px 38px 30px;
-
-  background: rgba(5, 18, 16, 0.78);
+  background: rgba(5, 18, 16, 0.85);
   border: 2px solid rgba(93, 164, 128, 0.45);
   border-radius: 20px;
+  overflow: hidden; /* clips the bg image to the border-radius */
 
   box-shadow:
     0 18px 40px rgba(0,0,0,0.28),
     inset 0 0 24px rgba(255,255,255,0.03);
 
   z-index: 2;
+}
+
+/* Scene image fills the entire smartboard as a background */
+.vn-board-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+  border-radius: 0;
+  margin: 0;
+}
+
+.vn-board-img.loaded { opacity: 0.55; }
+
+/* Dark gradient overlay so text stays readable over image */
+.vn-smartboard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(5,18,16,0.55) 0%,
+    rgba(5,18,16,0.25) 40%,
+    rgba(5,18,16,0.7)  100%
+  );
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 18px;
 }
 
 .vn-smartboard::after {
@@ -1023,50 +1054,44 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
   border-radius: 18px;
   box-shadow: inset 0 0 28px rgba(69, 154, 124, 0.05);
   pointer-events: none;
+  z-index: 2;
+}
+
+/* Text content sits above the image layers */
+.vn-board-label,
+.vn-board-text,
+.vn-board-loading {
+  position: relative;
+  z-index: 3;
 }
 
 .vn-board-label {
   font-family: 'Source Code Pro', monospace;
-  font-size: 1rem;
+  font-size: 0.9rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(146, 220, 191, 0.8);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  padding: 34px 38px 0;
 }
 
 .vn-board-text {
   font-family: 'Nunito', sans-serif;
-  font-size: 1.75rem;
+  font-size: 1.65rem;
   color: #f8fffb;
-  line-height: 1.7;
+  line-height: 1.65;
   font-weight: 800;
-
-  max-width: 80%;
-  margin-top: 10px;
-
-  text-shadow: 0 2px 12px rgba(0,0,0,0.55);
-}
-
-.vn-board-img {
-  width: 100%;
-  border-radius: 10px;
-  margin-top: 14px;
-  max-height: 220px;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-
-.vn-board-img.loaded {
-  opacity: 1;
+  max-width: 85%;
+  padding: 0 38px;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.8), 0 1px 4px rgba(0,0,0,0.9);
 }
 
 .vn-board-loading {
   font-family: 'Source Code Pro', monospace;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: rgba(146, 220, 191, 0.72);
-  margin-top: 12px;
   letter-spacing: 0.06em;
+  padding: 12px 38px 0;
 }
 
 /* ── PROFESSOR PIXEL ───────────────────────────────── */
@@ -1228,21 +1253,27 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
   .vn-smartboard {
     left: 4%;
     top: 4%;
-    width: 92%;
-    min-height: 220px;
-    padding: 16px 16px 14px;
+    width: 88%;
+    min-height: 200px;
     border-radius: 12px;
   }
 
   .vn-board-label {
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     margin-bottom: 8px;
+    padding: 16px 16px 0;
   }
 
   .vn-board-text {
-    font-size: 1.05rem;
-    min-height: 72px;
+    font-size: 1rem;
+    line-height: 1.5;
     max-width: 100%;
+    padding: 0 16px;
+  }
+
+  .vn-board-loading {
+    padding: 8px 16px 0;
+    font-size: 0.68rem;
   }
 
   .vn-character {
@@ -2266,4 +2297,393 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
   font-size: 0.65rem;
   font-weight: 800;
   letter-spacing: -0.02em;
+}
+
+/* ══════════════════════════════════════════════════════
+   PROFESSOR PIXEL — INLINE CHAT DIALOGUE SYSTEM
+   ══════════════════════════════════════════════════════ */
+
+/* ── PIXEL THINKING INDICATOR ───────────────────────── */
+/* Appears a few seconds after AI response */
+.pixel-thinking-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slideUp 0.25s ease forwards;
+  opacity: 0;
+  padding: 2px 0;
+}
+
+.pixel-thinking-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--forest-mid);
+  object-fit: cover;
+  object-position: top center;
+  background: var(--forest-light);
+  flex-shrink: 0;
+}
+
+.pixel-thinking-text {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.62rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.06em;
+  font-style: italic;
+}
+
+.pixel-thinking-dots {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.pixel-thinking-dots span {
+  width: 5px;
+  height: 5px;
+  background: var(--ink-muted);
+  border-radius: 50%;
+  animation: blink 1.3s infinite;
+  display: inline-block;
+}
+
+.pixel-thinking-dots span:nth-child(2) { animation-delay: 0.22s; }
+.pixel-thinking-dots span:nth-child(3) { animation-delay: 0.44s; }
+
+/* ── PIXEL REVEAL BUTTON ────────────────────────────── */
+/* Replaces thinking indicator when ready */
+.pixel-reveal-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 99px;
+  padding: 6px 14px 6px 8px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--forest-dark);
+  transition: all 0.18s ease;
+  animation: slideUp 0.3s ease forwards;
+  opacity: 0;
+  min-height: 40px;
+  align-self: flex-start;
+}
+
+.pixel-reveal-btn:hover {
+  background: var(--forest-light);
+  border-color: var(--forest-mid);
+  transform: translateX(3px);
+}
+
+.pixel-reveal-btn:active { transform: scale(0.97); }
+
+.pixel-reveal-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--forest-mid);
+  object-fit: cover;
+  object-position: top center;
+  background: var(--forest-light);
+  flex-shrink: 0;
+}
+
+.pixel-reveal-arrow {
+  margin-left: 2px;
+  font-size: 0.7rem;
+  opacity: 0.6;
+}
+
+/* ── PIXEL INLINE CHAT BUBBLE ───────────────────────── */
+/* Her response in the chat -- distinct from AI bubbles */
+.message.pixel .bubble {
+  background: var(--forest-light);
+  border-color: rgba(45,90,61,0.25);
+  border-top-left-radius: 4px;
+  color: var(--forest-dark);
+  font-style: normal;
+}
+
+.message.pixel .bubble-sender {
+  color: var(--forest-mid);
+}
+
+.message.pixel .avatar {
+  border-color: var(--forest-mid);
+  background: var(--forest-light);
+}
+
+/* Pixel's follow-up question at the bottom of her bubble */
+.pixel-followup {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(45,90,61,0.15);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--forest-dark);
+  font-style: italic;
+}
+
+/* ── PIXEL LOADING IN CHAT ──────────────────────────── */
+.pixel-loading-bubble {
+  background: var(--forest-light);
+  border: 1.5px solid rgba(45,90,61,0.2);
+  border-top-left-radius: 4px;
+  border-radius: var(--radius-lg);
+  padding: 10px 14px;
+}
+
+@media (max-width: 480px) {
+  .pixel-reveal-btn {
+    font-size: 0.7rem;
+    padding: 6px 12px 6px 7px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   SCAFFOLDED INPUT SYSTEM
+   ══════════════════════════════════════════════════════ */
+
+/* ── SCAFFOLD WRAPPER ───────────────────────────────── */
+.scaffold-area {
+  background: var(--parchment);
+  border-top: 2px solid var(--border);
+  padding: 12px 16px;
+  flex-shrink: 0;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+/* ── SCENARIO 1: GUIDED BUILDER ─────────────────────── */
+.guided-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.guided-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.guided-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--forest-mid);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.guided-label-num {
+  width: 18px;
+  height: 18px;
+  background: var(--forest);
+  color: #d4edd9;
+  border-radius: 50%;
+  font-size: 0.58rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.guided-input {
+  width: 100%;
+  background: var(--cream);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  padding: 9px 12px;
+  resize: none;
+  min-height: 44px;
+  max-height: 90px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: inset 0 1px 3px rgba(42,31,20,0.05);
+}
+
+.guided-input:focus {
+  border-color: var(--forest-mid);
+  box-shadow: inset 0 1px 3px rgba(42,31,20,0.05), 0 0 0 3px rgba(45,90,61,0.1);
+  background: #fff;
+}
+
+.guided-input::placeholder {
+  color: var(--ink-muted);
+  font-style: italic;
+  font-size: 0.84rem;
+}
+
+/* Live preview of assembled prompt */
+.guided-preview {
+  background: var(--forest-dark);
+  border-radius: var(--radius);
+  padding: 10px 13px;
+  margin-top: 4px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.75rem;
+  color: #a8d5b5;
+  line-height: 1.65;
+  min-height: 44px;
+  word-break: break-word;
+  transition: opacity 0.2s;
+  display: none; /* shown once any field has content */
+}
+
+.guided-preview.has-content { display: block; }
+
+.guided-preview-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(168,213,181,0.5);
+  margin-bottom: 5px;
+}
+
+/* Builder footer row */
+.guided-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  gap: 8px;
+}
+
+.guided-send-btn {
+  padding: 10px 20px;
+  background: var(--forest);
+  border: 2px solid var(--forest-dark);
+  border-radius: var(--radius);
+  color: #d4edd9;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 44px;
+  box-shadow: 0 2px 4px rgba(30,61,41,0.25);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.guided-send-btn:hover { background: var(--forest-dark); }
+.guided-send-btn:disabled {
+  background: var(--border-strong);
+  border-color: var(--border);
+  box-shadow: none;
+  cursor: not-allowed;
+  color: var(--ink-muted);
+}
+
+.guided-skip-link {
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 4px;
+  transition: color 0.15s;
+}
+
+.guided-skip-link:hover { color: var(--ink-light); }
+
+.guided-attempt-badge {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.64rem;
+  color: var(--ink-light);
+  margin-left: auto;
+}
+
+.guided-attempt-badge span { color: var(--terracotta); font-weight: 700; }
+
+/* ── SCENARIO 2: HINT CHIPS ──────────────────────────── */
+.hint-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.hint-chip {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 99px;
+  border: 1.5px solid var(--border);
+  color: var(--ink-muted);
+  background: var(--cream);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hint-chip.covered {
+  border-color: var(--forest-mid);
+  color: var(--forest-dark);
+  background: var(--forest-light);
+}
+
+.hint-chip .chip-check {
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 0.7rem;
+}
+
+.hint-chip.covered .chip-check { opacity: 1; }
+
+.hint-chip-label {
+  font-size: 0.62rem;
+  font-family: 'Source Code Pro', monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 5px;
+}
+
+/* ── SCENARIO 3: MEMORY HINT ─────────────────────────── */
+.memory-hint {
+  background: var(--amber-light);
+  border: 1px solid rgba(196,124,45,0.25);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  font-size: 0.76rem;
+  color: var(--amber-dark);
+  line-height: 1.55;
+  display: none; /* shown after scenario 2 complete */
+}
+
+.memory-hint.visible { display: block; }
+
+.memory-hint strong { font-weight: 700; }
+
+/* ── SHARED INPUT FOOTER ─────────────────────────────── */
+.input-footer-shared {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  align-items: center;
+}
+
+@media (max-width: 480px) {
+  .guided-preview { font-size: 0.7rem; }
+  .guided-label { font-size: 0.58rem; }
+  .hint-chip { font-size: 0.62rem; padding: 3px 8px; }
+  .memory-hint { font-size: 0.72rem; }
 }
