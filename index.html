@@ -2661,15 +2661,16 @@ async function sendMain(text) {
     gainXP(score.total * 6);
     lastScore = score.total;
 
-    // Scroll the AI response to the TOP of the chat so player reads from beginning
-    const aiMessages = document.getElementById('chat').querySelectorAll('.message.ai');
-    const latestAiMsg = aiMessages[aiMessages.length - 1];
-    if (latestAiMsg) {
-      latestAiMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    const chatEl = document.getElementById('chat');
+
+    // Scroll to the TOP of the AI response after DOM settles
+    setTimeout(() => {
+      const aiMessages = chatEl.querySelectorAll('.message.ai');
+      const latestAiMsg = aiMessages[aiMessages.length - 1];
+      if (latestAiMsg) chatEl.scrollTop = latestAiMsg.offsetTop - 12;
+    }, 60);
 
     // Cancel any pending Pixel timer from previous attempt
-    const chatEl = document.getElementById('chat');
     if (chatEl._pixelThinkTimer) clearTimeout(chatEl._pixelThinkTimer);
 
     // Schedule Pixel's inline response
