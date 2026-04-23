@@ -2657,18 +2657,23 @@ async function sendMain(text) {
     else if (score.total <= 3) replyExpr = 'encouraging';
     else                        replyExpr = 'excited';
 
-    addMsg('ai', fmt(reply) + buildFeedback(score), replyExpr);
+    const aiMsgEl = addMsg('ai', fmt(reply) + buildFeedback(score), replyExpr);
     gainXP(score.total * 6);
     lastScore = score.total;
 
     const chatEl = document.getElementById('chat');
 
-    // Scroll to the TOP of the AI response after DOM settles
-    setTimeout(() => {
-      const aiMessages = chatEl.querySelectorAll('.message.ai');
-      const latestAiMsg = aiMessages[aiMessages.length - 1];
-      if (latestAiMsg) chatEl.scrollTop = latestAiMsg.offsetTop - 12;
-    }, 60);
+    // Scroll so Pixel's response is at the top of the chat viewport.
+    // Use double-rAF so the element is fully painted before we measure.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (aiMsgEl) {
+          const chatRect = chatEl.getBoundingClientRect();
+          const msgRect  = aiMsgEl.getBoundingClientRect();
+          chatEl.scrollTop = chatEl.scrollTop + (msgRect.top - chatRect.top);
+        }
+      });
+    });
 
     // Cancel any pending Pixel timer from previous attempt
     if (chatEl._pixelThinkTimer) clearTimeout(chatEl._pixelThinkTimer);
