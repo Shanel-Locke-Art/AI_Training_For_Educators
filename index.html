@@ -2293,7 +2293,9 @@ function addMsg(role, html, pixelExpr) {
       <div class="bubble">${html}</div>
     </div>`;
   area.appendChild(wrap);
-  area.scrollTop = area.scrollHeight;
+  // Only scroll to bottom for user messages -- AI messages handled by caller
+  if (isUser) area.scrollTop = area.scrollHeight;
+  return wrap;
 }
 
 function addTyping() {
@@ -2659,6 +2661,13 @@ async function sendMain(text) {
     gainXP(score.total * 6);
     lastScore = score.total;
 
+    // Scroll the AI response to the TOP of the chat so player reads from beginning
+    const aiMessages = document.getElementById('chat').querySelectorAll('.message.ai');
+    const latestAiMsg = aiMessages[aiMessages.length - 1];
+    if (latestAiMsg) {
+      latestAiMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     // Cancel any pending Pixel timer from previous attempt
     const chatEl = document.getElementById('chat');
     if (chatEl._pixelThinkTimer) clearTimeout(chatEl._pixelThinkTimer);
@@ -2682,7 +2691,8 @@ async function sendMain(text) {
   } finally {
     const btn = document.getElementById('sendBtn');
     if (btn) btn.disabled = false;
-    document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+    // Note: intentionally not scrolling to bottom here --
+    // the AI response scroll-into-view above handles positioning
 
     // Pre-fill input with last prompt so player can refine rather than rewrite
     if (lastPromptText && scenarioIndex < 3) {
