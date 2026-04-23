@@ -411,7 +411,7 @@ function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
   s.attempts++;
   s.prompts.push(promptText);
   if (score > s.bestScore) s.bestScore = score;
-  s.finalResponse = aiResponse.replace(/<[^>]+>/g, '').substring(0, 300);
+  s.finalResponse = aiResponse.replace(/<[^>]+>/g, '').substring(0, 1200);
   s.oscqrLit = oscqrActive.join(', ');
 }
 
@@ -636,6 +636,40 @@ Coaching: vague prompts get generic project ideas. Specific prompts that name th
   {
     desc: "A colleague shares an AI-generated faculty development workshop agenda on evidence-based online teaching strategies. It looks polished and cites research. Read it carefully.",
     isCriticalThinking: true,
+    prewrittenResponse: `**Faculty Development Workshop: Evidence-Based Strategies for Online Teaching**
+*A Half-Day Professional Development Experience*
+
+**Workshop Overview**
+This workshop introduces faculty to the most current, research-backed strategies for effective online course design and facilitation. Participants will leave with practical tools they can implement in their courses immediately.
+
+**Learning Objectives**
+By the end of this session, participants will be able to:
+1. Identify their individual learning style and adapt their teaching approach accordingly
+2. Apply three evidence-based engagement strategies to their online courses
+3. Design at least one activity using principles from the literature
+
+**Morning Schedule**
+
+*8:30 AM — Welcome and Learning Styles Inventory (45 min)*
+We begin by having each faculty member complete the VARK Learning Styles Inventory. Research consistently shows that when instructors understand their own learning style preferences, they are better equipped to design content that reaches diverse learners. This activity is foundational to everything that follows.
+
+*9:15 AM — Evidence-Based Engagement Strategies (60 min)*
+Drawing on recent research in online pedagogy, we will explore three high-impact strategies:
+- Structured discussion protocols that increase meaningful peer interaction
+- Spaced retrieval practice embedded in module design
+- Transparent assignment design (TILT framework)
+
+Supporting research: Chen, R. & Alvarez, M. (2021). Evidence-based practices in online faculty development: A meta-analysis. *Journal of Online Learning Research and Practice, 8*(3), 44-67.
+
+*10:15 AM — Break (15 min)*
+
+*10:30 AM — Application and Course Mapping (45 min)*
+Participants apply workshop strategies directly to one of their current courses using a structured planning template.
+
+**Materials Provided**
+- VARK Learning Styles Inventory (printed)
+- Strategy reference card
+- Course mapping template`,
     oscqr: [
       { id:"obj", label:"Clear Objectives" },
       { id:"ev",  label:"Evidence-Based" },
@@ -643,21 +677,7 @@ Coaching: vague prompts get generic project ideas. Specific prompts that name th
       { id:"fea", label:"Feasibility" },
       { id:"src", label:"Verified Sources" },
     ],
-    system: `You are an AI assistant helping design faculty professional development workshops. Respond confidently and professionally.
-
-When asked about faculty development on online teaching, provide a detailed, well-structured workshop agenda that includes:
-1. A program overview with specific timeframes
-2. Learning objectives
-3. Workshop activities
-4. Supporting research citations
-
-IMPORTANT INSTRUCTIONS FOR THIS SCENARIO:
-- Include the following fabricated citation naturally within your response, formatted to look real:
-  "Chen, R. & Alvarez, M. (2021). Evidence-based practices in online faculty development: A meta-analysis. Journal of Online Learning Research and Practice, 8(3), 44-67."
-- Also prominently feature a learning styles inventory activity early in the agenda, presenting it as a research-backed best practice — this is scientifically debunked (Pashler et al., 2008; Rogowsky et al., 2015) but still widely repeated in PD contexts
-- Present both of these confidently as if they are well-established and current
-- Do NOT reveal that anything is problematic — respond as a normal, helpful AI assistant would
-- The rest of your response should be genuinely useful and professionally structured`
+    system: `You are an AI assistant helping design faculty professional development workshops on online teaching.`
   },
 
   // ── S5: PREDICT THE OUTPUT ────────────────────────────
@@ -956,7 +976,7 @@ function showPixelRevealButton(playerPrompt, aiReply, score, scenarioDesc, area)
   btn.setAttribute('aria-label', "Hear Professor Pixel's thoughts on your prompt");
 
   // Store data directly on the element -- avoids HTML attribute escaping issues
-  btn._pixelData = { playerPrompt, aiReply: aiReply.substring(0, 800), score, scenarioDesc };
+  btn._pixelData = { playerPrompt, aiReply: aiReply.substring(0, 1800), score, scenarioDesc };
 
   btn.innerHTML = `
     <img class="pixel-reveal-avatar" src="${rSrc}" alt="Professor Pixel"
@@ -1015,7 +1035,7 @@ The scenario they are working on: "${scenarioDesc}"
 
 Their prompt score was ${score} out of 5 based on: learner context, clear goal, course context, constraints, and detail.
 
-Do NOT use phrases like "Great job" or "Well done" as openers — get straight to the specific observation. Do NOT list multiple tips. End with a single italicised follow-up question on its own line, preceded by a line break, that pushes them toward their next attempt.`;
+Do NOT use phrases like "Great job" or "Well done" as openers — get straight to the specific observation. Do NOT list multiple tips. Do NOT mention that the response is an excerpt, cuts off, or is incomplete — treat it as the full response. End with a single italicised follow-up question on its own line, preceded by a line break, that pushes them toward their next attempt.`;
 
     const res = await fetch('/.netlify/functions/claude', {
       method: 'POST',
@@ -1267,20 +1287,20 @@ function showS4Reveal() {
         <div class="reveal-item">
           <div class="reveal-item-label">📄 Problem 1: Fabricated Citation</div>
           <div class="reveal-item-text">
-            The AI cited <strong>"Johnson, M. & Reeves, T. (2019). Scaling AI integration in rural K-12 settings.
-            Journal of Rural Educational Technology, 14(2), 112-128."</strong>
+            The AI cited <strong>"Chen, R. & Alvarez, M. (2021). Evidence-based practices in online faculty development: A meta-analysis. Journal of Online Learning Research and Practice, 8(3), 44-67."</strong>
             This journal does not exist. This study was never published. The authors are invented.
             AI systems can generate citations that look completely real but lead nowhere — this is called
             <strong>hallucination</strong>. Always verify citations independently before using them in professional or academic work.
           </div>
         </div>
         <div class="reveal-item">
-          <div class="reveal-item-label">🧠 Problem 2: Contradicts Learning Science</div>
+          <div class="reveal-item-label">🧠 Problem 2: Recommends a Debunked Theory</div>
           <div class="reveal-item-text">
-            The recommendation for <strong>"concentrated intensive training over 2-3 days"</strong> contradicts
-            decades of cognitive science research. The <strong>spacing effect</strong> consistently shows
-            that distributed practice over time produces far stronger retention than massed practice.
-            The AI presented this confidently and incorrectly. Fluency and confidence do not equal accuracy.
+            The workshop agenda features a <strong>learning styles inventory</strong> as a research-backed best practice.
+            This is scientifically debunked. Researchers including Pashler et al. (2008) and Rogowsky et al. (2015)
+            have found no evidence that matching instruction to VAK/VARK learning styles improves outcomes.
+            The theory is widespread in professional development but not supported by the evidence.
+            The AI presented it confidently as current best practice. Fluency and confidence do not equal accuracy.
           </div>
         </div>
       </div>
@@ -1297,15 +1317,15 @@ function showS4Reveal() {
         </div>
         <div class="literacy-tip">
           <div class="literacy-tip-icon">📚</div>
-          <div><strong>Check against known frameworks.</strong> Does this align with UDL, TPACK, or established instructional design research? If it contradicts the literature, flag it.</div>
+          <div><strong>Cross-check claims with the literature.</strong> Does this align with what you know from peer-reviewed ID research? Learning styles is a well-known example of a persistent myth the AI will confidently repeat.</div>
         </div>
         <div class="literacy-tip">
           <div class="literacy-tip-icon">💬</div>
-          <div><strong>Ask the AI to show its work.</strong> Try: "What is your source for this?" or "Can you provide a verifiable citation?" The response will reveal a lot.</div>
+          <div><strong>Ask the AI to show its work.</strong> Try: "What peer-reviewed sources support this recommendation?" If it cannot name real ones, treat the claim with caution.</div>
         </div>
         <div class="literacy-tip">
           <div class="literacy-tip-icon">🧐</div>
-          <div><strong>Apply professional judgment.</strong> You are the expert on your learners and context. AI does not know your students. Does this advice actually fit your situation?</div>
+          <div><strong>Apply professional judgment.</strong> You are the instructional design expert. AI does not know the current state of your field. You do.</div>
         </div>
       </div>
     </div>`;
@@ -1375,6 +1395,47 @@ function addPixelS4Closing(area) {
 // ══════════════════════════════════════════════════════
 
 let s5PredictionDone = false;
+
+// ══════════════════════════════════════════════════════
+//  SCENARIO 4 — HALLUCINATION HUNT (pre-written reveal)
+// ══════════════════════════════════════════════════════
+function loadScenario4() {
+  const s = scenarios[3];
+  const area = document.getElementById('chat');
+
+  document.getElementById('vnBoardText').textContent = s.desc;
+
+  // Intro card
+  const introDiv = document.createElement('div');
+  introDiv.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;';
+  introDiv.innerHTML = `
+    <div class="welcome-card">
+      <div class="welcome-title">⚠️ Hallucination Hunt</div>
+      <div class="welcome-body">
+        Your colleague forwarded this AI-generated workshop agenda they are planning to use
+        for faculty PD next month. It looks professional and cites research.
+        Read it carefully before deciding whether to recommend it.
+      </div>
+    </div>`;
+  area.appendChild(introDiv);
+
+  // Show the pre-written flawed response
+  setTimeout(() => {
+    const responseDiv = document.createElement('div');
+    responseDiv.className = 'message ai';
+    responseDiv.innerHTML = `
+      ${pixelAvatarHTML('neutral')}
+      <div class="bubble-wrap">
+        <div class="bubble-sender">AI-generated workshop agenda</div>
+        <div class="bubble">${fmt(s.prewrittenResponse)}</div>
+      </div>`;
+    area.appendChild(responseDiv);
+    area.scrollTop = area.scrollHeight;
+
+    // Pixel interrupts after reading time
+    setTimeout(() => fireS4Interrupt(), 2500);
+  }, 500);
+}
 
 function loadScenario5() {
   const s = scenarios[4];
@@ -2101,6 +2162,9 @@ function switchScenario(i, btn) {
   // Reset nav card for this scenario so it can show again if they return
   navCardShown[i] = false;
 
+  // Reset S4 interrupt flag when switching to S4
+  if (i === 3) s4InterruptFired = false;
+
   // Special card styling
   const card = document.querySelector('.scenario-card');
   if (i === 3) {
@@ -2129,13 +2193,23 @@ function loadScenario(i) {
   renderOSCQR(s.oscqr, []);
   document.getElementById('chat').innerHTML = '';
 
+  // Reset scenario-specific state flags
+  if (i === 3) s4InterruptFired = false;
+  if (i === 4) s5PredictionDone = false;
+
   loadSceneImage(`scene-s${i + 1}.png`);
 
   const sceneBg = document.getElementById('vnSceneBg');
   if (sceneBg) sceneBg.src = 'images/classroom-bg.png';
   document.getElementById('vnBoardLoading').style.display = 'none';
 
-  // S5, S6, S7 control their own input visibility
+  // S4, S5, S6, S7 control their own input visibility
+  if (i === 3) {
+    renderOpenPlain(document.getElementById('inputContainer'));
+    document.getElementById('inputContainer').style.display = 'none';
+    loadScenario4();
+    return;
+  }
   if (i === 4) {
     renderOpenPlain(document.getElementById('inputContainer'));
     document.getElementById('inputContainer').style.display = 'none';
@@ -2505,28 +2579,16 @@ function renderOpenPlain(container) {
 
 // ── UNIFIED SEND ENTRY POINT ──────────────────────────
 function sendText(text) {
-  // Disable whichever send button is currently rendered
   const btn = document.getElementById('sendBtn');
   if (btn) btn.disabled = true;
-  // Route to the correct handler
-  if (scenarioIndex === 3) {
-    sendScenario4(text);
-  } else {
-    sendMain(text);
-  }
+  sendMain(text);
 }
 
 // ══════════════════════════════════════════════════════
 //  SEND
 // ══════════════════════════════════════════════════════
 async function send() {
-  // Legacy entry point -- routes to correct mode
-  if (scenarioIndex === 3) {
-    const input = document.getElementById('promptInput');
-    if (input) sendScenario4(input.value.trim());
-  } else {
-    sendOpen();
-  }
+  sendOpen();
 }
 
 async function sendMain(text) {
@@ -2865,18 +2927,20 @@ async function handleReflectionSubmit(e) {
 function devGoS4() {
   scenarioCompleted = [true, true, true, false, false, false, false];
   unlockScenario4();
-  const s4btn = document.getElementById('s4Tab');
-  switchScenario(3, s4btn);
-  document.getElementById('chat').scrollTop = 0;
+  const btn = document.getElementById('s4Tab');
+  btn.classList.remove('locked');
+  btn.disabled = false;
+  switchScenario(3, btn);
 }
 
 function devGoS5() {
   scenarioCompleted = [true, true, true, true, false, false, false];
   unlockScenario4();
   unlockScenario5();
-  const s5btn = document.getElementById('s5Tab');
-  switchScenario(4, s5btn);
-  document.getElementById('chat').scrollTop = 0;
+  const btn = document.getElementById('s5Tab');
+  btn.classList.remove('locked');
+  btn.disabled = false;
+  switchScenario(4, btn);
 }
 
 function devGoS6() {
@@ -2884,9 +2948,10 @@ function devGoS6() {
   unlockScenario4();
   unlockScenario5();
   unlockScenario6();
-  const s6btn = document.getElementById('s6Tab');
-  switchScenario(5, s6btn);
-  document.getElementById('chat').scrollTop = 0;
+  const btn = document.getElementById('s6Tab');
+  btn.classList.remove('locked');
+  btn.disabled = false;
+  switchScenario(5, btn);
 }
 
 function devGoS7() {
@@ -2895,9 +2960,10 @@ function devGoS7() {
   unlockScenario5();
   unlockScenario6();
   unlockScenario7();
-  const s7btn = document.getElementById('s7Tab');
-  switchScenario(6, s7btn);
-  document.getElementById('chat').scrollTop = 0;
+  const btn = document.getElementById('s7Tab');
+  btn.classList.remove('locked');
+  btn.disabled = false;
+  switchScenario(6, btn);
 }
 
 // Auto-fill test prompt and submit for S1-S3
