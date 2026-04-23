@@ -993,29 +993,115 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
 }
 
 /* ── SMARTBOARD ────────────────────────────────────── */
-.vn-smartboard {
+/* ── SMARTBOARD OUTER WRAPPER ───────────────────────── */
+/* ── SMARTBOARD OUTER WRAPPER ───────────────────────── */
+.vn-smartboard-wrap {
   position: absolute;
   left: 2%;
-  top: 3%;
-
-  width: 72%;
-  height: 60vh;
-  min-height: 380px;
-  max-height: 600px;
-
-  background: rgba(5, 18, 16, 0.85);
-  border: 2px solid rgba(93, 164, 128, 0.45);
-  border-radius: 20px;
-  overflow: hidden; /* clips the bg image to the border-radius */
-
-  box-shadow:
-    0 18px 40px rgba(0,0,0,0.28),
-    inset 0 0 24px rgba(255,255,255,0.03);
-
+  top: 4%;
+  /* Landscape 16:10 ratio matching real SMART Boards */
+  width: 74%;
+  aspect-ratio: 16 / 10.5;
   z-index: 2;
+  /* Green screen glow lifts it off the dark background */
+  filter:
+    drop-shadow(0 0 28px rgba(74,124,94,0.3))
+    drop-shadow(0 18px 48px rgba(0,0,0,0.8));
 }
 
-/* Scene image fills the entire smartboard as a background */
+/* ── OUTER FRAME (thin silver bezel) ────────────────── */
+.vn-smartboard {
+  position: absolute;
+  inset: 0;
+  /* Silver aluminium frame -- very thin */
+  background: linear-gradient(170deg, #c8c4be 0%, #b4b0aa 50%, #a8a49e 100%);
+  border-radius: 6px;
+  border: 1px solid #989490;
+  overflow: visible;
+  box-shadow:
+    /* Physical frame thickness */
+    0 3px 0 #8a8680,
+    0 5px 10px rgba(0,0,0,0.5),
+    /* Inner highlights */
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    inset 0 -1px 0 rgba(0,0,0,0.2);
+}
+
+/* Top specular highlight on frame */
+.vn-smartboard::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 8px; right: 8px;
+  height: 2px;
+  background: rgba(255,255,255,0.55);
+  border-radius: 6px 6px 0 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.vn-smartboard::after { display: none; }
+
+/* Corner screws -- small, subtle */
+.vn-screw {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #999, #555);
+  border: 0.5px solid rgba(0,0,0,0.3);
+  z-index: 8;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.25);
+}
+
+.vn-screw::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 4px; height: 1px;
+  background: rgba(0,0,0,0.4);
+}
+
+/* Tight to the corners -- thin bezel */
+.vn-screw-tl { top: 5px;  left: 6px;  }
+.vn-screw-tr { top: 5px;  right: 6px; }
+.vn-screw-bl { bottom: 38px; left: 6px;  }
+.vn-screw-br { bottom: 38px; right: 6px; }
+
+/* Touch sensor dots on left/right sides */
+.vn-smartboard .vn-sensor-left,
+.vn-smartboard .vn-sensor-right {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 28px;
+  background: #2a2a2a;
+  border-radius: 3px;
+  z-index: 9;
+}
+.vn-smartboard .vn-sensor-left  { left: 3px; }
+.vn-smartboard .vn-sensor-right { right: 3px; }
+
+/* ── SCREEN SURFACE (bright white board area) ────────── */
+.vn-screen {
+  /* Thin bezel: 8px top/sides, deeper bottom for pen tray */
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 34px;
+  /* Grey window -- like an open window on an overcast day */
+  background: #b0b8b4;
+  border-radius: 1px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,0.15),
+    inset 2px 2px 8px rgba(0,0,0,0.12),
+    0 0 16px rgba(74,124,94,0.22),
+    0 0 40px rgba(74,124,94,0.1);
+}
+
+/* Scene illustration fills the screen */
 .vn-board-img {
   position: absolute;
   inset: 0;
@@ -1031,67 +1117,497 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
 
 .vn-board-img.loaded { opacity: 0.55; }
 
-/* Dark gradient overlay so text stays readable over image */
-.vn-smartboard::before {
+/* Gradient overlay -- light at top to show the grey, very dark at bottom for text */
+.vn-screen::before {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(5,18,16,0.55) 0%,
-    rgba(5,18,16,0.25) 40%,
-    rgba(5,18,16,0.7)  100%
+    rgba(4,14,10,0.45) 0%,
+    rgba(4,14,10,0.35) 35%,
+    rgba(4,14,10,0.72) 65%,
+    rgba(4,14,10,0.92) 100%
   );
   z-index: 1;
   pointer-events: none;
-  border-radius: 18px;
 }
 
-.vn-smartboard::after {
+/* Subtle projector hotspot */
+.vn-screen::after {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 18px;
-  box-shadow: inset 0 0 28px rgba(69, 154, 124, 0.05);
-  pointer-events: none;
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 40%,
+    rgba(74,124,94,0.05) 0%,
+    transparent 70%
+  );
   z-index: 2;
+  pointer-events: none;
 }
 
-/* Text content sits above the image layers */
+/* Screen inner border */
+.vn-screen-inner-border {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(74,124,94,0.18);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ── SCREEN TEXT CONTENT ────────────────────────────── */
 .vn-board-label,
 .vn-board-text,
 .vn-board-loading {
   position: relative;
-  z-index: 3;
+  z-index: 4;
 }
 
 .vn-board-label {
   font-family: 'Source Code Pro', monospace;
-  font-size: 0.9rem;
-  letter-spacing: 0.14em;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(146, 220, 191, 0.8);
-  margin-bottom: 16px;
-  padding: 34px 38px 0;
+  color: rgba(168,213,181,0.95);
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  margin: 0;
+}
+
+.vn-board-label::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #5ab07a;
+  box-shadow: 0 0 8px rgba(90,176,122,0.9), 0 0 18px rgba(90,176,122,0.4);
+  flex-shrink: 0;
+  animation: ledPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes ledPulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(90,176,122,0.7), 0 0 14px rgba(90,176,122,0.35); }
+  50%       { box-shadow: 0 0 11px rgba(90,176,122,1),  0 0 24px rgba(90,176,122,0.65); }
 }
 
 .vn-board-text {
   font-family: 'Nunito', sans-serif;
-  font-size: 1.65rem;
-  color: #f8fffb;
-  line-height: 1.65;
-  font-weight: 800;
-  max-width: 85%;
-  padding: 0 38px;
-  text-shadow: 0 2px 16px rgba(0,0,0,0.8), 0 1px 4px rgba(0,0,0,0.9);
+  font-size: 1.15rem;
+  color: #f0fdf4;
+  line-height: 1.55;
+  font-weight: 700;
+  position: absolute;
+  top: 38px;
+  left: 12px;
+  right: 12px;
+  z-index: 4;
+  max-width: 100%;
+  padding: 12px 16px 14px;
+  /* Very dark solid backdrop -- no guessing, always readable */
+  background: rgba(2, 10, 6, 0.88);
+  border-radius: 6px;
+  border: 1px solid rgba(74,124,94,0.25);
+  backdrop-filter: blur(4px);
+  text-shadow: none;
 }
 
 .vn-board-loading {
   font-family: 'Source Code Pro', monospace;
-  font-size: 0.9rem;
-  color: rgba(146, 220, 191, 0.72);
+  font-size: 0.72rem;
+  color: rgba(168,213,181,0.7);
   letter-spacing: 0.06em;
-  padding: 12px 38px 0;
+  position: absolute;
+  top: 44px;
+  left: 22px;
+  z-index: 4;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  padding: 0;
+}
+
+/* ── PEN TRAY (bottom strip -- the signature SMART Board detail) */
+.vn-control-rail {
+  position: absolute;
+  bottom: 0;
+  left: 0; right: 0;
+  height: 30px;
+  background: linear-gradient(180deg, #383430 0%, #2a2622 60%, #302c28 100%);
+  border-top: 1px solid #1a1814;
+  border-radius: 0 0 6px 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 6px;
+  z-index: 5;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* Coloured pen slots -- the characteristic SMART Board tray */
+.vn-light {
+  width: 10px;
+  height: 16px;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.4);
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
+}
+
+/* Black, blue, red, green pen colours */
+.vn-light:nth-child(1) { background: #1a1a1a; }
+.vn-light:nth-child(2) { background: #1a3d8a; }
+.vn-light:nth-child(3) { background: #8a1a1a; }
+.vn-light.dim          { background: #2d8a2d; }
+
+/* Eraser slot */
+.vn-usb {
+  margin-left: auto;
+  width: 22px;
+  height: 16px;
+  border-radius: 2px;
+  background: #e8e4dc;
+  border: 1px solid rgba(0,0,0,0.3);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.4);
+}
+
+/* Label */
+.vn-brand {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.18);
+  text-transform: uppercase;
+  margin-left: 8px;
+}
+
+/* ── SIDE MOUNTING RAILS ────────────────────────────── */
+.vn-rail-left,
+.vn-rail-right {
+  position: absolute;
+  top: 40px;
+  width: 7px;
+  bottom: 28px;
+  background: linear-gradient(90deg, #9a9690, #b0aca6, #9a9690);
+  border-radius: 3px;
+  z-index: 1;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+}
+
+.vn-rail-left  { left: -9px; }
+.vn-rail-right { right: -9px; }
+
+.vn-rail-left::after,
+.vn-rail-right::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1.5px;
+  background: rgba(255,255,255,0.35);
+}
+.vn-rail-left::after  { left: 2px; }
+.vn-rail-right::after { right: 2px; }
+
+/* ── MOBILE ─────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .vn-smartboard-wrap {
+    left: 2%;
+    top: 2%;
+    width: 88%;
+    aspect-ratio: 16 / 11;
+  }
+
+  .vn-board-label { font-size: 0.58rem; padding: 10px 12px 0; }
+  .vn-board-text  { font-size: 0.9rem; line-height: 1.5; padding: 0 12px; max-width: 100%; }
+  .vn-rail-left, .vn-rail-right { display: none; }
+}
+
+/* Corner screws -- dark on light bezel */
+.vn-screw {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #888, #444);
+  border: 1px solid rgba(0,0,0,0.25);
+  z-index: 8;
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.2),
+    0 1px 2px rgba(0,0,0,0.3);
+}
+
+.vn-screw::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 6px; height: 1.5px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 1px;
+}
+
+.vn-screw-tl { top: 12px; left: 14px; }
+.vn-screw-tr { top: 12px; right: 14px; }
+.vn-screw-bl { bottom: 36px; left: 14px; }
+.vn-screw-br { bottom: 36px; right: 14px; }
+
+/* ── SCREEN AREA ────────────────────────────────────── */
+.vn-screen {
+  position: absolute;
+  /* Thick bezel edges: 22px top/sides, 36px bottom for rail */
+  top: 22px;
+  left: 22px;
+  right: 22px;
+  bottom: 36px;
+  background: #071510;
+  border-radius: 2px;
+  overflow: hidden;
+  /* Deep recess effect -- the key to making it look 3D */
+  box-shadow:
+    /* Outer recess shadow -- thick dark line on all sides */
+    0 0 0 2px rgba(0,0,0,0.45),
+    /* Deep inner shadow on top/left -- light comes from top-right */
+    inset 4px 4px 12px rgba(0,0,0,0.7),
+    inset -1px -1px 6px rgba(0,0,0,0.3),
+    /* Screen glow radiating outward through the bezel */
+    0 0 0 4px rgba(74,124,94,0.08),
+    0 0 24px rgba(74,124,94,0.2),
+    0 0 56px rgba(74,124,94,0.12);
+}
+
+/* Scene illustration fills the screen */
+.vn-board-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+  border-radius: 0;
+  margin: 0;
+}
+
+.vn-board-img.loaded { opacity: 0.5; }
+
+/* Screen content overlay gradient */
+.vn-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(5,18,16,0.55) 0%,
+    rgba(5,18,16,0.1) 45%,
+    rgba(5,18,16,0.72) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Glare streak -- diagonal highlight */
+.vn-screen::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -5%;
+  width: 50%;
+  height: 60%;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.04) 0%,
+    rgba(255,255,255,0) 55%
+  );
+  transform: rotate(-8deg);
+  z-index: 2;
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+/* Screen inner glow border */
+.vn-screen-inner-border {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(74,124,94,0.25);
+  border-radius: 3px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ── SCREEN TEXT CONTENT ────────────────────────────── */
+.vn-board-label,
+.vn-board-text,
+.vn-board-loading {
+  position: relative;
+  z-index: 4;
+}
+
+.vn-board-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(168, 213, 181, 0.8);
+  padding: 20px 24px 0;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Active indicator dot */
+.vn-board-label::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #5ab07a;
+  box-shadow: 0 0 8px rgba(90,176,122,0.8), 0 0 16px rgba(90,176,122,0.4);
+  flex-shrink: 0;
+  animation: ledPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes ledPulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(90,176,122,0.7), 0 0 14px rgba(90,176,122,0.35); }
+  50%       { box-shadow: 0 0 10px rgba(90,176,122,1),   0 0 22px rgba(90,176,122,0.6); }
+}
+
+.vn-board-text {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.55rem;
+  color: #f0fdf4;
+  line-height: 1.6;
+  font-weight: 800;
+  max-width: 88%;
+  padding: 0 24px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.95), 0 1px 4px rgba(0,0,0,1);
+}
+
+.vn-board-loading {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.78rem;
+  color: rgba(168, 213, 181, 0.6);
+  letter-spacing: 0.06em;
+  padding: 10px 24px 0;
+  position: relative;
+  z-index: 4;
+}
+
+/* ── CONTROL RAIL (bottom strip) ────────────────────── */
+.vn-control-rail {
+  position: absolute;
+  bottom: 0;
+  left: 0; right: 0;
+  height: 32px;
+  background: linear-gradient(180deg, #b8b4ac 0%, #a4a09a 50%, #aeaaa2 100%);
+  border-top: 1px solid rgba(0,0,0,0.15);
+  border-radius: 0 0 12px 12px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  gap: 7px;
+  z-index: 5;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.35),
+    inset 0 -1px 0 rgba(0,0,0,0.1);
+}
+
+/* Power / status lights on control rail */
+.vn-light {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #5ab07a;
+  box-shadow: 0 0 5px rgba(90,176,122,0.8);
+  border: 1px solid rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+
+.vn-light.dim {
+  background: #888;
+  box-shadow: none;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
+/* USB port */
+.vn-usb {
+  margin-left: auto;
+  width: 16px;
+  height: 9px;
+  border: 1.5px solid #7a7670;
+  border-radius: 2px;
+  background: #8a8680;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.2);
+}
+
+/* Brand label */
+.vn-brand {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.14em;
+  color: rgba(0,0,0,0.3);
+  text-transform: uppercase;
+  margin-left: 10px;
+}
+
+/* ── SIDE MOUNTING RAILS ────────────────────────────── */
+.vn-rail-left,
+.vn-rail-right {
+  position: absolute;
+  top: 55px;
+  width: 9px;
+  bottom: 35px;
+  background: linear-gradient(90deg, #b8b4ac, #cac6be, #b8b4ac);
+  border-radius: 4px;
+  z-index: 1;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.vn-rail-left  { left: -11px; }
+.vn-rail-right { right: -11px; }
+
+.vn-rail-left::after,
+.vn-rail-right::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: rgba(255,255,255,0.4);
+}
+.vn-rail-left::after  { left: 2px; }
+.vn-rail-right::after { right: 2px; }
+
+/* ── MOBILE ─────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .vn-smartboard-wrap {
+    left: 2%;
+    top: 2%;
+    width: 86%;
+    aspect-ratio: 4 / 3.5;
+  }
+
+  .vn-board-label {
+    font-size: 0.58rem;
+    padding: 12px 14px 0;
+  }
+
+  .vn-board-text {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    max-width: 100%;
+    padding: 0 14px;
+  }
+
+  .vn-rail-left,
+  .vn-rail-right { display: none; }
 }
 
 /* ── PROFESSOR PIXEL ───────────────────────────────── */
@@ -1131,17 +1647,18 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
 .vn-dialogue {
   position: absolute;
   bottom: 0;
-  left: 0;
+  /* Sit in the right half, close to Pixel */
+  left: 40%;
   right: 0;
   background: linear-gradient(
     to top,
-    rgba(0,0,0,0.98),
-    rgba(0,0,0,0.88),
-    rgba(0,0,0,0.25),
+    rgba(0,0,0,0.97),
+    rgba(0,0,0,0.88) 60%,
+    rgba(0,0,0,0.3) 85%,
     transparent
   );
-  padding: 22px 28px 18px;
-  min-height: 145px;
+  padding: 20px 200px 18px 24px;
+  min-height: 130px;
   z-index: 5;
 }
 
@@ -1149,41 +1666,42 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
 .vn-dialogue::after {
   content: '';
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-color: rgba(146, 220, 191, 0.45);
   border-style: solid;
   opacity: 0.7;
 }
 
 .vn-dialogue::before {
-  top: 12px;
-  left: 12px;
+  top: 14px;
+  left: 14px;
   border-width: 2px 0 0 2px;
 }
 
 .vn-dialogue::after {
-  top: 12px;
-  right: 12px;
+  top: 14px;
+  right: 14px;
   border-width: 2px 2px 0 0;
 }
 
 .vn-speaker {
   font-family: 'Fraunces', serif;
-  font-size: 1.45rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #b9e6c8;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   letter-spacing: 0.02em;
 }
 
 .vn-text {
   font-family: 'Nunito', sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: #f2f4f2;
-  line-height: 1.65;
-  min-height: 58px;
-  max-width: 68%;
+  line-height: 1.6;
+  min-height: 50px;
+  /* Full width of the dialogue box minus Pixel's space */
+  max-width: 100%;
   text-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
@@ -1288,8 +1806,9 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
   }
 
   .vn-dialogue {
-    min-height: 145px;
-    padding: 18px 18px 18px;
+    left: 0;
+    min-height: 130px;
+    padding: 16px 16px 16px;
   }
 
   .vn-speaker {
@@ -3038,4 +3557,48 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
 
 @media (max-width: 480px) {
   .ideas-wall-btn { font-size: 0.65rem; padding: 4px 8px; }
+}
+
+/* ══════════════════════════════════════════════════════
+   PIXEL REVEAL BUTTON — SLOW PULSE ANIMATION
+   Draws attention without being intrusive
+   ══════════════════════════════════════════════════════ */
+.pixel-reveal-btn {
+  animation: slideUp 0.3s ease forwards, pixelPulse 2.4s ease-in-out 1s infinite !important;
+}
+
+@keyframes pixelPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(45,90,61,0);
+    border-color: var(--border);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(45,90,61,0.12);
+    border-color: var(--forest-mid);
+  }
+}
+
+/* Pause the pulse once hovered -- user has noticed it */
+.pixel-reveal-btn:hover {
+  animation: none !important;
+  background: var(--forest-light);
+  border-color: var(--forest-mid);
+  transform: translateX(3px);
+}
+
+/* ══════════════════════════════════════════════════════
+   SCENARIO TEST BUTTONS (dev bar)
+   ══════════════════════════════════════════════════════ */
+.dev-test-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.dev-test-label {
+  font-size: 0.58rem;
+  color: rgba(168,213,181,0.5);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }

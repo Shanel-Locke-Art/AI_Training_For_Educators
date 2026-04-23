@@ -44,15 +44,16 @@
 <!-- DEV BAR -->
 <div class="dev-bar" id="devBar">
   <span>DEV</span>
-  <button class="dev-btn" onclick="devVN('welcome')">VN: Welcome</button>
-  <button class="dev-btn" onclick="devVN('excited')">VN: Excited</button>
-  <button class="dev-btn" onclick="devVN('skeptical')">VN: Skeptical</button>
-  <button class="dev-btn" onclick="devComplete()">All Complete</button>
-  <button class="dev-btn" onclick="devSkip()">Reflection Room</button>
-  <button class="dev-btn" onclick="window.open('/wall.html','_blank')" style="border-color:#c47c2d;color:#c47c2d;">💡 Ideas Wall</button>
-  <button class="dev-btn" onclick="devGoS4()" style="border-color:#c4622d;color:#c4622d;">⚠️ Test S4</button>
-  <button class="dev-btn" onclick="devGoS5()" style="border-color:#9b59b6;color:#9b59b6;">🔮 Test S5</button>
-  <button class="dev-btn" onclick="devGoS6()" style="border-color:#e67e22;color:#e67e22;">⚖️ Test S6</button>
+  <span class="dev-test-label">Test:</span>
+  <button class="dev-btn" onclick="devTestScenario(0)">S1</button>
+  <button class="dev-btn" onclick="devTestScenario(1)">S2</button>
+  <button class="dev-btn" onclick="devTestScenario(2)">S3</button>
+  <button class="dev-btn" onclick="devGoS4()" style="border-color:#c4622d;color:#c4622d;">S4 ⚠️</button>
+  <button class="dev-btn" onclick="devGoS5()" style="border-color:#9b59b6;color:#9b59b6;">S5 🔮</button>
+  <button class="dev-btn" onclick="devGoS6()" style="border-color:#e67e22;color:#e67e22;">S6 ⚖️</button>
+  <button class="dev-btn" onclick="devGoS7()" style="border-color:#2980b9;color:#2980b9;">S7 🧠</button>
+  <button class="dev-btn" onclick="window.open('/wall.html','_blank')" style="border-color:#c47c2d;color:#c47c2d;">💡 Wall</button>
+  <button class="dev-btn" onclick="devSkip()">Reflection</button>
   <button class="dev-btn" onclick="document.getElementById('devBar').style.display='none'">Hide</button>
 </div>
 
@@ -85,12 +86,13 @@
 </header>
 
 <nav class="scenario-tabs" role="tablist" aria-label="Training scenarios">
-  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" onclick="switchScenario(0,this)">📋 Scenario 1: Engagement</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(1,this)">📋 Scenario 2: Differentiation</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(2,this)">📋 Scenario 3: Assessment</button>
-  <button class="tab-btn locked" id="s4Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 Scenario 4</button>
-  <button class="tab-btn locked" id="s5Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 Scenario 5</button>
-  <button class="tab-btn locked" id="s6Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 Scenario 6</button>
+  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" onclick="switchScenario(0,this)">📋 S1: Engagement</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(1,this)">📋 S2: Metacognition</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(2,this)">📋 S3: Assessment</button>
+  <button class="tab-btn locked" id="s4Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 S4</button>
+  <button class="tab-btn locked" id="s5Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 S5</button>
+  <button class="tab-btn locked" id="s6Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 S6</button>
+  <button class="tab-btn locked" id="s7Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 S7</button>
 </nav>
 
 <div class="scenario-card" role="region" aria-label="Current scenario challenge">
@@ -155,13 +157,43 @@
   <img id="vnSceneBg" class="vn-bg" alt="" aria-hidden="true" />
 
     <!-- SMARTBOARD -->
-    <div class="vn-smartboard" role="region" aria-label="Smartboard challenge display">
-      <!-- Image first so it sits behind text via z-index -->
-      <img class="vn-board-img" id="vnBoardImg" alt="Scene illustration" aria-hidden="true" />
-      <div class="vn-board-label" aria-hidden="true">📲 Today's Challenge</div>
-      <div class="vn-board-text" id="vnBoardText" aria-label="Scenario challenge text"></div>
-      <div class="vn-board-loading" id="vnBoardLoading" style="display:none;" aria-live="polite">
-        ◌ generating scene illustration...
+    <div class="vn-smartboard-wrap" role="region" aria-label="Smartboard challenge display">
+      <!-- Side mounting rails -->
+      <div class="vn-rail-left" aria-hidden="true"></div>
+      <div class="vn-rail-right" aria-hidden="true"></div>
+
+      <!-- Outer bezel -->
+      <div class="vn-smartboard" aria-hidden="true">
+        <!-- Corner screws -->
+        <div class="vn-screw vn-screw-tl"></div>
+        <div class="vn-screw vn-screw-tr"></div>
+        <div class="vn-screw vn-screw-bl"></div>
+        <div class="vn-screw vn-screw-br"></div>
+
+        <!-- Touch sensors on sides -->
+        <div class="vn-sensor-left"></div>
+        <div class="vn-sensor-right"></div>
+
+        <!-- Screen -->
+        <div class="vn-screen">
+          <img class="vn-board-img" id="vnBoardImg" alt="" aria-hidden="true" />
+          <div class="vn-screen-inner-border"></div>
+          <div class="vn-board-label">Today's Challenge</div>
+          <div class="vn-board-text" id="vnBoardText" aria-label="Scenario challenge text"></div>
+          <div class="vn-board-loading" id="vnBoardLoading" style="display:none;" aria-live="polite">
+            loading scene...
+          </div>
+        </div>
+
+        <!-- Pen tray (black, blue, red, green pen slots + eraser) -->
+        <div class="vn-control-rail">
+          <div class="vn-light"></div>
+          <div class="vn-light"></div>
+          <div class="vn-light"></div>
+          <div class="vn-light dim"></div>
+          <span class="vn-brand">PromptCraft</span>
+          <div class="vn-usb"></div>
+        </div>
       </div>
     </div>
 
@@ -282,7 +314,7 @@ let attempts = 0;
 let lastPromptText = ''; // tracks last prompt for pre-filling on next attempt
 let scenarioIndex = 0;
 let history = [];
-let scenarioCompleted = [false, false, false, false, false, false];
+let scenarioCompleted = [false, false, false, false, false, false, false];
 let playerName = 'You'; // updated by name entry modal
 
 // ── SCREEN READER UTILITY ─────────────────────────────
@@ -354,7 +386,7 @@ function startGame() {
 //  Paste your Google Apps Script Web App URL into SHEETS_URL
 // ══════════════════════════════════════════════════════
 const SURVEY_MODE   = 'sheets';
-const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbxerDUIcFTjpMEHE-yejcyWMGssBaqNbmh8gARgKqYlyhngdFesWnt9kHKDp7Cso4fd/exec';
+const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbzN9bGwzKUcucCltXfj72pxee7y6t1reML6YRQNqCjxJ9Y3rDGp1a_FkYMzJmZROka5/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 
 // ══════════════════════════════════════════════════════
@@ -371,6 +403,7 @@ const scenarioData = [
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', selfReport: '' },
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', prediction: '', predictionCorrect: false },
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', biasItemsSpotted: [] },
+  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', overrelianceDecisions: {} },
 ];
 
 function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
@@ -547,9 +580,11 @@ function toggleMusic() {
 //  SCENARIOS
 // ══════════════════════════════════════════════════════
 const scenarios = [
+
+  // ── S1: ENGAGEMENT ───────────────────────────────────
   {
-    desc: "Your rural online students are disengaged during discussion board activities. Use AI to help design a more compelling discussion prompt for a general education course.",
-    imagePrompt: "A cozy rural online classroom scene: a teacher at a computer, student faces visible in a video grid on screen, bulletin board with student work, warm afternoon light through a window. Soft watercolor illustration style, warm earthy tones.",
+    desc: "Students in your online general education course are posting surface-level discussion replies and the conversation dies after one exchange. Use AI to help design a discussion prompt that generates genuine intellectual engagement.",
+    testPrompt: "My online learners in a first-year general education course are submitting one-line discussion posts that don't build on each other. I need a weekly discussion prompt that encourages deeper thinking and at least two substantive peer replies. The course is fully asynchronous, 8 weeks long.",
     oscqr: [
       { id:"obj", label:"Clear Objectives" },
       { id:"int", label:"Student Interaction" },
@@ -557,29 +592,33 @@ const scenarios = [
       { id:"inc", label:"Inclusive Design" },
       { id:"out", label:"Measurable Outcomes" },
     ],
-    system: `You are a supportive instructional design coach helping a rural or distance educator improve student engagement in online courses.
-When the educator writes a prompt, respond with a practical, classroom-ready instructional activity. Be warm and encouraging.
-After your main response, add a short section called "OSCQR Check" noting which are addressed: Clear Objectives, Student Interaction, Real-World Context, Inclusive Design, Measurable Outcomes.
-Coaching: vague prompts get mediocre output with gentle guidance. Specific prompts get excellent output with explicit praise.`
+    system: `You are a supportive instructional design coach helping an online higher education faculty member improve student engagement in asynchronous discussions.
+When the instructor writes a prompt, respond with a practical, course-ready discussion activity. Be warm and specific.
+After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Student Interaction, Real-World Context, Inclusive Design, Measurable Outcomes.
+Coaching: vague prompts get generic outputs with gentle guidance. Specific prompts with learner context, course level, and format constraints get excellent, usable outputs with explicit praise.`
   },
+
+  // ── S2: METACOGNITION ─────────────────────────────────
   {
-    desc: "You have a mixed-ability online class serving rural learners. Use AI to help differentiate a reading assignment so it works for all students.",
-    imagePrompt: "A warm illustrated classroom scene showing differentiated learning materials: stacked books of different levels, sticky notes with strategies, a cozy reading corner. Soft watercolor style, earthy greens and ambers.",
+    desc: "Your online students are completing assignments and moving on without reflecting on how they learned. They are going through the motions. Use AI to help design an activity that builds metacognitive awareness in an asynchronous online course.",
+    testPrompt: "My students in an online introductory psychology course (16 weeks, asynchronous) complete readings and quizzes but show little evidence of self-monitoring or transfer. I want to design a weekly metacognitive check-in activity — something that takes 10-15 minutes and helps them notice how they are actually learning, not just what they are learning.",
     oscqr: [
       { id:"obj", label:"Clear Objectives" },
-      { id:"acc", label:"Accessibility" },
-      { id:"udl", label:"Multiple Means" },
-      { id:"sca", label:"Scaffolding" },
-      { id:"sup", label:"Learner Support" },
+      { id:"ref", label:"Reflection" },
+      { id:"str", label:"Learning Strategy" },
+      { id:"tf",  label:"Transfer" },
+      { id:"aut", label:"Student Autonomy" },
     ],
-    system: `You are a supportive instructional design coach helping a rural or distance educator differentiate instruction for mixed-ability learners.
-When the educator writes a prompt, respond with a practical differentiation strategy or adapted activity. Be warm and encouraging.
-After your main response, add a short section called "OSCQR Check" noting which are addressed: Clear Objectives, Accessibility, Multiple Means, Scaffolding, Learner Support.
-Coaching: vague prompts get generic outputs with gentle guidance. Specific prompts get excellent outputs with specific praise.`
+    system: `You are a supportive instructional design coach helping an online higher education faculty member build metacognitive skills into their asynchronous course.
+When the instructor writes a prompt, respond with a practical, low-barrier metacognitive activity suited to online learning. Be warm and specific.
+After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Reflection, Learning Strategy, Transfer, Student Autonomy.
+Coaching: vague prompts get generic journaling suggestions. Specific prompts that name the course level, duration, and what metacognitive struggle looks like for their students get rich, tailored activities with explicit praise.`
   },
+
+  // ── S3: AUTHENTIC ASSESSMENT ──────────────────────────
   {
-    desc: "Your online students struggle with low-stakes assessments that feel meaningless. Use AI to help design an authentic assessment connected to a rural or community context.",
-    imagePrompt: "A warm illustrated scene of authentic assessment in a rural context: student project displayed on a bulletin board, community map pinned up, handwritten rubric notes, sunlight through classroom windows. Soft watercolor style.",
+    desc: "Your online students are completing assessments that feel disconnected from professional practice. Use AI to help design an authentic assessment that asks students to demonstrate applied competency, not just recall.",
+    testPrompt: "I teach an online upper-division business communication course (fully asynchronous, 15 weeks). Students currently submit traditional essay exams but I want to replace the midterm with an authentic assessment that mirrors real workplace writing. Students have varying professional backgrounds — some are working adults, some are traditional students. Assessment should be completable asynchronously.",
     oscqr: [
       { id:"obj", label:"Clear Objectives" },
       { id:"aut", label:"Authentic Tasks" },
@@ -587,115 +626,227 @@ Coaching: vague prompts get generic outputs with gentle guidance. Specific promp
       { id:"age", label:"Student Agency" },
       { id:"ali", label:"Alignment" },
     ],
-    system: `You are a supportive instructional design coach helping a rural or distance educator design authentic, meaningful assessments.
-When the educator writes a prompt, respond with a practical assessment design. Be warm and encouraging.
-After your main response, add a short section called "OSCQR Check" noting which are addressed: Clear Objectives, Authentic Tasks, Feedback Design, Student Agency, Alignment.
-Coaching: vague prompts get generic outputs with gentle guidance. Specific prompts get excellent outputs with explicit praise.`
+    system: `You are a supportive instructional design coach helping an online higher education faculty member design authentic assessments for asynchronous courses.
+When the instructor writes a prompt, respond with a practical, course-ready authentic assessment design. Be warm and specific.
+After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Authentic Tasks, Feedback Design, Student Agency, Alignment.
+Coaching: vague prompts get generic project ideas. Specific prompts that name the discipline, course level, student population, and delivery mode get excellent, realistic assessment designs with explicit praise.`
   },
-  // ── SCENARIO 4: CRITICAL THINKING CHALLENGE ──────────
+
+  // ── S4: HALLUCINATION HUNT ────────────────────────────
   {
-    desc: "A colleague asks you to recommend an AI-generated professional development plan for rural educators that covers AI integration across all grade levels. Use AI to help design a comprehensive PD program.",
-    imagePrompt: "A cozy professional development workshop scene: educators gathered around tables with laptops, sticky notes on windows, collaborative energy, rural school setting. Soft watercolor style, warm earthy tones.",
-    isCriticalThinking: true, // flags special behavior
+    desc: "A colleague shares an AI-generated faculty development workshop agenda on evidence-based online teaching strategies. It looks polished and cites research. Read it carefully.",
+    isCriticalThinking: true,
     oscqr: [
       { id:"obj", label:"Clear Objectives" },
       { id:"ev",  label:"Evidence-Based" },
-      { id:"ctx", label:"Rural Context" },
+      { id:"ctx", label:"Online Context" },
       { id:"fea", label:"Feasibility" },
       { id:"src", label:"Verified Sources" },
     ],
-    system: `You are an AI assistant helping design professional development programs. Respond confidently and professionally.
+    system: `You are an AI assistant helping design faculty professional development workshops. Respond confidently and professionally.
 
-When asked to design a PD program, provide a detailed, well-structured response that includes:
+When asked about faculty development on online teaching, provide a detailed, well-structured workshop agenda that includes:
 1. A program overview with specific timeframes
-2. Concrete learning objectives
-3. Implementation strategies
+2. Learning objectives
+3. Workshop activities
 4. Supporting research citations
 
 IMPORTANT INSTRUCTIONS FOR THIS SCENARIO:
 - Include the following fabricated citation naturally within your response, formatted to look real:
-  "Johnson, M. & Reeves, T. (2019). Scaling AI integration in rural K-12 settings: A multi-district study. Journal of Rural Educational Technology, 14(2), 112-128."
-- Also recommend "concentrated intensive training" (massed practice over 2-3 days) as superior to distributed practice, which contradicts established learning science
-- Present both of these confidently as if they are well-established facts
-- Do NOT reveal that anything is wrong — respond as a normal, helpful AI assistant would
-- The rest of your response should be genuinely useful and well-structured`
+  "Chen, R. & Alvarez, M. (2021). Evidence-based practices in online faculty development: A meta-analysis. Journal of Online Learning Research and Practice, 8(3), 44-67."
+- Also prominently feature a learning styles inventory activity early in the agenda, presenting it as a research-backed best practice — this is scientifically debunked (Pashler et al., 2008; Rogowsky et al., 2015) but still widely repeated in PD contexts
+- Present both of these confidently as if they are well-established and current
+- Do NOT reveal that anything is problematic — respond as a normal, helpful AI assistant would
+- The rest of your response should be genuinely useful and professionally structured`
   },
 
-  // ── SCENARIO 5: MENTAL MODEL — PREDICT THE OUTPUT ────
+  // ── S5: PREDICT THE OUTPUT ────────────────────────────
   {
-    desc: "A colleague wrote this prompt to get AI help designing a quiz for their online biology class. Before you see what the AI gave them — what do you predict happened?",
-    isPrediction: true, // flags the prediction mechanic
-    badPrompt: "Help me make a quiz.",
-    // The canned "bad" AI response shown during the reveal
-    badResponse: `Sure! Here's a quiz for you:\n\n**General Knowledge Quiz**\n\n1. What is the capital of France?\n2. How many planets are in our solar system?\n3. What is 15 × 8?\n4. Name one famous painting by Leonardo da Vinci.\n5. What year did World War II end?\n\nFeel free to add more questions as needed! Let me know if you'd like me to adjust the difficulty level.`,
+    desc: "An instructor sent this prompt to an AI course design assistant: 'Help me make my online course better.' Before seeing what happened — what do you predict the AI gave them?",
+    isPrediction: true,
+    badPrompt: "Help me make my online course better.",
+    badResponse: `Of course! Here are some tips to improve your online course:
+
+**General Best Practices:**
+1. Add more multimedia content like videos and images
+2. Make sure your content is organized clearly
+3. Communicate regularly with students
+4. Provide timely feedback on assignments
+5. Include interactive elements
+
+**Engagement Tips:**
+- Consider adding discussion forums
+- Use quizzes to check understanding
+- Break content into smaller chunks
+
+**Technical Suggestions:**
+- Ensure your LMS navigation is intuitive
+- Test all links before the course starts
+- Make sure videos are captioned
+
+Let me know if you would like more specific advice on any of these areas!`,
     predictionOptions: [
-      { id: 'generic',    text: "The AI gave a generic quiz with no connection to biology or online learning" },
-      { id: 'refused',    text: "The AI refused because the prompt was too vague" },
-      { id: 'clarifying', text: "The AI asked clarifying questions before responding" },
+      { id: 'generic',    text: "The AI gave a generic list of best practices with no connection to the actual course" },
+      { id: 'refused',    text: "The AI asked several clarifying questions before responding" },
+      { id: 'excellent',  text: "The AI gave a detailed, specific improvement plan" },
     ],
     correctPrediction: 'generic',
     oscqr: [
       { id:"obj", label:"Clear Objectives" },
-      { id:"sub", label:"Subject Specific" },
-      { id:"ctx", label:"Online Context" },
+      { id:"sub", label:"Course Specific" },
+      { id:"ctx", label:"Learner Context" },
       { id:"lvl", label:"Level Appropriate" },
-      { id:"fmt", label:"Format Specified" },
+      { id:"fmt", label:"Actionable Steps" },
     ],
-    system: `You are a supportive instructional design coach helping a rural or distance educator design effective assessments for online biology classes.
+    system: `You are a supportive instructional design coach helping an online higher education faculty member improve a specific aspect of their online course.
 
-When the educator writes an improved prompt, respond with a practical, subject-specific quiz or assessment activity. Be warm and encouraging.
+When the instructor writes an improved prompt, respond with a practical, specific course improvement recommendation. Be warm and encouraging.
 
-After your main response, add a short section called "OSCQR Check" noting which are addressed: Clear Objectives, Subject Specific, Online Context, Level Appropriate, Format Specified.
+After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Course Specific, Learner Context, Level Appropriate, Actionable Steps.
 
-Coaching: reference specifically what they added to the prompt that made it better than "Help me make a quiz." Praise concrete improvements explicitly.`
+Coaching: reference specifically what they added to the prompt compared to "Help me make my online course better." Praise concrete improvements like naming the LMS, the course level, the student population, or a specific problem they want to solve.`
   },
 
-  // ── SCENARIO 6: BIAS AND CONTEXT ─────────────────────
+  // ── S6: SYNCHRONOUS ASSUMPTION BIAS ──────────────────
   {
-    desc: "A PD coordinator used AI to design a technology integration workshop for your rural district. Read what the AI suggested — would this actually work for your educators?",
-    isBiasScenario: true, // flags the bias reveal mechanic
-    // Pre-written AI response that assumes urban infrastructure
-    biasedResponse: `**Technology Integration Professional Development Program**
-*A Comprehensive Two-Day Workshop Series*
+    desc: "A curriculum committee used AI to redesign a fully asynchronous online program's capstone course. Read what the AI proposed — notice what it assumes about how your students learn and meet.",
+    isBiasScenario: true,
+    biasedResponse: `**Capstone Course Redesign — COMM 495: Professional Capstone**
+*A Comprehensive Redesign for Maximum Student Engagement*
 
-**Program Overview**
-This intensive professional development series will transform your educators into confident technology integrators. Participants will leverage the district's high-speed fiber network and 1:1 device program to explore cutting-edge tools.
+**Course Overview**
+This redesigned capstone creates a dynamic, high-energy culminating experience through intensive real-time collaboration and professional simulation.
 
-**Day 1: AI Tools and Learning Management Systems**
-- Morning: Hands-on exploration of ChatGPT-4, Midjourney, and Adobe Firefly for lesson design
-- Afternoon: Deep dive into Canvas LMS advanced features including analytics dashboards
-- Evening optional session: Explore the district's new maker space and 3D printing lab
+**Weekly Schedule**
+- Monday 6:00-8:00 PM: Full cohort live session via Zoom (attendance mandatory)
+- Wednesday: Small group live check-ins (30 min, scheduled individually)
+- Friday: Optional but strongly encouraged live office hours
 
-**Day 2: Implementation and Assessment**
-- Morning: Build a fully digital, paperless assessment pipeline using Google Workspace
-- Afternoon: Set up individual educator tech toolkits (assumes personal device ownership)
-- Participants will need to purchase the recommended apps ($12.99/month subscription)
+**Signature Assignments**
+1. Live pitch presentation to a panel of industry guests (Week 12, mandatory real-time)
+2. Real-time peer review sessions — students must be present simultaneously
+3. In-person or live capstone symposium for final presentations
 
-**Infrastructure Requirements**
-- Minimum 100Mbps per classroom
-- Personal smartphones for QR code activities
-- Google Workspace Enterprise license (contact your IT department to upgrade)
+**Collaboration Requirements**
+- Students must form teams and meet synchronously at least 3 times per week
+- Team contracts must include shared availability windows
+- All major feedback happens in live sessions for "authentic professional experience"
 
-**Expected Outcomes**
-Research by Hamilton & Torres (2022) in the Journal of Urban Educational Technology confirms this model achieves 94% adoption rates in comparable districts.`,
+**Technology Stack**
+- Zoom for all synchronous sessions
+- Google Workspace (assumes all students have personal Google accounts)
+- Slack for real-time team messaging (requires app download on personal device)
+- Miro for live collaborative whiteboarding sessions
+
+**Research Support**
+Studies by Harrison & Polk (2020) in the Journal of Synchronous Learning confirm that real-time interaction produces 40% higher capstone quality scores than asynchronous alternatives.`,
     oscqr: [
-      { id:"ctx", label:"Rural Context" },
-      { id:"acc", label:"Device Access" },
-      { id:"con", label:"Connectivity" },
-      { id:"cst", label:"No-Cost Tools" },
+      { id:"ctx", label:"Async-Friendly" },
+      { id:"acc", label:"Access & Equity" },
+      { id:"fle", label:"Flexibility" },
+      { id:"inc", label:"Inclusive Design" },
       { id:"fea", label:"Feasibility" },
     ],
-    system: `You are a supportive instructional design coach helping a rural or distance educator design technology professional development that actually works in their context.
+    system: `You are a supportive instructional design coach helping an online higher education faculty member or instructional designer redesign a course that actually works for asynchronous online learners.
 
-When the educator writes a revised prompt that explicitly includes rural constraints, respond with a practical, context-aware PD plan that:
-- Works with limited or inconsistent internet connectivity
-- Does not assume personal device ownership
-- Uses free or already-licensed tools
-- Is feasible on a rural school budget
+When the instructor writes a revised prompt that explicitly names asynchronous constraints, varied student schedules, or equity concerns, respond with a practical, truly async-first capstone design.
 
-After your main response, add a short section called "OSCQR Check" noting which are addressed: Rural Context, Device Access, Connectivity, No-Cost Tools, Feasibility.
+After your main response, add a short section called "Course Quality Check" noting which are addressed: Async-Friendly, Access & Equity, Flexibility, Inclusive Design, Feasibility.
 
-Coaching: compare explicitly what changed between the original assumption-laden response and this one. Point to specific rural constraints they named in their prompt that produced better results.`
+Coaching: compare explicitly what changed between the synchronous-assumption response and this one. Point to the specific async constraints they named that produced a more equitable design.`
+  },
+
+  // ── S7: OVERRELIANCE ─────────────────────────────────
+  {
+    desc: "You asked AI to help design a unit on academic integrity for your online first-year experience course. The response looks genuinely impressive. Your task is not to improve it — it is to decide what is safe to use, what needs your judgment, and what must come from you.",
+    isOverreliance: true,
+    prewrittenResponse: `**Unit 3: Academic Integrity in the Digital Age**
+*A Complete 2-Week Unit for FYE 101 — Online Section*
+
+**Unit Overview**
+This unit helps first-year students understand academic integrity not as a set of rules to avoid breaking but as a professional identity to develop. Students will examine real cases, reflect on their own practices, and build habits that will serve them throughout their academic and professional careers.
+
+**Learning Objectives**
+By the end of this unit, students will be able to:
+1. Define academic integrity and explain why it matters beyond avoiding penalties
+2. Identify at least three forms of academic dishonesty including AI-assisted work without attribution
+3. Apply institutional guidelines to ambiguous real-world scenarios
+4. Articulate a personal academic integrity philosophy in writing
+
+**Week 1: Understanding the Landscape**
+
+*Module 3.1 — What Counts? (Est. 45 min)*
+Students read two short case studies: a student who paraphrased without citation and a student who used AI to draft an email to a professor. Discussion prompt: "Which of these is a violation, and does your answer change based on context?" Students post an initial response and reply to two peers.
+
+*Module 3.2 — Your Institution's Standards (Est. 30 min)*
+Students locate and read their institution's academic integrity policy. They complete a short quiz confirming they have reviewed the key sections.
+
+*Module 3.3 — Gray Areas (Est. 60 min)*
+Students work through five scenario cards (provided below) ranging from clearly acceptable to clearly unacceptable, with several deliberately ambiguous cases in the middle. They submit a 200-word reflection on which scenario was hardest to classify and why.
+
+**Week 2: Building Your Practice**
+
+*Module 3.4 — AI and Integrity (Est. 45 min)*
+This module directly addresses AI tool use. Students read your institution's AI policy and respond to: "Where is the line between using AI as a tool and using it as a substitute for your own thinking?"
+
+*Module 3.5 — Integrity Pledge (Est. 20 min)*
+Students draft a personal academic integrity statement (150-200 words) describing their own standards, including how they will handle AI tools in their academic work.
+
+**Assessment**
+- Discussion participation: 40 points (graded on substance, not length)
+- Gray Areas reflection: 30 points
+- Personal Integrity Pledge: 30 points
+
+**Scenario Cards (for Module 3.3)**
+Scenario A: A student uses Grammarly to fix grammar errors on a final essay.
+Scenario B: A student asks ChatGPT to explain a concept they do not understand, then writes their response in their own words.
+Scenario C: A student submits an essay outline generated by AI and fills in the content themselves.
+Scenario D: A student finds a well-written paragraph online that perfectly captures their point and paraphrases it very closely without citation.
+Scenario E: Two students in different sections of the same course share notes and their submissions end up very similar.`,
+    overrelianceItems: [
+      {
+        id: 'policy',
+        section: 'Module 3.2 and Module 3.4',
+        label: "Your institution's actual policies",
+        verdict: 'must_be_original',
+        explanation: "The AI references your institution's academic integrity policy and AI policy as if they exist — but it has no idea what your institution actually says. These must come from you. Using placeholder language here would give students incorrect information."
+      },
+      {
+        id: 'cases',
+        section: 'Module 3.1 case studies',
+        label: 'Real cases from your course context',
+        verdict: 'needs_judgment',
+        explanation: 'The AI invented two generic case studies. They are serviceable, but cases drawn from situations your students actually encounter — in their program, their discipline, or your specific LMS context — will land far better. This is where your professional knowledge adds real value.'
+      },
+      {
+        id: 'pledge',
+        section: 'Module 3.5 Integrity Pledge',
+        label: 'The personal integrity pledge activity',
+        verdict: 'safe_to_use',
+        explanation: 'This is a well-established reflective activity that does not require your institutional knowledge. The format is sound and the prompt is appropriate. This is genuinely safe to use as-is or with minor adjustments.'
+      },
+      {
+        id: 'scenarios',
+        section: 'Scenario Cards A-E',
+        label: 'The five gray area scenario cards',
+        verdict: 'needs_judgment',
+        explanation: 'These are reasonable starting points but Scenario B and C directly involve AI tools — and whether those are violations depends entirely on your course policies and your own stance as an instructor. The AI cannot know what you have communicated to students. You need to review and own these explicitly.'
+      },
+      {
+        id: 'objectives',
+        section: 'Learning Objectives 1-4',
+        label: 'Learning objectives and overall structure',
+        verdict: 'safe_to_use',
+        explanation: 'The learning objectives are well-written and align with what this unit should accomplish. The two-week structure is sound. These are safe to use as a starting framework — though you may want to align objective 3 specifically with your institutional language.'
+      }
+    ],
+    oscqr: [
+      { id:"obj", label:"Clear Objectives" },
+      { id:"ali", label:"Alignment" },
+      { id:"ctx", label:"Institutional Context" },
+      { id:"jdg", label:"Professional Judgment" },
+      { id:"aut", label:"Original Voice" },
+    ],
   }
 ];
 
@@ -913,24 +1064,24 @@ Do NOT use phrases like "Great job" or "Well done" as openers — get straight t
 // ══════════════════════════════════════════════════════
 
 // Track whether nav card has been shown for current scenario
-let navCardShown = [false, false, false, false, false, false];
+let navCardShown = [false, false, false, false, false, false, false];
 
 const SCENARIO_NAMES = [
-  'Scenario 2: Differentiation',
-  'Scenario 3: Assessment',
-  'Scenario 4: Critical Thinking',
-  'Scenario 5: Predict the Output', // S4 uses its own card, but keep for reference
-  'Scenario 6: Bias and Context',
-  null // S6 leads to reflection room, no next
+  'S2: Metacognition',
+  'S3: Assessment',
+  'S4: Hallucination Hunt',
+  'S5: Predict the Output',
+  'S6: Synchronous Bias',
+  'S7: Overreliance',
+  null
 ];
-
 const SCORE_THRESHOLD = 3; // score out of 5 needed to show nav card
 
 function maybeShowNavCard(score) {
   // S4 has its own nav card shown in addPixelS4Closing -- skip here
   if (scenarioIndex === 3) return;
-  // S6 is the last scenario -- no next to navigate to
-  if (scenarioIndex >= 5) return;
+  // S7 is the last scenario -- leads to reflection room, no nav card
+  if (scenarioIndex >= 6) return;
 
   if (navCardShown[scenarioIndex]) return;
   if (score < SCORE_THRESHOLD) return;
@@ -985,7 +1136,7 @@ function unlockScenario4() {
   btn.classList.add('unlocked-s4');
   btn.disabled = false;
   btn.removeAttribute('aria-disabled');
-  btn.textContent = '⚠️ Scenario 4: Critical Thinking';
+  btn.textContent = '⚠️ S4: Hallucination';
   btn.onclick = () => switchScenario(3, btn);
 
   pixelBadgeSetExpr('thinking');
@@ -1427,7 +1578,7 @@ function unlockScenario5() {
   if (!btn || !btn.classList.contains('locked')) return;
   btn.classList.remove('locked');
   btn.disabled = false;
-  btn.textContent = '🔮 Scenario 5: Predict';
+  btn.textContent = '🔮 S5: Predict';
   btn.onclick = () => switchScenario(4, btn);
 }
 
@@ -1436,12 +1587,226 @@ function unlockScenario6() {
   if (!btn || !btn.classList.contains('locked')) return;
   btn.classList.remove('locked');
   btn.disabled = false;
-  btn.textContent = '⚖️ Scenario 6: Bias';
+  btn.textContent = '⚖️ S6: Sync Bias';
   btn.onclick = () => switchScenario(5, btn);
 }
 
+function unlockScenario7() {
+  const btn = document.getElementById('s7Tab');
+  if (!btn || !btn.classList.contains('locked')) return;
+  btn.classList.remove('locked');
+  btn.disabled = false;
+  btn.textContent = '🧠 S7: Overreliance';
+  btn.onclick = () => switchScenario(6, btn);
+
+  setTimeout(() => {
+    document.getElementById('pixelCoachMsg').textContent =
+      "Scenario 7 is now unlocked. This one is the hardest — not because the AI got something wrong, but because it got it right.";
+    document.getElementById('pixelCoachCard').classList.add('visible');
+    clearTimeout(coachDismissTimer);
+    coachDismissTimer = setTimeout(pixelCoachDismiss, 9000);
+  }, 600);
+}
+
 // ══════════════════════════════════════════════════════
-//  INCREMENTAL DATA SAVING
+//  SCENARIO 7 — OVERRELIANCE
+// ══════════════════════════════════════════════════════
+
+function loadScenario7() {
+  const s = scenarios[6];
+  const area = document.getElementById('chat');
+
+  document.getElementById('vnBoardText').textContent =
+    'Read the AI-generated unit carefully. Then make your decisions.';
+
+  // Show the pre-written AI response
+  const introDiv = document.createElement('div');
+  introDiv.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;';
+  introDiv.innerHTML = `
+    <div class="welcome-card">
+      <div class="welcome-title">🧠 Overreliance Challenge</div>
+      <div class="welcome-body">
+        You asked AI to help design a unit on academic integrity for your
+        online first-year experience course. Read the response below carefully.
+        Your task is <strong>not</strong> to improve it — it is to decide
+        what is safe to use, what needs your judgment, and what must come from you.
+      </div>
+    </div>`;
+  area.appendChild(introDiv);
+
+  // Show the pre-written response
+  setTimeout(() => {
+    const responseDiv = document.createElement('div');
+    responseDiv.className = 'message ai';
+    responseDiv.innerHTML = `
+      ${pixelAvatarHTML('neutral')}
+      <div class="bubble-wrap">
+        <div class="bubble-sender">AI-generated unit plan</div>
+        <div class="bubble">${fmt(s.prewrittenResponse)}</div>
+      </div>`;
+    area.appendChild(responseDiv);
+    area.scrollTop = area.scrollHeight;
+
+    // Pixel prompts the decision task
+    setTimeout(() => {
+      const pixelDiv = document.createElement('div');
+      pixelDiv.className = 'pixel-interrupt';
+      pixelDiv.innerHTML = `
+        <img class="pixel-interrupt-avatar" src="${PIXEL_EXPR['thinking']}" alt="Professor Pixel"
+             onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
+        <div style="flex:1;min-width:0;">
+          <div class="pixel-interrupt-sender">Professor Pixel</div>
+          <div class="pixel-interrupt-bubble">
+            Take a moment to read through this. It looks good — maybe very good.
+            But good-looking AI output is exactly where overreliance happens.
+            For each section below, tell me: is it safe to use, does it need your judgment, or must it be original?
+          </div>
+        </div>`;
+      area.appendChild(pixelDiv);
+      area.scrollTop = area.scrollHeight;
+      pixelBadgeSetExpr('thinking');
+
+      // Show decision cards
+      setTimeout(() => showS7DecisionCards(area), 1200);
+    }, 1000);
+  }, 500);
+}
+
+function showS7DecisionCards(area) {
+  const s = scenarios[6];
+  const container = document.createElement('div');
+  container.id = 's7DecisionContainer';
+  container.style.cssText = 'display:flex;flex-direction:column;gap:10px;margin:8px 0;animation:slideUp 0.35s ease forwards;opacity:0;';
+
+  const choices = [
+    { value: 'safe_to_use',    label: '✓ Safe to use',         color: 'var(--forest-light)', border: 'var(--forest-mid)', text: 'var(--forest-dark)' },
+    { value: 'needs_judgment', label: '⚠ Needs my judgment',   color: 'var(--amber-light)',  border: 'var(--amber)',      text: 'var(--amber-dark)' },
+    { value: 'must_be_original', label: '✕ Must be original', color: '#fdf0ef',             border: 'var(--terracotta)', text: '#8b2a1a' },
+  ];
+
+  s.overrelianceItems.forEach(item => {
+    const card = document.createElement('div');
+    card.style.cssText = `
+      background:var(--chalk);border:1.5px solid var(--border);
+      border-radius:var(--radius-lg);padding:12px 14px;`;
+    card.innerHTML = `
+      <div style="font-family:'Fraunces',serif;font-size:0.82rem;font-weight:700;color:var(--ink);margin-bottom:4px;">
+        ${item.label}
+      </div>
+      <div style="font-family:'Source Code Pro',monospace;font-size:0.6rem;color:var(--ink-muted);margin-bottom:10px;letter-spacing:0.06em;">
+        ${item.section}
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        ${choices.map(ch => `
+          <button class="s4-btn s7-choice"
+                  data-item="${item.id}" data-choice="${ch.value}"
+                  style="font-size:0.72rem;padding:6px 12px;min-height:38px;"
+                  onclick="s7SelectChoice(this,'${item.id}','${ch.value}')">
+            ${ch.label}
+          </button>`).join('')}
+      </div>
+      <div id="s7feedback-${item.id}" style="display:none;margin-top:8px;font-size:0.78rem;line-height:1.6;padding:8px 10px;border-radius:var(--radius);"></div>`;
+    container.appendChild(card);
+  });
+
+  // Submit button -- disabled until all decisions made
+  const submitWrap = document.createElement('div');
+  submitWrap.style.cssText = 'text-align:center;padding:4px 0;';
+  submitWrap.innerHTML = `
+    <button id="s7SubmitBtn" class="guided-send-btn" disabled
+            onclick="s7Submit()" style="min-width:180px;margin:0 auto;">
+      See Pixel's Analysis →
+    </button>`;
+  container.appendChild(submitWrap);
+
+  area.appendChild(container);
+  area.scrollTop = area.scrollHeight;
+
+  // Hide the normal input -- S7 uses decision cards
+  document.getElementById('inputContainer').style.display = 'none';
+}
+
+// Track S7 decisions
+const s7Decisions = {};
+
+function s7SelectChoice(btn, itemId, choice) {
+  // Mark selection
+  const btnGroup = btn.closest('[style]').querySelectorAll('.s7-choice');
+  btnGroup.forEach(b => {
+    b.classList.remove('selected');
+    b.disabled = true;
+    b.style.opacity = '0.5';
+  });
+  btn.classList.add('selected');
+  btn.style.opacity = '1';
+  s7Decisions[itemId] = choice;
+  scenarioData[6].overrelianceDecisions[itemId] = choice;
+
+  // Show immediate inline feedback
+  const s = scenarios[6];
+  const item = s.overrelianceItems.find(i => i.id === itemId);
+  const fb = document.getElementById(`s7feedback-${itemId}`);
+  if (fb && item) {
+    const correct = choice === item.verdict;
+    fb.style.display = 'block';
+    fb.style.background = correct ? 'var(--forest-light)' : 'var(--amber-light)';
+    fb.style.borderLeft = `3px solid ${correct ? 'var(--forest-mid)' : 'var(--amber)'}`;
+    fb.innerHTML = `<strong>${correct ? 'Good instinct.' : 'Worth reconsidering.'}</strong> ${item.explanation}`;
+  }
+
+  // Enable submit if all items decided
+  const totalItems = s.overrelianceItems.length;
+  if (Object.keys(s7Decisions).length >= totalItems) {
+    const submitBtn = document.getElementById('s7SubmitBtn');
+    if (submitBtn) submitBtn.disabled = false;
+  }
+}
+
+function s7Submit() {
+  const area = document.getElementById('chat');
+  const s = scenarios[6];
+
+  // Score: how many matched the correct verdict
+  const correct = s.overrelianceItems.filter(item =>
+    s7Decisions[item.id] === item.verdict
+  ).length;
+  const total = s.overrelianceItems.length;
+  scenarioData[6].bestScore = Math.round((correct / total) * 5);
+
+  // Disable submit button
+  const submitBtn = document.getElementById('s7SubmitBtn');
+  if (submitBtn) submitBtn.disabled = true;
+
+  // Pixel's closing message
+  setTimeout(() => {
+    const expr = correct >= 4 ? 'proud' : correct >= 2 ? 'encouraging' : 'thinking';
+    const msg = correct >= 4
+      ? `${correct} out of ${total} — you have strong AI judgment. You are thinking like an expert user, not a passive consumer.`
+      : correct >= 2
+      ? `${correct} out of ${total}. The ones you got right show real critical thinking. The ones you missed are worth reflecting on — they are where overreliance usually happens.`
+      : `This one is genuinely hard. The goal is not to avoid using AI — it is to know exactly where your judgment is irreplaceable. That awareness is the skill.`;
+
+    const closeDiv = document.createElement('div');
+    closeDiv.className = 'pixel-interrupt';
+    closeDiv.innerHTML = `
+      <img class="pixel-interrupt-avatar" src="${PIXEL_EXPR[expr]}" alt="Professor Pixel"
+           style="border-color:var(--forest-mid);"
+           onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
+      <div style="flex:1;min-width:0;">
+        <div class="pixel-interrupt-sender">Professor Pixel</div>
+        <div class="pixel-interrupt-bubble" style="background:var(--forest-light);border-color:rgba(45,90,61,0.3);color:var(--forest-dark);">
+          ${msg}
+        </div>
+      </div>`;
+    area.appendChild(closeDiv);
+    pixelBadgeSetExpr(expr);
+    area.scrollTop = area.scrollHeight;
+
+    saveIncrementalData(6);
+    scenarioCompleted[6] = true;
+    markScenarioComplete();
+  }, 400);
+}
 // ══════════════════════════════════════════════════════
 async function saveIncrementalData(scenarioIdx) {
   if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
@@ -1627,27 +1992,31 @@ const pixelDialogue = {
   ],
   scenarioStart_0: [
     { expr: 'neutral',     text: "Your first challenge is about student engagement in online discussion boards." },
-    { expr: 'encouraging', text: "Think about who your learners are, what makes discussion feel meaningful to them, and what constraints you are working with." },
+    { expr: 'encouraging', text: "Think about who your online learners are, what makes async discussion feel meaningful, and what format constraints you are working with." },
   ],
   scenarioStart_1: [
-    { expr: 'thinking',    text: "This scenario is about differentiation — making one assignment work for everyone." },
-    { expr: 'encouraging', text: "Think about your range of learners and what kinds of flexibility would genuinely help each of them." },
+    { expr: 'thinking',    text: "This scenario is about metacognition — helping online learners become more aware of how they are actually learning." },
+    { expr: 'encouraging', text: "Think about what self-regulation looks like in an async course and what a realistic, low-barrier activity could be." },
   ],
   scenarioStart_2: [
-    { expr: 'neutral',     text: "Your final scored scenario is about authentic assessment — the kind that actually matters to students." },
-    { expr: 'excited',     text: "Think community, real context, and student ownership. This one is really fun to design well." },
+    { expr: 'neutral',     text: "Your third scenario is about authentic assessment in online higher education." },
+    { expr: 'excited',     text: "Think real professional practice, student agency, and meaningful feedback. This one is really satisfying to get right." },
   ],
   scenarioStart_3: [
-    { expr: 'thinking',    text: "This last challenge is a little different from the others. I want you to stay alert." },
-    { expr: 'skeptical',   text: "Not everything an AI tells you is accurate — even when it sounds completely confident. Pay close attention to what comes back." },
+    { expr: 'thinking',    text: "This challenge is a little different from the others. I want you to stay alert." },
+    { expr: 'skeptical',   text: "AI can sound confident and authoritative while recommending things the field has already moved past. Read carefully." },
   ],
   scenarioStart_4: [
-    { expr: 'thinking',    text: "Scenario 5 is about understanding why AI responds the way it does." },
-    { expr: 'encouraging', text: "Before you see a response, you are going to predict what happened. This trains the mental model that makes you a better prompter." },
+    { expr: 'thinking',    text: "Scenario 5 is about your mental model of how AI actually processes a request." },
+    { expr: 'encouraging', text: "Before you see the response, you are going to predict what happened. That predictive instinct is the skill we are building." },
   ],
   scenarioStart_5: [
-    { expr: 'skeptical',   text: "This final scenario is about something subtle but important — AI assumes things about your context that may not be true." },
-    { expr: 'neutral',     text: "Read carefully. Count what the AI got wrong about your actual situation. Then fix it." },
+    { expr: 'skeptical',   text: "Scenario 6 is about something subtle — AI making assumptions about your teaching context that are not true." },
+    { expr: 'neutral',     text: "Read the AI output carefully. Count what it assumes about how your students meet and collaborate. Then fix it." },
+  ],
+  scenarioStart_6: [
+    { expr: 'thinking',    text: "This is the final scenario, and it is the hardest one." },
+    { expr: 'neutral',     text: "The AI did not hallucinate. It did not show bias. The output is genuinely good. Your job is to decide what that means for how you use it." },
   ],
 };
 
@@ -1766,7 +2135,7 @@ function loadScenario(i) {
   if (sceneBg) sceneBg.src = 'images/classroom-bg.png';
   document.getElementById('vnBoardLoading').style.display = 'none';
 
-  // S5 and S6 control their own input visibility
+  // S5, S6, S7 control their own input visibility
   if (i === 4) {
     renderOpenPlain(document.getElementById('inputContainer'));
     document.getElementById('inputContainer').style.display = 'none';
@@ -1777,6 +2146,12 @@ function loadScenario(i) {
     renderOpenPlain(document.getElementById('inputContainer'));
     document.getElementById('inputContainer').style.display = 'none';
     loadScenario6();
+    return;
+  }
+  if (i === 6) {
+    renderOpenPlain(document.getElementById('inputContainer'));
+    document.getElementById('inputContainer').style.display = 'none';
+    loadScenario7();
     return;
   }
 
@@ -2363,6 +2738,7 @@ function markScenarioComplete() {
   if (s1s2s3done && !scenarioCompleted[3]) unlockScenario4();
   if (scenarioCompleted[3] && !scenarioCompleted[4]) unlockScenario5();
   if (scenarioCompleted[4] && !scenarioCompleted[5]) unlockScenario6();
+  if (scenarioCompleted[5] && !scenarioCompleted[6]) unlockScenario7();
 
   const allDone = scenarioCompleted.every(Boolean);
   const area = document.getElementById('chat');
@@ -2486,11 +2862,8 @@ async function handleReflectionSubmit(e) {
   }
 }
 
-// ══════════════════════════════════════════════════════
-//  DEV TOOLS
-// ══════════════════════════════════════════════════════
 function devGoS4() {
-  scenarioCompleted = [true, true, true, false, false, false];
+  scenarioCompleted = [true, true, true, false, false, false, false];
   unlockScenario4();
   const s4btn = document.getElementById('s4Tab');
   switchScenario(3, s4btn);
@@ -2498,7 +2871,7 @@ function devGoS4() {
 }
 
 function devGoS5() {
-  scenarioCompleted = [true, true, true, true, false, false];
+  scenarioCompleted = [true, true, true, true, false, false, false];
   unlockScenario4();
   unlockScenario5();
   const s5btn = document.getElementById('s5Tab');
@@ -2507,7 +2880,7 @@ function devGoS5() {
 }
 
 function devGoS6() {
-  scenarioCompleted = [true, true, true, true, true, false];
+  scenarioCompleted = [true, true, true, true, true, false, false];
   unlockScenario4();
   unlockScenario5();
   unlockScenario6();
@@ -2516,23 +2889,71 @@ function devGoS6() {
   document.getElementById('chat').scrollTop = 0;
 }
 
+function devGoS7() {
+  scenarioCompleted = [true, true, true, true, true, true, false];
+  unlockScenario4();
+  unlockScenario5();
+  unlockScenario6();
+  unlockScenario7();
+  const s7btn = document.getElementById('s7Tab');
+  switchScenario(6, s7btn);
+  document.getElementById('chat').scrollTop = 0;
+}
+
+// Auto-fill test prompt and submit for S1-S3
+function devTestScenario(idx) {
+  // Switch to that scenario first if not already there
+  const tabs = document.querySelectorAll('.tab-btn');
+  if (scenarioIndex !== idx) {
+    switchScenario(idx, tabs[idx]);
+  }
+  const testPrompt = scenarios[idx].testPrompt;
+  if (!testPrompt) return;
+
+  // Give the UI a moment to render then fill and send
+  setTimeout(() => {
+    // Fill guided builder fields for S1
+    if (idx === 0) {
+      // Parse the test prompt into the three fields roughly
+      const learners  = 'online first-year general education students';
+      const goal      = 'Design a weekly discussion prompt that encourages deeper thinking and at least two substantive peer replies';
+      const constraints = 'Fully asynchronous course, 8 weeks long';
+      const lEl = document.getElementById('g-learners');
+      const gEl = document.getElementById('g-goal');
+      const cEl = document.getElementById('g-constraints');
+      if (lEl) { lEl.value = learners; onGuidedInput(lEl); }
+      if (gEl) { gEl.value = goal; onGuidedInput(gEl); }
+      if (cEl) { cEl.value = constraints; onGuidedInput(cEl); }
+      setTimeout(() => sendGuided(), 300);
+    } else {
+      // Fill textarea for S2/S3
+      const input = document.getElementById('promptInput');
+      if (input) {
+        input.value = testPrompt;
+        autoGrow(input);
+        setTimeout(() => sendOpen(), 300);
+      }
+    }
+  }, 400);
+}
+
 function devVN(preset) {
   const presets = {
-    welcome:  { expr:'excited',     text:"Welcome to the Prompt Lab! I am Professor Pixel. This is the dev test sequence — everything is working correctly." },
-    excited:  { expr:'excited',     text:"This is the excited expression. Use this for strong prompts and major moments." },
-    skeptical:{ expr:'skeptical',   text:"Hmm. This is the skeptical expression. She uses this when a prompt is too vague." },
+    welcome:  { expr:'excited',     text:"Welcome to the Prompt Lab! I am Professor Pixel. This is the dev test sequence." },
+    excited:  { expr:'excited',     text:"This is the excited expression. Strong prompts and major moments." },
+    skeptical:{ expr:'skeptical',   text:"Hmm. Skeptical expression — vague prompts and critical moments." },
   };
   const p = presets[preset];
   if (p) vnShow(p.expr, p.text, null);
 }
 
 function devSkip() {
-  scenarioCompleted = [true,true,true];
+  scenarioCompleted = [true,true,true,false,false,false,false];
   openReflection();
 }
 
 function devComplete() {
-  scenarioCompleted = [true,true,true];
+  scenarioCompleted = [true,true,true,false,false,false,false];
   const area = document.getElementById('chat');
   const div = document.createElement('div');
   div.style.cssText = 'text-align:center;padding:12px 0 4px;';
