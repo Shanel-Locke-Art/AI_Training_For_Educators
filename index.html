@@ -2670,7 +2670,7 @@ async function sendMain(text) {
         if (aiMsgEl) {
           const chatRect = chatEl.getBoundingClientRect();
           const msgRect  = aiMsgEl.getBoundingClientRect();
-          chatEl.scrollTop = chatEl.scrollTop + (msgRect.top - chatRect.top);
+          chatEl.scrollTop = chatEl.scrollTop + (msgRect.top - chatRect.top) - 48;
         }
       });
     });
