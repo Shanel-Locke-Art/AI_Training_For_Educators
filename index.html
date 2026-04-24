@@ -369,14 +369,18 @@ function getInitials(name) {
 }
 
 function startGame() {
-  // Initialise music on first user interaction (browser autoplay policy)
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!reducedMotion) initMusic();
 
+  window.scenarioIntroEnabled = false; // suppress during initial load
   loadScenario(0);
   setTimeout(() => {
     playPixelSequence('scenarioStart_0', null);
-    setTimeout(() => playPixelSequence('welcome', null), 200);
+    setTimeout(() => {
+      playPixelSequence('welcome', null);
+      // Enable scenario intro audio after opening sequence clears
+      setTimeout(() => { window.scenarioIntroEnabled = true; }, 3000);
+    }, 200);
   }, 700);
 }
 
@@ -501,12 +505,28 @@ async function autoSaveSession(label) {
 // ══════════════════════════════════════════════════════
 const audioReady = true;
 const sounds = audioReady ? {
-  welcome:          new Howl({ src: ['audio/welcome.mp3'],           volume: 0.9 }),
-  vague:            new Howl({ src: ['audio/vague.mp3'],             volume: 0.9 }),
-  decent:           new Howl({ src: ['audio/decent.mp3'],            volume: 0.9 }),
-  strong:           new Howl({ src: ['audio/strong.mp3'],            volume: 0.9 }),
-  scenarioComplete: new Howl({ src: ['audio/scenario-complete.mp3'], volume: 0.9 }),
-  allComplete:      new Howl({ src: ['audio/all-complete.mp3'],      volume: 0.9 }),
+  // ── Prompt quality feedback ───────────────────────────
+  welcome:           new Howl({ src: ['audio/welcome.mp3'],            volume: 0.9 }),
+  vague:             new Howl({ src: ['audio/vague.mp3'],              volume: 0.9 }),
+  decent:            new Howl({ src: ['audio/decent.mp3'],             volume: 0.9 }),
+  strong:            new Howl({ src: ['audio/strong.mp3'],             volume: 0.9 }),
+  scenarioComplete:  new Howl({ src: ['audio/scenario-complete.mp3'],  volume: 0.9 }),
+  allComplete:       new Howl({ src: ['audio/all-complete.mp3'],       volume: 0.9 }),
+
+  // ── Scenario introductions ────────────────────────────
+  scenarioIntro0:    new Howl({ src: ['audio/scenario-1-intro.mp3'],   volume: 0.9 }),
+  scenarioIntro1:    new Howl({ src: ['audio/scenario-2-intro.mp3'],   volume: 0.9 }),
+  scenarioIntro2:    new Howl({ src: ['audio/scenario-3-intro.mp3'],   volume: 0.9 }),
+  scenarioIntro3:    new Howl({ src: ['audio/scenario-4-intro.mp3'],   volume: 0.9 }),
+  scenarioIntro4:    new Howl({ src: ['audio/scenario-5-intro.mp3'],   volume: 0.9 }),
+  scenarioIntro5:    new Howl({ src: ['audio/scenario-6-intro.mp3'],   volume: 0.9 }),
+  scenarioIntro6:    new Howl({ src: ['audio/scenario-7-intro.mp3'],   volume: 0.9 }),
+
+  // ── Special scenario moments ──────────────────────────
+  s4Interrupt:       new Howl({ src: ['audio/s4-interrupt.mp3'],       volume: 0.9 }),
+  s4Reveal:          new Howl({ src: ['audio/s4-reveal.mp3'],          volume: 0.9 }),
+  s7Closing:         new Howl({ src: ['audio/s7-closing.mp3'],         volume: 0.9 }),
+  reflectionOpen:    new Howl({ src: ['audio/reflection-open.mp3'],    volume: 0.9 }),
 } : {};
 
 function playSound(name) {
@@ -1227,6 +1247,7 @@ function fireS4Interrupt() {
   if (s4InterruptFired) return;
   s4InterruptFired = true;
   const area = document.getElementById('chat');
+  playSound('s4Interrupt');
 
   const interruptDiv = document.createElement('div');
   interruptDiv.className = 'pixel-interrupt';
@@ -1336,6 +1357,7 @@ function showS4Reveal() {
 }
 
 function addPixelS4Closing(area) {
+  playSound('s4Reveal');
   const div = document.createElement('div');
   div.className = 'pixel-interrupt';
   const src = PIXEL_EXPR['proud'] || 'images/pixel-proud.png';
@@ -1826,6 +1848,7 @@ function s7SelectChoice(btn, itemId, choice) {
 function s7Submit() {
   const area = document.getElementById('chat');
   const s = scenarios[6];
+  playSound('s7Closing');
 
   // Score: how many matched the correct verdict
   const correct = s.overrelianceItems.filter(item =>
@@ -2089,7 +2112,13 @@ function playPixelSequence(key, onDone) {
   if (key.startsWith('scenarioStart_')) {
     const i = parseInt(key.split('_')[1]);
     document.getElementById('vnBoardText').textContent = scenarios[i].desc;
+    // Only play scenario intro audio when explicitly switching scenarios (not on initial load)
+    // scenarioIntroEnabled is set true after the first game start completes
+    if (window.scenarioIntroEnabled) playSound(`scenarioIntro${i}`);
   }
+
+  // Play welcome narration on the welcome sequence
+  if (key === 'welcome') playSound('welcome');
 
   // Queue all lines
   lines.forEach((line, idx) => {
@@ -2158,6 +2187,9 @@ function switchScenario(i, btn) {
   });
   btn.classList.add('active');
   btn.setAttribute('aria-selected', 'true');
+
+  // Always allow scenario intro audio when explicitly switching tabs
+  window.scenarioIntroEnabled = true;
 
   // Reset nav card for this scenario so it can show again if they return
   navCardShown[i] = false;
@@ -2848,9 +2880,8 @@ function markScenarioComplete() {
 //  REFLECTION ROOM
 // ══════════════════════════════════════════════════════
 function openReflection() {
-  // Auto-save all behavioral data before showing reflection room
-  // This means data is captured even if participant never submits the form
   autoSaveSession('reflection_room_opened');
+  playSound('reflectionOpen');
   document.getElementById('reflectionOverlay').classList.add('visible');
 }
 
