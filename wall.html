@@ -513,18 +513,56 @@
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // Simple markdown-to-HTML for idea cards
+  function inlineFmt(s) {
+    return s
+      .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:var(--ink);font-weight:700;">$1</strong>')
+      .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  }
+
   function fmtIdea(str) {
     if (!str) return '';
-    return escHtml(str)
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^### (.*)/gm, '<h4 style="font-family:\'Fraunces\',serif;font-size:0.88rem;font-weight:700;color:var(--ink);margin:10px 0 4px;">$1</h4>')
-      .replace(/^## (.*)/gm, '<h3 style="font-family:\'Fraunces\',serif;font-size:0.95rem;font-weight:700;color:var(--ink);margin:12px 0 5px;">$1</h3>')
-      .replace(/^- (.*)/gm, '<li style="margin:3px 0;padding-left:4px;">$1</li>')
-      .replace(/(<li.*<\/li>\n?)+/g, '<ul style="margin:6px 0 6px 16px;padding:0;">$&</ul>')
-      .replace(/\n\n/g, '<br><br>')
-      .replace(/\n/g, '<br>');
+    const lines = str.split('\n');
+    let out = '';
+    let inList = false;
+
+    lines.forEach(line => {
+      if (/^###\s/.test(line)) {
+        if (inList) { out += '</ul>'; inList = false; }
+        out += '<div style="font-family:\'Fraunces\',serif;font-size:0.88rem;font-weight:700;color:var(--ink);margin:14px 0 4px;">' + escHtml(line.replace(/^###\s+/,'')) + '</div>';
+        return;
+      }
+      if (/^##\s/.test(line)) {
+        if (inList) { out += '</ul>'; inList = false; }
+        out += '<div style="font-family:\'Fraunces\',serif;font-size:0.92rem;font-weight:700;color:var(--ink);margin:16px 0 5px;">' + escHtml(line.replace(/^##\s+/,'')) + '</div>';
+        return;
+      }
+      const num = line.match(/^(\d+)\.\s+(.*)/);
+      if (num) {
+        if (!inList) { out += '<ul style="margin:8px 0;padding:0;list-style:none;">'; inList = true; }
+        out += '<li style="display:flex;gap:8px;margin:5px 0;"><span style="font-family:\'Source Code Pro\',monospace;font-size:0.72rem;color:var(--amber-dark);font-weight:700;flex-shrink:0;min-width:20px;">' + num[1] + '.</span><span>' + inlineFmt(escHtml(num[2])) + '</span></li>';
+        return;
+      }
+      const bul = line.match(/^[-\u2022]\s+(.*)/);
+      if (bul) {
+        if (!inList) { out += '<ul style="margin:8px 0;padding:0;list-style:none;">'; inList = true; }
+        out += '<li style="display:flex;gap:8px;margin:4px 0;"><span style="color:var(--forest-mid);flex-shrink:0;">&middot;</span><span>' + inlineFmt(escHtml(bul[1])) + '</span></li>';
+        return;
+      }
+      if (inList) { out += '</ul>'; inList = false; }
+      if (!line.trim()) {
+        out += '<div style="height:8px;"></div>';
+        return;
+      }
+      const boldOnly = line.match(/^\*\*([^*]+)\*\*:?\s*$/);
+      if (boldOnly) {
+        out += '<div style="font-weight:700;color:var(--ink);margin-top:12px;margin-bottom:2px;">' + escHtml(boldOnly[1]) + (line.includes(':') ? ':' : '') + '</div>';
+        return;
+      }
+      out += '<div style="margin:2px 0;line-height:1.7;">' + inlineFmt(escHtml(line)) + '</div>';
+    });
+
+    if (inList) out += '</ul>';
+    return out;
   }
 
   // Load on page open
