@@ -386,7 +386,7 @@
 <script>
   // ── CONFIG ────────────────────────────────────────
   // Same SHEETS_URL as index.html -- reads from the same deployment
-  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzN9bGwzKUcucCltXfj72pxee7y6t1reML6YRQNqCjxJ9Y3rDGp1a_FkYMzJmZROka5/exec';
+  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzJbVcHDf5NngkwfRsVlw6fg-_qK8Xw_xIaKkdGR2FQ1DtE4xSRFYAwr5TxHLjKrxOnLA/exec';
 
   const SCENARIO_COLORS = { 1:'tag-1', 2:'tag-2', 3:'tag-3', 4:'tag-4', 5:'tag-5', 6:'tag-6' };
   const SCENARIO_LABELS = {
@@ -401,15 +401,16 @@
   // Shown when no real data is available yet
   const DEMO_IDEAS = [
     { scenario: 1, scenarioLabel: 'Engagement', score: 5,
-      idea: "Here's a compelling discussion prompt for your rural online students: 'Your grandparents' generation farmed this land differently than farmers do today. Interview an elder in your community about one agricultural practice that has changed — and consider whether that change was an improvement. Share what you learn with the class and respond to two classmates whose stories differ from yours.'" },
+      idea: "**Discussion Prompt: Perspective Bridges**\n\n**Initial Post** (due Wednesday, 300–400 words)\n\nChoose a current event or trending topic that connects to our course material this week.\n\n1. **Context & Connection** (100 words): Briefly summarize the topic and connect it to at least one concept from this week's readings.\n2. **Multiple Lenses** (150 words): Analyze this topic from two different perspectives — different stakeholders, cultures, or disciplines.\n3. **Bridge Question** (50–100 words): End with a question that invites classmates to share their own experiences.\n\n**Peer Replies** (due Sunday, 150+ words each)\n\n- First reply: Respond to someone whose topic genuinely surprised you.\n- Second reply: Offer a respectful counterpoint or extend their thinking.\n\n**Course Quality Check**\n\n✓ Clear Objectives · ✓ Student Interaction · ✓ Real-World Context · ✓ Inclusive Design" },
+
     { scenario: 1, scenarioLabel: 'Engagement', score: 4,
-      idea: "Discussion Prompt — 'The Invisible Infrastructure': Your rural community relies on systems most people never think about — water, power, roads, emergency services. Choose one and research what would happen if it failed for 72 hours. Present your findings as a 2-minute 'emergency briefing' to the class and discuss: which systems are most vulnerable and why?" },
-    { scenario: 2, scenarioLabel: 'Differentiation', score: 5,
-      idea: "Differentiated Reading Activity — Three-Tier Approach: Tier 1 students receive a graphic novel adaptation with visual supports and key vocabulary pre-taught. Tier 2 students use the standard text with annotated margin questions. Tier 3 students read the primary source alongside a secondary analysis and write a comparative response. All tiers discuss the same essential question together." },
-    { scenario: 2, scenarioLabel: 'Differentiation', score: 4,
-      idea: "Choice Board Assessment: Students demonstrate understanding of watershed ecology through one of three options — (A) create an annotated map of the local watershed showing human impact zones, (B) write a letter to the county water board citing three specific data points from the unit, or (C) design a 5-slide community education presentation for younger students." },
+      idea: "**Discussion: The Invisible Infrastructure**\n\nYour rural community relies on systems most people never think about — water, power, roads, emergency services.\n\n**Your Task**\n\nChoose one system and research what would happen if it failed for 72 hours. Present your findings as a 2-minute 'emergency briefing' to the class.\n\n**Discussion Questions**\n\n- Which systems are most vulnerable and why?\n- What does your community already have in place?\n- What would you recommend to local leadership?\n\n**Course Quality Check**\n\n✓ Real-World Context · ✓ Student Interaction · + Measurable Outcomes could be stronger" },
+
+    { scenario: 2, scenarioLabel: 'Metacognition', score: 5,
+      idea: "**Weekly Metacognitive Check-In (10–15 min)**\n\nThis activity helps students notice *how* they are learning, not just *what* they are learning.\n\n**Prompt Sequence**\n\n1. **Before you begin:** What do you already know about this topic? What confuses you?\n2. **During:** When did you feel stuck this week? What did you do about it?\n3. **After:** What strategy worked best for you this week — and would you use it again?\n\n**Format**\n\nStudents submit a short audio note or 150-word written reflection. No grading for correctness — only for completion and honest engagement.\n\n**Course Quality Check**\n\n✓ Clear Objectives · ✓ Reflection · ✓ Learning Strategy · ✓ Student Autonomy" },
+
     { scenario: 3, scenarioLabel: 'Assessment', score: 5,
-      idea: "Authentic Assessment — Community Asset Audit: Students document three underutilized community assets (natural, cultural, or economic) using photography, interviews, and data. Final product is a professional-grade report presented to a local organization. Rubric assesses research quality, community voice representation, feasibility of recommendations, and presentation clarity." },
+      idea: "**Authentic Assessment: Community Asset Audit**\n\nStudents document three underutilized community assets — natural, cultural, or economic — using photography, interviews, and publicly available data.\n\n**Deliverables**\n\n- A professional-grade report (8–10 pages) with evidence and recommendations\n- A 5-minute recorded presentation for a local organization\n- A self-assessment using the provided rubric\n\n**Rubric Dimensions**\n\n1. Research quality and source credibility\n2. Community voice representation\n3. Feasibility of recommendations\n4. Clarity and professional presentation\n\n**Course Quality Check**\n\n✓ Authentic Tasks · ✓ Feedback Design · ✓ Student Agency · ✓ Alignment" },
   ];
 
   // ── LOAD ──────────────────────────────────────────

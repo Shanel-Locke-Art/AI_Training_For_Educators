@@ -594,6 +594,7 @@ const scenarios = [
     ],
     system: `You are a supportive instructional design coach helping an online higher education faculty member improve student engagement in asynchronous discussions.
 When the instructor writes a prompt, respond with a practical, course-ready discussion activity. Be warm and specific.
+Format your response with **bold headers** for each main section and a blank line between sections. Use short paragraphs. Do not write in one long block of text.
 After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Student Interaction, Real-World Context, Inclusive Design, Measurable Outcomes.
 Coaching: vague prompts get generic outputs with gentle guidance. Specific prompts with learner context, course level, and format constraints get excellent, usable outputs with explicit praise.`
   },
@@ -611,6 +612,7 @@ Coaching: vague prompts get generic outputs with gentle guidance. Specific promp
     ],
     system: `You are a supportive instructional design coach helping an online higher education faculty member build metacognitive skills into their asynchronous course.
 When the instructor writes a prompt, respond with a practical, low-barrier metacognitive activity suited to online learning. Be warm and specific.
+Format your response with **bold headers** for each main section and a blank line between sections. Use short paragraphs. Do not write in one long block of text.
 After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Reflection, Learning Strategy, Transfer, Student Autonomy.
 Coaching: vague prompts get generic journaling suggestions. Specific prompts that name the course level, duration, and what metacognitive struggle looks like for their students get rich, tailored activities with explicit praise.`
   },
@@ -628,6 +630,7 @@ Coaching: vague prompts get generic journaling suggestions. Specific prompts tha
     ],
     system: `You are a supportive instructional design coach helping an online higher education faculty member design authentic assessments for asynchronous courses.
 When the instructor writes a prompt, respond with a practical, course-ready authentic assessment design. Be warm and specific.
+Format your response with **bold headers** for each main section and a blank line between sections. Use short paragraphs. Do not write in one long block of text.
 After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Authentic Tasks, Feedback Design, Student Agency, Alignment.
 Coaching: vague prompts get generic project ideas. Specific prompts that name the discipline, course level, student population, and delivery mode get excellent, realistic assessment designs with explicit praise.`
   },
@@ -1033,9 +1036,9 @@ Your job is to give feedback that is:
 
 The scenario they are working on: "${scenarioDesc}"
 
-Prompt quality: ${score <= 1 ? 'very early — missing most key elements' : score === 2 ? 'developing — some elements present but needs more specificity' : score === 3 ? 'solid — has learner context and a clear goal' : score === 4 ? 'strong — specific, contextual, and well-constrained' : 'excellent — thorough, specific, and professional'} (evaluated on: learner context, clear goal, course context, constraints, and detail).
+Their prompt score was ${score} out of 5 based on: learner context, clear goal, course context, constraints, and detail.
 
-Do NOT include any numbers, scores, or fractions in your response. Do NOT use phrases like "Great job" or "Well done" as openers — get straight to the specific observation. Do NOT list multiple tips. Do NOT mention that the response is an excerpt, cuts off, or is incomplete — treat it as the full response. End with a single italicised follow-up question on its own line, preceded by a line break, that pushes them toward their next attempt.`;
+Do NOT use phrases like "Great job" or "Well done" as openers — get straight to the specific observation. Do NOT list multiple tips. Do NOT mention that the response is an excerpt, cuts off, or is incomplete — treat it as the full response. End with a single italicised follow-up question on its own line, preceded by a line break, that pushes them toward their next attempt.`;
 
     const res = await fetch('/.netlify/functions/claude', {
       method: 'POST',
