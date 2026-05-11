@@ -2120,8 +2120,7 @@ function s8AfterRevision(revisedScore) {
     deltaDiv.innerHTML = `<span style="font-family:'Source Code Pro',monospace;font-size:0.75rem;font-weight:700;color:${color};background:var(--chalk);border:1.5px solid ${color};border-radius:99px;padding:4px 14px;">Score delta: ${deltaLabel}</span>`;
     document.getElementById('chat').appendChild(deltaDiv);
     document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
-    saveIncrementalData(7);
-    scenarioCompleted[7] = true;
+    scenarioData[7].scoreDelta = delta;  // already set above, this is fine
     markScenarioComplete();
   }, 400);
 }
@@ -2958,8 +2957,22 @@ async function sendMain(text) {
       const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
       return ind ? ind.label : id;
     }));
-    if (scenarioIndex === 7 && s8Phase === 1) { s8AfterResponse(score.total, reply); return; }
-    if (scenarioIndex === 7 && s8Phase === 2) { s8AfterRevision(score.total); }
+    // ── S8: show the AI message first, THEN handle round logic ──
+    if (scenarioIndex === 7) {
+      const expr = score.total <= 1 ? 'skeptical' : score.total <= 3 ? 'encouraging' : 'excited';
+      const aiMsgEl = addMsg('ai', fmt(reply) + buildFeedback(score), expr);
+      gainXP(score.total * 6);
+      const chatEl = document.getElementById('chat');
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (aiMsgEl) {
+          const chatRect = chatEl.getBoundingClientRect();
+          const msgRect  = aiMsgEl.getBoundingClientRect();
+          chatEl.scrollTop = chatEl.scrollTop + (msgRect.top - chatRect.top) - 48;
+        }
+      }));
+      if (s8Phase === 1) { s8AfterResponse(score.total, reply); return; }
+      if (s8Phase === 2) { s8AfterRevision(score.total); return; }
+    }
 
     // Pick expression for this response
     let replyExpr = 'neutral';
@@ -3011,7 +3024,7 @@ async function sendMain(text) {
     // the AI response scroll-into-view above handles positioning
 
     // Pre-fill input with last prompt so player can refine rather than rewrite
-    if (lastPromptText && scenarioIndex < 3) {
+    if (lastPromptText && (scenarioIndex < 3 || scenarioIndex === 4 || scenarioIndex === 5 || scenarioIndex === 7)) {
       const inp = document.getElementById('promptInput');
       if (inp) {
         inp.value = lastPromptText;
@@ -3140,7 +3153,7 @@ function markScenarioComplete() {
     setTimeout(() => playPixelSequence('allComplete', null), 400);
     pixelBadgeSetExpr('excited');
     div.innerHTML = `
-      <p style="font-size:0.76rem;color:var(--ink-light);margin-bottom:10px;font-weight:600;">All six scenarios complete.</p>
+      <p style="font-size:0.76rem;color:var(--ink-light);margin-bottom:10px;font-weight:600;">All eight scenarios complete.</p>
       <button class="complete-btn" id="completeAllBtn" onclick="openReflection()">Enter the Reflection Room →</button>`;
   } else if (!allDone) {
     const done = scenarioCompleted.filter(Boolean).length;
