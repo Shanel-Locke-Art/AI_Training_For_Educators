@@ -51,12 +51,12 @@
   <button class="dev-btn" onclick="devGoScenario(2)">S3</button>
   <button class="dev-btn" onclick="devFillScenario(2)" style="border-color:#6c8ebf;color:#6c8ebf;">S3 ✏️</button>
   <button class="dev-btn" onclick="devTestS4()" style="border-color:#c4622d;color:#c4622d;">S4 ⚠️</button>
-  <button class="dev-btn" onclick="devGoS5()" style="border-color:#9b59b6;color:#9b59b6;">S5</button>
+  <button class="dev-btn" onclick="devGoS5()">S5</button>
   <button class="dev-btn" onclick="devFillS5()" style="border-color:#9b59b6;color:#9b59b6;">S5 ✏️</button>
-  <button class="dev-btn" onclick="devGoS6()" style="border-color:#e67e22;color:#e67e22;">S6</button>
+  <button class="dev-btn" onclick="devGoS6()">S6</button>
   <button class="dev-btn" onclick="devFillS6()" style="border-color:#e67e22;color:#e67e22;">S6 ✏️</button>
-  <button class="dev-btn" onclick="devGoS7()" style="border-color:#2980b9;color:#2980b9;">S7 🧠</button>
-  <button class="dev-btn" onclick="devGoS8()" style="border-color:#27ae60;color:#27ae60;">S8</button>
+  <button class="dev-btn" onclick="devGoS7()" style="border-color:#2980b9;color:#2980b9;">S7</button>
+  <button class="dev-btn" onclick="devGoS8()">S8</button>
   <button class="dev-btn" onclick="devFillS8()" style="border-color:#27ae60;color:#27ae60;">S8 ✏️</button>
   <button class="dev-btn" onclick="window.open('/wall.html','_blank')" style="border-color:#c47c2d;color:#c47c2d;">💡 Wall</button>
   <button class="dev-btn" onclick="devSkip()">Reflection</button>
@@ -2153,6 +2153,8 @@ function switchToOpenS8() {
 function loadScenario8() {
   s8Phase = 1;
   const area = document.getElementById('chat');
+  // Clear previous S8 content to prevent duplicate IDs from re-navigation
+  area.innerHTML = '';
   document.getElementById('vnBoardText').textContent = 'Build your prompt below. After the AI responds, reflect — then revise.';
   const introDiv = document.createElement('div');
   introDiv.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;';
@@ -2204,8 +2206,16 @@ function s8AfterResponse(initialScore, reply) {
 }
 
 function s8CheckReflectionReady() {
-  const all = [1,2,3].every(n => { const el = document.getElementById(`s8ref${n}`); return el && el.value.trim().length > 5; });
-  const btn = document.getElementById('s8ReflectSubmitBtn');
+  // Use querySelectorAll and take the LAST instance — guards against
+  // duplicate IDs from re-navigating to S8 via the dev bar.
+  const val = (id) => {
+    const els = document.querySelectorAll(`#${id}`);
+    return els[els.length - 1]?.value?.trim() || '';
+  };
+  const all = [1,2,3].every(n => val(`s8ref${n}`).length > 5);
+  // Same guard for the submit button — take the last one
+  const btns = document.querySelectorAll('#s8ReflectSubmitBtn');
+  const btn = btns[btns.length - 1];
   if (btn) { btn.style.opacity = all ? '1' : '0.4'; btn.style.pointerEvents = all ? 'auto' : 'none'; }
 }
 
@@ -3514,14 +3524,21 @@ function devFillScenario(idx) {
   devGoScenario(idx);
   const testPrompt = scenarios[idx].testPrompt;
   if (!testPrompt) return;
-  setTimeout(() => {
+
+  // Poll until #promptInput exists — S2/S3 render it after the VN intro completes
+  const tryFill = (attempts) => {
     const input = document.getElementById('promptInput');
-    if (input) {
+    if (input && input.offsetParent !== null) {
       input.value = testPrompt;
       autoGrow(input);
       input.focus();
+      // Fire the hint chip highlighter for S2
+      if (typeof onHintInput === 'function') onHintInput(input);
+    } else if (attempts < 30) {
+      setTimeout(() => tryFill(attempts + 1), 400);
     }
-  }, 400);
+  };
+  setTimeout(() => tryFill(0), 400);
 }
 
 // S1 still auto-fills and sends (guided builder needs it)
