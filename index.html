@@ -437,7 +437,7 @@ function buildSessionPayload(formData) {
   return {
     // Session
     timestamp:            new Date().toISOString(),
-    participant_id:       formData ? (formData.get('participant_id') || 'anonymous') : 'anonymous',
+    participant_id:       (formData ? formData.get('participant_id') : null) || (playerName !== 'You' ? playerName : 'anonymous'),
     player_name:          playerName !== 'You' ? playerName : '',
     session_duration_min: parseFloat(durationMin),
     scenarios_completed:  scenarioCompleted.filter(Boolean).length,
@@ -525,7 +525,7 @@ async function saveIncrementalData(scenarioIdx) {
   if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
   try {
     const s = scenarioData[scenarioIdx];
-    const participantId = document.querySelector('input[name="participant_id"]')?.value?.trim() || 'anonymous';
+    const participantId = document.querySelector('input[name="participant_id"]')?.value?.trim() || (playerName !== 'You' ? playerName : 'anonymous');
  
     const payload = {
       type:                 'incremental',
