@@ -46,13 +46,18 @@
   <span>DEV</span>
   <span class="dev-test-label">Test:</span>
   <button class="dev-btn" onclick="devTestScenario(0)">S1</button>
-  <button class="dev-btn" onclick="devTestScenario(1)">S2</button>
-  <button class="dev-btn" onclick="devTestScenario(2)">S3</button>
+  <button class="dev-btn" onclick="devGoScenario(1)">S2</button>
+  <button class="dev-btn" onclick="devFillScenario(1)" style="border-color:#6c8ebf;color:#6c8ebf;">S2 ✏️</button>
+  <button class="dev-btn" onclick="devGoScenario(2)">S3</button>
+  <button class="dev-btn" onclick="devFillScenario(2)" style="border-color:#6c8ebf;color:#6c8ebf;">S3 ✏️</button>
   <button class="dev-btn" onclick="devTestS4()" style="border-color:#c4622d;color:#c4622d;">S4 ⚠️</button>
-  <button class="dev-btn" onclick="devTestS5()" style="border-color:#9b59b6;color:#9b59b6;">S5 🔮</button>
-  <button class="dev-btn" onclick="devTestS6()" style="border-color:#e67e22;color:#e67e22;">S6 ⚖️</button>
+  <button class="dev-btn" onclick="devGoS5()" style="border-color:#9b59b6;color:#9b59b6;">S5</button>
+  <button class="dev-btn" onclick="devFillS5()" style="border-color:#9b59b6;color:#9b59b6;">S5 ✏️</button>
+  <button class="dev-btn" onclick="devGoS6()" style="border-color:#e67e22;color:#e67e22;">S6</button>
+  <button class="dev-btn" onclick="devFillS6()" style="border-color:#e67e22;color:#e67e22;">S6 ✏️</button>
   <button class="dev-btn" onclick="devGoS7()" style="border-color:#2980b9;color:#2980b9;">S7 🧠</button>
-  <button class="dev-btn" onclick="devTestS8()" style="border-color:#27ae60;color:#27ae60;">S8 🔁</button>
+  <button class="dev-btn" onclick="devGoS8()" style="border-color:#27ae60;color:#27ae60;">S8</button>
+  <button class="dev-btn" onclick="devFillS8()" style="border-color:#27ae60;color:#27ae60;">S8 ✏️</button>
   <button class="dev-btn" onclick="window.open('/wall.html','_blank')" style="border-color:#c47c2d;color:#c47c2d;">💡 Wall</button>
   <button class="dev-btn" onclick="devSkip()">Reflection</button>
   <button class="dev-btn" onclick="document.getElementById('devBar').style.display='none'">Hide</button>
@@ -515,6 +520,8 @@ function buildSessionPayload(formData) {
 }
  
 async function saveIncrementalData(scenarioIdx) {
+  // Don't save if no attempts were made — avoids phantom rows from dev navigation
+  if ((scenarioData[scenarioIdx]?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 6) return;
   if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
   try {
     const s = scenarioData[scenarioIdx];
@@ -1549,8 +1556,7 @@ function loadScenario4() {
     area.appendChild(responseDiv);
     area.scrollTop = area.scrollHeight;
 
-    // Pixel interrupts after reading time
-    setTimeout(() => fireS4Interrupt(), 2500);
+    // fireS4Interrupt() is triggered by the VN intro onDone callback — not from here.
   }, 500);
 }
 
@@ -2000,13 +2006,36 @@ function s7Submit() {
     saveIncrementalData(6);
     scenarioCompleted[6] = true;
 
-    // Delay markScenarioComplete so scenarioComplete sound doesn't overlap s7Closing
-    const s7Sound = audioReady && sounds.s7Closing;
-    if (s7Sound && s7Sound.playing()) {
-      s7Sound.once('end', () => markScenarioComplete());
-    } else {
-      setTimeout(() => markScenarioComplete(), 800);
-    }
+    // Unlock S8 and show the nav card — S7 never goes through the normal
+    // prompt-scoring path so markScenarioComplete / maybeShowNavCard won't fire.
+    unlockScenario8();
+    playSound('scenarioComplete');
+
+    // Nav card to S8
+    setTimeout(() => {
+      const area = document.getElementById('chat');
+      const navCard = document.createElement('div');
+      navCard.style.cssText = 'margin-top:6px;';
+      navCard.innerHTML = `
+        <div class="scenario-nav-card">
+          <div class="scenario-nav-text">
+            <div class="scenario-nav-title">Ready for the final scenario?</div>
+            <div class="scenario-nav-sub">S8: Reflect and Revise is now unlocked.</div>
+          </div>
+          <button class="scenario-nav-btn"
+                  onclick="navigateToNext(7)"
+                  aria-label="Move to S8: Reflect and Revise">
+            Next scenario →
+          </button>
+        </div>
+        <button class="scenario-keep-link"
+                onclick="this.closest('div').remove()"
+                aria-label="Keep reviewing S7">
+          Stay here and review
+        </button>`;
+      area.appendChild(navCard);
+      area.scrollTop = area.scrollHeight;
+    }, 1200);
   }, 400);
 }
 // ══════════════════════════════════════════════════════
@@ -2181,9 +2210,15 @@ function s8CheckReflectionReady() {
 }
 
 function s8ShowRevisionInput() {
-  scenarioData[7].reflection1 = document.getElementById('s8ref1')?.value || '';
-  scenarioData[7].reflection2 = document.getElementById('s8ref2')?.value || '';
-  scenarioData[7].reflection3 = document.getElementById('s8ref3')?.value || '';
+  // Snapshot all three values immediately — before any DOM changes.
+  // Use querySelectorAll in case of duplicate IDs from re-navigation,
+  // always taking the LAST (most recently rendered) instance.
+  const allRef1 = document.querySelectorAll('#s8ref1');
+  const allRef2 = document.querySelectorAll('#s8ref2');
+  const allRef3 = document.querySelectorAll('#s8ref3');
+  scenarioData[7].reflection1 = (allRef1[allRef1.length - 1]?.value || '').trim();
+  scenarioData[7].reflection2 = (allRef2[allRef2.length - 1]?.value || '').trim();
+  scenarioData[7].reflection3 = (allRef3[allRef3.length - 1]?.value || '').trim();
   s8Phase = 2;
   const area = document.getElementById('chat');
   const label = document.createElement('div');
@@ -2219,45 +2254,27 @@ function s8AfterRevision(revisedScore) {
   }, 400);
 }
 
-function devTestS8() {
-  devGoS8();
+// devTestS8 replaced by devFillS8 below
+
+// Fill S8 phase 1 guided builder fields only — no auto-send.
+// User reads, sends, fills reflections, and sends revised prompt themselves.
+function devFillS8() {
+  if (scenarioIndex !== 7) devGoS8();
+
   setTimeout(() => {
-    const f = (id, val) => { const el = document.getElementById(id); if (el) { el.value = val; onGuidedInputS8(el); } };
+    const f = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) { el.value = val; onGuidedInputS8(el); }
+    };
     f('s8-learners', 'online students in a 16-week asynchronous course');
     f('s8-subject',  'introductory biology');
     f('s8-problem',  'Students complete weekly lab write-ups but never revisit or compare them to earlier work — they finish and move on without reflecting');
     f('s8-format',   'under 15 minutes, fully asynchronous, no extra tools required');
     f('s8-outcome',  'name one specific way their thinking or method has changed and identify one strategy to carry into the next unit');
-    setTimeout(() => {
-      const sendBtn = document.getElementById('sendBtn');
-      if (sendBtn) sendBtn.click(); else sendGuidedS8();
-      setTimeout(() => {
-        const fill = () => {
-          const r1 = document.getElementById('s8ref1');
-          if (!r1) { setTimeout(fill, 500); return; }
-          r1.value = 'I included the course length and format but forgot to specify what kind of activity I wanted.';
-          document.getElementById('s8ref2').value = 'The AI gave a clear structure with a before/during/after format that works asynchronously.';
-          document.getElementById('s8ref3').value = 'It was too generic — no connection to biology or the specific lab context.';
-          [1,2,3].forEach(n => document.getElementById(`s8ref${n}`)?.dispatchEvent(new Event('input')));
-          setTimeout(() => {
-            const btn = document.getElementById('s8ReflectSubmitBtn');
-            if (btn && btn.style.pointerEvents !== 'none') {
-              btn.click();
-              setTimeout(() => {
-                const input2 = document.getElementById('promptInput');
-                if (input2) {
-                  input2.value = 'My learners are online students in a 16-week asynchronous introductory biology course. Students complete weekly lab write-ups but never revisit them. I want a 10-minute end-of-unit activity where students compare one early lab write-up to a recent one and name one specific change in their thinking or method. Fully asynchronous, no extra tools. After the activity, students should carry one concrete strategy into the next unit.';
-                  autoGrow(input2);
-                  setTimeout(() => sendOpen(), 300);
-                }
-              }, 600);
-            }
-          }, 400);
-        };
-        fill();
-      }, 4500);
-    }, 300);
-  }, 600);
+    // Focus the first empty field so user knows where they are
+    document.getElementById('s8-learners')?.focus();
+    // No auto-send — user reviews and hits Send themselves
+  }, scenarioIndex !== 7 ? 800 : 200);
 }
 
 // ══════════════════════════════════════════════════════
@@ -2575,7 +2592,15 @@ function switchScenario(i, btn) {
   const revealWrap = document.getElementById('pixelRevealWrap');
   if (revealWrap) revealWrap.remove();
 
-  setTimeout(() => playPixelSequence(`scenarioStart_${i}`, null), 300);
+  // Dismiss the coach card immediately — it belongs to the previous scenario
+  clearTimeout(coachDismissTimer);
+  pixelCoachDismiss();
+
+  // S4: interrupt only fires AFTER VN intro completes
+  const s4Callback = (i === 3) ? () => {
+    setTimeout(() => fireS4Interrupt(), 2500);
+  } : null;
+  setTimeout(() => playPixelSequence(`scenarioStart_${i}`, s4Callback), 300);
 }
 
 function loadScenario(i) {
@@ -3386,36 +3411,40 @@ function devGoS5() {
   switchScenario(4, btn);
 }
 
-function devTestS5() {
-  devGoS5();
+// devTestS5 replaced by devFillS5 — see below
 
-  // Step 1: click the correct prediction button once it renders
+// Fill S5 test data: clicks the correct prediction button,
+// then fills the improved prompt textarea. Does NOT auto-send.
+function devFillS5() {
+  // Navigate to S5 if not already there
+  if (scenarioIndex !== 4) devGoS5();
+
   const clickPrediction = (attempts) => {
     const btns = [...document.querySelectorAll('.s4-btn')];
     const correct = btns.find(b => b.getAttribute('onclick')?.includes('generic'));
     if (correct) {
       correct.click();
-      // Step 2: wait for input to appear, then fill and submit
       waitForInput(0);
     } else if (attempts < 15) {
       setTimeout(() => clickPrediction(attempts + 1), 400);
     }
   };
 
-  // Step 3: fill the improved prompt once the textarea is visible
   const waitForInput = (attempts) => {
     const input = document.getElementById('promptInput');
     if (input && input.offsetParent !== null) {
       input.value = scenarios[4].testPrompt ||
         'I teach an online introductory biology course (16 weeks, fully asynchronous). My students are first-year undergraduates with varying science backgrounds. I need a low-stakes quiz with 5 multiple-choice questions testing key vocabulary from Module 3 on cell structure. Questions should be completable in under 10 minutes with no external resources.';
       autoGrow(input);
-      setTimeout(() => sendOpen(), 300);
+      input.focus();
+      // No auto-send — user hits Send themselves
     } else if (attempts < 20) {
       setTimeout(() => waitForInput(attempts + 1), 400);
     }
   };
 
-  setTimeout(() => clickPrediction(0), 800);
+  // If we just navigated, give extra time for the VN + prediction card to render
+  setTimeout(() => clickPrediction(0), scenarioIndex !== 4 ? 1200 : 200);
 }
 
 function devGoS6() {
@@ -3429,21 +3458,27 @@ function devGoS6() {
   switchScenario(5, btn);
 }
 
-function devTestS6() {
-  devGoS6();
-  // Wait for the input to appear after the biased plan + Pixel reveal animation
+// devTestS6 replaced by devFillS6 below
+
+// Fill S6 test data: waits for the textarea to appear after the
+// biased plan + Pixel reveal sequence, then fills — no auto-send.
+function devFillS6() {
+  // Navigate to S6 if not already there
+  if (scenarioIndex !== 5) devGoS6();
+
   const waitForInput = (attempts) => {
     const input = document.getElementById('promptInput');
     if (input && input.offsetParent !== null) {
       input.value = 'Redesign COMM 495 as a fully asynchronous capstone for adult learners in an online program. Students have no shared availability and cannot attend live sessions. All collaboration, feedback, and presentations must be asynchronous. Do not assume access to Zoom, Google accounts, Slack, or any synchronous tool. The program serves working adults across multiple time zones. Deliverables should be submittable on flexible individual schedules.';
       autoGrow(input);
-      setTimeout(() => sendOpen(), 300);
+      input.focus();
+      // No auto-send — user reads, then hits Send themselves
     } else if (attempts < 25) {
       setTimeout(() => waitForInput(attempts + 1), 400);
     }
   };
-  // S6 takes longer to render than S5 — the bias reveal + Pixel message add ~2s
-  setTimeout(() => waitForInput(0), 2500);
+  // S6 has a delayed reveal sequence; if we just navigated give it extra time
+  setTimeout(() => waitForInput(0), scenarioIndex !== 5 ? 3000 : 200);
 }
 
 function devGoS7() {
@@ -3466,8 +3501,31 @@ function devGoS8() {
 }
 
 // Auto-fill test prompt and submit for S1-S3
+// Navigate to scenario without filling or sending
+function devGoScenario(idx) {
+  const tabs = document.querySelectorAll('.tab-btn');
+  if (scenarioIndex !== idx) {
+    switchScenario(idx, tabs[idx]);
+  }
+}
+
+// Fill the test prompt into the textarea — no auto-send
+function devFillScenario(idx) {
+  devGoScenario(idx);
+  const testPrompt = scenarios[idx].testPrompt;
+  if (!testPrompt) return;
+  setTimeout(() => {
+    const input = document.getElementById('promptInput');
+    if (input) {
+      input.value = testPrompt;
+      autoGrow(input);
+      input.focus();
+    }
+  }, 400);
+}
+
+// S1 still auto-fills and sends (guided builder needs it)
 function devTestScenario(idx) {
-  // Switch to that scenario first if not already there
   const tabs = document.querySelectorAll('.tab-btn');
   if (scenarioIndex !== idx) {
     switchScenario(idx, tabs[idx]);
@@ -3475,29 +3533,20 @@ function devTestScenario(idx) {
   const testPrompt = scenarios[idx].testPrompt;
   if (!testPrompt) return;
 
-  // Give the UI a moment to render then fill and send
   setTimeout(() => {
-    // Fill guided builder fields for S1
     if (idx === 0) {
-      // Parse the test prompt into the three fields roughly
-      const learners  = 'online first-year general education students';
-      const goal      = 'Design a weekly discussion prompt that encourages deeper thinking and at least two substantive peer replies';
+      const learners    = 'online first-year general education students';
+      const goal        = 'Design a weekly discussion prompt that encourages deeper thinking and at least two substantive peer replies';
       const constraints = 'Fully asynchronous course, 8 weeks long';
       const lEl = document.getElementById('g-learners');
       const gEl = document.getElementById('g-goal');
       const cEl = document.getElementById('g-constraints');
-      if (lEl) { lEl.value = learners; onGuidedInput(lEl); }
-      if (gEl) { gEl.value = goal; onGuidedInput(gEl); }
+      if (lEl) { lEl.value = learners;    onGuidedInput(lEl); }
+      if (gEl) { gEl.value = goal;        onGuidedInput(gEl); }
       if (cEl) { cEl.value = constraints; onGuidedInput(cEl); }
       setTimeout(() => sendGuided(), 300);
     } else {
-      // Fill textarea for S2/S3
-      const input = document.getElementById('promptInput');
-      if (input) {
-        input.value = testPrompt;
-        autoGrow(input);
-        setTimeout(() => sendOpen(), 300);
-      }
+      devFillScenario(idx);
     }
   }, 400);
 }
