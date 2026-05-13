@@ -2212,7 +2212,7 @@ function s8CheckReflectionReady() {
     const els = document.querySelectorAll(`#${id}`);
     return els[els.length - 1]?.value?.trim() || '';
   };
-  const all = [1,2,3].every(n => val(`s8ref${n}`).length > 5);
+  const all = [1,2,3].every(n => val(`s8ref${n}`).length > 0);
   // Same guard for the submit button — take the last one
   const btns = document.querySelectorAll('#s8ReflectSubmitBtn');
   const btn = btns[btns.length - 1];

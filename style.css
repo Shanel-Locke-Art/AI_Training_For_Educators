@@ -2003,20 +2003,7 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
 
 /* ── PIXEL BADGE (persistent corner portrait) ──────── */
 .pixel-badge {
-  position: absolute;
-  bottom: 14px;
-  right: 14px;
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  border: 3px solid var(--forest-mid);
-  background: var(--forest-light);
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(30,61,41,0.25);
-  cursor: default;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  z-index: 10;
-  flex-shrink: 0;
+  display: none !important;
 }
 
 .pixel-badge:hover {
