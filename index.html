@@ -438,7 +438,6 @@ function buildSessionPayload(formData) {
     // Session
     timestamp:            new Date().toISOString(),
     participant_id:       (formData ? formData.get('participant_id') : null) || (playerName !== 'You' ? playerName : 'anonymous'),
-    player_name:          playerName !== 'You' ? playerName : '',
     session_duration_min: parseFloat(durationMin),
     scenarios_completed:  scenarioCompleted.filter(Boolean).length,
     total_xp:             Math.round(xp),
