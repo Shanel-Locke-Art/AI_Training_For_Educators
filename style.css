@@ -3601,3 +3601,143 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
   text-transform: uppercase;
   white-space: nowrap;
 }
+
+/* ══════════════════════════════════════════════════════
+   LAYOUT CLARITY OVERRIDES — v3
+   Goal: sidebar nav, merged chrome, clearer focus path.
+   Desktop only (≥ 769px). All mobile behaviour preserved.
+   Adds no new HTML; purely CSS grid re-arrangement.
+   ══════════════════════════════════════════════════════ */
+
+@media (min-width: 769px) {
+
+  /* ── BODY: 2-column grid ──────────────────────────── */
+  /* Col 1: 196px sidebar (scenario tabs)
+     Col 2: the rest (header + chrome + chat + input)
+     The header + dev bar span full width via grid-area.  */
+  body {
+    display: grid;
+    grid-template-rows:
+      auto          /* header */
+      auto          /* devbar */
+      auto          /* challenge bar */
+      auto          /* oscqr row */
+      1fr           /* chat — expands */
+      auto;         /* input container */
+    grid-template-columns: 196px 1fr;
+    grid-template-areas:
+      "header    header"
+      "devbar    devbar"
+      "sidenav   challenge"
+      "sidenav   oscqrzone"
+      "sidenav   chat"
+      "sidenav   inputzone";
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  /* Assign grid areas */
+  header           { grid-area: header; }
+  .dev-bar         { grid-area: devbar; }
+  .scenario-tabs   { grid-area: sidenav; }
+  .scenario-card   { grid-area: challenge; }
+  .oscqr-row       { grid-area: oscqrzone; }
+  .chat-area       { grid-area: chat; }
+  #inputContainer  { grid-area: inputzone; }
+
+  /* ── SIDEBAR: vertical orientation ───────────────── */
+  .scenario-tabs {
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    border-bottom: none;
+    border-right: 2px solid var(--border);
+    background: var(--parchment);
+    gap: 0;
+    align-items: stretch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  /* Section label at top of sidebar */
+  .scenario-tabs::before {
+    content: 'Scenarios';
+    display: block;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.56rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    padding: 12px 14px 8px;
+    border-bottom: 1px solid var(--border-light);
+    flex-shrink: 0;
+  }
+
+  /* Tab buttons: left-to-right becomes top-to-bottom */
+  .tab-btn {
+    text-align: left;
+    border-bottom: none;
+    border-left: 3px solid transparent;
+    border-right: none;
+    padding: 9px 14px 9px 11px;
+    font-size: 0.72rem;
+    white-space: normal;
+    line-height: 1.3;
+    min-height: auto;
+    flex-shrink: 0;
+    width: 100%;
+  }
+
+  .tab-btn.active {
+    border-left-color: var(--forest);
+    border-bottom-color: transparent;
+    background: rgba(45,90,61,0.07);
+    color: var(--forest-dark);
+  }
+
+  /* ── CHALLENGE BAR: tighter, no left padding waste ── */
+  .scenario-card {
+    padding: 9px 16px 9px 18px;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  /* ── OSCQR ROW: quieter secondary strip ─────────── */
+  .oscqr-row {
+    padding: 5px 18px;
+    background: var(--chalk);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  /* ── PIXEL BADGE: ensure it stays in the chat area,
+        not overlapping the sidebar ─────────────────── */
+  .pixel-badge {
+    right: 18px;
+    bottom: 86px;
+  }
+
+  /* ── PIXEL COACH CARD: already fixed-position, stays ── */
+
+}
+
+/* ══════════════════════════════════════════════════════
+   REFLECTION TEST PAGE — align with main site styles
+   (test-reflection.html uses same style.css)
+   ══════════════════════════════════════════════════════ */
+
+/* The test-reflection.html has its own body bg override;
+   just ensure the reflection-room component looks correct
+   when standalone. No changes needed — existing .ref-*
+   classes already handle it. The key fix is the form label
+   number style which was missing from the original: */
+
+.ref-label span:first-child {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.58rem;
+  color: var(--ref-gold);
+  letter-spacing: 0.1em;
+  margin-right: 6px;
+  font-weight: 400;
+}
+

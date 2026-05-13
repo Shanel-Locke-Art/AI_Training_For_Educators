@@ -49,8 +49,8 @@
   <button class="dev-btn" onclick="devTestScenario(1)">S2</button>
   <button class="dev-btn" onclick="devTestScenario(2)">S3</button>
   <button class="dev-btn" onclick="devTestS4()" style="border-color:#c4622d;color:#c4622d;">S4 ⚠️</button>
-  <button class="dev-btn" onclick="devGoS5()" style="border-color:#9b59b6;color:#9b59b6;">S5 🔮</button>
-  <button class="dev-btn" onclick="devGoS6()" style="border-color:#e67e22;color:#e67e22;">S6 ⚖️</button>
+  <button class="dev-btn" onclick="devTestS5()" style="border-color:#9b59b6;color:#9b59b6;">S5 🔮</button>
+  <button class="dev-btn" onclick="devTestS6()" style="border-color:#e67e22;color:#e67e22;">S6 ⚖️</button>
   <button class="dev-btn" onclick="devGoS7()" style="border-color:#2980b9;color:#2980b9;">S7 🧠</button>
   <button class="dev-btn" onclick="devTestS8()" style="border-color:#27ae60;color:#27ae60;">S8 🔁</button>
   <button class="dev-btn" onclick="window.open('/wall.html','_blank')" style="border-color:#c47c2d;color:#c47c2d;">💡 Wall</button>
@@ -410,7 +410,7 @@ const scenarioData = [
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', prediction: '', predictionCorrect: false },
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', biasItemsSpotted: [] },
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', overrelianceDecisions: {} },
-  { attempts: 0, initialPrompt: '', revisedPrompt: '', initialScore: 0, revisedScore: 0, scoreDelta: 0, finalResponse: '', oscqrLit: '', reflection1: '', reflection2: '', reflection3: '' },
+  { attempts: 0, prompts: [], initialPrompt: '', revisedPrompt: '', initialScore: 0, revisedScore: 0, scoreDelta: 0, finalResponse: '', oscqrLit: '', reflection1: '', reflection2: '', reflection3: '' },
 ];
 
 function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
@@ -579,8 +579,25 @@ const sounds = audioReady ? {
   reflectionOpen:    new Howl({ src: ['audio/reflection-open.mp3'],    volume: 0.9 }),
 } : {};
 
+// Narration sounds that should not overlap each other
+const NARRATION_KEYS = new Set([
+  'welcome','vague','decent','strong','scenarioComplete','allComplete',
+  'scenarioIntro0','scenarioIntro1','scenarioIntro2','scenarioIntro3',
+  'scenarioIntro4','scenarioIntro5','scenarioIntro6','scenarioIntro7',
+  's4Interrupt','s4Reveal','s7Closing','reflectionOpen'
+]);
+let _currentNarration = null;
+
 function playSound(name) {
-  if (audioReady && sounds[name]) sounds[name].play();
+  if (!audioReady || !sounds[name]) return;
+  // Stop any currently playing narration before starting a new one
+  if (NARRATION_KEYS.has(name)) {
+    if (_currentNarration && _currentNarration !== sounds[name]) {
+      _currentNarration.stop();
+    }
+    _currentNarration = sounds[name];
+  }
+  sounds[name].play();
 }
 
 // ── BACKGROUND MUSIC SYSTEM ───────────────────────────
@@ -1425,7 +1442,7 @@ function showS4Reveal() {
   area.appendChild(div);
   area.scrollTop = area.scrollHeight;
 
-  setTimeout(() => addPixelS4Closing(area), 900);
+  setTimeout(() => addPixelS4Closing(area), 3500);
 }
 
 function addPixelS4Closing(area) {
@@ -1480,7 +1497,13 @@ function addPixelS4Closing(area) {
 
   setTimeout(() => {
     scenarioCompleted[3] = true;
-    markScenarioComplete();
+    // Wait for s4Reveal to finish before playing scenarioComplete
+    const s4Sound = audioReady && sounds.s4Reveal;
+    if (s4Sound && s4Sound.playing()) {
+      s4Sound.once('end', () => markScenarioComplete());
+    } else {
+      markScenarioComplete();
+    }
   }, 1200);
 }
 
@@ -1949,7 +1972,7 @@ function s7Submit() {
   const submitBtn = document.getElementById('s7SubmitBtn');
   if (submitBtn) submitBtn.disabled = true;
 
-  // Pixel's closing message
+  // Pixel's closing message — delayed so s7Closing audio finishes first
   setTimeout(() => {
     const expr = correct >= 4 ? 'proud' : correct >= 2 ? 'encouraging' : 'thinking';
     const msg = correct >= 4
@@ -1976,7 +1999,14 @@ function s7Submit() {
 
     saveIncrementalData(6);
     scenarioCompleted[6] = true;
-    markScenarioComplete();
+
+    // Delay markScenarioComplete so scenarioComplete sound doesn't overlap s7Closing
+    const s7Sound = audioReady && sounds.s7Closing;
+    if (s7Sound && s7Sound.playing()) {
+      s7Sound.once('end', () => markScenarioComplete());
+    } else {
+      setTimeout(() => markScenarioComplete(), 800);
+    }
   }, 400);
 }
 // ══════════════════════════════════════════════════════
@@ -3356,6 +3386,38 @@ function devGoS5() {
   switchScenario(4, btn);
 }
 
+function devTestS5() {
+  devGoS5();
+
+  // Step 1: click the correct prediction button once it renders
+  const clickPrediction = (attempts) => {
+    const btns = [...document.querySelectorAll('.s4-btn')];
+    const correct = btns.find(b => b.getAttribute('onclick')?.includes('generic'));
+    if (correct) {
+      correct.click();
+      // Step 2: wait for input to appear, then fill and submit
+      waitForInput(0);
+    } else if (attempts < 15) {
+      setTimeout(() => clickPrediction(attempts + 1), 400);
+    }
+  };
+
+  // Step 3: fill the improved prompt once the textarea is visible
+  const waitForInput = (attempts) => {
+    const input = document.getElementById('promptInput');
+    if (input && input.offsetParent !== null) {
+      input.value = scenarios[4].testPrompt ||
+        'I teach an online introductory biology course (16 weeks, fully asynchronous). My students are first-year undergraduates with varying science backgrounds. I need a low-stakes quiz with 5 multiple-choice questions testing key vocabulary from Module 3 on cell structure. Questions should be completable in under 10 minutes with no external resources.';
+      autoGrow(input);
+      setTimeout(() => sendOpen(), 300);
+    } else if (attempts < 20) {
+      setTimeout(() => waitForInput(attempts + 1), 400);
+    }
+  };
+
+  setTimeout(() => clickPrediction(0), 800);
+}
+
 function devGoS6() {
   scenarioCompleted = [true, true, true, true, true, false, false, false];
   unlockScenario4();
@@ -3365,6 +3427,23 @@ function devGoS6() {
   btn.classList.remove('locked');
   btn.disabled = false;
   switchScenario(5, btn);
+}
+
+function devTestS6() {
+  devGoS6();
+  // Wait for the input to appear after the biased plan + Pixel reveal animation
+  const waitForInput = (attempts) => {
+    const input = document.getElementById('promptInput');
+    if (input && input.offsetParent !== null) {
+      input.value = 'Redesign COMM 495 as a fully asynchronous capstone for adult learners in an online program. Students have no shared availability and cannot attend live sessions. All collaboration, feedback, and presentations must be asynchronous. Do not assume access to Zoom, Google accounts, Slack, or any synchronous tool. The program serves working adults across multiple time zones. Deliverables should be submittable on flexible individual schedules.';
+      autoGrow(input);
+      setTimeout(() => sendOpen(), 300);
+    } else if (attempts < 25) {
+      setTimeout(() => waitForInput(attempts + 1), 400);
+    }
+  };
+  // S6 takes longer to render than S5 — the bias reveal + Pixel message add ~2s
+  setTimeout(() => waitForInput(0), 2500);
 }
 
 function devGoS7() {
