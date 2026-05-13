@@ -3275,6 +3275,8 @@ function markScenarioComplete() {
   if (allDone && !document.getElementById('completeAllBtn')) {
     playSound('allComplete');
     loadSceneImage('scene-complete.png');
+    document.getElementById('vnBoardText').textContent =
+      'You have completed all eight scenarios. Head into the Reflection Room when you are ready — your responses contribute to research on how educators use AI in their practice.';
     setTimeout(() => playPixelSequence('allComplete', null), 400);
     pixelBadgeSetExpr('excited');
     div.innerHTML = `
