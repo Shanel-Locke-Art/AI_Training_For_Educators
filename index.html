@@ -50,11 +50,12 @@
   <button class="dev-btn" onclick="devFillScenario(1)" style="border-color:#6c8ebf;color:#6c8ebf;">S2 ✏️</button>
   <button class="dev-btn" onclick="devGoScenario(2)">S3</button>
   <button class="dev-btn" onclick="devFillScenario(2)" style="border-color:#6c8ebf;color:#6c8ebf;">S3 ✏️</button>
-  <button class="dev-btn" onclick="devTestS4()" style="border-color:#c4622d;color:#c4622d;">S4 ⚠️</button>
+  <button class="dev-btn" onclick="devGoScenario(3)">S4</button>
+  <button class="dev-btn" onclick="devFillScenario(3)" style="border-color:#e67e22;color:#e67e22;">S4 ✏️</button>
   <button class="dev-btn" onclick="devGoS5()">S5</button>
-  <button class="dev-btn" onclick="devFillS5()" style="border-color:#9b59b6;color:#9b59b6;">S5 ✏️</button>
+  <button class="dev-btn" onclick="devFillS5()" style="border-color:#c4622d;color:#c4622d;">S5 ✏️</button>
   <button class="dev-btn" onclick="devGoS6()">S6</button>
-  <button class="dev-btn" onclick="devFillS6()" style="border-color:#e67e22;color:#e67e22;">S6 ✏️</button>
+  <button class="dev-btn" onclick="devFillS6()" style="border-color:#9b59b6;color:#9b59b6;">S6 ✏️</button>
   <button class="dev-btn" onclick="devGoS7()" style="border-color:#2980b9;color:#2980b9;">S7</button>
   <button class="dev-btn" onclick="devGoS8()">S8</button>
   <button class="dev-btn" onclick="devFillS8()" style="border-color:#27ae60;color:#27ae60;">S8 ✏️</button>
@@ -269,16 +270,16 @@
       <form name="promptcraft-reflection" method="POST" data-netlify="true" onsubmit="handleReflectionSubmit(event)">
         <input type="hidden" name="form-name" value="promptcraft-reflection" />
         <div class="ref-question">
-          <label class="ref-label"><span>01</span>What surprised you most about working with AI during these scenarios?</label>
+          <label class="ref-label"><span>01</span>What surprised you most about how AI responded to your prompts during these scenarios?</label>
           <textarea class="ref-textarea" name="q1_surprise" placeholder="Write freely — there is no wrong answer."></textarea>
         </div>
         <div class="ref-question">
-          <label class="ref-label"><span>02</span>How did the way you wrote your prompts change as you moved through the scenarios?</label>
-          <textarea class="ref-textarea" name="q2_change" placeholder="Think about your first prompt versus your last."></textarea>
+          <label class="ref-label"><span>02</span>What is one thing you noticed about AI that you did not expect — either a strength or a limitation?</label>
+          <textarea class="ref-textarea" name="q2_change" placeholder="Think about the hallucination scenario, the prediction, or any moment that shifted your thinking."></textarea>
         </div>
         <div class="ref-question">
-          <label class="ref-label"><span>03</span>What is one thing you would do differently when using AI for instructional design in your actual teaching?</label>
-          <textarea class="ref-textarea" name="q3_practice" placeholder="Be as specific as you can."></textarea>
+          <label class="ref-label"><span>03</span>How has this experience changed how you plan to use — or not use — AI in your actual teaching or course design work?</label>
+          <textarea class="ref-textarea" name="q3_practice" placeholder="Be as specific as you can — a concrete change in practice, not just a general attitude."></textarea>
         </div>
         <div class="ref-question">
           <label class="ref-label"><span>04</span>Is there anything else you want to share about your experience today?</label>
@@ -299,14 +300,29 @@
         <span class="ref-success-icon">📚</span>
         <div class="ref-success-title">Thank you for your reflection.</div>
         <div class="ref-success-body">
-          Your responses will contribute to research on how educators can use AI more effectively.<br><br>
-          You are welcome to return to the scenarios at any time to continue practicing.
+          Your responses will contribute to research on how educators can use AI more effectively.
         </div>
-        <a href="/wall.html" target="_blank"
-           style="display:inline-block;margin-top:16px;margin-bottom:10px;padding:11px 24px;background:var(--forest);border:2px solid var(--forest-dark);border-radius:var(--radius);color:#d4edd9;font-family:'Fraunces',serif;font-weight:700;font-size:0.88rem;text-decoration:none;">
-          💡 See the Ideas Wall →
-        </a>
-        <button class="ref-close-btn" onclick="closeReflection()">Return to the Prompt Lab</button>
+
+        <!-- Growth report — injected after AI call -->
+        <div id="growthReportWrap" style="margin-top:20px;text-align:left;">
+          <div id="growthNarrativeWrap" style="background:var(--forest-light);border:1.5px solid rgba(45,90,61,0.25);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:4px;">
+            <div style="font-family:'Source Code Pro',monospace;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--forest-dark);margin-bottom:10px;">Your Growth Summary</div>
+            <div id="growthNarrative" style="font-size:0.88rem;line-height:1.65;color:var(--ink);">
+              <div style="display:flex;align-items:center;gap:8px;color:var(--ink-muted);font-size:0.82rem;">
+                <span style="animation:dot 0.9s infinite;">●</span> Generating your personal summary…
+              </div>
+            </div>
+          </div>
+          <div id="growthTable"></div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;justify-content:center;">
+          <a href="/wall.html" target="_blank"
+             style="display:inline-block;padding:11px 24px;background:var(--forest);border:2px solid var(--forest-dark);border-radius:var(--radius);color:#d4edd9;font-family:'Fraunces',serif;font-weight:700;font-size:0.88rem;text-decoration:none;">
+            💡 See the Ideas Wall →
+          </a>
+          <button class="ref-close-btn" onclick="closeReflection()">Return to the Prompt Lab</button>
+        </div>
       </div>
     </div>
   </div>
@@ -427,6 +443,113 @@ function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
   s.oscqrLit = oscqrActive.join(', ');
 }
 
+
+// ══════════════════════════════════════════════════════
+//  GROWTH SCORING — normalize all 8 scenarios to 0–5
+// ══════════════════════════════════════════════════════
+function buildGrowthScores() {
+  const s1 = scenarioData[0].bestScore || 0;
+  const s2 = scenarioData[1].bestScore || 0;
+  const s3 = scenarioData[2].bestScore || 0;
+  const s4 = scenarioData[3].bestScore || 0;
+
+  // S5 Hallucination Hunt: caught=5, unsure=2.5, missed=1
+  const s5raw = scenarioData[4].selfReport || '';
+  const s5 = s5raw === 'yes_noticed' ? 5 : s5raw === 'unsure' ? 2.5 : 1;
+
+  // S6 Predict: prediction accuracy (2.5) + prompt quality (2.5)
+  const s6pred   = scenarioData[5].predictionCorrect ? 2.5 : 0;
+  const s6prompt = Math.min(2.5, (scenarioData[5].bestScore || 0) * 0.5);
+  const s6 = s6pred + s6prompt;
+
+  // S7 Overreliance: correct decisions out of 5
+  const d7 = scenarioData[6].overrelianceDecisions || {};
+  const correct7 = [
+    d7.policy    === 'must_be_original',
+    d7.cases     === 'needs_judgment',
+    d7.pledge    === 'safe_to_use',
+    d7.scenarios === 'needs_judgment',
+    d7.objectives=== 'safe_to_use',
+  ].filter(Boolean).length;
+  const s7 = correct7;
+
+  // S8: revised score is the outcome of iteration
+  const s8 = scenarioData[7].revisedScore || scenarioData[7].initialScore || 0;
+  const delta = (scenarioData[7].revisedScore || 0) - (scenarioData[7].initialScore || 0);
+
+  return {
+    s1, s2, s3, s4, s5, s6, s7, s8, delta,
+    trajectory: [s1, s2, s3, s4, s5, s6, s7, s8],
+    s5_caught:    s5raw,
+    s6_predicted: scenarioData[5].predictionCorrect ? 'yes' : 'no',
+    s7_correct:   correct7,
+    threshold_met: [s1,s2,s3,s4].filter(s => s >= 3).length,
+  };
+}
+
+async function generateGrowthReport(reflectionAnswers) {
+  const g = buildGrowthScores();
+  const name = (playerName && playerName !== 'You') ? playerName : 'the participant';
+
+  const systemPrompt = `You are a research-informed instructional design coach writing a personalized growth summary for an educator who completed PromptCraft — an 8-scenario AI prompting training game. Write 2-3 paragraphs (warm, specific, professional). Address the participant directly as "${name}". Your summary must: (1) name the specific trajectory pattern across the 8 scenarios — did they improve steadily, plateau, dip at the critical thinking scenarios, finish strong? (2) call out one specific strength demonstrated with evidence from the data, (3) name one concrete area to keep developing, (4) end with one actionable sentence they can take into their actual teaching practice. Do NOT use generic praise. Be specific to the numbers. Under 200 words. Flowing paragraphs only — no bullets.`;
+
+  const dataPrompt = `${name}'s PromptCraft performance data:
+
+TRAJECTORY (0-5 each):
+S1 Engagement: ${g.s1} | S2 Metacognition: ${g.s2} | S3 Authentic Assessment: ${g.s3} | S4 Sync Bias: ${g.s4}
+S5 Hallucination Hunt: ${g.s5} (${g.s5_caught === 'yes_noticed' ? 'caught issues independently' : g.s5_caught === 'unsure' ? 'was uncertain' : 'initially missed problems'})
+S6 Predict the Output: ${g.s6} (prediction ${g.s6_predicted === 'yes' ? 'correct' : 'incorrect'})
+S7 Overreliance: ${g.s7} (${g.s7_correct}/5 decisions correct)
+S8 Reflect & Revise: ${g.s8} (initial: ${scenarioData[7].initialScore||0} → revised: ${scenarioData[7].revisedScore||0}, delta: ${g.delta>=0?'+':''}${g.delta})
+
+ATTEMPTS: S1:${scenarioData[0].attempts} S2:${scenarioData[1].attempts} S3:${scenarioData[2].attempts} S4:${scenarioData[3].attempts} S5:${scenarioData[4].attempts} S6:${scenarioData[5].attempts} S7:${scenarioData[6].attempts||1} S8:${scenarioData[7].attempts||1}
+
+PROMPTING THRESHOLDS MET (>=3/5): ${g.threshold_met}/4
+
+REFLECTIONS:
+Why they wrote their S8 prompt that way: ${reflectionAnswers.q1||'not provided'}
+What worked: ${reflectionAnswers.q2||'not provided'}
+What fell short: ${reflectionAnswers.q3||'not provided'}
+Other: ${reflectionAnswers.q4||''}
+
+Write the growth summary.`;
+
+  try {
+    const res = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: dataPrompt }]
+      })
+    });
+    const data = await res.json();
+    return data.content?.[0]?.text || '';
+  } catch(e) { return ''; }
+}
+
+function buildGrowthTableHTML(g) {
+  const rows = [
+    ['S1','Engagement',g.s1,'Prompt quality'],
+    ['S2','Metacognition',g.s2,'Prompt quality'],
+    ['S3','Authentic Assessment',g.s3,'Prompt quality'],
+    ['S4','Sync Bias',g.s4,'Prompt quality'],
+    ['S5','Hallucination Hunt',g.s5, g.s5_caught==='yes_noticed'?'Caught independently ✓':'Missed initially'],
+    ['S6','Predict the Output',g.s6,`Prediction ${g.s6_predicted==='yes'?'correct ✓':'incorrect'}`],
+    ['S7','Overreliance',g.s7,`${g.s7_correct}/5 decisions correct`],
+    ['S8','Reflect & Revise',g.s8,`Δ ${g.delta>=0?'+':''}${g.delta} from initial`],
+  ];
+  const rowHTML = rows.map(([num,sname,score,note]) => {
+    const pct = Math.round((score/5)*100);
+    const col = score>=4?'#2d7a4a':score>=3?'#c47a1a':'#8a3020';
+    return `<tr><td style="font-family:'Source Code Pro',monospace;font-size:0.72rem;color:#8b7355;padding:6px 10px;">${num}</td><td style="font-size:0.82rem;padding:6px 10px;font-weight:600;">${sname}</td><td style="padding:6px 10px;"><div style="display:flex;align-items:center;gap:8px;"><div style="width:80px;height:6px;background:#e8e4dc;border-radius:3px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${col};border-radius:3px;"></div></div><span style="font-family:'Source Code Pro',monospace;font-size:0.75rem;color:${col};font-weight:600;">${score}/5</span></div></td><td style="font-size:0.75rem;color:#6b6560;padding:6px 10px;">${note}</td></tr>`;
+  }).join('');
+  const avg = (g.trajectory.reduce((a,b)=>a+b,0)/8).toFixed(1);
+  return `<div style="margin-top:24px;border-top:1px solid #d6cfc0;padding-top:20px;"><div style="font-family:'Source Code Pro',monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#8b7355;margin-bottom:12px;">Performance Summary</div><table style="width:100%;border-collapse:collapse;font-family:'Nunito',sans-serif;"><thead><tr style="border-bottom:1px solid #d6cfc0;"><th style="text-align:left;padding:4px 10px;font-size:0.68rem;color:#8b7355;">#</th><th style="text-align:left;padding:4px 10px;font-size:0.68rem;color:#8b7355;">SCENARIO</th><th style="text-align:left;padding:4px 10px;font-size:0.68rem;color:#8b7355;">SCORE</th><th style="text-align:left;padding:4px 10px;font-size:0.68rem;color:#8b7355;">NOTE</th></tr></thead><tbody>${rowHTML}</tbody></table><div style="display:flex;gap:20px;margin-top:16px;padding-top:12px;border-top:1px solid #e8e4dc;"><div style="flex:1;text-align:center;"><div style="font-size:1.6rem;font-weight:800;color:#2d5a3d;">${avg}</div><div style="font-size:0.68rem;color:#8b7355;text-transform:uppercase;letter-spacing:0.08em;">Avg score / 5</div></div><div style="flex:1;text-align:center;"><div style="font-size:1.6rem;font-weight:800;color:#2d5a3d;">${g.threshold_met}/4</div><div style="font-size:0.68rem;color:#8b7355;text-transform:uppercase;letter-spacing:0.08em;">Prompting thresholds met</div></div><div style="flex:1;text-align:center;"><div style="font-size:1.6rem;font-weight:800;color:${g.delta>=0?'#2d5a3d':'#8a3020'};">${g.delta>=0?'+':''}${g.delta}</div><div style="font-size:0.68rem;color:#8b7355;text-transform:uppercase;letter-spacing:0.08em;">S8 revision delta</div></div></div></div>`;
+}
+
 function buildSessionPayload(formData) {
   const durationMin = ((Date.now() - sessionStart) / 60000).toFixed(1);
   const totalAttempts = scenarioData.reduce((sum, s) => sum + (s.attempts || 0), 0);
@@ -470,21 +593,19 @@ function buildSessionPayload(formData) {
     s4_prompts:           scenarioData[3].prompts.join(' | '),
     s4_final_response:    scenarioData[3].finalResponse,
     s4_oscqr:             scenarioData[3].oscqrLit,
-    s4_self_report:       scenarioData[3].selfReport || '',
  
     // S5 — predict the output
     s5_attempts:          scenarioData[4].attempts,
-    s5_best_score:        scenarioData[4].bestScore,
+    s5_best_score:        scenarioData[4].bestScore || 0,
+    s5_self_report:       scenarioData[4].selfReport || '',
     s5_prompts:           scenarioData[4].prompts.join(' | '),
-    s5_prediction:        scenarioData[4].prediction || '',
-    s5_prediction_correct: scenarioData[4].predictionCorrect ? 'yes' : 'no',
+    s5_final_response:    scenarioData[4].finalResponse || '',
  
     // S6 — sync bias
     s6_attempts:          scenarioData[5].attempts,
-    s6_best_score:        scenarioData[5].bestScore,
+    s6_prediction:        scenarioData[5].prediction || '',
+    s6_prediction_correct: scenarioData[5].predictionCorrect ? 'yes' : 'no',
     s6_prompts:           scenarioData[5].prompts.join(' | '),
-    s6_final_response:    scenarioData[5].finalResponse,
-    s6_oscqr:             scenarioData[5].oscqrLit,
  
     // S7 — overreliance decisions
     s7_decisions: {
@@ -503,14 +624,16 @@ function buildSessionPayload(formData) {
     s8_revised_score:     scenarioData[7].revisedScore   || 0,
     s8_score_delta:       scenarioData[7].scoreDelta     || 0,
     s8_reflection_1:      scenarioData[7].reflection1    || '',
+    ai_narrative:         '',  // populated after async generation
+    growth_json:          '',  // populated after async generation
     s8_reflection_2:      scenarioData[7].reflection2    || '',
     s8_reflection_3:      scenarioData[7].reflection3    || '',
  
     // Reflection Room
-    q1_surprise:  formData ? (formData.get('q1_surprise')  || '') : '',
-    q2_change:    formData ? (formData.get('q2_change')    || '') : '',
-    q3_practice:  formData ? (formData.get('q3_practice')  || '') : '',
-    q4_other:     formData ? (formData.get('q4_other')     || '') : '',
+    q1_surprise:    formData ? (formData.get('q1_surprise')  || '') : '',
+    q2_unexpected:  formData ? (formData.get('q2_change')    || '') : '',
+    q3_transfer:    formData ? (formData.get('q3_practice')  || '') : '',
+    q4_other:       formData ? (formData.get('q4_other')     || '') : '',
  
     // Metadata
     screen_width: window.screen.width,
@@ -725,7 +848,7 @@ After your main response, add a short section called "Course Quality Check" noti
 Coaching: vague prompts get generic project ideas. Specific prompts that name the discipline, course level, student population, and delivery mode get excellent, realistic assessment designs with explicit praise.`
   },
 
-  // ── S4: HALLUCINATION HUNT ────────────────────────────
+  // ── S5: HALLUCINATION HUNT (index 4) ────────────────────────────
   {
     desc: "A colleague shares an AI-generated faculty development workshop agenda on evidence-based online teaching strategies. It looks polished and cites research. Read it carefully.",
     isCriticalThinking: true,
@@ -773,7 +896,7 @@ Participants apply workshop strategies directly to one of their current courses 
     system: `You are an AI assistant helping design faculty professional development workshops on online teaching.`
   },
 
-  // ── S5: PREDICT THE OUTPUT ────────────────────────────
+  // ── S6: PREDICT THE OUTPUT (index 5) ────────────────────────────
   {
     desc: "An instructor sent this prompt to an AI course design assistant: 'Help me make my online course better.' Before seeing what happened — what do you predict the AI gave them?",
     isPrediction: true,
@@ -977,10 +1100,12 @@ Scenario E: Two students in different sections of the same course share notes an
       { id:"iter", label:"Iterative Practice" },
     ],
     system: `You are a supportive instructional design coach helping an online higher education faculty member design meaningful reflection activities for asynchronous courses.
-When the instructor writes a prompt, respond with a practical, course-ready metacognitive activity that helps students notice their own learning patterns. Be warm and specific.
-Format your response with **bold headers** for each main section and a blank line between sections. Use short paragraphs. Do not write in one long block of text.
-After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Reflection, Learning Strategy, Student Autonomy, Iterative Practice.
-Do NOT include any numbers, scores, or fractions in your response.`
+
+PHASE 1 — Initial prompt: Respond with a practical, course-ready metacognitive activity. Be warm, specific, and concrete. Use **bold headers** for each section. Short paragraphs only.
+
+PHASE 2 — Revised prompt (you will see the instructor's self-reflection in the prior messages): Your job is to (1) briefly name what specifically improved between the two versions, (2) respond to the revised prompt with a refined activity, and (3) note one thing they could push further. Be direct and coaching-focused. Reference their own reflection if they named something specific.
+
+In BOTH phases: after your main response add a short "Course Quality Check" section noting which are addressed: Clear Objectives, Reflection, Learning Strategy, Student Autonomy, Iterative Practice. Do NOT include numbers, scores, or fractions.`
   }
 ];
 
@@ -1271,7 +1396,7 @@ function unlockScenario4() {
   btn.classList.add('unlocked-s4');
   btn.disabled = false;
   btn.removeAttribute('aria-disabled');
-  btn.textContent = '⚠️ S4: Hallucination';
+  btn.textContent = '⚖️ S4: Sync Bias';
   btn.onclick = () => switchScenario(3, btn);
 
   pixelBadgeSetExpr('thinking');
@@ -1279,7 +1404,7 @@ function unlockScenario4() {
 
   setTimeout(() => {
     document.getElementById('pixelCoachMsg').textContent =
-      "Scenario 4 is now unlocked. This one is different — stay sharp.";
+      "Scenario 4 is now unlocked. Watch out — this AI has some assumptions baked in.";
     document.getElementById('pixelCoachCard').classList.add('visible');
     clearTimeout(coachDismissTimer);
     coachDismissTimer = setTimeout(pixelCoachDismiss, 8000);
@@ -1288,10 +1413,10 @@ function unlockScenario4() {
 
 async function sendScenario4(text) {
   s4InterruptFired = false;
-  scenarioData[3].attempts++;
-  scenarioData[3].prompts.push(text);
+  scenarioData[4].attempts++;
+  scenarioData[4].prompts.push(text);
 
-  document.getElementById('attNum').textContent = scenarioData[3].attempts;
+  document.getElementById('attNum').textContent = scenarioData[4].attempts;
   addMsg('user', esc(text));
   const input = document.getElementById('promptInput');
   if (input) { input.value = ''; input.style.height = 'auto'; }
@@ -1307,7 +1432,7 @@ async function sendScenario4(text) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
-        system: scenarios[3].system,
+        system: scenarios[4].system,
         messages: history
       })
     });
@@ -1323,7 +1448,7 @@ async function sendScenario4(text) {
 
     const reply = data.content[0].text;
     history.push({ role: 'assistant', content: reply });
-    scenarioData[3].finalResponse = reply.substring(0, 300);
+    scenarioData[4].finalResponse = reply.substring(0, 300);
 
     addMsg('ai', fmt(reply), 'neutral');
 
@@ -1384,7 +1509,7 @@ function showS4SelfReport(area) {
 
 function s4SelectReport(btn, answer) {
   s4SelfReportAnswer = answer;
-  scenarioData[3].selfReport = answer;
+  scenarioData[4].selfReport = answer;
   btn.closest('.s4-self-report-btns').querySelectorAll('.s4-btn').forEach(b => {
     b.classList.remove('selected');
     b.disabled = true;
@@ -1474,7 +1599,11 @@ function addPixelS4Closing(area) {
   pixelBadgeSetExpr('proud');
   document.getElementById('pixelBadgeLabel').textContent = 'proud';
 
-  saveIncrementalData(3);
+  // Score S5 (Hallucination) based on self-report for data consistency
+  const s5Score = s4SelfReportAnswer === 'yes_noticed' ? 5
+                : s4SelfReportAnswer === 'unsure'       ? 3 : 1;
+  scenarioData[4].bestScore = s5Score;
+  saveIncrementalData(4);
 
   // Nav card pointing to S5 appears after Pixel's message
   setTimeout(() => {
@@ -1502,7 +1631,7 @@ function addPixelS4Closing(area) {
   }, 1400);
 
   setTimeout(() => {
-    scenarioCompleted[3] = true;
+    scenarioCompleted[4] = true;
     // Wait for s4Reveal to finish before playing scenarioComplete
     const s4Sound = audioReady && sounds.s4Reveal;
     if (s4Sound && s4Sound.playing()) {
@@ -1522,8 +1651,8 @@ let s5PredictionDone = false;
 // ══════════════════════════════════════════════════════
 //  SCENARIO 4 — HALLUCINATION HUNT (pre-written reveal)
 // ══════════════════════════════════════════════════════
-function loadScenario4() {
-  const s = scenarios[3];
+function loadScenarioHallucination() {
+  const s = scenarios[4];
   const area = document.getElementById('chat');
 
   document.getElementById('vnBoardText').textContent = s.desc;
@@ -1559,8 +1688,8 @@ function loadScenario4() {
   }, 500);
 }
 
-function loadScenario5() {
-  const s = scenarios[4];
+function loadScenarioPredict() {
+  const s = scenarios[5];
   const area = document.getElementById('chat');
 
   // Show the bad prompt on the smartboard
@@ -1690,8 +1819,8 @@ function s5RevealResponse(predictedCorrectly) {
 //  SCENARIO 6 — BIAS AND CONTEXT
 // ══════════════════════════════════════════════════════
 
-function loadScenario6() {
-  const s = scenarios[5];
+function loadScenarioSyncBias() {
+  const s = scenarios[3];
   const area = document.getElementById('chat');
 
   // Show the biased response on smartboard
@@ -1761,7 +1890,7 @@ function unlockScenario5() {
   if (!btn || !btn.classList.contains('locked')) return;
   btn.classList.remove('locked');
   btn.disabled = false;
-  btn.textContent = '🔮 S5: Predict';
+  btn.textContent = '⚠️ S5: Hallucination';
   btn.onclick = () => switchScenario(4, btn);
 }
 
@@ -1770,7 +1899,7 @@ function unlockScenario6() {
   if (!btn || !btn.classList.contains('locked')) return;
   btn.classList.remove('locked');
   btn.disabled = false;
-  btn.textContent = '⚖️ S6: Sync Bias';
+  btn.textContent = '🔮 S6: Predict';
   btn.onclick = () => switchScenario(5, btn);
 }
 
@@ -2237,6 +2366,31 @@ function s8ShowRevisionInput() {
       <strong>Round 2:</strong> Now write your revised prompt. Your original is pre-filled — edit it or rewrite from scratch.
     </div>`;
   area.appendChild(label);
+  // Inject the instructor's reflections into conversation history
+  // so the AI sees them as context before the revised prompt arrives.
+  const r1 = scenarioData[7].reflection1 || '';
+  const r2 = scenarioData[7].reflection2 || '';
+  const r3 = scenarioData[7].reflection3 || '';
+  if (r1 || r2 || r3) {
+    history.push({
+      role: 'user',
+      content: `Before I revise my prompt, here is my honest reflection on your response:
+
+` +
+        (r1 ? `Why I wrote it that way: ${r1}
+
+` : '') +
+        (r2 ? `What worked: ${r2}
+
+` : '') +
+        (r3 ? `What fell short or surprised me: ${r3}` : '')
+    });
+    history.push({
+      role: 'assistant',
+      content: `Thank you for reflecting so honestly — that kind of self-assessment is exactly what makes revision meaningful. I can see what you were going for. Go ahead and share your revised prompt and I'll respond to it directly, noting what changed and what you might push further.`
+    });
+  }
+
   document.getElementById('inputContainer').style.display = 'block';
   renderOpenPlain(document.getElementById('inputContainer'));
   const input = document.getElementById('promptInput');
@@ -2620,8 +2774,8 @@ function loadScenario(i) {
   document.getElementById('chat').innerHTML = '';
 
   // Reset scenario-specific state flags
-  if (i === 3) s4InterruptFired = false;
-  if (i === 4) s5PredictionDone = false;
+  if (i === 4) s4InterruptFired = false;   // Hallucination is now S5 (index 4)
+  if (i === 5) s5PredictionDone = false;  // Predict is now S6 (index 5)
 
   loadSceneImage(`scene-s${i + 1}.png`);
 
@@ -2631,21 +2785,24 @@ function loadScenario(i) {
 
   // S4, S5, S6, S7 control their own input visibility
   if (i === 3) {
+    // S4 is now Sync Bias (open prompt, scored)
     renderOpenPlain(document.getElementById('inputContainer'));
-    document.getElementById('inputContainer').style.display = 'none';
-    loadScenario4();
+    document.getElementById('inputContainer').style.display = 'block';
+    loadScenarioSyncBias();
     return;
   }
   if (i === 4) {
+    // S5 is now Hallucination Hunt
     renderOpenPlain(document.getElementById('inputContainer'));
     document.getElementById('inputContainer').style.display = 'none';
-    loadScenario5();
+    loadScenarioHallucination();
     return;
   }
   if (i === 5) {
+    // S6 is now Predict the Output
     renderOpenPlain(document.getElementById('inputContainer'));
     document.getElementById('inputContainer').style.display = 'none';
-    loadScenario6();
+    loadScenarioPredict();
     return;
   }
   if (i === 6) {
@@ -3362,8 +3519,44 @@ async function handleReflectionSubmit(e) {
       // Netlify fallback is best-effort -- Sheets is the primary
     }
 
+    // Show success + trigger growth report generation
     document.getElementById('refForm').style.display = 'none';
     document.getElementById('refSuccess').style.display = 'block';
+
+    // Generate AI growth narrative asynchronously
+    const reflAnswers = {
+      q1: formData.get('q1_surprise') || '',
+      q2: formData.get('q2_change')   || '',
+      q3: formData.get('q3_practice') || '',
+      q4: formData.get('q4_other')    || '',
+    };
+    generateGrowthReport(reflAnswers).then(narrative => {
+      const el = document.getElementById('growthNarrative');
+      if (el && narrative) el.innerHTML = narrative.replace(/\n/g, '<br>');
+      const g = buildGrowthScores();
+      const tableEl = document.getElementById('growthTable');
+      if (tableEl) tableEl.innerHTML = buildGrowthTableHTML(g);
+      // Append growth data to payload and re-submit (best-effort)
+      if (narrative) {
+        const growthPayload = Object.assign(buildSessionPayload(formData), {
+          ai_narrative: narrative,
+          growth_json: JSON.stringify({
+            trajectory: g.trajectory,
+            avg: (g.trajectory.reduce((a,b)=>a+b,0)/8).toFixed(2),
+            delta: g.delta,
+            threshold_met: g.threshold_met,
+            s5_caught: g.s5_caught,
+            s6_predicted: g.s6_predicted,
+            s7_correct: g.s7_correct,
+          }),
+        });
+        fetch(SHEETS_URL, {
+          method: 'POST', mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(growthPayload)
+        }).catch(() => {});
+      }
+    });
     return;
   }
 
@@ -3377,6 +3570,15 @@ async function handleReflectionSubmit(e) {
     if (res.ok) {
       document.getElementById('refForm').style.display = 'none';
       document.getElementById('refSuccess').style.display = 'block';
+      // Generate growth report even in netlify mode
+      const rfAnswers = { q1: formData.get('q1_surprise')||'', q2: formData.get('q2_change')||'', q3: formData.get('q3_practice')||'', q4: formData.get('q4_other')||'' };
+      generateGrowthReport(rfAnswers).then(narrative => {
+        const el = document.getElementById('growthNarrative');
+        if (el && narrative) el.innerHTML = narrative.replace(/\n/g, '<br>');
+        const g = buildGrowthScores();
+        const tableEl = document.getElementById('growthTable');
+        if (tableEl) tableEl.innerHTML = buildGrowthTableHTML(g);
+      });
     } else {
       btn.disabled = false;
       btn.textContent = 'Submit Reflection';
@@ -3428,7 +3630,7 @@ function devGoS5() {
 // then fills the improved prompt textarea. Does NOT auto-send.
 function devFillS5() {
   // Navigate to S5 if not already there
-  if (scenarioIndex !== 4) devGoS5();
+  if (scenarioIndex !== 4) devGoS5(); // S5 = Hallucination (index 4)
 
   const clickPrediction = (attempts) => {
     const btns = [...document.querySelectorAll('.s4-btn')];
@@ -3475,7 +3677,7 @@ function devGoS6() {
 // biased plan + Pixel reveal sequence, then fills — no auto-send.
 function devFillS6() {
   // Navigate to S6 if not already there
-  if (scenarioIndex !== 5) devGoS6();
+  if (scenarioIndex !== 5) devGoS6(); // S6 = Predict (index 5)
 
   const waitForInput = (attempts) => {
     const input = document.getElementById('promptInput');

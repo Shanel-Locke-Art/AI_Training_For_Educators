@@ -998,9 +998,9 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
 .vn-smartboard-wrap {
   position: absolute;
   left: 2%;
-  top: 4%;
+  top: 5%;
   /* Landscape 16:10 ratio matching real SMART Boards */
-  width: 74%;
+  width: 56%;
   aspect-ratio: 16 / 10.5;
   z-index: 2;
   /* Green screen glow lifts it off the dark background */
