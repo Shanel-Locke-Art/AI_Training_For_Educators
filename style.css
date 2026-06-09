@@ -6148,2261 +6148,849 @@ body.s1-result-active #inputContainer { display: block; }
 }
 
 
-/* PROMPTCRAFT FINAL CRT SCENE PATCH: canonical Claude prediction/output layout.
-   Appended last on purpose. This wins over the earlier prototype sediment. */
-#vnOverlay.active.claude-prediction .vn-smartboard-wrap,
-#vnOverlay.active.claude-prediction .claude-shelf,
-#vnOverlay.active.claude-output-closeup .vn-smartboard-wrap,
-#vnOverlay.active.claude-output-closeup .claude-shelf {
-  display: none !important;
+/* PROMPTCRAFT CLEAN SINGLE OWNER CSS */
+.vn-overlay.active.pc-clean-prediction,
+.vn-overlay.active.pc-clean-output {
+  overflow: hidden !important;
+}
+.vn-overlay.active.pc-clean-prediction .vn-smartboard-wrap,
+.vn-overlay.active.pc-clean-output .vn-smartboard-wrap,
+.vn-overlay.active.pc-clean-prediction .vn-board-label,
+.vn-overlay.active.pc-clean-output .vn-board-label,
+.vn-overlay.active.pc-clean-prediction .vn-board-text,
+.vn-overlay.active.pc-clean-output .vn-board-text,
+.vn-overlay.active.pc-clean-prediction .vn-board-loading,
+.vn-overlay.active.pc-clean-output .vn-board-loading {
   opacity: 0 !important;
   pointer-events: none !important;
 }
-#vnOverlay.active.claude-prediction,
-#vnOverlay.active.claude-output-closeup {
-  background: rgba(0,0,0,0.72) !important;
-}
-#vnOverlay.active.claude-prediction .vn-scene,
-#vnOverlay.active.claude-output-closeup .vn-scene {
-  background: transparent !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-scene,
-#vnOverlay.active.claude-output-closeup .claude-terminal-scene {
-  display: flex !important;
-  opacity: 1 !important;
-  pointer-events: none !important;
-  z-index: 4 !important;
-  inset: 0 !important;
-  background: transparent !important;
-  transform: none !important;
-  filter: none !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-scene {
-  align-items: flex-start !important;
-  justify-content: center !important;
-  padding-top: 3.5vh !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-photo {
-  width: min(78vw, 1280px) !important;
-  height: min(54vh, 640px) !important;
-  max-width: none !important;
-  max-height: none !important;
-  margin: 0 !important;
-  border-radius: 28px !important;
-  overflow: hidden !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  border: 3px solid #18ff47 !important;
-  box-shadow: 0 0 34px rgba(24,255,71,.42), 0 26px 80px rgba(0,0,0,.82) !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-photo::before {
-  content: 'CLAUDE TERMINAL  •  AWAITING PREDICTION' !important;
-  position: absolute !important;
-  left: 15% !important;
-  right: 15% !important;
-  bottom: 4.5% !important;
-  height: 34px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 6 !important;
-  background: rgba(0,0,0,.88) !important;
-  border: 1.5px solid rgba(32,255,70,.9) !important;
-  border-radius: 8px !important;
-  color: #36ff69 !important;
-  font-family: 'Source Code Pro', monospace !important;
-  font-size: clamp(.7rem, 1.05vw, 1rem) !important;
-  font-weight: 700 !important;
-  letter-spacing: .16em !important;
-  text-shadow: 0 0 9px rgba(32,255,70,.78) !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-photo::after {
-  content: '' !important;
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: 2 !important;
-  background: linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.34)),
-              repeating-linear-gradient(0deg, rgba(255,255,255,.035), rgba(255,255,255,.035) 1px, transparent 1px, transparent 5px) !important;
-  mix-blend-mode: multiply !important;
-  pointer-events: none !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-screen {
-  left: 35.6% !important;
-  top: 21.5% !important;
-  width: 31% !important;
-  height: 28.5% !important;
-  border-radius: 26px !important;
-  padding: 0 !important;
-  background: radial-gradient(circle at 50% 45%, rgba(18,110,61,.94), rgba(0,20,10,.98) 66%) !important;
-  box-shadow: inset 0 0 24px rgba(0,0,0,.92), 0 0 14px rgba(30,255,90,.24) !important;
-  z-index: 5 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  overflow: hidden !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-title {
-  display: none !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-output {
-  color: #37ff63 !important;
-  font-family: 'Source Code Pro', monospace !important;
-  font-size: clamp(.86rem, 1.28vw, 1.25rem) !important;
-  font-weight: 700 !important;
-  letter-spacing: .06em !important;
-  text-transform: uppercase !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-shadow: 0 0 10px rgba(55,255,99,.85) !important;
-  max-width: 92% !important;
-  text-align: center !important;
-}
-#vnOverlay.active.claude-prediction .vn-character {
+.vn-overlay.active.pc-clean-prediction .claude-terminal-scene,
+.vn-overlay.active.pc-clean-output .claude-terminal-scene {
   display: block !important;
   opacity: 1 !important;
-  z-index: 9 !important;
-  height: min(42vh, 430px) !important;
-  left: clamp(14px, 3vw, 54px) !important;
-  bottom: 138px !important;
-  transform: none !important;
-  pointer-events: none !important;
-}
-#vnOverlay.active.claude-prediction .vn-dialogue,
-#vnOverlay.active.claude-output-closeup .vn-dialogue {
+  visibility: visible !important;
   position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100% !important;
-  min-height: 138px !important;
-  max-height: 25vh !important;
-  padding: 18px clamp(18px, 3vw, 34px) 18px !important;
-  background: linear-gradient(180deg, rgba(0,0,0,.88), rgba(0,0,0,.98)) !important;
-  border-top: 1.5px solid rgba(168,213,181,.38) !important;
-  border-radius: 0 !important;
-  box-shadow: 0 -12px 38px rgba(0,0,0,.65) !important;
-  z-index: 12 !important;
-  pointer-events: auto !important;
-  overflow: visible !important;
-}
-#vnOverlay.active.claude-prediction .vn-speaker,
-#vnOverlay.active.claude-output-closeup .vn-speaker {
-  color: #a8f5bf !important;
-  font-size: clamp(1rem, 1.55vw, 1.25rem) !important;
-}
-#vnOverlay.active.claude-prediction #vnText {
-  max-width: none !important;
-  padding-right: 0 !important;
-}
-#vnOverlay.active.claude-prediction .vn-choice-list {
-  position: absolute !important;
-  right: clamp(20px, 3vw, 54px) !important;
-  bottom: 22px !important;
-  width: min(62vw, 760px) !important;
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(130px, 1fr)) !important;
-  gap: 12px !important;
-  margin: 0 !important;
-  z-index: 16 !important;
-}
-#vnOverlay.active.claude-prediction .vn-choice-btn {
-  min-height: 56px !important;
-  height: auto !important;
-  width: 100% !important;
-  border-radius: 10px !important;
-  padding: 10px 12px !important;
-  border: 2px solid rgba(168,213,181,.62) !important;
-  background: rgba(4,24,14,.86) !important;
-  color: #d7f5de !important;
-  text-align: center !important;
-  font-family: 'Nunito', sans-serif !important;
-  font-size: clamp(.72rem, .9vw, .9rem) !important;
-  font-weight: 800 !important;
-  line-height: 1.25 !important;
-  cursor: pointer !important;
-  box-shadow: inset 0 0 18px rgba(0,0,0,.28) !important;
-}
-#vnOverlay.active.claude-prediction .vn-choice-btn:hover,
-#vnOverlay.active.claude-prediction .vn-choice-btn:focus {
-  background: #d7f5de !important;
-  color: #153923 !important;
-  outline: 3px solid rgba(168,213,181,.32) !important;
-}
-#vnOverlay.active.claude-prediction .vn-prompt-line {
-  max-width: 42vw !important;
-}
-#vnOverlay.active.claude-prediction .vn-skip,
-#vnOverlay.active.claude-output-closeup .vn-skip {
-  right: 18px !important;
-  top: 14px !important;
+  left: 50% !important;
+  top: 44% !important;
+  width: min(74vw, 1120px) !important;
+  height: min(52vh, 530px) !important;
+  transform: translate(-50%, -50%) !important;
   z-index: 20 !important;
-}
-
-/* Claude output: the CRT screen itself is the content area, not a floating tablet. */
-#vnOverlay.active.claude-output-closeup .claude-terminal-scene {
-  align-items: flex-start !important;
-  justify-content: center !important;
-  padding-top: 2vh !important;
-}
-#vnOverlay.active.claude-output-closeup .claude-terminal-photo {
-  width: min(88vw, 1440px) !important;
-  height: min(73vh, 760px) !important;
-  max-width: none !important;
-  max-height: none !important;
-  margin: 0 !important;
-  border-radius: 18px !important;
-  overflow: hidden !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  border: 2.5px solid #20ff46 !important;
-  box-shadow: 0 0 38px rgba(32,255,70,.26), 0 24px 80px rgba(0,0,0,.9) !important;
-}
-#vnOverlay.active.claude-output-closeup .claude-terminal-photo::before,
-#vnOverlay.active.claude-output-closeup .claude-terminal-photo::after {
-  display: none !important;
-  content: none !important;
-}
-#vnOverlay.active.claude-output-closeup .claude-terminal-screen {
-  left: 21.7% !important;
-  top: 10.5% !important;
-  width: 45.8% !important;
-  height: 64% !important;
-  border-radius: 22px !important;
-  padding: clamp(18px, 2.2vw, 34px) !important;
-  background:
-    repeating-linear-gradient(0deg, rgba(47,255,86,.075), rgba(47,255,86,.075) 1px, transparent 1px, transparent 5px),
-    radial-gradient(circle at 50% 42%, rgba(0,65,31,.96), rgba(0,8,5,.99) 72%) !important;
-  color: #20ff46 !important;
-  text-shadow: 0 0 8px rgba(32,255,70,.88), 0 0 18px rgba(32,255,70,.36) !important;
-  box-shadow: inset 0 0 34px rgba(0,0,0,.96), 0 0 20px rgba(32,255,70,.20) !important;
-  z-index: 5 !important;
-  overflow: hidden !important;
-}
-#vnOverlay.active.claude-output-closeup .claude-terminal-title {
-  display: block !important;
-  color: #20ff46 !important;
-  font-size: clamp(.65rem, 1vw, .95rem) !important;
-  letter-spacing: .14em !important;
-  margin-bottom: clamp(8px, 1vw, 12px) !important;
-}
-#vnOverlay.active.claude-output-closeup .claude-terminal-output {
-  color: #20ff46 !important;
-  font-size: clamp(.82rem, 1.08vw, 1.08rem) !important;
-  line-height: 1.35 !important;
-  letter-spacing: .035em !important;
-  text-transform: uppercase !important;
-  white-space: pre-wrap !important;
-  overflow-y: auto !important;
-  max-height: calc(100% - 2rem) !important;
-  padding-right: 18px !important;
-  scrollbar-width: thin !important;
-  scrollbar-color: #d7ffe0 rgba(0,0,0,.35) !important;
-}
-#vnOverlay.active.claude-output-closeup .vn-character {
-  display: block !important;
-  opacity: 1 !important;
-  z-index: 14 !important;
-  height: min(34vh, 350px) !important;
-  left: clamp(14px, 2vw, 36px) !important;
-  bottom: 70px !important;
-  transform: none !important;
-}
-#vnOverlay.active.claude-output-closeup #vnText {
-  padding-left: min(19vw, 260px) !important;
-  padding-right: min(22vw, 310px) !important;
-}
-#vnOverlay.active.claude-output-closeup .terminal-return {
-  position: absolute !important;
-  right: clamp(26px, 5vw, 90px) !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  min-width: 160px !important;
-  min-height: 56px !important;
-  border-radius: 10px !important;
-  border: 2px solid rgba(32,255,70,.95) !important;
-  background: #20ff00 !important;
-  color: #001500 !important;
-  font-family: 'Source Code Pro', monospace !important;
-  font-weight: 800 !important;
-  text-transform: uppercase !important;
-  letter-spacing: .08em !important;
-  box-shadow: 0 0 22px rgba(32,255,70,.52) !important;
-}
-#vnOverlay.active.claude-output-closeup .terminal-return:hover,
-#vnOverlay.active.claude-output-closeup .terminal-return:focus {
-  background: #d7ffe0 !important;
-  color: #001500 !important;
-  outline: 3px solid rgba(32,255,70,.25) !important;
-}
-
-/* Result/navigation buttons */
-.s1-result-controls .continue-btn,
-.s1-result-controls .guided-send-btn,
-#inputContainer .s1-result-controls-actions .continue-btn,
-#inputContainer .s1-result-controls-actions .guided-send-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-width: 190px !important;
-  min-height: 52px !important;
-  padding: 12px 24px !important;
-  border-radius: 10px !important;
-  border: 2px solid var(--forest-dark) !important;
-  background: var(--forest) !important;
-  color: #d4edd9 !important;
-  font-family: 'Fraunces', serif !important;
-  font-size: 1rem !important;
-  font-weight: 800 !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-  box-shadow: 0 4px 12px rgba(30,61,41,.22) !important;
-}
-.s1-result-controls .s1-secondary-btn,
-#inputContainer .s1-result-controls-actions .s1-secondary-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-width: 160px !important;
-  min-height: 52px !important;
-  padding: 12px 22px !important;
-  border-radius: 10px !important;
-  border: 1.5px solid var(--border-strong) !important;
-  background: var(--chalk) !important;
-  color: var(--ink-mid) !important;
-  font-family: 'Fraunces', serif !important;
-  font-size: 1rem !important;
-  font-weight: 800 !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-}
-
-@media (max-width: 980px) {
-  #vnOverlay.active.claude-prediction .claude-terminal-photo { width: 92vw !important; height: 45vh !important; }
-  #vnOverlay.active.claude-prediction .vn-choice-list { grid-template-columns: repeat(2, minmax(130px, 1fr)) !important; width: min(64vw, 540px) !important; }
-  #vnOverlay.active.claude-prediction .vn-character { height: 34vh !important; bottom: 136px !important; }
-  #vnOverlay.active.claude-output-closeup .claude-terminal-photo { width: 96vw !important; height: 62vh !important; }
-  #vnOverlay.active.claude-output-closeup .claude-terminal-screen { left: 20% !important; width: 48% !important; }
-}
-@media (max-width: 700px) {
-  #vnOverlay.active.claude-prediction .vn-choice-list { position: static !important; width: 100% !important; grid-template-columns: 1fr !important; margin-top: 10px !important; }
-  #vnOverlay.active.claude-prediction .vn-prompt-line { max-width: none !important; }
-  #vnOverlay.active.claude-prediction .vn-dialogue { max-height: 38vh !important; overflow-y: auto !important; }
-  #vnOverlay.active.claude-output-closeup #vnText { padding-left: 0 !important; padding-right: 0 !important; }
-  #vnOverlay.active.claude-output-closeup .terminal-return { position: static !important; transform: none !important; margin-top: 10px !important; }
-}
-
-
-/* ══════════════════════════════════════════════════════
-   CANONICAL S1 CRT + RESULT LAYOUT OVERRIDE
-   This block intentionally wins over older prototype rules.
-   ══════════════════════════════════════════════════════ */
-#vnOverlay.active.claude-prediction .vn-smartboard-wrap,
-#vnOverlay.active.claude-output-closeup .vn-smartboard-wrap,
-#vnOverlay.active.claude-prediction .claude-shelf,
-#vnOverlay.active.claude-output-closeup .claude-shelf {
-  display: none !important;
-  opacity: 0 !important;
   pointer-events: none !important;
 }
-#vnOverlay.active.claude-prediction .vn-scene,
-#vnOverlay.active.claude-output-closeup .vn-scene {
-  background: radial-gradient(circle at 50% 28%, rgba(9,45,18,.30), transparent 45%), linear-gradient(180deg, rgba(0,0,0,.38), rgba(0,0,0,.84)) !important;
-  overflow: hidden !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-scene,
-#vnOverlay.active.claude-output-closeup .claude-terminal-scene {
-  display: flex !important;
-  opacity: 1 !important;
-  pointer-events: none !important;
-  z-index: 5 !important;
-  inset: 0 !important;
-  transform: none !important;
-}
-
-/* Prediction: large monitor, one message on the CRT glass. */
-#vnOverlay.active.claude-prediction .claude-terminal-scene {
-  align-items: flex-start !important;
-  justify-content: center !important;
-  padding-top: clamp(42px, 4.2vh, 70px) !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-photo {
-  width: min(78vw, 1220px) !important;
-  height: min(56vh, 620px) !important;
-  max-width: none !important;
-  max-height: none !important;
-  margin: 0 auto !important;
-  border: 2px solid #20ff46 !important;
-  border-radius: 22px !important;
-  overflow: hidden !important;
-  background-size: cover !important;
-  background-position: center !important;
-  box-shadow: 0 0 0 1px rgba(32,255,70,.45), 0 0 34px rgba(32,255,70,.45), 0 22px 80px rgba(0,0,0,.86) !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-photo::before {
-  content: 'CLAUDE TERMINAL • AWAITING PREDICTION' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 22% !important;
-  right: 22% !important;
-  height: 34px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: rgba(0, 10, 3, .88) !important;
-  border: 1px solid rgba(32,255,70,.7) !important;
-  border-top: none !important;
-  border-radius: 0 0 7px 7px !important;
-  color: #20ff46 !important;
-  font-family: 'Source Code Pro', monospace !important;
-  font-size: clamp(.58rem, .8vw, .82rem) !important;
-  font-weight: 800 !important;
-  letter-spacing: .16em !important;
-  text-shadow: 0 0 10px rgba(32,255,70,.72) !important;
-  z-index: 8 !important;
-  pointer-events: none !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-photo::after {
-  content: '' !important;
-  position: absolute !important;
-  inset: 0 !important;
-  background: linear-gradient(180deg, rgba(0,0,0,.14), rgba(0,0,0,.20)), repeating-linear-gradient(0deg, rgba(255,255,255,.035), rgba(255,255,255,.035) 1px, transparent 1px, transparent 5px) !important;
-  pointer-events: none !important;
-  mix-blend-mode: multiply !important;
-  z-index: 2 !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-screen {
-  left: 34.9% !important;
-  top: 23.4% !important;
-  width: 27.2% !important;
-  height: 31.5% !important;
-  border-radius: 20px !important;
-  padding: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: repeating-linear-gradient(0deg, rgba(32,255,70,.09), rgba(32,255,70,.09) 1px, transparent 1px, transparent 4px), radial-gradient(circle at 50% 45%, rgba(0,78,38,.96), rgba(0,12,6,.99) 72%) !important;
-  box-shadow: inset 0 0 28px rgba(0,0,0,.96), 0 0 14px rgba(32,255,70,.25) !important;
-  overflow: hidden !important;
-  z-index: 6 !important;
-}
-#vnOverlay.active.claude-prediction .claude-terminal-title { display: none !important; }
-#vnOverlay.active.claude-prediction .claude-terminal-output {
-  color: #40ff68 !important;
-  font-family: 'Source Code Pro', monospace !important;
-  font-size: clamp(.7rem, 1.18vw, 1.18rem) !important;
-  font-weight: 800 !important;
-  letter-spacing: .05em !important;
-  line-height: 1.1 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  max-width: 92% !important;
-  text-align: center !important;
-  text-shadow: 0 0 10px rgba(64,255,104,.8) !important;
-}
-
-/* Prediction dialogue: mockup-style bottom panel, Pixel bigger, choices never disappear. */
-#vnOverlay.active.claude-prediction .vn-character {
-  display: block !important;
-  opacity: 1 !important;
-  height: min(46vh, 520px) !important;
-  left: clamp(22px, 4vw, 88px) !important;
-  bottom: 64px !important;
-  z-index: 14 !important;
-  transform: none !important;
-  pointer-events: none !important;
-}
-#vnOverlay.active.claude-prediction .vn-dialogue,
-#vnOverlay.active.claude-output-closeup .vn-dialogue {
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100% !important;
-  min-height: 176px !important;
-  max-height: 28vh !important;
-  padding: 22px clamp(22px, 3vw, 44px) 22px clamp(22px, 3vw, 44px) !important;
-  background: linear-gradient(180deg, rgba(0,8,4,.82), rgba(0,0,0,.97)) !important;
-  border-top: 1.5px solid rgba(168,213,181,.35) !important;
-  border-radius: 0 !important;
-  box-shadow: 0 -14px 44px rgba(0,0,0,.75) !important;
-  z-index: 20 !important;
-  overflow: visible !important;
-  pointer-events: auto !important;
-}
-#vnOverlay.active.claude-prediction #vnText {
-  display: grid !important;
-  grid-template-columns: minmax(250px, 34vw) minmax(420px, 1fr) !important;
-  align-items: end !important;
-  gap: clamp(18px, 3vw, 42px) !important;
-  width: 100% !important;
-  max-width: none !important;
-  padding-left: min(18vw, 290px) !important;
-  padding-right: clamp(80px, 9vw, 150px) !important;
-}
-#vnOverlay.active.claude-prediction .vn-copy-block {
-  align-self: center !important;
-}
-#vnOverlay.active.claude-prediction .vn-speaker,
-#vnOverlay.active.claude-output-closeup .vn-speaker {
-  color: #a8f5bf !important;
-  font-size: clamp(1.05rem, 1.5vw, 1.38rem) !important;
-  margin-bottom: 8px !important;
-}
-#vnOverlay.active.claude-prediction .vn-prompt-line {
-  max-width: none !important;
-  color: #f4fff6 !important;
-  font-size: clamp(.9rem, 1.05vw, 1.05rem) !important;
-  line-height: 1.45 !important;
-}
-#vnOverlay.active.claude-prediction .vn-choice-list {
-  position: static !important;
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(145px, 1fr)) !important;
-  gap: 14px !important;
-  width: 100% !important;
-  margin: 0 !important;
-  z-index: 24 !important;
-}
-#vnOverlay.active.claude-prediction .vn-choice-btn {
-  width: 100% !important;
-  min-height: 66px !important;
-  height: auto !important;
-  padding: 12px 16px !important;
-  border-radius: 12px !important;
-  border: 1.7px solid rgba(168,213,181,.62) !important;
-  background: rgba(5,24,14,.86) !important;
-  color: #e8ffee !important;
-  font-family: 'Nunito', sans-serif !important;
-  font-size: clamp(.78rem, .92vw, .98rem) !important;
-  font-weight: 800 !important;
-  line-height: 1.25 !important;
-  text-align: center !important;
-  cursor: pointer !important;
-  box-shadow: inset 0 0 18px rgba(0,0,0,.32) !important;
-}
-#vnOverlay.active.claude-prediction .vn-choice-btn:first-child,
-#vnOverlay.active.claude-prediction .vn-choice-btn:hover,
-#vnOverlay.active.claude-prediction .vn-choice-btn:focus {
-  background: #d7f5de !important;
-  color: #153923 !important;
-  outline: 3px solid rgba(168,213,181,.28) !important;
-}
-
-/* Output: use the CRT screen in the image, not a floating black tablet. */
-#vnOverlay.active.claude-output-closeup .claude-terminal-scene {
-  align-items: flex-start !important;
-  justify-content: center !important;
-  padding-top: 1.5vh !important;
-}
-#vnOverlay.active.claude-output-closeup .claude-terminal-photo {
-  width: min(88vw, 1480px) !important;
-  height: min(72vh, 760px) !important;
-  border-radius: 18px !important;
-  border: 2px solid #20ff46 !important;
-  background-size: cover !important;
-  background-position: center !important;
-  overflow: hidden !important;
-  box-shadow: 0 0 40px rgba(32,255,70,.24), 0 24px 80px rgba(0,0,0,.92) !important;
-}
-#vnOverlay.active.claude-output-closeup .claude-terminal-photo::before,
-#vnOverlay.active.claude-output-closeup .claude-terminal-photo::after { content: none !important; display: none !important; }
-#vnOverlay.active.claude-output-closeup .claude-terminal-screen {
-  left: 23.2% !important;
-  top: 11.7% !important;
-  width: 43.5% !important;
-  height: 64.5% !important;
-  border-radius: 26px !important;
-  padding: clamp(18px, 2.1vw, 34px) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-  background: repeating-linear-gradient(0deg, rgba(32,255,70,.075), rgba(32,255,70,.075) 1px, transparent 1px, transparent 5px), radial-gradient(circle at 50% 42%, rgba(0,48,22,.98), rgba(0,6,3,.995) 75%) !important;
-  box-shadow: inset 0 0 40px rgba(0,0,0,.98), 0 0 18px rgba(32,255,70,.2) !important;
-  overflow: hidden !important;
-}
-#vnOverlay.active.claude-output-closeup .claude-terminal-title {
-  display: block !important;
-  color: #20ff46 !important;
-  font-family: 'Source Code Pro', monospace !important;
-  font-size: clamp(.62rem, .86vw, .9rem) !important;
-  letter-spacing: .14em !important;
-  margin-bottom: 14px !important;
-  flex: 0 0 auto !important;
-}
-#vnOverlay.active.claude-output-closeup .claude-terminal-output {
-  color: #20ff46 !important;
-  font-family: 'Source Code Pro', monospace !important;
-  font-size: clamp(.72rem, .92vw, 1rem) !important;
-  line-height: 1.34 !important;
-  letter-spacing: .035em !important;
-  text-transform: uppercase !important;
-  white-space: pre-wrap !important;
-  overflow-y: auto !important;
-  height: 100% !important;
-  max-height: none !important;
-  padding-right: 16px !important;
-  scrollbar-width: thin !important;
-  scrollbar-color: #d7ffe0 rgba(0,0,0,.35) !important;
-  text-shadow: 0 0 8px rgba(32,255,70,.88), 0 0 18px rgba(32,255,70,.35) !important;
-}
-#vnOverlay.active.claude-output-closeup .vn-character {
-  display: block !important;
-  opacity: 1 !important;
-  height: min(37vh, 390px) !important;
-  left: clamp(18px, 2.6vw, 46px) !important;
-  bottom: 48px !important;
-  z-index: 23 !important;
-}
-#vnOverlay.active.claude-output-closeup #vnText {
-  display: grid !important;
-  grid-template-columns: 1fr auto !important;
-  align-items: center !important;
-  gap: 24px !important;
-  padding-left: min(20vw, 300px) !important;
-  padding-right: clamp(30px, 5vw, 90px) !important;
-}
-#vnOverlay.active.claude-output-closeup .terminal-return {
-  position: static !important;
-  transform: none !important;
-  min-width: 190px !important;
-  min-height: 58px !important;
-  border-radius: 10px !important;
-  border: 2px solid rgba(32,255,70,.95) !important;
-  background: #20ff00 !important;
-  color: #001500 !important;
-  font-family: 'Source Code Pro', monospace !important;
-  font-weight: 900 !important;
-  text-transform: uppercase !important;
-  letter-spacing: .08em !important;
-  box-shadow: 0 0 22px rgba(32,255,70,.52) !important;
-}
-
-/* Locked result footer from the chosen mockup. */
-.s1-result-controls {
-  display: grid !important;
-  grid-template-columns: minmax(210px, 1fr) minmax(220px, 1.1fr) auto !important;
-  align-items: center !important;
-  gap: 22px !important;
-  padding: 18px 30px !important;
-  background: var(--parchment) !important;
-  border-top: 1.5px solid var(--border) !important;
-}
-.s1-result-controls-status {
-  color: var(--ink-light) !important;
-  font-size: 1rem !important;
-  text-align: center !important;
-  line-height: 1.35 !important;
-}
-.s1-result-controls-actions { display: flex !important; gap: 14px !important; align-items: center !important; justify-content: flex-end !important; }
-.s1-result-controls-actions button {
-  display: inline-flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-width: 190px !important;
-  min-height: 64px !important;
-  padding: 10px 20px !important;
-  border-radius: 10px !important;
-  font-family: 'Fraunces', serif !important;
-  font-size: 1rem !important;
-  font-weight: 800 !important;
-  line-height: 1.2 !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-}
-.s1-result-controls-actions button span { font-family: 'Nunito', sans-serif !important; font-size: .78rem !important; font-weight: 700 !important; opacity: .78 !important; margin-top: 3px !important; }
-.s1-result-controls-actions .s1-secondary-btn { background: var(--chalk) !important; border: 1.5px solid var(--border-strong) !important; color: var(--forest-dark) !important; }
-.s1-result-controls-actions .continue-btn:not(:disabled) { background: var(--forest) !important; border: 2px solid var(--forest-dark) !important; color: #d4edd9 !important; box-shadow: 0 4px 14px rgba(30,61,41,.28) !important; }
-.s1-result-controls-actions .continue-btn:disabled { background: rgba(150,140,120,.22) !important; border: 1.5px solid rgba(150,140,120,.28) !important; color: rgba(80,70,60,.5) !important; cursor: not-allowed !important; box-shadow: none !important; }
-
-@media (max-width: 1050px) {
-  #vnOverlay.active.claude-prediction .claude-terminal-photo { width: 86vw !important; height: 48vh !important; }
-  #vnOverlay.active.claude-prediction #vnText { grid-template-columns: 1fr !important; padding-left: min(22vw, 210px) !important; padding-right: 86px !important; gap: 10px !important; }
-  #vnOverlay.active.claude-prediction .vn-choice-list { grid-template-columns: repeat(2, minmax(130px, 1fr)) !important; }
-  #vnOverlay.active.claude-prediction .vn-character { height: min(38vh, 390px) !important; bottom: 76px !important; }
-  #vnOverlay.active.claude-output-closeup .claude-terminal-photo { width: 94vw !important; height: 62vh !important; }
-  .s1-result-controls { grid-template-columns: 1fr !important; text-align: left !important; }
-  .s1-result-controls-status { text-align: left !important; }
-  .s1-result-controls-actions { justify-content: flex-start !important; flex-wrap: wrap !important; }
-}
-@media (max-width: 720px) {
-  #vnOverlay.active.claude-prediction .vn-dialogue { max-height: 40vh !important; overflow-y: auto !important; }
-  #vnOverlay.active.claude-prediction .vn-character { display: none !important; }
-  #vnOverlay.active.claude-prediction #vnText { padding-left: 0 !important; padding-right: 60px !important; }
-  #vnOverlay.active.claude-prediction .vn-choice-list { grid-template-columns: 1fr !important; }
-  #vnOverlay.active.claude-output-closeup #vnText { padding-left: 0 !important; padding-right: 0 !important; grid-template-columns: 1fr !important; }
-}
-
-/* =========================================================
-   PROMPTCRAFT S1 CLAUDE SCENES — CLEAN FINAL OVERRIDE
-   Keeps prediction, output, and result controls from fighting
-   older prototype rules. Yes, CSS needed adult supervision.
-   ========================================================= */
-
-/* Base VN overlay hygiene for Claude-specific scenes */
-#vnOverlay.active.claude-prediction,
-#vnOverlay.active.claude-output-closeup {
-  overflow: hidden !important;
-}
-
-#vnOverlay.active.claude-prediction .vn-scene,
-#vnOverlay.active.claude-output-closeup .vn-scene {
-  position: absolute !important;
-  inset: 0 !important;
-  overflow: hidden !important;
-}
-
-/* Hide old smartboard and shelf during Claude scenes */
-#vnOverlay.active.claude-prediction .vn-smartboard-wrap,
-#vnOverlay.active.claude-output-closeup .vn-smartboard-wrap,
-#vnOverlay.active.claude-prediction .claude-shelf,
-#vnOverlay.active.claude-output-closeup .claude-shelf {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* Kill old duplicate labels and floating frames */
-#vnOverlay.active.claude-prediction .claude-terminal-photo::before,
-#vnOverlay.active.claude-prediction .claude-terminal-photo::after,
-#vnOverlay.active.claude-output-closeup .claude-terminal-photo::before,
-#vnOverlay.active.claude-output-closeup .claude-terminal-photo::after {
-  content: none !important;
-  display: none !important;
-}
-
-/* Prediction scene: large centered CRT photo, not a floating tablet */
-#vnOverlay.active.claude-prediction .claude-terminal-scene {
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: 4 !important;
-  pointer-events: none !important;
-}
-
-#vnOverlay.active.claude-prediction .claude-terminal-photo {
-  display: block !important;
-  position: absolute !important;
-  left: 50% !important;
-  top: clamp(48px, 8vh, 86px) !important;
-  transform: translateX(-50%) !important;
-  width: min(78vw, 1160px) !important;
-  height: min(51vh, 560px) !important;
-  max-height: calc(100vh - 290px) !important;
-  border: 3px solid #15ff4f !important;
-  border-radius: 26px !important;
-  background-image:
-    linear-gradient(rgba(0,0,0,.42), rgba(0,0,0,.42)),
-    url('images/claude-terminal.jpg') !important;
-  background-size: cover !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.9), 0 0 36px rgba(0,255,70,.62) !important;
-  overflow: hidden !important;
-}
-
-/* The only prediction status lives inside the CRT glass */
-#vnOverlay.active.claude-prediction .claude-terminal-screen {
-  display: flex !important;
-  position: absolute !important;
-  left: 41.3% !important;
-  top: 23.5% !important;
-  width: 25.8% !important;
-  height: 25.2% !important;
-  z-index: 8 !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 0 18px !important;
-  overflow: hidden !important;
-  border: none !important;
-  border-radius: 22px !important;
-  background:
-    radial-gradient(circle at 50% 45%, rgba(22,90,50,.96) 0%, rgba(0,22,11,.98) 68%),
-    repeating-linear-gradient(0deg, rgba(54,255,105,.08) 0 1px, transparent 1px 4px) !important;
-  box-shadow: inset 0 0 32px rgba(0,0,0,.95), inset 0 0 18px rgba(27,255,84,.24) !important;
-}
-
-#vnOverlay.active.claude-prediction .claude-terminal-title {
-  display: none !important;
-}
-
-#vnOverlay.active.claude-prediction .claude-terminal-output {
-  display: block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow: hidden !important;
-  white-space: nowrap !important;
-  text-align: center !important;
-  color: #38ff69 !important;
-  font-family: 'Source Code Pro', monospace !important;
-  font-size: clamp(.72rem, 1.25vw, 1.2rem) !important;
-  font-weight: 800 !important;
-  letter-spacing: .04em !important;
-  line-height: 1.2 !important;
-  text-shadow: 0 0 10px rgba(56,255,105,.9) !important;
-}
-
-/* Keep Pixel substantial and readable */
-#vnOverlay.active.claude-prediction .vn-character {
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  position: absolute !important;
-  left: clamp(24px, 4vw, 80px) !important;
-  bottom: 166px !important;
-  height: min(38vh, 430px) !important;
-  width: auto !important;
-  z-index: 9 !important;
-  transform: none !important;
-  pointer-events: none !important;
-}
-
-/* Full-width dialogue panel with buttons high enough to stay visible */
-#vnOverlay.active.claude-prediction .vn-dialogue {
-  display: block !important;
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100% !important;
-  height: clamp(190px, 24vh, 248px) !important;
-  min-height: 190px !important;
-  max-height: 248px !important;
-  overflow: hidden !important;
-  padding: 22px clamp(24px, 3vw, 52px) 20px clamp(220px, 22vw, 360px) !important;
-  border-top: 1px solid rgba(168,213,181,.5) !important;
-  background: linear-gradient(180deg, rgba(0,0,0,.86), rgba(0,0,0,.96)) !important;
-  box-shadow: 0 -18px 42px rgba(0,0,0,.55) !important;
-  z-index: 8 !important;
-}
-
-#vnOverlay.active.claude-prediction .vn-speaker {
-  display: block !important;
-  position: static !important;
-  margin: 0 0 8px 0 !important;
-  color: #a8f0be !important;
-  font-size: clamp(1rem, 1.3vw, 1.28rem) !important;
-}
-
-#vnOverlay.active.claude-prediction #vnText {
-  display: grid !important;
-  grid-template-columns: minmax(260px, 420px) minmax(520px, 1fr) !important;
-  align-items: end !important;
-  gap: clamp(18px, 3vw, 42px) !important;
-  width: 100% !important;
-  max-width: 1440px !important;
-  margin: 0 auto !important;
-  padding: 0 !important;
-  overflow: visible !important;
-}
-
-#vnOverlay.active.claude-prediction .vn-prompt-line {
-  margin: 0 !important;
-  padding: 0 !important;
-  color: #fff !important;
-  font-size: clamp(.92rem, 1.1vw, 1.08rem) !important;
-  line-height: 1.45 !important;
-}
-
-#vnOverlay.active.claude-prediction .vn-choice-list {
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(140px, 1fr)) !important;
-  gap: clamp(10px, 1.2vw, 18px) !important;
-  position: static !important;
-  width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  max-height: none !important;
-  overflow: visible !important;
-}
-
-#vnOverlay.active.claude-prediction .vn-choice-btn {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-height: 62px !important;
-  max-height: 74px !important;
-  width: 100% !important;
-  padding: 10px 14px !important;
-  border-radius: 10px !important;
-  border: 1.5px solid rgba(168,213,181,.55) !important;
-  background: rgba(0,32,18,.72) !important;
-  color: #f3fff6 !important;
-  font-size: clamp(.74rem, .85vw, .92rem) !important;
-  font-weight: 800 !important;
-  line-height: 1.25 !important;
-  text-align: center !important;
-  box-shadow: none !important;
-  transform: none !important;
-}
-
-#vnOverlay.active.claude-prediction .vn-choice-btn:first-child,
-#vnOverlay.active.claude-prediction .vn-choice-btn:hover,
-#vnOverlay.active.claude-prediction .vn-choice-btn:focus {
-  background: #d8fbe2 !important;
-  color: #123c24 !important;
-  border-color: #a8f0be !important;
-  box-shadow: 0 0 18px rgba(84,255,131,.4) !important;
-}
-
-#vnOverlay.active.claude-prediction .vn-skip,
-#vnOverlay.active.claude-output-closeup .vn-skip {
-  display: block !important;
-  position: absolute !important;
-  right: 20px !important;
-  top: 18px !important;
-  z-index: 20 !important;
-}
-
-/* Claude output: make the actual monitor glass the text area, not a floating tablet */
-#vnOverlay.active.claude-output-closeup .claude-terminal-scene {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: 5 !important;
-  pointer-events: none !important;
-}
-
-#vnOverlay.active.claude-output-closeup .claude-terminal-photo {
-  display: block !important;
-  position: absolute !important;
-  left: 50% !important;
-  top: clamp(26px, 4vh, 48px) !important;
-  transform: translateX(-50%) !important;
-  width: min(88vw, 1360px) !important;
-  height: min(66vh, 690px) !important;
-  border: 3px solid #15ff4f !important;
-  border-radius: 24px !important;
-  background-image:
-    linear-gradient(rgba(0,0,0,.28), rgba(0,0,0,.28)),
-    url('images/claude-terminal.jpg') !important;
-  background-size: cover !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.9), 0 0 36px rgba(0,255,70,.55) !important;
-  overflow: hidden !important;
-}
-
-#vnOverlay.active.claude-output-closeup .claude-terminal-screen {
-  display: block !important;
-  position: absolute !important;
-  left: 27.8% !important;
-  top: 16.2% !important;
-  width: 43.4% !important;
-  height: 55.8% !important;
-  z-index: 8 !important;
-  padding: clamp(18px, 2.1vw, 34px) !important;
-  border-radius: 26px !important;
-  border: none !important;
-  background:
-    radial-gradient(circle at 48% 42%, rgba(16,70,38,.94) 0%, rgba(0,13,5,.99) 72%),
-    repeating-linear-gradient(0deg, rgba(80,255,120,.07) 0 1px, transparent 1px 4px) !important;
-  box-shadow: inset 0 0 42px rgba(0,0,0,.98), inset 0 0 22px rgba(40,255,96,.18) !important;
-  overflow: hidden !important;
-}
-
-#vnOverlay.active.claude-output-closeup .claude-terminal-title {
-  display: block !important;
-  margin: 0 0 14px 0 !important;
-  color: #35ff65 !important;
-  font-size: clamp(.72rem, .9vw, .96rem) !important;
-  letter-spacing: .16em !important;
-}
-
-#vnOverlay.active.claude-output-closeup .claude-terminal-output {
-  display: block !important;
-  width: 100% !important;
-  height: calc(100% - 28px) !important;
-  max-height: none !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  padding-right: 14px !important;
-  color: #32ff61 !important;
-  font-family: 'Source Code Pro', monospace !important;
-  font-size: clamp(.74rem, 1.05vw, 1.05rem) !important;
-  font-weight: 700 !important;
-  line-height: 1.42 !important;
-  letter-spacing: .045em !important;
-  white-space: pre-wrap !important;
-  text-shadow: 0 0 9px rgba(50,255,97,.72) !important;
-  scrollbar-width: thin !important;
-}
-
-#vnOverlay.active.claude-output-closeup .vn-character {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: absolute !important;
-  left: clamp(18px, 3vw, 58px) !important;
-  bottom: 52px !important;
-  height: min(36vh, 390px) !important;
-  z-index: 12 !important;
-  pointer-events: none !important;
-}
-
-#vnOverlay.active.claude-output-closeup .vn-dialogue {
-  display: block !important;
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100% !important;
-  height: 170px !important;
-  min-height: 170px !important;
-  max-height: 170px !important;
-  padding: 24px 190px 24px clamp(250px, 22vw, 380px) !important;
-  overflow: hidden !important;
-  border-top: 1px solid rgba(168,213,181,.45) !important;
-  background: linear-gradient(180deg, rgba(0,0,0,.86), rgba(0,0,0,.96)) !important;
-  z-index: 10 !important;
-}
-
-#vnOverlay.active.claude-output-closeup #vnText {
-  display: block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  max-width: 900px !important;
-  color: #fff !important;
-  font-size: clamp(.95rem, 1.2vw, 1.2rem) !important;
-  line-height: 1.5 !important;
-}
-
-#vnOverlay.active.claude-output-closeup .terminal-return {
-  display: inline-flex !important;
-  position: absolute !important;
-  right: clamp(28px, 4vw, 70px) !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  width: 180px !important;
-  height: 58px !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border-radius: 10px !important;
-  border: 2px solid #48ff68 !important;
-  background: #18ff38 !important;
-  color: #06220c !important;
-  font-family: 'Source Code Pro', monospace !important;
-  font-weight: 900 !important;
-  letter-spacing: .08em !important;
-  text-transform: uppercase !important;
-  box-shadow: 0 0 22px rgba(24,255,56,.65) !important;
-  z-index: 24 !important;
-  pointer-events: auto !important;
-}
-
-/* S1 result footer buttons: no browser-default escape artists */
-.s1-result-actions,
-.scenario-result-actions,
-.result-actions {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 14px !important;
-}
-
-.s1-result-actions button,
-.scenario-result-actions button,
-.result-actions button,
-button.s1-next-btn,
-button.next-scenario-btn,
-button[onclick*="Scenario"],
-button[onclick*="scenario"] {
-  appearance: none !important;
-  border-radius: 10px !important;
-  border: 1.5px solid var(--forest-dark, #1e3d29) !important;
-  background: var(--forest, #2d5a3d) !important;
-  color: #f2fff5 !important;
-  min-height: 48px !important;
-  min-width: 190px !important;
-  padding: 12px 24px !important;
-  font-family: 'Fraunces', serif !important;
-  font-size: 1rem !important;
-  font-weight: 800 !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-  box-shadow: 0 3px 10px rgba(30,61,41,.22) !important;
-}
-
-button[disabled],
-button.is-locked,
-.next-scenario-btn.is-locked {
-  background: #d8d0c4 !important;
-  border-color: #c5b9a7 !important;
-  color: #9b8b78 !important;
-  cursor: not-allowed !important;
-  box-shadow: none !important;
-}
-
-/* Smaller screens: keep buttons visible instead of creating horizontal scroll */
-@media (max-width: 980px) {
-  #vnOverlay.active.claude-prediction .claude-terminal-photo {
-    width: 88vw !important;
-    height: 43vh !important;
-    top: 42px !important;
-  }
-  #vnOverlay.active.claude-prediction .vn-character {
-    height: 30vh !important;
-    bottom: 170px !important;
-  }
-  #vnOverlay.active.claude-prediction .vn-dialogue {
-    height: 220px !important;
-    max-height: 220px !important;
-    padding-left: clamp(140px, 24vw, 230px) !important;
-    padding-right: 24px !important;
-  }
-  #vnOverlay.active.claude-prediction #vnText {
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
-  }
-  #vnOverlay.active.claude-prediction .vn-choice-list {
-    grid-template-columns: repeat(2, minmax(120px, 1fr)) !important;
-  }
-  #vnOverlay.active.claude-output-closeup .claude-terminal-photo {
-    width: 94vw !important;
-    height: 58vh !important;
-  }
-  #vnOverlay.active.claude-output-closeup .vn-dialogue {
-    height: 190px !important;
-    min-height: 190px !important;
-    max-height: 190px !important;
-    padding-left: clamp(140px, 25vw, 240px) !important;
-    padding-right: 24px !important;
-  }
-  #vnOverlay.active.claude-output-closeup .terminal-return {
-    position: static !important;
-    transform: none !important;
-    width: 180px !important;
-    margin-top: 10px !important;
-  }
-}
-
-
-/* PROMPTCRAFT STABLE S1 VISUAL PASS
-   One final owner for the two Claude VN states. The rest of the stylesheet may sulk quietly. */
-#vnOverlay.active.pc-prediction-scene,
-#vnOverlay.active.pc-output-scene {
-  overflow: hidden !important;
-}
-
-#vnOverlay.active.pc-prediction-scene .vn-smartboard-wrap,
-#vnOverlay.active.pc-output-scene .vn-smartboard-wrap,
-#vnOverlay.active.pc-prediction-scene .claude-shelf,
-#vnOverlay.active.pc-output-scene .claude-shelf,
-#vnOverlay.active.pc-prediction-scene .vn-advance,
-#vnOverlay.active.pc-output-scene .vn-advance {
-  display: none !important;
-}
-
-#vnOverlay.active.pc-prediction-scene .vn-scene,
-#vnOverlay.active.pc-output-scene .vn-scene {
-  position: absolute !important;
-  inset: 0 !important;
-  background: rgba(0,0,0,.42) !important;
-  overflow: hidden !important;
-}
-
-#vnOverlay.active.pc-prediction-scene .claude-terminal-scene,
-#vnOverlay.active.pc-output-scene .claude-terminal-scene {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: absolute !important;
-  inset: 0 !important;
-  pointer-events: none !important;
-  z-index: 5 !important;
-}
-
-/* Prediction: use the image as the monitor frame, not a generic glowing tablet. */
-#vnOverlay.active.pc-prediction-scene .claude-terminal-photo {
-  display: block !important;
-  position: absolute !important;
-  left: 50% !important;
-  top: clamp(16px, 3vh, 34px) !important;
-  transform: translateX(-50%) !important;
-  width: min(84vw, 1260px) !important;
-  height: min(56vh, 620px) !important;
-  border: 3px solid #12ff4f !important;
-  border-radius: 22px !important;
-  overflow: hidden !important;
-  background-image:
-    linear-gradient(rgba(0,0,0,.18), rgba(0,0,0,.20)),
-    url('images/claude-terminal.jpg') !important;
-  background-size: cover !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.9), 0 0 36px rgba(0,255,80,.55) !important;
-}
-#vnOverlay.active.pc-prediction-scene .claude-terminal-photo::before,
-#vnOverlay.active.pc-prediction-scene .claude-terminal-photo::after,
-#vnOverlay.active.pc-output-scene .claude-terminal-photo::before,
-#vnOverlay.active.pc-output-scene .claude-terminal-photo::after {
-  content: none !important;
-  display: none !important;
-}
-
-#vnOverlay.active.pc-prediction-scene .claude-terminal-screen {
-  display: block !important;
-  position: absolute !important;
-  left: 42.6% !important;
-  top: 25.2% !important;
-  width: 22.8% !important;
-  height: 24.2% !important;
-  z-index: 7 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 18px !important;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(20,86,45,.92) 0%, rgba(0,22,10,.98) 70%),
-    repeating-linear-gradient(0deg, rgba(75,255,114,.07) 0 1px, transparent 1px 4px) !important;
-  box-shadow: inset 0 0 36px rgba(0,0,0,.96), inset 0 0 18px rgba(45,255,90,.25) !important;
-  overflow: hidden !important;
-}
-#vnOverlay.active.pc-prediction-scene .claude-terminal-title { display: none !important; }
-#vnOverlay.active.pc-prediction-scene .claude-terminal-output {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+.vn-overlay.active.pc-clean-prediction .claude-terminal-photo,
+.vn-overlay.active.pc-clean-output .claude-terminal-photo {
   width: 100% !important;
   height: 100% !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  white-space: nowrap !important;
-  color: #4cff70 !important;
-  font: 900 clamp(.62rem, 1vw, 1.05rem)/1 'Source Code Pro', monospace !important;
-  letter-spacing: .04em !important;
-  text-shadow: 0 0 10px rgba(76,255,112,.8) !important;
-}
-
-#vnOverlay.active.pc-prediction-scene .vn-character {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: absolute !important;
-  left: clamp(18px, 4.3vw, 76px) !important;
-  bottom: 62px !important;
-  height: min(43vh, 460px) !important;
-  z-index: 12 !important;
-  pointer-events: none !important;
-}
-#vnOverlay.active.pc-prediction-scene .vn-dialogue {
-  display: block !important;
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100% !important;
-  height: 185px !important;
-  min-height: 185px !important;
-  max-height: 185px !important;
-  padding: 22px 70px 18px clamp(280px, 24vw, 420px) !important;
-  overflow: visible !important;
-  border-top: 1px solid rgba(168,213,181,.45) !important;
-  background: linear-gradient(180deg, rgba(0,0,0,.86), rgba(0,0,0,.98)) !important;
-  z-index: 10 !important;
-}
-#vnOverlay.active.pc-prediction-scene .vn-speaker,
-#vnOverlay.active.pc-output-scene .vn-speaker {
-  color: #a8f5b7 !important;
-  font-size: clamp(1rem, 1.3vw, 1.28rem) !important;
-  margin-bottom: 8px !important;
-}
-#vnOverlay.active.pc-prediction-scene #vnText {
-  display: grid !important;
-  grid-template-columns: minmax(220px, 360px) minmax(420px, 1fr) !important;
-  align-items: center !important;
-  gap: clamp(16px, 2.2vw, 34px) !important;
-  width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  color: #fff !important;
-}
-#vnOverlay.active.pc-prediction-scene .pc-dialogue-copy {
-  font-size: clamp(.92rem, 1vw, 1.1rem) !important;
-  line-height: 1.45 !important;
-}
-#vnOverlay.active.pc-prediction-scene .vn-choice-list {
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(130px, 1fr)) !important;
-  gap: 12px !important;
-  width: 100% !important;
-}
-#vnOverlay.active.pc-prediction-scene .vn-choice-btn {
-  appearance: none !important;
-  width: 100% !important;
-  min-height: 64px !important;
-  max-height: 74px !important;
-  padding: 10px 13px !important;
-  border-radius: 12px !important;
-  border: 1.5px solid rgba(168,213,181,.62) !important;
-  background: rgba(0,32,18,.78) !important;
-  color: #f3fff6 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font: 900 clamp(.72rem, .78vw, .9rem)/1.18 'Nunito', sans-serif !important;
-  text-align: center !important;
-  box-shadow: none !important;
-}
-#vnOverlay.active.pc-prediction-scene .vn-choice-btn:first-child,
-#vnOverlay.active.pc-prediction-scene .vn-choice-btn:hover,
-#vnOverlay.active.pc-prediction-scene .vn-choice-btn:focus {
-  background: #d8fbe2 !important;
-  color: #123c24 !important;
-  border-color: #a8f0be !important;
-  box-shadow: 0 0 18px rgba(84,255,131,.4) !important;
-}
-
-/* Output: large close-up of the actual computer, with text placed in the monitor glass. */
-#vnOverlay.active.pc-output-scene .claude-terminal-photo {
-  display: block !important;
-  position: absolute !important;
-  left: 50% !important;
-  top: clamp(14px, 2.2vh, 28px) !important;
-  transform: translateX(-50%) !important;
-  width: min(92vw, 1500px) !important;
-  height: min(69vh, 735px) !important;
-  border: 3px solid #12ff4f !important;
-  border-radius: 22px !important;
-  overflow: hidden !important;
-  background-image:
-    linear-gradient(rgba(0,0,0,.12), rgba(0,0,0,.14)),
-    url('images/claude-terminal.jpg') !important;
-  background-size: cover !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.9), 0 0 36px rgba(0,255,80,.55) !important;
-}
-#vnOverlay.active.pc-output-scene .claude-terminal-screen {
-  display: block !important;
-  position: absolute !important;
-  left: 32.0% !important;
-  top: 13.8% !important;
-  width: 36.7% !important;
-  height: 59.5% !important;
-  z-index: 7 !important;
-  padding: clamp(18px, 1.8vw, 32px) !important;
-  border: 0 !important;
-  border-radius: 28px !important;
-  background:
-    radial-gradient(circle at 50% 44%, rgba(10,55,28,.96) 0%, rgba(0,10,4,.995) 75%),
-    repeating-linear-gradient(0deg, rgba(80,255,120,.07) 0 1px, transparent 1px 4px) !important;
-  box-shadow: inset 0 0 54px rgba(0,0,0,.98), inset 0 0 20px rgba(50,255,90,.22) !important;
-  overflow: hidden !important;
-}
-#vnOverlay.active.pc-output-scene .claude-terminal-title {
-  display: block !important;
-  margin: 0 0 14px 0 !important;
-  color: #35ff65 !important;
-  font-size: clamp(.68rem, .75vw, .95rem) !important;
-  letter-spacing: .16em !important;
-}
-#vnOverlay.active.pc-output-scene .claude-terminal-output {
-  display: block !important;
-  height: calc(100% - 28px) !important;
-  max-height: none !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  padding-right: 16px !important;
-  color: #32ff61 !important;
-  font: 800 clamp(.62rem, .82vw, .92rem)/1.38 'Source Code Pro', monospace !important;
-  letter-spacing: .035em !important;
-  white-space: pre-wrap !important;
-  text-shadow: 0 0 8px rgba(50,255,97,.72) !important;
-  scrollbar-width: thin !important;
-}
-#vnOverlay.active.pc-output-scene .vn-character {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: absolute !important;
-  left: clamp(16px, 3vw, 54px) !important;
-  bottom: 18px !important;
-  height: min(36vh, 380px) !important;
-  z-index: 14 !important;
-  pointer-events: none !important;
-}
-#vnOverlay.active.pc-output-scene .vn-dialogue {
-  display: block !important;
-  position: absolute !important;
-  left: clamp(220px, 20vw, 360px) !important;
-  right: clamp(18px, 3vw, 56px) !important;
-  bottom: 18px !important;
-  width: auto !important;
-  height: 150px !important;
-  min-height: 150px !important;
-  max-height: 150px !important;
-  padding: 22px 210px 18px 28px !important;
-  overflow: visible !important;
-  border: 1.5px solid rgba(168,213,181,.34) !important;
-  border-radius: 14px !important;
-  background: linear-gradient(180deg, rgba(0,0,0,.82), rgba(0,0,0,.95)) !important;
-  z-index: 13 !important;
-}
-#vnOverlay.active.pc-output-scene #vnText {
-  display: block !important;
-  max-width: none !important;
-  color: #fff !important;
-  font-size: clamp(.95rem, 1.05vw, 1.14rem) !important;
-  line-height: 1.55 !important;
-}
-#vnOverlay.active.pc-output-scene .terminal-return {
-  display: inline-flex !important;
-  position: absolute !important;
-  right: 28px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  width: 168px !important;
-  height: 58px !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border-radius: 10px !important;
-  border: 2px solid #48ff68 !important;
-  background: #18ff38 !important;
-  color: #06220c !important;
-  font: 900 .88rem/1 'Source Code Pro', monospace !important;
-  letter-spacing: .08em !important;
-  text-transform: uppercase !important;
-  box-shadow: 0 0 22px rgba(24,255,56,.65) !important;
-  z-index: 25 !important;
-  pointer-events: auto !important;
-}
-#vnOverlay.active.pc-prediction-scene .vn-skip,
-#vnOverlay.active.pc-output-scene .vn-skip {
-  position: absolute !important;
-  right: 18px !important;
-  top: 16px !important;
-  z-index: 30 !important;
-}
-
-/* Result footer buttons, again, because default browser buttons are apparently immortal. */
-.s1-result-controls {
-  display: grid !important;
-  grid-template-columns: minmax(220px, 1fr) minmax(260px, 1fr) auto !important;
-  gap: 18px !important;
-  align-items: center !important;
-  padding: 18px 28px !important;
-  border-top: 1px solid rgba(214,207,192,.9) !important;
-  background: rgba(250,246,238,.98) !important;
-}
-.s1-result-controls-actions { display: flex !important; gap: 12px !important; align-items: center !important; justify-content: flex-end !important; }
-.s1-result-controls-actions button,
-.s1-result-controls-actions .continue-btn,
-.s1-result-controls-actions .s1-secondary-btn {
-  appearance: none !important;
-  border-radius: 10px !important;
-  min-width: 190px !important;
-  min-height: 58px !important;
-  padding: 10px 18px !important;
-  font-family: 'Fraunces', serif !important;
-  font-size: 1rem !important;
-  font-weight: 800 !important;
-  line-height: 1.2 !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-}
-.s1-result-controls-actions .s1-secondary-btn {
-  background: #fffaf2 !important;
-  border: 1.5px solid #bfae91 !important;
-  color: #2a1f14 !important;
-}
-.s1-result-controls-actions .continue-btn:not(:disabled) {
-  background: #103d25 !important;
-  border: 1.5px solid #0b2b1a !important;
-  color: #f2fff5 !important;
-}
-.s1-result-controls-actions .continue-btn:disabled {
-  background: #d8d0c4 !important;
-  border: 1.5px solid #c5b9a7 !important;
-  color: #8d806d !important;
-  cursor: not-allowed !important;
-  box-shadow: none !important;
-}
-.s1-result-controls-actions button span { display: block !important; margin-top: 4px !important; font-family: 'Nunito', sans-serif !important; font-size: .78rem !important; font-weight: 700 !important; opacity: .8 !important; }
-
-@media (max-width: 1100px) {
-  #vnOverlay.active.pc-prediction-scene .claude-terminal-photo { width: 90vw !important; height: 48vh !important; }
-  #vnOverlay.active.pc-prediction-scene .vn-character { height: 32vh !important; bottom: 122px !important; }
-  #vnOverlay.active.pc-prediction-scene .vn-dialogue { height: 220px !important; max-height: 220px !important; padding-left: clamp(190px, 24vw, 280px) !important; padding-right: 22px !important; }
-  #vnOverlay.active.pc-prediction-scene #vnText { grid-template-columns: 1fr !important; gap: 10px !important; }
-  #vnOverlay.active.pc-prediction-scene .vn-choice-list { grid-template-columns: repeat(2, minmax(120px, 1fr)) !important; }
-  #vnOverlay.active.pc-output-scene .claude-terminal-photo { width: 94vw !important; height: 58vh !important; }
-  #vnOverlay.active.pc-output-scene .vn-dialogue { left: 18px !important; right: 18px !important; bottom: 12px !important; height: 170px !important; min-height: 170px !important; max-height: 170px !important; padding: 18px 18px 18px 170px !important; }
-  #vnOverlay.active.pc-output-scene .vn-character { height: 26vh !important; bottom: 30px !important; }
-  #vnOverlay.active.pc-output-scene .terminal-return { position: static !important; transform: none !important; margin-top: 10px !important; width: 160px !important; }
-  .s1-result-controls { grid-template-columns: 1fr !important; }
-  .s1-result-controls-actions { justify-content: stretch !important; }
-  .s1-result-controls-actions button { flex: 1 1 0 !important; min-width: 0 !important; }
-}
-
-/* === PROMPTCRAFT S1 RESPONSIVE FIX, June 3 final override ===
-   The earlier patches were fighting each other like faculty committees over a syllabus font.
-   These rules make the VN terminal scenes own the full frame and keep Pixel away from buttons. */
-.vn-overlay.active.pc-prediction-scene .vn-smartboard-wrap,
-.vn-overlay.active.pc-output-scene .vn-smartboard-wrap,
-.vn-overlay.active.claude-prediction .vn-smartboard-wrap,
-.vn-overlay.active.claude-output-closeup .vn-smartboard-wrap {
-  display: none !important;
-}
-
-.vn-overlay.active.pc-prediction-scene .vn-scene,
-.vn-overlay.active.pc-output-scene .vn-scene,
-.vn-overlay.active.claude-prediction .vn-scene,
-.vn-overlay.active.claude-output-closeup .vn-scene {
-  background:
-    linear-gradient(rgba(0,0,0,.62), rgba(0,0,0,.78)),
-    var(--vn-bg, #101712) !important;
-  overflow: hidden !important;
-}
-
-.vn-overlay.active.pc-prediction-scene .claude-terminal-scene,
-.vn-overlay.active.pc-output-scene .claude-terminal-scene,
-.vn-overlay.active.claude-prediction .claude-terminal-scene,
-.vn-overlay.active.claude-output-closeup .claude-terminal-scene {
-  position: absolute !important;
-  inset: clamp(14px, 3vh, 34px) clamp(56px, 5vw, 96px) auto clamp(56px, 5vw, 96px) !important;
-  width: auto !important;
-  height: calc(100dvh - clamp(250px, 32vh, 320px)) !important;
-  min-height: 300px !important;
-  max-height: none !important;
-  display: flex !important;
-  align-items: stretch !important;
-  justify-content: stretch !important;
-  opacity: 1 !important;
-  pointer-events: none !important;
-  z-index: 4 !important;
-  transform: none !important;
-  padding: 0 !important;
-  background: transparent !important;
-}
-
-.vn-overlay.active.pc-prediction-scene .claude-terminal-photo,
-.vn-overlay.active.pc-output-scene .claude-terminal-photo,
-.vn-overlay.active.claude-prediction .claude-terminal-photo,
-.vn-overlay.active.claude-output-closeup .claude-terminal-photo {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  border-radius: 22px !important;
-  border: 3px solid #20ff00 !important;
-  box-shadow: 0 0 42px rgba(32,255,0,.42), inset 0 0 38px rgba(32,255,0,.08) !important;
-  background-size: cover !important;
-  background-position: center !important;
-  overflow: hidden !important;
-}
-
-.vn-overlay.active.pc-prediction-scene .claude-terminal-screen,
-.vn-overlay.active.claude-prediction .claude-terminal-screen {
-  display: flex !important;
-  left: 8% !important;
-  top: 18% !important;
-  width: min(36%, 420px) !important;
-  height: min(38%, 260px) !important;
-  padding: 18px 22px !important;
-  border-radius: 14px !important;
-  background: rgba(0,14,4,.9) !important;
-  border: 1px solid rgba(32,255,0,.55) !important;
-}
-
-.vn-overlay.active.pc-output-scene .claude-terminal-screen,
-.vn-overlay.active.claude-output-closeup .claude-terminal-screen {
-  display: block !important;
-  left: 24% !important;
-  top: 12% !important;
-  width: min(48%, 620px) !important;
-  height: min(70%, 440px) !important;
-  max-height: calc(100% - 72px) !important;
-  padding: clamp(18px, 2.2vw, 34px) !important;
+  object-fit: cover !important;
+  object-position: center center !important;
   border-radius: 18px !important;
-  background: rgba(0,14,4,.94) !important;
-  border: 1px solid rgba(32,255,0,.55) !important;
-  box-shadow: 0 0 36px rgba(0,0,0,.75), inset 0 0 34px rgba(32,255,0,.10) !important;
+  border: 3px solid #00ff38 !important;
+  box-shadow: 0 0 34px rgba(0,255,56,.58) !important;
+  filter: brightness(.82) saturate(1.08) !important;
 }
-
-.vn-overlay.active.pc-output-scene .claude-terminal-output,
-.vn-overlay.active.claude-output-closeup .claude-terminal-output {
-  max-height: calc(100% - 34px) !important;
-  overflow-y: auto !important;
-  white-space: pre-wrap !important;
-  overflow-wrap: anywhere !important;
-  font-size: clamp(.76rem, 1.05vw, 1rem) !important;
-  line-height: 1.36 !important;
-}
-
-.vn-overlay.active.pc-prediction-scene .claude-terminal-output,
-.vn-overlay.active.claude-prediction .claude-terminal-output {
-  font-size: clamp(.9rem, 1.5vw, 1.25rem) !important;
-  line-height: 1.45 !important;
-  overflow: hidden !important;
-}
-
-.vn-overlay.active.pc-prediction-scene .claude-terminal-scene::after,
-.vn-overlay.active.claude-prediction .claude-terminal-scene::after {
-  content: 'CLAUDE TERMINAL  •  AWAITING PREDICTION';
-  position: absolute;
-  left: 28px;
-  top: 12px;
-  right: 28px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(32,255,0,.55);
-  border-radius: 7px;
-  background: rgba(0,0,0,.86);
-  color: #39ff14;
-  font: 800 clamp(.58rem, .9vw, .78rem)/1 'Source Code Pro', monospace;
-  letter-spacing: .13em;
-  text-transform: uppercase;
-  z-index: 8;
-}
-
-.vn-overlay.active.pc-prediction-scene .vn-character,
-.vn-overlay.active.pc-output-scene .vn-character,
-.vn-overlay.active.claude-prediction .vn-character,
-.vn-overlay.active.claude-output-closeup .vn-character {
-  left: auto !important;
-  right: clamp(42px, 7vw, 120px) !important;
-  bottom: clamp(64px, 6vh, 92px) !important;
-  height: min(34vh, 330px) !important;
-  z-index: 18 !important;
-  transform: none !important;
-  pointer-events: none !important;
-}
-
-.vn-overlay.active.pc-prediction-scene .vn-dialogue,
-.vn-overlay.active.pc-output-scene .vn-dialogue,
-.vn-overlay.active.claude-prediction .vn-dialogue,
-.vn-overlay.active.claude-output-closeup .vn-dialogue {
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100vw !important;
-  min-height: clamp(150px, 22vh, 210px) !important;
-  max-height: clamp(150px, 24vh, 230px) !important;
-  padding: 24px clamp(24px, 12vw, 240px) 18px clamp(22px, 7vw, 96px) !important;
-  overflow: visible !important;
-  z-index: 10 !important;
-  background: linear-gradient(180deg, rgba(0,0,0,.88), rgba(0,0,0,.98)) !important;
-  border-top: 1px solid rgba(168,213,181,.5) !important;
-}
-
-.vn-overlay.active.pc-prediction-scene .vn-text,
-.vn-overlay.active.pc-output-scene .vn-text,
-.vn-overlay.active.claude-prediction .vn-text,
-.vn-overlay.active.claude-output-closeup .vn-text {
-  max-height: none !important;
-  overflow: visible !important;
-  padding-right: 0 !important;
-}
-
-.vn-overlay.active.pc-prediction-scene .vn-choice-list,
-.vn-overlay.active.claude-prediction .vn-choice-list,
-.vn-overlay.active.pc-prediction-scene .vn-prediction-options,
-.vn-overlay.active.claude-prediction .vn-prediction-options {
-  position: absolute !important;
-  left: clamp(330px, 34vw, 620px) !important;
-  right: clamp(22px, 5vw, 86px) !important;
-  bottom: 16px !important;
-  top: auto !important;
-  width: auto !important;
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(132px, 1fr)) !important;
-  gap: 12px !important;
-  margin: 0 !important;
-  z-index: 30 !important;
-}
-
-.vn-overlay.active.pc-prediction-scene .vn-choice-btn,
-.vn-overlay.active.claude-prediction .vn-choice-btn,
-.vn-overlay.active.pc-prediction-scene .vn-prediction-btn,
-.vn-overlay.active.claude-prediction .vn-prediction-btn {
-  min-height: 58px !important;
-  border-radius: 12px !important;
-  white-space: normal !important;
-  text-align: center !important;
-  padding: 10px 12px !important;
-  font-size: clamp(.68rem, .82vw, .82rem) !important;
-  line-height: 1.25 !important;
-}
-
-.vn-overlay.active.pc-output-scene .terminal-return,
-.vn-overlay.active.claude-output-closeup .terminal-return {
-  position: fixed !important;
-  right: clamp(300px, 27vw, 520px) !important;
-  bottom: clamp(30px, 6vh, 64px) !important;
-  z-index: 35 !important;
-  min-width: 174px !important;
-  min-height: 56px !important;
-}
-
-.s1-result-summary {
-  margin-top: 16px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: #edf7f0;
-  border: 1.5px solid rgba(45,90,61,.32);
-  color: #193d28;
-}
-.s1-result-summary-title {
-  font-family: 'Fraunces', serif;
-  font-weight: 800;
-  margin-bottom: 6px;
-}
-.s1-result-summary ul {
-  margin: 8px 0 0 20px;
-  padding: 0;
-}
-.s1-result-controls-status {
-  font-weight: 800;
-  color: #245a39;
-}
-.s1-result-controls-actions .continue-btn[disabled] {
-  opacity: .5;
-  cursor: not-allowed;
-}
-
-@media (max-width: 1050px) {
-  .vn-overlay.active.pc-prediction-scene .claude-terminal-scene,
-  .vn-overlay.active.pc-output-scene .claude-terminal-scene,
-  .vn-overlay.active.claude-prediction .claude-terminal-scene,
-  .vn-overlay.active.claude-output-closeup .claude-terminal-scene {
-    inset: 16px 48px auto 48px !important;
-    height: calc(100dvh - 270px) !important;
-  }
-  .vn-overlay.active.pc-output-scene .claude-terminal-screen,
-  .vn-overlay.active.claude-output-closeup .claude-terminal-screen {
-    left: 18% !important;
-    width: 64% !important;
-  }
-  .vn-overlay.active.pc-prediction-scene .vn-choice-list,
-  .vn-overlay.active.claude-prediction .vn-choice-list,
-  .vn-overlay.active.pc-prediction-scene .vn-prediction-options,
-  .vn-overlay.active.claude-prediction .vn-prediction-options {
-    left: 220px !important;
-    grid-template-columns: repeat(2, minmax(150px, 1fr)) !important;
-  }
-  .vn-overlay.active.pc-prediction-scene .vn-character,
-  .vn-overlay.active.pc-output-scene .vn-character,
-  .vn-overlay.active.claude-prediction .vn-character,
-  .vn-overlay.active.claude-output-closeup .vn-character {
-    right: 18px !important;
-    height: min(30vh, 260px) !important;
-  }
-  .vn-overlay.active.pc-output-scene .terminal-return,
-  .vn-overlay.active.claude-output-closeup .terminal-return {
-    right: 220px !important;
-  }
-}
-
-@media (max-width: 720px) {
-  .vn-overlay.active.pc-prediction-scene .claude-terminal-scene,
-  .vn-overlay.active.pc-output-scene .claude-terminal-scene,
-  .vn-overlay.active.claude-prediction .claude-terminal-scene,
-  .vn-overlay.active.claude-output-closeup .claude-terminal-scene {
-    inset: 12px 14px auto 14px !important;
-    height: calc(100dvh - 300px) !important;
-    min-height: 240px !important;
-  }
-  .vn-overlay.active.pc-output-scene .claude-terminal-screen,
-  .vn-overlay.active.claude-output-closeup .claude-terminal-screen {
-    left: 6% !important;
-    top: 10% !important;
-    width: 88% !important;
-    height: 76% !important;
-  }
-  .vn-overlay.active.pc-prediction-scene .vn-character,
-  .vn-overlay.active.pc-output-scene .vn-character,
-  .vn-overlay.active.claude-prediction .vn-character,
-  .vn-overlay.active.claude-output-closeup .vn-character {
-    display: none !important;
-  }
-  .vn-overlay.active.pc-prediction-scene .vn-dialogue,
-  .vn-overlay.active.pc-output-scene .vn-dialogue,
-  .vn-overlay.active.claude-prediction .vn-dialogue,
-  .vn-overlay.active.claude-output-closeup .vn-dialogue {
-    padding: 18px 16px 16px 16px !important;
-    min-height: 260px !important;
-    max-height: 300px !important;
-  }
-  .vn-overlay.active.pc-prediction-scene .vn-choice-list,
-  .vn-overlay.active.claude-prediction .vn-choice-list,
-  .vn-overlay.active.pc-prediction-scene .vn-prediction-options,
-  .vn-overlay.active.claude-prediction .vn-prediction-options {
-    position: static !important;
-    grid-template-columns: 1fr !important;
-    margin-top: 12px !important;
-  }
-  .vn-overlay.active.pc-output-scene .terminal-return,
-  .vn-overlay.active.claude-output-closeup .terminal-return {
-    position: static !important;
-    margin-top: 12px !important;
-  }
-}
-
-/* =========================================================
-   PROMPTCRAFT CLEAN S1 CLAUDE SCENES, SINGLE OWNER
-   This block intentionally uses pc-clean-* classes only.
-   ========================================================= */
-#vnOverlay.active.pc-clean-prediction,
-#vnOverlay.active.pc-clean-output {
-  background: rgba(0,0,0,.68) !important;
-  overflow: hidden !important;
-}
-
-#vnOverlay.active.pc-clean-prediction .vn-scene,
-#vnOverlay.active.pc-clean-output .vn-scene {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100dvh !important;
-  overflow: hidden !important;
-  background: transparent !important;
-}
-
-#vnOverlay.active.pc-clean-prediction .vn-smartboard-wrap,
-#vnOverlay.active.pc-clean-output .vn-smartboard-wrap,
-#vnOverlay.active.pc-clean-prediction .claude-shelf,
-#vnOverlay.active.pc-clean-output .claude-shelf {
-  display: none !important;
-}
-
-#vnOverlay.active.pc-clean-prediction .claude-terminal-scene,
-#vnOverlay.active.pc-clean-output .claude-terminal-scene {
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: none !important;
-  pointer-events: auto !important;
-  position: fixed !important;
-  z-index: 7 !important;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  overflow: visible !important;
-}
-
-/* Prediction: computer image is the frame. The black CRT panel stays inside the glass. */
-#vnOverlay.active.pc-clean-prediction .claude-terminal-scene {
-  left: 50% !important;
-  top: clamp(18px, 4vh, 46px) !important;
-  width: min(78vw, 1220px) !important;
-  height: min(54vh, 590px) !important;
-  transform: translateX(-50%) !important;
-}
-
-#vnOverlay.active.pc-clean-output .claude-terminal-scene {
-  left: 50% !important;
-  top: clamp(16px, 3vh, 34px) !important;
-  width: min(86vw, 1380px) !important;
-  height: min(66vh, 720px) !important;
-  transform: translateX(-50%) !important;
-}
-
-#vnOverlay.active.pc-clean-prediction .claude-terminal-photo,
-#vnOverlay.active.pc-clean-output .claude-terminal-photo {
-  display: block !important;
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  border-radius: 22px !important;
-  overflow: hidden !important;
-  background-size: cover !important;
-  background-position: center !important;
-  border: 3px solid #28ff42 !important;
-  box-shadow: 0 0 38px rgba(40,255,66,.48), inset 0 0 28px rgba(40,255,66,.07) !important;
-}
-
-#vnOverlay.active.pc-clean-prediction .claude-terminal-photo::before,
-#vnOverlay.active.pc-clean-output .claude-terminal-photo::before {
-  content: 'CLAUDE TERMINAL  •  AWAITING PREDICTION';
-  position: absolute;
-  left: 28%;
-  right: 28%;
-  top: 8px;
-  height: 34px;
-  z-index: 6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 7px;
-  border: 1px solid rgba(57,255,20,.7);
-  background: rgba(0,0,0,.88);
-  color: #39ff14;
-  font: 800 clamp(.58rem, .85vw, .8rem)/1 'Source Code Pro', monospace;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  text-shadow: 0 0 10px rgba(57,255,20,.75);
-}
-#vnOverlay.active.pc-clean-output .claude-terminal-photo::before {
-  content: 'CLAUDE TERMINAL  •  ANALYSIS COMPLETE';
-}
-
-#vnOverlay.active.pc-clean-prediction .claude-terminal-photo::after,
-#vnOverlay.active.pc-clean-output .claude-terminal-photo::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background:
-    linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.18)),
-    repeating-linear-gradient(0deg, rgba(255,255,255,.025), rgba(255,255,255,.025) 1px, transparent 1px, transparent 5px);
-  mix-blend-mode: multiply;
-}
-
-#vnOverlay.active.pc-clean-prediction .claude-terminal-screen {
-  display: flex !important;
+.vn-overlay.active.pc-clean-prediction .claude-terminal-screen {
   position: absolute !important;
   left: 31.5% !important;
-  top: 22% !important;
+  top: 24% !important;
   width: 25.5% !important;
-  height: 33.5% !important;
-  z-index: 4 !important;
-  padding: clamp(10px, 1.2vw, 18px) !important;
-  border-radius: 16px !important;
-  background:
-    repeating-linear-gradient(0deg, rgba(90,255,135,.08), rgba(90,255,135,.08) 1px, transparent 1px, transparent 4px),
-    radial-gradient(circle at 50% 45%, rgba(32,255,128,.18), rgba(0,18,8,.96) 62%) !important;
-  border: 1px solid rgba(50,255,80,.55) !important;
-  box-shadow: inset 0 0 34px rgba(0,0,0,.85), 0 0 18px rgba(32,255,80,.35) !important;
+  height: 27.5% !important;
+  padding: 0 !important;
+  display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  background: radial-gradient(circle at center, rgba(13,126,60,.62), rgba(0,20,10,.98) 70%) !important;
+  border-radius: 16px !important;
   overflow: hidden !important;
+  box-shadow: inset 0 0 22px rgba(0,255,56,.35), 0 0 20px rgba(0,255,56,.32) !important;
 }
-
-#vnOverlay.active.pc-clean-output .claude-terminal-screen {
-  display: flex !important;
+.vn-overlay.active.pc-clean-output .claude-terminal-screen {
   position: absolute !important;
-  left: 27.5% !important;
-  top: 13% !important;
-  width: 43% !important;
-  height: 69% !important;
-  z-index: 4 !important;
-  padding: clamp(18px, 2.1vw, 36px) !important;
-  border-radius: 20px !important;
-  background:
-    repeating-linear-gradient(0deg, rgba(90,255,135,.075), rgba(90,255,135,.075) 1px, transparent 1px, transparent 4px),
-    radial-gradient(circle at 50% 45%, rgba(20,110,54,.22), rgba(0,14,5,.98) 64%) !important;
-  border: 1px solid rgba(50,255,80,.58) !important;
-  box-shadow: inset 0 0 38px rgba(0,0,0,.92), 0 0 20px rgba(32,255,80,.28) !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
+  left: 29% !important;
+  top: 14% !important;
+  width: 48% !important;
+  height: 62% !important;
+  padding: 24px 34px !important;
+  background: rgba(0,12,6,.9) !important;
+  border-radius: 16px !important;
+  overflow: auto !important;
+  box-shadow: inset 0 0 22px rgba(0,255,56,.25), 0 0 22px rgba(0,255,56,.24) !important;
 }
-
-#vnOverlay.active.pc-clean-prediction .claude-terminal-title,
-#vnOverlay.active.pc-clean-prediction .claude-terminal-cursor {
-  display: none !important;
+.vn-overlay.active.pc-clean-prediction .claude-terminal-title,
+.vn-overlay.active.pc-clean-output .claude-terminal-title {
+  position: absolute !important;
+  top: 10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(62vw, 780px) !important;
+  background: rgba(0,0,0,.92) !important;
+  color: #22ff3b !important;
+  border: 1px solid #22ff3b !important;
+  border-radius: 5px !important;
+  padding: 7px 14px !important;
+  text-align: center !important;
+  font-family: 'Source Code Pro', monospace !important;
+  font-size: clamp(.7rem, .95vw, .9rem) !important;
+  letter-spacing: .12em !important;
+  z-index: 3 !important;
 }
-#vnOverlay.active.pc-clean-output .claude-terminal-title {
-  display: block !important;
-  flex: 0 0 auto !important;
-  margin-bottom: 14px !important;
-  font: 800 clamp(.66rem, .9vw, .92rem)/1.2 'Source Code Pro', monospace !important;
-  color: #39ff14 !important;
-  letter-spacing: .16em !important;
-  text-transform: uppercase !important;
-  text-shadow: 0 0 10px rgba(57,255,20,.8) !important;
-}
-
-#vnOverlay.active.pc-clean-prediction .claude-terminal-output {
-  display: block !important;
-  overflow: hidden !important;
+.vn-overlay.active.pc-clean-prediction .claude-terminal-output {
+  color: #46ff69 !important;
+  font-family: 'Source Code Pro', monospace !important;
+  font-size: clamp(.82rem, 1.45vw, 1.3rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: .02em !important;
+  text-shadow: 0 0 10px rgba(70,255,105,.78) !important;
   white-space: nowrap !important;
-  font: 800 clamp(.72rem, 1.6vw, 1.3rem)/1 'Source Code Pro', monospace !important;
-  color: #39ff14 !important;
-  text-shadow: 0 0 12px rgba(57,255,20,.86) !important;
+  text-align: center !important;
+  line-height: 1 !important;
 }
-
-#vnOverlay.active.pc-clean-output .claude-terminal-output {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  width: 100% !important;
-  overflow-y: auto !important;
+.vn-overlay.active.pc-clean-output .claude-terminal-output {
+  color: #22ff3b !important;
+  font-family: 'Source Code Pro', monospace !important;
+  font-size: clamp(.82rem, 1vw, 1.05rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.48 !important;
   white-space: pre-wrap !important;
-  overflow-wrap: anywhere !important;
-  font: 800 clamp(.66rem, .82vw, .92rem)/1.42 'Source Code Pro', monospace !important;
-  color: #39ff14 !important;
-  text-shadow: 0 0 10px rgba(57,255,20,.78) !important;
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(210,255,220,.95) rgba(0,0,0,.28) !important;
+  text-shadow: 0 0 9px rgba(34,255,59,.65) !important;
 }
-
-/* Pixel and dialogue */
-#vnOverlay.active.pc-clean-prediction .vn-character,
-#vnOverlay.active.pc-clean-output .vn-character {
+.vn-overlay.active.pc-clean-prediction .vn-character,
+.vn-overlay.active.pc-clean-output .vn-character {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
-  position: fixed !important;
-  left: clamp(22px, 4vw, 74px) !important;
-  right: auto !important;
-  bottom: clamp(96px, 16vh, 150px) !important;
-  height: min(40vh, 410px) !important;
-  max-height: 410px !important;
-  z-index: 12 !important;
-  transform: none !important;
-  pointer-events: none !important;
+  height: min(45vh, 430px) !important;
+  bottom: 90px !important;
+  left: 7vw !important;
+  z-index: 45 !important;
 }
-
-#vnOverlay.active.pc-clean-prediction .vn-dialogue,
-#vnOverlay.active.pc-clean-output .vn-dialogue {
-  position: fixed !important;
+.vn-overlay.active.pc-clean-output .vn-character {
+  left: auto !important;
+  right: 8vw !important;
+  height: min(43vh, 410px) !important;
+}
+.vn-overlay.active.pc-clean-prediction .vn-dialogue,
+.vn-overlay.active.pc-clean-output .vn-dialogue {
+  position: absolute !important;
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  width: 100vw !important;
-  min-height: clamp(162px, 22vh, 230px) !important;
-  max-height: clamp(162px, 24vh, 240px) !important;
-  padding: 22px clamp(24px, 3vw, 60px) 18px clamp(24px, 18vw, 330px) !important;
+  width: 100% !important;
+  min-height: 170px !important;
+  max-height: 30vh !important;
+  padding: 22px max(24px, 14vw) 20px max(24px, 22vw) !important;
+  background: linear-gradient(180deg, rgba(0,0,0,.82), rgba(0,0,0,.96)) !important;
+  z-index: 40 !important;
+  border-top: 1px solid rgba(168,213,181,.4) !important;
   overflow: visible !important;
-  z-index: 10 !important;
-  background: linear-gradient(180deg, rgba(0,0,0,.86), rgba(0,0,0,.98)) !important;
-  border-top: 1px solid rgba(168,213,181,.62) !important;
 }
-
-#vnOverlay.active.pc-clean-prediction .vn-speaker,
-#vnOverlay.active.pc-clean-output .vn-speaker {
-  color: #a8f2b9 !important;
-  font-size: clamp(1rem, 1.25vw, 1.35rem) !important;
+.vn-overlay.active.pc-clean-prediction #vnSpeaker,
+.vn-overlay.active.pc-clean-output #vnSpeaker {
+  color: #b8f2c9 !important;
+  font-family: 'Fraunces', serif !important;
+  font-size: clamp(1.05rem, 1.25vw, 1.35rem) !important;
+  margin-bottom: 8px !important;
 }
-#vnOverlay.active.pc-clean-prediction .vn-text,
-#vnOverlay.active.pc-clean-output .vn-text {
-  overflow: visible !important;
-  max-height: none !important;
-  padding-right: 0 !important;
+.vn-overlay.active.pc-clean-prediction #vnText,
+.vn-overlay.active.pc-clean-output #vnText {
+  color: #fff !important;
+  font-size: clamp(.95rem, 1.05vw, 1.08rem) !important;
+  line-height: 1.35 !important;
+  max-width: none !important;
 }
 .pc-clean-dialogue-copy,
-.pc-clean-output-dialogue {
-  max-width: min(34vw, 470px);
-  font-size: clamp(.95rem, 1vw, 1.12rem);
-  line-height: 1.55;
-  color: #fff;
+.pc-feedback-copy {
+  max-width: min(760px, 52vw) !important;
 }
-
 .pc-clean-choice-grid {
-  position: absolute !important;
-  left: clamp(440px, 42vw, 720px) !important;
-  right: clamp(22px, 4vw, 68px) !important;
-  bottom: 24px !important;
   display: grid !important;
-  grid-template-columns: repeat(4, minmax(130px, 1fr)) !important;
-  gap: 14px !important;
-  z-index: 30 !important;
+  grid-template-columns: repeat(4, minmax(150px, 1fr)) !important;
+  gap: 12px !important;
+  position: absolute !important;
+  left: 34vw !important;
+  right: 4vw !important;
+  bottom: 22px !important;
+  z-index: 55 !important;
 }
-.pc-clean-choice-btn {
-  min-height: 64px !important;
-  padding: 12px 14px !important;
-  border-radius: 14px !important;
-  border: 1.5px solid rgba(168,213,181,.72) !important;
-  background: rgba(6,33,19,.92) !important;
-  color: #f4fff6 !important;
-  font: 800 clamp(.72rem, .82vw, .9rem)/1.25 'Nunito', sans-serif !important;
+.pc-clean-choice-btn,
+.prediction-continue-btn {
+  min-height: 52px !important;
+  border: 2px solid rgba(168,213,181,.75) !important;
+  background: rgba(5,28,18,.9) !important;
+  color: #eaffef !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  font-size: clamp(.78rem, .85vw, .92rem) !important;
   cursor: pointer !important;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.035) !important;
+  box-shadow: none !important;
 }
 .pc-clean-choice-btn:hover,
-.pc-clean-choice-btn:focus {
-  background: #d7f8df !important;
-  color: #123824 !important;
-  outline: 3px solid rgba(57,255,20,.38) !important;
-  box-shadow: 0 0 18px rgba(57,255,20,.42) !important;
+.pc-clean-choice-btn:focus,
+.pc-clean-choice-btn.selected,
+.pc-clean-choice-btn.is-selected {
+  background: #d7f5de !important;
+  color: #12351f !important;
+  outline: 3px solid rgba(168,213,181,.32) !important;
+  box-shadow: 0 0 18px rgba(168,213,181,.38) !important;
 }
-
-#vnOverlay.active.pc-clean-prediction .vn-skip,
-#vnOverlay.active.pc-clean-output .vn-skip {
-  position: fixed !important;
-  right: 22px !important;
-  bottom: calc(clamp(162px, 22vh, 230px) - 52px) !important;
-  z-index: 35 !important;
-}
-
-#vnOverlay.active.pc-clean-output .terminal-return,
-#vnOverlay.active.pc-clean-output .pc-clean-continue {
-  position: fixed !important;
-  right: clamp(36px, 7vw, 120px) !important;
-  bottom: clamp(34px, 7vh, 72px) !important;
-  z-index: 36 !important;
-  min-width: 180px !important;
-  min-height: 58px !important;
-  border-radius: 12px !important;
-  border: 2px solid #39ff14 !important;
-  background: #19f231 !important;
-  color: #001b08 !important;
-  font: 900 .9rem/1 'Source Code Pro', monospace !important;
-  letter-spacing: .12em !important;
+.prediction-continue-btn,
+.vn-return-btn.terminal-return {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-top: 16px !important;
+  background: #10f43a !important;
+  color: #031907 !important;
+  border-color: #caffd2 !important;
+  min-width: 220px !important;
   text-transform: uppercase !important;
-  box-shadow: 0 0 24px rgba(57,255,20,.62) !important;
-}
-
-/* Result footer and summary */
-.s1-result-summary {
-  margin-top: 18px;
-  padding: 16px 18px;
-  border-radius: 14px;
-  background: #edf7f0;
-  border: 1.5px solid rgba(45,90,61,.32);
-  color: #193d28;
-}
-.s1-result-summary-title,
-.s1-clean-reference-title {
-  font-family: 'Fraunces', serif;
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-.s1-result-summary ul { margin: 10px 0 0 22px; padding: 0; }
-.s1-clean-reference {
-  margin-top: 14px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: rgba(240,234,216,.72);
-  border: 1px solid rgba(139,115,85,.22);
-  font-size: .86rem;
-  line-height: 1.55;
+  letter-spacing: .08em !important;
 }
 .s1-result-controls {
-  position: sticky;
-  bottom: 0;
-  display: grid;
-  grid-template-columns: 1.2fr 1fr auto;
-  align-items: center;
-  gap: 18px;
-  width: 100%;
-  padding: 18px 26px;
-  background: rgba(250,246,238,.98);
-  border-top: 1px solid #d6cfc0;
-  box-shadow: 0 -8px 24px rgba(42,31,20,.08);
-  z-index: 20;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  padding: 18px 22px !important;
+  background: #f3eadc !important;
+  border-top: 1.5px solid #c8b89e !important;
 }
-.s1-result-controls-title { font-family:'Fraunces',serif; font-weight:800; color:#183d27; font-size:1.08rem; }
-.s1-result-controls-sub { color:#6b5544; font-size:.9rem; margin-top:3px; }
-.s1-result-controls-status { text-align:center; font-weight:800; color:#245a39; }
-.s1-result-controls-actions { display:flex; gap:14px; justify-content:flex-end; align-items:center; }
-.s1-result-controls-actions button,
-.s1-result-controls-actions .continue-btn,
-.s1-result-controls-actions .s1-secondary-btn {
-  min-width: 154px;
-  min-height: 54px;
-  border-radius: 10px;
-  font: 800 .96rem/1.1 'Nunito', sans-serif;
-  cursor: pointer;
-  border: 1.5px solid #b7a88f;
-  background: #fffaf1;
-  color: #2a1f14;
-  text-decoration: none;
+.s1-result-controls-title {
+  font-family: 'Fraunces', serif !important;
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  color: #163d28 !important;
 }
-.s1-result-controls-actions .continue-btn {
-  background: #123d28;
-  color: #f4fff6;
-  border-color: #0d2d1d;
-  box-shadow: 0 3px 10px rgba(13,45,29,.22);
+.s1-result-controls-sub,
+.s1-result-controls-status {
+  font-size: .9rem !important;
+  color: #6f5b46 !important;
 }
-.s1-result-controls-actions .continue-btn:disabled {
-  opacity: .45;
-  cursor: not-allowed;
-  background: #d6cfc0;
-  color: #7a6b5c;
-  box-shadow: none;
+.s1-result-controls-actions {
+  display: flex !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-end !important;
+}
+.s1-secondary-btn,
+.s1-result-controls .continue-btn {
+  min-height: 52px !important;
+  min-width: 150px !important;
+  border-radius: 12px !important;
+  padding: 12px 20px !important;
+  font-family: 'Fraunces', serif !important;
+  font-weight: 800 !important;
+  font-size: .95rem !important;
+  cursor: pointer !important;
+}
+.s1-secondary-btn {
+  background: #fffaf2 !important;
+  color: #4a3728 !important;
+  border: 1.5px solid #b89c76 !important;
+}
+.s1-result-controls .continue-btn {
+  background: #1e5a37 !important;
+  color: #fff !important;
+  border: 2px solid #17462b !important;
+}
+@media (max-width: 900px) {
+  .vn-overlay.active.pc-clean-prediction .claude-terminal-scene,
+  .vn-overlay.active.pc-clean-output .claude-terminal-scene {
+    width: 86vw !important;
+    height: 42vh !important;
+    top: 34% !important;
+  }
+  .pc-clean-choice-grid {
+    grid-template-columns: repeat(2, minmax(130px, 1fr)) !important;
+    left: 24px !important;
+    right: 24px !important;
+    bottom: 16px !important;
+  }
+  .pc-clean-dialogue-copy,
+  .pc-feedback-copy { max-width: 90vw !important; }
+  .vn-overlay.active.pc-clean-prediction .vn-dialogue,
+  .vn-overlay.active.pc-clean-output .vn-dialogue { padding-left: 24px !important; padding-right: 24px !important; max-height: 38vh !important; }
+  .vn-overlay.active.pc-clean-prediction .vn-character,
+  .vn-overlay.active.pc-clean-output .vn-character { height: 32vh !important; bottom: 140px !important; left: 20px !important; right: auto !important; }
+  .s1-result-controls { flex-direction: column !important; align-items: stretch !important; }
 }
 
+
+/* PROMPTCRAFT S1 PREDICTION STABILIZER CSS
+   Final owner for this one screen. Because apparently the old rules breed at night. */
+.vn-overlay.active.pc-clean-prediction .vn-dialogue,
+.vn-overlay.active.pc-clean-prediction #vnText,
+.vn-overlay.active.pc-clean-prediction .pc-clean-dialogue-copy,
+.vn-overlay.active.pc-clean-prediction .pc-feedback-copy {
+  user-select: none !important;
+}
+.vn-overlay.active.pc-clean-prediction #vnText::selection,
+.vn-overlay.active.pc-clean-prediction .vn-dialogue::selection {
+  background: transparent !important;
+}
+.vn-overlay.active.pc-clean-prediction .claude-terminal-scene {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 40% !important;
+  width: min(72vw, 1080px) !important;
+  height: min(52vh, 500px) !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 20 !important;
+  pointer-events: none !important;
+}
+.vn-overlay.active.pc-clean-prediction .claude-terminal-photo {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  border-radius: 18px !important;
+  border: 3px solid #00ff38 !important;
+  box-shadow: 0 0 34px rgba(0,255,56,.58) !important;
+  filter: brightness(.84) saturate(1.08) !important;
+}
+.vn-overlay.active.pc-clean-prediction .claude-terminal-screen {
+  position: absolute !important;
+  left: 31.2% !important;
+  top: 24.5% !important;
+  width: 25.8% !important;
+  height: 27.2% !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: radial-gradient(circle at center, rgba(13,126,60,.64), rgba(0,20,10,.98) 72%) !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: inset 0 0 24px rgba(0,255,56,.38), 0 0 20px rgba(0,255,56,.32) !important;
+}
+.vn-overlay.active.pc-clean-prediction .claude-terminal-output {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #46ff69 !important;
+  font-family: 'Source Code Pro', monospace !important;
+  font-size: clamp(.86rem, 1.25vw, 1.18rem) !important;
+  font-weight: 900 !important;
+  letter-spacing: .01em !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  text-shadow: 0 0 10px rgba(70,255,105,.78) !important;
+}
+.vn-overlay.active.pc-clean-prediction .claude-terminal-title {
+  position: absolute !important;
+  top: 10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(62vw, 780px) !important;
+  background: rgba(0,0,0,.94) !important;
+  color: #22ff3b !important;
+  border: 1px solid #22ff3b !important;
+  border-radius: 5px !important;
+  padding: 7px 14px !important;
+  text-align: center !important;
+  font-family: 'Source Code Pro', monospace !important;
+  font-size: clamp(.7rem, .95vw, .9rem) !important;
+  letter-spacing: .12em !important;
+}
+.vn-overlay.active.pc-clean-prediction .vn-character {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  height: min(45vh, 430px) !important;
+  bottom: 88px !important;
+  left: 7vw !important;
+  z-index: 45 !important;
+}
+.vn-overlay.active.pc-clean-prediction .vn-dialogue {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  min-height: 178px !important;
+  max-height: 30vh !important;
+  padding: 22px max(24px, 14vw) 20px max(24px, 22vw) !important;
+  background: linear-gradient(180deg, rgba(0,0,0,.82), rgba(0,0,0,.96)) !important;
+  z-index: 40 !important;
+  border-top: 1px solid rgba(168,213,181,.4) !important;
+  overflow: visible !important;
+}
+.vn-overlay.active.pc-clean-prediction .pc-clean-choice-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(140px, 1fr)) !important;
+  gap: 12px !important;
+  position: absolute !important;
+  left: 34vw !important;
+  right: 4vw !important;
+  bottom: 20px !important;
+  z-index: 60 !important;
+}
+.vn-overlay.active.pc-clean-prediction .pc-clean-choice-btn,
+.vn-overlay.active.pc-clean-prediction .prediction-continue-btn {
+  min-height: 52px !important;
+  border: 2px solid rgba(168,213,181,.75) !important;
+  background: rgba(5,28,18,.92) !important;
+  color: #eaffef !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  font-size: clamp(.78rem, .85vw, .92rem) !important;
+  cursor: pointer !important;
+}
+.vn-overlay.active.pc-clean-prediction .pc-clean-choice-btn:hover,
+.vn-overlay.active.pc-clean-prediction .pc-clean-choice-btn:focus,
+.vn-overlay.active.pc-clean-prediction .pc-clean-choice-btn.is-selected {
+  background: #d7f5de !important;
+  color: #12351f !important;
+  outline: 3px solid rgba(168,213,181,.32) !important;
+  box-shadow: 0 0 18px rgba(168,213,181,.38) !important;
+}
+.vn-overlay.active.pc-clean-prediction .pc-feedback-copy {
+  max-width: min(820px, 60vw) !important;
+}
+.vn-overlay.active.pc-clean-prediction .prediction-continue-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-top: 16px !important;
+  background: #10f43a !important;
+  color: #031907 !important;
+  border-color: #caffd2 !important;
+  min-width: 220px !important;
+  text-transform: uppercase !important;
+  letter-spacing: .08em !important;
+}
+@media (max-width: 900px) {
+  .vn-overlay.active.pc-clean-prediction .claude-terminal-scene {
+    width: 86vw !important;
+    height: 42vh !important;
+    top: 34% !important;
+  }
+  .vn-overlay.active.pc-clean-prediction .pc-clean-choice-grid {
+    grid-template-columns: repeat(2, minmax(130px, 1fr)) !important;
+    left: 24px !important;
+    right: 24px !important;
+    bottom: 16px !important;
+  }
+  .vn-overlay.active.pc-clean-prediction .vn-dialogue {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    max-height: 38vh !important;
+  }
+  .vn-overlay.active.pc-clean-prediction .vn-character {
+    height: 32vh !important;
+    bottom: 140px !important;
+    left: 20px !important;
+  }
+}
+
+/* PROMPTCRAFT HARD S1 PREDICTION OWNER CSS
+   Last word for the prediction screen. The old rules are no longer invited. */
+body .vn-overlay.active.pc-clean-prediction {
+  overflow: hidden !important;
+}
+body .vn-overlay.active.pc-clean-prediction .vn-smartboard-wrap,
+body .vn-overlay.active.pc-clean-prediction .vn-board-label,
+body .vn-overlay.active.pc-clean-prediction .vn-board-text,
+body .vn-overlay.active.pc-clean-prediction .vn-board-loading {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+body .vn-overlay.active.pc-clean-prediction .claude-terminal-scene {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 38% !important;
+  width: min(78vw, 1180px) !important;
+  height: min(54vh, 560px) !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 20 !important;
+  pointer-events: none !important;
+}
+body .vn-overlay.active.pc-clean-prediction .claude-terminal-photo {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  opacity: 1 !important;
+  border-radius: 18px !important;
+  border: 3px solid #00ff38 !important;
+  box-shadow: 0 0 36px rgba(0,255,56,.62) !important;
+  filter: brightness(.88) saturate(1.08) !important;
+}
+body .vn-overlay.active.pc-clean-prediction .claude-terminal-screen {
+  position: absolute !important;
+  left: 31.4% !important;
+  top: 24.2% !important;
+  width: 25.8% !important;
+  height: 27.2% !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: radial-gradient(circle at center, rgba(17,130,65,.70), rgba(0,18,9,.98) 72%) !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: inset 0 0 24px rgba(0,255,56,.42), 0 0 22px rgba(0,255,56,.32) !important;
+}
+body .vn-overlay.active.pc-clean-prediction .claude-terminal-output {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #52ff72 !important;
+  font-family: 'Source Code Pro', monospace !important;
+  font-size: clamp(.9rem, 1.35vw, 1.3rem) !important;
+  font-weight: 900 !important;
+  letter-spacing: .01em !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  text-shadow: 0 0 12px rgba(82,255,114,.82) !important;
+}
+body .vn-overlay.active.pc-clean-prediction .claude-terminal-title {
+  position: absolute !important;
+  top: 10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(62vw, 780px) !important;
+  background: rgba(0,0,0,.94) !important;
+  color: #22ff3b !important;
+  border: 1px solid #22ff3b !important;
+  border-radius: 5px !important;
+  padding: 7px 14px !important;
+  text-align: center !important;
+  font-family: 'Source Code Pro', monospace !important;
+  font-size: clamp(.7rem, .95vw, .9rem) !important;
+  letter-spacing: .12em !important;
+  z-index: 23 !important;
+}
+body .vn-overlay.active.pc-clean-prediction .vn-character {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  height: min(47vh, 455px) !important;
+  bottom: 88px !important;
+  left: 6vw !important;
+  z-index: 45 !important;
+}
+body .vn-overlay.active.pc-clean-prediction .vn-dialogue {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  min-height: 184px !important;
+  max-height: 31vh !important;
+  padding: 22px 4vw 20px 20vw !important;
+  background: linear-gradient(180deg, rgba(0,0,0,.82), rgba(0,0,0,.97)) !important;
+  border-top: 1px solid rgba(168,213,181,.45) !important;
+  overflow: visible !important;
+  z-index: 40 !important;
+  user-select: none !important;
+}
+body .vn-overlay.active.pc-clean-prediction #vnSpeaker {
+  color: #b8f2c9 !important;
+  font-family: 'Fraunces', serif !important;
+  font-size: clamp(1.05rem, 1.25vw, 1.35rem) !important;
+  margin-bottom: 8px !important;
+}
+body .vn-overlay.active.pc-clean-prediction #vnText {
+  color: #fff !important;
+  font-size: clamp(.95rem, 1.05vw, 1.1rem) !important;
+  line-height: 1.35 !important;
+  user-select: none !important;
+}
+body .vn-overlay.active.pc-clean-prediction #vnText::selection,
+body .vn-overlay.active.pc-clean-prediction .vn-dialogue::selection {
+  background: transparent !important;
+}
+body .vn-overlay.active.pc-clean-prediction .pc-clean-dialogue-copy,
+body .vn-overlay.active.pc-clean-prediction .pc-feedback-copy {
+  max-width: min(760px, 42vw) !important;
+}
+body .vn-overlay.active.pc-clean-prediction .pc-choice-panel-final {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(140px, 1fr)) !important;
+  gap: 12px !important;
+  position: fixed !important;
+  left: max(360px, 34vw) !important;
+  right: 4vw !important;
+  bottom: 20px !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+body .vn-overlay.active.pc-clean-prediction .pc-clean-choice-btn,
+body .vn-overlay.active.pc-clean-prediction .prediction-continue-btn {
+  min-height: 52px !important;
+  border: 2px solid rgba(168,213,181,.78) !important;
+  background: rgba(5,28,18,.94) !important;
+  color: #eaffef !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  font-size: clamp(.78rem, .85vw, .92rem) !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+}
+body .vn-overlay.active.pc-clean-prediction .pc-clean-choice-btn:hover,
+body .vn-overlay.active.pc-clean-prediction .pc-clean-choice-btn:focus,
+body .vn-overlay.active.pc-clean-prediction .pc-clean-choice-btn.is-selected {
+  background: #d7f5de !important;
+  color: #12351f !important;
+  outline: 3px solid rgba(168,213,181,.32) !important;
+  box-shadow: 0 0 18px rgba(168,213,181,.38) !important;
+}
+body .vn-overlay.active.pc-clean-prediction .prediction-continue-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-top: 16px !important;
+  background: #10f43a !important;
+  color: #031907 !important;
+  border-color: #caffd2 !important;
+  min-width: 230px !important;
+  text-transform: uppercase !important;
+  letter-spacing: .08em !important;
+}
+@media (max-width: 900px) {
+  body .vn-overlay.active.pc-clean-prediction .claude-terminal-scene {
+    width: 90vw !important;
+    height: 42vh !important;
+    top: 31% !important;
+  }
+  body .vn-overlay.active.pc-clean-prediction .vn-character {
+    height: 32vh !important;
+    left: 18px !important;
+    bottom: 150px !important;
+  }
+  body .vn-overlay.active.pc-clean-prediction .vn-dialogue {
+    padding: 18px 22px 18px 22px !important;
+    max-height: 40vh !important;
+  }
+  body .vn-overlay.active.pc-clean-prediction .pc-choice-panel-final {
+    grid-template-columns: repeat(2, minmax(130px, 1fr)) !important;
+    left: 22px !important;
+    right: 22px !important;
+    bottom: 16px !important;
+  }
+  body .vn-overlay.active.pc-clean-prediction .pc-clean-dialogue-copy,
+  body .vn-overlay.active.pc-clean-prediction .pc-feedback-copy {
+    max-width: 92vw !important;
+  }
+}
+
+/* PROMPTCRAFT FINAL VISIBLE PREDICTION PANEL PATCH
+   Works even when the older S1 overlay handler is the one that wins. */
+body .vn-overlay.active.claude-prediction #vnPredictionChoicePanel,
+body .vn-overlay.active #vnPredictionChoicePanel.pc-choice-panel-final,
+body .vn-overlay.active #vnPredictionChoicePanel.pc-clean-choice-grid,
+body .vn-overlay.active #vnPredictionChoicePanel.vn-prediction-options {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(150px, 1fr)) !important;
+  gap: 14px !important;
+  position: fixed !important;
+  left: 35vw !important;
+  right: 3.5vw !important;
+  bottom: 22px !important;
+  width: auto !important;
+  max-width: none !important;
+  min-height: 58px !important;
+  z-index: 2147483640 !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  overflow: visible !important;
+}
+body .vn-overlay.active #vnPredictionChoicePanel button,
+body .vn-overlay.active .pc-clean-choice-btn,
+body .vn-overlay.active .vn-prediction-btn,
+body .vn-overlay.active .vn-choice-btn,
+body .vn-overlay.active .prediction-continue-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 58px !important;
+  width: 100% !important;
+  border: 2px solid rgba(168,213,181,.84) !important;
+  background: rgba(5,28,18,.96) !important;
+  color: #eefdf2 !important;
+  border-radius: 13px !important;
+  padding: 10px 14px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  font-size: clamp(.78rem, .9vw, .98rem) !important;
+  line-height: 1.15 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  text-align: center !important;
+  white-space: normal !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+body .vn-overlay.active #vnPredictionChoicePanel button:hover,
+body .vn-overlay.active #vnPredictionChoicePanel button:focus,
+body .vn-overlay.active #vnPredictionChoicePanel button.is-selected {
+  background: #d7f5de !important;
+  color: #12351f !important;
+  box-shadow: 0 0 18px rgba(168,213,181,.44) !important;
+}
+body .vn-overlay.active.claude-prediction .vn-dialogue,
+body .vn-overlay.active.pc-clean-prediction .vn-dialogue {
+  min-height: 190px !important;
+  padding-left: max(340px, 22vw) !important;
+  padding-right: 4vw !important;
+  padding-bottom: 96px !important;
+  overflow: visible !important;
+}
+body .vn-overlay.active.claude-prediction .vn-character,
+body .vn-overlay.active.pc-clean-prediction .vn-character {
+  height: min(45vh, 430px) !important;
+  left: 5vw !important;
+  bottom: 80px !important;
+  z-index: 80 !important;
+  pointer-events: none !important;
+}
+body .vn-overlay.active .pc-feedback-copy {
+  max-width: min(760px, 48vw) !important;
+}
+body .vn-overlay.active .prediction-continue-btn {
+  width: auto !important;
+  min-width: 245px !important;
+  margin-top: 14px !important;
+  background: #10f43a !important;
+  color: #031907 !important;
+  border-color: #caffd2 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .08em !important;
+}
+@media (max-width: 980px) {
+  body .vn-overlay.active.claude-prediction #vnPredictionChoicePanel,
+  body .vn-overlay.active #vnPredictionChoicePanel.pc-choice-panel-final,
+  body .vn-overlay.active #vnPredictionChoicePanel.pc-clean-choice-grid,
+  body .vn-overlay.active #vnPredictionChoicePanel.vn-prediction-options {
+    grid-template-columns: repeat(2, minmax(130px, 1fr)) !important;
+    left: 18px !important;
+    right: 18px !important;
+    bottom: 14px !important;
+  }
+  body .vn-overlay.active.claude-prediction .vn-dialogue,
+  body .vn-overlay.active.pc-clean-prediction .vn-dialogue {
+    padding-left: 22px !important;
+    padding-bottom: 150px !important;
+  }
+  body .vn-overlay.active.claude-prediction .vn-character,
+  body .vn-overlay.active.pc-clean-prediction .vn-character {
+    height: 30vh !important;
+    left: 18px !important;
+    bottom: 150px !important;
+  }
+}
+
+
+/* PROMPTCRAFT S1 PREDICTION UI FINAL ADJUSTMENTS
+   Small layout corrections only: keep Pixel out of the dialogue copy, keep buttons reachable,
+   and make the S1 result navigation button look like the rest of the UI. */
+body .vn-overlay.active.claude-prediction .vn-character,
+body .vn-overlay.active.pc-clean-prediction .vn-character {
+  height: min(39vh, 380px) !important;
+  left: 2.2vw !important;
+  bottom: 84px !important;
+  z-index: 72 !important;
+  pointer-events: none !important;
+}
+body .vn-overlay.active.claude-prediction .vn-dialogue,
+body .vn-overlay.active.pc-clean-prediction .vn-dialogue {
+  min-height: 182px !important;
+  padding-left: max(320px, 24vw) !important;
+  padding-right: 3vw !important;
+  padding-bottom: 104px !important;
+  overflow: visible !important;
+}
+body .vn-overlay.active.claude-prediction #vnSpeaker,
+body .vn-overlay.active.pc-clean-prediction #vnSpeaker {
+  margin-left: 0 !important;
+}
+body .vn-overlay.active.claude-prediction #vnText,
+body .vn-overlay.active.pc-clean-prediction #vnText {
+  max-width: min(760px, 48vw) !important;
+}
+body .vn-overlay.active.claude-prediction #vnPredictionChoicePanel,
+body .vn-overlay.active #vnPredictionChoicePanel.pc-choice-panel-final,
+body .vn-overlay.active #vnPredictionChoicePanel.pc-clean-choice-grid,
+body .vn-overlay.active #vnPredictionChoicePanel.vn-prediction-options {
+  left: max(610px, 35vw) !important;
+  right: 3vw !important;
+  bottom: 26px !important;
+  grid-template-columns: repeat(4, minmax(150px, 1fr)) !important;
+  z-index: 2147483640 !important;
+}
+body .vn-overlay.active .pc-feedback-copy {
+  max-width: min(800px, 50vw) !important;
+}
+body .vn-overlay.active .prediction-continue-btn {
+  position: relative !important;
+  z-index: 2147483641 !important;
+}
+body .s1-result-controls .continue-btn,
+body .s1-result-controls .s1-secondary-btn,
+body .scenario-nav-card .scenario-nav-btn {
+  appearance: none !important;
+  border: 2px solid rgba(26, 91, 55, .55) !important;
+  border-radius: 12px !important;
+  padding: 14px 24px !important;
+  min-height: 52px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  font-size: 1rem !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+body .s1-result-controls .continue-btn,
+body .scenario-nav-card .scenario-nav-btn {
+  background: #1f623a !important;
+  color: #fff !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,.14) !important;
+}
+body .s1-result-controls .s1-secondary-btn {
+  background: #fffaf2 !important;
+  color: #3b2313 !important;
+}
 @media (max-width: 1100px) {
-  #vnOverlay.active.pc-clean-prediction .claude-terminal-scene { width: 92vw !important; height: min(46vh, 470px) !important; }
-  #vnOverlay.active.pc-clean-output .claude-terminal-scene { width: 94vw !important; height: min(60vh, 620px) !important; }
-  #vnOverlay.active.pc-clean-prediction .vn-character,
-  #vnOverlay.active.pc-clean-output .vn-character { height: min(32vh, 300px) !important; bottom: 132px !important; }
-  #vnOverlay.active.pc-clean-prediction .vn-dialogue,
-  #vnOverlay.active.pc-clean-output .vn-dialogue { padding-left: 220px !important; }
-  .pc-clean-dialogue-copy,.pc-clean-output-dialogue { max-width: 360px; }
-  .pc-clean-choice-grid { left: 480px !important; grid-template-columns: repeat(2, minmax(130px, 1fr)) !important; }
-  .s1-result-controls { grid-template-columns: 1fr; text-align:center; }
-  .s1-result-controls-actions { justify-content:center; }
-}
-@media (max-width: 760px) {
-  #vnOverlay.active.pc-clean-prediction .claude-terminal-scene,
-  #vnOverlay.active.pc-clean-output .claude-terminal-scene { left: 50% !important; top: 12px !important; width: 96vw !important; height: 38vh !important; }
-  #vnOverlay.active.pc-clean-prediction .vn-character,
-  #vnOverlay.active.pc-clean-output .vn-character { display:none !important; }
-  #vnOverlay.active.pc-clean-prediction .vn-dialogue,
-  #vnOverlay.active.pc-clean-output .vn-dialogue { padding: 16px !important; min-height: 270px !important; max-height: 42vh !important; overflow-y: auto !important; }
-  .pc-clean-dialogue-copy,.pc-clean-output-dialogue { max-width:none; }
-  .pc-clean-choice-grid { position: static !important; grid-template-columns: 1fr !important; margin-top: 12px !important; }
-  #vnOverlay.active.pc-clean-output .terminal-return { position: static !important; margin-top: 14px !important; }
-}
-
-/* PromptCraft S1 prediction response polish */
-.vn-prediction-reaction {
-  margin-top: 0.55rem;
-  max-width: 62rem;
-  line-height: 1.45;
-}
-.vn-prediction-note {
-  margin-top: 0.65rem;
-  color: #bfffd0;
-  font-family: var(--mono, monospace);
-  letter-spacing: 0.04em;
-  opacity: 0.88;
-}
-.vn-choice-btn.selected,
-.vn-prediction-btn.selected {
-  background: #d8ffe4 !important;
-  color: #06351d !important;
-  border-color: #a9ffd0 !important;
-  box-shadow: 0 0 18px rgba(75, 255, 132, 0.65) !important;
-}
-
-
-/* Final patch: prediction feedback must be readable before Claude runs */
-#vnOverlay .prediction-feedback-text {
-  margin-top: 10px;
-  max-width: min(760px, 72vw);
-  font-size: clamp(0.95rem, 1.25vw, 1.12rem);
-  line-height: 1.55;
-  color: #f2fff4;
-  text-shadow: 0 1px 8px rgba(0,0,0,.9);
-}
-
-#vnOverlay .prediction-continue-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 16px;
-  min-width: 220px;
-  min-height: 48px;
-  padding: 12px 22px;
-  border-radius: 12px;
-  border: 2px solid #90f7a8;
-  background: #d8f8df;
-  color: #082214;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 900;
-  letter-spacing: .01em;
-  cursor: pointer;
-  box-shadow: 0 0 18px rgba(67,255,105,.35);
-}
-
-#vnOverlay .prediction-continue-btn:hover,
-#vnOverlay .prediction-continue-btn:focus-visible {
-  outline: 3px solid rgba(168,255,186,.55);
-  outline-offset: 3px;
-  transform: translateY(-1px);
-}
-
-#vnOverlay .vn-choice-btn.selected,
-#vnOverlay .vn-prediction-btn.selected {
-  background: #d8f8df !important;
-  color: #082214 !important;
-  border-color: #9dffb3 !important;
-  box-shadow: 0 0 18px rgba(67,255,105,.45) !important;
+  body .vn-overlay.active.claude-prediction .vn-character,
+  body .vn-overlay.active.pc-clean-prediction .vn-character {
+    height: 30vh !important;
+    left: 16px !important;
+    bottom: 160px !important;
+  }
+  body .vn-overlay.active.claude-prediction .vn-dialogue,
+  body .vn-overlay.active.pc-clean-prediction .vn-dialogue {
+    padding-left: 22px !important;
+    padding-bottom: 156px !important;
+  }
+  body .vn-overlay.active.claude-prediction #vnPredictionChoicePanel,
+  body .vn-overlay.active #vnPredictionChoicePanel.pc-choice-panel-final,
+  body .vn-overlay.active #vnPredictionChoicePanel.pc-clean-choice-grid,
+  body .vn-overlay.active #vnPredictionChoicePanel.vn-prediction-options {
+    left: 18px !important;
+    right: 18px !important;
+    bottom: 14px !important;
+    grid-template-columns: repeat(2, minmax(130px, 1fr)) !important;
+  }
 }

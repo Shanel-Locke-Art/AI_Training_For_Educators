@@ -1650,25 +1650,28 @@ function maybeShowNavCard(score) {
 }
 
 function navigateToNext(targetIndex) {
-  // S1 -> S2 has been fragile because the result footer can be rendered
-  // from several paths. Use the dedicated handoff when available.
-  if (targetIndex === 1 && typeof window.forceGoS2 === 'function') {
-    window.forceGoS2();
-    return;
-  }
-
   const tabs = document.querySelectorAll('.tab-btn');
   const targetTab = tabs[targetIndex];
-  if (!targetTab) return;
+  if (!targetTab) return false;
 
-  // Do not let a stale locked/disabled tab block a completed scenario handoff.
+  // Make the previous scenario complete before switching.
+  // S1's result footer can appear before Pixel's final reflection finishes,
+  // so relying on the old delayed completion state made S2 look dead.
+  if (Array.isArray(scenarioCompleted) && typeof scenarioIndex === 'number') {
+    scenarioCompleted[scenarioIndex] = true;
+  }
+
   targetTab.disabled = false;
   targetTab.classList.remove('locked');
   targetTab.removeAttribute('aria-disabled');
 
   const chat = document.getElementById('chat');
   if (chat) chat.scrollTop = 0;
-  switchScenario(targetIndex, targetTab);
+
+  if (typeof switchScenario === 'function') {
+    switchScenario(targetIndex, targetTab);
+  }
+  return false;
 }
 
 let s4InterruptFired = false;
@@ -2933,7 +2936,7 @@ function showS1ResultControls(scoreTotal) {
     <div class="s1-result-actions-sub">Claude's draft is shown above. Professor Pixel will explain what changed.</div>
     <div class="s1-result-actions-buttons">
       <button type="button" class="s1-secondary-btn" onclick="reviseS1()">Revise S1</button>
-      ${thresholdMet ? `<button type="button" class="guided-send-btn" onclick="forceGoS2()">Continue to S2 →</button>` : ''}
+      ${thresholdMet ? `<button type="button" class="guided-send-btn" onclick="navigateToNext(1)">Continue to S2 →</button>` : ''}
     </div>
     ${s1ReferencePanelHTML()}
   `;
@@ -3265,7 +3268,10 @@ function switchScenario(i, btn) {
   attempts = 0;
   lastPromptText = '';
   history = [];
-  document.getElementById('attNum').textContent = '0';
+  const attNum = document.getElementById('attNum');
+  if (attNum) {
+      attNum.textContent = '0';
+  }
   document.querySelectorAll('.tab-btn').forEach(b => {
     b.classList.remove('active');
     b.setAttribute('aria-selected', 'false');
@@ -4692,9 +4698,15 @@ function devNextScenario() {
 // Navigate to scenario without filling or sending
 function devGoScenario(idx) {
   const tabs = document.querySelectorAll('.tab-btn');
+  const btn = tabs[idx];
+  if (!btn) return false;
+  btn.disabled = false;
+  btn.classList.remove('locked');
+  btn.removeAttribute('aria-disabled');
   if (scenarioIndex !== idx) {
-    switchScenario(idx, tabs[idx]);
+    switchScenario(idx, btn);
   }
+  return false;
 }
 
 // Fill the test prompt into the textarea — no auto-send
@@ -5137,7 +5149,7 @@ function devComplete() {
         </div>
         <div class="s1-result-controls-actions">
           <button class="s1-secondary-btn" type="button" onclick="reviseS1()">Revise S1</button>
-          ${thresholdMet ? `<button class="continue-btn" type="button" onclick="forceGoS2()">Next scenario →</button>` : `<button class="continue-btn" type="button" onclick="reviseS1()">Strengthen and try again</button>`}
+          ${thresholdMet ? `<button class="continue-btn" type="button" onclick="navigateToNext(1)">Next scenario →</button>` : `<button class="continue-btn" type="button" onclick="reviseS1()">Strengthen and try again</button>`}
         </div>
       </div>`;
   };
@@ -5191,276 +5203,534 @@ function devComplete() {
     };
   }
 })();
+</script>
 
-// ══════════════════════════════════════════════════════
-// FINAL S1 PATCH — S2 INTRO + READABLE PREDICTION FEEDBACK
-// This intentionally overrides the earlier emergency patches above.
-// ══════════════════════════════════════════════════════
+
+<script>
+/* PROMPTCRAFT S1 PREDICTION FLOW STABILIZER
+   One final owner for the prediction gate, dev S1 fill, and S2 handoff.
+   No automatic Claude analysis after choice: the player must click Continue. */
 (function(){
-  const predictionFeedback = {
-    targeted: 'Good prediction. Since you gave Claude learners, the actual failure, and success criteria, it should have enough context to give a targeted repair instead of generic advice.',
-    generic: 'Reasonable concern. Even with context, AI can still drift generic if the prompt does not make the teaching problem and success criteria explicit enough.',
-    ignores_constraints: 'That is a useful risk to watch for. Constraints are easy for AI to mention and then quietly ignore, so we need to check whether Claude actually honors them.',
-    not_sure: 'Fair. Prediction is a skill we build by comparing what we expected with what Claude actually does. Let’s test it and see what changes.'
+  const PC_REACTION = {
+    targeted: 'That is a reasonable prediction. You gave Claude enough context to aim at the real discussion problem, so it should have something specific to work with.',
+    generic: 'That could happen. Even with decent context, Claude can still drift into polite template language if the repair move is not clear enough.',
+    ignores_constraints: 'Good caution. Constraints are easy for AI to flatten or forget, especially when the prompt asks for a redesign instead of naming what must stay true.',
+    not_sure: 'That uncertainty is useful. Predicting the output before seeing it helps you notice what Claude changes, misses, or invents.'
+  };
+
+  function pcById(id){ return document.getElementById(id); }
+
+  function pcStopVNQueue(){
+    try { vnQueue = []; } catch(e) {}
+    try { clearTimeout(vnTypeTimer); } catch(e) {}
+    try { vnTyping = false; vnOnComplete = null; vnFullText = ''; vnCurrentText = ''; } catch(e) {}
+  }
+
+  window.pcCloseVNOverlayForDev = function pcCloseVNOverlayForDev(){
+    pcStopVNQueue();
+    const overlay = pcById('vnOverlay');
+    if (overlay) {
+      overlay.classList.remove('active','claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-prediction','pc-clean-prediction','pc-clean-output');
+    }
+    pcById('vnDialogue')?.classList.remove('has-choices');
+    pcById('vnCharacter')?.classList.remove('visible');
+    pcById('vnPredictionChoicePanel')?.remove();
+    document.querySelectorAll('.vn-choice-list,.pc-clean-choice-grid,#predictionGate').forEach(el => el.remove());
+    try { if (typeof musicEndVN === 'function') musicEndVN(); } catch(e) {}
+  };
+
+  window.showPredictionGate = function showPredictionGate(text){
+    if (!text) return;
+    window.pendingPromptForPrediction = text;
+    try { predictionGateActive = true; } catch(e) {}
+    window.predictionGateActive = true;
+
+    pcStopVNQueue();
+    pcById('predictionGate')?.remove();
+    pcById('vnPredictionChoicePanel')?.remove();
+    document.querySelectorAll('.vn-choice-list,.pc-clean-choice-grid').forEach(el => el.remove());
+
+    const overlay = pcById('vnOverlay');
+    if (overlay) {
+      overlay.classList.remove('claude-consult','claude-terminal-consult','claude-terminal-textmode','pc-clean-output');
+      overlay.classList.add('active','claude-prediction','pc-clean-prediction');
+    }
+
+    try { setClaudeTerminalTextMode(false); } catch(e) {}
+    try { setVNClaudeMode(false); } catch(e) {}
+    try { setVNClaudeTerminalMode(false); } catch(e) {}
+    try { setClaudeShelfState('idle',''); } catch(e) {}
+    try { setClaudeTerminalState('thinking','CLAUDE TERMINAL', 'AWAITING_PREDICTION_'); } catch(e) {}
+    try { musicStartVN(); } catch(e) {}
+    try { vnSetExpression('thinking'); } catch(e) {}
+
+    const boardText = pcById('vnBoardText');
+    if (boardText) boardText.textContent = 'Before we consult Claude, make a prediction.';
+    const speaker = pcById('vnSpeaker');
+    if (speaker) speaker.textContent = 'Professor Pixel';
+    const dialogue = pcById('vnDialogue');
+    if (dialogue) dialogue.classList.add('has-choices');
+    const hint = pcById('vnAdvanceHint');
+    if (hint) hint.classList.remove('show');
+
+    const vnText = pcById('vnText');
+    if (vnText) {
+      vnText.innerHTML = `
+        <div class="pc-clean-dialogue-copy">
+          <div><strong>Before we consult Claude...</strong></div>
+          <div style="margin-top:8px;">Based on the context you gave, what do you predict Claude will do?</div>
+        </div>
+        <div id="vnPredictionChoicePanel" class="pc-clean-choice-grid" role="group" aria-label="Prediction choices">
+          <button class="pc-clean-choice-btn" type="button" data-choice="targeted">It will give a targeted response.</button>
+          <button class="pc-clean-choice-btn" type="button" data-choice="generic">It might still be generic.</button>
+          <button class="pc-clean-choice-btn" type="button" data-choice="ignores_constraints">It may ignore some constraints.</button>
+          <button class="pc-clean-choice-btn" type="button" data-choice="not_sure">I am not sure yet.</button>
+        </div>`;
+      vnText.querySelectorAll('.pc-clean-choice-btn').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+          ev.preventDefault(); ev.stopPropagation();
+          window.choosePrediction(btn.dataset.choice);
+        });
+      });
+    }
+
+    requestAnimationFrame(() => {
+      pcById('vnCharacter')?.classList.add('visible');
+      // Do not auto-focus text/buttons. It was causing weird blue selections/highlights. Naturally.
+    });
   };
 
   window.choosePrediction = function choosePrediction(choice){
     const text = window.pendingPromptForPrediction;
-    if (!text || isSubmittingToClaude) return;
+    if (!text || window.pcWaitingForClaudeContinue || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
 
-    const buttons = document.querySelectorAll('.vn-choice-btn,.vn-prediction-btn');
-    buttons.forEach(btn => {
-      btn.disabled = true;
-      btn.classList.remove('selected');
-    });
-    const clicked = Array.from(buttons).find(btn => (btn.getAttribute('onclick') || '').includes(choice));
-    if (clicked) clicked.classList.add('selected');
+    window.pendingPromptAfterPrediction = text;
+    window.pendingPromptForPrediction = '';
+    try { predictionGateActive = false; } catch(e) {}
+    window.predictionGateActive = false;
+    window.pcWaitingForClaudeContinue = true;
 
     const s = scenarioData[scenarioIndex];
     if (s) {
       if (!s.predictions) s.predictions = [];
-      s.predictions.push({
-        choice,
-        prompt: text,
-        attempt: (s.attempts || 0) + 1,
-        timestamp: new Date().toISOString()
-      });
+      s.predictions.push({ choice, prompt:text, attempt:(s.attempts || 0) + 1, timestamp:new Date().toISOString() });
     }
 
-    const speaker = document.getElementById('vnSpeaker');
-    if (speaker) speaker.textContent = 'Professor Pixel';
+    const buttons = document.querySelectorAll('.pc-clean-choice-btn,.vn-choice-btn,.vn-prediction-btn');
+    buttons.forEach(btn => {
+      btn.disabled = true;
+      if (btn.dataset && btn.dataset.choice === choice) btn.classList.add('is-selected');
+    });
 
-    const vnText = document.getElementById('vnText');
+    const vnText = pcById('vnText');
     if (vnText) {
       vnText.innerHTML = `
-        <div><strong>Prediction noted.</strong></div>
-        <div class="prediction-feedback-text">${predictionFeedback[choice] || predictionFeedback.not_sure}</div>
-        <button class="prediction-continue-btn" type="button"
-                onclick="event.stopPropagation(); continueToClaudeAfterPrediction()">
-          Continue to Claude →
-        </button>`;
+        <div class="pc-feedback-copy">
+          <div><strong>Your prediction:</strong></div>
+          <div style="margin-top:8px;">${PC_REACTION[choice] || PC_REACTION.not_sure}</div>
+          <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
+        </div>`;
+      const btn = pcById('pcContinueToClaudeBtn');
+      if (btn) btn.addEventListener('click', (ev) => {
+        ev.preventDefault(); ev.stopPropagation();
+        window.pcContinueToClaudeAnalysis();
+      });
     }
-
-    const hint = document.getElementById('vnAdvanceHint');
-    if (hint) hint.classList.remove('show');
-    setTimeout(() => document.querySelector('.prediction-continue-btn')?.focus(), 80);
   };
 
-  window.continueToClaudeAfterPrediction = function continueToClaudeAfterPrediction(){
-    const text = window.pendingPromptForPrediction;
-    if (!text || isSubmittingToClaude) return;
+  window.pcContinueToClaudeAnalysis = function pcContinueToClaudeAnalysis(){
+    const text = window.pendingPromptAfterPrediction;
+    if (!text || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
+    window.pcWaitingForClaudeContinue = false;
+    window.pendingPromptAfterPrediction = '';
 
-    window.pendingPromptForPrediction = '';
-    predictionGateActive = false;
-
-    const dialogue = document.getElementById('vnDialogue');
-    if (dialogue) dialogue.classList.remove('has-choices');
-
-    const overlay = document.getElementById('vnOverlay');
-    if (overlay) {
-      overlay.classList.remove('active', 'claude-consult', 'claude-terminal-consult', 'claude-terminal-textmode', 'claude-prediction');
-    }
-    document.getElementById('vnCharacter')?.classList.remove('visible');
-    setClaudeShelfState('idle', 'idle');
-    setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
-    musicEndVN();
-
+    const overlay = pcById('vnOverlay');
+    if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction');
+    pcById('vnDialogue')?.classList.remove('has-choices');
+    pcById('vnCharacter')?.classList.remove('visible');
+    try { setClaudeShelfState('idle','idle'); } catch(e) {}
+    try { setClaudeTerminalState('idle','CLAUDE TERMINAL','IDLE'); } catch(e) {}
+    try { musicEndVN(); } catch(e) {}
     sendMain(text);
   };
 
-  window.forceGoS2 = function forceGoS2(){
-    // Clear any leftover result/VN state first. The old button sometimes changed
-    // tabs while Pixel/Claude overlay state was still swallowing the intro.
-    vnQueue = [];
-    clearTimeout(vnTypeTimer);
-    vnTyping = false;
-    vnOnComplete = null;
-    predictionGateActive = false;
-    window.pendingPromptForPrediction = '';
-
-    const overlay = document.getElementById('vnOverlay');
-    if (overlay) overlay.classList.remove('active', 'claude-consult', 'claude-terminal-consult', 'claude-terminal-textmode', 'claude-prediction');
-    document.getElementById('vnCharacter')?.classList.remove('visible');
-    document.getElementById('vnDialogue')?.classList.remove('has-choices');
-    document.body.classList.remove('s1-result-active', 's1-active');
-    setClaudeShelfState('idle', 'idle');
-    setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
-    musicEndVN();
-
-    const tabs = document.querySelectorAll('.tab-btn');
-    const s2Tab = tabs[1];
-    if (s2Tab) {
-      s2Tab.disabled = false;
-      s2Tab.classList.remove('locked');
+  // Dev fill should not replay or continue the opening Pixel intro. It should just fill the S1 builder.
+  const originalDevFillScenario = window.devFillScenario || devFillScenario;
+  window.devFillScenario = function devFillScenarioStable(idx){
+    if (idx === 0) {
+      window.pcCloseVNOverlayForDev();
+      if (typeof scenarioIndex !== 'undefined' && scenarioIndex !== 0) {
+        const tabs = document.querySelectorAll('.tab-btn');
+        if (tabs[0] && typeof switchScenario === 'function') switchScenario(0, tabs[0]);
+      }
+      const fill = (attempts=0) => {
+        const lEl = pcById('g-learners');
+        const iEl = pcById('g-issue');
+        const mEl = pcById('g-interaction');
+        const cEl = pcById('g-constraints');
+        if (lEl && iEl && mEl && cEl) {
+          lEl.value = 'online first-year general education students in an 8-week fully asynchronous course';
+          iEl.value = 'students are posting one-sentence reactions, replying only because it is required, and the conversation dies after one exchange';
+          mEl.value = 'compare two possible interpretations of the reading, support their claim with one specific example, and ask a follow-up question that invites a peer to extend or challenge the idea';
+          cEl.value = "no extra tools, one initial post, two substantive peer replies, and strong replies must explain reasoning, use evidence or examples, and build on a classmate's idea";
+          [lEl,iEl,mEl,cEl].forEach(el => { try { autoGrow(el); } catch(e) {} try { onGuidedInput(el); } catch(e) {} });
+          lEl.focus();
+          return;
+        }
+        if (attempts < 30) setTimeout(() => fill(attempts+1), 200);
+      };
+      setTimeout(fill, 50);
+      return;
     }
+    return originalDevFillScenario(idx);
+  };
 
-    // Use the native loader for the actual scenario UI, then explicitly replay
-    // Pixel's intro once the screen exists.
-    switchScenario(1, s2Tab || tabs[0]);
-
-    // Guarantee the S2 intro appears after the S2 UI renders.
-    // The normal switchScenario intro sometimes loses the race against
-    // the S1 result/VN cleanup, so this resets the VN queue and starts
-    // the S2 intro once the page is actually on S2.
+  // Normal S1 dev test can still auto-choose, but now it must click the Continue button too.
+  const originalDevTestScenario = window.devTestScenario || devTestScenario;
+  window.devTestScenario = function devTestScenarioStable(idx){
+    if (idx !== 0) return originalDevTestScenario(idx);
+    window.devFillScenario(0);
     setTimeout(() => {
-      if (scenarioIndex !== 1) return;
-      vnQueue = [];
-      clearTimeout(vnTypeTimer);
-      vnTyping = false;
-      vnOnComplete = null;
-      const overlay2 = document.getElementById('vnOverlay');
-      if (overlay2) overlay2.classList.remove('claude-consult', 'claude-terminal-consult', 'claude-terminal-textmode', 'claude-prediction');
-      playPixelSequence('scenarioStart_1', null);
+      try { sendGuided(); } catch(e) { console.error(e); }
+      const chooseThenContinue = (attempts=0) => {
+        const choiceBtn = document.querySelector('.pc-clean-choice-btn[data-choice="targeted"]');
+        if (choiceBtn) {
+          choiceBtn.click();
+          setTimeout(() => pcById('pcContinueToClaudeBtn')?.click(), 500);
+        } else if (attempts < 30) {
+          setTimeout(() => chooseThenContinue(attempts+1), 250);
+        }
+      };
+      chooseThenContinue();
     }, 450);
   };
 
-  window.showS1ResultControls = function showS1ResultControls(scoreTotal){
-    const container = document.getElementById('inputContainer');
-    if (!container) return;
-    const thresholdMet = scoreTotal >= SCORE_THRESHOLD;
-    container.className = '';
-    container.style.display = 'block';
-    container.innerHTML = `
-      <div class="s1-result-controls" role="region" aria-label="Scenario 1 result options">
-        <div>
-          <div class="s1-result-controls-title">Scenario 1 result</div>
-          <div class="s1-result-controls-sub">Claude's draft and Pixel's change summary are shown above.</div>
-        </div>
-        <div class="s1-result-controls-actions">
-          <button class="s1-secondary-btn" type="button" onclick="reviseS1()">Revise S1</button>
-          ${thresholdMet ? `<button class="continue-btn" type="button" onclick="forceGoS2()">Next scenario →</button>` : `<button class="continue-btn" type="button" onclick="reviseS1()">Strengthen and try again</button>`}
-        </div>
-      </div>`;
-  };
-
-  window.devNextScenario = function devNextScenario(){
-    if (scenarioIndex === 0) return forceGoS2();
-    const target = Math.min(scenarioIndex + 1, scenarios.length - 1);
-    const tabs = document.querySelectorAll('.tab-btn');
-    const tab = tabs[target];
-    if (tab) {
-      tab.disabled = false;
-      tab.classList.remove('locked');
-      switchScenario(target, tab);
-    }
-  };
 })();
+</script>
 
 
 
-// ══════════════════════════════════════════════════════
-// FINAL HARD FIX — S1 TO S2 HANDOFF + READABLE PREDICTION PAUSE
-// This bypasses the fragile tab/switch path for S1 -> S2.
-// ══════════════════════════════════════════════════════
-function pcResetVNStateForScenarioSwitch() {
-  try { vnQueue = []; } catch(e) {}
-  try { clearTimeout(vnTypeTimer); } catch(e) {}
-  try { vnTyping = false; } catch(e) {}
-  try { vnOnComplete = null; } catch(e) {}
-  try { predictionGateActive = false; } catch(e) {}
-  try { isSubmittingToClaude = false; } catch(e) {}
-  window.pendingPromptForPrediction = '';
-
-  const overlay = document.getElementById('vnOverlay');
-  if (overlay) {
-    overlay.classList.remove(
-      'active', 'claude-consult', 'claude-terminal-consult',
-      'claude-terminal-textmode', 'claude-prediction'
-    );
-  }
-  document.getElementById('vnCharacter')?.classList.remove('visible');
-  document.getElementById('vnDialogue')?.classList.remove('has-choices');
-
-  try { setClaudeShelfState('idle', 'idle'); } catch(e) {}
-  try { setClaudeTerminalTextMode(false); } catch(e) {}
-  try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE'); } catch(e) {}
-  try { musicEndVN(); } catch(e) {}
-}
-
-function pcPlayS2IntroAfterRender() {
-  const play = () => {
-    if (scenarioIndex !== 1) return;
-    pcResetVNStateForScenarioSwitch();
-    window.scenarioIntroEnabled = true;
-    const boardText = document.getElementById('vnBoardText');
-    if (boardText && scenarios[1]) boardText.textContent = scenarios[1].desc;
-    playPixelSequence('scenarioStart_1', null);
+<script>
+/* PROMPTCRAFT HARD S1 PREDICTION OWNER
+   This replaces the duplicate/older prediction handlers by assigning both
+   window properties and global function bindings. Apparently one steering
+   wheel was too much to ask from civilization. */
+(function(){
+  const REACTIONS = {
+    targeted: 'That prediction makes sense. You gave Claude learner context, the actual discussion failure, and a clear interaction move, so it should have enough to give a targeted repair.',
+    generic: 'That could happen. Claude can still drift into polite template language if it treats the issue as “make this better” instead of “fix this exact discussion breakdown.”',
+    ignores_constraints: 'Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Claude actually respected them.',
+    not_sure: 'That is a useful answer too. Predicting before you look helps you notice what Claude changes, misses, or invents instead of just accepting the shiny paragraph.'
   };
 
-  // Run after layout settles. The second pass catches browsers that repaint late.
-  setTimeout(play, 250);
-  setTimeout(() => {
-    const overlay = document.getElementById('vnOverlay');
-    if (scenarioIndex === 1 && overlay && !overlay.classList.contains('active')) play();
-  }, 900);
-}
+  function byId(id){ return document.getElementById(id); }
 
-function forceGoS2() {
-  pcResetVNStateForScenarioSwitch();
-
-  scenarioCompleted[0] = true;
-  scenarioIndex = 1;
-  attempts = 0;
-  lastPromptText = '';
-  history = [];
-  document.body.classList.remove('s1-active', 's1-result-active');
-
-  const tabs = document.querySelectorAll('.tab-btn');
-  tabs.forEach((tab, idx) => {
-    tab.classList.toggle('active', idx === 1);
-    tab.setAttribute('aria-selected', idx === 1 ? 'true' : 'false');
-  });
-
-  const s2Tab = tabs[1];
-  if (s2Tab) {
-    s2Tab.disabled = false;
-    s2Tab.classList.remove('locked');
-    s2Tab.removeAttribute('aria-disabled');
-    s2Tab.onclick = () => switchScenario(1, s2Tab);
+  function stopVN(){
+    try { vnQueue = []; } catch(e) {}
+    try { clearTimeout(vnTypeTimer); } catch(e) {}
+    try { vnTyping = false; vnOnComplete = null; vnFullText = ''; vnCurrentText = ''; } catch(e) {}
   }
 
-  const chat = document.getElementById('chat');
-  if (chat) chat.scrollTop = 0;
+  function clearOldPredictionUI(){
+    byId('predictionGate')?.remove();
+    byId('vnPredictionChoicePanel')?.remove();
+    document.querySelectorAll('.vn-choice-list,.vn-prediction-options,.pc-clean-choice-grid,.pc-choice-panel-final').forEach(el => el.remove());
+  }
 
-  loadScenario(1);
-  pcPlayS2IntroAfterRender();
-}
+  function hardShowPredictionGate(text){
+    if (!text || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
+    window.pendingPromptForPrediction = text;
+    window.pendingPromptAfterPrediction = '';
+    window.pcWaitingForClaudeContinue = false;
+    try { predictionGateActive = true; } catch(e) {}
+    window.predictionGateActive = true;
 
-window.forceGoS2 = forceGoS2;
+    stopVN();
+    clearOldPredictionUI();
 
-window.navigateToNext = function navigateToNextPatched(targetIndex) {
-  if (targetIndex === 1) return forceGoS2();
-  const tabs = document.querySelectorAll('.tab-btn');
-  const targetTab = tabs[targetIndex];
-  if (!targetTab) return;
-  targetTab.disabled = false;
-  targetTab.classList.remove('locked');
-  targetTab.removeAttribute('aria-disabled');
-  switchScenario(targetIndex, targetTab);
-};
+    const overlay = byId('vnOverlay');
+    if (overlay) {
+      overlay.className = overlay.className
+        .replace(/\bclaude-consult\b|\bclaude-terminal-consult\b|\bclaude-terminal-textmode\b|\bpc-clean-output\b/g, '')
+        .trim();
+      overlay.classList.add('active','claude-prediction','pc-clean-prediction');
+    }
 
-window.devNextScenario = function devNextScenarioPatched() {
-  if (scenarioIndex === 0) return forceGoS2();
-  const target = Math.min(scenarioIndex + 1, scenarios.length - 1);
-  const tabs = document.querySelectorAll('.tab-btn');
-  const tab = tabs[target];
-  if (!tab) return;
-  tab.disabled = false;
-  tab.classList.remove('locked');
-  tab.removeAttribute('aria-disabled');
-  switchScenario(target, tab);
-};
+    try { setClaudeTerminalTextMode(false); } catch(e) {}
+    try { setVNClaudeMode(false); } catch(e) {}
+    try { setVNClaudeTerminalMode(false); } catch(e) {}
+    try { setClaudeShelfState('idle',''); } catch(e) {}
+    try { setClaudeTerminalState('thinking','CLAUDE TERMINAL', 'AWAITING_PREDICTION_'); } catch(e) {}
+    try { musicStartVN(); } catch(e) {}
+    try { vnSetExpression('thinking'); } catch(e) {}
 
-window.devGoScenario = function devGoScenarioPatched(idx) {
-  if (idx === 1) return forceGoS2();
-  const tabs = document.querySelectorAll('.tab-btn');
-  const tab = tabs[idx];
-  if (!tab) return;
-  tab.disabled = false;
-  tab.classList.remove('locked');
-  tab.removeAttribute('aria-disabled');
-  switchScenario(idx, tab);
-};
+    const boardText = byId('vnBoardText');
+    if (boardText) boardText.textContent = 'Before we consult Claude, make a prediction.';
+    const speaker = byId('vnSpeaker');
+    if (speaker) speaker.textContent = 'Professor Pixel';
+    const dialogue = byId('vnDialogue');
+    if (dialogue) dialogue.classList.add('has-choices');
+    const hint = byId('vnAdvanceHint');
+    if (hint) hint.classList.remove('show');
+
+    const vnText = byId('vnText');
+    if (vnText) {
+      vnText.innerHTML = `
+        <div class="pc-clean-dialogue-copy">
+          <div><strong>Before we consult Claude...</strong></div>
+          <div>Based on the context you gave, what do you predict Claude will do?</div>
+        </div>
+        <div id="vnPredictionChoicePanel" class="pc-choice-panel-final" role="group" aria-label="Prediction choices">
+          <button class="pc-clean-choice-btn" type="button" data-choice="targeted">It will give a targeted response.</button>
+          <button class="pc-clean-choice-btn" type="button" data-choice="generic">It might still be generic.</button>
+          <button class="pc-clean-choice-btn" type="button" data-choice="ignores_constraints">It may ignore some constraints.</button>
+          <button class="pc-clean-choice-btn" type="button" data-choice="not_sure">I am not sure yet.</button>
+        </div>`;
+      vnText.querySelectorAll('.pc-clean-choice-btn').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          hardChoosePrediction(btn.dataset.choice);
+        });
+      });
+    }
+
+    requestAnimationFrame(() => {
+      byId('vnCharacter')?.classList.add('visible');
+      // Keep focus off dialogue/buttons so nothing becomes blue-selected.
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    });
+  }
+
+  function hardChoosePrediction(choice){
+    const text = window.pendingPromptForPrediction;
+    if (!text || window.pcWaitingForClaudeContinue || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
+
+    window.pendingPromptAfterPrediction = text;
+    window.pendingPromptForPrediction = '';
+    window.pcWaitingForClaudeContinue = true;
+    try { predictionGateActive = false; } catch(e) {}
+    window.predictionGateActive = false;
+
+    const s = scenarioData && scenarioData[scenarioIndex];
+    if (s) {
+      if (!s.predictions) s.predictions = [];
+      s.predictions.push({ choice, prompt:text, attempt:(s.attempts || 0) + 1, timestamp:new Date().toISOString() });
+    }
+
+    const vnText = byId('vnText');
+    if (vnText) {
+      vnText.innerHTML = `
+        <div class="pc-feedback-copy">
+          <div><strong>Your prediction is logged.</strong></div>
+          <div>${REACTIONS[choice] || REACTIONS.not_sure}</div>
+          <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
+        </div>`;
+      byId('pcContinueToClaudeBtn')?.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        hardContinueToClaude();
+      });
+    }
+  }
+
+  function hardContinueToClaude(){
+    const text = window.pendingPromptAfterPrediction;
+    if (!text || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
+    window.pendingPromptAfterPrediction = '';
+    window.pcWaitingForClaudeContinue = false;
+
+    const overlay = byId('vnOverlay');
+    if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction');
+    byId('vnDialogue')?.classList.remove('has-choices');
+    byId('vnCharacter')?.classList.remove('visible');
+    clearOldPredictionUI();
+    try { setClaudeShelfState('idle','idle'); } catch(e) {}
+    try { setClaudeTerminalState('idle','CLAUDE TERMINAL','IDLE'); } catch(e) {}
+    try { musicEndVN(); } catch(e) {}
+    sendMain(text);
+  }
+
+  function hardSendText(text){
+    if (!text || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude) || window.pcWaitingForClaudeContinue) return;
+    const btn = byId('sendBtn');
+    if (btn) btn.disabled = true;
+    hardShowPredictionGate(text);
+  }
+
+  window.showPredictionGate = hardShowPredictionGate;
+  window.choosePrediction = hardChoosePrediction;
+  window.pcContinueToClaudeAnalysis = hardContinueToClaude;
+  window.sendText = hardSendText;
+  try { showPredictionGate = hardShowPredictionGate; } catch(e) {}
+  try { choosePrediction = hardChoosePrediction; } catch(e) {}
+  try { pcContinueToClaudeAnalysis = hardContinueToClaude; } catch(e) {}
+  try { sendText = hardSendText; } catch(e) {}
+})();
+</script>
+
+
+
+<script>
+/* PROMPTCRAFT FINAL S1 PREDICTION WATCHDOG
+   This does not redesign the scene. It only guarantees the missing buttons appear,
+   Pixel feedback pauses for reading, and Claude analysis only starts after Continue. */
+(function(){
+  const REACTIONS = {
+    targeted: 'That prediction makes sense. You gave Claude learner context, the actual discussion failure, and a clear interaction move, so it should have enough to give a targeted repair.',
+    generic: 'That could happen. Claude can still drift into polite template language if it treats the issue as “make this better” instead of “fix this exact discussion breakdown.”',
+    ignores_constraints: 'Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Claude actually respected them.',
+    not_sure: 'That is a useful answer too. Predicting before you look helps you notice what Claude changes, misses, or invents instead of just accepting the shiny paragraph.'
+  };
+  const LABELS = {
+    targeted: 'It will give a targeted response.',
+    generic: 'It might still be generic.',
+    ignores_constraints: 'It may ignore some constraints.',
+    not_sure: 'I am not sure yet.'
+  };
+  function byId(id){ return document.getElementById(id); }
+  function predictionIsOpen(){
+    const overlay = byId('vnOverlay');
+    const text = (byId('vnText')?.textContent || '').toLowerCase();
+    return !!(overlay && overlay.classList.contains('active') &&
+      (overlay.classList.contains('claude-prediction') || overlay.classList.contains('pc-clean-prediction') || text.includes('what do you predict claude will do')));
+  }
+  function ensurePredictionButtons(){
+    if (!predictionIsOpen()) return;
+    if (window.pcWaitingForClaudeContinue) return;
+    const prompt = window.pendingPromptForPrediction || window.pendingPromptAfterPrediction;
+    if (!prompt) return;
+    let panel = byId('vnPredictionChoicePanel');
+    if (!panel) {
+      const dialogue = byId('vnDialogue') || byId('vnText');
+      if (!dialogue) return;
+      panel = document.createElement('div');
+      panel.id = 'vnPredictionChoicePanel';
+      panel.className = 'pc-choice-panel-final';
+      panel.setAttribute('role','group');
+      panel.setAttribute('aria-label','Prediction choices');
+      panel.innerHTML = Object.entries(LABELS).map(([choice,label]) =>
+        `<button class="pc-clean-choice-btn" type="button" data-choice="${choice}">${label}</button>`
+      ).join('');
+      dialogue.appendChild(panel);
+    }
+    panel.querySelectorAll('button[data-choice]').forEach(btn => {
+      if (btn.dataset.pcBound === '1') return;
+      btn.dataset.pcBound = '1';
+      btn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        finalChoosePrediction(btn.dataset.choice);
+      });
+    });
+  }
+  function finalChoosePrediction(choice){
+    const text = window.pendingPromptForPrediction || window.pendingPromptAfterPrediction;
+    if (!text || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
+    window.pendingPromptForPrediction = '';
+    window.pendingPromptAfterPrediction = text;
+    window.pcWaitingForClaudeContinue = true;
+    try { predictionGateActive = false; } catch(e) {}
+    window.predictionGateActive = false;
+    try {
+      const s = scenarioData && scenarioData[scenarioIndex];
+      if (s) {
+        if (!s.predictions) s.predictions = [];
+        s.predictions.push({ choice, prompt:text, attempt:(s.attempts || 0) + 1, timestamp:new Date().toISOString() });
+      }
+    } catch(e) {}
+    const vnText = byId('vnText');
+    if (vnText) {
+      vnText.innerHTML = `
+        <div class="pc-feedback-copy">
+          <div><strong>Your prediction is logged.</strong></div>
+          <div style="margin-top:8px;">${REACTIONS[choice] || REACTIONS.not_sure}</div>
+          <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
+        </div>`;
+    }
+    byId('vnPredictionChoicePanel')?.remove();
+    byId('pcContinueToClaudeBtn')?.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      finalContinueToClaude();
+    });
+  }
+  function finalContinueToClaude(){
+    const text = window.pendingPromptAfterPrediction;
+    if (!text || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
+    window.pendingPromptAfterPrediction = '';
+    window.pcWaitingForClaudeContinue = false;
+    byId('vnPredictionChoicePanel')?.remove();
+    const overlay = byId('vnOverlay');
+    if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction');
+    byId('vnDialogue')?.classList.remove('has-choices');
+    byId('vnCharacter')?.classList.remove('visible');
+    try { if (typeof musicEndVN === 'function') musicEndVN(); } catch(e) {}
+    if (typeof sendMain === 'function') sendMain(text);
+  }
+  const oldShow = window.showPredictionGate;
+  window.showPredictionGate = function(text){
+    window.pendingPromptForPrediction = text;
+    const result = (typeof oldShow === 'function') ? oldShow.apply(this, arguments) : undefined;
+    setTimeout(ensurePredictionButtons, 0);
+    setTimeout(ensurePredictionButtons, 100);
+    setTimeout(ensurePredictionButtons, 350);
+    return result;
+  };
+  try { showPredictionGate = window.showPredictionGate; } catch(e) {}
+  window.choosePrediction = finalChoosePrediction;
+  window.pcContinueToClaudeAnalysis = finalContinueToClaude;
+  try { choosePrediction = finalChoosePrediction; } catch(e) {}
+  try { pcContinueToClaudeAnalysis = finalContinueToClaude; } catch(e) {}
+  document.addEventListener('click', () => setTimeout(ensurePredictionButtons, 50), true);
+  setInterval(ensurePredictionButtons, 600);
+})();
+</script>
+
+
+<script>
+/* PROMPTCRAFT FINAL NAV + S1 RESULT CONTROL OWNER */
+(function(){
+  window.navigateToNext = function navigateToNextFinal(targetIndex){
+    const tabs = document.querySelectorAll('.tab-btn');
+    const targetTab = tabs[targetIndex];
+    if (!targetTab) return false;
+    if (Array.isArray(window.scenarioCompleted) && typeof window.scenarioIndex === 'number') {
+      window.scenarioCompleted[window.scenarioIndex] = true;
+    } else {
+      try { scenarioCompleted[scenarioIndex] = true; } catch(e) {}
+    }
+    targetTab.disabled = false;
+    targetTab.classList.remove('locked');
+    targetTab.removeAttribute('aria-disabled');
+    document.getElementById('vnOverlay')?.classList.remove('active','claude-prediction','pc-clean-prediction','claude-consult','claude-terminal-consult','claude-terminal-textmode');
+    document.getElementById('vnDialogue')?.classList.remove('has-choices');
+    document.getElementById('vnCharacter')?.classList.remove('visible');
+    document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
+    try { if (typeof musicEndVN === 'function') musicEndVN(); } catch(e) {}
+    const chat = document.getElementById('chat');
+    if (chat) chat.scrollTop = 0;
+    if (typeof switchScenario === 'function') switchScenario(targetIndex, targetTab);
+    return false;
+  };
+  try { navigateToNext = window.navigateToNext; } catch(e) {}
+  window.devGoScenario = function devGoScenarioFinal(idx){
+    const tabs = document.querySelectorAll('.tab-btn');
+    const btn = tabs[idx];
+    if (!btn) return false;
+    btn.disabled = false;
+    btn.classList.remove('locked');
+    btn.removeAttribute('aria-disabled');
+    if (typeof switchScenario === 'function') switchScenario(idx, btn);
+    return false;
+  };
+  try { devGoScenario = window.devGoScenario; } catch(e) {}
+  window.devNextScenario = function devNextScenarioFinal(){
+    const next = Math.min((typeof scenarioIndex === 'number' ? scenarioIndex : 0) + 1, scenarios.length - 1);
+    return window.navigateToNext(next);
+  };
+  try { devNextScenario = window.devNextScenario; } catch(e) {}
+})();
 </script>
 
 </body>
