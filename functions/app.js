@@ -1,4 +1,11 @@
-/* PromptCraft application logic extracted from index.html. */
+/* ======================================================
+   PROMPTCRAFT APP.JS
+   Cleanup pass: labeled sections, preserved behavior.
+   Notes:
+   - Professor Pixel dialogue sequences remain in functions/dialogue.js.
+   - Scenario data still lives here until a later scenario-data.js pass.
+   - Claude terminal background image is controlled by style.css, not app.js.
+====================================================== */
 
 // ══════════════════════════════════════════════════════
 //  STATE
@@ -98,6 +105,7 @@ const FORCE_MOCK_CLAUDE = new URLSearchParams(window.location.search).get('mockC
 const IS_LOCAL_TEST = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:';
 const USE_MOCK_CLAUDE = FORCE_MOCK_CLAUDE || (MOCK_CLAUDE_FOR_LOCAL && IS_LOCAL_TEST);
 
+// NOTE: Mock Claude text is dialogue/content-heavy. Move to dialogue.js in a later pass if desired.
 function mockClaudeText(payload, context = 'main') {
   const system = payload.system || '';
   const lastUser = payload.messages?.slice().reverse().find(m => m.role === 'user')?.content || '';
@@ -1101,7 +1109,7 @@ Do NOT use phrases like "Great job" or "Well done" as openers — get straight t
 }
 
 // ══════════════════════════════════════════════════════
-//  SCENARIO 4 — CRITICAL THINKING CHALLENGE
+//  LEGACY S4/S5 CRITICAL THINKING HELPERS
 // ══════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════════
@@ -1445,13 +1453,13 @@ function addPixelS4Closing(area) {
 }
 
 // ══════════════════════════════════════════════════════
-//  SCENARIO 5 — PREDICT THE OUTPUT
+//  S5/S6 PREDICTION STATE
 // ══════════════════════════════════════════════════════
 
 let s5PredictionDone = false;
 
 // ══════════════════════════════════════════════════════
-//  SCENARIO 4 — HALLUCINATION HUNT (pre-written reveal)
+//  S5 — HALLUCINATION HUNT PREWRITTEN REVEAL
 // ══════════════════════════════════════════════════════
 function loadScenarioHallucination() {
   const s = scenarios[4];
@@ -1618,7 +1626,7 @@ function s5RevealResponse(predictedCorrectly) {
 }
 
 // ══════════════════════════════════════════════════════
-//  SCENARIO 6 — BIAS AND CONTEXT
+//  S4/S6 — BIAS AND CONTEXT SCREEN
 // ══════════════════════════════════════════════════════
 
 function loadScenarioSyncBias() {
@@ -2372,8 +2380,14 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
   claudeTerminalCloseCallback = typeof onClose === 'function' ? onClose : null;
   const label = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
   const terminalText = `${label}\n\n${terminalizeClaudeText(feedback)}`;
+
   setClaudeTerminalTextMode(true);
-  setClaudeTerminalState('responding', mock ? 'MOCK CLAUDE TERMINAL' : 'CLAUDE TERMINAL', esc(terminalText));
+
+  setClaudeTerminalState(
+    'responding',
+    mock ? 'MOCK CLAUDE TERMINAL' : 'CLAUDE TERMINAL',
+    esc(terminalText)
+  );
 
   const speaker = document.getElementById('vnSpeaker');
   if (speaker) speaker.textContent = mock ? 'Mock Claude Terminal' : 'Claude Terminal';
@@ -2391,6 +2405,7 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
 }
 
 
+// NOTE: Terminal diagnosis copy is still inline. Candidate for dialogue.js or scenario-data.js.
 function buildS1TerminalDiagnosis(score, responseText) {
   const level = score <= 2 ? 'NEEDS MORE CONTEXT' : score <= 3 ? 'PARTIAL REPAIR DETECTED' : score <= 4 ? 'STRONG REPAIR DETECTED' : 'HIGH-CONFIDENCE REPAIR';
   const issue = 'The original prompt asked students to reply, but did not give them a meaningful reason to continue the conversation.';
@@ -2466,9 +2481,10 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
       ? buildS1TerminalDiagnosis(scoreTotal, responseText)
       : responseText;
     showClaudeConsultResult(terminalOutput, mock, onClose);
-  }, 700);
+  }, 1200);
 }
 
+// NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
 function showPixelScoreReflection(totalScore, onDone = null) {
   let lines;
   if (totalScore <= 1) {
@@ -2798,44 +2814,128 @@ function switchScenario(i, btn) {
   }, 300);
 }
 
-function resetS1Dev() {
-  scenarioIndex = 0;
-  attempts = 0;
-  lastPromptText = '';
-  history = [];
-
-  const attNum = document.getElementById('attNum');
-  if (attNum) attNum.textContent = '0';
-
-  if (window.scenarioIntroTimer) {
-    clearTimeout(window.scenarioIntroTimer);
-  }
-
-  localStorage.removeItem(S1_STORAGE_KEY);
-
-  const overlay = document.querySelector('.vn-overlay');
+function pcClearVNStateForScenarioSwitch() {
+  const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
   if (overlay) {
     overlay.classList.remove(
+      'active',
       'claude-prediction',
       'pc-clean-prediction',
       'claude-terminal-consult',
+      'claude-terminal-textmode',
       'claude-analysis',
-      'claude-consult'
+      'claude-consult',
+      'pc-clean-output'
     );
   }
 
-  loadScenario(0);
+  document.getElementById('vnDialogue')?.classList.remove('has-choices');
+  document.getElementById('vnCharacter')?.classList.remove('visible');
+  document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
 
-  // Clear workspace
-  ['g-learners','g-issue','g-interaction','g-constraints']
-    .forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
+  window.pendingPromptForPrediction = '';
+  window.pendingPromptAfterPrediction = '';
+  window.pcWaitingForClaudeContinue = false;
+
+  try { predictionGateActive = false; } catch(e) {}
+  try { vnQueue = []; } catch(e) {}
+  try { vnTyping = false; } catch(e) {}
+  try { vnOnComplete = null; } catch(e) {}
+  try { clearTimeout(vnTypeTimer); } catch(e) {}
+  try { setClaudeShelfState('idle', 'idle'); } catch(e) {}
+  try { setClaudeTerminalTextMode(false); } catch(e) {}
+  try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE'); } catch(e) {}
+  try { musicEndVN(); } catch(e) {}
+}
+
+function pcFillS1DevFields() {
+  const values = {
+    'g-learners': 'online first-year general education students in an 8-week fully asynchronous course',
+    'g-issue': 'students are posting one-sentence reactions, replying only because it is required, and the conversation dies after one exchange',
+    'g-interaction': 'compare two possible interpretations of the reading, support their claim with one specific example, and ask a follow-up question that invites a peer to extend or challenge the idea',
+    'g-constraints': "no extra tools, one initial post, two substantive peer replies, and strong replies must explain reasoning, use evidence or examples, and build on a classmate's idea"
+  };
+
+  const tryFill = (attempts = 0) => {
+    const fields = Object.keys(values).map(id => document.getElementById(id));
+    if (fields.every(Boolean)) {
+      Object.entries(values).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        el.value = val;
+        if (typeof autoGrow === 'function') autoGrow(el);
+      });
+      if (typeof onGuidedInput === 'function') onGuidedInput(document.getElementById('g-learners'));
+      document.getElementById('g-learners')?.focus();
+      return;
+    }
+    if (attempts < 30) setTimeout(() => tryFill(attempts + 1), 100);
+  };
+
+  tryFill();
+}
+
+function resetS1Dev() {
+    scenarioIndex = 0;
+    attempts = 0;
+    lastPromptText = '';
+    history = [];
+
+    if (window.scenarioIntroTimer) {
+      clearTimeout(window.scenarioIntroTimer);
+      window.scenarioIntroTimer = null;
+    }
+
+    pcClearVNStateForScenarioSwitch();
+
+    localStorage.removeItem('promptcraft_s1_clean_draft');
+
+    if (window.playerHistory && window.playerHistory.s1) {
+      window.playerHistory.s1 = {
+        learners: '',
+        issue: '',
+        goal: '',
+        interaction: '',
+        constraints: '',
+        assembled: ''
+      };
+    }
+
+    if (typeof playerHistory !== 'undefined' && playerHistory.s1) {
+      playerHistory.s1 = {
+        learners: '',
+        issue: '',
+        goal: '',
+        interaction: '',
+        constraints: '',
+        assembled: ''
+      };
+    }
+
+    document.body.classList.remove('s1-result-active');
+    document.body.classList.add('s1-active');
+
+    document.querySelectorAll('.tab-btn').forEach((b, idx) => {
+      b.classList.toggle('active', idx === 0);
+      b.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
     });
 
-  // Apply dev test data
-  fillS1DevData(); // whatever your existing dev-fill function is called
-}
+    const attNum = document.getElementById('attNum');
+    if (attNum) attNum.textContent = '0';
+
+    window.scenarioIntroEnabled = true;
+    if (Array.isArray(navCardShown)) navCardShown[0] = false;
+
+    loadScenario(0);
+
+    setTimeout(() => {
+      pcFillS1DevFields();
+    }, 120);
+  }
+
+window.pcClearVNStateForScenarioSwitch = pcClearVNStateForScenarioSwitch;
+window.pcFillS1DevFields = pcFillS1DevFields;
+window.resetS1Dev = resetS1Dev;
+try { resetS1Dev = window.resetS1Dev; } catch(e) {}
 
 function loadScenario(i) {
   const s = scenarios[i];
@@ -3187,12 +3287,45 @@ function s1ReferencePanelHTML() {
 }
 
 function reviseS1() {
-  loadScenario(0);
-  setTimeout(() => {
-    restoreS1DraftToFields();
-    document.getElementById('g-learners')?.focus();
-  }, 80);
-}
+    const saved = typeof getS1SavedDraft === 'function'
+      ? getS1SavedDraft()
+      : {
+          learners: '',
+          issue: '',
+          interaction: '',
+          constraints: ''
+        };
+
+    const area = document.getElementById('chat');
+    if (area) area.innerHTML = '';
+
+    document.body.classList.remove('s1-result-active');
+    document.body.classList.add('s1-active');
+
+    const container = document.getElementById('inputContainer');
+    renderGuidedBuilder(container);
+
+    setTimeout(() => {
+      const map = {
+        'g-learners': saved.learners || '',
+        'g-issue': saved.issue || saved.goal || '',
+        'g-interaction': saved.interaction || '',
+        'g-constraints': saved.constraints || ''
+      };
+
+      Object.entries(map).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.value = value;
+          if (typeof autoGrow === 'function') autoGrow(el);
+        }
+      });
+
+      if (typeof onGuidedInput === 'function') {
+        onGuidedInput(document.getElementById('g-learners'));
+      }
+    }, 50);
+  }
 
 function buildS1AssembledPrompt(values) {
   const { learners, issue, interaction, constraints } = values;
@@ -4324,7 +4457,10 @@ function devComplete() {
   area.scrollTop = area.scrollHeight;
 }
 
-/* ===== Original inline script boundary ===== */
+/* ======================================================
+   LEGACY PATCH BLOCK 1: S1 CLEAN WORKSPACE + PREDICTION FLOW
+   Kept for compatibility. Do not add new logic above this unless replacing it.
+====================================================== */
 
 (function(){
   const S1_STORAGE_KEY = 'promptcraft_s1_clean_draft';
@@ -4670,11 +4806,41 @@ function devComplete() {
       </div>`;
   };
 
-  window.reviseS1 = function reviseS1(){
+  window.reviseS1 = reviseS1 = function reviseS1(){
+    const saved = Object.assign(
+      {},
+      JSON.parse(localStorage.getItem('promptcraft_s1_clean_draft') || '{}'),
+      window.playerHistory?.s1 || {}
+    );
+
     const area = document.getElementById('chat');
     if (area) area.innerHTML = '';
+
     document.body.classList.remove('s1-result-active');
+    document.body.classList.add('s1-active');
+
     renderGuidedBuilder(document.getElementById('inputContainer'));
+
+    setTimeout(() => {
+      [
+        ['g-learners', 'learners'],
+        ['g-issue', 'issue'],
+        ['g-interaction', 'interaction'],
+        ['g-constraints', 'constraints']
+      ].forEach(([id, key]) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.value = saved[key] || '';
+          if (typeof autoGrow === 'function') autoGrow(el);
+        }
+      });
+
+      if (typeof onGuidedInput === 'function') {
+        onGuidedInput(document.getElementById('g-learners'));
+      }
+
+      document.getElementById('g-learners')?.focus();
+    }, 100);
   };
 
   window.showPixelScoreReflection = function showPixelScoreReflection(totalScore, onDone = null){
@@ -4720,7 +4886,10 @@ function devComplete() {
   }
 })();
 
-/* ===== Original inline script boundary ===== */
+/* ======================================================
+   LEGACY PATCH BLOCK 2: FINAL PREDICTION FLOW STABILIZER
+   This is the current owner for prediction button behavior.
+====================================================== */
 
 /* PROMPTCRAFT S1 PREDICTION FLOW STABILIZER
    One final owner for the prediction gate, dev S1 fill, and S2 handoff.
@@ -4775,7 +4944,7 @@ function devComplete() {
     try { setVNClaudeMode(false); } catch(e) {}
     try { setVNClaudeTerminalMode(false); } catch(e) {}
     try { setClaudeShelfState('idle',''); } catch(e) {}
-    try { setClaudeTerminalState('thinking','CLAUDE TERMINAL', 'AWAITING_PREDICTION_'); } catch(e) {}
+    try { setClaudeTerminalState('thinking','CLAUDE TERMINAL', 'PREDICTION PHASE'); } catch(e) {}
     try { musicStartVN(); } catch(e) {}
     try { vnSetExpression('thinking'); } catch(e) {}
 
@@ -4922,7 +5091,10 @@ function devComplete() {
 
 })();
 
-/* ===== Original inline script boundary ===== */
+/* ======================================================
+   LEGACY PATCH BLOCK 3: FINAL NAV + S1 RESULT CONTROL OWNER
+   This is the current owner for scenario navigation handoff.
+====================================================== */
 
 /* PROMPTCRAFT HARD S1 PREDICTION OWNER
    This replaces the duplicate/older prediction handlers by assigning both
@@ -4973,7 +5145,7 @@ function devComplete() {
     try { setVNClaudeMode(false); } catch(e) {}
     try { setVNClaudeTerminalMode(false); } catch(e) {}
     try { setClaudeShelfState('idle',''); } catch(e) {}
-    try { setClaudeTerminalState('thinking','CLAUDE TERMINAL', 'AWAITING_PREDICTION_'); } catch(e) {}
+    try { setClaudeTerminalState('thinking','CLAUDE TERMINAL', 'PREDICTION PHASE'); } catch(e) {}
     try { musicStartVN(); } catch(e) {}
     try { vnSetExpression('thinking'); } catch(e) {}
 
@@ -5081,7 +5253,9 @@ function devComplete() {
   try { sendText = hardSendText; } catch(e) {}
 })();
 
-/* ===== Original inline script boundary ===== */
+/* ======================================================
+   LEGACY PATCH BLOCK
+====================================================== */
 
 /* PROMPTCRAFT FINAL S1 PREDICTION WATCHDOG
    This does not redesign the scene. It only guarantees the missing buttons appear,
@@ -5197,7 +5371,9 @@ function devComplete() {
   setInterval(ensurePredictionButtons, 600);
 })();
 
-/* ===== Original inline script boundary ===== */
+/* ======================================================
+   LEGACY PATCH BLOCK
+====================================================== */
 
 /* PROMPTCRAFT FINAL NAV + S1 RESULT CONTROL OWNER */
 (function(){
@@ -5237,6 +5413,100 @@ function devComplete() {
   try { devGoScenario = window.devGoScenario; } catch(e) {}
   window.devNextScenario = function devNextScenarioFinal(){
     const next = Math.min((typeof scenarioIndex === 'number' ? scenarioIndex : 0) + 1, scenarios.length - 1);
+    return window.navigateToNext(next);
+  };
+  try { devNextScenario = window.devNextScenario; } catch(e) {}
+})();
+
+
+/* ===== PromptCraft stable dev/navigation owner — added cleanup ===== */
+(function(){
+  function clearVN(){
+    if (typeof window.pcClearVNStateForScenarioSwitch === 'function') {
+      window.pcClearVNStateForScenarioSwitch();
+      return;
+    }
+    const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
+    if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction','claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output');
+    document.getElementById('vnDialogue')?.classList.remove('has-choices');
+    document.getElementById('vnCharacter')?.classList.remove('visible');
+    document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
+  }
+
+  const originalDevFillScenario = window.devFillScenario || (typeof devFillScenario === 'function' ? devFillScenario : null);
+
+  window.devFillScenario = function devFillScenarioFinal(idx){
+    if (idx === 0) {
+      return window.resetS1Dev();
+    }
+
+    if (typeof window.devGoScenario === 'function') window.devGoScenario(idx);
+    else if (typeof devGoScenario === 'function') devGoScenario(idx);
+
+    const testPrompt = window.scenarios?.[idx]?.testPrompt || (typeof scenarios !== 'undefined' ? scenarios[idx]?.testPrompt : '');
+    if (!testPrompt) return false;
+
+    const tryFill = (attempts = 0) => {
+      const input = document.getElementById('promptInput');
+      if (input && input.offsetParent !== null) {
+        input.value = testPrompt;
+        if (typeof autoGrow === 'function') autoGrow(input);
+        if (typeof onHintInput === 'function') onHintInput(input);
+        input.focus();
+        return;
+      }
+      if (attempts < 30) setTimeout(() => tryFill(attempts + 1), 200);
+    };
+    setTimeout(() => tryFill(), 300);
+    return false;
+  };
+  try { devFillScenario = window.devFillScenario; } catch(e) {}
+
+  window.devTestScenario = function devTestScenarioFinal(idx){
+    // S1 dev key now resets and fills only. No intro replay. No auto-submit.
+    if (idx === 0) return window.resetS1Dev();
+    return window.devFillScenario(idx);
+  };
+  try { devTestScenario = window.devTestScenario; } catch(e) {}
+
+  window.devGoScenario = function devGoScenarioFinalClean(idx){
+    const tabs = document.querySelectorAll('.tab-btn');
+    const btn = tabs[idx];
+    if (!btn) return false;
+    btn.disabled = false;
+    btn.classList.remove('locked');
+    btn.removeAttribute('aria-disabled');
+    clearVN();
+    if (typeof switchScenario === 'function') switchScenario(idx, btn);
+    return false;
+  };
+  try { devGoScenario = window.devGoScenario; } catch(e) {}
+
+  window.navigateToNext = function navigateToNextFinalClean(targetIndex){
+    const tabs = document.querySelectorAll('.tab-btn');
+    const targetTab = tabs[targetIndex];
+    if (!targetTab) return false;
+
+    try { scenarioCompleted[scenarioIndex] = true; } catch(e) {}
+
+    targetTab.disabled = false;
+    targetTab.classList.remove('locked');
+    targetTab.removeAttribute('aria-disabled');
+
+    clearVN();
+
+    const chat = document.getElementById('chat');
+    if (chat) chat.scrollTop = 0;
+
+    if (typeof switchScenario === 'function') switchScenario(targetIndex, targetTab);
+    return false;
+  };
+  try { navigateToNext = window.navigateToNext; } catch(e) {}
+
+  window.devNextScenario = function devNextScenarioFinalClean(){
+    const current = typeof scenarioIndex === 'number' ? scenarioIndex : 0;
+    const max = typeof scenarios !== 'undefined' ? scenarios.length - 1 : 7;
+    const next = Math.min(current + 1, max);
     return window.navigateToNext(next);
   };
   try { devNextScenario = window.devNextScenario; } catch(e) {}

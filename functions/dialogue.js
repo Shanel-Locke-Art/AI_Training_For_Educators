@@ -1,6 +1,12 @@
-/* PromptCraft dialogue data extracted from index.html. */
+/* ══════════════════════════════════════════════════════
+   PromptCraft — dialogue.js
+   Owns Professor Pixel dialogue sequences only.
 
-const pixelDialogue = {
+   Keep dialogue text here so index.html can handle behavior
+   without becoming a haunted filing cabinet.
+   ══════════════════════════════════════════════════════ */
+
+window.pixelDialogue = {
   welcome: [
     { expr: 'excited',     text: "Welcome to the Prompt Lab! I am Professor Pixel, your AI coaching companion." },
     { expr: 'encouraging', text: "Read the challenge on the smartboard, then write your prompt in the box below." },
@@ -59,4 +65,4 @@ const pixelDialogue = {
     { expr: 'encouraging', text: "You have written prompts, spotted hallucinations, caught bias, and evaluated AI judgment. Now I want you to look at your own thinking." },
     { expr: 'thinking',    text: "Build your prompt using the fields below. After you see what the AI gives you, I will ask you three questions before you revise." },
   ],
-};
+}
