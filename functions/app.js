@@ -5522,3 +5522,362 @@ function devComplete() {
   try { devNextScenario = window.devNextScenario; } catch(e) {}
 })();
 
+
+/* ======================================================
+   S2 METACOGNITION DETECTIVE OVERHAUL
+   Uses existing PromptCraft shell: inputContainer, sendText,
+   prediction gate, Claude terminal, OSCQR row, and nav flow.
+====================================================== */
+(function(){
+  const S2_STUDENTS = {
+    A: {
+      name: 'Student A',
+      quote: 'I got an 88%. Moving on.',
+      feedback: 'That is performance awareness, not metacognition yet. Student A knows the score, but not the learning strategy behind it.'
+    },
+    B: {
+      name: 'Student B',
+      quote: 'I studied harder this week.',
+      feedback: 'Closer, but still vague. Student B notices effort, but does not identify what strategy worked or what to change next.'
+    },
+    C: {
+      name: 'Student C',
+      quote: 'I realized flashcards worked better than rereading, so I am using them again next week.',
+      feedback: 'Exactly. Student C is monitoring a strategy, judging its usefulness, and planning transfer. Tiny learning-science confetti, somehow still useful.'
+    }
+  };
+
+  const S2_INGREDIENTS = [
+    { key: 'audience', label: 'Audience' },
+    { key: 'courseContext', label: 'Course Context' },
+    { key: 'studentProblem', label: 'Student Problem' },
+    { key: 'reflectionGoal', label: 'Reflection Goal' },
+    { key: 'transferGoal', label: 'Transfer Goal' },
+    { key: 'timeConstraint', label: 'Time Constraint' }
+  ];
+
+  const S2_PRESETS = {
+    weak: {
+      student: 'A',
+      ingredients: ['audience'],
+      course: 'College class',
+      struggle: 'Students struggle.',
+      behavior: 'Do better.'
+    },
+    mid: {
+      student: 'C',
+      ingredients: ['audience','courseContext','studentProblem','reflectionGoal','transferGoal'],
+      course: 'Intro Psychology, asynchronous online course',
+      struggle: 'Students complete readings and quizzes but do not think about which study strategies are helping them learn.',
+      behavior: 'Students identify one study strategy that worked and choose one adjustment for next week.'
+    },
+    strong: {
+      student: 'C',
+      ingredients: ['audience','courseContext','studentProblem','reflectionGoal','transferGoal','timeConstraint'],
+      course: 'First-year nursing students in a fully asynchronous 8-week course',
+      struggle: 'Students repeat the same documentation mistakes even after receiving detailed feedback, and they rarely compare current work to earlier attempts.',
+      behavior: 'Students identify a pattern in their mistakes, explain what caused it, and create a specific strategy they will use before the next submission.'
+    }
+  };
+
+  window.s2State = window.s2State || {
+    student: null,
+    ingredients: {},
+    course: '',
+    struggle: '',
+    behavior: ''
+  };
+
+  function s2ResetState() {
+    window.s2State = { student: null, ingredients: {}, course: '', struggle: '', behavior: '' };
+  }
+
+  function selectedIngredients() {
+    return S2_INGREDIENTS.filter(i => !!window.s2State.ingredients[i.key]);
+  }
+
+  function s2ScorePercent() {
+    let score = 0;
+    if (window.s2State.student === 'C') score += 20;
+    score += Math.min(36, selectedIngredients().length * 6);
+    if ((window.s2State.course || '').trim().length > 4) score += 12;
+    if ((window.s2State.struggle || '').trim().length > 12) score += 16;
+    if ((window.s2State.behavior || '').trim().length > 12) score += 16;
+    return Math.min(100, score);
+  }
+
+  function s2PromptText() {
+    const course = (window.s2State.course || '').trim() || '[course / learner context]';
+    const struggle = (window.s2State.struggle || '').trim() || '[what students struggle with]';
+    const behavior = (window.s2State.behavior || '').trim() || '[desired learning behavior]';
+    const chips = selectedIngredients().map(i => i.label).join(', ') || 'no prompt ingredients selected yet';
+
+    return `I teach ${course}.\n\nMy students are completing work, but they are not reflecting on how they learn. Specifically, ${struggle}\n\nCreate a brief asynchronous metacognitive activity that helps students ${behavior}\n\nUse these design ingredients: ${chips}.\n\nThe activity should be low-stakes, easy to complete online, take about 10-15 minutes if a time limit is appropriate, and include a student-facing prompt plus a short instructor note explaining how it supports metacognition, learning strategy awareness, and transfer.`;
+  }
+
+  function renderS2MetacognitionWorkbench(container) {
+    s2ResetState();
+    document.body.classList.remove('s1-active','s1-result-active');
+    document.body.classList.add('s2-active');
+    container.innerHTML = `
+      <div class="scaffold-area s2-workbench">
+        <div class="s2-left-stack">
+          <div class="s2-mission-card" role="note" aria-label="Scenario 2 mission briefing">
+            <div class="s2-mission-eyebrow">Mission Briefing</div>
+            <div class="s2-mission-title">Find the metacognitive thinker.</div>
+            <div class="s2-mission-copy">Students are completing work and moving on. First, identify what metacognition looks like. Then build a personalized Claude prompt for your own teaching context.</div>
+          </div>
+
+          <div class="s2-detective-card" role="region" aria-label="Metacognition detective cards">
+            <div class="s2-card-eyebrow">Student Thought Detective</div>
+            <div class="s2-panel-title">Which student is showing metacognition?</div>
+            <div class="s2-helper-text">Choose the thought bubble that shows a learner monitoring strategy, judging effectiveness, and planning what to do next.</div>
+            <div class="s2-student-grid">
+              ${Object.entries(S2_STUDENTS).map(([key, item]) => `
+                <button type="button" class="s2-student-card" id="s2-student-${key}" onclick="s2SelectStudent('${key}')">
+                  <div class="s2-student-name">${item.name}</div>
+                  <div class="s2-student-quote">“${item.quote}”</div>
+                </button>
+              `).join('')}
+            </div>
+            <div class="s2-feedback-line" id="s2StudentFeedback">Pick the strongest example before consulting Claude.</div>
+          </div>
+
+          <div class="s2-panel">
+            <div class="s2-panel-eyebrow">Metacognitive Strength</div>
+            <div class="s2-meter-wrap">
+              <div class="s2-meter-top">
+                <span class="s2-meter-label">Prompt readiness</span>
+                <span class="s2-meter-score" id="s2MeterScore">0%</span>
+              </div>
+              <div class="s2-meter-track"><div class="s2-meter-fill" id="s2MeterFill"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="s2-right-stack">
+          <div class="s2-panel" role="region" aria-label="Prompt ingredient puzzle">
+            <div class="s2-panel-eyebrow">Prompt Ingredient Puzzle</div>
+            <div class="s2-panel-title">Select the ingredients Claude needs.</div>
+            <div class="s2-helper-text">These reuse the same quality logic as the chips above, just in a more playable form because apparently people like clicking things.</div>
+            <div class="s2-ingredient-grid" role="group" aria-label="Prompt ingredient choices">
+              ${S2_INGREDIENTS.map(i => `<button type="button" class="s2-ingredient-chip" id="s2-ing-${i.key}" onclick="s2ToggleIngredient('${i.key}')">${i.label}</button>`).join('')}
+            </div>
+          </div>
+
+          <div class="s2-context-panel" role="region" aria-label="Personal teacher context">
+            <div class="s2-panel-eyebrow">Personal Instructor Context</div>
+            <div class="s2-panel-title">Tell Claude about your students.</div>
+            <div class="s2-helper-text">This is the part that should feel personal. Claude will respond to the course and learning behavior you describe, not just a generic reflection activity.</div>
+            <div class="s2-field-grid">
+              <div class="s2-field">
+                <label for="s2-course">What kind of course are you teaching?</label>
+                <input id="s2-course" class="s2-input" placeholder="Example: Intro Psychology, asynchronous, 16 weeks" oninput="s2UpdateFromFields()" />
+              </div>
+              <div class="s2-field">
+                <label for="s2-struggle">What do your students struggle with?</label>
+                <textarea id="s2-struggle" class="s2-textarea" placeholder="Example: They complete quizzes but do not notice which study strategies are working." oninput="s2UpdateFromFields();autoGrow(this)"></textarea>
+              </div>
+              <div class="s2-field">
+                <label for="s2-behavior">What learning behavior should improve?</label>
+                <textarea id="s2-behavior" class="s2-textarea" placeholder="Example: Students choose one strategy to reuse or adjust next week." oninput="s2UpdateFromFields();autoGrow(this)"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="s2-panel">
+            <div class="s2-panel-eyebrow">Claude Prompt Preview</div>
+            <div class="s2-prompt-preview" id="s2PromptPreview"></div>
+          </div>
+
+          <div class="s2-footer">
+            <span class="s2-dev-note">Dev shortcuts: S2 weak · S2 mid · S2 strong</span>
+            <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
+            <button type="button" class="guided-send-btn" id="sendBtn" onclick="s2SendToClaude()">Consult Claude →</button>
+          </div>
+        </div>
+      </div>`;
+    s2RefreshUI();
+  }
+
+  window.s2SelectStudent = function s2SelectStudent(key) {
+    window.s2State.student = key;
+    document.querySelectorAll('.s2-student-card').forEach(el => el.classList.remove('selected'));
+    document.getElementById(`s2-student-${key}`)?.classList.add('selected');
+    const line = document.getElementById('s2StudentFeedback');
+    if (line) line.textContent = S2_STUDENTS[key]?.feedback || '';
+    s2RefreshUI();
+  };
+
+  window.s2ToggleIngredient = function s2ToggleIngredient(key) {
+    window.s2State.ingredients[key] = !window.s2State.ingredients[key];
+    s2RefreshUI();
+  };
+
+  window.s2UpdateFromFields = function s2UpdateFromFields() {
+    window.s2State.course = document.getElementById('s2-course')?.value || '';
+    window.s2State.struggle = document.getElementById('s2-struggle')?.value || '';
+    window.s2State.behavior = document.getElementById('s2-behavior')?.value || '';
+    s2RefreshUI();
+  };
+
+  function s2RefreshUI() {
+    S2_INGREDIENTS.forEach(i => {
+      const btn = document.getElementById(`s2-ing-${i.key}`);
+      if (btn) {
+        const selected = !!window.s2State.ingredients[i.key];
+        btn.classList.toggle('selected', selected);
+        btn.setAttribute('aria-pressed', String(selected));
+      }
+    });
+    const percent = s2ScorePercent();
+    const fill = document.getElementById('s2MeterFill');
+    const score = document.getElementById('s2MeterScore');
+    const preview = document.getElementById('s2PromptPreview');
+    if (fill) fill.style.width = percent + '%';
+    if (score) score.textContent = percent + '%';
+    if (preview) preview.textContent = s2PromptText();
+  }
+
+  window.s2SendToClaude = function s2SendToClaude() {
+    s2UpdateFromFields();
+    const text = s2PromptText();
+    if (!text) return false;
+    if (window.s2State.student !== 'C') {
+      const line = document.getElementById('s2StudentFeedback');
+      if (line) line.textContent = 'You can still consult Claude, but notice that the detective choice will weaken the learning target.';
+    }
+    sendText(text);
+    return false;
+  };
+
+  window.devFillS2 = function devFillS2(mode = 'mid') {
+    const preset = S2_PRESETS[mode] || S2_PRESETS.mid;
+    if (typeof window.devGoScenario === 'function') window.devGoScenario(1);
+    else if (typeof devGoScenario === 'function') devGoScenario(1);
+
+    const tryFill = (attempts = 0) => {
+      const course = document.getElementById('s2-course');
+      if (!course) {
+        if (attempts < 40) setTimeout(() => tryFill(attempts + 1), 150);
+        return;
+      }
+      window.s2State.student = preset.student;
+      window.s2State.ingredients = {};
+      preset.ingredients.forEach(k => window.s2State.ingredients[k] = true);
+      window.s2State.course = preset.course;
+      window.s2State.struggle = preset.struggle;
+      window.s2State.behavior = preset.behavior;
+
+      course.value = preset.course;
+      document.getElementById('s2-struggle').value = preset.struggle;
+      document.getElementById('s2-behavior').value = preset.behavior;
+      document.querySelectorAll('.s2-student-card').forEach(el => el.classList.remove('selected'));
+      document.getElementById(`s2-student-${preset.student}`)?.classList.add('selected');
+      const line = document.getElementById('s2StudentFeedback');
+      if (line) line.textContent = S2_STUDENTS[preset.student]?.feedback || '';
+      s2RefreshUI();
+      course.focus();
+    };
+    setTimeout(() => tryFill(), 250);
+    return false;
+  };
+
+  const priorRenderInputMode = window.renderInputMode || (typeof renderInputMode === 'function' ? renderInputMode : null);
+  window.renderInputMode = function renderInputModeS2Owner(idx) {
+    const container = document.getElementById('inputContainer');
+    if (!container) return;
+    document.body.classList.toggle('s2-active', idx === 1);
+    if (idx === 1) {
+      document.body.classList.remove('s2-submitted');
+      renderS2MetacognitionWorkbench(container);
+      return;
+    }
+    document.body.classList.remove('s2-active','s2-submitted');
+    if (typeof priorRenderInputMode === 'function') return priorRenderInputMode(idx);
+  };
+  try { renderInputMode = window.renderInputMode; } catch(e) {}
+
+  const priorDevFillScenario = window.devFillScenario || (typeof devFillScenario === 'function' ? devFillScenario : null);
+  window.devFillScenario = function devFillScenarioS2Owner(idx) {
+    if (idx === 1) return window.devFillS2('mid');
+    if (typeof priorDevFillScenario === 'function') return priorDevFillScenario(idx);
+    return false;
+  };
+  try { devFillScenario = window.devFillScenario; } catch(e) {}
+
+  window.devFillS2Weak = () => window.devFillS2('weak');
+  window.devFillS2Mid = () => window.devFillS2('mid');
+  window.devFillS2Strong = () => window.devFillS2('strong');
+})();
+
+/* S2 result + Pixel reflection owner. Appended after legacy owners on purpose. */
+(function(){
+  function addS2ClaudeResultCard(responseText) {
+    document.body.classList.add('s2-active','s2-submitted');
+    const area = document.getElementById('chat');
+    if (!area) return;
+    // Keep the user's submitted prompt bubble, but remove transient typing rows.
+    document.getElementById('typing')?.remove();
+    const card = document.createElement('div');
+    card.className = 's2-result-card';
+    card.innerHTML = `
+      <div class="s2-result-eyebrow">Claude Draft</div>
+      <div class="s2-result-title">Metacognitive Activity Draft</div>
+      <div class="s2-result-body">${fmt(responseText)}</div>
+    `;
+    area.appendChild(card);
+    area.scrollTop = area.scrollHeight;
+  }
+
+  const priorShowClaudeFinal = window.showClaudeFinalResponseInTerminal || (typeof showClaudeFinalResponseInTerminal === 'function' ? showClaudeFinalResponseInTerminal : null);
+  window.showClaudeFinalResponseInTerminal = function showClaudeFinalResponseInTerminalS2Owner(responseText, mock = false, onClose = null, scoreTotal = null) {
+    if (typeof priorShowClaudeFinal !== 'function') return;
+    if (typeof scenarioIndex !== 'undefined' && scenarioIndex === 1) {
+      const wrappedClose = function(){
+        addS2ClaudeResultCard(responseText);
+        if (typeof onClose === 'function') onClose();
+      };
+      return priorShowClaudeFinal(responseText, mock, wrappedClose, scoreTotal);
+    }
+    return priorShowClaudeFinal(responseText, mock, onClose, scoreTotal);
+  };
+  try { showClaudeFinalResponseInTerminal = window.showClaudeFinalResponseInTerminal; } catch(e) {}
+
+  const priorPixelReflection = window.showPixelScoreReflection || (typeof showPixelScoreReflection === 'function' ? showPixelScoreReflection : null);
+  window.showPixelScoreReflection = function showPixelScoreReflectionS2Owner(totalScore, onDone = null) {
+    if (typeof scenarioIndex !== 'undefined' && scenarioIndex === 1) {
+      const dialogue = document.getElementById('vnDialogue');
+      if (dialogue) dialogue.classList.remove('has-choices');
+      let lines;
+      if (totalScore <= 2) {
+        lines = [
+          { expr:'skeptical', text:'Claude had to guess what metacognitive behavior you wanted students to practice.' },
+          { expr:'thinking', text:'For a stronger activity, name the student struggle and the learning strategy you want them to notice or transfer.' }
+        ];
+      } else if (totalScore <= 3) {
+        lines = [
+          { expr:'encouraging', text:'This is moving in the right direction. You gave Claude a real learning problem, not just “make a reflection.”' },
+          { expr:'thinking', text:'Push it one step further by naming what students should do differently after the reflection.' }
+        ];
+      } else {
+        lines = [
+          { expr:'proud', text:'Notice what changed: Claude could design for metacognition because you described the learners, the struggle, and the desired behavior.' },
+          { expr:'encouraging', text:'That is the useful pattern: identify the thinking you want students to practice before asking AI to create the activity.' }
+        ];
+      }
+      lines.forEach((line, idx) => vnShow(line.expr, line.text, idx === lines.length - 1 ? onDone : null));
+      return;
+    }
+    if (typeof priorPixelReflection === 'function') return priorPixelReflection(totalScore, onDone);
+  };
+  try { showPixelScoreReflection = window.showPixelScoreReflection; } catch(e) {}
+
+  const priorDevGoScenario = window.devGoScenario || (typeof devGoScenario === 'function' ? devGoScenario : null);
+  window.devGoScenario = function devGoScenarioS2Clean(idx) {
+    document.body.classList.remove('s2-submitted');
+    if (typeof priorDevGoScenario === 'function') return priorDevGoScenario(idx);
+    return false;
+  };
+  try { devGoScenario = window.devGoScenario; } catch(e) {}
+})();
