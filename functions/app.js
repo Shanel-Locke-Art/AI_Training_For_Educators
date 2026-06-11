@@ -3993,15 +3993,14 @@ function cleanS1ClaudeDraft(text) {
     .trim();
 }
 
-function fmt(text) {
+function cleanS1ClaudeDraft(text) {
   return String(text || '')
-    .replace(/^### (.*)$/gm, '<h4>$1</h4>')
-    .replace(/^## (.*)$/gm, '<h3>$1</h3>')
-    .replace(/^# (.*)$/gm, '<h2>$1</h2>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/\n\n/g, '<br><br>')
-    .replace(/\n/g, '<br>');
+    .replace(/^#{1,3}\s*Revised Discussion Prompt\s*/i, '')
+    .replace(/^Revised Discussion Prompt\s*/i, '')
+    .replace(/^Here's your redesigned discussion prompt:\s*/i, '')
+    .replace(/^\s*---+\s*$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 function esc(t) {
