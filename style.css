@@ -5095,8 +5095,8 @@ body.s1-active:not(.s1-result-active) .guided-input::placeholder {
 }
 
 .vn-overlay.active.claude-prediction .vn-text {
-  max-width: 720px;
-  font-size: 1rem;
+  max-height: none !important;
+  overflow: visible !important;
 }
 
 .vn-overlay.active.claude-prediction .vn-prediction-options {
