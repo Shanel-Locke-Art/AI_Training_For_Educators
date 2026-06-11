@@ -5004,42 +5004,55 @@ function devComplete() {
     });
   };
 
-  window.choosePrediction = function choosePrediction(choice){
+  window.choosePrediction = function choosePrediction(choice) {
     const text = window.pendingPromptForPrediction;
-    if (!text || window.pcWaitingForClaudeContinue || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
+
+    if (
+      !text ||
+      window.pcWaitingForClaudeContinue ||
+      (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)
+    ) return;
 
     window.pendingPromptAfterPrediction = text;
     window.pendingPromptForPrediction = '';
+
     try { predictionGateActive = false; } catch(e) {}
     window.predictionGateActive = false;
-    window.pcWaitingForClaudeContinue = true;
+    window.pcWaitingForClaudeContinue = false;
 
     const s = scenarioData[scenarioIndex];
     if (s) {
       if (!s.predictions) s.predictions = [];
-      s.predictions.push({ choice, prompt:text, attempt:(s.attempts || 0) + 1, timestamp:new Date().toISOString() });
-    }
-
-    const buttons = document.querySelectorAll('.pc-clean-choice-btn,.vn-choice-btn,.vn-prediction-btn');
-    buttons.forEach(btn => {
-      btn.disabled = true;
-      if (btn.dataset && btn.dataset.choice === choice) btn.classList.add('is-selected');
-    });
-
-    const vnText = pcById('vnText');
-    if (vnText) {
-      vnText.innerHTML = `
-        <div class="pc-feedback-copy">
-          <div><strong>Your prediction:</strong></div>
-          <div style="margin-top:8px;">${PC_REACTION[choice] || PC_REACTION.not_sure}</div>
-          <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
-        </div>`;
-      const btn = pcById('pcContinueToClaudeBtn');
-      if (btn) btn.addEventListener('click', (ev) => {
-        ev.preventDefault(); ev.stopPropagation();
-        window.pcContinueToClaudeAnalysis();
+      s.predictions.push({
+        choice,
+        prompt: text,
+        attempt: (s.attempts || 0) + 1,
+        timestamp: new Date().toISOString()
       });
     }
+
+    document.querySelectorAll('.pc-clean-choice-btn,.vn-choice-btn,.vn-prediction-btn').forEach(btn => {
+      btn.disabled = true;
+      if (btn.dataset && btn.dataset.choice === choice) {
+        btn.classList.add('is-selected');
+      }
+    });
+
+    document.getElementById('vnPredictionChoicePanel')?.remove();
+    document.getElementById('predictionGate')?.remove();
+    document.querySelectorAll('.pc-clean-choice-grid,.pc-choice-panel-final,.vn-choice-list').forEach(el => el.remove());
+
+    vnQueue = [];
+    vnTyping = false;
+    vnOnComplete = null;
+    clearTimeout(vnTypeTimer);
+
+    // Go directly to Claude thinking. No intermediate Continue button.
+    showClaudeConsultOverlay('Scenario diagnosis');
+
+    setTimeout(() => {
+      sendMain(text);
+    }, 300);
   };
 
   window.pcContinueToClaudeAnalysis = function pcContinueToClaudeAnalysis(){
