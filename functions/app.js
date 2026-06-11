@@ -1,4 +1,11 @@
-/* PromptCraft application logic extracted from index.html. */
+/* ======================================================
+   PROMPTCRAFT APP.JS
+   Cleanup pass: labeled sections, preserved behavior.
+   Notes:
+   - Professor Pixel dialogue sequences remain in functions/dialogue.js.
+   - Scenario data still lives here until a later scenario-data.js pass.
+   - Claude terminal background image is controlled by style.css, not app.js.
+====================================================== */
 
 // ══════════════════════════════════════════════════════
 //  STATE
@@ -98,6 +105,7 @@ const FORCE_MOCK_CLAUDE = new URLSearchParams(window.location.search).get('mockC
 const IS_LOCAL_TEST = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:';
 const USE_MOCK_CLAUDE = FORCE_MOCK_CLAUDE || (MOCK_CLAUDE_FOR_LOCAL && IS_LOCAL_TEST);
 
+// NOTE: Mock Claude text is dialogue/content-heavy. Move to dialogue.js in a later pass if desired.
 function mockClaudeText(payload, context = 'main') {
   const system = payload.system || '';
   const lastUser = payload.messages?.slice().reverse().find(m => m.role === 'user')?.content || '';
@@ -1101,7 +1109,7 @@ Do NOT use phrases like "Great job" or "Well done" as openers — get straight t
 }
 
 // ══════════════════════════════════════════════════════
-//  SCENARIO 4 — CRITICAL THINKING CHALLENGE
+//  LEGACY S4/S5 CRITICAL THINKING HELPERS
 // ══════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════════
@@ -1445,13 +1453,13 @@ function addPixelS4Closing(area) {
 }
 
 // ══════════════════════════════════════════════════════
-//  SCENARIO 5 — PREDICT THE OUTPUT
+//  S5/S6 PREDICTION STATE
 // ══════════════════════════════════════════════════════
 
 let s5PredictionDone = false;
 
 // ══════════════════════════════════════════════════════
-//  SCENARIO 4 — HALLUCINATION HUNT (pre-written reveal)
+//  S5 — HALLUCINATION HUNT PREWRITTEN REVEAL
 // ══════════════════════════════════════════════════════
 function loadScenarioHallucination() {
   const s = scenarios[4];
@@ -1618,7 +1626,7 @@ function s5RevealResponse(predictedCorrectly) {
 }
 
 // ══════════════════════════════════════════════════════
-//  SCENARIO 6 — BIAS AND CONTEXT
+//  S4/S6 — BIAS AND CONTEXT SCREEN
 // ══════════════════════════════════════════════════════
 
 function loadScenarioSyncBias() {
@@ -2397,6 +2405,7 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
 }
 
 
+// NOTE: Terminal diagnosis copy is still inline. Candidate for dialogue.js or scenario-data.js.
 function buildS1TerminalDiagnosis(score, responseText) {
   const level = score <= 2 ? 'NEEDS MORE CONTEXT' : score <= 3 ? 'PARTIAL REPAIR DETECTED' : score <= 4 ? 'STRONG REPAIR DETECTED' : 'HIGH-CONFIDENCE REPAIR';
   const issue = 'The original prompt asked students to reply, but did not give them a meaningful reason to continue the conversation.';
@@ -2475,6 +2484,7 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
   }, 1200);
 }
 
+// NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
 function showPixelScoreReflection(totalScore, onDone = null) {
   let lines;
   if (totalScore <= 1) {
@@ -4447,7 +4457,10 @@ function devComplete() {
   area.scrollTop = area.scrollHeight;
 }
 
-/* ===== Original inline script boundary ===== */
+/* ======================================================
+   LEGACY PATCH BLOCK 1: S1 CLEAN WORKSPACE + PREDICTION FLOW
+   Kept for compatibility. Do not add new logic above this unless replacing it.
+====================================================== */
 
 (function(){
   const S1_STORAGE_KEY = 'promptcraft_s1_clean_draft';
@@ -4873,7 +4886,10 @@ function devComplete() {
   }
 })();
 
-/* ===== Original inline script boundary ===== */
+/* ======================================================
+   LEGACY PATCH BLOCK 2: FINAL PREDICTION FLOW STABILIZER
+   This is the current owner for prediction button behavior.
+====================================================== */
 
 /* PROMPTCRAFT S1 PREDICTION FLOW STABILIZER
    One final owner for the prediction gate, dev S1 fill, and S2 handoff.
@@ -5075,7 +5091,10 @@ function devComplete() {
 
 })();
 
-/* ===== Original inline script boundary ===== */
+/* ======================================================
+   LEGACY PATCH BLOCK 3: FINAL NAV + S1 RESULT CONTROL OWNER
+   This is the current owner for scenario navigation handoff.
+====================================================== */
 
 /* PROMPTCRAFT HARD S1 PREDICTION OWNER
    This replaces the duplicate/older prediction handlers by assigning both
@@ -5234,7 +5253,9 @@ function devComplete() {
   try { sendText = hardSendText; } catch(e) {}
 })();
 
-/* ===== Original inline script boundary ===== */
+/* ======================================================
+   LEGACY PATCH BLOCK
+====================================================== */
 
 /* PROMPTCRAFT FINAL S1 PREDICTION WATCHDOG
    This does not redesign the scene. It only guarantees the missing buttons appear,
@@ -5350,7 +5371,9 @@ function devComplete() {
   setInterval(ensurePredictionButtons, 600);
 })();
 
-/* ===== Original inline script boundary ===== */
+/* ======================================================
+   LEGACY PATCH BLOCK
+====================================================== */
 
 /* PROMPTCRAFT FINAL NAV + S1 RESULT CONTROL OWNER */
 (function(){
