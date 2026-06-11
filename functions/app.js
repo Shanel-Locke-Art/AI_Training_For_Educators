@@ -82,7 +82,7 @@ function startGame() {
       // Enable scenario intro audio after opening sequence clears
       setTimeout(() => { window.scenarioIntroEnabled = true; }, 3000);
     }, 200);
-  }, 700);
+  },1200);
 }
 
 // ══════════════════════════════════════════════════════
@@ -2481,7 +2481,7 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
       ? buildS1TerminalDiagnosis(scoreTotal, responseText)
       : responseText;
     showClaudeConsultResult(terminalOutput, mock, onClose);
-  }, 1200);
+  }, 100000);
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
@@ -2648,6 +2648,16 @@ function vnSkipType() {
 }
 
 function vnAdvance() {
+  const overlay = document.getElementById('vnOverlay');
+
+  // Do not auto-advance while prediction choices are visible.
+  if (
+    overlay &&
+    overlay.classList.contains('claude-prediction') &&
+    document.querySelector('.vn-prediction-options')
+  ) {
+    return;
+  }
   // If still typing, skip to end first
   if (document.getElementById('vnAdvanceHint').classList.contains('show') === false) {
     vnSkipType();
@@ -5511,3 +5521,4 @@ function devComplete() {
   };
   try { devNextScenario = window.devNextScenario; } catch(e) {}
 })();
+

@@ -2,8 +2,7 @@
    PromptCraft — dialogue.js
    Owns Professor Pixel dialogue sequences only.
 
-   Keep dialogue text here so index.html can handle behavior
-   without becoming a haunted filing cabinet.
+   Keep dialogue text here so index.html can handle behavior and styling without being cluttered by long strings. This also makes it easier to edit dialogue without accidentally breaking something in the HTML.
    ══════════════════════════════════════════════════════ */
 
 window.pixelDialogue = {
