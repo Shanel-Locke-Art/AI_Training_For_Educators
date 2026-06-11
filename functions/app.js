@@ -3729,12 +3729,15 @@ function choosePrediction(choice) {
   window.pendingPromptForPrediction = '';
   predictionGateActive = false;
 
-  const choiceButtons = document.querySelectorAll('.vn-prediction-btn');
-  choiceButtons.forEach(btn => btn.disabled = true);
+  // Disable and remove prediction controls.
+  document.querySelectorAll('.vn-prediction-btn').forEach(btn => {
+    btn.disabled = true;
+  });
 
-  const predictionPanel = document.getElementById('vnPredictionChoicePanel');
-  if (predictionPanel) predictionPanel.remove();
+  document.getElementById('vnPredictionChoicePanel')?.remove();
+  document.getElementById('predictionGate')?.remove();
 
+  // Save the prediction for research data.
   const s = scenarioData[scenarioIndex];
   if (!s.predictions) s.predictions = [];
   s.predictions.push({
@@ -3744,53 +3747,19 @@ function choosePrediction(choice) {
     timestamp: new Date().toISOString()
   });
 
-  const gate = document.getElementById('predictionGate');
-  if (gate) gate.remove();
-
-  // Keep the VN overlay open and transition directly into Claude thinking.
+  // Clear any leftover VN typing state.
   vnQueue = [];
   vnTyping = false;
   vnOnComplete = null;
   clearTimeout(vnTypeTimer);
 
-  const overlay = document.getElementById('vnOverlay');
-  if (overlay) {
-    overlay.classList.remove('claude-prediction', 'claude-consult', 'claude-terminal-textmode');
-    overlay.classList.add('active', 'claude-terminal-consult');
-  }
+  // Immediately show the Claude thinking screen.
+  showClaudeConsultOverlay('Scenario diagnosis');
 
-  document.getElementById('vnCharacter')?.classList.remove('visible');
-
-  setVNClaudeMode(false);
-  setVNClaudeTerminalMode(true);
-  setClaudeTerminalTextMode(false);
-  setClaudeShelfState('idle', 'idle');
-
-  setClaudeTerminalState(
-    'thinking',
-    'CLAUDE TERMINAL',
-    'PREDICTION LOGGED\n\nCONNECTING TO CLAUDE...\n\nANALYSIS IN PROGRESS...'
-  );
-
-  const speaker = document.getElementById('vnSpeaker');
-  if (speaker) speaker.textContent = 'Professor Pixel';
-
-  const vnText = document.getElementById('vnText');
-  if (vnText) {
-    vnText.innerHTML = `
-      <div><strong>Your prediction is logged.</strong></div>
-      <div style="margin-top:8px;">Now Claude is analyzing the prompt.</div>
-    `;
-  }
-
-  const hint = document.getElementById('vnAdvanceHint');
-  if (hint) hint.classList.remove('show');
-
-  musicStartVN();
-
+  // Send the prompt after the terminal has had a moment to appear.
   setTimeout(() => {
     sendMain(text);
-  }, 250);
+  }, 300);
 }
 
 // ══════════════════════════════════════════════════════
@@ -4018,6 +3987,12 @@ function buildFeedback(s) {
 // ══════════════════════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════════════════════
+function cleanS1ClaudeDraft(text) {
+  return String(text || '')
+    .replace(/^#{1,3}\s*Revised Discussion Prompt\s*/i, '')
+    .trim();
+}
+
 function fmt(text) {
   return String(text || '')
     .replace(/^### (.*)$/gm, '<h4>$1</h4>')
@@ -4819,7 +4794,7 @@ function devComplete() {
     card.innerHTML = `
       <div class="s1-result-eyebrow">Claude Draft</div>
       <div class="s1-result-title">Revised Discussion Prompt</div>
-      <div class="s1-result-body">${fmt(responseText)}</div>
+      <div class="s1-result-body">${fmt(cleanS1ClaudeDraft(responseText))}</div>
       <div class="s1-clean-reference">
         <div class="s1-clean-reference-title">Your Repair Notes</div>
         <div><strong>Learners:</strong> ${esc(values.learners || 'Not provided')}</div>
