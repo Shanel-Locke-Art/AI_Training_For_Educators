@@ -3731,6 +3731,7 @@ function choosePrediction(choice) {
 
   const choiceButtons = document.querySelectorAll('.vn-prediction-btn');
   choiceButtons.forEach(btn => btn.disabled = true);
+
   const predictionPanel = document.getElementById('vnPredictionChoicePanel');
   if (predictionPanel) predictionPanel.remove();
 
@@ -3746,19 +3747,50 @@ function choosePrediction(choice) {
   const gate = document.getElementById('predictionGate');
   if (gate) gate.remove();
 
-  // Close the VN overlay and return to the main flow.
+  // Keep the VN overlay open and transition directly into Claude thinking.
   vnQueue = [];
   vnTyping = false;
   vnOnComplete = null;
   clearTimeout(vnTypeTimer);
-  const overlay = document.getElementById('vnOverlay');
-  if (overlay) overlay.classList.remove('active', 'claude-consult', 'claude-terminal-consult', 'claude-terminal-textmode', 'claude-prediction');
-  document.getElementById('vnCharacter')?.classList.remove('visible');
-  setClaudeShelfState('idle', 'idle');
-  setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
-  musicEndVN();
 
-  sendMain(text);
+  const overlay = document.getElementById('vnOverlay');
+  if (overlay) {
+    overlay.classList.remove('claude-prediction', 'claude-consult', 'claude-terminal-textmode');
+    overlay.classList.add('active', 'claude-terminal-consult');
+  }
+
+  document.getElementById('vnCharacter')?.classList.remove('visible');
+
+  setVNClaudeMode(false);
+  setVNClaudeTerminalMode(true);
+  setClaudeTerminalTextMode(false);
+  setClaudeShelfState('idle', 'idle');
+
+  setClaudeTerminalState(
+    'thinking',
+    'CLAUDE TERMINAL',
+    'PREDICTION LOGGED\n\nCONNECTING TO CLAUDE...\n\nANALYSIS IN PROGRESS...'
+  );
+
+  const speaker = document.getElementById('vnSpeaker');
+  if (speaker) speaker.textContent = 'Professor Pixel';
+
+  const vnText = document.getElementById('vnText');
+  if (vnText) {
+    vnText.innerHTML = `
+      <div><strong>Your prediction is logged.</strong></div>
+      <div style="margin-top:8px;">Now Claude is analyzing the prompt.</div>
+    `;
+  }
+
+  const hint = document.getElementById('vnAdvanceHint');
+  if (hint) hint.classList.remove('show');
+
+  musicStartVN();
+
+  setTimeout(() => {
+    sendMain(text);
+  }, 250);
 }
 
 // ══════════════════════════════════════════════════════
