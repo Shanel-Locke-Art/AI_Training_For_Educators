@@ -72,22 +72,22 @@
   <span>DEV</span>
   <span class="dev-test-label">Test:</span>
   <button class="dev-btn" onclick="devTestScenario(0)">S1</button>
-  <button class="dev-btn" onclick="devFillScenario(0)" style="border-color:#6c8ebf;color:#6c8ebf;">S1 ✏️</button>
+  <button class="dev-btn" onclick="devFillScenario(0)" class="dev-btn dev-btn-fill">S1 ✏️</button>
   <button class="dev-btn" onclick="devGoScenario(1)">S2</button>
-  <button class="dev-btn" onclick="devFillScenario(1)" style="border-color:#6c8ebf;color:#6c8ebf;">S2 ✏️</button>
+  <button class="dev-btn" onclick="devFillScenario(1)" class="dev-btn dev-btn-fill">S2 ✏️</button>
   <button class="dev-btn" onclick="devGoScenario(2)">S3</button>
-  <button class="dev-btn" onclick="devFillScenario(2)" style="border-color:#6c8ebf;color:#6c8ebf;">S3 ✏️</button>
+  <button class="dev-btn" onclick="devFillScenario(2)" class="dev-btn dev-btn-fill">S3 ✏️</button>
   <button class="dev-btn" onclick="devGoScenario(3)">S4</button>
-  <button class="dev-btn" onclick="devFillScenario(3)" style="border-color:#e67e22;color:#e67e22;">S4 ✏️</button>
+  <button class="dev-btn" onclick="devFillScenario(3)" class="dev-btn dev-btn-sync">S4 ✏️</button>
   <button class="dev-btn" onclick="devGoS5()">S5</button>
-  <button class="dev-btn" onclick="devFillS5()" style="border-color:#c4622d;color:#c4622d;">S5 ✏️</button>
+  <button class="dev-btn" onclick="devFillS5()" class="dev-btn dev-btn-hallucination">S5 ✏️</button>
   <button class="dev-btn" onclick="devGoS6()">S6</button>
-  <button class="dev-btn" onclick="devFillS6()" style="border-color:#9b59b6;color:#9b59b6;">S6 ✏️</button>
-  <button class="dev-btn" onclick="devGoS7()" style="border-color:#2980b9;color:#2980b9;">S7</button>
+  <button class="dev-btn" onclick="devFillS6()" class="dev-btn dev-btn-predict">S6 ✏️</button>
+  <button class="dev-btn" onclick="devGoS7()" class="dev-btn dev-btn-overreliance">S7</button>
   <button class="dev-btn" onclick="devGoS8()">S8</button>
-  <button class="dev-btn" onclick="devFillS8()" style="border-color:#27ae60;color:#27ae60;">S8 ✏️</button>
-  <button class="dev-btn" onclick="devNextScenario()" style="border-color:#a8d5b5;color:#a8d5b5;">Next ▶</button>
-  <button class="dev-btn" onclick="window.open('/wall.html','_blank')" style="border-color:#c47c2d;color:#c47c2d;">💡 Wall</button>
+  <button class="dev-btn" onclick="devFillS8()" class="dev-btn dev-btn-revise">S8 ✏️</button>
+  <button class="dev-btn" onclick="devNextScenario()" class="dev-btn dev-btn-next">Next ▶</button>
+  <button class="dev-btn" onclick="window.open('/wall.html','_blank')" class="dev-btn dev-btn-wall">💡 Wall</button>
   <button class="dev-btn" onclick="devSkip()">Reflection</button>
   <button class="dev-btn" onclick="document.getElementById('devBar').style.display='none'">Hide</button>
 </div>
@@ -154,7 +154,7 @@
 
 <div class="oscqr-row" role="region" aria-label="OSCQR quality alignment indicators">
   <span class="oscqr-heading" aria-hidden="true">OSCQR Alignment</span>
-  <div id="oscqrChips" style="display:flex;gap:6px;flex-wrap:wrap;" aria-live="polite" aria-label="Active OSCQR indicators"></div>
+  <div id="oscqrChips" class="oscqr-chips" aria-live="polite" aria-label="Active OSCQR indicators"></div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════
@@ -270,7 +270,7 @@
       <svg id="vnPortraitPlaceholder"
            viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg"
            aria-hidden="true"
-           style="width:100%;display:block;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4))">
+           class="vn-portrait-placeholder-svg">
         <ellipse cx="100" cy="280" rx="70" ry="50" fill="#3d7a54" opacity="0.9"/>
         <rect x="60" y="160" width="80" height="100" rx="10" fill="#4a7c5e"/>
         <rect x="90" y="145" width="20" height="25" fill="#c8956c"/>
@@ -377,11 +377,11 @@
         </div>
         <div class="ref-question">
           <label class="ref-label"><span>04</span>Is there anything else you want to share about your experience today?</label>
-          <textarea class="ref-textarea" name="q4_other" style="min-height:60px;" placeholder="Optional."></textarea>
+          <textarea class="ref-textarea ref-textarea-short" name="q4_other" placeholder="Optional."></textarea>
         </div>
-        <div style="border-top:1px solid #d6cfc0;padding-top:16px;margin-top:4px;">
-          <div class="ref-question" style="margin-bottom:14px;">
-            <label class="ref-label">Participant ID <span style="font-style:italic;letter-spacing:0;">(only if your study protocol asks for it)</span></label>
+        <div class="ref-divider">
+          <div class="ref-question ref-question-last">
+            <label class="ref-label">Participant ID <span class="ref-label-note">(only if your study protocol asks for it)</span></label>
             <input class="ref-input" type="text" name="participant_id" placeholder="Leave blank to remain anonymous" />
           </div>
         </div>
@@ -398,23 +398,18 @@
         </div>
 
         <!-- Growth report — injected after AI call -->
-        <div id="growthReportWrap" style="margin-top:20px;text-align:left;">
-          <div id="growthNarrativeWrap" style="background:var(--forest-light);border:1.5px solid rgba(45,90,61,0.25);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:4px;">
-            <div style="font-family:'Source Code Pro',monospace;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--forest-dark);margin-bottom:10px;">Your Growth Summary</div>
-            <div id="growthNarrative" style="font-size:0.88rem;line-height:1.65;color:var(--ink);">
-              <div style="display:flex;align-items:center;gap:8px;color:var(--ink-muted);font-size:0.82rem;">
-                <span style="animation:dot 0.9s infinite;">●</span> Generating your personal summary…
-              </div>
+        <div id="growthReportWrap" class="growth-report-wrap">
+          <div id="growthNarrativeWrap" class="growth-narrative-wrap">
+            <div class="growth-section-label">Your Growth Summary</div>
+            <div id="growthNarrative" class="growth-narrative-text">
+              <div class="growth-loading">● Generating your personal summary…</div>
             </div>
           </div>
           <div id="growthTable"></div>
         </div>
 
-        <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;justify-content:center;">
-          <a href="/wall.html" target="_blank"
-             style="display:inline-block;padding:11px 24px;background:var(--forest);border:2px solid var(--forest-dark);border-radius:var(--radius);color:#d4edd9;font-family:'Fraunces',serif;font-weight:700;font-size:0.88rem;text-decoration:none;">
-            💡 See the Ideas Wall →
-          </a>
+        <div class="ref-success-actions">
+          <a href="/wall.html" target="_blank" class="ideas-wall-success-btn">💡 See the Ideas Wall →</a>
           <button class="ref-close-btn" onclick="closeReflection()">Return to the Prompt Lab</button>
         </div>
       </div>

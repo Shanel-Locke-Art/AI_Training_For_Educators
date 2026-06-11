@@ -2481,7 +2481,7 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
       ? buildS1TerminalDiagnosis(scoreTotal, responseText)
       : responseText;
     showClaudeConsultResult(terminalOutput, mock, onClose);
-  }, 100000);
+  }, 1500);
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.

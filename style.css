@@ -7314,3 +7314,320 @@ body .vn-overlay.active.claude-prediction #claudeTerminalOutput {
   line-height: 1.15 !important;
   white-space: nowrap !important;
 }
+
+/* Match prediction Claude to consult Claude styling */
+body .vn-overlay.active.pc-clean-prediction .claude-terminal-photo,
+body .vn-overlay.active.claude-prediction .claude-terminal-photo {
+  border: 2px solid rgba(231,183,82,0.18) !important;
+  box-shadow:
+    0 24px 70px rgba(0,0,0,0.85),
+    0 0 0 2px rgba(231,183,82,0.18),
+    0 0 46px rgba(61,255,183,0.12) !important;
+}
+
+body .vn-overlay.active.pc-clean-prediction .claude-terminal-photo::after,
+body .vn-overlay.active.claude-prediction .claude-terminal-photo::after {
+  background:
+    radial-gradient(circle at 47% 40%, rgba(48,255,171,0.18), transparent 21%),
+    
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.035), rgba(255,255,255,0.035) 1px, transparent 1px, transparent 5px) !important;
+  mix-blend-mode: screen !important;
+}
+
+body .vn-overlay.active.pc-clean-prediction .claude-terminal-screen,
+body .vn-overlay.active.claude-prediction .claude-terminal-screen {
+  background:
+    
+    radial-gradient(circle at 50% 45%, rgba(52,255,174,0.30), rgba(0,70,42,0.62) 58%, rgba(0,18,9,0.88)) !important;
+  color: #d9ffe5 !important;
+  font-family: 'Source Code Pro', monospace !important;
+  text-shadow: 0 0 8px rgba(124,255,181,0.75) !important;
+  box-shadow:
+    inset 0 0 30px rgba(0,0,0,0.35),
+    0 0 26px rgba(64,255,172,0.25) !important;
+}
+
+/* Use the same small terminal-title font style, but hide it only if you still want */
+body .vn-overlay.active.pc-clean-prediction #claudeTerminalOutput,
+body .vn-overlay.active.claude-prediction #claudeTerminalOutput {
+  font-family: 'Source Code Pro', monospace !important;
+  color: #d9ffe5 !important;
+  text-shadow: 0 0 8px rgba(124,255,181,0.75) !important;
+  font-size: clamp(0.72rem, 1vw, 1.05rem) !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* ==================================================
+   CLAUDE RESPONSE SCREEN
+   Match final analysis screen to framed computer look
+  ================================================== */
+
+  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene.textmode.responding .claude-terminal-screen {
+    position: absolute !important;
+    padding: clamp(6px, 1.1vw, 18px) !important;
+    background:
+      radial-gradient(circle at 50% 45%, rgba(52,255,174,0.30), rgba(0,70,42,0.62) 58%, rgba(0,18,9,0.88)) !important;
+    overflow: hidden !important;
+  }
+
+  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene.textmode.responding .claude-terminal-title {
+    display: none !important;
+  }
+
+  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene.textmode.responding .claude-terminal-output {
+    font-family: 'Source Code Pro', monospace !important;
+    color: #d9ffe5 !important;
+    text-shadow: 0 0 8px rgba(124,255,181,0.75) !important;
+    line-height: 1.25 !important;
+    letter-spacing: 0.02em !important;
+    text-transform: none !important;
+    white-space: pre-wrap !important;
+    overflow: hidden !important;
+  }
+
+  /* ==========================================
+   MAIN VN LAYOUT
+   ========================================== */
+
+  .vn-stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 650px;
+    overflow: hidden;
+  }
+
+  /* ==========================================
+    SMARTBOARD
+    ========================================== */
+
+  .vn-smartboard-wrap {
+    position: absolute;
+    left: 2%;
+    top: 3%;
+    width: 68%;
+    height: 78%;
+    max-width: none;
+    aspect-ratio: auto;
+    z-index: 2;
+  }
+
+  .vn-smartboard {
+    width: 100%;
+    height: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 2px rgba(255,255,255,.15),
+      0 12px 40px rgba(0,0,0,.35);
+  }
+
+  .vn-smartboard iframe,
+  .vn-smartboard canvas,
+  .vn-smartboard-content {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ==========================================
+    CHARACTER
+    ========================================== */
+
+  .vn-character {
+    max-width: 80%;
+  }
+
+  /* ==========================================
+    DIALOG BOX
+    ========================================== */
+
+  .vn-dialog {
+    position: absolute;
+    left: 2%;
+    right: 2%;
+    bottom: 1rem;
+    z-index: 5;
+  }
+
+  /* ==========================================
+    CHOICE BUTTONS
+    ========================================== */
+
+  .vn-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 1rem;
+  }
+
+  .vn-choice-btn {
+    flex: 1 1 240px;
+    min-height: 54px;
+  }
+
+  /* ==========================================
+    ANALYSIS SCREEN
+    ========================================== */
+
+  .analysis-screen {
+    width: 100%;
+    height: calc(100vh - 220px);
+    min-height: 500px;
+    overflow-y: auto;
+  }
+
+  /* ==========================================
+    MOBILE
+    ========================================== */
+
+  @media (max-width: 900px) {
+
+    .vn-smartboard-wrap {
+      position: relative;
+      width: 100%;
+      height: 45vh;
+      left: 0;
+      top: 0;
+    }
+
+    .vn-dialog {
+      position: relative;
+      margin-top: 1rem;
+    }
+
+    .analysis-screen {
+      height: auto;
+      min-height: 400px;
+    }
+  }
+
+  /* VN normal scene: balanced smartboard + Pixel */
+    .vn-overlay.active:not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.claude-prediction) .vn-smartboard-wrap {
+      left: 15% !important;
+      top: 3% !important;
+      width: clamp(25%, 100%, 55%) !important;
+      aspect-ratio: 16 / 10.5 !important;
+      transform: none !important;
+    }
+
+    .vn-overlay.active:not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.claude-prediction) .vn-character {
+      right: 4% !important;
+      bottom: 34px !important;
+      height: clamp(300px, 58vh, 680px) !important;
+      max-height: none !important;
+      transform: none !important;
+    }
+
+    @media (max-width: 760px), (max-height: 720px) {
+
+    .vn-overlay.active:not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.claude-prediction) .vn-smartboard-wrap {
+      left: 50% !important;
+      top: 2% !important;
+      width: 92vw !important;
+      max-width: 650px !important;
+      transform: translateX(-50%) !important;
+    }
+
+    .vn-overlay.active:not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.claude-prediction) .vn-character {
+      left: 50% !important;
+      right: auto !important;
+      bottom: 135px !important;
+      height: clamp(180px, 34vh, 320px) !important;
+      transform: translateX(-50%) !important;
+    }
+
+  }
+
+/* ╔══════════════════════════════════════════════════════════╗
+   ║  CLASSES MIGRATED FROM index.html INLINE STYLES         ║
+   ║  All previously inline styles now live here.            ║
+   ╚══════════════════════════════════════════════════════════╝ */
+
+/* ── DEV BAR — scenario-color-coded fill buttons ── */
+.dev-btn-fill         { border-color: #6c8ebf; color: #6c8ebf; }
+.dev-btn-sync         { border-color: #e67e22; color: #e67e22; }
+.dev-btn-hallucination{ border-color: #c4622d; color: #c4622d; }
+.dev-btn-predict      { border-color: #9b59b6; color: #9b59b6; }
+.dev-btn-overreliance { border-color: #2980b9; color: #2980b9; }
+.dev-btn-revise       { border-color: #27ae60; color: #27ae60; }
+.dev-btn-next         { border-color: #a8d5b5; color: #a8d5b5; }
+.dev-btn-wall         { border-color: #c47c2d; color: #c47c2d; }
+
+/* ── OSCQR CHIPS CONTAINER ── */
+.oscqr-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* ── VN PORTRAIT PLACEHOLDER SVG ── */
+.vn-portrait-placeholder-svg {
+  width: 100%;
+  display: block;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+}
+
+/* ── REFLECTION ROOM — misc ── */
+.ref-label-note {
+  font-style: italic;
+  letter-spacing: 0;
+}
+.ref-textarea-short  { min-height: 60px; }
+.ref-question-last   { margin-bottom: 14px; }
+.ref-divider         { border-top: 1px solid #d6cfc0; padding-top: 16px; margin-top: 4px; }
+
+/* ── REFLECTION SUCCESS — growth report ── */
+.ref-success-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.ideas-wall-success-btn {
+  display: inline-block;
+  padding: 11px 24px;
+  background: var(--forest);
+  border: 2px solid var(--forest-dark);
+  border-radius: var(--radius);
+  color: #d4edd9;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-decoration: none;
+}
+.ideas-wall-success-btn:hover {
+  background: var(--forest-dark);
+}
+.growth-report-wrap {
+  margin-top: 20px;
+  text-align: left;
+}
+.growth-narrative-wrap {
+  background: var(--forest-light);
+  border: 1.5px solid rgba(45,90,61,0.25);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 4px;
+}
+.growth-section-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--forest-dark);
+  margin-bottom: 10px;
+}
+.growth-narrative-text {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.growth-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  animation: dot 0.9s infinite;
+}
