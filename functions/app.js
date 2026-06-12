@@ -2338,7 +2338,7 @@ function terminalizeClaudeText(text) {
     .trim();
 }
 
-function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', output = 'PREPARING ANALYSIS') {
+function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', output = 'IDLE') {
   const terminal = document.getElementById('claudeTerminalScene');
   const titleEl = document.getElementById('claudeTerminalTitle');
   const outputEl = document.getElementById('claudeTerminalOutput');
@@ -2427,13 +2427,17 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
       if (typeof onClose === 'function') onClose();
     };
   }
-  showClaudeConsultOverlay('Scenario diagnosis');
+  // If the thinking screen is already open, keep it and swap to the result quickly.
+  const overlay = document.getElementById('vnOverlay');
+  if (!overlay || !overlay.classList.contains('active')) {
+    showClaudeConsultOverlay('Scenario diagnosis');
+  }
   setTimeout(() => {
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
       ? buildS1TerminalDiagnosis(scoreTotal, responseText)
       : responseText;
     showClaudeConsultResult(terminalOutput, mock, effectiveClose);
-  }, 1500);
+  }, 350);
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
@@ -4457,14 +4461,28 @@ function pcContinueToClaudeAnalysis(){
   window.pendingPromptAfterPrediction = '';
   window.pcWaitingForClaudeContinue = false;
 
+  // IMPORTANT: show Claude's thinking screen immediately BEFORE the network/API call.
+  // Previously this overlay did not appear until after Claude returned, which made the
+  // game look frozen for 20-30 seconds. Tiny little UX crime scene.
   const overlay = document.getElementById('vnOverlay');
-  if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction');
+  if (overlay) {
+    overlay.classList.remove('claude-prediction','pc-clean-prediction','claude-terminal-textmode');
+    overlay.classList.add('active','claude-terminal-consult');
+  }
   document.getElementById('vnDialogue')?.classList.remove('has-choices');
   document.getElementById('vnCharacter')?.classList.remove('visible');
   pcClearPredictionUI();
-  try { setClaudeShelfState('idle','idle'); } catch(e) {}
-  try { setClaudeTerminalState('idle','CLAUDE TERMINAL','IDLE'); } catch(e) {}
-  try { musicEndVN(); } catch(e) {}
+
+  try { showClaudeConsultOverlay('Scenario diagnosis'); } catch(e) {
+    try {
+      setVNClaudeMode(false);
+      setVNClaudeTerminalMode(true);
+      setClaudeTerminalTextMode(false);
+      setClaudeShelfState('thinking','analyzing');
+      setClaudeTerminalState('thinking','CLAUDE TERMINAL','ANALYZING...');
+      musicStartVN();
+    } catch(_) {}
+  }
 
   sendMain(text);
   return false;
