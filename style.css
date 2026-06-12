@@ -1000,8 +1000,9 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
   left: 2%;
   top: 5%;
   /* Landscape 16:10 ratio matching real SMART Boards */
-  width: 56%;
+  width: min(56vw, 980px);
   aspect-ratio: 16 / 10.5;
+  height: auto;
   z-index: 2;
   /* Green screen glow lifts it off the dark background */
   filter:
@@ -1025,6 +1026,8 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
     /* Inner highlights */
     inset 0 1px 0 rgba(255,255,255,0.6),
     inset 0 -1px 0 rgba(0,0,0,0.2);
+  width: 100%;
+  height: 100%;
 }
 
 /* Top specular highlight on frame */
@@ -1286,33 +1289,6 @@ textarea::placeholder { color: var(--ink-muted); font-size: 0.84rem; font-style:
   text-transform: uppercase;
   margin-left: 8px;
 }
-
-/* ── SIDE MOUNTING RAILS ────────────────────────────── */
-.vn-rail-left,
-.vn-rail-right {
-  position: absolute;
-  top: 30px;
-  width: 7px;
-  bottom: 28px;
-  background: linear-gradient(90deg, #9a9690, #b0aca6, #9a9690);
-  border-radius: 3px;
-  z-index: 1;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-}
-
-.vn-rail-left  { left: -9px; }
-.vn-rail-right { right: -9px; }
-
-.vn-rail-left::after,
-.vn-rail-right::after {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 1.5px;
-  background: rgba(255,255,255,0.35);
-}
-.vn-rail-left::after  { left: 2px; }
-.vn-rail-right::after { right: 2px; }
 
 /* ── MOBILE ─────────────────────────────────────────── */
 @media (max-width: 480px) {
@@ -4588,10 +4564,11 @@ body.s1-result-active #inputContainer { display: block; }
 }
 
 .vn-overlay.active.claude-terminal-textmode .vn-dialogue {
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
   background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  pointer-events: none;
+  pointer-events: none !important;
 }
 
 .vn-overlay.active.claude-terminal-textmode .vn-speaker,
@@ -4788,9 +4765,12 @@ body.s1-result-active #inputContainer { display: block; }
 }
 
 .vn-overlay.active.claude-terminal-textmode .terminal-return {
-  padding: 10px 18px;
-  font-size: 0.82rem;
-  min-width: 132px;
+  pointer-events: auto !important;
+  position: fixed !important;
+  right: 28px !important;
+  bottom: 24px !important;
+  padding: 10px 28px !important;
+  min-width: 170px !important;
 }
 
 /* ── BLOCK 6 ── */

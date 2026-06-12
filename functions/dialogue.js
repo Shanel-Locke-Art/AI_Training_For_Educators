@@ -64,4 +64,47 @@ window.pixelDialogue = {
     { expr: 'encouraging', text: "You have written prompts, spotted hallucinations, caught bias, and evaluated AI judgment. Now I want you to look at your own thinking." },
     { expr: 'thinking',    text: "Build your prompt using the fields below. After you see what the AI gives you, I will ask you three questions before you revise." },
   ],
-}
+
+  // ── Score reflection lines (referenced by showPixelScoreReflection) ──
+
+  scoreReflection_0_1: [
+    { expr: 'skeptical', text: "Claude had to make a lot of assumptions there." },
+    { expr: 'thinking', text: "Give it clearer learner context, the specific discussion failure, and what a stronger reply should actually do." },
+  ],
+  scoreReflection_2: [
+    { expr: 'encouraging', text: "You are starting to give Claude useful context." },
+    { expr: 'thinking', text: "Now tighten the connection to the original problem: shallow replies and conversations that stop after one exchange." },
+  ],
+  scoreReflection_3: [
+    { expr: 'encouraging', text: "Much better. Claude is responding to the teaching problem instead of guessing at a generic discussion activity." },
+    { expr: 'neutral', text: "The next improvement is to make the interaction move and success criteria more explicit." },
+  ],
+  scoreReflection_4: [
+    { expr: 'proud', text: "Nice work. The prompt gives Claude enough context to address the dead-discussion problem directly." },
+    { expr: 'encouraging', text: "Notice how the response changes when the prompt includes learners, constraints, and a clear interaction strategy." },
+  ],
+  scoreReflection_5: [
+    { expr: 'excited', text: "Excellent. Claude had very little guessing to do." },
+    { expr: 'proud', text: "Students were already doing what the prompt asked them to do. The challenge was designing better interaction, and that is exactly what you helped Claude understand." },
+  ],
+  s2_scoreReflection_0_2: [
+    { expr: 'skeptical', text: "Claude had to guess what metacognitive behavior you wanted students to practice." },
+    { expr: 'thinking', text: "For a stronger activity, name the student struggle and the learning strategy you want them to notice or transfer." },
+  ],
+  s2_scoreReflection_3: [
+    { expr: 'encouraging', text: "This is moving in the right direction. You gave Claude a real learning problem, not just make a reflection." },
+    { expr: 'thinking', text: "Push it one step further by naming what students should do differently after the reflection." },
+  ],
+  s2_scoreReflection_4_5: [
+    { expr: 'proud', text: "Notice what changed: Claude could design for metacognition because you described the learners, the struggle, and the desired behavior." },
+    { expr: 'encouraging', text: "That is the useful pattern: identify the thinking you want students to practice before asking AI to create the activity." },
+  ],
+};
+
+// ── Prediction gate reaction text ─────────────────────────────────────
+window.predictionReactions = {
+  targeted:            "That prediction makes sense. You gave Claude learner context, the actual discussion failure, and a clear interaction move, so it should have enough to give a targeted repair.",
+  generic:             "That could happen. Claude can still drift into polite template language if it treats the issue as make this better instead of fix this exact discussion breakdown.",
+  ignores_constraints: "Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Claude actually respected them.",
+  not_sure:            "That is a useful answer too. Predicting before you look helps you notice what Claude changes, misses, or invents instead of just accepting the shiny paragraph.",
+};

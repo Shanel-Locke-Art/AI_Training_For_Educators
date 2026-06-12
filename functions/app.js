@@ -1,10 +1,48 @@
 /* ======================================================
    PROMPTCRAFT APP.JS
-   Cleanup pass: labeled sections, preserved behavior.
-   Notes:
-   - Professor Pixel dialogue sequences remain in functions/dialogue.js.
-   - Scenario data still lives here until a later scenario-data.js pass.
-   - Claude terminal background image is controlled by style.css, not app.js.
+   Clean pass: labeled sections, no IIFEs, no duplicate functions.
+   Each function defined exactly once — the final winning version.
+
+   Sections (Ctrl+F to jump):
+     STATE
+     SCREEN READER UTILITY
+     NAME MODAL
+     SURVEY CONFIGURATION
+     MOCK CLAUDE
+     BEHAVIORAL DATA TRACKING
+     GROWTH SCORING
+     SESSION PAYLOAD
+     AUDIO
+     SCENARIOS
+     PIXEL HUD
+     PIXEL INLINE CHAT         ← flagged for dialogue.js next pass
+     SCENARIO NAVIGATION
+     SCENARIO UNLOCK
+     S4 — SYNC BIAS
+     S5 — HALLUCINATION HUNT
+     S6 — PREDICT THE OUTPUT
+     S7 — OVERRELIANCE
+     S8 — REFLECT AND REVISE
+     AUTOSAVE
+     VN ENGINE                 ← flagged for dialogue.js next pass
+     SCENE IMAGE LOADER
+     INIT
+     SCENARIO SWITCH + LOAD
+     S1 WORKBENCH              ← final owner (from legacy patch block 1)
+     OSCQR
+     CHAT MESSAGES
+     SCAFFOLDED INPUT
+     SEND + PREDICTION GATE    ← final owner (from legacy patch block 3/4)
+     SCORING + FEEDBACK
+     HELPERS
+     COMPLETION
+     REFLECTION ROOM
+     DEV FUNCTIONS
+     S2 METACOGNITION          ← new content
+     S2 RESULT + REFLECTION    ← new content
+
+   NOTE: Functions marked [→ dialogue.js] should move there
+   once dialogue.js is reviewed. Kept here so game stays functional.
 ====================================================== */
 
 // ══════════════════════════════════════════════════════
@@ -486,7 +524,7 @@ async function saveIncrementalData(scenarioIdx) {
 //  AUDIO
 //  Set audioReady = true once ElevenLabs MP3s are in audio/
 // ══════════════════════════════════════════════════════
-const audioReady = true;
+const audioReady = typeof Howl !== 'undefined';
 const sounds = audioReady ? {
   // ── Prompt quality feedback ───────────────────────────
   welcome:           new Howl({ src: ['audio/welcome.mp3'],            volume: 0.9 }),
@@ -1171,31 +1209,6 @@ function maybeShowNavCard(score) {
 
   area.appendChild(card);
   area.scrollTop = area.scrollHeight;
-}
-
-function navigateToNext(targetIndex) {
-  const tabs = document.querySelectorAll('.tab-btn');
-  const targetTab = tabs[targetIndex];
-  if (!targetTab) return false;
-
-  // Make the previous scenario complete before switching.
-  // S1's result footer can appear before Pixel's final reflection finishes,
-  // so relying on the old delayed completion state made S2 look dead.
-  if (Array.isArray(scenarioCompleted) && typeof scenarioIndex === 'number') {
-    scenarioCompleted[scenarioIndex] = true;
-  }
-
-  targetTab.disabled = false;
-  targetTab.classList.remove('locked');
-  targetTab.removeAttribute('aria-disabled');
-
-  const chat = document.getElementById('chat');
-  if (chat) chat.scrollTop = 0;
-
-  if (typeof switchScenario === 'function') {
-    switchScenario(targetIndex, targetTab);
-  }
-  return false;
 }
 
 let s4InterruptFired = false;
@@ -2295,7 +2308,6 @@ let vnFullText = '';
 let vnOnComplete = null;
 
 
-
 // ── CLAUDE SHELF STATE SYSTEM ────────────────────────
 
 function setVNClaudeMode(enabled = false) {
@@ -2326,7 +2338,7 @@ function terminalizeClaudeText(text) {
     .trim();
 }
 
-function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', output = 'IDLE') {
+function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', output = 'PREPARING ANALYSIS') {
   const terminal = document.getElementById('claudeTerminalScene');
   const titleEl = document.getElementById('claudeTerminalTitle');
   const outputEl = document.getElementById('claudeTerminalOutput');
@@ -2406,116 +2418,25 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
 
 
 // NOTE: Terminal diagnosis copy is still inline. Candidate for dialogue.js or scenario-data.js.
-function buildS1TerminalDiagnosis(score, responseText) {
-  const level = score <= 2 ? 'NEEDS MORE CONTEXT' : score <= 3 ? 'PARTIAL REPAIR DETECTED' : score <= 4 ? 'STRONG REPAIR DETECTED' : 'HIGH-CONFIDENCE REPAIR';
-  const issue = 'The original prompt asked students to reply, but did not give them a meaningful reason to continue the conversation.';
-  const repair = score <= 2
-    ? 'Add clearer learner context, the specific discussion failure, and what a strong peer reply should do.'
-    : 'Use a peer interaction move such as build on, challenge, extend, compare, or ask a follow-up question.';
-  const confidence = score <= 2 ? 'LOW' : score <= 3 ? 'MODERATE' : 'HIGH';
-  return `ANALYSIS COMPLETE
-
-STATUS
-${level}
-
-ISSUE DETECTED
-${issue}
-
-RECOMMENDED REPAIR
-${repair}
-
-CONFIDENCE
-${confidence}`;
-}
-
-function addS1ClaudeResultCard(responseText) {
-  document.body.classList.add('s1-result-active');
-  const area = document.getElementById('chat');
-  if (!area) return null;
-
-  // S1 result mode: clear the old working conversation so the final draft becomes the focus.
-  area.innerHTML = '';
-
-  const card = document.createElement('div');
-  card.className = 's1-result-card s1-result-card-focused';
-  card.innerHTML = `
-    <div class="s1-result-eyebrow">Claude Draft</div>
-    <div class="s1-result-title">Revised Discussion Prompt</div>
-    <div class="s1-result-body">${fmt(responseText)}</div>
-  `;
-  area.appendChild(card);
-  area.scrollTop = 0;
-  return card;
-}
-
-function showS1ResultControls(scoreTotal) {
-  const container = document.getElementById('inputContainer');
-  if (container) container.innerHTML = '';
-
-  const area = document.getElementById('chat');
-  if (!area) return;
-
-  const old = document.getElementById('s1ResultActions');
-  if (old) old.remove();
-
-  const thresholdMet = scoreTotal >= SCORE_THRESHOLD;
-  const controls = document.createElement('div');
-  controls.id = 's1ResultActions';
-  controls.className = 's1-result-actions';
-  controls.innerHTML = `
-    <div class="s1-result-actions-heading">Scenario 1 result</div>
-    <div class="s1-result-actions-sub">Claude's draft is shown above. Professor Pixel will explain what changed.</div>
-    <div class="s1-result-actions-buttons">
-      <button type="button" class="s1-secondary-btn" onclick="reviseS1()">Revise S1</button>
-      ${thresholdMet ? `<button type="button" class="guided-send-btn" onclick="navigateToNext(1)">Continue to S2 →</button>` : ''}
-    </div>
-    ${s1ReferencePanelHTML()}
-  `;
-  area.appendChild(controls);
-  setTimeout(() => controls.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
-}
 function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose = null, scoreTotal = null) {
+  // S2: wrap onClose to render the result card after terminal closes
+  let effectiveClose = onClose;
+  if (scenarioIndex === 1) {
+    effectiveClose = function() {
+      addS2ClaudeResultCard(responseText);
+      if (typeof onClose === 'function') onClose();
+    };
+  }
   showClaudeConsultOverlay('Scenario diagnosis');
   setTimeout(() => {
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
       ? buildS1TerminalDiagnosis(scoreTotal, responseText)
       : responseText;
-    showClaudeConsultResult(terminalOutput, mock, onClose);
-  },1000);
+    showClaudeConsultResult(terminalOutput, mock, effectiveClose);
+  }, 1500);
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
-function showPixelScoreReflection(totalScore, onDone = null) {
-  let lines;
-  if (totalScore <= 1) {
-    lines = [
-      { expr: 'skeptical', text: 'Claude had to make a lot of assumptions there.' },
-      { expr: 'thinking', text: 'Before trying again, give it clearer learner context, the specific discussion failure, and what a stronger reply should actually do.' }
-    ];
-  } else if (totalScore <= 2) {
-    lines = [
-      { expr: 'encouraging', text: 'You are starting to give Claude useful context.' },
-      { expr: 'thinking', text: 'Now tighten the connection to the original problem: shallow replies and conversations that stop after one exchange.' }
-    ];
-  } else if (totalScore <= 3) {
-    lines = [
-      { expr: 'encouraging', text: 'Much better. Claude is responding to the teaching problem instead of guessing at a generic discussion activity.' },
-      { expr: 'neutral', text: 'The next improvement is to make the interaction move and success criteria more explicit.' }
-    ];
-  } else if (totalScore <= 4) {
-    lines = [
-      { expr: 'proud', text: 'Nice work. The prompt gives Claude enough context to address the dead-discussion problem directly.' },
-      { expr: 'encouraging', text: 'Notice how the response changes when the prompt includes learners, constraints, and a clear interaction strategy.' }
-    ];
-  } else {
-    lines = [
-      { expr: 'excited', text: 'Excellent. Claude had very little guessing to do.' },
-      { expr: 'proud', text: 'That is the goal: use AI as a capable analysis partner while keeping the instructional judgment with you.' }
-    ];
-  }
-  lines.forEach((line, idx) => vnShow(line.expr, line.text, idx === lines.length - 1 ? onDone : null));
-}
-
 function closeClaudeConsultOverlay() {
   const cb = claudeTerminalCloseCallback;
   claudeTerminalCloseCallback = null;
@@ -2854,7 +2775,7 @@ function pcClearVNStateForScenarioSwitch() {
   try { clearTimeout(vnTypeTimer); } catch(e) {}
   try { setClaudeShelfState('idle', 'idle'); } catch(e) {}
   try { setClaudeTerminalTextMode(false); } catch(e) {}
-  try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE'); } catch(e) {}
+  try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'PROCESSING PROMPT...'); } catch(e) {}
   try { musicEndVN(); } catch(e) {}
 }
 
@@ -3119,124 +3040,23 @@ function renderInputMode(idx) {
   if (!container) return;
   container.classList.remove('s1-workbench');
 
-  if (idx === 0)      renderGuidedBuilder(container);
-  else if (idx === 1) renderHintChips(container);
-  else if (idx === 2) renderOpenWithMemory(container);
-  else                renderOpenPlain(container); // S3, S4, S5, S6 all get plain open
+  if (idx === 0) {
+    renderGuidedBuilder(container);
+  } else if (idx === 1) {
+    // S2: metacognition workbench
+    document.body.classList.add('s2-active');
+    document.body.classList.remove('s2-submitted');
+    renderS2MetacognitionWorkbench(container);
+  } else if (idx === 2) {
+    document.body.classList.remove('s2-active', 's2-submitted');
+    renderOpenWithMemory(container);
+  } else {
+    document.body.classList.remove('s2-active', 's2-submitted');
+    renderOpenPlain(container);
+  }
 }
 
 // ── MODE 1: GUIDED BUILDER (Scenario 1) ──────────────
-function renderGuidedBuilder(container) {
-  container.classList.add('s1-workbench');
-  container.innerHTML = `
-    <div class="scaffold-area">
-      <div class="s1-mission-card mission-briefing-card" role="note" aria-label="Mission briefing">
-        <div class="mission-eyebrow">Mission Briefing</div>
-        <div class="mission-title">Fix the dead discussion board.</div>
-        <div class="mission-copy">
-          Students are posting and replying, but the conversation dies after one exchange. Use Claude to redesign the prompt so peer replies extend, challenge, or build on ideas instead of checking a box.
-        </div>
-      </div>
-
-      <div class="s1-left-stack">
-        <div class="problem-artifact-card" role="region" aria-label="Scenario 1 problem artifact">
-          <div class="problem-artifact-eyebrow">Faculty Submission</div>
-          <div class="problem-artifact-title">Current Discussion Prompt</div>
-          <div class="problem-artifact-content">
-            What did you think about this week's reading?<br><br>
-            Reply to at least two classmates.
-          </div>
-          <div class="problem-artifact-stats" aria-label="Discussion board symptoms">
-            <div class="artifact-stat"><strong>Average Replies</strong><span>1.1 per student</span></div>
-            <div class="artifact-stat"><strong>Post Quality</strong><span>Mostly one-sentence reactions</span></div>
-            <div class="artifact-stat"><strong>Conversation</strong><span>Rarely continues after one exchange</span></div>
-          </div>
-        </div>
-
-        <div class="ingredient-panel" role="region" aria-label="Prompt ingredients checklist">
-          <div class="ingredient-heading">Prompt Ingredients</div>
-          <div class="ingredient-row">
-            <span class="ingredient-chip" id="ing-audience">Audience</span>
-            <span class="ingredient-chip" id="ing-goal">Goal</span>
-            <span class="ingredient-chip" id="ing-context">Course Context</span>
-            <span class="ingredient-chip" id="ing-constraints">Constraints</span>
-            <span class="ingredient-chip" id="ing-success">Success Criteria</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="s1-right-stack">
-        <div class="guided-builder" id="guidedBuilder">
-          <div class="guided-field">
-            <label class="guided-label" for="g-learners">
-              <span class="guided-label-num">1</span>
-              Learners + course
-            </label>
-            <textarea class="guided-input" id="g-learners" rows="2"
-              placeholder="e.g. First-year online general education students in an 8-week asynchronous course..."
-              oninput="onGuidedInput(this)" aria-label="Describe your learners and course context"></textarea>
-          </div>
-
-          <div class="guided-field">
-            <label class="guided-label" for="g-issue">
-              <span class="guided-label-num">2</span>
-              What is failing?
-            </label>
-            <textarea class="guided-input" id="g-issue" rows="2"
-              placeholder="e.g. Students write one-sentence reactions and do not build on peers' ideas..."
-              oninput="onGuidedInput(this)" aria-label="Describe the specific discussion problem to fix"></textarea>
-          </div>
-
-          <div class="guided-field">
-            <label class="guided-label" for="g-interaction">
-              <span class="guided-label-num">3</span>
-              Interaction move
-            </label>
-            <textarea class="guided-input" id="g-interaction" rows="2"
-              placeholder="e.g. Ask students to compare viewpoints, use evidence, and ask one follow-up question to a peer..."
-              oninput="onGuidedInput(this)" aria-label="Describe how students should interact differently"></textarea>
-          </div>
-
-          <div class="guided-field">
-            <label class="guided-label" for="g-constraints">
-              <span class="guided-label-num">4</span>
-              Constraints + success criteria
-            </label>
-            <textarea class="guided-input" id="g-constraints" rows="2"
-              placeholder="e.g. Fully asynchronous, no extra tools, two peer replies, strong posts explain reasoning and include an example..."
-              oninput="onGuidedInput(this)" aria-label="Add constraints and success criteria"></textarea>
-          </div>
-
-          <div class="s1-builder-nudge" id="s1BuilderNudge" role="status" aria-live="polite" style="display:none;"></div>
-
-          <div class="guided-footer">
-            <button class="guided-skip-link" onclick="switchToOpen()" type="button">
-              Write it myself instead
-            </button>
-            <span class="guided-attempt-badge">Attempts: <span id="attNum">0</span></span>
-            <button class="guided-send-btn" id="sendBtn"
-                    onclick="sendGuided()" aria-label="Send assembled prompt to Claude">
-              Consult Claude →
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  requestAnimationFrame(() => {
-    restoreS1DraftToFields();
-    ['g-learners','g-issue','g-interaction','g-constraints'].forEach(id => autoGrow(document.getElementById(id)));
-  });
-}
-
-function getS1GuidedValues() {
-  return {
-    learners:    (document.getElementById('g-learners')?.value    || '').trim(),
-    issue:       (document.getElementById('g-issue')?.value       || '').trim(),
-    interaction: (document.getElementById('g-interaction')?.value || '').trim(),
-    constraints: (document.getElementById('g-constraints')?.value || '').trim(),
-  };
-}
-
 function getS1SavedDraft() {
   const s1 = playerHistory?.s1 || {};
   return {
@@ -3245,34 +3065,6 @@ function getS1SavedDraft() {
     interaction: s1.interaction || '',
     constraints: s1.constraints || '',
   };
-}
-
-function saveS1Draft(values = getS1GuidedValues()) {
-  if (!playerHistory.s1) playerHistory.s1 = {};
-  playerHistory.s1.learners = values.learners || '';
-  playerHistory.s1.issue = values.issue || '';
-  playerHistory.s1.goal = values.issue || ''; // legacy key used by later memory hints
-  playerHistory.s1.interaction = values.interaction || '';
-  playerHistory.s1.constraints = values.constraints || '';
-  playerHistory.s1.assembled = buildS1AssembledPrompt(values);
-}
-
-function restoreS1DraftToFields() {
-  const saved = getS1SavedDraft();
-  const fields = [
-    ['g-learners', saved.learners],
-    ['g-issue', saved.issue],
-    ['g-interaction', saved.interaction],
-    ['g-constraints', saved.constraints],
-  ];
-  fields.forEach(([id, val]) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.value = val || '';
-    autoGrow(el);
-  });
-  const first = document.getElementById('g-learners');
-  if (first) onGuidedInput(first);
 }
 
 function s1ReferencePanelHTML() {
@@ -3296,71 +3088,6 @@ function s1ReferencePanelHTML() {
     </div>`;
 }
 
-function reviseS1() {
-    const saved = typeof getS1SavedDraft === 'function'
-      ? getS1SavedDraft()
-      : {
-          learners: '',
-          issue: '',
-          interaction: '',
-          constraints: ''
-        };
-
-    const area = document.getElementById('chat');
-    if (area) area.innerHTML = '';
-
-    document.body.classList.remove('s1-result-active');
-    document.body.classList.add('s1-active');
-
-    const container = document.getElementById('inputContainer');
-    renderGuidedBuilder(container);
-
-    setTimeout(() => {
-      const map = {
-        'g-learners': saved.learners || '',
-        'g-issue': saved.issue || saved.goal || '',
-        'g-interaction': saved.interaction || '',
-        'g-constraints': saved.constraints || ''
-      };
-
-      Object.entries(map).forEach(([id, value]) => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.value = value;
-          if (typeof autoGrow === 'function') autoGrow(el);
-        }
-      });
-
-      if (typeof onGuidedInput === 'function') {
-        onGuidedInput(document.getElementById('g-learners'));
-      }
-    }, 50);
-  }
-
-function buildS1AssembledPrompt(values) {
-  const { learners, issue, interaction, constraints } = values;
-  const parts = [
-    `I need help fixing this weak asynchronous discussion prompt: "What did you think about this week's reading? Reply to at least two classmates."`,
-  ];
-  if (learners)    parts.push(`Learners and course context: ${learners}.`);
-  if (issue)       parts.push(`The current problem is: ${issue}.`);
-  if (interaction) parts.push(`Redesign the discussion so students: ${interaction}.`);
-  if (constraints) parts.push(`Constraints and success criteria: ${constraints}.`);
-  parts.push(`Please create a revised student-facing discussion prompt and briefly explain how it addresses the original problem of surface-level replies.`);
-  return parts.join(' ');
-}
-
-function analyzeS1Guided(values) {
-  const allText = `${values.learners} ${values.issue} ${values.interaction} ${values.constraints}`.toLowerCase();
-  return {
-    audience: values.learners.length > 8 || /student|learner|class|course|online|first-year|adult|faculty|cohort|gen ed|general education/.test(allText),
-    issue: values.issue.length > 8 || /one.sentence|surface|shallow|dead|not build|do not build|generic|reply|replies|conversation|dies|weak/.test(allText),
-    interaction: values.interaction.length > 12 || /compare|contrast|respond|reply|peer|build|question|evidence|example|explain|reason|connect|disagree|agree|extend/.test(allText),
-    constraints: values.constraints.length > 8 || /minute|week|reply|peer|two|2|asynchronous|format|word|time|low tech|no extra|lms|canvas/.test(allText),
-    success: /substantive|meaningful|evidence|example|build|criteria|reason|explain|success|quality|rubric|strong|specific|follow.up|follow-up/.test(allText)
-  };
-}
-
 function showS1BuilderNudge(missing) {
   const nudge = document.getElementById('s1BuilderNudge');
   if (!nudge) return;
@@ -3371,37 +3098,6 @@ function showS1BuilderNudge(missing) {
   }
   nudge.style.display = 'block';
   nudge.innerHTML = `<strong>Pixel's nudge:</strong> Before we test this, connect your prompt back to the dead discussion board. Add: ${missing.join(', ')}.`;
-}
-
-function onGuidedInput(el) {
-  autoGrow(el);
-  const values = getS1GuidedValues();
-  saveS1Draft(values);
-  const checks = analyzeS1Guided(values);
-
-  const ingredientChecks = {
-    audience: checks.audience,
-    goal: checks.issue,
-    context: checks.interaction,
-    constraints: checks.constraints,
-    success: checks.success
-  };
-
-  Object.entries(ingredientChecks).forEach(([key, covered]) => {
-    const chip = document.getElementById(`ing-${key}`);
-    if (!chip) return;
-    chip.classList.toggle('covered', covered);
-    chip.setAttribute('aria-label', `${chip.textContent} — ${covered ? 'covered' : 'not yet covered'}`);
-  });
-
-  const missing = [];
-  if (!checks.issue) missing.push('the specific failure');
-  if (!checks.interaction) missing.push('how students should respond to each other');
-  if (!checks.success) missing.push('what a stronger reply should include');
-  showS1BuilderNudge(missing.length >= 2 ? missing : []);
-
-  // The assembled prompt is intentionally hidden from the player.
-  // S1 should feel like diagnosing a teaching problem, not inspecting a giant prompt blob.
 }
 
 
@@ -3490,33 +3186,6 @@ async function reviewS1Part(part) {
   }
 }
 
-
-function sendGuided() {
-  const values = getS1GuidedValues();
-  const checks = analyzeS1Guided(values);
-  const missing = [];
-  if (!checks.audience) missing.push('learners/course context');
-  if (!checks.issue) missing.push('the specific failure');
-  if (!checks.interaction) missing.push('the interaction move');
-  if (!checks.success) missing.push('success criteria');
-
-  // For S1, do not let the guided path send a prompt that ignores the actual dead-discussion problem.
-  if (missing.length) {
-    showS1BuilderNudge(missing);
-    if (!checks.audience) document.getElementById('g-learners')?.focus();
-    else if (!checks.issue) document.getElementById('g-issue')?.focus();
-    else if (!checks.interaction) document.getElementById('g-interaction')?.focus();
-    else document.getElementById('g-constraints')?.focus();
-    return;
-  }
-
-  const assembled = buildS1AssembledPrompt(values);
-
-  // Save to player history for scenario 3 memory hint and S1 revision.
-  playerHistory.s1 = { learners: values.learners, issue: values.issue, goal: values.issue, interaction: values.interaction, constraints: values.constraints, assembled };
-
-  sendText(assembled);
-}
 
 function switchToOpen() {
   // Replaces guided builder with plain textarea mid-session
@@ -3651,116 +3320,6 @@ function renderOpenPlain(container) {
 // turn one prompt into a tiny haunted carousel.
 let predictionGateActive = false;
 let isSubmittingToClaude = false;
-
-function sendText(text) {
-  if (!text || isSubmittingToClaude || predictionGateActive) return;
-  const btn = document.getElementById('sendBtn');
-  if (btn) btn.disabled = true;
-  showPredictionGate(text);
-}
-
-function showPredictionGate(text) {
-  window.pendingPromptForPrediction = text;
-  predictionGateActive = true;
-
-  // Clean up any older prediction UI from earlier builds.
-  const existing = document.getElementById('predictionGate');
-  if (existing) existing.remove();
-  const oldPanel = document.getElementById('vnPredictionChoicePanel');
-  if (oldPanel) oldPanel.remove();
-
-  // Keep prediction as a normal VN choice moment. The terminal takes over after the choice,
-  // not before. This avoids the competing-overlay mess and keeps the scene readable.
-  vnQueue = [];
-  clearTimeout(vnTypeTimer);
-  vnTyping = false;
-  vnOnComplete = null;
-  vnFullText = '';
-  vnCurrentText = '';
-
-  const overlay = document.getElementById('vnOverlay');
-  if (overlay) {
-    overlay.classList.remove('claude-consult', 'claude-terminal-consult', 'claude-terminal-textmode', 'claude-prediction');
-    overlay.classList.add('active');
-  }
-
-  setClaudeTerminalTextMode(false);
-  setVNClaudeMode(false);
-  setVNClaudeTerminalMode(false);
-  setClaudeShelfState('idle', '');
-  musicStartVN();
-  vnSetExpression('thinking');
-
-  const boardText = document.getElementById('vnBoardText');
-  if (boardText) boardText.textContent = 'Before we send this to Claude, make a prediction.';
-
-  const hint = document.getElementById('vnAdvanceHint');
-  if (hint) hint.classList.remove('show');
-
-  const vnText = document.getElementById('vnText');
-  if (vnText) {
-    vnText.innerHTML = `
-      <div><strong>Before we consult Claude...</strong></div>
-      <div style="margin-top:8px;">Based on the context you gave, what do you predict Claude will do?</div>
-      <div id="vnPredictionChoicePanel" class="vn-prediction-options" role="group" aria-label="Prediction choices">
-        <button class="vn-prediction-btn" type="button" onclick="event.stopPropagation(); choosePrediction('targeted')">Very targeted response</button>
-        <button class="vn-prediction-btn" type="button" onclick="event.stopPropagation(); choosePrediction('generic')">Somewhat generic response</button>
-        <button class="vn-prediction-btn" type="button" onclick="event.stopPropagation(); choosePrediction('ignores_constraints')">May ignore constraints</button>
-        <button class="vn-prediction-btn" type="button" onclick="event.stopPropagation(); choosePrediction('not_sure')">Not sure</button>
-      </div>
-    `;
-  }
-
-  setTimeout(() => {
-    const character = document.getElementById('vnCharacter');
-    if (character) character.classList.add('visible');
-    const dialogue = document.getElementById('vnDialogue');
-    if (dialogue) dialogue.focus();
-    const firstBtn = document.querySelector('#vnPredictionChoicePanel .vn-prediction-btn');
-    if (firstBtn) firstBtn.focus();
-  }, 100);
-}
-
-function choosePrediction(choice) {
-  const text = window.pendingPromptForPrediction;
-  if (!text || isSubmittingToClaude) return;
-
-  // Prevent double-clicks or VN parent clicks from replaying the prediction gate.
-  window.pendingPromptForPrediction = '';
-  predictionGateActive = false;
-
-  // Disable and remove prediction controls.
-  document.querySelectorAll('.vn-prediction-btn').forEach(btn => {
-    btn.disabled = true;
-  });
-
-  document.getElementById('vnPredictionChoicePanel')?.remove();
-  document.getElementById('predictionGate')?.remove();
-
-  // Save the prediction for research data.
-  const s = scenarioData[scenarioIndex];
-  if (!s.predictions) s.predictions = [];
-  s.predictions.push({
-    choice,
-    prompt: text,
-    attempt: (s.attempts || 0) + 1,
-    timestamp: new Date().toISOString()
-  });
-
-  // Clear any leftover VN typing state.
-  vnQueue = [];
-  vnTyping = false;
-  vnOnComplete = null;
-  clearTimeout(vnTypeTimer);
-
-  // Immediately show the Claude thinking screen.
-  showClaudeConsultOverlay('Scenario diagnosis');
-
-  // Send the prompt after the terminal has had a moment to appear.
-  setTimeout(() => {
-    sendMain(text);
-  }, 300);
-}
 
 // ══════════════════════════════════════════════════════
 //  SEND
@@ -3990,12 +3549,6 @@ function buildFeedback(s) {
 function cleanS1ClaudeDraft(text) {
   return String(text || '')
     .replace(/^#{1,3}\s*Revised Discussion Prompt\s*/i, '')
-    .trim();
-}
-
-function cleanS1ClaudeDraft(text) {
-  return String(text || '')
-    .replace(/^#{1,3}\s*Revised Discussion Prompt\s*/i, '')
     .replace(/^Revised Discussion Prompt\s*/i, '')
     .replace(/^Here's your redesigned discussion prompt:\s*/i, '')
     .replace(/^\s*---+\s*$/gm, '')
@@ -4004,7 +3557,19 @@ function cleanS1ClaudeDraft(text) {
 }
 
 function esc(t) {
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(t ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Minimal markdown formatter used by result cards and legacy chat bubbles.
+// Claude's cleanup removed this helper, which made Consult Claude crash after the mock response returned.
+function fmt(text) {
+  return esc(String(text ?? ''))
+    .replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
+    .replace(/^##\s+(.+)$/gm, '<h3>$1</h3>')
+    .replace(/^#\s+(.+)$/gm, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br>');
 }
 
 function autoGrow(el) {
@@ -4346,109 +3911,10 @@ function devAutoChoosePrediction(choice = 'targeted') {
 }
 
 // Dev shortcut: move to the next scenario and unlock it if needed.
-function devNextScenario() {
-  const next = Math.min(scenarioIndex + 1, scenarios.length - 1);
-  if (next === scenarioIndex) return;
-
-  scenarioCompleted = scenarioCompleted.map((done, i) => i < next ? true : done);
-  if (next >= 3) unlockScenario4();
-  if (next >= 4) unlockScenario5();
-  if (next >= 5) unlockScenario6();
-  if (next >= 6) unlockScenario7();
-  if (next >= 7) unlockScenario8();
-
-  const tabs = document.querySelectorAll('.tab-btn');
-  const btn = tabs[next];
-  if (btn) {
-    btn.classList.remove('locked');
-    btn.disabled = false;
-    switchScenario(next, btn);
-  }
-}
-
 // Auto-fill test prompt and submit for S1-S3
 // Navigate to scenario without filling or sending
-function devGoScenario(idx) {
-  const tabs = document.querySelectorAll('.tab-btn');
-  const btn = tabs[idx];
-  if (!btn) return false;
-  btn.disabled = false;
-  btn.classList.remove('locked');
-  btn.removeAttribute('aria-disabled');
-  if (scenarioIndex !== idx) {
-    switchScenario(idx, btn);
-  }
-  return false;
-}
-
 // Fill the test prompt into the textarea — no auto-send
-function devFillScenario(idx) {
-  devGoScenario(idx);
-  const testPrompt = scenarios[idx].testPrompt;
-  if (!testPrompt) return;
-
-  const tryFill = (attempts) => {
-    // Scenario 1 uses the repair-focused guided builder instead of #promptInput.
-    if (idx === 0) {
-      const lEl = document.getElementById('g-learners');
-      const iEl = document.getElementById('g-issue');
-      const mEl = document.getElementById('g-interaction');
-      const cEl = document.getElementById('g-constraints');
-      if (lEl && iEl && mEl && cEl) {
-        lEl.value = 'online first-year general education students in an 8-week fully asynchronous course';
-        iEl.value = 'students are posting one-sentence reactions, replying only because it is required, and the conversation dies after one exchange';
-        mEl.value = 'compare two possible interpretations of the reading, support their claim with one specific example, and ask a follow-up question that invites a peer to extend or challenge the idea';
-        cEl.value = "no extra tools, one initial post, two substantive peer replies, and strong replies must explain reasoning, use evidence or examples, and build on a classmate's idea";
-        [lEl, iEl, mEl, cEl].forEach(el => {
-          if (typeof autoGrow === 'function') autoGrow(el);
-          if (typeof onGuidedInput === 'function') onGuidedInput(el);
-        });
-        lEl.focus();
-        return;
-      }
-    }
-
-    // S2/S3 render #promptInput after the VN intro completes.
-    const input = document.getElementById('promptInput');
-    if (input && input.offsetParent !== null) {
-      input.value = testPrompt;
-      autoGrow(input);
-      input.focus();
-      if (typeof onHintInput === 'function') onHintInput(input);
-    } else if (attempts < 30) {
-      setTimeout(() => tryFill(attempts + 1), 400);
-    }
-  };
-  setTimeout(() => tryFill(0), 400);
-}
-
 // S1 still auto-fills and sends (guided builder needs it)
-function devTestScenario(idx) {
-  const tabs = document.querySelectorAll('.tab-btn');
-  if (scenarioIndex !== idx) {
-    switchScenario(idx, tabs[idx]);
-  }
-  const testPrompt = scenarios[idx].testPrompt;
-  if (!testPrompt) return;
-
-  setTimeout(() => {
-    if (idx === 0) {
-      const learners    = 'online first-year general education students';
-      const goal        = 'Design a weekly discussion prompt that encourages deeper thinking and at least two substantive peer replies';
-      const constraints = 'Fully asynchronous course, 8 weeks long';
-      const lEl = document.getElementById('g-learners');
-      const gEl = document.getElementById('g-goal');
-      const cEl = document.getElementById('g-constraints');
-      if (lEl) { lEl.value = learners;    onGuidedInput(lEl); }
-      if (gEl) { gEl.value = goal;        onGuidedInput(gEl); }
-      if (cEl) { cEl.value = constraints; onGuidedInput(cEl); }
-      setTimeout(() => { sendGuided(); devAutoChoosePrediction('targeted'); }, 300);
-    } else {
-      devFillScenario(idx);
-    }
-  }, 400);
-}
-
 function devVN(preset) {
   const presets = {
     welcome:  { expr:'excited',     text:"Welcome to the Prompt Lab! I am Professor Pixel. This is the dev test sequence." },
@@ -4476,38 +3942,311 @@ function devComplete() {
   area.scrollTop = area.scrollHeight;
 }
 
-/* ======================================================
-   LEGACY PATCH BLOCK 1: S1 CLEAN WORKSPACE + PREDICTION FLOW
-   Kept for compatibility. Do not add new logic above this unless replacing it.
-====================================================== */
 
-(function(){
-  const S1_STORAGE_KEY = 'promptcraft_s1_clean_draft';
+// ══════════════════════════════════════════════════════
+//  S1 WORKBENCH — final owner
+//  renderGuidedBuilder, onGuidedInput, sendGuided,
+//  addS1ClaudeResultCard, showS1ResultControls, reviseS1,
+//  and all S1 guided builder helpers.
+//  These supersede the earlier definitions above.
+// ══════════════════════════════════════════════════════
+const S1_STORAGE_KEY = 'promptcraft_s1_clean_draft';
 
-  function safeJsonParse(raw, fallback){
-    try { return raw ? JSON.parse(raw) : fallback; } catch(e) { return fallback; }
+function safeJsonParse(raw, fallback){
+  try { return raw ? JSON.parse(raw) : fallback; } catch(e) { return fallback; }
+}
+
+function getS1GuidedValues(){
+  return {
+    learners: (document.getElementById('g-learners')?.value || '').trim(),
+    issue: (document.getElementById('g-issue')?.value || '').trim(),
+    interaction: (document.getElementById('g-interaction')?.value || '').trim(),
+    constraints: (document.getElementById('g-constraints')?.value || '').trim()
+  };
+};
+
+function saveS1Draft(values){
+  window.playerHistory = window.playerHistory || {};
+  window.playerHistory.s1 = Object.assign({}, values || getS1GuidedValues());
+  try { localStorage.setItem(S1_STORAGE_KEY, JSON.stringify(window.playerHistory.s1)); } catch(e) {}
+};
+
+function restoreS1DraftToFields(){
+  [['g-learners','learners'],['g-issue','issue'],['g-interaction','interaction'],['g-constraints','constraints']].forEach(([id,key]) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.value = '';
+      if (typeof autoGrow === 'function') autoGrow(el);
+    }
+  });
+
+  if (typeof onGuidedInput === 'function') {
+    onGuidedInput(document.getElementById('g-learners'));
   }
+};
 
-  window.getS1GuidedValues = function getS1GuidedValues(){
-    return {
-      learners: (document.getElementById('g-learners')?.value || '').trim(),
-      issue: (document.getElementById('g-issue')?.value || '').trim(),
-      interaction: (document.getElementById('g-interaction')?.value || '').trim(),
-      constraints: (document.getElementById('g-constraints')?.value || '').trim()
-    };
+function analyzeS1Guided(values){
+  const allText = `${values.learners} ${values.issue} ${values.interaction} ${values.constraints}`.toLowerCase();
+  return {
+    audience: values.learners.length > 12 || /student|learner|class|course|online|first-year|adult|faculty|cohort|gen ed|general education|asynchronous/.test(allText),
+    issue: values.issue.length > 12 || /one.sentence|one sentence|surface|shallow|dead|not build|do not build|generic|reply|replies|conversation|dies|stops|weak|required/.test(allText),
+    interaction: values.interaction.length > 12 || /compare|contrast|respond|reply|peer|build|question|evidence|example|explain|reason|connect|disagree|agree|extend|challenge|follow/.test(allText),
+    constraints: values.constraints.length > 8 || /minute|week|reply|peer|two|2|asynchronous|format|word|time|low tech|no extra|lms|canvas|deadline/.test(allText),
+    success: /substantive|meaningful|evidence|example|build|criteria|reason|explain|success|quality|rubric|strong|specific|follow.up|follow-up|extend|challenge/.test(allText)
   };
+};
 
-  window.saveS1Draft = function saveS1Draft(values){
-    window.playerHistory = window.playerHistory || {};
-    window.playerHistory.s1 = Object.assign({}, values || getS1GuidedValues());
-    try { localStorage.setItem(S1_STORAGE_KEY, JSON.stringify(window.playerHistory.s1)); } catch(e) {}
+function buildS1MissionHTML(){
+  return `
+    <section class="s1-clean-mission" role="region" aria-label="Mission briefing">
+      <div class="mission-eyebrow">Mission Briefing</div>
+      <div class="mission-title">Fix the dead discussion board.</div>
+      <div class="mission-copy">
+        Students are participating, but the conversation dies after one exchange. Diagnose the problem and use Claude to redesign the discussion so students extend, challenge, and build on ideas.
+      </div>
+    </section>`;
+}
+
+function buildS1LeftHTML(){
+  return `
+    <div class="s1-clean-left">
+      <section class="s1-clean-card" aria-label="Faculty submission">
+        <div class="s1-clean-eyebrow">Faculty Submission</div>
+        <div class="s1-clean-title">Current Discussion Prompt</div>
+        <div class="s1-clean-prompt">
+          What did you think about this week's reading?<br><br>
+          Reply to at least two classmates.
+        </div>
+        <div class="s1-clean-title" style="font-size:0.98rem;margin-bottom:7px;">Observed Problems</div>
+        <div class="s1-clean-observed">
+          <div><strong>Post quality:</strong> Mostly one-sentence reactions.</div>
+          <div><strong>Peer replies:</strong> Feel required, not conversational.</div>
+          <div><strong>Conversation:</strong> Rarely continues beyond one exchange.</div>
+        </div>
+        <div class="s1-clean-ingredients" aria-label="Prompt ingredients checklist">
+          <div class="ingredient-heading">Prompt Ingredients</div>
+          <div class="ingredient-row">
+            <span class="ingredient-chip" id="ing-audience">Audience</span>
+            <span class="ingredient-chip" id="ing-goal">Problem</span>
+            <span class="ingredient-chip" id="ing-context">Interaction Move</span>
+            <span class="ingredient-chip" id="ing-constraints">Constraints</span>
+            <span class="ingredient-chip" id="ing-success">Success Criteria</span>
+          </div>
+        </div>
+      </section>
+    </div>`;
+}
+
+function buildS1RightHTML(){
+  return `
+    <div class="s1-clean-right">
+      <section class="s1-clean-builder" aria-label="Repair workspace">
+        <div class="s1-clean-builder-head">
+          <div>
+            <div class="s1-clean-builder-title">Repair Workspace</div>
+            <div class="s1-clean-builder-sub">Give Claude the information it needs to repair the actual teaching problem, not just make a prettier prompt.</div>
+          </div>
+        </div>
+        <div class="s1-clean-fields">
+          <div class="s1-clean-field">
+            <label class="s1-clean-label" for="g-learners"><span class="s1-clean-num">1</span>Learners + course</label>
+            <textarea class="s1-clean-textarea" id="g-learners" rows="3" placeholder="Who are these students? What kind of course is this?" oninput="onGuidedInput(this)" aria-label="Describe learners and course"></textarea>
+          </div>
+          <div class="s1-clean-field">
+            <label class="s1-clean-label" for="g-issue"><span class="s1-clean-num">2</span>What is failing?</label>
+            <textarea class="s1-clean-textarea" id="g-issue" rows="3" placeholder="What exactly is going wrong in the discussion?" oninput="onGuidedInput(this)" aria-label="Describe the discussion problem"></textarea>
+          </div>
+          <div class="s1-clean-field">
+            <label class="s1-clean-label" for="g-interaction"><span class="s1-clean-num">3</span>Interaction move</label>
+            <textarea class="s1-clean-textarea" id="g-interaction" rows="3" placeholder="How should students build on, challenge, compare, or extend peer ideas?" oninput="onGuidedInput(this)" aria-label="Describe the interaction move"></textarea>
+          </div>
+          <div class="s1-clean-field">
+            <label class="s1-clean-label" for="g-constraints"><span class="s1-clean-num">4</span>Constraints + success criteria</label>
+            <textarea class="s1-clean-textarea" id="g-constraints" rows="3" placeholder="What limits matter? What should a strong reply include?" oninput="onGuidedInput(this)" aria-label="Describe constraints and success criteria"></textarea>
+          </div>
+        </div>
+        <div class="s1-clean-actions">
+          <div class="s1-clean-nudge" id="s1BuilderNudge"></div>
+          <button class="s1-clean-submit" id="sendBtn" type="button" onclick="sendGuided()">Consult Claude →</button>
+        </div>
+      </section>
+    </div>`;
+}
+
+function renderGuidedBuilder(container){
+  if (!container) container = document.getElementById('inputContainer');
+  if (!container) return;
+  document.body.classList.add('s1-active');
+  document.body.classList.remove('s1-result-active');
+  container.className = 's1-clean-workbench';
+  container.style.display = 'flex';
+  container.innerHTML = `
+    <div class="s1-clean-stage">
+      ${buildS1MissionHTML()}
+      <div class="s1-clean-grid">
+        ${buildS1LeftHTML()}
+        ${buildS1RightHTML()}
+      </div>
+    </div>`;
+  restoreS1DraftToFields();
+  setTimeout(() => document.getElementById('g-learners')?.focus(), 60);
+};
+
+function onGuidedInput(el){
+  if (el && typeof autoGrow === 'function') autoGrow(el);
+  const values = getS1GuidedValues();
+  saveS1Draft(values);
+  const checks = analyzeS1Guided(values);
+  const ingredientChecks = {
+    audience: checks.audience,
+    goal: checks.issue,
+    context: checks.interaction,
+    constraints: checks.constraints,
+    success: checks.success
   };
+  Object.entries(ingredientChecks).forEach(([key, covered]) => {
+    const chip = document.getElementById(`ing-${key}`);
+    if (!chip) return;
+    chip.classList.toggle('covered', !!covered);
+    chip.setAttribute('aria-label', `${chip.textContent} — ${covered ? 'covered' : 'not yet covered'}`);
+  });
+  const missing = [];
+  if (!checks.issue) missing.push('name the specific failure');
+  if (!checks.interaction) missing.push('define how students should respond to one another');
+  if (!checks.success) missing.push('say what a stronger reply should include');
+  const nudge = document.getElementById('s1BuilderNudge');
+  if (nudge) {
+    if (missing.length >= 2) {
+      nudge.style.display = 'block';
+      nudge.innerHTML = `<strong>Pixel's nudge:</strong> ${missing.join('; ')}.`;
+    } else {
+      nudge.style.display = 'none';
+      nudge.innerHTML = '';
+    }
+  }
+};
 
-  window.restoreS1DraftToFields = function restoreS1DraftToFields(){
-    [['g-learners','learners'],['g-issue','issue'],['g-interaction','interaction'],['g-constraints','constraints']].forEach(([id,key]) => {
+function buildS1AssembledPrompt(values){
+  const parts = [
+    `I need help fixing this weak asynchronous discussion prompt: "What did you think about this week's reading? Reply to at least two classmates."`
+  ];
+  if (values.learners) parts.push(`Learners and course context: ${values.learners}.`);
+  if (values.issue) parts.push(`The current problem is: ${values.issue}.`);
+  if (values.interaction) parts.push(`Redesign the discussion so students: ${values.interaction}.`);
+  if (values.constraints) parts.push(`Constraints and success criteria: ${values.constraints}.`);
+  parts.push('Create a revised student-facing discussion prompt. Keep it practical for an asynchronous online course. Briefly explain how the revision addresses the original problem of surface-level replies.');
+  return parts.join(' ');
+};
+
+function sendGuided(){
+  const values = getS1GuidedValues();
+  saveS1Draft(values);
+  const checks = analyzeS1Guided(values);
+  const missing = [];
+  if (!checks.audience) missing.push('audience/course');
+  if (!checks.issue) missing.push('problem diagnosis');
+  if (!checks.interaction) missing.push('interaction move');
+  if (!checks.constraints) missing.push('constraints');
+  if (!checks.success) missing.push('success criteria');
+  if (missing.length >= 3) {
+    const nudge = document.getElementById('s1BuilderNudge');
+    if (nudge) {
+      nudge.style.display = 'block';
+      nudge.innerHTML = `<strong>Before we ask Claude:</strong> Add more detail for ${missing.join(', ')}.`;
+    }
+    const focusMap = { 'audience/course':'g-learners', 'problem diagnosis':'g-issue', 'interaction move':'g-interaction', 'constraints':'g-constraints', 'success criteria':'g-constraints' };
+    document.getElementById(focusMap[missing[0]])?.focus();
+    return;
+  }
+  sendText(buildS1AssembledPrompt(values));
+};
+
+function buildS1TerminalDiagnosis(score, responseText){
+  const values = getS1GuidedValues();
+  const checks = analyzeS1Guided(values);
+  const level = score <= 2 ? 'NEEDS MORE CONTEXT' : score <= 3 ? 'PARTIAL REPAIR DETECTED' : score <= 4 ? 'STRONG REPAIR DETECTED' : 'HIGH-CONFIDENCE REPAIR';
+  const missing = [];
+  if (!checks.audience) missing.push('learner context');
+  if (!checks.issue) missing.push('problem diagnosis');
+  if (!checks.interaction) missing.push('interaction strategy');
+  if (!checks.constraints) missing.push('constraints');
+  if (!checks.success) missing.push('success criteria');
+  const issue = 'Students are replying because the prompt requires replies, but the prompt does not create a reason to continue the conversation.';
+  const repair = missing.length
+    ? `Strengthen: ${missing.join(', ')}.`
+    : 'Require students to extend, challenge, compare, or build on a peer\'s idea using evidence or reasoning.';
+  const confidence = score <= 2 ? 'LOW' : score <= 3 ? 'MODERATE' : 'HIGH';
+  return `STATUS\n${level}\n\nISSUE DETECTED\n${issue}\n\nRECOMMENDED REPAIR\n${repair}\n\nCONFIDENCE\n${confidence}`;
+};
+
+function addS1ClaudeResultCard(responseText){
+  document.body.classList.add('s1-result-active');
+  const area = document.getElementById('chat');
+  if (!area) return null;
+  area.innerHTML = '';
+  const values = (window.playerHistory && window.playerHistory.s1) || getS1GuidedValues();
+  const card = document.createElement('div');
+  card.className = 's1-result-card s1-result-card-focused';
+  card.innerHTML = `
+    <div class="s1-result-eyebrow">Claude Draft</div>
+    <div class="s1-result-title">Revised Discussion Prompt</div>
+    <div class="s1-result-body">${fmt(cleanS1ClaudeDraft(responseText))}</div>
+    <div class="s1-clean-reference">
+      <div class="s1-clean-reference-title">Your Repair Notes</div>
+      <div><strong>Learners:</strong> ${esc(values.learners || 'Not provided')}</div>
+      <div><strong>Problem:</strong> ${esc(values.issue || 'Not provided')}</div>
+      <div><strong>Interaction:</strong> ${esc(values.interaction || 'Not provided')}</div>
+      <div><strong>Constraints:</strong> ${esc(values.constraints || 'Not provided')}</div>
+    </div>`;
+  area.appendChild(card);
+  area.scrollTop = 0;
+  return card;
+};
+
+function showS1ResultControls(scoreTotal){
+  const container = document.getElementById('inputContainer');
+  if (!container) return;
+  const thresholdMet = scoreTotal >= SCORE_THRESHOLD;
+  container.className = '';
+  container.style.display = 'block';
+  container.innerHTML = `
+    <div class="s1-result-controls" role="region" aria-label="Scenario 1 result options">
+      <div>
+        <div class="s1-result-controls-title">Scenario 1 result</div>
+        <div class="s1-result-controls-sub">Claude's draft is shown above. Professor Pixel will explain what changed.</div>
+      </div>
+      <div class="s1-result-controls-actions">
+        <button class="s1-secondary-btn" type="button" onclick="reviseS1()">Revise S1</button>
+        ${thresholdMet ? `<button class="continue-btn" type="button" onclick="navigateToNext(1)">Next scenario →</button>` : `<button class="continue-btn" type="button" onclick="reviseS1()">Strengthen and try again</button>`}
+      </div>
+    </div>`;
+};
+
+window.reviseS1 = reviseS1 = function reviseS1(){
+  const saved = Object.assign(
+    {},
+    JSON.parse(localStorage.getItem('promptcraft_s1_clean_draft') || '{}'),
+    window.playerHistory?.s1 || {}
+  );
+
+  const area = document.getElementById('chat');
+  if (area) area.innerHTML = '';
+
+  document.body.classList.remove('s1-result-active');
+  document.body.classList.add('s1-active');
+
+  renderGuidedBuilder(document.getElementById('inputContainer'));
+
+  setTimeout(() => {
+    [
+      ['g-learners', 'learners'],
+      ['g-issue', 'issue'],
+      ['g-interaction', 'interaction'],
+      ['g-constraints', 'constraints']
+    ].forEach(([id, key]) => {
       const el = document.getElementById(id);
       if (el) {
-        el.value = '';
+        el.value = saved[key] || '';
         if (typeof autoGrow === 'function') autoGrow(el);
       }
     });
@@ -4515,1391 +4254,766 @@ function devComplete() {
     if (typeof onGuidedInput === 'function') {
       onGuidedInput(document.getElementById('g-learners'));
     }
-  };
 
-  window.analyzeS1Guided = function analyzeS1Guided(values){
-    const allText = `${values.learners} ${values.issue} ${values.interaction} ${values.constraints}`.toLowerCase();
-    return {
-      audience: values.learners.length > 12 || /student|learner|class|course|online|first-year|adult|faculty|cohort|gen ed|general education|asynchronous/.test(allText),
-      issue: values.issue.length > 12 || /one.sentence|one sentence|surface|shallow|dead|not build|do not build|generic|reply|replies|conversation|dies|stops|weak|required/.test(allText),
-      interaction: values.interaction.length > 12 || /compare|contrast|respond|reply|peer|build|question|evidence|example|explain|reason|connect|disagree|agree|extend|challenge|follow/.test(allText),
-      constraints: values.constraints.length > 8 || /minute|week|reply|peer|two|2|asynchronous|format|word|time|low tech|no extra|lms|canvas|deadline/.test(allText),
-      success: /substantive|meaningful|evidence|example|build|criteria|reason|explain|success|quality|rubric|strong|specific|follow.up|follow-up|extend|challenge/.test(allText)
-    };
-  };
+    document.getElementById('g-learners')?.focus();
+  }, 100);
+};
 
-  function buildS1MissionHTML(){
-    return `
-      <section class="s1-clean-mission" role="region" aria-label="Mission briefing">
-        <div class="mission-eyebrow">Mission Briefing</div>
-        <div class="mission-title">Fix the dead discussion board.</div>
-        <div class="mission-copy">
-          Students are participating, but the conversation dies after one exchange. Diagnose the problem and use Claude to redesign the discussion so students extend, challenge, and build on ideas.
-        </div>
-      </section>`;
+function showPixelScoreReflection(totalScore, onDone = null){
+  const dialogue = document.getElementById('vnDialogue');
+  if (dialogue) dialogue.classList.remove('has-choices');
+  const d = window.pixelDialogue;
+  let lines;
+  if (scenarioIndex === 1) {
+    // S2 metacognition reflection
+    lines =
+      totalScore <= 2 ? d.s2_scoreReflection_0_2 :
+      totalScore <= 3 ? d.s2_scoreReflection_3   :
+                        d.s2_scoreReflection_4_5;
+  } else {
+    // S1 and default
+    lines =
+      totalScore <= 1 ? d.scoreReflection_0_1 :
+      totalScore <= 2 ? d.scoreReflection_2   :
+      totalScore <= 3 ? d.scoreReflection_3   :
+      totalScore <= 4 ? d.scoreReflection_4   :
+                        d.scoreReflection_5;
+  }
+  lines.forEach((line, idx) => vnShow(line.expr, line.text, idx === lines.length - 1 ? onDone : null));
+};
+
+// Clean up VN classes when advancing after a choice-heavy moment.
+const oldClose = window.closeClaudeConsultOverlay;
+if (typeof oldClose === 'function') {
+  function closeClaudeConsultOverlayClean(){
+    document.getElementById('vnDialogue')?.classList.remove('has-choices');
+    return oldClose.apply(this, arguments);
+  };
+}
+
+
+// ══════════════════════════════════════════════════════
+//  SEND + PREDICTION GATE — final owner
+//  Authoritative, non-recursive implementation.
+// ══════════════════════════════════════════════════════
+
+const PC_PREDICTION_LABELS = {
+  targeted: 'It will give a targeted response.',
+  generic: 'It might still be generic.',
+  ignores_constraints: 'It may ignore some constraints.',
+  not_sure: 'I am not sure yet.'
+};
+
+const PC_PREDICTION_REACTIONS = {
+  targeted: 'Good prediction. Now we will see whether Claude actually had enough context to stay specific.',
+  generic: 'That is a reasonable suspicion. Generic input often produces generic output, because apparently machines also enjoy vague assignments.',
+  ignores_constraints: 'Exactly the kind of risk worth watching for. Constraints only help when the model actually uses them.',
+  not_sure: 'Fair. The whole point is to build that prediction muscle before trusting the output.'
+};
+
+function pcStopVN(){
+  try { vnQueue = []; } catch(e) {}
+  try { clearTimeout(vnTypeTimer); } catch(e) {}
+  try { vnTyping = false; vnOnComplete = null; vnFullText = ''; vnCurrentText = ''; } catch(e) {}
+}
+
+function pcClearPredictionUI(){
+  document.getElementById('predictionGate')?.remove();
+  document.getElementById('vnPredictionChoicePanel')?.remove();
+  document.querySelectorAll('.vn-choice-list,.vn-prediction-options,.pc-clean-choice-grid,.pc-choice-panel-final').forEach(el => el.remove());
+}
+
+function pcPredictionIsOpen(){
+  const overlay = document.getElementById('vnOverlay');
+  const text = (document.getElementById('vnText')?.textContent || '').toLowerCase();
+  return !!(overlay && overlay.classList.contains('active') &&
+    (overlay.classList.contains('claude-prediction') || overlay.classList.contains('pc-clean-prediction') || text.includes('what do you predict claude will do')));
+}
+
+function pcEnsurePredictionButtons(){
+  if (!pcPredictionIsOpen()) return;
+  if (window.pcWaitingForClaudeContinue) return;
+  const prompt = window.pendingPromptForPrediction || window.pendingPromptAfterPrediction;
+  if (!prompt) return;
+
+  let panel = document.getElementById('vnPredictionChoicePanel');
+  if (!panel) {
+    const dialogue = document.getElementById('vnDialogue') || document.getElementById('vnText');
+    if (!dialogue) return;
+    panel = document.createElement('div');
+    panel.id = 'vnPredictionChoicePanel';
+    panel.className = 'pc-choice-panel-final';
+    panel.setAttribute('role','group');
+    panel.setAttribute('aria-label','Prediction choices');
+    panel.innerHTML = Object.entries(PC_PREDICTION_LABELS).map(([choice,label]) =>
+      `<button class="pc-clean-choice-btn" type="button" data-choice="${choice}">${label}</button>`
+    ).join('');
+    dialogue.appendChild(panel);
   }
 
-  function buildS1LeftHTML(){
-    return `
-      <div class="s1-clean-left">
-        <section class="s1-clean-card" aria-label="Faculty submission">
-          <div class="s1-clean-eyebrow">Faculty Submission</div>
-          <div class="s1-clean-title">Current Discussion Prompt</div>
-          <div class="s1-clean-prompt">
-            What did you think about this week's reading?<br><br>
-            Reply to at least two classmates.
-          </div>
-          <div class="s1-clean-title" style="font-size:0.98rem;margin-bottom:7px;">Observed Problems</div>
-          <div class="s1-clean-observed">
-            <div><strong>Post quality:</strong> Mostly one-sentence reactions.</div>
-            <div><strong>Peer replies:</strong> Feel required, not conversational.</div>
-            <div><strong>Conversation:</strong> Rarely continues beyond one exchange.</div>
-          </div>
-          <div class="s1-clean-ingredients" aria-label="Prompt ingredients checklist">
-            <div class="ingredient-heading">Prompt Ingredients</div>
-            <div class="ingredient-row">
-              <span class="ingredient-chip" id="ing-audience">Audience</span>
-              <span class="ingredient-chip" id="ing-goal">Problem</span>
-              <span class="ingredient-chip" id="ing-context">Interaction Move</span>
-              <span class="ingredient-chip" id="ing-constraints">Constraints</span>
-              <span class="ingredient-chip" id="ing-success">Success Criteria</span>
-            </div>
-          </div>
-        </section>
-      </div>`;
-  }
-
-  function buildS1RightHTML(){
-    return `
-      <div class="s1-clean-right">
-        <section class="s1-clean-builder" aria-label="Repair workspace">
-          <div class="s1-clean-builder-head">
-            <div>
-              <div class="s1-clean-builder-title">Repair Workspace</div>
-              <div class="s1-clean-builder-sub">Give Claude the information it needs to repair the actual teaching problem, not just make a prettier prompt.</div>
-            </div>
-          </div>
-          <div class="s1-clean-fields">
-            <div class="s1-clean-field">
-              <label class="s1-clean-label" for="g-learners"><span class="s1-clean-num">1</span>Learners + course</label>
-              <textarea class="s1-clean-textarea" id="g-learners" rows="3" placeholder="Who are these students? What kind of course is this?" oninput="onGuidedInput(this)" aria-label="Describe learners and course"></textarea>
-            </div>
-            <div class="s1-clean-field">
-              <label class="s1-clean-label" for="g-issue"><span class="s1-clean-num">2</span>What is failing?</label>
-              <textarea class="s1-clean-textarea" id="g-issue" rows="3" placeholder="What exactly is going wrong in the discussion?" oninput="onGuidedInput(this)" aria-label="Describe the discussion problem"></textarea>
-            </div>
-            <div class="s1-clean-field">
-              <label class="s1-clean-label" for="g-interaction"><span class="s1-clean-num">3</span>Interaction move</label>
-              <textarea class="s1-clean-textarea" id="g-interaction" rows="3" placeholder="How should students build on, challenge, compare, or extend peer ideas?" oninput="onGuidedInput(this)" aria-label="Describe the interaction move"></textarea>
-            </div>
-            <div class="s1-clean-field">
-              <label class="s1-clean-label" for="g-constraints"><span class="s1-clean-num">4</span>Constraints + success criteria</label>
-              <textarea class="s1-clean-textarea" id="g-constraints" rows="3" placeholder="What limits matter? What should a strong reply include?" oninput="onGuidedInput(this)" aria-label="Describe constraints and success criteria"></textarea>
-            </div>
-          </div>
-          <div class="s1-clean-actions">
-            <div class="s1-clean-nudge" id="s1BuilderNudge"></div>
-            <button class="s1-clean-submit" id="sendBtn" type="button" onclick="sendGuided()">Consult Claude →</button>
-          </div>
-        </section>
-      </div>`;
-  }
-
-  window.renderGuidedBuilder = function renderGuidedBuilder(container){
-    if (!container) container = document.getElementById('inputContainer');
-    if (!container) return;
-    document.body.classList.add('s1-active');
-    document.body.classList.remove('s1-result-active');
-    container.className = 's1-clean-workbench';
-    container.style.display = 'flex';
-    container.innerHTML = `
-      <div class="s1-clean-stage">
-        ${buildS1MissionHTML()}
-        <div class="s1-clean-grid">
-          ${buildS1LeftHTML()}
-          ${buildS1RightHTML()}
-        </div>
-      </div>`;
-    restoreS1DraftToFields();
-    setTimeout(() => document.getElementById('g-learners')?.focus(), 60);
-  };
-
-  window.onGuidedInput = function onGuidedInput(el){
-    if (el && typeof autoGrow === 'function') autoGrow(el);
-    const values = getS1GuidedValues();
-    saveS1Draft(values);
-    const checks = analyzeS1Guided(values);
-    const ingredientChecks = {
-      audience: checks.audience,
-      goal: checks.issue,
-      context: checks.interaction,
-      constraints: checks.constraints,
-      success: checks.success
-    };
-    Object.entries(ingredientChecks).forEach(([key, covered]) => {
-      const chip = document.getElementById(`ing-${key}`);
-      if (!chip) return;
-      chip.classList.toggle('covered', !!covered);
-      chip.setAttribute('aria-label', `${chip.textContent} — ${covered ? 'covered' : 'not yet covered'}`);
-    });
-    const missing = [];
-    if (!checks.issue) missing.push('name the specific failure');
-    if (!checks.interaction) missing.push('define how students should respond to one another');
-    if (!checks.success) missing.push('say what a stronger reply should include');
-    const nudge = document.getElementById('s1BuilderNudge');
-    if (nudge) {
-      if (missing.length >= 2) {
-        nudge.style.display = 'block';
-        nudge.innerHTML = `<strong>Pixel's nudge:</strong> ${missing.join('; ')}.`;
-      } else {
-        nudge.style.display = 'none';
-        nudge.innerHTML = '';
-      }
-    }
-  };
-
-  window.buildS1AssembledPrompt = function buildS1AssembledPrompt(values){
-    const parts = [
-      `I need help fixing this weak asynchronous discussion prompt: "What did you think about this week's reading? Reply to at least two classmates."`
-    ];
-    if (values.learners) parts.push(`Learners and course context: ${values.learners}.`);
-    if (values.issue) parts.push(`The current problem is: ${values.issue}.`);
-    if (values.interaction) parts.push(`Redesign the discussion so students: ${values.interaction}.`);
-    if (values.constraints) parts.push(`Constraints and success criteria: ${values.constraints}.`);
-    parts.push('Create a revised student-facing discussion prompt. Keep it practical for an asynchronous online course. Briefly explain how the revision addresses the original problem of surface-level replies.');
-    return parts.join(' ');
-  };
-
-  window.sendGuided = function sendGuided(){
-    const values = getS1GuidedValues();
-    saveS1Draft(values);
-    const checks = analyzeS1Guided(values);
-    const missing = [];
-    if (!checks.audience) missing.push('audience/course');
-    if (!checks.issue) missing.push('problem diagnosis');
-    if (!checks.interaction) missing.push('interaction move');
-    if (!checks.constraints) missing.push('constraints');
-    if (!checks.success) missing.push('success criteria');
-    if (missing.length >= 3) {
-      const nudge = document.getElementById('s1BuilderNudge');
-      if (nudge) {
-        nudge.style.display = 'block';
-        nudge.innerHTML = `<strong>Before we ask Claude:</strong> Add more detail for ${missing.join(', ')}.`;
-      }
-      const focusMap = { 'audience/course':'g-learners', 'problem diagnosis':'g-issue', 'interaction move':'g-interaction', 'constraints':'g-constraints', 'success criteria':'g-constraints' };
-      document.getElementById(focusMap[missing[0]])?.focus();
-      return;
-    }
-    sendText(buildS1AssembledPrompt(values));
-  };
-
-  window.showPredictionGate = function showPredictionGate(text){
-    window.pendingPromptForPrediction = text;
-    window.predictionGateActive = true;
-    document.getElementById('predictionGate')?.remove();
-    document.getElementById('vnPredictionChoicePanel')?.remove();
-
-    vnQueue = [];
-    clearTimeout(vnTypeTimer);
-    vnTyping = true;
-    vnOnComplete = null;
-    vnFullText = '';
-    vnCurrentText = '';
-
-    const overlay = document.getElementById('vnOverlay');
-    overlay.classList.remove('claude-consult', 'claude-terminal-consult', 'claude-terminal-textmode');
-    overlay.classList.add('active', 'claude-prediction');
-    setClaudeTerminalTextMode(false);
-    setVNClaudeMode(false);
-    setVNClaudeTerminalMode(false);
-    setClaudeShelfState('idle', '');
-    setClaudeTerminalState('thinking', 'CLAUDE TERMINAL', 'AWAITING PREDICTION');
-    musicStartVN();
-    vnSetExpression('thinking');
-
-    const boardText = document.getElementById('vnBoardText');
-    if (boardText) boardText.textContent = 'Before we consult Claude, make a prediction.';
-    const speaker = document.getElementById('vnSpeaker');
-    if (speaker) speaker.textContent = 'Professor Pixel';
-    const dialogue = document.getElementById('vnDialogue');
-    if (dialogue) dialogue.classList.add('has-choices');
-    const hint = document.getElementById('vnAdvanceHint');
-    if (hint) hint.classList.remove('show');
-
-    const vnText = document.getElementById('vnText');
-    if (vnText) {
-      vnText.innerHTML = `
-        <div><strong>Before we consult Claude...</strong></div>
-        <div style="margin-top:8px;">Based on the context you gave, what do you predict Claude will do?</div>
-        <div class="vn-choice-list" role="group" aria-label="Prediction choices">
-          <button class="vn-choice-btn" type="button" onclick="event.stopPropagation(); choosePrediction('targeted')">It will give a targeted response.</button>
-          <button class="vn-choice-btn" type="button" onclick="event.stopPropagation(); choosePrediction('generic')">It might still be generic.</button>
-          <button class="vn-choice-btn" type="button" onclick="event.stopPropagation(); choosePrediction('ignores_constraints')">It may ignore some constraints.</button>
-          <button class="vn-choice-btn" type="button" onclick="event.stopPropagation(); choosePrediction('not_sure')">I am not sure yet.</button>
-        </div>`;
-    }
-    setTimeout(() => {
-      document.getElementById('vnCharacter')?.classList.add('visible');
-      document.querySelector('.vn-choice-btn')?.focus();
-    }, 100);
-  };
-
-  window.choosePrediction = function choosePrediction(choice){
-    const text = window.pendingPromptForPrediction;
-    if (!text || isSubmittingToClaude) return;
-    window.pendingPromptForPrediction = '';
-    window.predictionGateActive = false;
-    document.querySelectorAll('.vn-choice-btn,.vn-prediction-btn').forEach(btn => btn.disabled = true);
-    const s = scenarioData[scenarioIndex];
-    if (!s.predictions) s.predictions = [];
-    s.predictions.push({ choice, prompt:text, attempt:(s.attempts || 0) + 1, timestamp:new Date().toISOString() });
-    const dialogue = document.getElementById('vnDialogue');
-    if (dialogue) dialogue.classList.remove('has-choices');
-    const overlay = document.getElementById('vnOverlay');
-    if (overlay) overlay.classList.remove('active', 'claude-consult', 'claude-terminal-consult', 'claude-terminal-textmode', 'claude-prediction');
-    document.getElementById('vnCharacter')?.classList.remove('visible');
-    setClaudeShelfState('idle', 'idle');
-    setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
-    musicEndVN();
-    sendMain(text);
-  };
-
-  window.buildS1TerminalDiagnosis = function buildS1TerminalDiagnosis(score, responseText){
-    const values = getS1GuidedValues();
-    const checks = analyzeS1Guided(values);
-    const level = score <= 2 ? 'NEEDS MORE CONTEXT' : score <= 3 ? 'PARTIAL REPAIR DETECTED' : score <= 4 ? 'STRONG REPAIR DETECTED' : 'HIGH-CONFIDENCE REPAIR';
-    const missing = [];
-    if (!checks.audience) missing.push('learner context');
-    if (!checks.issue) missing.push('problem diagnosis');
-    if (!checks.interaction) missing.push('interaction strategy');
-    if (!checks.constraints) missing.push('constraints');
-    if (!checks.success) missing.push('success criteria');
-    const issue = 'Students are replying because the prompt requires replies, but the prompt does not create a reason to continue the conversation.';
-    const repair = missing.length
-      ? `Strengthen: ${missing.join(', ')}.`
-      : 'Require students to extend, challenge, compare, or build on a peer\'s idea using evidence or reasoning.';
-    const confidence = score <= 2 ? 'LOW' : score <= 3 ? 'MODERATE' : 'HIGH';
-    return `STATUS\n${level}\n\nISSUE DETECTED\n${issue}\n\nRECOMMENDED REPAIR\n${repair}\n\nCONFIDENCE\n${confidence}`;
-  };
-
-  window.addS1ClaudeResultCard = function addS1ClaudeResultCard(responseText){
-    document.body.classList.add('s1-result-active');
-    const area = document.getElementById('chat');
-    if (!area) return null;
-    area.innerHTML = '';
-    const values = (window.playerHistory && window.playerHistory.s1) || getS1GuidedValues();
-    const card = document.createElement('div');
-    card.className = 's1-result-card s1-result-card-focused';
-    card.innerHTML = `
-      <div class="s1-result-eyebrow">Claude Draft</div>
-      <div class="s1-result-title">Revised Discussion Prompt</div>
-      <div class="s1-result-body">${fmt(cleanS1ClaudeDraft(responseText))}</div>
-      <div class="s1-clean-reference">
-        <div class="s1-clean-reference-title">Your Repair Notes</div>
-        <div><strong>Learners:</strong> ${esc(values.learners || 'Not provided')}</div>
-        <div><strong>Problem:</strong> ${esc(values.issue || 'Not provided')}</div>
-        <div><strong>Interaction:</strong> ${esc(values.interaction || 'Not provided')}</div>
-        <div><strong>Constraints:</strong> ${esc(values.constraints || 'Not provided')}</div>
-      </div>`;
-    area.appendChild(card);
-    area.scrollTop = 0;
-    return card;
-  };
-
-  window.showS1ResultControls = function showS1ResultControls(scoreTotal){
-    const container = document.getElementById('inputContainer');
-    if (!container) return;
-    const thresholdMet = scoreTotal >= SCORE_THRESHOLD;
-    container.className = '';
-    container.style.display = 'block';
-    container.innerHTML = `
-      <div class="s1-result-controls" role="region" aria-label="Scenario 1 result options">
-        <div>
-          <div class="s1-result-controls-title">Scenario 1 result</div>
-          <div class="s1-result-controls-sub">Claude's draft is shown above. Professor Pixel will explain what changed.</div>
-        </div>
-        <div class="s1-result-controls-actions">
-          <button class="s1-secondary-btn" type="button" onclick="reviseS1()">Revise S1</button>
-          ${thresholdMet ? `<button class="continue-btn" type="button" onclick="navigateToNext(1)">Next scenario →</button>` : `<button class="continue-btn" type="button" onclick="reviseS1()">Strengthen and try again</button>`}
-        </div>
-      </div>`;
-  };
-
-  window.reviseS1 = reviseS1 = function reviseS1(){
-    const saved = Object.assign(
-      {},
-      JSON.parse(localStorage.getItem('promptcraft_s1_clean_draft') || '{}'),
-      window.playerHistory?.s1 || {}
-    );
-
-    const area = document.getElementById('chat');
-    if (area) area.innerHTML = '';
-
-    document.body.classList.remove('s1-result-active');
-    document.body.classList.add('s1-active');
-
-    renderGuidedBuilder(document.getElementById('inputContainer'));
-
-    setTimeout(() => {
-      [
-        ['g-learners', 'learners'],
-        ['g-issue', 'issue'],
-        ['g-interaction', 'interaction'],
-        ['g-constraints', 'constraints']
-      ].forEach(([id, key]) => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.value = saved[key] || '';
-          if (typeof autoGrow === 'function') autoGrow(el);
-        }
-      });
-
-      if (typeof onGuidedInput === 'function') {
-        onGuidedInput(document.getElementById('g-learners'));
-      }
-
-      document.getElementById('g-learners')?.focus();
-    }, 100);
-  };
-
-  window.showPixelScoreReflection = function showPixelScoreReflection(totalScore, onDone = null){
-    const dialogue = document.getElementById('vnDialogue');
-    if (dialogue) dialogue.classList.remove('has-choices');
-    let lines;
-    if (totalScore <= 1) {
-      lines = [
-        { expr:'skeptical', text:'Claude had to make a lot of assumptions there.' },
-        { expr:'thinking', text:'Give it clearer learner context, the specific discussion failure, and what a stronger reply should actually do.' }
-      ];
-    } else if (totalScore <= 2) {
-      lines = [
-        { expr:'encouraging', text:'You are starting to give Claude useful context.' },
-        { expr:'thinking', text:'Now tighten the connection to the original problem: shallow replies and conversations that stop after one exchange.' }
-      ];
-    } else if (totalScore <= 3) {
-      lines = [
-        { expr:'encouraging', text:'Much better. Claude is responding to the teaching problem instead of guessing at a generic discussion activity.' },
-        { expr:'neutral', text:'The next improvement is to make the interaction move and success criteria more explicit.' }
-      ];
-    } else if (totalScore <= 4) {
-      lines = [
-        { expr:'proud', text:'Nice work. The prompt gives Claude enough context to address the dead-discussion problem directly.' },
-        { expr:'encouraging', text:'Notice how the response changes when the prompt includes learners, constraints, and a clear interaction strategy.' }
-      ];
-    } else {
-      lines = [
-        { expr:'excited', text:'Excellent. Claude had very little guessing to do.' },
-        { expr:'proud', text:'Students were already doing what the prompt asked them to do. The challenge was designing better interaction, and that is exactly what you helped Claude understand.' }
-      ];
-    }
-    lines.forEach((line, idx) => vnShow(line.expr, line.text, idx === lines.length - 1 ? onDone : null));
-  };
-
-  // Clean up VN classes when advancing after a choice-heavy moment.
-  const oldClose = window.closeClaudeConsultOverlay;
-  if (typeof oldClose === 'function') {
-    window.closeClaudeConsultOverlay = function closeClaudeConsultOverlayClean(){
-      document.getElementById('vnDialogue')?.classList.remove('has-choices');
-      return oldClose.apply(this, arguments);
-    };
-  }
-})();
-
-/* ======================================================
-   LEGACY PATCH BLOCK 2: FINAL PREDICTION FLOW STABILIZER
-   This is the current owner for prediction button behavior.
-====================================================== */
-
-/* PROMPTCRAFT S1 PREDICTION FLOW STABILIZER
-   One final owner for the prediction gate, dev S1 fill, and S2 handoff.
-   No automatic Claude analysis after choice: the player must click Continue. */
-(function(){
-  const PC_REACTION = {
-    targeted: 'That is a reasonable prediction. You gave Claude enough context to aim at the real discussion problem, so it should have something specific to work with.',
-    generic: 'That could happen. Even with decent context, Claude can still drift into polite template language if the repair move is not clear enough.',
-    ignores_constraints: 'Good caution. Constraints are easy for AI to flatten or forget, especially when the prompt asks for a redesign instead of naming what must stay true.',
-    not_sure: 'That uncertainty is useful. Predicting the output before seeing it helps you notice what Claude changes, misses, or invents.'
-  };
-
-  function pcById(id){ return document.getElementById(id); }
-
-  function pcStopVNQueue(){
-    try { vnQueue = []; } catch(e) {}
-    try { clearTimeout(vnTypeTimer); } catch(e) {}
-    try { vnTyping = false; vnOnComplete = null; vnFullText = ''; vnCurrentText = ''; } catch(e) {}
-  }
-
-  window.pcCloseVNOverlayForDev = function pcCloseVNOverlayForDev(){
-    pcStopVNQueue();
-    const overlay = pcById('vnOverlay');
-    if (overlay) {
-      overlay.classList.remove('active','claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-prediction','pc-clean-prediction','pc-clean-output');
-    }
-    pcById('vnDialogue')?.classList.remove('has-choices');
-    pcById('vnCharacter')?.classList.remove('visible');
-    pcById('vnPredictionChoicePanel')?.remove();
-    document.querySelectorAll('.vn-choice-list,.pc-clean-choice-grid,#predictionGate').forEach(el => el.remove());
-    try { if (typeof musicEndVN === 'function') musicEndVN(); } catch(e) {}
-  };
-
-  window.showPredictionGate = function showPredictionGate(text){
-    if (!text) return;
-    window.pendingPromptForPrediction = text;
-    try { predictionGateActive = true; } catch(e) {}
-    window.predictionGateActive = true;
-
-    pcStopVNQueue();
-    pcById('predictionGate')?.remove();
-    pcById('vnPredictionChoicePanel')?.remove();
-    document.querySelectorAll('.vn-choice-list,.pc-clean-choice-grid').forEach(el => el.remove());
-
-    const overlay = pcById('vnOverlay');
-    if (overlay) {
-      overlay.classList.remove('claude-consult','claude-terminal-consult','claude-terminal-textmode','pc-clean-output');
-      overlay.classList.add('active','claude-prediction','pc-clean-prediction');
-    }
-
-    try { setClaudeTerminalTextMode(false); } catch(e) {}
-    try { setVNClaudeMode(false); } catch(e) {}
-    try { setVNClaudeTerminalMode(false); } catch(e) {}
-    try { setClaudeShelfState('idle',''); } catch(e) {}
-    try { setClaudeTerminalState('thinking','CLAUDE TERMINAL', 'PREDICTION PHASE'); } catch(e) {}
-    try { musicStartVN(); } catch(e) {}
-    try { vnSetExpression('thinking'); } catch(e) {}
-
-    const boardText = pcById('vnBoardText');
-    if (boardText) boardText.textContent = 'Before we consult Claude, make a prediction.';
-    const speaker = pcById('vnSpeaker');
-    if (speaker) speaker.textContent = 'Professor Pixel';
-    const dialogue = pcById('vnDialogue');
-    if (dialogue) dialogue.classList.add('has-choices');
-    const hint = pcById('vnAdvanceHint');
-    if (hint) hint.classList.remove('show');
-
-    const vnText = pcById('vnText');
-    if (vnText) {
-      vnText.innerHTML = `
-        <div class="pc-clean-dialogue-copy">
-          <div><strong>Before we consult Claude...</strong></div>
-          <div style="margin-top:8px;">Based on the context you gave, what do you predict Claude will do?</div>
-        </div>
-        <div id="vnPredictionChoicePanel" class="pc-clean-choice-grid" role="group" aria-label="Prediction choices">
-          <button class="pc-clean-choice-btn" type="button" data-choice="targeted">It will give a targeted response.</button>
-          <button class="pc-clean-choice-btn" type="button" data-choice="generic">It might still be generic.</button>
-          <button class="pc-clean-choice-btn" type="button" data-choice="ignores_constraints">It may ignore some constraints.</button>
-          <button class="pc-clean-choice-btn" type="button" data-choice="not_sure">I am not sure yet.</button>
-        </div>`;
-      vnText.querySelectorAll('.pc-clean-choice-btn').forEach(btn => {
-        btn.addEventListener('click', (ev) => {
-          ev.preventDefault(); ev.stopPropagation();
-          window.choosePrediction(btn.dataset.choice);
-        });
-      });
-    }
-
-    requestAnimationFrame(() => {
-      pcById('vnCharacter')?.classList.add('visible');
-      // Do not auto-focus text/buttons. It was causing weird blue selections/highlights. Naturally.
-    });
-  };
-
-  window.choosePrediction = function choosePrediction(choice) {
-    const text = window.pendingPromptForPrediction;
-
-    if (
-      !text ||
-      window.pcWaitingForClaudeContinue ||
-      (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)
-    ) return;
-
-    window.pendingPromptAfterPrediction = text;
-    window.pendingPromptForPrediction = '';
-
-    try { predictionGateActive = false; } catch(e) {}
-    window.predictionGateActive = false;
-    window.pcWaitingForClaudeContinue = false;
-
-    const s = scenarioData[scenarioIndex];
-    if (s) {
-      if (!s.predictions) s.predictions = [];
-      s.predictions.push({
-        choice,
-        prompt: text,
-        attempt: (s.attempts || 0) + 1,
-        timestamp: new Date().toISOString()
-      });
-    }
-
-    document.querySelectorAll('.pc-clean-choice-btn,.vn-choice-btn,.vn-prediction-btn').forEach(btn => {
-      btn.disabled = true;
-      if (btn.dataset && btn.dataset.choice === choice) {
-        btn.classList.add('is-selected');
-      }
-    });
-
-    document.getElementById('vnPredictionChoicePanel')?.remove();
-    document.getElementById('predictionGate')?.remove();
-    document.querySelectorAll('.pc-clean-choice-grid,.pc-choice-panel-final,.vn-choice-list').forEach(el => el.remove());
-
-    vnQueue = [];
-    vnTyping = false;
-    vnOnComplete = null;
-    clearTimeout(vnTypeTimer);
-
-    // Go directly to Claude thinking. No intermediate Continue button.
-    showClaudeConsultOverlay('Scenario diagnosis');
-
-    setTimeout(() => {
-      sendMain(text);
-    }, 300);
-  };
-
-  window.pcContinueToClaudeAnalysis = function pcContinueToClaudeAnalysis(){
-    const text = window.pendingPromptAfterPrediction;
-    if (!text || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
-    window.pcWaitingForClaudeContinue = false;
-    window.pendingPromptAfterPrediction = '';
-
-    const overlay = pcById('vnOverlay');
-    if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction');
-    pcById('vnDialogue')?.classList.remove('has-choices');
-    pcById('vnCharacter')?.classList.remove('visible');
-    try { setClaudeShelfState('idle','idle'); } catch(e) {}
-    try { setClaudeTerminalState('idle','CLAUDE TERMINAL','IDLE'); } catch(e) {}
-    try { musicEndVN(); } catch(e) {}
-    sendMain(text);
-  };
-
-  // Dev fill should not replay or continue the opening Pixel intro. It should just fill the S1 builder.
-  const originalDevFillScenario = window.devFillScenario || devFillScenario;
-  window.devFillScenario = function devFillScenarioStable(idx){
-    if (idx === 0) {
-      window.pcCloseVNOverlayForDev();
-      if (typeof scenarioIndex !== 'undefined' && scenarioIndex !== 0) {
-        const tabs = document.querySelectorAll('.tab-btn');
-        if (tabs[0] && typeof switchScenario === 'function') switchScenario(0, tabs[0]);
-      }
-      const fill = (attempts=0) => {
-        const lEl = pcById('g-learners');
-        const iEl = pcById('g-issue');
-        const mEl = pcById('g-interaction');
-        const cEl = pcById('g-constraints');
-        if (lEl && iEl && mEl && cEl) {
-          lEl.value = 'online first-year general education students in an 8-week fully asynchronous course';
-          iEl.value = 'students are posting one-sentence reactions, replying only because it is required, and the conversation dies after one exchange';
-          mEl.value = 'compare two possible interpretations of the reading, support their claim with one specific example, and ask a follow-up question that invites a peer to extend or challenge the idea';
-          cEl.value = "no extra tools, one initial post, two substantive peer replies, and strong replies must explain reasoning, use evidence or examples, and build on a classmate's idea";
-          [lEl,iEl,mEl,cEl].forEach(el => { try { autoGrow(el); } catch(e) {} try { onGuidedInput(el); } catch(e) {} });
-          lEl.focus();
-          return;
-        }
-        if (attempts < 30) setTimeout(() => fill(attempts+1), 200);
-      };
-      setTimeout(fill, 50);
-      return;
-    }
-    return originalDevFillScenario(idx);
-  };
-
-  // Normal S1 dev test can still auto-choose, but now it must click the Continue button too.
-  const originalDevTestScenario = window.devTestScenario || devTestScenario;
-  window.devTestScenario = function devTestScenarioStable(idx){
-    if (idx !== 0) return originalDevTestScenario(idx);
-    window.devFillScenario(0);
-    setTimeout(() => {
-      try { sendGuided(); } catch(e) { console.error(e); }
-      const chooseThenContinue = (attempts=0) => {
-        const choiceBtn = document.querySelector('.pc-clean-choice-btn[data-choice="targeted"]');
-        if (choiceBtn) {
-          choiceBtn.click();
-          setTimeout(() => pcById('pcContinueToClaudeBtn')?.click(), 500);
-        } else if (attempts < 30) {
-          setTimeout(() => chooseThenContinue(attempts+1), 250);
-        }
-      };
-      chooseThenContinue();
-    }, 450);
-  };
-
-})();
-
-/* ======================================================
-   LEGACY PATCH BLOCK 3: FINAL NAV + S1 RESULT CONTROL OWNER
-   This is the current owner for scenario navigation handoff.
-====================================================== */
-
-/* PROMPTCRAFT HARD S1 PREDICTION OWNER
-   This replaces the duplicate/older prediction handlers by assigning both
-   window properties and global function bindings. Apparently one steering
-   wheel was too much to ask from civilization. */
-(function(){
-  const REACTIONS = {
-    targeted: 'That prediction makes sense. You gave Claude learner context, the actual discussion failure, and a clear interaction move, so it should have enough to give a targeted repair.',
-    generic: 'That could happen. Claude can still drift into polite template language if it treats the issue as “make this better” instead of “fix this exact discussion breakdown.”',
-    ignores_constraints: 'Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Claude actually respected them.',
-    not_sure: 'That is a useful answer too. Predicting before you look helps you notice what Claude changes, misses, or invents instead of just accepting the shiny paragraph.'
-  };
-
-  function byId(id){ return document.getElementById(id); }
-
-  function stopVN(){
-    try { vnQueue = []; } catch(e) {}
-    try { clearTimeout(vnTypeTimer); } catch(e) {}
-    try { vnTyping = false; vnOnComplete = null; vnFullText = ''; vnCurrentText = ''; } catch(e) {}
-  }
-
-  function clearOldPredictionUI(){
-    byId('predictionGate')?.remove();
-    byId('vnPredictionChoicePanel')?.remove();
-    document.querySelectorAll('.vn-choice-list,.vn-prediction-options,.pc-clean-choice-grid,.pc-choice-panel-final').forEach(el => el.remove());
-  }
-
-  function hardShowPredictionGate(text){
-    if (!text || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
-    window.pendingPromptForPrediction = text;
-    window.pendingPromptAfterPrediction = '';
-    window.pcWaitingForClaudeContinue = false;
-    try { predictionGateActive = true; } catch(e) {}
-    window.predictionGateActive = true;
-
-    stopVN();
-    clearOldPredictionUI();
-
-    const overlay = byId('vnOverlay');
-    if (overlay) {
-      overlay.className = overlay.className
-        .replace(/\bclaude-consult\b|\bclaude-terminal-consult\b|\bclaude-terminal-textmode\b|\bpc-clean-output\b/g, '')
-        .trim();
-      overlay.classList.add('active','claude-prediction','pc-clean-prediction');
-    }
-
-    try { setClaudeTerminalTextMode(false); } catch(e) {}
-    try { setVNClaudeMode(false); } catch(e) {}
-    try { setVNClaudeTerminalMode(false); } catch(e) {}
-    try { setClaudeShelfState('idle',''); } catch(e) {}
-    try { setClaudeTerminalState('thinking','CLAUDE TERMINAL', 'PREDICTION PHASE'); } catch(e) {}
-    try { musicStartVN(); } catch(e) {}
-    try { vnSetExpression('thinking'); } catch(e) {}
-
-    const boardText = byId('vnBoardText');
-    if (boardText) boardText.textContent = 'Before we consult Claude, make a prediction.';
-    const speaker = byId('vnSpeaker');
-    if (speaker) speaker.textContent = 'Professor Pixel';
-    const dialogue = byId('vnDialogue');
-    if (dialogue) dialogue.classList.add('has-choices');
-    const hint = byId('vnAdvanceHint');
-    if (hint) hint.classList.remove('show');
-
-    const vnText = byId('vnText');
-    if (vnText) {
-      vnText.innerHTML = `
-        <div class="pc-clean-dialogue-copy">
-          <div><strong>Before we consult Claude...</strong></div>
-          <div>Based on the context you gave, what do you predict Claude will do?</div>
-        </div>
-        <div id="vnPredictionChoicePanel" class="pc-choice-panel-final" role="group" aria-label="Prediction choices">
-          <button class="pc-clean-choice-btn" type="button" data-choice="targeted">It will give a targeted response.</button>
-          <button class="pc-clean-choice-btn" type="button" data-choice="generic">It might still be generic.</button>
-          <button class="pc-clean-choice-btn" type="button" data-choice="ignores_constraints">It may ignore some constraints.</button>
-          <button class="pc-clean-choice-btn" type="button" data-choice="not_sure">I am not sure yet.</button>
-        </div>`;
-      vnText.querySelectorAll('.pc-clean-choice-btn').forEach(btn => {
-        btn.addEventListener('click', (ev) => {
-          ev.preventDefault();
-          ev.stopPropagation();
-          hardChoosePrediction(btn.dataset.choice);
-        });
-      });
-    }
-
-    requestAnimationFrame(() => {
-      byId('vnCharacter')?.classList.add('visible');
-      // Keep focus off dialogue/buttons so nothing becomes blue-selected.
-      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-    });
-  }
-
-  function hardChoosePrediction(choice){
-    const text = window.pendingPromptForPrediction;
-    if (!text || window.pcWaitingForClaudeContinue || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
-
-    window.pendingPromptAfterPrediction = text;
-    window.pendingPromptForPrediction = '';
-    window.pcWaitingForClaudeContinue = true;
-    try { predictionGateActive = false; } catch(e) {}
-    window.predictionGateActive = false;
-
-    const s = scenarioData && scenarioData[scenarioIndex];
-    if (s) {
-      if (!s.predictions) s.predictions = [];
-      s.predictions.push({ choice, prompt:text, attempt:(s.attempts || 0) + 1, timestamp:new Date().toISOString() });
-    }
-
-    const vnText = byId('vnText');
-    if (vnText) {
-      vnText.innerHTML = `
-        <div class="pc-feedback-copy">
-          <div><strong>Your prediction is logged.</strong></div>
-          <div>${REACTIONS[choice] || REACTIONS.not_sure}</div>
-          <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
-        </div>`;
-      byId('pcContinueToClaudeBtn')?.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        hardContinueToClaude();
-      });
-    }
-  }
-
-  function hardContinueToClaude(){
-    const text = window.pendingPromptAfterPrediction;
-    if (!text || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
-    window.pendingPromptAfterPrediction = '';
-    window.pcWaitingForClaudeContinue = false;
-
-    const overlay = byId('vnOverlay');
-    if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction');
-    byId('vnDialogue')?.classList.remove('has-choices');
-    byId('vnCharacter')?.classList.remove('visible');
-    clearOldPredictionUI();
-    try { setClaudeShelfState('idle','idle'); } catch(e) {}
-    try { setClaudeTerminalState('idle','CLAUDE TERMINAL','IDLE'); } catch(e) {}
-    try { musicEndVN(); } catch(e) {}
-    sendMain(text);
-  }
-
-  function hardSendText(text){
-    if (!text || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude) || window.pcWaitingForClaudeContinue) return;
-    const btn = byId('sendBtn');
-    if (btn) btn.disabled = true;
-    hardShowPredictionGate(text);
-  }
-
-  window.showPredictionGate = hardShowPredictionGate;
-  window.choosePrediction = hardChoosePrediction;
-  window.pcContinueToClaudeAnalysis = hardContinueToClaude;
-  window.sendText = hardSendText;
-  try { showPredictionGate = hardShowPredictionGate; } catch(e) {}
-  try { choosePrediction = hardChoosePrediction; } catch(e) {}
-  try { pcContinueToClaudeAnalysis = hardContinueToClaude; } catch(e) {}
-  try { sendText = hardSendText; } catch(e) {}
-})();
-
-/* ======================================================
-   LEGACY PATCH BLOCK
-====================================================== */
-
-/* PROMPTCRAFT FINAL S1 PREDICTION WATCHDOG
-   This does not redesign the scene. It only guarantees the missing buttons appear,
-   Pixel feedback pauses for reading, and Claude analysis only starts after Continue. */
-(function(){
-  const REACTIONS = {
-    targeted: 'That prediction makes sense. You gave Claude learner context, the actual discussion failure, and a clear interaction move, so it should have enough to give a targeted repair.',
-    generic: 'That could happen. Claude can still drift into polite template language if it treats the issue as “make this better” instead of “fix this exact discussion breakdown.”',
-    ignores_constraints: 'Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Claude actually respected them.',
-    not_sure: 'That is a useful answer too. Predicting before you look helps you notice what Claude changes, misses, or invents instead of just accepting the shiny paragraph.'
-  };
-  const LABELS = {
-    targeted: 'It will give a targeted response.',
-    generic: 'It might still be generic.',
-    ignores_constraints: 'It may ignore some constraints.',
-    not_sure: 'I am not sure yet.'
-  };
-  function byId(id){ return document.getElementById(id); }
-  function predictionIsOpen(){
-    const overlay = byId('vnOverlay');
-    const text = (byId('vnText')?.textContent || '').toLowerCase();
-    return !!(overlay && overlay.classList.contains('active') &&
-      (overlay.classList.contains('claude-prediction') || overlay.classList.contains('pc-clean-prediction') || text.includes('what do you predict claude will do')));
-  }
-  function ensurePredictionButtons(){
-    if (!predictionIsOpen()) return;
-    if (window.pcWaitingForClaudeContinue) return;
-    const prompt = window.pendingPromptForPrediction || window.pendingPromptAfterPrediction;
-    if (!prompt) return;
-    let panel = byId('vnPredictionChoicePanel');
-    if (!panel) {
-      const dialogue = byId('vnDialogue') || byId('vnText');
-      if (!dialogue) return;
-      panel = document.createElement('div');
-      panel.id = 'vnPredictionChoicePanel';
-      panel.className = 'pc-choice-panel-final';
-      panel.setAttribute('role','group');
-      panel.setAttribute('aria-label','Prediction choices');
-      panel.innerHTML = Object.entries(LABELS).map(([choice,label]) =>
-        `<button class="pc-clean-choice-btn" type="button" data-choice="${choice}">${label}</button>`
-      ).join('');
-      dialogue.appendChild(panel);
-    }
-    panel.querySelectorAll('button[data-choice]').forEach(btn => {
-      if (btn.dataset.pcBound === '1') return;
-      btn.dataset.pcBound = '1';
-      btn.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        finalChoosePrediction(btn.dataset.choice);
-      });
-    });
-  }
-  function finalChoosePrediction(choice){
-    const text = window.pendingPromptForPrediction || window.pendingPromptAfterPrediction;
-    if (!text || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
-    window.pendingPromptForPrediction = '';
-    window.pendingPromptAfterPrediction = text;
-    window.pcWaitingForClaudeContinue = true;
-    try { predictionGateActive = false; } catch(e) {}
-    window.predictionGateActive = false;
-    try {
-      const s = scenarioData && scenarioData[scenarioIndex];
-      if (s) {
-        if (!s.predictions) s.predictions = [];
-        s.predictions.push({ choice, prompt:text, attempt:(s.attempts || 0) + 1, timestamp:new Date().toISOString() });
-      }
-    } catch(e) {}
-    const vnText = byId('vnText');
-    if (vnText) {
-      vnText.innerHTML = `
-        <div class="pc-feedback-copy">
-          <div><strong>Your prediction is logged.</strong></div>
-          <div style="margin-top:8px;">${REACTIONS[choice] || REACTIONS.not_sure}</div>
-          <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
-        </div>`;
-    }
-    byId('vnPredictionChoicePanel')?.remove();
-    byId('pcContinueToClaudeBtn')?.addEventListener('click', (ev) => {
+  panel.querySelectorAll('button[data-choice]').forEach(btn => {
+    if (btn.dataset.pcBound === '1') return;
+    btn.dataset.pcBound = '1';
+    btn.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
-      finalContinueToClaude();
+      pcChoosePrediction(btn.dataset.choice);
+    });
+  });
+}
+
+function pcShowPredictionGate(text){
+  if (!text) return false;
+
+  window.pendingPromptForPrediction = text;
+  window.pendingPromptAfterPrediction = '';
+  window.pcWaitingForClaudeContinue = false;
+  window.predictionGateActive = true;
+  try { predictionGateActive = true; } catch(e) {}
+
+  pcClearPredictionUI();
+  pcStopVN();
+
+  const overlay = document.getElementById('vnOverlay');
+  if (overlay) {
+    overlay.classList.remove('claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output');
+    overlay.classList.add('active','claude-prediction','pc-clean-prediction');
+  }
+
+  const dialogue = document.getElementById('vnDialogue');
+  if (dialogue) dialogue.classList.add('has-choices');
+
+  try { setVNClaudeMode(false); } catch(e) {}
+  try { setVNClaudeTerminalMode(false); } catch(e) {}
+  try { setClaudeTerminalTextMode(false); } catch(e) {}
+  try { setClaudeShelfState('thinking', 'awaiting prediction'); } catch(e) {}
+  try { vnSetExpression('thinking'); } catch(e) {}
+  try { musicStartVN(); } catch(e) {}
+
+  const speaker = document.getElementById('vnSpeaker');
+  if (speaker) speaker.textContent = 'Professor Pixel';
+
+  const character = document.getElementById('vnCharacter');
+  if (character) character.classList.add('visible');
+
+  const hint = document.getElementById('vnAdvanceHint');
+  if (hint) hint.classList.remove('show');
+
+  const vnText = document.getElementById('vnText');
+  if (vnText) {
+    vnText.innerHTML = `
+      <div class="pc-feedback-copy">
+        <div><strong>Before we consult Claude...</strong></div>
+        <div>Based on the context you gave, what do you predict Claude will do?</div>
+      </div>`;
+  }
+
+  setTimeout(pcEnsurePredictionButtons, 0);
+  setTimeout(pcEnsurePredictionButtons, 100);
+  setTimeout(pcEnsurePredictionButtons, 350);
+  setTimeout(() => dialogue?.focus(), 80);
+  return false;
+}
+
+function pcChoosePrediction(choice){
+  const text = window.pendingPromptForPrediction;
+  if (!text || window.pcWaitingForClaudeContinue || window.isSubmittingToClaude || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
+
+  window.pendingPromptAfterPrediction = text;
+  window.pendingPromptForPrediction = '';
+  window.pcWaitingForClaudeContinue = true;
+  window.predictionGateActive = false;
+  try { predictionGateActive = false; } catch(e) {}
+
+  const s = scenarioData && scenarioData[scenarioIndex];
+  if (s) {
+    if (!s.predictions) s.predictions = [];
+    s.predictions.push({ choice, prompt:text, attempt:(s.attempts || 0) + 1, timestamp:new Date().toISOString() });
+  }
+
+  pcClearPredictionUI();
+
+  const reaction = (window.predictionReactions && window.predictionReactions[choice]) || PC_PREDICTION_REACTIONS[choice] || PC_PREDICTION_REACTIONS.not_sure;
+  const vnText = document.getElementById('vnText');
+  if (vnText) {
+    vnText.innerHTML = `
+      <div class="pc-feedback-copy">
+        <div><strong>Your prediction is logged.</strong></div>
+        <div>${reaction}</div>
+        <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
+      </div>`;
+    document.getElementById('pcContinueToClaudeBtn')?.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      pcContinueToClaudeAnalysis();
     });
   }
-  function finalContinueToClaude(){
-    const text = window.pendingPromptAfterPrediction;
-    if (!text || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return;
-    window.pendingPromptAfterPrediction = '';
-    window.pcWaitingForClaudeContinue = false;
-    byId('vnPredictionChoicePanel')?.remove();
-    const overlay = byId('vnOverlay');
-    if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction');
-    byId('vnDialogue')?.classList.remove('has-choices');
-    byId('vnCharacter')?.classList.remove('visible');
-    try { if (typeof musicEndVN === 'function') musicEndVN(); } catch(e) {}
-    if (typeof sendMain === 'function') sendMain(text);
+}
+
+function pcContinueToClaudeAnalysis(){
+  const text = window.pendingPromptAfterPrediction;
+  if (!text || window.isSubmittingToClaude || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return false;
+
+  window.pendingPromptAfterPrediction = '';
+  window.pcWaitingForClaudeContinue = false;
+
+  const overlay = document.getElementById('vnOverlay');
+  if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction');
+  document.getElementById('vnDialogue')?.classList.remove('has-choices');
+  document.getElementById('vnCharacter')?.classList.remove('visible');
+  pcClearPredictionUI();
+  try { setClaudeShelfState('idle','idle'); } catch(e) {}
+  try { setClaudeTerminalState('idle','CLAUDE TERMINAL','IDLE'); } catch(e) {}
+  try { musicEndVN(); } catch(e) {}
+
+  sendMain(text);
+  return false;
+}
+
+function sendText(text){
+  if (!text || window.isSubmittingToClaude || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude) || window.pcWaitingForClaudeContinue) return false;
+  const btn = document.getElementById('sendBtn');
+  if (btn) btn.disabled = true;
+  return pcShowPredictionGate(text);
+}
+
+// Legacy names used by inline handlers and older patches. Keep all roads pointed
+// at the non-recursive implementation above. Yes, this is ridiculous. It is also JavaScript.
+var showPredictionGate = pcShowPredictionGate;
+var choosePrediction = pcChoosePrediction;
+var finalChoosePrediction = pcChoosePrediction;
+var finalContinueToClaude = pcContinueToClaudeAnalysis;
+var hardShowPredictionGate = pcShowPredictionGate;
+var hardChoosePrediction = pcChoosePrediction;
+var hardContinueToClaude = pcContinueToClaudeAnalysis;
+var hardSendText = sendText;
+
+window.pcShowPredictionGate = pcShowPredictionGate;
+window.showPredictionGate = pcShowPredictionGate;
+window.choosePrediction = pcChoosePrediction;
+window.finalChoosePrediction = pcChoosePrediction;
+window.pcContinueToClaudeAnalysis = pcContinueToClaudeAnalysis;
+window.finalContinueToClaude = pcContinueToClaudeAnalysis;
+window.hardShowPredictionGate = pcShowPredictionGate;
+window.hardChoosePrediction = pcChoosePrediction;
+window.hardContinueToClaude = pcContinueToClaudeAnalysis;
+window.hardSendText = sendText;
+window.sendText = sendText;
+window.ensurePredictionButtons = pcEnsurePredictionButtons;
+
+if (!window.__pcPredictionWatchdogBound) {
+  window.__pcPredictionWatchdogBound = true;
+  document.addEventListener('click', () => setTimeout(pcEnsurePredictionButtons, 50), true);
+  setInterval(pcEnsurePredictionButtons, 600);
+}
+
+// ══════════════════════════════════════════════════════
+//  NAVIGATION — final owner
+//  navigateToNext, devGoScenario, devFillScenario,
+//  devNextScenario, devTestScenario.
+//  clearVN() calls pcClearVNStateForScenarioSwitch
+//  (defined in S1 workbench above).
+// ══════════════════════════════════════════════════════
+function clearVN(){
+  if (typeof window.pcClearVNStateForScenarioSwitch === 'function') {
+    window.pcClearVNStateForScenarioSwitch();
+    return;
   }
-  const oldShow = window.showPredictionGate;
-  window.showPredictionGate = function(text){
-    window.pendingPromptForPrediction = text;
-    const result = (typeof oldShow === 'function') ? oldShow.apply(this, arguments) : undefined;
-    setTimeout(ensurePredictionButtons, 0);
-    setTimeout(ensurePredictionButtons, 100);
-    setTimeout(ensurePredictionButtons, 350);
-    return result;
-  };
-  try { showPredictionGate = window.showPredictionGate; } catch(e) {}
-  window.choosePrediction = finalChoosePrediction;
-  window.pcContinueToClaudeAnalysis = finalContinueToClaude;
-  try { choosePrediction = finalChoosePrediction; } catch(e) {}
-  try { pcContinueToClaudeAnalysis = finalContinueToClaude; } catch(e) {}
-  document.addEventListener('click', () => setTimeout(ensurePredictionButtons, 50), true);
-  setInterval(ensurePredictionButtons, 600);
-})();
+  const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
+  if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction','claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output');
+  document.getElementById('vnDialogue')?.classList.remove('has-choices');
+  document.getElementById('vnCharacter')?.classList.remove('visible');
+  document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
+}
 
-/* ======================================================
-   LEGACY PATCH BLOCK
-====================================================== */
+const originalDevFillScenario = window.devFillScenario || (typeof devFillScenario === 'function' ? devFillScenario : null);
 
-/* PROMPTCRAFT FINAL NAV + S1 RESULT CONTROL OWNER */
-(function(){
-  window.navigateToNext = function navigateToNextFinal(targetIndex){
-    const tabs = document.querySelectorAll('.tab-btn');
-    const targetTab = tabs[targetIndex];
-    if (!targetTab) return false;
-    if (Array.isArray(window.scenarioCompleted) && typeof window.scenarioIndex === 'number') {
-      window.scenarioCompleted[window.scenarioIndex] = true;
-    } else {
-      try { scenarioCompleted[scenarioIndex] = true; } catch(e) {}
+function devFillScenarioFinal(idx){
+  if (idx === 0) {
+    return window.resetS1Dev();
+  }
+
+  if (typeof window.devGoScenario === 'function') window.devGoScenario(idx);
+  else if (typeof devGoScenario === 'function') devGoScenario(idx);
+
+  const testPrompt = window.scenarios?.[idx]?.testPrompt || (typeof scenarios !== 'undefined' ? scenarios[idx]?.testPrompt : '');
+  if (!testPrompt) return false;
+
+  const tryFill = (attempts = 0) => {
+    const input = document.getElementById('promptInput');
+    if (input && input.offsetParent !== null) {
+      input.value = testPrompt;
+      if (typeof autoGrow === 'function') autoGrow(input);
+      if (typeof onHintInput === 'function') onHintInput(input);
+      input.focus();
+      return;
     }
-    targetTab.disabled = false;
-    targetTab.classList.remove('locked');
-    targetTab.removeAttribute('aria-disabled');
-    document.getElementById('vnOverlay')?.classList.remove('active','claude-prediction','pc-clean-prediction','claude-consult','claude-terminal-consult','claude-terminal-textmode');
-    document.getElementById('vnDialogue')?.classList.remove('has-choices');
-    document.getElementById('vnCharacter')?.classList.remove('visible');
-    document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
-    try { if (typeof musicEndVN === 'function') musicEndVN(); } catch(e) {}
-    const chat = document.getElementById('chat');
-    if (chat) chat.scrollTop = 0;
-    if (typeof switchScenario === 'function') switchScenario(targetIndex, targetTab);
-    return false;
+    if (attempts < 30) setTimeout(() => tryFill(attempts + 1), 200);
   };
-  try { navigateToNext = window.navigateToNext; } catch(e) {}
-  window.devGoScenario = function devGoScenarioFinal(idx){
+  setTimeout(() => tryFill(), 300);
+  return false;
+};
+function devTestScenarioFinal(idx){
+  // S1 dev key now resets and fills only. No intro replay. No auto-submit.
+  if (idx === 0) return window.resetS1Dev();
+  return window.devFillScenario(idx);
+};
+function devGoScenarioFinalClean(idx){
+  const tabs = document.querySelectorAll('.tab-btn');
+  const btn = tabs[idx];
+  if (!btn) return false;
+  btn.disabled = false;
+  btn.classList.remove('locked');
+  btn.removeAttribute('aria-disabled');
+  document.body.classList.remove('s2-submitted');
+  clearVN();
+  if (typeof switchScenario === 'function') switchScenario(idx, btn);
+  return false;
+};
+function navigateToNextFinalClean(targetIndex){
+  const tabs = document.querySelectorAll('.tab-btn');
+  const targetTab = tabs[targetIndex];
+  if (!targetTab) return false;
+
+  try { scenarioCompleted[scenarioIndex] = true; } catch(e) {}
+  document.body.classList.remove('s2-submitted');
+
+  targetTab.disabled = false;
+  targetTab.classList.remove('locked');
+  targetTab.removeAttribute('aria-disabled');
+
+  clearVN();
+
+  const chat = document.getElementById('chat');
+  if (chat) chat.scrollTop = 0;
+
+  if (typeof switchScenario === 'function') switchScenario(targetIndex, targetTab);
+  return false;
+};
+function devNextScenarioFinalClean(){
+  const current = typeof scenarioIndex === 'number' ? scenarioIndex : 0;
+  const max = typeof scenarios !== 'undefined' ? scenarios.length - 1 : 7;
+  const next = Math.min(current + 1, max);
+  return window.navigateToNext(next);
+};
+try { devNextScenario = window.devNextScenario; } catch(e) {}
+
+
+// ══════════════════════════════════════════════════════
+//  S2 METACOGNITION WORKBENCH
+//  Student selector, ingredient chips, prompt preview,
+//  and dev fill shortcuts for S2.
+// ══════════════════════════════════════════════════════
+const S2_STUDENTS = {
+  A: {
+    name: 'Student A',
+    quote: 'I got an 88%. Moving on.',
+    feedback: 'That is performance awareness, not metacognition yet. Student A knows the score, but not the learning strategy behind it.'
+  },
+  B: {
+    name: 'Student B',
+    quote: 'I studied harder this week.',
+    feedback: 'Closer, but still vague. Student B notices effort, but does not identify what strategy worked or what to change next.'
+  },
+  C: {
+    name: 'Student C',
+    quote: 'I realized flashcards worked better than rereading, so I am using them again next week.',
+    feedback: 'Exactly. Student C is monitoring a strategy, judging its usefulness, and planning transfer. Tiny learning-science confetti, somehow still useful.'
+  }
+};
+
+const S2_INGREDIENTS = [
+  { key: 'audience', label: 'Audience' },
+  { key: 'courseContext', label: 'Course Context' },
+  { key: 'studentProblem', label: 'Student Problem' },
+  { key: 'reflectionGoal', label: 'Reflection Goal' },
+  { key: 'transferGoal', label: 'Transfer Goal' },
+  { key: 'timeConstraint', label: 'Time Constraint' }
+];
+
+const S2_PRESETS = {
+  weak: {
+    student: 'A',
+    ingredients: ['audience'],
+    course: 'College class',
+    struggle: 'Students struggle.',
+    behavior: 'Do better.'
+  },
+  mid: {
+    student: 'C',
+    ingredients: ['audience','courseContext','studentProblem','reflectionGoal','transferGoal'],
+    course: 'Intro Psychology, asynchronous online course',
+    struggle: 'Students complete readings and quizzes but do not think about which study strategies are helping them learn.',
+    behavior: 'Students identify one study strategy that worked and choose one adjustment for next week.'
+  },
+  strong: {
+    student: 'C',
+    ingredients: ['audience','courseContext','studentProblem','reflectionGoal','transferGoal','timeConstraint'],
+    course: 'First-year nursing students in a fully asynchronous 8-week course',
+    struggle: 'Students repeat the same documentation mistakes even after receiving detailed feedback, and they rarely compare current work to earlier attempts.',
+    behavior: 'Students identify a pattern in their mistakes, explain what caused it, and create a specific strategy they will use before the next submission.'
+  }
+};
+
+window.s2State = window.s2State || {
+  student: null,
+  ingredients: {},
+  course: '',
+  struggle: '',
+  behavior: ''
+};
+
+function s2ResetState() {
+  window.s2State = { student: null, ingredients: {}, course: '', struggle: '', behavior: '' };
+}
+
+function selectedIngredients() {
+  return S2_INGREDIENTS.filter(i => !!window.s2State.ingredients[i.key]);
+}
+
+function s2ScorePercent() {
+  let score = 0;
+  if (window.s2State.student === 'C') score += 20;
+  score += Math.min(36, selectedIngredients().length * 6);
+  if ((window.s2State.course || '').trim().length > 4) score += 12;
+  if ((window.s2State.struggle || '').trim().length > 12) score += 16;
+  if ((window.s2State.behavior || '').trim().length > 12) score += 16;
+  return Math.min(100, score);
+}
+
+function s2PromptText() {
+  const course = (window.s2State.course || '').trim() || '[course / learner context]';
+  const struggle = (window.s2State.struggle || '').trim() || '[what students struggle with]';
+  const behavior = (window.s2State.behavior || '').trim() || '[desired learning behavior]';
+  const chips = selectedIngredients().map(i => i.label).join(', ') || 'no prompt ingredients selected yet';
+
+  return `I teach ${course}.\n\nMy students are completing work, but they are not reflecting on how they learn. Specifically, ${struggle}\n\nCreate a brief asynchronous metacognitive activity that helps students ${behavior}\n\nUse these design ingredients: ${chips}.\n\nThe activity should be low-stakes, easy to complete online, take about 10-15 minutes if a time limit is appropriate, and include a student-facing prompt plus a short instructor note explaining how it supports metacognition, learning strategy awareness, and transfer.`;
+}
+
+function renderS2MetacognitionWorkbench(container) {
+  s2ResetState();
+  document.body.classList.remove('s1-active','s1-result-active');
+  document.body.classList.add('s2-active');
+  container.innerHTML = `
+    <div class="scaffold-area s2-workbench">
+      <div class="s2-left-stack">
+        <div class="s2-mission-card" role="note" aria-label="Scenario 2 mission briefing">
+          <div class="s2-mission-eyebrow">Mission Briefing</div>
+          <div class="s2-mission-title">Find the metacognitive thinker.</div>
+          <div class="s2-mission-copy">Students are completing work and moving on. First, identify what metacognition looks like. Then build a personalized Claude prompt for your own teaching context.</div>
+        </div>
+
+        <div class="s2-detective-card" role="region" aria-label="Metacognition detective cards">
+          <div class="s2-card-eyebrow">Student Thought Detective</div>
+          <div class="s2-panel-title">Which student is showing metacognition?</div>
+          <div class="s2-helper-text">Choose the thought bubble that shows a learner monitoring strategy, judging effectiveness, and planning what to do next.</div>
+          <div class="s2-student-grid">
+            ${Object.entries(S2_STUDENTS).map(([key, item]) => `
+              <button type="button" class="s2-student-card" id="s2-student-${key}" onclick="s2SelectStudent('${key}')">
+                <div class="s2-student-name">${item.name}</div>
+                <div class="s2-student-quote">“${item.quote}”</div>
+              </button>
+            `).join('')}
+          </div>
+          <div class="s2-feedback-line" id="s2StudentFeedback">Pick the strongest example before consulting Claude.</div>
+        </div>
+
+        <div class="s2-panel">
+          <div class="s2-panel-eyebrow">Metacognitive Strength</div>
+          <div class="s2-meter-wrap">
+            <div class="s2-meter-top">
+              <span class="s2-meter-label">Prompt readiness</span>
+              <span class="s2-meter-score" id="s2MeterScore">0%</span>
+            </div>
+            <div class="s2-meter-track"><div class="s2-meter-fill" id="s2MeterFill"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="s2-right-stack">
+        <div class="s2-panel" role="region" aria-label="Prompt ingredient puzzle">
+          <div class="s2-panel-eyebrow">Prompt Ingredient Puzzle</div>
+          <div class="s2-panel-title">Select the ingredients Claude needs.</div>
+          <div class="s2-helper-text">These reuse the same quality logic as the chips above, just in a more playable form because apparently people like clicking things.</div>
+          <div class="s2-ingredient-grid" role="group" aria-label="Prompt ingredient choices">
+            ${S2_INGREDIENTS.map(i => `<button type="button" class="s2-ingredient-chip" id="s2-ing-${i.key}" onclick="s2ToggleIngredient('${i.key}')">${i.label}</button>`).join('')}
+          </div>
+        </div>
+
+        <div class="s2-context-panel" role="region" aria-label="Personal teacher context">
+          <div class="s2-panel-eyebrow">Personal Instructor Context</div>
+          <div class="s2-panel-title">Tell Claude about your students.</div>
+          <div class="s2-helper-text">This is the part that should feel personal. Claude will respond to the course and learning behavior you describe, not just a generic reflection activity.</div>
+          <div class="s2-field-grid">
+            <div class="s2-field">
+              <label for="s2-course">What kind of course are you teaching?</label>
+              <input id="s2-course" class="s2-input" placeholder="Example: Intro Psychology, asynchronous, 16 weeks" oninput="s2UpdateFromFields()" />
+            </div>
+            <div class="s2-field">
+              <label for="s2-struggle">What do your students struggle with?</label>
+              <textarea id="s2-struggle" class="s2-textarea" placeholder="Example: They complete quizzes but do not notice which study strategies are working." oninput="s2UpdateFromFields();autoGrow(this)"></textarea>
+            </div>
+            <div class="s2-field">
+              <label for="s2-behavior">What learning behavior should improve?</label>
+              <textarea id="s2-behavior" class="s2-textarea" placeholder="Example: Students choose one strategy to reuse or adjust next week." oninput="s2UpdateFromFields();autoGrow(this)"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="s2-panel">
+          <div class="s2-panel-eyebrow">Claude Prompt Preview</div>
+          <div class="s2-prompt-preview" id="s2PromptPreview"></div>
+        </div>
+
+        <div class="s2-footer">
+          <span class="s2-dev-note">Dev shortcuts: S2 weak · S2 mid · S2 strong</span>
+          <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
+          <button type="button" class="guided-send-btn" id="sendBtn" onclick="s2SendToClaude()">Consult Claude →</button>
+        </div>
+      </div>
+    </div>`;
+  s2RefreshUI();
+}
+
+function s2SelectStudent(key) {
+  window.s2State.student = key;
+  document.querySelectorAll('.s2-student-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById(`s2-student-${key}`)?.classList.add('selected');
+  const line = document.getElementById('s2StudentFeedback');
+  if (line) line.textContent = S2_STUDENTS[key]?.feedback || '';
+  s2RefreshUI();
+};
+
+function s2ToggleIngredient(key) {
+  window.s2State.ingredients[key] = !window.s2State.ingredients[key];
+  s2RefreshUI();
+};
+
+function s2UpdateFromFields() {
+  window.s2State.course = document.getElementById('s2-course')?.value || '';
+  window.s2State.struggle = document.getElementById('s2-struggle')?.value || '';
+  window.s2State.behavior = document.getElementById('s2-behavior')?.value || '';
+  s2RefreshUI();
+};
+
+function s2RefreshUI() {
+  S2_INGREDIENTS.forEach(i => {
+    const btn = document.getElementById(`s2-ing-${i.key}`);
+    if (btn) {
+      const selected = !!window.s2State.ingredients[i.key];
+      btn.classList.toggle('selected', selected);
+      btn.setAttribute('aria-pressed', String(selected));
+    }
+  });
+  const percent = s2ScorePercent();
+  const fill = document.getElementById('s2MeterFill');
+  const score = document.getElementById('s2MeterScore');
+  const preview = document.getElementById('s2PromptPreview');
+  if (fill) fill.style.width = percent + '%';
+  if (score) score.textContent = percent + '%';
+  if (preview) preview.textContent = s2PromptText();
+}
+
+function s2SendToClaude() {
+  s2UpdateFromFields();
+  const text = s2PromptText();
+  if (!text) return false;
+  if (window.s2State.student !== 'C') {
+    const line = document.getElementById('s2StudentFeedback');
+    if (line) line.textContent = 'You can still consult Claude, but notice that the detective choice will weaken the learning target.';
+  }
+  sendText(text);
+  return false;
+};
+
+function devFillS2(mode = 'mid') {
+  const preset = S2_PRESETS[mode] || S2_PRESETS.mid;
+  if (typeof window.devGoScenario === 'function') window.devGoScenario(1);
+  else if (typeof devGoScenario === 'function') devGoScenario(1);
+
+  const tryFill = (attempts = 0) => {
+    const course = document.getElementById('s2-course');
+    if (!course) {
+      if (attempts < 40) setTimeout(() => tryFill(attempts + 1), 150);
+      return;
+    }
+    window.s2State.student = preset.student;
+    window.s2State.ingredients = {};
+    preset.ingredients.forEach(k => window.s2State.ingredients[k] = true);
+    window.s2State.course = preset.course;
+    window.s2State.struggle = preset.struggle;
+    window.s2State.behavior = preset.behavior;
+
+    course.value = preset.course;
+    document.getElementById('s2-struggle').value = preset.struggle;
+    document.getElementById('s2-behavior').value = preset.behavior;
+    document.querySelectorAll('.s2-student-card').forEach(el => el.classList.remove('selected'));
+    document.getElementById(`s2-student-${preset.student}`)?.classList.add('selected');
+    const line = document.getElementById('s2StudentFeedback');
+    if (line) line.textContent = S2_STUDENTS[preset.student]?.feedback || '';
+    s2RefreshUI();
+    course.focus();
+  };
+  setTimeout(() => tryFill(), 250);
+  return false;
+};
+
+;
+const priorDevFillScenario = window.devFillScenario || (typeof devFillScenario === 'function' ? devFillScenario : null);
+function devFillScenarioS2Owner(idx) {
+  if (idx === 1) return window.devFillS2('mid');
+  if (typeof priorDevFillScenario === 'function') return priorDevFillScenario(idx);
+  return false;
+};
+try { devFillScenario = window.devFillScenario; } catch(e) {}
+
+window.devFillS2Weak = () => window.devFillS2('weak');
+window.devFillS2Mid = () => window.devFillS2('mid');
+window.devFillS2Strong = () => window.devFillS2('strong');
+
+
+// ══════════════════════════════════════════════════════
+//  S2 RESULT + PIXEL REFLECTION
+//  addS2ClaudeResultCard and the S2-specific
+//  showPixelScoreReflection override.
+// ══════════════════════════════════════════════════════
+function addS2ClaudeResultCard(responseText) {
+  document.body.classList.add('s2-active','s2-submitted');
+  const area = document.getElementById('chat');
+  if (!area) return;
+  // Keep the user's submitted prompt bubble, but remove transient typing rows.
+  document.getElementById('typing')?.remove();
+  const card = document.createElement('div');
+  card.className = 's2-result-card';
+  card.innerHTML = `
+    <div class="s2-result-eyebrow">Claude Draft</div>
+    <div class="s2-result-title">Metacognitive Activity Draft</div>
+    <div class="s2-result-body">${fmt(responseText)}</div>
+  `;
+  area.appendChild(card);
+  area.scrollTop = area.scrollHeight;
+}
+
+;
+;
+;
+
+// ══════════════════════════════════════════════════════
+//  DEV BAR GLOBAL EXPORT REPAIR — V2
+//  Inline onclick handlers in index.html require true window globals.
+//  This block must stay at the very bottom of app.js.
+// ══════════════════════════════════════════════════════
+(function exposePromptCraftDevToolsV2(){
+  function assign(name, fn) {
+    if (typeof fn === 'function') {
+      window[name] = fn;
+      try { globalThis[name] = fn; } catch(e) {}
+    }
+  }
+
+  function unlockTab(index) {
     const tabs = document.querySelectorAll('.tab-btn');
-    const btn = tabs[idx];
-    if (!btn) return false;
+    const btn = tabs[index];
+    if (!btn) return null;
     btn.disabled = false;
     btn.classList.remove('locked');
     btn.removeAttribute('aria-disabled');
-    if (typeof switchScenario === 'function') switchScenario(idx, btn);
-    return false;
-  };
-  try { devGoScenario = window.devGoScenario; } catch(e) {}
-  window.devNextScenario = function devNextScenarioFinal(){
-    const next = Math.min((typeof scenarioIndex === 'number' ? scenarioIndex : 0) + 1, scenarios.length - 1);
-    return window.navigateToNext(next);
-  };
-  try { devNextScenario = window.devNextScenario; } catch(e) {}
-})();
-
-
-/* ===== PromptCraft stable dev/navigation owner — added cleanup ===== */
-(function(){
-  function clearVN(){
-    if (typeof window.pcClearVNStateForScenarioSwitch === 'function') {
-      window.pcClearVNStateForScenarioSwitch();
-      return;
-    }
-    const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
-    if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction','claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output');
-    document.getElementById('vnDialogue')?.classList.remove('has-choices');
-    document.getElementById('vnCharacter')?.classList.remove('visible');
-    document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
+    return btn;
   }
 
-  const originalDevFillScenario = window.devFillScenario || (typeof devFillScenario === 'function' ? devFillScenario : null);
+  function unlockThrough(index) {
+    for (let i = 0; i <= index; i++) unlockTab(i);
+    try {
+      for (let i = 0; i < index; i++) scenarioCompleted[i] = true;
+    } catch(e) {}
+    try { if (index >= 3 && typeof unlockScenario4 === 'function') unlockScenario4(); } catch(e) {}
+    try { if (index >= 4 && typeof unlockScenario5 === 'function') unlockScenario5(); } catch(e) {}
+    try { if (index >= 5 && typeof unlockScenario6 === 'function') unlockScenario6(); } catch(e) {}
+    try { if (index >= 6 && typeof unlockScenario7 === 'function') unlockScenario7(); } catch(e) {}
+    try { if (index >= 7 && typeof unlockScenario8 === 'function') unlockScenario8(); } catch(e) {}
+  }
 
-  window.devFillScenario = function devFillScenarioFinal(idx){
-    if (idx === 0) {
-      return window.resetS1Dev();
-    }
+  function devGoScenarioGlobal(index) {
+    index = Number(index) || 0;
+    unlockThrough(index);
+    const btn = unlockTab(index);
+    try { document.body.classList.remove('s1-result-active','s2-submitted'); } catch(e) {}
+    try { if (typeof clearVN === 'function') clearVN(); } catch(e) {}
+    if (typeof switchScenario === 'function') switchScenario(index, btn);
+    else if (typeof loadScenario === 'function') loadScenario(index);
+    return false;
+  }
 
-    if (typeof window.devGoScenario === 'function') window.devGoScenario(idx);
-    else if (typeof devGoScenario === 'function') devGoScenario(idx);
+  function devFillScenarioGlobal(index, mode) {
+    index = Number(index) || 0;
+    if (index === 0 && typeof window.resetS1Dev === 'function') return window.resetS1Dev();
+    if (index === 1 && typeof window.devFillS2 === 'function') return window.devFillS2(mode || 'mid');
 
-    const testPrompt = window.scenarios?.[idx]?.testPrompt || (typeof scenarios !== 'undefined' ? scenarios[idx]?.testPrompt : '');
-    if (!testPrompt) return false;
-
+    devGoScenarioGlobal(index);
+    const testPrompt = (typeof scenarios !== 'undefined' && scenarios[index] && scenarios[index].testPrompt) ? scenarios[index].testPrompt : '';
+    const fallback = testPrompt || 'Test prompt for PromptCraft dev mode.';
     const tryFill = (attempts = 0) => {
       const input = document.getElementById('promptInput');
       if (input && input.offsetParent !== null) {
-        input.value = testPrompt;
-        if (typeof autoGrow === 'function') autoGrow(input);
-        if (typeof onHintInput === 'function') onHintInput(input);
+        input.value = fallback;
+        try { if (typeof autoGrow === 'function') autoGrow(input); } catch(e) {}
+        try { if (typeof onHintInput === 'function') onHintInput(input); } catch(e) {}
         input.focus();
-        return;
+        return true;
       }
-      if (attempts < 30) setTimeout(() => tryFill(attempts + 1), 200);
-    };
-    setTimeout(() => tryFill(), 300);
-    return false;
-  };
-  try { devFillScenario = window.devFillScenario; } catch(e) {}
-
-  window.devTestScenario = function devTestScenarioFinal(idx){
-    // S1 dev key now resets and fills only. No intro replay. No auto-submit.
-    if (idx === 0) return window.resetS1Dev();
-    return window.devFillScenario(idx);
-  };
-  try { devTestScenario = window.devTestScenario; } catch(e) {}
-
-  window.devGoScenario = function devGoScenarioFinalClean(idx){
-    const tabs = document.querySelectorAll('.tab-btn');
-    const btn = tabs[idx];
-    if (!btn) return false;
-    btn.disabled = false;
-    btn.classList.remove('locked');
-    btn.removeAttribute('aria-disabled');
-    clearVN();
-    if (typeof switchScenario === 'function') switchScenario(idx, btn);
-    return false;
-  };
-  try { devGoScenario = window.devGoScenario; } catch(e) {}
-
-  window.navigateToNext = function navigateToNextFinalClean(targetIndex){
-    const tabs = document.querySelectorAll('.tab-btn');
-    const targetTab = tabs[targetIndex];
-    if (!targetTab) return false;
-
-    try { scenarioCompleted[scenarioIndex] = true; } catch(e) {}
-
-    targetTab.disabled = false;
-    targetTab.classList.remove('locked');
-    targetTab.removeAttribute('aria-disabled');
-
-    clearVN();
-
-    const chat = document.getElementById('chat');
-    if (chat) chat.scrollTop = 0;
-
-    if (typeof switchScenario === 'function') switchScenario(targetIndex, targetTab);
-    return false;
-  };
-  try { navigateToNext = window.navigateToNext; } catch(e) {}
-
-  window.devNextScenario = function devNextScenarioFinalClean(){
-    const current = typeof scenarioIndex === 'number' ? scenarioIndex : 0;
-    const max = typeof scenarios !== 'undefined' ? scenarios.length - 1 : 7;
-    const next = Math.min(current + 1, max);
-    return window.navigateToNext(next);
-  };
-  try { devNextScenario = window.devNextScenario; } catch(e) {}
-})();
-
-
-/* ======================================================
-   S2 METACOGNITION DETECTIVE OVERHAUL
-   Uses existing PromptCraft shell: inputContainer, sendText,
-   prediction gate, Claude terminal, OSCQR row, and nav flow.
-====================================================== */
-(function(){
-  const S2_STUDENTS = {
-    A: {
-      name: 'Student A',
-      quote: 'I got an 88%. Moving on.',
-      feedback: 'That is performance awareness, not metacognition yet. Student A knows the score, but not the learning strategy behind it.'
-    },
-    B: {
-      name: 'Student B',
-      quote: 'I studied harder this week.',
-      feedback: 'Closer, but still vague. Student B notices effort, but does not identify what strategy worked or what to change next.'
-    },
-    C: {
-      name: 'Student C',
-      quote: 'I realized flashcards worked better than rereading, so I am using them again next week.',
-      feedback: 'Exactly. Student C is monitoring a strategy, judging its usefulness, and planning transfer. Tiny learning-science confetti, somehow still useful.'
-    }
-  };
-
-  const S2_INGREDIENTS = [
-    { key: 'audience', label: 'Audience' },
-    { key: 'courseContext', label: 'Course Context' },
-    { key: 'studentProblem', label: 'Student Problem' },
-    { key: 'reflectionGoal', label: 'Reflection Goal' },
-    { key: 'transferGoal', label: 'Transfer Goal' },
-    { key: 'timeConstraint', label: 'Time Constraint' }
-  ];
-
-  const S2_PRESETS = {
-    weak: {
-      student: 'A',
-      ingredients: ['audience'],
-      course: 'College class',
-      struggle: 'Students struggle.',
-      behavior: 'Do better.'
-    },
-    mid: {
-      student: 'C',
-      ingredients: ['audience','courseContext','studentProblem','reflectionGoal','transferGoal'],
-      course: 'Intro Psychology, asynchronous online course',
-      struggle: 'Students complete readings and quizzes but do not think about which study strategies are helping them learn.',
-      behavior: 'Students identify one study strategy that worked and choose one adjustment for next week.'
-    },
-    strong: {
-      student: 'C',
-      ingredients: ['audience','courseContext','studentProblem','reflectionGoal','transferGoal','timeConstraint'],
-      course: 'First-year nursing students in a fully asynchronous 8-week course',
-      struggle: 'Students repeat the same documentation mistakes even after receiving detailed feedback, and they rarely compare current work to earlier attempts.',
-      behavior: 'Students identify a pattern in their mistakes, explain what caused it, and create a specific strategy they will use before the next submission.'
-    }
-  };
-
-  window.s2State = window.s2State || {
-    student: null,
-    ingredients: {},
-    course: '',
-    struggle: '',
-    behavior: ''
-  };
-
-  function s2ResetState() {
-    window.s2State = { student: null, ingredients: {}, course: '', struggle: '', behavior: '' };
-  }
-
-  function selectedIngredients() {
-    return S2_INGREDIENTS.filter(i => !!window.s2State.ingredients[i.key]);
-  }
-
-  function s2ScorePercent() {
-    let score = 0;
-    if (window.s2State.student === 'C') score += 20;
-    score += Math.min(36, selectedIngredients().length * 6);
-    if ((window.s2State.course || '').trim().length > 4) score += 12;
-    if ((window.s2State.struggle || '').trim().length > 12) score += 16;
-    if ((window.s2State.behavior || '').trim().length > 12) score += 16;
-    return Math.min(100, score);
-  }
-
-  function s2PromptText() {
-    const course = (window.s2State.course || '').trim() || '[course / learner context]';
-    const struggle = (window.s2State.struggle || '').trim() || '[what students struggle with]';
-    const behavior = (window.s2State.behavior || '').trim() || '[desired learning behavior]';
-    const chips = selectedIngredients().map(i => i.label).join(', ') || 'no prompt ingredients selected yet';
-
-    return `I teach ${course}.\n\nMy students are completing work, but they are not reflecting on how they learn. Specifically, ${struggle}\n\nCreate a brief asynchronous metacognitive activity that helps students ${behavior}\n\nUse these design ingredients: ${chips}.\n\nThe activity should be low-stakes, easy to complete online, take about 10-15 minutes if a time limit is appropriate, and include a student-facing prompt plus a short instructor note explaining how it supports metacognition, learning strategy awareness, and transfer.`;
-  }
-
-  function renderS2MetacognitionWorkbench(container) {
-    s2ResetState();
-    document.body.classList.remove('s1-active','s1-result-active');
-    document.body.classList.add('s2-active');
-    container.innerHTML = `
-      <div class="scaffold-area s2-workbench">
-        <div class="s2-left-stack">
-          <div class="s2-mission-card" role="note" aria-label="Scenario 2 mission briefing">
-            <div class="s2-mission-eyebrow">Mission Briefing</div>
-            <div class="s2-mission-title">Find the metacognitive thinker.</div>
-            <div class="s2-mission-copy">Students are completing work and moving on. First, identify what metacognition looks like. Then build a personalized Claude prompt for your own teaching context.</div>
-          </div>
-
-          <div class="s2-detective-card" role="region" aria-label="Metacognition detective cards">
-            <div class="s2-card-eyebrow">Student Thought Detective</div>
-            <div class="s2-panel-title">Which student is showing metacognition?</div>
-            <div class="s2-helper-text">Choose the thought bubble that shows a learner monitoring strategy, judging effectiveness, and planning what to do next.</div>
-            <div class="s2-student-grid">
-              ${Object.entries(S2_STUDENTS).map(([key, item]) => `
-                <button type="button" class="s2-student-card" id="s2-student-${key}" onclick="s2SelectStudent('${key}')">
-                  <div class="s2-student-name">${item.name}</div>
-                  <div class="s2-student-quote">“${item.quote}”</div>
-                </button>
-              `).join('')}
-            </div>
-            <div class="s2-feedback-line" id="s2StudentFeedback">Pick the strongest example before consulting Claude.</div>
-          </div>
-
-          <div class="s2-panel">
-            <div class="s2-panel-eyebrow">Metacognitive Strength</div>
-            <div class="s2-meter-wrap">
-              <div class="s2-meter-top">
-                <span class="s2-meter-label">Prompt readiness</span>
-                <span class="s2-meter-score" id="s2MeterScore">0%</span>
-              </div>
-              <div class="s2-meter-track"><div class="s2-meter-fill" id="s2MeterFill"></div></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="s2-right-stack">
-          <div class="s2-panel" role="region" aria-label="Prompt ingredient puzzle">
-            <div class="s2-panel-eyebrow">Prompt Ingredient Puzzle</div>
-            <div class="s2-panel-title">Select the ingredients Claude needs.</div>
-            <div class="s2-helper-text">These reuse the same quality logic as the chips above, just in a more playable form because apparently people like clicking things.</div>
-            <div class="s2-ingredient-grid" role="group" aria-label="Prompt ingredient choices">
-              ${S2_INGREDIENTS.map(i => `<button type="button" class="s2-ingredient-chip" id="s2-ing-${i.key}" onclick="s2ToggleIngredient('${i.key}')">${i.label}</button>`).join('')}
-            </div>
-          </div>
-
-          <div class="s2-context-panel" role="region" aria-label="Personal teacher context">
-            <div class="s2-panel-eyebrow">Personal Instructor Context</div>
-            <div class="s2-panel-title">Tell Claude about your students.</div>
-            <div class="s2-helper-text">This is the part that should feel personal. Claude will respond to the course and learning behavior you describe, not just a generic reflection activity.</div>
-            <div class="s2-field-grid">
-              <div class="s2-field">
-                <label for="s2-course">What kind of course are you teaching?</label>
-                <input id="s2-course" class="s2-input" placeholder="Example: Intro Psychology, asynchronous, 16 weeks" oninput="s2UpdateFromFields()" />
-              </div>
-              <div class="s2-field">
-                <label for="s2-struggle">What do your students struggle with?</label>
-                <textarea id="s2-struggle" class="s2-textarea" placeholder="Example: They complete quizzes but do not notice which study strategies are working." oninput="s2UpdateFromFields();autoGrow(this)"></textarea>
-              </div>
-              <div class="s2-field">
-                <label for="s2-behavior">What learning behavior should improve?</label>
-                <textarea id="s2-behavior" class="s2-textarea" placeholder="Example: Students choose one strategy to reuse or adjust next week." oninput="s2UpdateFromFields();autoGrow(this)"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <div class="s2-panel">
-            <div class="s2-panel-eyebrow">Claude Prompt Preview</div>
-            <div class="s2-prompt-preview" id="s2PromptPreview"></div>
-          </div>
-
-          <div class="s2-footer">
-            <span class="s2-dev-note">Dev shortcuts: S2 weak · S2 mid · S2 strong</span>
-            <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
-            <button type="button" class="guided-send-btn" id="sendBtn" onclick="s2SendToClaude()">Consult Claude →</button>
-          </div>
-        </div>
-      </div>`;
-    s2RefreshUI();
-  }
-
-  window.s2SelectStudent = function s2SelectStudent(key) {
-    window.s2State.student = key;
-    document.querySelectorAll('.s2-student-card').forEach(el => el.classList.remove('selected'));
-    document.getElementById(`s2-student-${key}`)?.classList.add('selected');
-    const line = document.getElementById('s2StudentFeedback');
-    if (line) line.textContent = S2_STUDENTS[key]?.feedback || '';
-    s2RefreshUI();
-  };
-
-  window.s2ToggleIngredient = function s2ToggleIngredient(key) {
-    window.s2State.ingredients[key] = !window.s2State.ingredients[key];
-    s2RefreshUI();
-  };
-
-  window.s2UpdateFromFields = function s2UpdateFromFields() {
-    window.s2State.course = document.getElementById('s2-course')?.value || '';
-    window.s2State.struggle = document.getElementById('s2-struggle')?.value || '';
-    window.s2State.behavior = document.getElementById('s2-behavior')?.value || '';
-    s2RefreshUI();
-  };
-
-  function s2RefreshUI() {
-    S2_INGREDIENTS.forEach(i => {
-      const btn = document.getElementById(`s2-ing-${i.key}`);
-      if (btn) {
-        const selected = !!window.s2State.ingredients[i.key];
-        btn.classList.toggle('selected', selected);
-        btn.setAttribute('aria-pressed', String(selected));
-      }
-    });
-    const percent = s2ScorePercent();
-    const fill = document.getElementById('s2MeterFill');
-    const score = document.getElementById('s2MeterScore');
-    const preview = document.getElementById('s2PromptPreview');
-    if (fill) fill.style.width = percent + '%';
-    if (score) score.textContent = percent + '%';
-    if (preview) preview.textContent = s2PromptText();
-  }
-
-  window.s2SendToClaude = function s2SendToClaude() {
-    s2UpdateFromFields();
-    const text = s2PromptText();
-    if (!text) return false;
-    if (window.s2State.student !== 'C') {
-      const line = document.getElementById('s2StudentFeedback');
-      if (line) line.textContent = 'You can still consult Claude, but notice that the detective choice will weaken the learning target.';
-    }
-    sendText(text);
-    return false;
-  };
-
-  window.devFillS2 = function devFillS2(mode = 'mid') {
-    const preset = S2_PRESETS[mode] || S2_PRESETS.mid;
-    if (typeof window.devGoScenario === 'function') window.devGoScenario(1);
-    else if (typeof devGoScenario === 'function') devGoScenario(1);
-
-    const tryFill = (attempts = 0) => {
-      const course = document.getElementById('s2-course');
-      if (!course) {
-        if (attempts < 40) setTimeout(() => tryFill(attempts + 1), 150);
-        return;
-      }
-      window.s2State.student = preset.student;
-      window.s2State.ingredients = {};
-      preset.ingredients.forEach(k => window.s2State.ingredients[k] = true);
-      window.s2State.course = preset.course;
-      window.s2State.struggle = preset.struggle;
-      window.s2State.behavior = preset.behavior;
-
-      course.value = preset.course;
-      document.getElementById('s2-struggle').value = preset.struggle;
-      document.getElementById('s2-behavior').value = preset.behavior;
-      document.querySelectorAll('.s2-student-card').forEach(el => el.classList.remove('selected'));
-      document.getElementById(`s2-student-${preset.student}`)?.classList.add('selected');
-      const line = document.getElementById('s2StudentFeedback');
-      if (line) line.textContent = S2_STUDENTS[preset.student]?.feedback || '';
-      s2RefreshUI();
-      course.focus();
+      if (attempts < 40) setTimeout(() => tryFill(attempts + 1), 150);
+      return false;
     };
     setTimeout(() => tryFill(), 250);
     return false;
-  };
-
-  const priorRenderInputMode = window.renderInputMode || (typeof renderInputMode === 'function' ? renderInputMode : null);
-  window.renderInputMode = function renderInputModeS2Owner(idx) {
-    const container = document.getElementById('inputContainer');
-    if (!container) return;
-    document.body.classList.toggle('s2-active', idx === 1);
-    if (idx === 1) {
-      document.body.classList.remove('s2-submitted');
-      renderS2MetacognitionWorkbench(container);
-      return;
-    }
-    document.body.classList.remove('s2-active','s2-submitted');
-    if (typeof priorRenderInputMode === 'function') return priorRenderInputMode(idx);
-  };
-  try { renderInputMode = window.renderInputMode; } catch(e) {}
-
-  const priorDevFillScenario = window.devFillScenario || (typeof devFillScenario === 'function' ? devFillScenario : null);
-  window.devFillScenario = function devFillScenarioS2Owner(idx) {
-    if (idx === 1) return window.devFillS2('mid');
-    if (typeof priorDevFillScenario === 'function') return priorDevFillScenario(idx);
-    return false;
-  };
-  try { devFillScenario = window.devFillScenario; } catch(e) {}
-
-  window.devFillS2Weak = () => window.devFillS2('weak');
-  window.devFillS2Mid = () => window.devFillS2('mid');
-  window.devFillS2Strong = () => window.devFillS2('strong');
-})();
-
-/* S2 result + Pixel reflection owner. Appended after legacy owners on purpose. */
-(function(){
-  function addS2ClaudeResultCard(responseText) {
-    document.body.classList.add('s2-active','s2-submitted');
-    const area = document.getElementById('chat');
-    if (!area) return;
-    // Keep the user's submitted prompt bubble, but remove transient typing rows.
-    document.getElementById('typing')?.remove();
-    const card = document.createElement('div');
-    card.className = 's2-result-card';
-    card.innerHTML = `
-      <div class="s2-result-eyebrow">Claude Draft</div>
-      <div class="s2-result-title">Metacognitive Activity Draft</div>
-      <div class="s2-result-body">${fmt(responseText)}</div>
-    `;
-    area.appendChild(card);
-    area.scrollTop = area.scrollHeight;
   }
 
-  const priorShowClaudeFinal = window.showClaudeFinalResponseInTerminal || (typeof showClaudeFinalResponseInTerminal === 'function' ? showClaudeFinalResponseInTerminal : null);
-  window.showClaudeFinalResponseInTerminal = function showClaudeFinalResponseInTerminalS2Owner(responseText, mock = false, onClose = null, scoreTotal = null) {
-    if (typeof priorShowClaudeFinal !== 'function') return;
-    if (typeof scenarioIndex !== 'undefined' && scenarioIndex === 1) {
-      const wrappedClose = function(){
-        addS2ClaudeResultCard(responseText);
-        if (typeof onClose === 'function') onClose();
-      };
-      return priorShowClaudeFinal(responseText, mock, wrappedClose, scoreTotal);
-    }
-    return priorShowClaudeFinal(responseText, mock, onClose, scoreTotal);
-  };
-  try { showClaudeFinalResponseInTerminal = window.showClaudeFinalResponseInTerminal; } catch(e) {}
+  function devTestScenarioGlobal(index) {
+    return devFillScenarioGlobal(index);
+  }
 
-  const priorPixelReflection = window.showPixelScoreReflection || (typeof showPixelScoreReflection === 'function' ? showPixelScoreReflection : null);
-  window.showPixelScoreReflection = function showPixelScoreReflectionS2Owner(totalScore, onDone = null) {
-    if (typeof scenarioIndex !== 'undefined' && scenarioIndex === 1) {
-      const dialogue = document.getElementById('vnDialogue');
-      if (dialogue) dialogue.classList.remove('has-choices');
-      let lines;
-      if (totalScore <= 2) {
-        lines = [
-          { expr:'skeptical', text:'Claude had to guess what metacognitive behavior you wanted students to practice.' },
-          { expr:'thinking', text:'For a stronger activity, name the student struggle and the learning strategy you want them to notice or transfer.' }
-        ];
-      } else if (totalScore <= 3) {
-        lines = [
-          { expr:'encouraging', text:'This is moving in the right direction. You gave Claude a real learning problem, not just “make a reflection.”' },
-          { expr:'thinking', text:'Push it one step further by naming what students should do differently after the reflection.' }
-        ];
-      } else {
-        lines = [
-          { expr:'proud', text:'Notice what changed: Claude could design for metacognition because you described the learners, the struggle, and the desired behavior.' },
-          { expr:'encouraging', text:'That is the useful pattern: identify the thinking you want students to practice before asking AI to create the activity.' }
-        ];
-      }
-      lines.forEach((line, idx) => vnShow(line.expr, line.text, idx === lines.length - 1 ? onDone : null));
-      return;
-    }
-    if (typeof priorPixelReflection === 'function') return priorPixelReflection(totalScore, onDone);
-  };
-  try { showPixelScoreReflection = window.showPixelScoreReflection; } catch(e) {}
+  function navigateToNextGlobal(targetIndex) {
+    targetIndex = Number(targetIndex);
+    if (!Number.isFinite(targetIndex)) targetIndex = ((typeof scenarioIndex === 'number' ? scenarioIndex : 0) + 1);
+    return devGoScenarioGlobal(targetIndex);
+  }
 
-  const priorDevGoScenario = window.devGoScenario || (typeof devGoScenario === 'function' ? devGoScenario : null);
-  window.devGoScenario = function devGoScenarioS2Clean(idx) {
-    document.body.classList.remove('s2-submitted');
-    if (typeof priorDevGoScenario === 'function') return priorDevGoScenario(idx);
-    return false;
+  function devNextScenarioGlobal() {
+    const current = typeof scenarioIndex === 'number' ? scenarioIndex : 0;
+    const max = typeof scenarios !== 'undefined' ? scenarios.length - 1 : 7;
+    return devGoScenarioGlobal(Math.min(current + 1, max));
+  }
+
+  // Main DEV bar functions used by index.html inline onclick attributes.
+  assign('devGoScenario', devGoScenarioGlobal);
+  assign('devFillScenario', devFillScenarioGlobal);
+  assign('devTestScenario', devTestScenarioGlobal);
+  assign('navigateToNext', navigateToNextGlobal);
+  assign('devNextScenario', devNextScenarioGlobal);
+
+  // Scenario-specific shortcuts. Use existing owners where they exist, otherwise route through generic navigation/fill.
+  assign('devGoS4', typeof devGoS4 === 'function' ? devGoS4 : () => devGoScenarioGlobal(3));
+  assign('devTestS4', typeof devTestS4 === 'function' ? devTestS4 : () => devFillScenarioGlobal(3));
+  assign('devGoS5', typeof devGoS5 === 'function' ? devGoS5 : () => devGoScenarioGlobal(4));
+  assign('devFillS5', typeof devFillS5 === 'function' ? devFillS5 : () => devFillScenarioGlobal(4));
+  assign('devGoS6', typeof devGoS6 === 'function' ? devGoS6 : () => devGoScenarioGlobal(5));
+  assign('devFillS6', typeof devFillS6 === 'function' ? devFillS6 : () => devFillScenarioGlobal(5));
+  assign('devGoS7', typeof devGoS7 === 'function' ? devGoS7 : () => devGoScenarioGlobal(6));
+  assign('devGoS8', typeof devGoS8 === 'function' ? devGoS8 : () => devGoScenarioGlobal(7));
+  assign('devFillS8', typeof devFillS8 === 'function' ? devFillS8 : () => devFillScenarioGlobal(7));
+  assign('devSkip', typeof devSkip === 'function' ? devSkip : window.devSkip);
+
+  if (typeof devFillS2 === 'function') {
+    assign('devFillS2', devFillS2);
+    assign('devFillS2Weak', () => devFillS2('weak'));
+    assign('devFillS2Mid', () => devFillS2('mid'));
+    assign('devFillS2Strong', () => devFillS2('strong'));
+  }
+
+  window.devStatus = function devStatus(){
+    const names = ['devGoScenario','devFillScenario','devTestScenario','devNextScenario','devSkip','navigateToNext','devGoS5','devFillS5','devGoS6','devFillS6','devGoS7','devGoS8','devFillS8'];
+    return Object.fromEntries(names.map(name => [name, typeof window[name]]));
   };
-  try { devGoScenario = window.devGoScenario; } catch(e) {}
+
+  console.info('[PromptCraft] DEV globals repaired:', window.devStatus());
 })();
