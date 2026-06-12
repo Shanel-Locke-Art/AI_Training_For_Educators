@@ -2338,7 +2338,53 @@ function terminalizeClaudeText(text) {
     .trim();
 }
 
-function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', output = 'IDLE') {
+
+let claudeSpeechUtterance = null;
+
+function cleanClaudeSpeechText(text) {
+  return String(text || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\*\*/g, '')
+    .replace(/#{1,6}\s*/g, '')
+    .replace(/[-]{3,}/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function stopClaudeTTS() {
+  if (window.speechSynthesis?.speaking || window.speechSynthesis?.pending) {
+    window.speechSynthesis.cancel();
+  }
+  const btn = document.getElementById('claudeTTSBtn');
+  if (btn) btn.textContent = '🔊 Read Claude Output';
+}
+
+function toggleClaudeTTS() {
+  const btn = document.getElementById('claudeTTSBtn');
+  if (!('speechSynthesis' in window)) {
+    if (btn) btn.textContent = 'TTS unavailable';
+    return;
+  }
+  if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+    stopClaudeTTS();
+    return;
+  }
+  const output = document.getElementById('claudeTerminalOutput');
+  const text = cleanClaudeSpeechText(output?.textContent || '');
+  if (!text) return;
+  claudeSpeechUtterance = new SpeechSynthesisUtterance(text);
+  claudeSpeechUtterance.rate = 0.9;
+  claudeSpeechUtterance.pitch = 0.85;
+  claudeSpeechUtterance.onend = () => { if (btn) btn.textContent = '🔊 Read Claude Output'; };
+  claudeSpeechUtterance.onerror = () => { if (btn) btn.textContent = '🔊 Read Claude Output'; };
+  if (btn) btn.textContent = '⏹ Stop Reading';
+  window.speechSynthesis.speak(claudeSpeechUtterance);
+}
+
+window.toggleClaudeTTS = toggleClaudeTTS;
+window.stopClaudeTTS = stopClaudeTTS;
+
+function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', output = 'AWAITING CONTEXT') {
   const terminal = document.getElementById('claudeTerminalScene');
   const titleEl = document.getElementById('claudeTerminalTitle');
   const outputEl = document.getElementById('claudeTerminalOutput');
@@ -2348,6 +2394,11 @@ function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', outpu
   }
   if (titleEl) titleEl.textContent = title;
   if (outputEl) outputEl.innerHTML = `${output}<span class="claude-terminal-cursor"></span>`;
+  const ttsBtn = document.getElementById('claudeTTSBtn');
+  if (ttsBtn) {
+    ttsBtn.hidden = true;
+    ttsBtn.setAttribute('aria-hidden', 'true');
+  }
 }
 
 function showClaudeConsultOverlay(partLabel) {
@@ -2388,7 +2439,7 @@ function showClaudeConsultOverlay(partLabel) {
   }, 100);
 }
 
-function showClaudeConsultResult(feedback, mock = false, onClose = null) {
+function showClaudeConsultResult(feedback, mock = false, onClose = null, allowTTS = false) {
   claudeTerminalCloseCallback = typeof onClose === 'function' ? onClose : null;
   const label = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
   const terminalText = `${label}\n\n${terminalizeClaudeText(feedback)}`;
@@ -2407,7 +2458,10 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
   const vnText = document.getElementById('vnText');
   if (vnText) {
     vnText.innerHTML = `
-      <button class="vn-return-btn terminal-return" type="button" onclick="event.stopPropagation();closeClaudeConsultOverlay()">Continue</button>
+      <div class="terminal-controls">
+        ${allowTTS ? `<button id="claudeTTSBtn" class="claude-tts-btn" type="button" onclick="event.stopPropagation();toggleClaudeTTS();">🔊 Read Claude Output</button>` : ''}
+        <button class="vn-return-btn terminal-return" type="button" onclick="event.stopPropagation();closeClaudeConsultOverlay()">Continue</button>
+      </div>
     `;
     setTimeout(() => vnText.querySelector('.vn-return-btn')?.focus(), 100);
   }
@@ -2436,12 +2490,13 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
       ? buildS1TerminalDiagnosis(scoreTotal, responseText)
       : responseText;
-    showClaudeConsultResult(terminalOutput, mock, effectiveClose);
+    showClaudeConsultResult(terminalOutput, mock, effectiveClose, true);
   }, 350);
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
 function closeClaudeConsultOverlay() {
+  try { stopClaudeTTS(); } catch(e) {}
   const cb = claudeTerminalCloseCallback;
   claudeTerminalCloseCallback = null;
   const overlay = document.getElementById('vnOverlay');
@@ -2449,7 +2504,7 @@ function closeClaudeConsultOverlay() {
   document.getElementById('vnCharacter')?.classList.remove('visible');
   setClaudeShelfState('idle', 'idle');
   setClaudeTerminalTextMode(false);
-  setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
+  setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'AWAITING CONTEXT');
   musicEndVN();
   if (cb) {
     setTimeout(cb, 250);
@@ -2750,6 +2805,7 @@ function switchScenario(i, btn) {
 }
 
 function pcClearVNStateForScenarioSwitch() {
+  try { stopClaudeTTS(); } catch(e) {}
   const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
   if (overlay) {
     overlay.classList.remove(
