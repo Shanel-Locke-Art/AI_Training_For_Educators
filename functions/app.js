@@ -481,41 +481,118 @@ function buildSessionPayload(formData) {
     referrer:     document.referrer || 'direct'
   };
 }
- 
-async function saveIncrementalData(scenarioIdx) {
-  // Don't save if no attempts were made — avoids phantom rows from dev navigation
-  if ((scenarioData[scenarioIdx]?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 6) return;
-  if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
+
+
+// Reliable Google Apps Script sender.
+// Apps Script web apps behave better with text/plain + no-cors than application/json.
+// no-cors means the browser cannot read the response, so use console logs and the Apps Script /exec URL for diagnosis.
+const SURVEY_MODE = 'sheets';
+
+const SHEETS_URL =
+  'https://script.google.com/macros/s/AKfycbzN9bGwzKUcucCltXfj72pxee7y6t1reML6YRQNqCjxJ9Y3rDGp1a_FkYMzJmZROka5/exec';
+
+async function sendPayloadToSheets(payload, label = 'PromptCraft Save') {
+  if (
+    SURVEY_MODE !== 'sheets' ||
+    !SHEETS_URL ||
+    SHEETS_URL.trim() === ''
+  ) {
+    console.warn('[PromptCraft] Sheets save skipped. Invalid configuration.', {
+      SURVEY_MODE,
+      SHEETS_URL
+    });
+    return false;
+  }
+
   try {
-    const s = scenarioData[scenarioIdx];
-    const participantId = document.querySelector('input[name="participant_id"]')?.value?.trim() || (playerName !== 'You' ? playerName : 'anonymous');
- 
-    const payload = {
-      type:                 'incremental',
-      timestamp:            new Date().toISOString(),
-      participant_id:       participantId,
-      scenario_index:       scenarioIdx + 1,
-      session_duration_min: parseFloat(((Date.now() - sessionStart) / 60000).toFixed(1)),
-      attempts:             s.attempts         || 0,
-      best_score:           s.bestScore        || 0,
-      prompts:              (s.prompts || []).join(' | '),
-      final_response:       s.finalResponse    || '',
-      oscqr_lit:            s.oscqrLit         || '',
-      self_report:          s.selfReport       || s.prediction || '',
-      screen_width:         window.screen.width,
-    };
- 
-    console.log(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
- 
+    const body = JSON.stringify(payload || {});
+
+    console.group(`[PromptCraft] ${label}`);
+    console.log('Endpoint:', SHEETS_URL);
+    console.log('Payload:', payload);
+
     await fetch(SHEETS_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      redirect: 'follow',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body
     });
- 
-  } catch(e) {
-    console.warn('[PromptCraft] Incremental save failed:', e.message);
+
+    console.log('Upload request sent.');
+    console.groupEnd();
+
+    return true;
+  } catch (err) {
+    console.error(`[PromptCraft] ${label} failed`, err);
+    return false;
+  }
+}
+
+window.sendPayloadToSheets = sendPayloadToSheets;
+
+async function saveIncrementalData(scenarioIdx) {
+  const s = scenarioData?.[scenarioIdx];
+
+  if (
+    (s?.attempts || 0) === 0 &&
+    scenarioIdx !== 3 &&
+    scenarioIdx !== 6
+  ) {
+    console.log(
+      `[PromptCraft] Skipping S${scenarioIdx + 1} incremental save (no attempts).`
+    );
+    return;
+  }
+
+  if (
+    SURVEY_MODE !== 'sheets' ||
+    !SHEETS_URL ||
+    SHEETS_URL.trim() === ''
+  ) {
+    console.warn(
+      '[PromptCraft] Incremental save skipped. Sheets configuration missing.'
+    );
+    return;
+  }
+
+  try {
+    const participantId =
+      document.querySelector('input[name="participant_id"]')
+        ?.value
+        ?.trim() ||
+      (playerName !== 'You' ? playerName : 'anonymous');
+
+    const payload = {
+      type: 'incremental',
+      timestamp: new Date().toISOString(),
+      participant_id: participantId,
+      scenario_index: scenarioIdx + 1,
+      session_duration_min: parseFloat(
+        ((Date.now() - sessionStart) / 60000).toFixed(1)
+      ),
+      attempts: s?.attempts || 0,
+      best_score: s?.bestScore || 0,
+      prompts: (s?.prompts || []).join(' | '),
+      final_response: s?.finalResponse || '',
+      oscqr_lit: s?.oscqrLit || '',
+      self_report: s?.selfReport || s?.prediction || '',
+      screen_width: window.screen.width
+    };
+
+    console.log(`[PromptCraft] Saving S${scenarioIdx + 1}`, payload);
+
+    await sendPayloadToSheets(
+      payload,
+      `Incremental Save S${scenarioIdx + 1}`
+    );
+  } catch (err) {
+    console.error(
+      `[PromptCraft] Incremental Save S${scenarioIdx + 1} Failed`,
+      err
+    );
   }
 }
  
@@ -2279,12 +2356,7 @@ async function autoSaveSession(label) {
     const payload = buildSessionPayload(null);
     payload.type = 'autosave';
     payload.autosave_trigger = label;
-    await fetch(SHEETS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    await sendPayloadToSheets(payload, `Autosave: ${label}`);
   } catch(e) {
     // silent fail — reflection form send is the primary
   }
@@ -3734,12 +3806,7 @@ async function handleReflectionSubmit(e) {
       const payload = buildSessionPayload(formData);
       console.log('[PromptCraft] Submitting full session payload:', payload);
 
-      await fetch(SHEETS_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+      await sendPayloadToSheets(payload, 'Full reflection submission');
       console.log('[PromptCraft] Sheets submission sent');
     } catch(err) {
       console.warn('[PromptCraft] Sheets submission error:', err);
@@ -3792,11 +3859,7 @@ async function handleReflectionSubmit(e) {
             s7_correct: g.s7_correct,
           }),
         });
-        fetch(SHEETS_URL, {
-          method: 'POST', mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(growthPayload)
-        }).catch(() => {});
+        sendPayloadToSheets(growthPayload, 'Growth report update').catch(() => {});
       }
     });
     return;
