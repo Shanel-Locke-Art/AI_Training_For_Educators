@@ -3507,9 +3507,12 @@ async function sendMain(text) {
 
     // Track behavioral data
     trackPrompt(scenarioIndex, text, score.total, reply, active.map(id => {
-      const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
-      return ind ? ind.label : id;
-    }));
+    const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
+    return ind ? ind.label : id;
+  }));
+
+  // Save every Claude submission immediately.
+  saveIncrementalData(scenarioIndex);
     // ── S8: show the AI message first, THEN handle round logic ──
     if (scenarioIndex === 7) {
       const expr = score.total <= 1 ? 'skeptical' : score.total <= 3 ? 'encouraging' : 'excited';
