@@ -564,17 +564,52 @@ async function saveIncrementalData(scenarioIdx) {
       type: 'incremental',
       timestamp: new Date().toISOString(),
       participant_id: participantId,
+
+      event_type: s?.eventType || 'prompt_attempt',
+
       scenario_index: scenarioIdx + 1,
+      scenario_label:
+        scenarios?.[scenarioIdx]?.title ||
+        scenarios?.[scenarioIdx]?.label ||
+        '',
+
       session_duration_min: parseFloat(
         ((Date.now() - sessionStart) / 60000).toFixed(1)
       ),
-      attempts: s?.attempts || 0,
+
+      attempt_number: s?.attemptNumber || attempts || s?.attempts || 0,
+      current_score: s?.currentScore ?? s?.bestScore ?? 0,
       best_score: s?.bestScore || 0,
-      prompts: (s?.prompts || []).join(' | '),
-      final_response: s?.finalResponse || '',
-      oscqr_lit: s?.oscqrLit || '',
-      self_report: s?.selfReport || s?.prediction || '',
-      screen_width: window.screen.width
+      score_delta: s?.scoreDelta ?? '',
+
+      prompts:
+        s?.lastPromptText ||
+        (s?.prompts || []).slice(-1)[0] ||
+        '',
+
+      final_response:
+        s?.lastClaudeResponse ||
+        s?.finalResponse ||
+        '',
+
+      oscqr_lit:
+        s?.lastQualityIndicators ||
+        s?.oscqrLit ||
+        '',
+
+      self_report:
+        s?.selfReport ||
+        s?.prediction ||
+        '',
+
+      time_since_last_attempt_sec:
+        s?.timeSinceLastAttemptSec ?? '',
+
+      screen_width: window.screen.width,
+
+      notes:
+        s?.codingMemo ||
+        ''
     };
 
     console.log(`[PromptCraft] Saving S${scenarioIdx + 1}`, payload);
@@ -3451,37 +3486,40 @@ let isSubmittingToClaude = false;
 // ══════════════════════════════════════════════════════
 //  SEND
 // ══════════════════════════════════════════════════════
-async function send() {
-  sendOpen();
-}
-
 async function sendMain(text) {
   if (!text || isSubmittingToClaude) return;
   isSubmittingToClaude = true;
 
+  const attemptStartedAt = Date.now();
+  const previousBestScore = scenarioData?.[scenarioIndex]?.bestScore || 0;
+  const previousAttemptAt = scenarioData?.[scenarioIndex]?.lastAttemptAt || null;
+
   attempts++;
-  lastPromptText = text; // save for pre-filling next attempt
+  lastPromptText = text;
+
   const attEl = document.getElementById('attNum');
   if (attEl) attEl.textContent = attempts;
 
-  // In S1, do not print the hidden assembled prompt into the chat.
-  // It is a behind-the-scenes request to Claude, not player-facing content.
   if (scenarioIndex !== 0) addMsg('user', esc(text));
 
-  // Clear whichever input is active
   const input = document.getElementById('promptInput');
-  if (input) { input.value = ''; input.style.height = 'auto'; }
-  // Keep S1 guided fields visible after consulting Claude so the player can see what they submitted.
+  if (input) {
+    input.value = '';
+    input.style.height = 'auto';
+  }
+
   if (scenarioIndex !== 0) {
-    ['g-learners','g-issue','g-interaction','g-constraints'].forEach(id => {
+    ['g-learners', 'g-issue', 'g-interaction', 'g-constraints'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
   }
 
   history.push({ role: 'user', content: text });
+
   const btn = document.getElementById('sendBtn');
   if (btn) btn.disabled = true;
+
   addTyping();
 
   try {
@@ -3491,6 +3529,7 @@ async function sendMain(text) {
       system: scenarios[scenarioIndex].system,
       messages: history
     }, 'main');
+
     removeTyping();
 
     if (data.error) {
@@ -3503,31 +3542,64 @@ async function sendMain(text) {
 
     const score = scorePrompt(text);
     const active = detectOSCQR(reply, scenarios[scenarioIndex].oscqr);
+    const activeLabels = active.map(id => {
+      const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
+      return ind ? ind.label : id;
+    });
+
     renderOSCQR(scenarios[scenarioIndex].oscqr, active);
 
-    // Track behavioral data
-    trackPrompt(scenarioIndex, text, score.total, reply, active.map(id => {
-    const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
-    return ind ? ind.label : id;
-  }));
+    trackPrompt(
+      scenarioIndex,
+      text,
+      score.total,
+      reply,
+      activeLabels
+    );
 
-  // Save every Claude submission immediately.
-  saveIncrementalData(scenarioIndex);
+    const s = scenarioData[scenarioIndex];
+
+    s.eventType = 'prompt_attempt';
+    s.attemptNumber = attempts;
+    s.currentScore = score.total;
+    s.previousBestScore = previousBestScore;
+    s.scoreDelta = score.total - previousBestScore;
+    s.timeSinceLastAttemptSec = previousAttemptAt
+      ? Math.round((attemptStartedAt - previousAttemptAt) / 1000)
+      : '';
+
+    s.lastPromptText = text;
+    s.lastClaudeResponse = reply;
+    s.lastQualityIndicators = activeLabels.join(', ');
+    s.lastAttemptAt = attemptStartedAt;
+
+    await saveIncrementalData(scenarioIndex);
+
     // ── S8: show the AI message first, THEN handle round logic ──
     if (scenarioIndex === 7) {
       const expr = score.total <= 1 ? 'skeptical' : score.total <= 3 ? 'encouraging' : 'excited';
       const aiMsgEl = addMsg('claude', fmt(reply) + buildFeedback(score), expr);
+
       gainXP(score.total * 6);
+
       const chatEl = document.getElementById('chat');
       requestAnimationFrame(() => requestAnimationFrame(() => {
         if (aiMsgEl) {
           const chatRect = chatEl.getBoundingClientRect();
-          const msgRect  = aiMsgEl.getBoundingClientRect();
+          const msgRect = aiMsgEl.getBoundingClientRect();
           chatEl.scrollTop = chatEl.scrollTop + (msgRect.top - chatRect.top) - 48;
         }
       }));
-      if (s8Phase === 1) { s8AfterResponse(score.total, reply); return; }
-      if (s8Phase === 2) { s8AfterRevision(score.total); return; }
+
+      if (s8Phase === 1) {
+        s8AfterResponse(score.total, reply);
+        return;
+      }
+
+      if (s8Phase === 2) {
+        s8AfterRevision(score.total);
+        return;
+      }
     }
 
     // Pick expression for this response
