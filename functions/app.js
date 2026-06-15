@@ -486,11 +486,6 @@ function buildSessionPayload(formData) {
 // Reliable Google Apps Script sender.
 // Apps Script web apps behave better with text/plain + no-cors than application/json.
 // no-cors means the browser cannot read the response, so use console logs and the Apps Script /exec URL for diagnosis.
-const SURVEY_MODE = 'sheets';
-
-const SHEETS_URL =
-  'https://script.google.com/macros/s/AKfycbzN9bGwzKUcucCltXfj72pxee7y6t1reML6YRQNqCjxJ9Y3rDGp1a_FkYMzJmZROka5/exec';
-
 async function sendPayloadToSheets(payload, label = 'PromptCraft Save') {
   if (
     SURVEY_MODE !== 'sheets' ||
