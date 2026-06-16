@@ -3573,7 +3573,12 @@ async function sendMain(text) {
     s.lastQualityIndicators = activeLabels.join(', ');
     s.lastAttemptAt = attemptStartedAt;
 
-    await saveIncrementalData(scenarioIndex);
+    console.log('Before incremental save');
+
+    saveIncrementalData(scenarioIndex);
+
+    console.log('After incremental save');
+    saveIncrementalData(scenarioIndex);
 
     // ── S8: show the AI message first, THEN handle round logic ──
     if (scenarioIndex === 7) {
