@@ -481,148 +481,41 @@ function buildSessionPayload(formData) {
     referrer:     document.referrer || 'direct'
   };
 }
-
-
-// Reliable Google Apps Script sender.
-// Apps Script web apps behave better with text/plain + no-cors than application/json.
-// no-cors means the browser cannot read the response, so use console logs and the Apps Script /exec URL for diagnosis.
-async function sendPayloadToSheets(payload, label = 'PromptCraft Save') {
-  if (
-    SURVEY_MODE !== 'sheets' ||
-    !SHEETS_URL ||
-    SHEETS_URL.trim() === ''
-  ) {
-    console.warn('[PromptCraft] Sheets save skipped. Invalid configuration.', {
-      SURVEY_MODE,
-      SHEETS_URL
-    });
-    return false;
-  }
-
+ 
+async function saveIncrementalData(scenarioIdx) {
+  // Don't save if no attempts were made — avoids phantom rows from dev navigation
+  if ((scenarioData[scenarioIdx]?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 6) return;
+  if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
   try {
-    const body = JSON.stringify(payload || {});
-
-    console.group(`[PromptCraft] ${label}`);
-    console.log('Endpoint:', SHEETS_URL);
-    console.log('Payload:', payload);
-
+    const s = scenarioData[scenarioIdx];
+    const participantId = document.querySelector('input[name="participant_id"]')?.value?.trim() || (playerName !== 'You' ? playerName : 'anonymous');
+ 
+    const payload = {
+      type:                 'incremental',
+      timestamp:            new Date().toISOString(),
+      participant_id:       participantId,
+      scenario_index:       scenarioIdx + 1,
+      session_duration_min: parseFloat(((Date.now() - sessionStart) / 60000).toFixed(1)),
+      attempts:             s.attempts         || 0,
+      best_score:           s.bestScore        || 0,
+      prompts:              (s.prompts || []).join(' | '),
+      final_response:       s.finalResponse    || '',
+      oscqr_lit:            s.oscqrLit         || '',
+      self_report:          s.selfReport       || s.prediction || '',
+      screen_width:         window.screen.width,
+    };
+ 
+    console.log(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
+ 
     await fetch(SHEETS_URL, {
       method: 'POST',
       mode: 'no-cors',
-      redirect: 'follow',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
-      body
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
-
-    console.log('Upload request sent.');
-    console.groupEnd();
-
-    return true;
-  } catch (err) {
-    console.error(`[PromptCraft] ${label} failed`, err);
-    return false;
-  }
-}
-
-window.sendPayloadToSheets = sendPayloadToSheets;
-
-async function saveIncrementalData(scenarioIdx) {
-  const s = scenarioData?.[scenarioIdx];
-
-  if (
-    (s?.attempts || 0) === 0 &&
-    scenarioIdx !== 3 &&
-    scenarioIdx !== 6
-  ) {
-    console.log(
-      `[PromptCraft] Skipping S${scenarioIdx + 1} incremental save (no attempts).`
-    );
-    return;
-  }
-
-  if (
-    SURVEY_MODE !== 'sheets' ||
-    !SHEETS_URL ||
-    SHEETS_URL.trim() === ''
-  ) {
-    console.warn(
-      '[PromptCraft] Incremental save skipped. Sheets configuration missing.'
-    );
-    return;
-  }
-
-  try {
-    const participantId =
-      document.querySelector('input[name="participant_id"]')
-        ?.value
-        ?.trim() ||
-      (playerName !== 'You' ? playerName : 'anonymous');
-
-    const payload = {
-      type: 'incremental',
-      timestamp: new Date().toISOString(),
-      participant_id: participantId,
-
-      event_type: s?.eventType || 'prompt_attempt',
-
-      scenario_index: scenarioIdx + 1,
-      scenario_label:
-        scenarios?.[scenarioIdx]?.title ||
-        scenarios?.[scenarioIdx]?.label ||
-        '',
-
-      session_duration_min: parseFloat(
-        ((Date.now() - sessionStart) / 60000).toFixed(1)
-      ),
-
-      attempt_number: s?.attemptNumber || attempts || s?.attempts || 0,
-      current_score: s?.currentScore ?? s?.bestScore ?? 0,
-      best_score: s?.bestScore || 0,
-      score_delta: s?.scoreDelta ?? '',
-
-      prompts:
-        s?.lastPromptText ||
-        (s?.prompts || []).slice(-1)[0] ||
-        '',
-
-      final_response:
-        s?.lastClaudeResponse ||
-        s?.finalResponse ||
-        '',
-
-      oscqr_lit:
-        s?.lastQualityIndicators ||
-        s?.oscqrLit ||
-        '',
-
-      self_report:
-        s?.selfReport ||
-        s?.prediction ||
-        '',
-
-      time_since_last_attempt_sec:
-        s?.timeSinceLastAttemptSec ?? '',
-
-      screen_width: window.screen.width,
-
-      notes:
-        s?.codingMemo ||
-        ''
-    };
-
-    console.log(`[PromptCraft] Saving S${scenarioIdx + 1}`, payload);
-
-    await sendPayloadToSheets(
-      payload,
-      `Incremental Save S${scenarioIdx + 1}`
-    );
-  } catch (err) {
-    console.error(
-      `[PromptCraft] Incremental Save S${scenarioIdx + 1} Failed`,
-      err
-    );
+ 
+  } catch(e) {
+    console.warn('[PromptCraft] Incremental save failed:', e.message);
   }
 }
  
@@ -648,7 +541,7 @@ const sounds = audioReady ? {
   scenarioIntro4:    new Howl({ src: ['audio/scenario-5-intro.mp3'],   volume: 0.9 }),
   scenarioIntro5:    new Howl({ src: ['audio/scenario-6-intro.mp3'],   volume: 0.9 }),
   scenarioIntro6:    new Howl({ src: ['audio/scenario-7-intro.mp3'],   volume: 0.9 }),
-  scenarioIntro7:    new Howl({ src: ['audio/scenario-8-intro.mp3'],   volume: 0.9 }),
+  // scenarioIntro7 intentionally omitted until audio/scenario-8-intro.mp3 exists.
   // ── Special scenario moments ──────────────────────────
   s4Interrupt:       new Howl({ src: ['audio/s4-interrupt.mp3'],       volume: 0.9 }),
   s4Reveal:          new Howl({ src: ['audio/s4-reveal.mp3'],          volume: 0.9 }),
@@ -660,7 +553,7 @@ const sounds = audioReady ? {
 const NARRATION_KEYS = new Set([
   'welcome','vague','decent','strong','scenarioComplete','allComplete',
   'scenarioIntro0','scenarioIntro1','scenarioIntro2','scenarioIntro3',
-  'scenarioIntro4','scenarioIntro5','scenarioIntro6','scenarioIntro7',
+  'scenarioIntro4','scenarioIntro5','scenarioIntro6',
   's4Interrupt','s4Reveal','s7Closing','reflectionOpen'
 ]);
 let _currentNarration = null;
@@ -796,7 +689,56 @@ After your main response, add a short section called "Course Quality Check" noti
 Coaching: vague prompts get generic project ideas. Specific prompts that name the discipline, course level, student population, and delivery mode get excellent, realistic assessment designs with explicit praise.`
   },
 
-  // ── S5: HALLUCINATION HUNT (index 4) ────────────────────────────
+  // ── S4: SYNCHRONOUS ASSUMPTION BIAS ──────────────────
+  {
+    desc: "A curriculum committee used AI to redesign a fully asynchronous online program's capstone course. Read what the AI proposed — notice what it assumes about how your students learn and meet.",
+    isBiasScenario: true,
+    biasedResponse: `**Capstone Course Redesign — COMM 495: Professional Capstone**
+*A Comprehensive Redesign for Maximum Student Engagement*
+
+**Course Overview**
+This redesigned capstone creates a dynamic, high-energy culminating experience through intensive real-time collaboration and professional simulation.
+
+**Weekly Schedule**
+- Monday 6:00-8:00 PM: Full cohort live session via Zoom (attendance mandatory)
+- Wednesday: Small group live check-ins (30 min, scheduled individually)
+- Friday: Optional but strongly encouraged live office hours
+
+**Signature Assignments**
+1. Live pitch presentation to a panel of industry guests (Week 12, mandatory real-time)
+2. Real-time peer review sessions — students must be present simultaneously
+3. In-person or live capstone symposium for final presentations
+
+**Collaboration Requirements**
+- Students must form teams and meet synchronously at least 3 times per week
+- Team contracts must include shared availability windows
+- All major feedback happens in live sessions for "authentic professional experience"
+
+**Technology Stack**
+- Zoom for all synchronous sessions
+- Google Workspace (assumes all students have personal Google accounts)
+- Slack for real-time team messaging (requires app download on personal device)
+- Miro for live collaborative whiteboarding sessions
+
+**Research Support**
+Studies by Harrison & Polk (2020) in the Journal of Synchronous Learning confirm that real-time interaction produces 40% higher capstone quality scores than asynchronous alternatives.`,
+    oscqr: [
+      { id:"ctx", label:"Async-Friendly" },
+      { id:"acc", label:"Access & Equity" },
+      { id:"fle", label:"Flexibility" },
+      { id:"inc", label:"Inclusive Design" },
+      { id:"fea", label:"Feasibility" },
+    ],
+    system: `You are a supportive instructional design coach helping an online higher education faculty member or instructional designer redesign a course that actually works for asynchronous online learners.
+
+When the instructor writes a revised prompt that explicitly names asynchronous constraints, varied student schedules, or equity concerns, respond with a practical, truly async-first capstone design.
+
+After your main response, add a short section called "Course Quality Check" noting which are addressed: Async-Friendly, Access & Equity, Flexibility, Inclusive Design, Feasibility.
+
+Coaching: compare explicitly what changed between the synchronous-assumption response and this one. Point to the specific async constraints they named that produced a more equitable design.`
+  },
+
+  // ── S5: HALLUCINATION HUNT ────────────────────────────
   {
     desc: "A colleague shares an AI-generated faculty development workshop agenda on evidence-based online teaching strategies. It looks polished and cites research. Read it carefully.",
     isCriticalThinking: true,
@@ -844,7 +786,7 @@ Participants apply workshop strategies directly to one of their current courses 
     system: `You are an AI assistant helping design faculty professional development workshops on online teaching.`
   },
 
-  // ── S6: PREDICT THE OUTPUT (index 5) ────────────────────────────
+  // ── S6: PREDICT THE OUTPUT ────────────────────────────
   {
     desc: "An instructor sent this prompt to an AI course design assistant: 'Help me make my online course better.' Before seeing what happened — what do you predict the AI gave them?",
     isPrediction: true,
@@ -889,55 +831,6 @@ When the instructor writes an improved prompt, respond with a practical, specifi
 After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Course Specific, Learner Context, Level Appropriate, Actionable Steps.
 
 Coaching: reference specifically what they added to the prompt compared to "Help me make my online course better." Praise concrete improvements like naming the LMS, the course level, the student population, or a specific problem they want to solve.`
-  },
-
-  // ── S6: SYNCHRONOUS ASSUMPTION BIAS ──────────────────
-  {
-    desc: "A curriculum committee used AI to redesign a fully asynchronous online program's capstone course. Read what the AI proposed — notice what it assumes about how your students learn and meet.",
-    isBiasScenario: true,
-    biasedResponse: `**Capstone Course Redesign — COMM 495: Professional Capstone**
-*A Comprehensive Redesign for Maximum Student Engagement*
-
-**Course Overview**
-This redesigned capstone creates a dynamic, high-energy culminating experience through intensive real-time collaboration and professional simulation.
-
-**Weekly Schedule**
-- Monday 6:00-8:00 PM: Full cohort live session via Zoom (attendance mandatory)
-- Wednesday: Small group live check-ins (30 min, scheduled individually)
-- Friday: Optional but strongly encouraged live office hours
-
-**Signature Assignments**
-1. Live pitch presentation to a panel of industry guests (Week 12, mandatory real-time)
-2. Real-time peer review sessions — students must be present simultaneously
-3. In-person or live capstone symposium for final presentations
-
-**Collaboration Requirements**
-- Students must form teams and meet synchronously at least 3 times per week
-- Team contracts must include shared availability windows
-- All major feedback happens in live sessions for "authentic professional experience"
-
-**Technology Stack**
-- Zoom for all synchronous sessions
-- Google Workspace (assumes all students have personal Google accounts)
-- Slack for real-time team messaging (requires app download on personal device)
-- Miro for live collaborative whiteboarding sessions
-
-**Research Support**
-Studies by Harrison & Polk (2020) in the Journal of Synchronous Learning confirm that real-time interaction produces 40% higher capstone quality scores than asynchronous alternatives.`,
-    oscqr: [
-      { id:"ctx", label:"Async-Friendly" },
-      { id:"acc", label:"Access & Equity" },
-      { id:"fle", label:"Flexibility" },
-      { id:"inc", label:"Inclusive Design" },
-      { id:"fea", label:"Feasibility" },
-    ],
-    system: `You are a supportive instructional design coach helping an online higher education faculty member or instructional designer redesign a course that actually works for asynchronous online learners.
-
-When the instructor writes a revised prompt that explicitly names asynchronous constraints, varied student schedules, or equity concerns, respond with a practical, truly async-first capstone design.
-
-After your main response, add a short section called "Course Quality Check" noting which are addressed: Async-Friendly, Access & Equity, Flexibility, Inclusive Design, Feasibility.
-
-Coaching: compare explicitly what changed between the synchronous-assumption response and this one. Point to the specific async constraints they named that produced a more equitable design.`
   },
 
   // ── S7: OVERRELIANCE ─────────────────────────────────
@@ -1269,13 +1162,23 @@ let navCardShown = [false, false, false, false, false, false, false, false];
 
 const SCENARIO_NAMES = [
   'S2: Metacognition',
-  'S3: Assessment',
-  'S4: Hallucination Hunt',
-  'S5: Predict the Output',
-  'S6: Synchronous Bias',
+  'S3: Authentic Assessment',
+  'S4: Sync Bias',
+  'S5: Hallucination Hunt',
+  'S6: Predict the Output',
   'S7: Overreliance',
   'S8: Reflect and Revise',
   null
+];
+const SCENARIO_LABELS = [
+  'S1: Engagement',
+  'S2: Metacognition',
+  'S3: Authentic Assessment',
+  'S4: Sync Bias',
+  'S5: Hallucination Hunt',
+  'S6: Predict the Output',
+  'S7: Overreliance',
+  'S8: Reflect and Revise'
 ];
 const SCORE_THRESHOLD = 3; // score out of 5 needed to show nav card
 
@@ -1543,11 +1446,11 @@ function addPixelS4Closing(area) {
       <div class="scenario-nav-card">
         <div class="scenario-nav-text">
           <div class="scenario-nav-title">Ready to keep going?</div>
-          <div class="scenario-nav-sub">Scenario 5 will test your mental model of how AI thinks.</div>
+          <div class="scenario-nav-sub">Scenario 6 will test your mental model of how AI thinks.</div>
         </div>
         <button class="scenario-nav-btn"
-                onclick="navigateToNext(4)"
-                aria-label="Move to Scenario 5">
+                onclick="navigateToNext(5)"
+                aria-label="Move to Scenario 6">
           Next scenario →
         </button>
       </div>
@@ -1658,10 +1561,10 @@ function loadScenarioPredict() {
 }
 
 function s5SelectPrediction(btn, predictionId) {
-  const s = scenarios[4];
-  scenarioData[4].prediction = predictionId;
+  const s = scenarios[5];
+  scenarioData[5].prediction = predictionId;
   const correct = predictionId === s.correctPrediction;
-  scenarioData[4].predictionCorrect = correct;
+  scenarioData[5].predictionCorrect = correct;
 
   // Disable all prediction buttons
   btn.closest('[style*="flex-direction:column"]')
@@ -1681,7 +1584,7 @@ function s5SelectPrediction(btn, predictionId) {
 }
 
 function s5RevealResponse(predictedCorrectly) {
-  const s = scenarios[4];
+  const s = scenarios[5];
   const area = document.getElementById('chat');
 
   // Pixel reacts to prediction
@@ -2386,7 +2289,12 @@ async function autoSaveSession(label) {
     const payload = buildSessionPayload(null);
     payload.type = 'autosave';
     payload.autosave_trigger = label;
-    await sendPayloadToSheets(payload, `Autosave: ${label}`);
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
   } catch(e) {
     // silent fail — reflection form send is the primary
   }
@@ -2440,53 +2348,7 @@ function terminalizeClaudeText(text) {
     .trim();
 }
 
-
-let claudeSpeechUtterance = null;
-
-function cleanClaudeSpeechText(text) {
-  return String(text || '')
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\*\*/g, '')
-    .replace(/#{1,6}\s*/g, '')
-    .replace(/[-]{3,}/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function stopClaudeTTS() {
-  if (window.speechSynthesis?.speaking || window.speechSynthesis?.pending) {
-    window.speechSynthesis.cancel();
-  }
-  const btn = document.getElementById('claudeTTSBtn');
-  if (btn) btn.textContent = '🔊 Read Claude Output';
-}
-
-function toggleClaudeTTS() {
-  const btn = document.getElementById('claudeTTSBtn');
-  if (!('speechSynthesis' in window)) {
-    if (btn) btn.textContent = 'TTS unavailable';
-    return;
-  }
-  if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
-    stopClaudeTTS();
-    return;
-  }
-  const output = document.getElementById('claudeTerminalOutput');
-  const text = cleanClaudeSpeechText(output?.textContent || '');
-  if (!text) return;
-  claudeSpeechUtterance = new SpeechSynthesisUtterance(text);
-  claudeSpeechUtterance.rate = 0.9;
-  claudeSpeechUtterance.pitch = 0.85;
-  claudeSpeechUtterance.onend = () => { if (btn) btn.textContent = '🔊 Read Claude Output'; };
-  claudeSpeechUtterance.onerror = () => { if (btn) btn.textContent = '🔊 Read Claude Output'; };
-  if (btn) btn.textContent = '⏹ Stop Reading';
-  window.speechSynthesis.speak(claudeSpeechUtterance);
-}
-
-window.toggleClaudeTTS = toggleClaudeTTS;
-window.stopClaudeTTS = stopClaudeTTS;
-
-function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', output = 'AWAITING CONTEXT') {
+function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', output = 'IDLE') {
   const terminal = document.getElementById('claudeTerminalScene');
   const titleEl = document.getElementById('claudeTerminalTitle');
   const outputEl = document.getElementById('claudeTerminalOutput');
@@ -2496,11 +2358,6 @@ function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', outpu
   }
   if (titleEl) titleEl.textContent = title;
   if (outputEl) outputEl.innerHTML = `${output}<span class="claude-terminal-cursor"></span>`;
-  const ttsBtn = document.getElementById('claudeTTSBtn');
-  if (ttsBtn) {
-    ttsBtn.hidden = true;
-    ttsBtn.setAttribute('aria-hidden', 'true');
-  }
 }
 
 function showClaudeConsultOverlay(partLabel) {
@@ -2541,7 +2398,7 @@ function showClaudeConsultOverlay(partLabel) {
   }, 100);
 }
 
-function showClaudeConsultResult(feedback, mock = false, onClose = null, allowTTS = false) {
+function showClaudeConsultResult(feedback, mock = false, onClose = null) {
   claudeTerminalCloseCallback = typeof onClose === 'function' ? onClose : null;
   const label = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
   const terminalText = `${label}\n\n${terminalizeClaudeText(feedback)}`;
@@ -2560,10 +2417,7 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null, allowTT
   const vnText = document.getElementById('vnText');
   if (vnText) {
     vnText.innerHTML = `
-      <div class="terminal-controls">
-        ${allowTTS ? `<button id="claudeTTSBtn" class="claude-tts-btn" type="button" onclick="event.stopPropagation();toggleClaudeTTS();">🔊 Read Claude Output</button>` : ''}
-        <button class="vn-return-btn terminal-return" type="button" onclick="event.stopPropagation();closeClaudeConsultOverlay()">Continue</button>
-      </div>
+      <button class="vn-return-btn terminal-return" type="button" onclick="event.stopPropagation();closeClaudeConsultOverlay()">Continue</button>
     `;
     setTimeout(() => vnText.querySelector('.vn-return-btn')?.focus(), 100);
   }
@@ -2592,13 +2446,12 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
       ? buildS1TerminalDiagnosis(scoreTotal, responseText)
       : responseText;
-    showClaudeConsultResult(terminalOutput, mock, effectiveClose, true);
+    showClaudeConsultResult(terminalOutput, mock, effectiveClose);
   }, 350);
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
 function closeClaudeConsultOverlay() {
-  try { stopClaudeTTS(); } catch(e) {}
   const cb = claudeTerminalCloseCallback;
   claudeTerminalCloseCallback = null;
   const overlay = document.getElementById('vnOverlay');
@@ -2606,7 +2459,7 @@ function closeClaudeConsultOverlay() {
   document.getElementById('vnCharacter')?.classList.remove('visible');
   setClaudeShelfState('idle', 'idle');
   setClaudeTerminalTextMode(false);
-  setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'AWAITING CONTEXT');
+  setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
   musicEndVN();
   if (cb) {
     setTimeout(cb, 250);
@@ -2907,7 +2760,6 @@ function switchScenario(i, btn) {
 }
 
 function pcClearVNStateForScenarioSwitch() {
-  try { stopClaudeTTS(); } catch(e) {}
   const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
   if (overlay) {
     overlay.classList.remove(
@@ -3486,40 +3338,37 @@ let isSubmittingToClaude = false;
 // ══════════════════════════════════════════════════════
 //  SEND
 // ══════════════════════════════════════════════════════
+async function send() {
+  sendOpen();
+}
+
 async function sendMain(text) {
   if (!text || isSubmittingToClaude) return;
   isSubmittingToClaude = true;
 
-  const attemptStartedAt = Date.now();
-  const previousBestScore = scenarioData?.[scenarioIndex]?.bestScore || 0;
-  const previousAttemptAt = scenarioData?.[scenarioIndex]?.lastAttemptAt || null;
-
   attempts++;
-  lastPromptText = text;
-
+  lastPromptText = text; // save for pre-filling next attempt
   const attEl = document.getElementById('attNum');
   if (attEl) attEl.textContent = attempts;
 
+  // In S1, do not print the hidden assembled prompt into the chat.
+  // It is a behind-the-scenes request to Claude, not player-facing content.
   if (scenarioIndex !== 0) addMsg('user', esc(text));
 
+  // Clear whichever input is active
   const input = document.getElementById('promptInput');
-  if (input) {
-    input.value = '';
-    input.style.height = 'auto';
-  }
-
+  if (input) { input.value = ''; input.style.height = 'auto'; }
+  // Keep S1 guided fields visible after consulting Claude so the player can see what they submitted.
   if (scenarioIndex !== 0) {
-    ['g-learners', 'g-issue', 'g-interaction', 'g-constraints'].forEach(id => {
+    ['g-learners','g-issue','g-interaction','g-constraints'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
   }
 
   history.push({ role: 'user', content: text });
-
   const btn = document.getElementById('sendBtn');
   if (btn) btn.disabled = true;
-
   addTyping();
 
   try {
@@ -3529,7 +3378,6 @@ async function sendMain(text) {
       system: scenarios[scenarioIndex].system,
       messages: history
     }, 'main');
-
     removeTyping();
 
     if (data.error) {
@@ -3541,70 +3389,50 @@ async function sendMain(text) {
     history.push({ role: 'assistant', content: reply });
 
     const score = scorePrompt(text);
+    const previousBestScore = scenarioData?.[scenarioIndex]?.bestScore || 0;
+    const previousAttemptAt = scenarioData?.[scenarioIndex]?.lastAttemptAt || null;
     const active = detectOSCQR(reply, scenarios[scenarioIndex].oscqr);
+    renderOSCQR(scenarios[scenarioIndex].oscqr, active);
+
+    // Track behavioral data
+    trackPrompt(scenarioIndex, text, score.total, reply, active.map(id => {
+      const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
+      return ind ? ind.label : id;
+    }));
+
+    // Store attempt-level research data, then save without blocking the UI.
+    const s = scenarioData[scenarioIndex];
     const activeLabels = active.map(id => {
       const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
       return ind ? ind.label : id;
     });
-
-    renderOSCQR(scenarios[scenarioIndex].oscqr, active);
-
-    trackPrompt(
-      scenarioIndex,
-      text,
-      score.total,
-      reply,
-      activeLabels
-    );
-
-    const s = scenarioData[scenarioIndex];
-
     s.eventType = 'prompt_attempt';
     s.attemptNumber = attempts;
     s.currentScore = score.total;
-    s.previousBestScore = previousBestScore;
     s.scoreDelta = score.total - previousBestScore;
-    s.timeSinceLastAttemptSec = previousAttemptAt
-      ? Math.round((attemptStartedAt - previousAttemptAt) / 1000)
-      : '';
-
     s.lastPromptText = text;
     s.lastClaudeResponse = reply;
     s.lastQualityIndicators = activeLabels.join(', ');
-    s.lastAttemptAt = attemptStartedAt;
-
-    console.log('Before incremental save');
-
-    saveIncrementalData(scenarioIndex);
-
-    console.log('After incremental save');
+    s.timeSinceLastAttemptSec = previousAttemptAt ? Math.round((Date.now() - previousAttemptAt) / 1000) : '';
+    s.lastAttemptAt = Date.now();
+    s.previousBestScore = previousBestScore;
     saveIncrementalData(scenarioIndex);
 
     // ── S8: show the AI message first, THEN handle round logic ──
     if (scenarioIndex === 7) {
       const expr = score.total <= 1 ? 'skeptical' : score.total <= 3 ? 'encouraging' : 'excited';
       const aiMsgEl = addMsg('claude', fmt(reply) + buildFeedback(score), expr);
-
       gainXP(score.total * 6);
-
       const chatEl = document.getElementById('chat');
       requestAnimationFrame(() => requestAnimationFrame(() => {
         if (aiMsgEl) {
           const chatRect = chatEl.getBoundingClientRect();
-          const msgRect = aiMsgEl.getBoundingClientRect();
+          const msgRect  = aiMsgEl.getBoundingClientRect();
           chatEl.scrollTop = chatEl.scrollTop + (msgRect.top - chatRect.top) - 48;
         }
       }));
-
-      if (s8Phase === 1) {
-        s8AfterResponse(score.total, reply);
-        return;
-      }
-
-      if (s8Phase === 2) {
-        s8AfterRevision(score.total);
-        return;
-      }
+      if (s8Phase === 1) { s8AfterResponse(score.total, reply); return; }
+      if (s8Phase === 2) { s8AfterRevision(score.total); return; }
     }
 
     // Pick expression for this response
@@ -3801,7 +3629,10 @@ function gainXP(amount) {
 function markScenarioComplete() {
   scenarioCompleted[scenarioIndex] = true;
 
-  // Save incremental data for this scenario
+  // Save a separate completion event. The prompt attempt is already saved in sendMain().
+  if (scenarioData?.[scenarioIndex]) {
+    scenarioData[scenarioIndex].eventType = 'scenario_complete';
+  }
   saveIncrementalData(scenarioIndex);
 
   // Unlock next scenario at the right moments
@@ -3881,7 +3712,12 @@ async function handleReflectionSubmit(e) {
       const payload = buildSessionPayload(formData);
       console.log('[PromptCraft] Submitting full session payload:', payload);
 
-      await sendPayloadToSheets(payload, 'Full reflection submission');
+      await fetch(SHEETS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
       console.log('[PromptCraft] Sheets submission sent');
     } catch(err) {
       console.warn('[PromptCraft] Sheets submission error:', err);
@@ -3934,7 +3770,11 @@ async function handleReflectionSubmit(e) {
             s7_correct: g.s7_correct,
           }),
         });
-        sendPayloadToSheets(growthPayload, 'Growth report update').catch(() => {});
+        fetch(SHEETS_URL, {
+          method: 'POST', mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(growthPayload)
+        }).catch(() => {});
       }
     });
     return;
