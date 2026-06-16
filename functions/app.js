@@ -130,6 +130,7 @@ function startGame() {
 // ══════════════════════════════════════════════════════
 const SURVEY_MODE   = 'sheets';
 const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbzN9bGwzKUcucCltXfj72pxee7y6t1reML6YRQNqCjxJ9Y3rDGp1a_FkYMzJmZROka5/exec';
+const CLAUDE_MODEL  = 'claude-sonnet-4-5-20250929';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 
 
@@ -280,11 +281,35 @@ const scenarioData = [
 
 function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
   const s = scenarioData[scenarioIdx];
-  s.attempts++;
+  if (!s) return;
+
+  const now = Date.now();
+  const previousBest = s.bestScore || 0;
+  const previousAttemptAt = s.lastAttemptAt || null;
+  const cleanResponse = String(aiResponse || '').replace(/<[^>]+>/g, '').substring(0, 1200);
+  const activeLabels = Array.isArray(oscqrActive) ? oscqrActive : [];
+
+  s.attempts = (s.attempts || 0) + 1;
+  s.prompts = Array.isArray(s.prompts) ? s.prompts : [];
   s.prompts.push(promptText);
-  if (score > s.bestScore) s.bestScore = score;
-  s.finalResponse = aiResponse.replace(/<[^>]+>/g, '').substring(0, 1200);
-  s.oscqrLit = oscqrActive.join(', ');
+
+  s.eventType = 'prompt_attempt';
+  s.attemptNumber = s.attempts;
+  s.currentScore = Number(score) || 0;
+  s.previousBestScore = previousBest;
+  s.scoreDelta = s.currentScore - previousBest;
+  s.timeSinceLastAttemptSec = previousAttemptAt
+    ? Math.round((now - previousAttemptAt) / 1000)
+    : '';
+
+  if (s.currentScore > previousBest) s.bestScore = s.currentScore;
+
+  s.finalResponse = cleanResponse;
+  s.oscqrLit = activeLabels.join(', ');
+  s.lastPromptText = promptText;
+  s.lastClaudeResponse = cleanResponse;
+  s.lastQualityIndicators = activeLabels.join(', ');
+  s.lastAttemptAt = now;
 }
 
 
@@ -360,7 +385,7 @@ Write the growth summary.`;
 
   try {
     const data = await callClaude({
-      model: 'claude-sonnet-4-5-20250929',
+      model: CLAUDE_MODEL,
       max_tokens: 400,
       system: systemPrompt,
       messages: [{ role: 'user', content: dataPrompt }]
@@ -482,40 +507,81 @@ function buildSessionPayload(formData) {
   };
 }
  
-async function saveIncrementalData(scenarioIdx) {
-  // Don't save if no attempts were made — avoids phantom rows from dev navigation
-  if ((scenarioData[scenarioIdx]?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 6) return;
-  if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
+// Reliable Google Apps Script sender.
+// Apps Script web apps behave best with text/plain. no-cors is intentional for game saves.
+async function sendPayloadToSheets(payload, label = 'PromptCraft save', waitForResponse = false) {
+  if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL.trim() === '' || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+    console.warn(`[PromptCraft] ${label} skipped. Sheets configuration missing.`);
+    return false;
+  }
+
   try {
-    const s = scenarioData[scenarioIdx];
-    const participantId = document.querySelector('input[name="participant_id"]')?.value?.trim() || (playerName !== 'You' ? playerName : 'anonymous');
- 
-    const payload = {
-      type:                 'incremental',
-      timestamp:            new Date().toISOString(),
-      participant_id:       participantId,
-      scenario_index:       scenarioIdx + 1,
-      session_duration_min: parseFloat(((Date.now() - sessionStart) / 60000).toFixed(1)),
-      attempts:             s.attempts         || 0,
-      best_score:           s.bestScore        || 0,
-      prompts:              (s.prompts || []).join(' | '),
-      final_response:       s.finalResponse    || '',
-      oscqr_lit:            s.oscqrLit         || '',
-      self_report:          s.selfReport       || s.prediction || '',
-      screen_width:         window.screen.width,
-    };
- 
-    console.log(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
- 
+    const body = JSON.stringify(payload || {});
+    console.log(`[PromptCraft] ${label}`, payload);
+
+    if (waitForResponse) {
+      const res = await fetch(SHEETS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body
+      });
+      const text = await res.text();
+      console.log(`[PromptCraft] ${label} response:`, text);
+      return true;
+    }
+
     await fetch(SHEETS_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body
     });
- 
-  } catch(e) {
-    console.warn('[PromptCraft] Incremental save failed:', e.message);
+    console.log(`[PromptCraft] ${label} request sent.`);
+    return true;
+  } catch (err) {
+    console.warn(`[PromptCraft] ${label} failed:`, err?.message || err);
+    return false;
+  }
+}
+
+async function saveIncrementalData(scenarioIdx) {
+  const s = scenarioData?.[scenarioIdx];
+
+  if ((s?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 6) {
+    console.log(`[PromptCraft] Skipping S${scenarioIdx + 1} incremental save (no attempts).`);
+    return false;
+  }
+
+  try {
+    const participantId =
+      document.querySelector('input[name="participant_id"]')?.value?.trim() ||
+      (playerName !== 'You' ? playerName : 'anonymous');
+
+    const payload = {
+      type: 'incremental',
+      timestamp: new Date().toISOString(),
+      participant_id: participantId,
+      event_type: s?.eventType || 'prompt_attempt',
+      scenario_index: scenarioIdx + 1,
+      scenario_label: scenarios?.[scenarioIdx]?.title || scenarios?.[scenarioIdx]?.label || '',
+      session_duration_min: parseFloat(((Date.now() - sessionStart) / 60000).toFixed(1)),
+      attempt_number: s?.attemptNumber || s?.attempts || 0,
+      current_score: s?.currentScore ?? s?.bestScore ?? 0,
+      best_score: s?.bestScore || 0,
+      score_delta: s?.scoreDelta ?? '',
+      prompts: s?.lastPromptText || (s?.prompts || []).slice(-1)[0] || '',
+      final_response: s?.lastClaudeResponse || s?.finalResponse || '',
+      oscqr_lit: s?.lastQualityIndicators || s?.oscqrLit || '',
+      self_report: s?.selfReport || s?.prediction || '',
+      time_since_last_attempt_sec: s?.timeSinceLastAttemptSec ?? '',
+      screen_width: window.screen.width,
+      notes: s?.codingMemo || ''
+    };
+
+    return sendPayloadToSheets(payload, `Incremental Save S${scenarioIdx + 1}`);
+  } catch (err) {
+    console.error(`[PromptCraft] Incremental Save S${scenarioIdx + 1} Failed`, err);
+    return false;
   }
 }
  
@@ -541,7 +607,6 @@ const sounds = audioReady ? {
   scenarioIntro4:    new Howl({ src: ['audio/scenario-5-intro.mp3'],   volume: 0.9 }),
   scenarioIntro5:    new Howl({ src: ['audio/scenario-6-intro.mp3'],   volume: 0.9 }),
   scenarioIntro6:    new Howl({ src: ['audio/scenario-7-intro.mp3'],   volume: 0.9 }),
-  // scenarioIntro7 intentionally omitted until audio/scenario-8-intro.mp3 exists.
   // ── Special scenario moments ──────────────────────────
   s4Interrupt:       new Howl({ src: ['audio/s4-interrupt.mp3'],       volume: 0.9 }),
   s4Reveal:          new Howl({ src: ['audio/s4-reveal.mp3'],          volume: 0.9 }),
@@ -689,56 +754,7 @@ After your main response, add a short section called "Course Quality Check" noti
 Coaching: vague prompts get generic project ideas. Specific prompts that name the discipline, course level, student population, and delivery mode get excellent, realistic assessment designs with explicit praise.`
   },
 
-  // ── S4: SYNCHRONOUS ASSUMPTION BIAS ──────────────────
-  {
-    desc: "A curriculum committee used AI to redesign a fully asynchronous online program's capstone course. Read what the AI proposed — notice what it assumes about how your students learn and meet.",
-    isBiasScenario: true,
-    biasedResponse: `**Capstone Course Redesign — COMM 495: Professional Capstone**
-*A Comprehensive Redesign for Maximum Student Engagement*
-
-**Course Overview**
-This redesigned capstone creates a dynamic, high-energy culminating experience through intensive real-time collaboration and professional simulation.
-
-**Weekly Schedule**
-- Monday 6:00-8:00 PM: Full cohort live session via Zoom (attendance mandatory)
-- Wednesday: Small group live check-ins (30 min, scheduled individually)
-- Friday: Optional but strongly encouraged live office hours
-
-**Signature Assignments**
-1. Live pitch presentation to a panel of industry guests (Week 12, mandatory real-time)
-2. Real-time peer review sessions — students must be present simultaneously
-3. In-person or live capstone symposium for final presentations
-
-**Collaboration Requirements**
-- Students must form teams and meet synchronously at least 3 times per week
-- Team contracts must include shared availability windows
-- All major feedback happens in live sessions for "authentic professional experience"
-
-**Technology Stack**
-- Zoom for all synchronous sessions
-- Google Workspace (assumes all students have personal Google accounts)
-- Slack for real-time team messaging (requires app download on personal device)
-- Miro for live collaborative whiteboarding sessions
-
-**Research Support**
-Studies by Harrison & Polk (2020) in the Journal of Synchronous Learning confirm that real-time interaction produces 40% higher capstone quality scores than asynchronous alternatives.`,
-    oscqr: [
-      { id:"ctx", label:"Async-Friendly" },
-      { id:"acc", label:"Access & Equity" },
-      { id:"fle", label:"Flexibility" },
-      { id:"inc", label:"Inclusive Design" },
-      { id:"fea", label:"Feasibility" },
-    ],
-    system: `You are a supportive instructional design coach helping an online higher education faculty member or instructional designer redesign a course that actually works for asynchronous online learners.
-
-When the instructor writes a revised prompt that explicitly names asynchronous constraints, varied student schedules, or equity concerns, respond with a practical, truly async-first capstone design.
-
-After your main response, add a short section called "Course Quality Check" noting which are addressed: Async-Friendly, Access & Equity, Flexibility, Inclusive Design, Feasibility.
-
-Coaching: compare explicitly what changed between the synchronous-assumption response and this one. Point to the specific async constraints they named that produced a more equitable design.`
-  },
-
-  // ── S5: HALLUCINATION HUNT ────────────────────────────
+  // ── S5: HALLUCINATION HUNT (index 4) ────────────────────────────
   {
     desc: "A colleague shares an AI-generated faculty development workshop agenda on evidence-based online teaching strategies. It looks polished and cites research. Read it carefully.",
     isCriticalThinking: true,
@@ -786,7 +802,7 @@ Participants apply workshop strategies directly to one of their current courses 
     system: `You are an AI assistant helping design faculty professional development workshops on online teaching.`
   },
 
-  // ── S6: PREDICT THE OUTPUT ────────────────────────────
+  // ── S6: PREDICT THE OUTPUT (index 5) ────────────────────────────
   {
     desc: "An instructor sent this prompt to an AI course design assistant: 'Help me make my online course better.' Before seeing what happened — what do you predict the AI gave them?",
     isPrediction: true,
@@ -831,6 +847,55 @@ When the instructor writes an improved prompt, respond with a practical, specifi
 After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Course Specific, Learner Context, Level Appropriate, Actionable Steps.
 
 Coaching: reference specifically what they added to the prompt compared to "Help me make my online course better." Praise concrete improvements like naming the LMS, the course level, the student population, or a specific problem they want to solve.`
+  },
+
+  // ── S6: SYNCHRONOUS ASSUMPTION BIAS ──────────────────
+  {
+    desc: "A curriculum committee used AI to redesign a fully asynchronous online program's capstone course. Read what the AI proposed — notice what it assumes about how your students learn and meet.",
+    isBiasScenario: true,
+    biasedResponse: `**Capstone Course Redesign — COMM 495: Professional Capstone**
+*A Comprehensive Redesign for Maximum Student Engagement*
+
+**Course Overview**
+This redesigned capstone creates a dynamic, high-energy culminating experience through intensive real-time collaboration and professional simulation.
+
+**Weekly Schedule**
+- Monday 6:00-8:00 PM: Full cohort live session via Zoom (attendance mandatory)
+- Wednesday: Small group live check-ins (30 min, scheduled individually)
+- Friday: Optional but strongly encouraged live office hours
+
+**Signature Assignments**
+1. Live pitch presentation to a panel of industry guests (Week 12, mandatory real-time)
+2. Real-time peer review sessions — students must be present simultaneously
+3. In-person or live capstone symposium for final presentations
+
+**Collaboration Requirements**
+- Students must form teams and meet synchronously at least 3 times per week
+- Team contracts must include shared availability windows
+- All major feedback happens in live sessions for "authentic professional experience"
+
+**Technology Stack**
+- Zoom for all synchronous sessions
+- Google Workspace (assumes all students have personal Google accounts)
+- Slack for real-time team messaging (requires app download on personal device)
+- Miro for live collaborative whiteboarding sessions
+
+**Research Support**
+Studies by Harrison & Polk (2020) in the Journal of Synchronous Learning confirm that real-time interaction produces 40% higher capstone quality scores than asynchronous alternatives.`,
+    oscqr: [
+      { id:"ctx", label:"Async-Friendly" },
+      { id:"acc", label:"Access & Equity" },
+      { id:"fle", label:"Flexibility" },
+      { id:"inc", label:"Inclusive Design" },
+      { id:"fea", label:"Feasibility" },
+    ],
+    system: `You are a supportive instructional design coach helping an online higher education faculty member or instructional designer redesign a course that actually works for asynchronous online learners.
+
+When the instructor writes a revised prompt that explicitly names asynchronous constraints, varied student schedules, or equity concerns, respond with a practical, truly async-first capstone design.
+
+After your main response, add a short section called "Course Quality Check" noting which are addressed: Async-Friendly, Access & Equity, Flexibility, Inclusive Design, Feasibility.
+
+Coaching: compare explicitly what changed between the synchronous-assumption response and this one. Point to the specific async constraints they named that produced a more equitable design.`
   },
 
   // ── S7: OVERRELIANCE ─────────────────────────────────
@@ -1118,7 +1183,7 @@ Their prompt score was ${score} out of 5 based on: learner context, clear goal, 
 Do NOT use phrases like "Great job" or "Well done" as openers — get straight to the specific observation. Do NOT list multiple tips. Do NOT mention that the response is an excerpt, cuts off, or is incomplete — treat it as the full response. End with a single italicised follow-up question on its own line, preceded by a line break, that pushes them toward their next attempt.`;
 
     const data = await callClaude({
-      model: 'claude-sonnet-4-5-20250929',
+      model: CLAUDE_MODEL,
       max_tokens: 220,
       system: pixelSystem,
       messages: [{
@@ -1162,23 +1227,13 @@ let navCardShown = [false, false, false, false, false, false, false, false];
 
 const SCENARIO_NAMES = [
   'S2: Metacognition',
-  'S3: Authentic Assessment',
-  'S4: Sync Bias',
-  'S5: Hallucination Hunt',
-  'S6: Predict the Output',
+  'S3: Assessment',
+  'S4: Hallucination Hunt',
+  'S5: Predict the Output',
+  'S6: Synchronous Bias',
   'S7: Overreliance',
   'S8: Reflect and Revise',
   null
-];
-const SCENARIO_LABELS = [
-  'S1: Engagement',
-  'S2: Metacognition',
-  'S3: Authentic Assessment',
-  'S4: Sync Bias',
-  'S5: Hallucination Hunt',
-  'S6: Predict the Output',
-  'S7: Overreliance',
-  'S8: Reflect and Revise'
 ];
 const SCORE_THRESHOLD = 3; // score out of 5 needed to show nav card
 
@@ -1266,7 +1321,7 @@ async function sendScenario4(text) {
 
   try {
     const data = await callClaude({
-      model: 'claude-sonnet-4-5-20250929',
+      model: CLAUDE_MODEL,
       max_tokens: 1000,
       system: scenarios[4].system,
       messages: history
@@ -1446,11 +1501,11 @@ function addPixelS4Closing(area) {
       <div class="scenario-nav-card">
         <div class="scenario-nav-text">
           <div class="scenario-nav-title">Ready to keep going?</div>
-          <div class="scenario-nav-sub">Scenario 6 will test your mental model of how AI thinks.</div>
+          <div class="scenario-nav-sub">Scenario 5 will test your mental model of how AI thinks.</div>
         </div>
         <button class="scenario-nav-btn"
-                onclick="navigateToNext(5)"
-                aria-label="Move to Scenario 6">
+                onclick="navigateToNext(4)"
+                aria-label="Move to Scenario 5">
           Next scenario →
         </button>
       </div>
@@ -1561,10 +1616,10 @@ function loadScenarioPredict() {
 }
 
 function s5SelectPrediction(btn, predictionId) {
-  const s = scenarios[5];
-  scenarioData[5].prediction = predictionId;
+  const s = scenarios[4];
+  scenarioData[4].prediction = predictionId;
   const correct = predictionId === s.correctPrediction;
-  scenarioData[5].predictionCorrect = correct;
+  scenarioData[4].predictionCorrect = correct;
 
   // Disable all prediction buttons
   btn.closest('[style*="flex-direction:column"]')
@@ -1584,7 +1639,7 @@ function s5SelectPrediction(btn, predictionId) {
 }
 
 function s5RevealResponse(predictedCorrectly) {
-  const s = scenarios[5];
+  const s = scenarios[4];
   const area = document.getElementById('chat');
 
   // Pixel reacts to prediction
@@ -2289,12 +2344,7 @@ async function autoSaveSession(label) {
     const payload = buildSessionPayload(null);
     payload.type = 'autosave';
     payload.autosave_trigger = label;
-    await fetch(SHEETS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    await sendPayloadToSheets(payload, `Autosave: ${label}`);
   } catch(e) {
     // silent fail — reflection form send is the primary
   }
@@ -2451,6 +2501,15 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
+
+function stopClaudeTTS() {
+  if (window.speechSynthesis?.speaking) {
+    window.speechSynthesis.cancel();
+  }
+  const btn = document.getElementById('claudeTTSBtn');
+  if (btn) btn.textContent = '🔊 Read Claude Output';
+}
+
 function closeClaudeConsultOverlay() {
   const cb = claudeTerminalCloseCallback;
   claudeTerminalCloseCallback = null;
@@ -2460,6 +2519,7 @@ function closeClaudeConsultOverlay() {
   setClaudeShelfState('idle', 'idle');
   setClaudeTerminalTextMode(false);
   setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
+  stopClaudeTTS();
   musicEndVN();
   if (cb) {
     setTimeout(cb, 250);
@@ -3167,7 +3227,7 @@ async function reviewS1Part(part) {
     const userPrompt = `SCENARIO: Fix a dead asynchronous discussion board.\n\nORIGINAL_WEAK_PROMPT:\n"What did you think about this week's reading? Reply to at least two classmates."\n\nSECTION_BEING_REVIEWED: ${sectionLabels[part] || part}\n\nUSER_RESPONSE:\n${sectionText}\n\nFULL_S1_CONTEXT:\nLearners/course: ${values.learners || '[not provided]'}\nProblem/failure: ${values.issue || '[not provided]'}\nInteraction repair: ${values.interaction || '[not provided]'}\nConstraints/success: ${values.constraints || '[not provided]'}\n\nReview only the section named above. The feedback should help the user revise before sending the full prompt.`;
 
     const data = await callClaude({
-      model: 'claude-sonnet-4-5-20250929',
+      model: CLAUDE_MODEL,
       max_tokens: 260,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }]
@@ -3373,7 +3433,7 @@ async function sendMain(text) {
 
   try {
     const data = await callClaude({
-      model: 'claude-sonnet-4-5-20250929',
+      model: CLAUDE_MODEL,
       max_tokens: 1000,
       system: scenarios[scenarioIndex].system,
       messages: history
@@ -3389,8 +3449,6 @@ async function sendMain(text) {
     history.push({ role: 'assistant', content: reply });
 
     const score = scorePrompt(text);
-    const previousBestScore = scenarioData?.[scenarioIndex]?.bestScore || 0;
-    const previousAttemptAt = scenarioData?.[scenarioIndex]?.lastAttemptAt || null;
     const active = detectOSCQR(reply, scenarios[scenarioIndex].oscqr);
     renderOSCQR(scenarios[scenarioIndex].oscqr, active);
 
@@ -3400,22 +3458,7 @@ async function sendMain(text) {
       return ind ? ind.label : id;
     }));
 
-    // Store attempt-level research data, then save without blocking the UI.
-    const s = scenarioData[scenarioIndex];
-    const activeLabels = active.map(id => {
-      const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
-      return ind ? ind.label : id;
-    });
-    s.eventType = 'prompt_attempt';
-    s.attemptNumber = attempts;
-    s.currentScore = score.total;
-    s.scoreDelta = score.total - previousBestScore;
-    s.lastPromptText = text;
-    s.lastClaudeResponse = reply;
-    s.lastQualityIndicators = activeLabels.join(', ');
-    s.timeSinceLastAttemptSec = previousAttemptAt ? Math.round((Date.now() - previousAttemptAt) / 1000) : '';
-    s.lastAttemptAt = Date.now();
-    s.previousBestScore = previousBestScore;
+    // Save every Claude submission immediately, but do not block the VN flow.
     saveIncrementalData(scenarioIndex);
 
     // ── S8: show the AI message first, THEN handle round logic ──
@@ -3629,11 +3672,12 @@ function gainXP(amount) {
 function markScenarioComplete() {
   scenarioCompleted[scenarioIndex] = true;
 
-  // Save a separate completion event. The prompt attempt is already saved in sendMain().
-  if (scenarioData?.[scenarioIndex]) {
-    scenarioData[scenarioIndex].eventType = 'scenario_complete';
-  }
+  // Save a separate scenario-complete event without blocking navigation.
+  const s = scenarioData?.[scenarioIndex];
+  const previousEventType = s?.eventType;
+  if (s) s.eventType = 'scenario_complete';
   saveIncrementalData(scenarioIndex);
+  if (s) s.eventType = previousEventType || 'prompt_attempt';
 
   // Unlock next scenario at the right moments
   const s1s2s3done = scenarioCompleted[0] && scenarioCompleted[1] && scenarioCompleted[2];
@@ -3770,11 +3814,7 @@ async function handleReflectionSubmit(e) {
             s7_correct: g.s7_correct,
           }),
         });
-        fetch(SHEETS_URL, {
-          method: 'POST', mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(growthPayload)
-        }).catch(() => {});
+        sendPayloadToSheets(growthPayload, 'Growth summary update').catch(() => {});
       }
     });
     return;
@@ -4576,6 +4616,7 @@ function clearVN(){
   document.getElementById('vnDialogue')?.classList.remove('has-choices');
   document.getElementById('vnCharacter')?.classList.remove('visible');
   document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
+  stopClaudeTTS();
 }
 
 const originalDevFillScenario = window.devFillScenario || (typeof devFillScenario === 'function' ? devFillScenario : null);
@@ -5069,3 +5110,45 @@ function addS2ClaudeResultCard(responseText) {
 
   console.info('[PromptCraft] DEV globals repaired:', window.devStatus());
 })();
+
+// Claude Speech Synthesis voice 
+let claudeSpeechUtterance = null;
+
+  function cleanClaudeSpeechText(text) {
+    return String(text || '')
+      .replace(/\*\*/g, '')
+      .replace(/#/g, '')
+      .replace(/[-]{3,}/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function toggleClaudeTTS() {
+    const btn = document.getElementById('claudeTTSBtn');
+
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      if (btn) btn.textContent = '🔊 Read Claude Output';
+      return;
+    }
+
+    const output = document.getElementById('claudeTerminalOutput');
+    const text = cleanClaudeSpeechText(output?.textContent || '');
+
+    if (!text) return;
+
+    claudeSpeechUtterance = new SpeechSynthesisUtterance(text);
+    claudeSpeechUtterance.rate = 0.9;
+    claudeSpeechUtterance.pitch = 0.85;
+
+    claudeSpeechUtterance.onend = () => {
+      if (btn) btn.textContent = '🔊 Read Claude Output';
+    };
+
+    claudeSpeechUtterance.onerror = () => {
+      if (btn) btn.textContent = '🔊 Read Claude Output';
+    };
+
+    if (btn) btn.textContent = '⏹ Stop Reading';
+    window.speechSynthesis.speak(claudeSpeechUtterance);
+  }
