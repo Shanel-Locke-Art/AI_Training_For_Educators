@@ -483,7 +483,6 @@ function buildSessionPayload(formData) {
   };
 }
  
-
 // Reliable Google Apps Script sender.
 // Apps Script web apps are most reliable from browsers with text/plain + no-cors.
 // no-cors means the browser cannot read the response, so success is confirmed in
@@ -2420,7 +2419,9 @@ function showClaudeConsultOverlay(partLabel) {
   // This is an interaction moment: Pixel consults Claude through the terminal close-up.
   vnQueue = [];
   clearTimeout(vnTypeTimer);
-  vnTyping = true;
+  // Terminal mode is not a typewriter VN line. Keep vnTyping false so generic
+  // dialogue advancement cannot skip/replace the terminal status text.
+  vnTyping = false;
   vnOnComplete = null;
   vnFullText = '';
   vnCurrentText = '';
@@ -2557,6 +2558,7 @@ function vnPlayNext() {
       // Fade music down when VN closes
       musicEndVN();
       setClaudeShelfState('idle', 'idle');
+      if (document.body.classList.contains('s1-result-active')) forceS1ResultScrollTop();
     }, 300);
     vnTyping = false;
     return;
@@ -2640,6 +2642,20 @@ function vnSkipType() {
 
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');
+
+  // Do not let the regular VN tap/continue handler mutate the dialogue while
+  // Claude's terminal thinking screen is open. The terminal has its own Continue
+  // button once analysis is ready. This prevents the bottom dialogue from turning
+  // blank if the user taps during "ANALYSIS IN PROGRESS...".
+  if (
+    overlay &&
+    overlay.classList.contains('claude-terminal-consult') &&
+    !document.querySelector('.terminal-return')
+  ) {
+    const hint = document.getElementById('vnAdvanceHint');
+    if (hint) hint.classList.remove('show');
+    return false;
+  }
 
   // Do not auto-advance while prediction choices are visible.
   if (
@@ -3437,7 +3453,9 @@ async function sendMain(text) {
     removeTyping();
 
     if (data.error) {
-      addMsg('ai', `<span style="color:var(--red)">Error: ${data.error.message}</span>`);
+      const message = data.error?.message || 'Claude returned an error.';
+      showClaudeConsultResult(`Claude returned an error.\n\n${message}`, false);
+      addMsg('ai', `<span style="color:var(--red)">Error: ${esc(message)}</span>`);
       return;
     }
 
@@ -3507,6 +3525,7 @@ async function sendMain(text) {
         showS1ResultControls(score.total);
         showPixelScoreReflection(score.total, () => {
           if (score.total >= SCORE_THRESHOLD) markScenarioComplete();
+          forceS1ResultScrollTop();
         });
       } else {
         showPixelScoreReflection(score.total, () => {
@@ -3518,7 +3537,14 @@ async function sendMain(text) {
 
   } catch(e) {
     removeTyping();
-    addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`);
+    const message = e?.message || 'Something went wrong. Please try again.';
+    console.warn('[PromptCraft] sendMain failed:', e);
+    try {
+      showClaudeConsultResult(`Claude could not complete the analysis.\n\n${message}\n\nClose this terminal, revise if needed, and try again.`, false);
+    } catch(_) {
+      closeClaudeConsultOverlay?.();
+    }
+    addMsg('ai', `<span style="color:var(--red)">${esc(message)}</span>`);
   } finally {
     isSubmittingToClaude = false;
     predictionGateActive = false;
@@ -3661,6 +3687,82 @@ function fmt(text) {
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     .replace(/\n/g, '<br>');
+}
+
+
+
+// Richer formatter for long Claude result drafts.
+// Keeps chat formatting light, but result cards need readable paragraphs/lists.
+function fmtResultMarkdown(text) {
+  const raw = String(text ?? '').replace(/\r\n/g, '\n').trim();
+  if (!raw) return '';
+
+  const inline = (value) => esc(value)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+  const lines = raw.split('\n');
+  let html = '';
+  let para = [];
+  let listType = null;
+
+  const flushPara = () => {
+    if (!para.length) return;
+    html += `<p>${inline(para.join(' ').replace(/\s+/g, ' ').trim())}</p>`;
+    para = [];
+  };
+  const closeList = () => {
+    if (!listType) return;
+    html += `</${listType}>`;
+    listType = null;
+  };
+  const openList = (type) => {
+    if (listType === type) return;
+    closeList();
+    listType = type;
+    html += `<${type}>`;
+  };
+
+  for (const sourceLine of lines) {
+    const line = sourceLine.trim();
+    if (!line) { flushPara(); closeList(); continue; }
+
+    const h = line.match(/^(#{1,3})\s+(.+)$/);
+    if (h) {
+      flushPara(); closeList();
+      const level = h[1].length === 1 ? 'h2' : 'h3';
+      html += `<${level}>${inline(h[2])}</${level}>`;
+      continue;
+    }
+
+    const boldHeading = line.match(/^\*\*(.+?)\*\*\s*$/);
+    if (boldHeading) {
+      flushPara(); closeList();
+      html += `<h3>${inline(boldHeading[1])}</h3>`;
+      continue;
+    }
+
+    const bullet = line.match(/^[-•]\s+(.+)$/);
+    if (bullet) {
+      flushPara(); openList('ul');
+      html += `<li>${inline(bullet[1])}</li>`;
+      continue;
+    }
+
+    const numbered = line.match(/^(\d+)\.\s+(.+)$/);
+    if (numbered) {
+      flushPara(); openList('ol');
+      html += `<li>${inline(numbered[2])}</li>`;
+      continue;
+    }
+
+    closeList();
+    para.push(line);
+  }
+
+  flushPara();
+  closeList();
+  return html;
 }
 
 function autoGrow(el) {
@@ -4264,6 +4366,37 @@ function buildS1TerminalDiagnosis(score, responseText){
   return `STATUS\n${level}\n\nISSUE DETECTED\n${issue}\n\nRECOMMENDED REPAIR\n${repair}\n\nCONFIDENCE\n${confidence}`;
 };
 
+
+function forceS1ResultScrollTop() {
+  if (!document.body.classList.contains('s1-result-active')) return;
+
+  const chat = document.getElementById('chat');
+  const input = document.getElementById('inputContainer');
+  const resultCard = document.querySelector('.s1-result-card');
+
+  const reset = () => {
+    if (chat) chat.scrollTop = 0;
+    if (input) input.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); }
+    catch (_) { window.scrollTo(0, 0); }
+    if (resultCard && typeof resultCard.scrollIntoView === 'function') {
+      resultCard.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'auto' });
+    }
+    if (chat) chat.scrollTop = 0;
+  };
+
+  reset();
+  requestAnimationFrame(() => {
+    reset();
+    requestAnimationFrame(reset);
+  });
+  setTimeout(reset, 50);
+  setTimeout(reset, 150);
+  setTimeout(reset, 350);
+}
+
 function addS1ClaudeResultCard(responseText){
   document.body.classList.add('s1-result-active');
   const area = document.getElementById('chat');
@@ -4275,7 +4408,7 @@ function addS1ClaudeResultCard(responseText){
   card.innerHTML = `
     <div class="s1-result-eyebrow">Claude Draft</div>
     <div class="s1-result-title">Revised Discussion Prompt</div>
-    <div class="s1-result-body">${fmt(cleanS1ClaudeDraft(responseText))}</div>
+    <div class="s1-result-body s1-result-body-readable">${fmtResultMarkdown(cleanS1ClaudeDraft(responseText))}</div>
     <div class="s1-clean-reference">
       <div class="s1-clean-reference-title">Your Repair Notes</div>
       <div><strong>Learners:</strong> ${esc(values.learners || 'Not provided')}</div>
@@ -4285,6 +4418,7 @@ function addS1ClaudeResultCard(responseText){
     </div>`;
   area.appendChild(card);
   area.scrollTop = 0;
+  forceS1ResultScrollTop();
   return card;
 };
 
@@ -4305,6 +4439,7 @@ function showS1ResultControls(scoreTotal){
         ${thresholdMet ? `<button class="continue-btn" type="button" onclick="navigateToNext(1)">Next scenario →</button>` : `<button class="continue-btn" type="button" onclick="reviseS1()">Strengthen and try again</button>`}
       </div>
     </div>`;
+  forceS1ResultScrollTop();
 };
 
 window.reviseS1 = reviseS1 = function reviseS1(){
