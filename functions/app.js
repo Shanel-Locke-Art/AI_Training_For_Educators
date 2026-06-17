@@ -587,6 +587,7 @@ let musicReady   = false;
 
 function initMusic() {
   if (bgMusic) return;
+  if (typeof Howl === 'undefined') return; // Howler failed to load — skip music gracefully
   bgMusic = new Howl({
     src: ['audio/background.mp3'],
     loop: true,
@@ -2832,7 +2833,7 @@ function resetS1Dev() {
 
     pcClearVNStateForScenarioSwitch();
 
-    localStorage.removeItem('promptcraft_s1_clean_draft');
+    try { localStorage.removeItem('promptcraft_s1_clean_draft'); } catch(e) {}
 
     if (window.playerHistory && window.playerHistory.s1) {
       window.playerHistory.s1 = {
@@ -4263,7 +4264,7 @@ function showS1ResultControls(scoreTotal){
 window.reviseS1 = reviseS1 = function reviseS1(){
   const saved = Object.assign(
     {},
-    JSON.parse(localStorage.getItem('promptcraft_s1_clean_draft') || '{}'),
+    JSON.parse((() => { try { return localStorage.getItem('promptcraft_s1_clean_draft') || '{}'; } catch(e) { return '{}'; } })()),
     window.playerHistory?.s1 || {}
   );
 
