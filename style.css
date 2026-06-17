@@ -8145,3 +8145,681 @@ body .vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) .
     line-height: 1.32 !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════
+   FINAL CONSOLIDATED VN INTRO BALANCE PATCH
+   Added after all previous VN rules.
+   Goal: board and Pixel scale together, no giant board/tiny Pixel split.
+   Applies only to normal Professor Pixel briefing/dialogue scenes.
+   ══════════════════════════════════════════════════════ */
+
+body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-smartboard-wrap {
+  display: block !important;
+  position: absolute !important;
+  left: clamp(18px, 3vw, 56px) !important;
+  top: clamp(18px, 3.4vh, 44px) !important;
+  width: clamp(560px, 55vw, 980px) !important;
+  max-width: calc(100vw - clamp(340px, 31vw, 520px)) !important;
+  max-height: calc(100dvh - clamp(260px, 32vh, 350px)) !important;
+  aspect-ratio: 16 / 10.5 !important;
+  height: auto !important;
+  transform: none !important;
+  transform-origin: top left !important;
+  z-index: 2 !important;
+}
+
+body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-board-text {
+  top: clamp(42px, 11.4%, 64px) !important;
+  left: clamp(18px, 4.4%, 34px) !important;
+  right: clamp(18px, 4.4%, 34px) !important;
+  width: auto !important;
+  max-width: none !important;
+  max-height: calc(100% - 78px) !important;
+  overflow: hidden !important;
+  padding: clamp(10px, 1.25vw, 16px) clamp(13px, 1.5vw, 20px) !important;
+  font-size: clamp(1.02rem, 1.32vw, 1.58rem) !important;
+  line-height: 1.27 !important;
+  text-wrap: balance !important;
+}
+
+body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-board-label {
+  top: clamp(13px, 4%, 22px) !important;
+  left: clamp(18px, 4.4%, 34px) !important;
+  right: clamp(18px, 4.4%, 34px) !important;
+  font-size: clamp(0.5rem, 0.65vw, 0.68rem) !important;
+}
+
+body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-character {
+  display: flex !important;
+  position: absolute !important;
+  left: auto !important;
+  right: clamp(28px, 6.5vw, 110px) !important;
+  bottom: clamp(210px, 27vh, 285px) !important;
+  height: clamp(360px, 48vh, 650px) !important;
+  max-height: calc(100dvh - 230px) !important;
+  transform: none !important;
+  z-index: 6 !important;
+  opacity: 1 !important;
+}
+
+body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-character.visible {
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) #vnPortrait {
+  height: 100% !important;
+  width: auto !important;
+  max-width: min(34vw, 520px) !important;
+  object-fit: contain !important;
+  object-position: bottom center !important;
+}
+
+/* Large desktop: keep the board from swallowing the scene and let Pixel share the frame. */
+@media (min-width: 1400px) and (min-height: 760px) {
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-smartboard-wrap {
+    width: min(58vw, 1040px) !important;
+    max-width: calc(100vw - 500px) !important;
+    top: clamp(24px, 3.6vh, 48px) !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-character {
+    right: clamp(56px, 7vw, 132px) !important;
+    bottom: clamp(205px, 25vh, 270px) !important;
+    height: clamp(470px, 54vh, 720px) !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) #vnPortrait {
+    max-width: min(31vw, 560px) !important;
+  }
+}
+
+/* Medium widths: board stays readable, Pixel becomes a real character instead of a postage stamp. */
+@media (max-width: 1100px) {
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-smartboard-wrap {
+    left: 50% !important;
+    top: clamp(16px, 2.6vh, 30px) !important;
+    width: min(88vw, 720px) !important;
+    max-width: 88vw !important;
+    max-height: 33vh !important;
+    transform: translateX(-50%) !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-board-text {
+    top: clamp(34px, 10.5%, 48px) !important;
+    font-size: clamp(0.86rem, 2.8vw, 1.14rem) !important;
+    line-height: 1.22 !important;
+    max-height: calc(100% - 62px) !important;
+    padding: 9px 11px !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-character {
+    left: 50% !important;
+    right: auto !important;
+    bottom: clamp(245px, 32vh, 330px) !important;
+    height: clamp(330px, 43vh, 500px) !important;
+    max-height: 46vh !important;
+    transform: translateX(-50%) !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-character.visible {
+    transform: translateX(-50%) !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) #vnPortrait {
+    max-width: min(58vw, 390px) !important;
+  }
+}
+
+/* Phone/tall narrow screens: put the board high, enlarge Pixel, keep both clear of dialogue. */
+@media (max-width: 700px) {
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-smartboard-wrap {
+    top: 18px !important;
+    width: min(92vw, 600px) !important;
+    max-width: 92vw !important;
+    max-height: 31vh !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-board-text {
+    top: clamp(30px, 10.4%, 42px) !important;
+    font-size: clamp(0.78rem, 3.7vw, 0.98rem) !important;
+    line-height: 1.18 !important;
+    padding: 8px 10px !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-board-label {
+    font-size: clamp(0.44rem, 2.1vw, 0.56rem) !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-character {
+    bottom: clamp(250px, 34vh, 350px) !important;
+    height: clamp(350px, 46vh, 470px) !important;
+    max-height: 48vh !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) #vnPortrait {
+    max-width: min(72vw, 420px) !important;
+  }
+}
+
+/* Short screens: reduce board height first, not Pixel. Pixel is the guide, not a decorative thumbnail. */
+@media (max-height: 760px) {
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-smartboard-wrap {
+    top: 14px !important;
+    max-height: 30vh !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-prediction):not(.pc-clean-output) .vn-character {
+    bottom: clamp(220px, 31vh, 300px) !important;
+    height: clamp(300px, 42vh, 455px) !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   FINAL VN PREDICTION BALANCE PATCH
+   Fixes prediction screen: Pixel fully visible and terminal text wraps/scales
+   instead of being clipped inside the monitor.
+   Keep this block at the very end of style.css.
+   ══════════════════════════════════════════════════════ */
+
+/* Prediction screen terminal: keep the computer visible, but do not let it
+   push Pixel off-screen. */
+body .vn-overlay.active.claude-prediction #claudeTerminalScene,
+body .vn-overlay.active.pc-clean-prediction #claudeTerminalScene {
+  left: 50% !important;
+  top: clamp(176px, 28vh, 310px) !important;
+  width: min(76vw, 940px) !important;
+  max-width: calc(100vw - 28px) !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 5 !important;
+}
+
+body .vn-overlay.active.claude-prediction .claude-terminal-photo,
+body .vn-overlay.active.pc-clean-prediction .claude-terminal-photo {
+  width: 100% !important;
+  height: 100% !important;
+  background-size: contain !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* The text lives on a tiny fake CRT. Let it wrap and shrink, because apparently
+   even fictional computers need responsive typography now. */
+body .vn-overlay.active.claude-prediction .claude-terminal-screen,
+body .vn-overlay.active.pc-clean-prediction .claude-terminal-screen {
+  left: 24.15% !important;
+  top: 24.5% !important;
+  width: 27.2% !important;
+  height: 41.5% !important;
+  padding: clamp(4px, 0.95vw, 12px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+body .vn-overlay.active.claude-prediction #claudeTerminalOutput,
+body .vn-overlay.active.pc-clean-prediction #claudeTerminalOutput,
+body .vn-overlay.active.claude-prediction .claude-terminal-output,
+body .vn-overlay.active.pc-clean-prediction .claude-terminal-output {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  display: block !important;
+  text-align: center !important;
+  white-space: pre-line !important;
+  overflow: hidden !important;
+  overflow-wrap: normal !important;
+  word-break: keep-all !important;
+  font-size: clamp(0.38rem, 1.05vw, 0.78rem) !important;
+  line-height: 1.08 !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* Pixel in prediction mode: visible, balanced, and not sawed off at the edge. */
+body .vn-overlay.active.claude-prediction .vn-character,
+body .vn-overlay.active.pc-clean-prediction .vn-character {
+  display: flex !important;
+  position: absolute !important;
+  left: clamp(18px, 5vw, 86px) !important;
+  right: auto !important;
+  bottom: clamp(318px, 34vh, 405px) !important;
+  height: clamp(310px, 43vh, 540px) !important;
+  max-height: 48vh !important;
+  transform: none !important;
+  opacity: 1 !important;
+  z-index: 8 !important;
+  overflow: visible !important;
+}
+
+body .vn-overlay.active.claude-prediction .vn-character.visible,
+body .vn-overlay.active.pc-clean-prediction .vn-character.visible {
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+body .vn-overlay.active.claude-prediction #vnPortrait,
+body .vn-overlay.active.pc-clean-prediction #vnPortrait {
+  height: 100% !important;
+  width: auto !important;
+  max-width: min(42vw, 430px) !important;
+  object-fit: contain !important;
+  object-position: bottom left !important;
+}
+
+/* Keep the prediction choices readable while preserving room for Pixel. */
+body .vn-overlay.active.claude-prediction .vn-dialogue,
+body .vn-overlay.active.pc-clean-prediction .vn-dialogue {
+  height: clamp(300px, 36vh, 390px) !important;
+  min-height: clamp(300px, 36vh, 390px) !important;
+  max-height: clamp(300px, 36vh, 390px) !important;
+  padding: clamp(18px, 2.5vh, 28px) clamp(24px, 5vw, 76px) clamp(42px, 5vh, 60px) !important;
+}
+
+@media (min-width: 1000px) {
+  body .vn-overlay.active.claude-prediction .vn-dialogue,
+  body .vn-overlay.active.pc-clean-prediction .vn-dialogue {
+    padding-left: clamp(300px, 27vw, 470px) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  body .vn-overlay.active.claude-prediction #claudeTerminalScene,
+  body .vn-overlay.active.pc-clean-prediction #claudeTerminalScene {
+    top: clamp(164px, 25vh, 230px) !important;
+    width: min(88vw, 620px) !important;
+  }
+
+  body .vn-overlay.active.claude-prediction #claudeTerminalOutput,
+  body .vn-overlay.active.pc-clean-prediction #claudeTerminalOutput,
+  body .vn-overlay.active.claude-prediction .claude-terminal-output,
+  body .vn-overlay.active.pc-clean-prediction .claude-terminal-output {
+    font-size: clamp(0.32rem, 2.05vw, 0.56rem) !important;
+    line-height: 1.02 !important;
+    letter-spacing: 0.025em !important;
+  }
+
+  body .vn-overlay.active.claude-prediction .vn-character,
+  body .vn-overlay.active.pc-clean-prediction .vn-character {
+    left: clamp(14px, 4vw, 30px) !important;
+    bottom: clamp(315px, 37vh, 390px) !important;
+    height: clamp(270px, 38vh, 405px) !important;
+    max-height: 42vh !important;
+  }
+
+  body .vn-overlay.active.claude-prediction #vnPortrait,
+  body .vn-overlay.active.pc-clean-prediction #vnPortrait {
+    max-width: min(46vw, 290px) !important;
+  }
+
+  body .vn-overlay.active.claude-prediction .vn-dialogue,
+  body .vn-overlay.active.pc-clean-prediction .vn-dialogue {
+    height: clamp(315px, 38vh, 410px) !important;
+    min-height: clamp(315px, 38vh, 410px) !important;
+    max-height: clamp(315px, 38vh, 410px) !important;
+    padding: 18px 18px 42px !important;
+  }
+}
+
+@media (max-width: 430px), (max-height: 740px) {
+  body .vn-overlay.active.claude-prediction #claudeTerminalScene,
+  body .vn-overlay.active.pc-clean-prediction #claudeTerminalScene {
+    top: clamp(150px, 23vh, 205px) !important;
+    width: min(86vw, 540px) !important;
+  }
+
+  body .vn-overlay.active.claude-prediction .vn-character,
+  body .vn-overlay.active.pc-clean-prediction .vn-character {
+    left: 8px !important;
+    bottom: clamp(300px, 37vh, 365px) !important;
+    height: clamp(245px, 35vh, 350px) !important;
+  }
+
+  body .vn-overlay.active.claude-prediction #vnPortrait,
+  body .vn-overlay.active.pc-clean-prediction #vnPortrait {
+    max-width: min(49vw, 250px) !important;
+  }
+
+  body .vn-overlay.active.claude-prediction .vn-dialogue,
+  body .vn-overlay.active.pc-clean-prediction .vn-dialogue {
+    height: clamp(315px, 41vh, 410px) !important;
+    min-height: clamp(315px, 41vh, 410px) !important;
+    max-height: clamp(315px, 41vh, 410px) !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   FINAL TERMINAL TEXT FIT — CONSULT + PREDICTION
+   Keeps CRT text inside the actual monitor when the VN image scales.
+   ══════════════════════════════════════════════════════ */
+body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.thinking .claude-terminal-screen,
+body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.idle .claude-terminal-screen {
+  position: absolute !important;
+  left: 30.1% !important;
+  top: 22.6% !important;
+  width: 25.6% !important;
+  height: 26.8% !important;
+  padding: clamp(6px, 0.72vw, 12px) !important;
+  display: block !important;
+  overflow: hidden !important;
+  border-radius: 6px !important;
+  background: rgba(0, 28, 15, 0.58) !important;
+}
+
+body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.thinking .claude-terminal-title,
+body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.idle .claude-terminal-title {
+  display: block !important;
+  margin: 0 0 clamp(4px, 0.45vw, 8px) 0 !important;
+  padding: 0 !important;
+  font-size: clamp(0.42rem, 0.55vw, 0.72rem) !important;
+  line-height: 1.08 !important;
+  letter-spacing: 0.10em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+}
+
+body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.thinking .claude-terminal-output,
+body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.idle .claude-terminal-output {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: calc(100% - 18px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  text-align: left !important;
+  font-size: clamp(0.34rem, 0.48vw, 0.62rem) !important;
+  line-height: 1.22 !important;
+  letter-spacing: 0.035em !important;
+}
+
+body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.thinking .claude-terminal-cursor,
+body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.idle .claude-terminal-cursor {
+  width: 0.55em !important;
+  height: 0.9em !important;
+  vertical-align: -0.08em !important;
+}
+
+/* Prediction CRT: keep the short status centered, but never clipped. */
+body .vn-overlay.active.pc-clean-prediction .claude-terminal-screen,
+body .vn-overlay.active.claude-prediction .claude-terminal-screen {
+  left: 30.1% !important;
+  top: 22.6% !important;
+  width: 25.6% !important;
+  height: 26.8% !important;
+  padding: clamp(5px, 0.7vw, 10px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+body .vn-overlay.active.pc-clean-prediction #claudeTerminalOutput,
+body .vn-overlay.active.claude-prediction #claudeTerminalOutput {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  font-size: clamp(0.48rem, 0.86vw, 1.05rem) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.02em !important;
+}
+
+@media (max-width: 900px), (max-height: 760px) {
+  body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.thinking .claude-terminal-screen,
+  body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.idle .claude-terminal-screen,
+  body .vn-overlay.active.pc-clean-prediction .claude-terminal-screen,
+  body .vn-overlay.active.claude-prediction .claude-terminal-screen {
+    left: 30.0% !important;
+    top: 22.5% !important;
+    width: 25.9% !important;
+    height: 27.2% !important;
+    padding: 5px !important;
+  }
+
+  body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.thinking .claude-terminal-title,
+  body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.idle .claude-terminal-title {
+    font-size: clamp(0.28rem, 1.05vw, 0.46rem) !important;
+    margin-bottom: 3px !important;
+  }
+
+  body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.thinking .claude-terminal-output,
+  body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.idle .claude-terminal-output {
+    font-size: clamp(0.24rem, 0.92vw, 0.42rem) !important;
+    line-height: 1.15 !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   FINAL TERMINAL REPORT READABILITY FIX
+   Full-screen Claude diagnosis uses a responsive report layout instead of a
+   raw wall of CRT text. Tiny terminal cosplay was cute. It was also unusable.
+   ══════════════════════════════════════════════════════ */
+body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene.textmode.responding .claude-terminal-photo {
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  max-height: none !important;
+  border: clamp(3px, 0.45vw, 7px) solid #20ff00 !important;
+  border-radius: 0 !important;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(52,255,174,0.26), rgba(0,70,42,0.56) 50%, rgba(0,18,9,0.92) 82%),
+    repeating-linear-gradient(0deg, rgba(32,255,0,0.055) 0 1px, transparent 1px 4px),
+    #001708 !important;
+  overflow: hidden !important;
+}
+
+body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene.textmode.responding .claude-terminal-screen {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: clamp(20px, 3vw, 54px) clamp(18px, 4vw, 72px) clamp(100px, 12vh, 150px) !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  background:
+    linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.18)),
+    repeating-linear-gradient(0deg, rgba(32,255,0,0.045) 0 1px, transparent 1px 5px) !important;
+}
+
+body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene.textmode.responding .claude-terminal-output {
+  width: min(1180px, 92vw) !important;
+  max-width: 1180px !important;
+  height: auto !important;
+  max-height: calc(100dvh - clamp(145px, 18vh, 220px)) !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  color: #d9ffe5 !important;
+  text-align: left !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-size: clamp(0.88rem, 1vw, 1.12rem) !important;
+  line-height: 1.42 !important;
+  letter-spacing: 0.025em !important;
+  text-shadow: 0 0 8px rgba(124,255,181,0.72) !important;
+  white-space: normal !important;
+}
+
+body .terminal-report {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: clamp(14px, 1.6vh, 24px) !important;
+}
+
+body .terminal-report-topline {
+  width: fit-content !important;
+  max-width: 100% !important;
+  padding: 0.32em 0.62em !important;
+  border: 1px solid rgba(32,255,0,0.55) !important;
+  background: rgba(32,255,0,0.12) !important;
+  color: #20ff00 !important;
+  font-size: clamp(0.72rem, 0.85vw, 0.98rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+body .terminal-report-title {
+  color: #d9ffe5 !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-size: clamp(1.25rem, 2.35vw, 2.35rem) !important;
+  line-height: 1.05 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+body .terminal-report-grid {
+  display: grid !important;
+  grid-template-columns: minmax(220px, 0.72fr) minmax(320px, 1.28fr) !important;
+  gap: clamp(12px, 1.8vw, 24px) !important;
+  align-items: stretch !important;
+}
+
+body .terminal-report-section {
+  min-width: 0 !important;
+  padding: clamp(12px, 1.4vw, 20px) !important;
+  border: 1px solid rgba(32,255,0,0.36) !important;
+  background: rgba(0,18,9,0.55) !important;
+  box-shadow: inset 0 0 28px rgba(32,255,0,0.055) !important;
+}
+
+body .terminal-report-section:nth-child(2),
+body .terminal-report-section:nth-child(3) {
+  grid-column: span 2 !important;
+}
+
+body .terminal-report-section h3 {
+  margin: 0 0 0.55em 0 !important;
+  color: #20ff00 !important;
+  font-size: clamp(0.72rem, 0.92vw, 1rem) !important;
+  line-height: 1.2 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+body .terminal-report-section p {
+  margin: 0 !important;
+  color: #d9ffe5 !important;
+  font-size: clamp(0.88rem, 1.08vw, 1.18rem) !important;
+  line-height: 1.48 !important;
+  font-weight: 700 !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: none !important;
+}
+
+body .terminal-report-section.compact p {
+  color: #f2fff4 !important;
+  font-size: clamp(1rem, 1.4vw, 1.5rem) !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #vnText {
+  position: fixed !important;
+  inset: auto clamp(16px, 3vw, 42px) clamp(16px, 3vw, 36px) auto !important;
+  z-index: 60 !important;
+  pointer-events: auto !important;
+}
+
+body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .terminal-return,
+body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .vn-return-btn.terminal-return {
+  min-width: clamp(150px, 18vw, 230px) !important;
+  min-height: clamp(48px, 5.8vh, 64px) !important;
+  padding: 0 24px !important;
+  background: #20ff00 !important;
+  color: #001708 !important;
+  border: 4px double #d9ffe5 !important;
+  box-shadow: 0 0 0 2px #20ff00, 0 0 24px rgba(32,255,0,0.28) !important;
+  font-size: clamp(0.86rem, 1.1vw, 1.1rem) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+}
+
+@media (max-width: 760px) {
+  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene.textmode.responding .claude-terminal-screen {
+    padding: 18px 14px 116px !important;
+    align-items: flex-start !important;
+  }
+
+  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene.textmode.responding .claude-terminal-output {
+    width: 100% !important;
+    max-height: calc(100dvh - 138px) !important;
+    font-size: clamp(0.78rem, 2.6vw, 0.98rem) !important;
+    line-height: 1.35 !important;
+  }
+
+  body .terminal-report {
+    gap: 10px !important;
+  }
+
+  body .terminal-report-title {
+    font-size: clamp(1rem, 5.2vw, 1.45rem) !important;
+    line-height: 1.08 !important;
+  }
+
+  body .terminal-report-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  body .terminal-report-section,
+  body .terminal-report-section:nth-child(2),
+  body .terminal-report-section:nth-child(3) {
+    grid-column: auto !important;
+    padding: 10px 11px !important;
+  }
+
+  body .terminal-report-section h3 {
+    font-size: clamp(0.64rem, 2.7vw, 0.78rem) !important;
+    margin-bottom: 0.38em !important;
+  }
+
+  body .terminal-report-section p {
+    font-size: clamp(0.76rem, 3vw, 0.9rem) !important;
+    line-height: 1.32 !important;
+    font-weight: 700 !important;
+  }
+
+  body .terminal-report-section.compact p {
+    font-size: clamp(0.82rem, 3.3vw, 0.96rem) !important;
+  }
+
+  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #vnText {
+    left: 14px !important;
+    right: 14px !important;
+    bottom: 14px !important;
+    width: auto !important;
+  }
+
+  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .terminal-return,
+  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .vn-return-btn.terminal-return {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 56px !important;
+  }
+}
+
+@media (min-width: 1500px) {
+  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene.textmode.responding .claude-terminal-output {
+    max-width: 1260px !important;
+    font-size: 1.08rem !important;
+  }
+}

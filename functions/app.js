@@ -281,11 +281,35 @@ const scenarioData = [
 
 function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
   const s = scenarioData[scenarioIdx];
-  s.attempts++;
-  s.prompts.push(promptText);
-  if (score > s.bestScore) s.bestScore = score;
-  s.finalResponse = aiResponse.replace(/<[^>]+>/g, '').substring(0, 1200);
-  s.oscqrLit = oscqrActive.join(', ');
+  if (!s) return;
+
+  const now = Date.now();
+  const previousBest = Number(s.bestScore || 0);
+  const previousAttemptAt = s.lastAttemptAt || null;
+  const cleanResponse = String(aiResponse || '').replace(/<[^>]+>/g, '').substring(0, 1800);
+  const indicatorList = Array.isArray(oscqrActive) ? oscqrActive.filter(Boolean) : [];
+
+  s.attempts = (s.attempts || 0) + 1;
+  s.prompts = Array.isArray(s.prompts) ? s.prompts : [];
+  s.prompts.push(promptText || '');
+
+  s.eventType = 'prompt_attempt';
+  s.attemptNumber = s.attempts;
+  s.currentScore = Number(score) || 0;
+  s.previousBestScore = previousBest;
+  s.scoreDelta = s.currentScore - previousBest;
+  s.timeSinceLastAttemptSec = previousAttemptAt
+    ? Math.round((now - previousAttemptAt) / 1000)
+    : '';
+
+  if (s.currentScore > previousBest) s.bestScore = s.currentScore;
+
+  s.finalResponse = cleanResponse;
+  s.oscqrLit = indicatorList.join(', ');
+  s.lastPromptText = promptText || '';
+  s.lastClaudeResponse = cleanResponse;
+  s.lastQualityIndicators = indicatorList.join(', ');
+  s.lastAttemptAt = now;
 }
 
 
@@ -520,12 +544,27 @@ async function sendPayloadToSheets(payload, label = 'PromptCraft save') {
 
 window.sendPayloadToSheets = sendPayloadToSheets;
 
-async function saveIncrementalData(scenarioIdx) {
+window.buildIncrementalPayloadPreview = function buildIncrementalPayloadPreview(scenarioIdx = scenarioIndex) {
+  const s = scenarioData?.[scenarioIdx] || {};
+  return {
+    scenario: scenarioIdx + 1,
+    prompt_text: getIncrementalPromptText(scenarioIdx),
+    claude_response: getIncrementalClaudeResponse(scenarioIdx),
+    quality_indicators_lit: getIncrementalQualityIndicators(scenarioIdx),
+    self_report_prediction: getIncrementalSelfReport(scenarioIdx),
+    time_since_last_attempt_sec: s.timeSinceLastAttemptSec ?? '',
+    screen_width: window.screen.width,
+    event_type: s.eventType || inferIncrementalEventType(scenarioIdx),
+    notes_coding_memo: s.codingMemo || getIncrementalNotes(scenarioIdx)
+  };
+};
+
+async function saveIncrementalData(scenarioIdx, eventTypeOverride = '') {
   const s = scenarioData?.[scenarioIdx];
 
   // Do not create blank rows from dev navigation, but allow non-prompt scenarios
-  // to save their self-report / decision data.
-  if ((s?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 4 && scenarioIdx !== 6) {
+  // to save their self-report / prediction / decision data.
+  if ((s?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 4 && scenarioIdx !== 5 && scenarioIdx !== 6 && scenarioIdx !== 7) {
     console.log(`[PromptCraft] Skipping S${scenarioIdx + 1} save; no research data yet.`);
     return false;
   }
@@ -535,6 +574,19 @@ async function saveIncrementalData(scenarioIdx) {
       document.querySelector('input[name="participant_id"]')?.value?.trim() ||
       (playerName !== 'You' ? playerName : 'anonymous');
 
+    const promptText = getIncrementalPromptText(scenarioIdx);
+    const claudeResponse = getIncrementalClaudeResponse(scenarioIdx);
+    const qualityIndicators = getIncrementalQualityIndicators(scenarioIdx);
+    const selfReport = getIncrementalSelfReport(scenarioIdx);
+    const eventType = eventTypeOverride || s?.eventType || inferIncrementalEventType(scenarioIdx);
+    const timeSince = s?.timeSinceLastAttemptSec ?? '';
+    const currentScore = s?.currentScore ?? s?.bestScore ?? 0;
+    const previousBest = s?.previousBestScore ?? 0;
+    const scoreDelta = s?.scoreDelta ?? (Number(currentScore || 0) - Number(previousBest || 0));
+    const notes = s?.codingMemo || getIncrementalNotes(scenarioIdx);
+
+    // Send both the old field names and the exact spreadsheet-style field names.
+    // This makes the browser payload compatible with either version of Code.gs.
     const payload = {
       type: 'incremental',
       timestamp: new Date().toISOString(),
@@ -543,13 +595,24 @@ async function saveIncrementalData(scenarioIdx) {
       scenario_label: `S${scenarioIdx + 1}: ${scenarioTitleForData(scenarioIdx)}`,
       session_duration_min: parseFloat(((Date.now() - sessionStart) / 60000).toFixed(1)),
       attempts: s?.attempts || 0,
+      attempt_number: s?.attemptNumber || s?.attempts || 0,
+      current_score: currentScore,
       best_score: s?.bestScore || 0,
-      prompts: (s?.prompts || []).join(' | '),
-      final_response: s?.finalResponse || s?.lastClaudeResponse || '',
-      oscqr_lit: s?.oscqrLit || s?.lastQualityIndicators || '',
-      self_report: s?.selfReport || s?.prediction || summarizeS7DecisionsForData(),
+      score_delta: Number.isFinite(scoreDelta) ? scoreDelta : '',
+      prompt_text: promptText,
+      prompts: promptText,
+      claude_response: claudeResponse,
+      final_response: claudeResponse,
+      quality_indicators_lit: qualityIndicators,
+      oscqr_lit: qualityIndicators,
+      self_report_prediction: selfReport,
+      self_report: selfReport,
+      prediction: s?.prediction || '',
+      time_since_last_attempt_sec: timeSince,
       screen_width: window.screen.width,
-      notes: s?.codingMemo || s?.eventType || ''
+      event_type: eventType,
+      notes_coding_memo: notes,
+      notes: notes
     };
 
     console.log(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
@@ -558,6 +621,56 @@ async function saveIncrementalData(scenarioIdx) {
     console.warn('[PromptCraft] Incremental save failed:', e?.message || e);
     return false;
   }
+}
+
+function getIncrementalPromptText(scenarioIdx) {
+  const s = scenarioData?.[scenarioIdx] || {};
+  if (s.lastPromptText) return s.lastPromptText;
+  if (Array.isArray(s.prompts) && s.prompts.length) return s.prompts[s.prompts.length - 1] || '';
+  if (scenarioIdx === 7) return s.revisedPrompt || s.initialPrompt || '';
+  if (scenarioIdx === 6) return JSON.stringify(s.overrelianceDecisions || {});
+  return '';
+}
+
+function getIncrementalClaudeResponse(scenarioIdx) {
+  const s = scenarioData?.[scenarioIdx] || {};
+  return String(s.lastClaudeResponse || s.finalResponse || '').replace(/<[^>]+>/g, '').substring(0, 1800);
+}
+
+function getIncrementalQualityIndicators(scenarioIdx) {
+  const s = scenarioData?.[scenarioIdx] || {};
+  return s.lastQualityIndicators || s.oscqrLit || '';
+}
+
+function getIncrementalSelfReport(scenarioIdx) {
+  const s = scenarioData?.[scenarioIdx] || {};
+  if (s.selfReport) return s.selfReport;
+  if (s.prediction) return s.prediction;
+  if (scenarioIdx === 6) return summarizeS7DecisionsForData();
+  if (scenarioIdx === 7) {
+    return [s.reflection1, s.reflection2, s.reflection3].filter(Boolean).join(' | ');
+  }
+  return '';
+}
+
+function inferIncrementalEventType(scenarioIdx) {
+  const s = scenarioData?.[scenarioIdx] || {};
+  if (s.eventType) return s.eventType;
+  if (scenarioIdx === 4 && s.selfReport) return 'hallucination_self_report';
+  if (scenarioIdx === 5 && s.prediction) return 'prediction_gate';
+  if (scenarioIdx === 6 && Object.keys(s.overrelianceDecisions || {}).length) return 'overreliance_decisions';
+  if (scenarioIdx === 7) return 'reflect_revise';
+  return 'incremental_save';
+}
+
+function getIncrementalNotes(scenarioIdx) {
+  const s = scenarioData?.[scenarioIdx] || {};
+  const notes = [];
+  if (s.predictionCorrect !== undefined) notes.push(`prediction_correct=${s.predictionCorrect ? 'yes' : 'no'}`);
+  if (s.biasItemsSpotted?.length) notes.push(`bias_items=${s.biasItemsSpotted.join(', ')}`);
+  if (s.sectionReviews?.length) notes.push(`section_reviews=${s.sectionReviews.length}`);
+  if (s.eventType) notes.push(`event=${s.eventType}`);
+  return notes.join(' | ');
 }
 
 function scenarioTitleForData(idx) {
@@ -2403,6 +2516,51 @@ function terminalizeClaudeText(text) {
     .trim();
 }
 
+function renderClaudeTerminalReportHTML(label, text) {
+  const clean = terminalizeClaudeText(text);
+  const lines = clean.split('\n').map(line => line.trim()).filter(Boolean);
+  const headings = new Set(['STATUS', 'ISSUE DETECTED', 'RECOMMENDED REPAIR', 'CONFIDENCE']);
+  const sections = [];
+  let current = null;
+
+  lines.forEach(line => {
+    const upper = line.toUpperCase();
+    if (headings.has(upper)) {
+      current = { heading: upper, body: [] };
+      sections.push(current);
+      return;
+    }
+    if (!current) {
+      current = { heading: '', body: [] };
+      sections.push(current);
+    }
+    current.body.push(line);
+  });
+
+  const sectionHTML = sections
+    .filter(section => section.heading || section.body.length)
+    .map(section => {
+      const body = section.body.join(' ');
+      const compact = section.heading === 'STATUS' || section.heading === 'CONFIDENCE';
+      return `
+        <section class="terminal-report-section ${compact ? 'compact' : ''}">
+          ${section.heading ? `<h3>${esc(section.heading)}</h3>` : ''}
+          ${body ? `<p>${esc(body)}</p>` : ''}
+        </section>`;
+    })
+    .join('');
+
+  return `
+    <div class="terminal-report" role="document" aria-label="Claude analysis report">
+      <div class="terminal-report-topline">${esc(label)}</div>
+      <div class="terminal-report-title">Scenario Diagnostic</div>
+      <div class="terminal-report-grid">
+        ${sectionHTML || `<section class="terminal-report-section"><p>${esc(clean)}</p></section>`}
+      </div>
+    </div>`;
+}
+
+
 function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', output = 'IDLE') {
   const terminal = document.getElementById('claudeTerminalScene');
   const titleEl = document.getElementById('claudeTerminalTitle');
@@ -2412,7 +2570,15 @@ function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', outpu
     terminal.classList.add(state);
   }
   if (titleEl) titleEl.textContent = title;
-  if (outputEl) outputEl.innerHTML = `${output}<span class="claude-terminal-cursor"></span>`;
+  if (outputEl) {
+    // Preserve terminal line breaks. Raw newlines collapse in innerHTML,
+    // which is why the live CRT text was running off the monitor.
+    const safeOutput = esc(String(output || ''))
+      .replace(/\r\n/g, '\n')
+      .replace(/\r/g, '\n')
+      .replace(/\n/g, '<br>');
+    outputEl.innerHTML = `${safeOutput}<span class="claude-terminal-cursor"></span>`;
+  }
 }
 
 function showClaudeConsultOverlay(partLabel) {
@@ -2458,15 +2624,19 @@ function showClaudeConsultOverlay(partLabel) {
 function showClaudeConsultResult(feedback, mock = false, onClose = null) {
   claudeTerminalCloseCallback = typeof onClose === 'function' ? onClose : null;
   const label = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
-  const terminalText = `${label}\n\n${terminalizeClaudeText(feedback)}`;
 
   setClaudeTerminalTextMode(true);
 
   setClaudeTerminalState(
     'responding',
     mock ? 'MOCK CLAUDE TERMINAL' : 'CLAUDE TERMINAL',
-    esc(terminalText)
+    ''
   );
+
+  const terminalOutput = document.getElementById('claudeTerminalOutput');
+  if (terminalOutput) {
+    terminalOutput.innerHTML = renderClaudeTerminalReportHTML(label, feedback);
+  }
 
   const speaker = document.getElementById('vnSpeaker');
   if (speaker) speaker.textContent = mock ? 'Mock Claude Terminal' : 'Claude Terminal';
@@ -2861,7 +3031,7 @@ function pcClearVNStateForScenarioSwitch() {
   try { clearTimeout(vnTypeTimer); } catch(e) {}
   try { setClaudeShelfState('idle', 'idle'); } catch(e) {}
   try { setClaudeTerminalTextMode(false); } catch(e) {}
-  try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'PROCESSING PROMPT...'); } catch(e) {}
+  try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'PROCESSING\nPROMPT...'); } catch(e) {}
   try { musicEndVN(); } catch(e) {}
 }
 
