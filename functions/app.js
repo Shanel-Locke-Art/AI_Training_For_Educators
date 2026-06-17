@@ -2366,7 +2366,9 @@ function showClaudeConsultOverlay(partLabel) {
   // This is an interaction moment: Pixel consults Claude through the terminal close-up.
   vnQueue = [];
   clearTimeout(vnTypeTimer);
-  vnTyping = true;
+  // Terminal mode is not a typewriter VN line. Keep vnTyping false so generic
+  // dialogue advancement cannot skip/replace the terminal status text.
+  vnTyping = false;
   vnOnComplete = null;
   vnFullText = '';
   vnCurrentText = '';
@@ -2586,6 +2588,20 @@ function vnSkipType() {
 
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');
+
+  // Do not let the regular VN tap/continue handler mutate the dialogue while
+  // Claude's terminal thinking screen is open. The terminal has its own Continue
+  // button once analysis is ready. This prevents the bottom dialogue from turning
+  // blank if the user taps during "ANALYSIS IN PROGRESS...".
+  if (
+    overlay &&
+    overlay.classList.contains('claude-terminal-consult') &&
+    !document.querySelector('.terminal-return')
+  ) {
+    const hint = document.getElementById('vnAdvanceHint');
+    if (hint) hint.classList.remove('show');
+    return false;
+  }
 
   // Do not auto-advance while prediction choices are visible.
   if (
@@ -3618,6 +3634,82 @@ function fmt(text) {
     .replace(/\n/g, '<br>');
 }
 
+
+
+// Richer formatter for long Claude result drafts.
+// Keeps chat formatting light, but result cards need readable paragraphs/lists.
+function fmtResultMarkdown(text) {
+  const raw = String(text ?? '').replace(/\r\n/g, '\n').trim();
+  if (!raw) return '';
+
+  const inline = (value) => esc(value)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+  const lines = raw.split('\n');
+  let html = '';
+  let para = [];
+  let listType = null;
+
+  const flushPara = () => {
+    if (!para.length) return;
+    html += `<p>${inline(para.join(' ').replace(/\s+/g, ' ').trim())}</p>`;
+    para = [];
+  };
+  const closeList = () => {
+    if (!listType) return;
+    html += `</${listType}>`;
+    listType = null;
+  };
+  const openList = (type) => {
+    if (listType === type) return;
+    closeList();
+    listType = type;
+    html += `<${type}>`;
+  };
+
+  for (const sourceLine of lines) {
+    const line = sourceLine.trim();
+    if (!line) { flushPara(); closeList(); continue; }
+
+    const h = line.match(/^(#{1,3})\s+(.+)$/);
+    if (h) {
+      flushPara(); closeList();
+      const level = h[1].length === 1 ? 'h2' : 'h3';
+      html += `<${level}>${inline(h[2])}</${level}>`;
+      continue;
+    }
+
+    const boldHeading = line.match(/^\*\*(.+?)\*\*\s*$/);
+    if (boldHeading) {
+      flushPara(); closeList();
+      html += `<h3>${inline(boldHeading[1])}</h3>`;
+      continue;
+    }
+
+    const bullet = line.match(/^[-•]\s+(.+)$/);
+    if (bullet) {
+      flushPara(); openList('ul');
+      html += `<li>${inline(bullet[1])}</li>`;
+      continue;
+    }
+
+    const numbered = line.match(/^(\d+)\.\s+(.+)$/);
+    if (numbered) {
+      flushPara(); openList('ol');
+      html += `<li>${inline(numbered[2])}</li>`;
+      continue;
+    }
+
+    closeList();
+    para.push(line);
+  }
+
+  flushPara();
+  closeList();
+  return html;
+}
+
 function autoGrow(el) {
   if (!el) return;
   el.style.height = 'auto';
@@ -4239,7 +4331,7 @@ function addS1ClaudeResultCard(responseText){
   card.innerHTML = `
     <div class="s1-result-eyebrow">Claude Draft</div>
     <div class="s1-result-title">Revised Discussion Prompt</div>
-    <div class="s1-result-body">${fmt(cleanS1ClaudeDraft(responseText))}</div>
+    <div class="s1-result-body s1-result-body-readable">${fmtResultMarkdown(cleanS1ClaudeDraft(responseText))}</div>
     <div class="s1-clean-reference">
       <div class="s1-clean-reference-title">Your Repair Notes</div>
       <div><strong>Learners:</strong> ${esc(values.learners || 'Not provided')}</div>
