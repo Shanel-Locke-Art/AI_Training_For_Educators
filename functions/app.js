@@ -130,7 +130,6 @@ function startGame() {
 // ══════════════════════════════════════════════════════
 const SURVEY_MODE   = 'sheets';
 const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbzN9bGwzKUcucCltXfj72pxee7y6t1reML6YRQNqCjxJ9Y3rDGp1a_FkYMzJmZROka5/exec';
-const CLAUDE_MODEL  = 'claude-sonnet-4-5-20250929';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 
 
@@ -281,35 +280,11 @@ const scenarioData = [
 
 function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
   const s = scenarioData[scenarioIdx];
-  if (!s) return;
-
-  const now = Date.now();
-  const previousBest = s.bestScore || 0;
-  const previousAttemptAt = s.lastAttemptAt || null;
-  const cleanResponse = String(aiResponse || '').replace(/<[^>]+>/g, '').substring(0, 1200);
-  const activeLabels = Array.isArray(oscqrActive) ? oscqrActive : [];
-
-  s.attempts = (s.attempts || 0) + 1;
-  s.prompts = Array.isArray(s.prompts) ? s.prompts : [];
+  s.attempts++;
   s.prompts.push(promptText);
-
-  s.eventType = 'prompt_attempt';
-  s.attemptNumber = s.attempts;
-  s.currentScore = Number(score) || 0;
-  s.previousBestScore = previousBest;
-  s.scoreDelta = s.currentScore - previousBest;
-  s.timeSinceLastAttemptSec = previousAttemptAt
-    ? Math.round((now - previousAttemptAt) / 1000)
-    : '';
-
-  if (s.currentScore > previousBest) s.bestScore = s.currentScore;
-
-  s.finalResponse = cleanResponse;
-  s.oscqrLit = activeLabels.join(', ');
-  s.lastPromptText = promptText;
-  s.lastClaudeResponse = cleanResponse;
-  s.lastQualityIndicators = activeLabels.join(', ');
-  s.lastAttemptAt = now;
+  if (score > s.bestScore) s.bestScore = score;
+  s.finalResponse = aiResponse.replace(/<[^>]+>/g, '').substring(0, 1200);
+  s.oscqrLit = oscqrActive.join(', ');
 }
 
 
@@ -385,7 +360,7 @@ Write the growth summary.`;
 
   try {
     const data = await callClaude({
-      model: CLAUDE_MODEL,
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 400,
       system: systemPrompt,
       messages: [{ role: 'user', content: dataPrompt }]
@@ -507,7 +482,6 @@ function buildSessionPayload(formData) {
   };
 }
  
-<<<<<<< HEAD
 async function saveIncrementalData(scenarioIdx) {
   // Don't save if no attempts were made — avoids phantom rows from dev navigation
   if ((scenarioData[scenarioIdx]?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 6) return;
@@ -542,83 +516,6 @@ async function saveIncrementalData(scenarioIdx) {
  
   } catch(e) {
     console.warn('[PromptCraft] Incremental save failed:', e.message);
-=======
-// Reliable Google Apps Script sender.
-// Apps Script web apps behave best with text/plain. no-cors is intentional for game saves.
-async function sendPayloadToSheets(payload, label = 'PromptCraft save', waitForResponse = false) {
-  if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL.trim() === '' || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
-    console.warn(`[PromptCraft] ${label} skipped. Sheets configuration missing.`);
-    return false;
-  }
-
-  try {
-    const body = JSON.stringify(payload || {});
-    console.log(`[PromptCraft] ${label}`, payload);
-
-    if (waitForResponse) {
-      const res = await fetch(SHEETS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body
-      });
-      const text = await res.text();
-      console.log(`[PromptCraft] ${label} response:`, text);
-      return true;
-    }
-
-    await fetch(SHEETS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body
-    });
-    console.log(`[PromptCraft] ${label} request sent.`);
-    return true;
-  } catch (err) {
-    console.warn(`[PromptCraft] ${label} failed:`, err?.message || err);
-    return false;
-  }
-}
-
-async function saveIncrementalData(scenarioIdx) {
-  const s = scenarioData?.[scenarioIdx];
-
-  if ((s?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 6) {
-    console.log(`[PromptCraft] Skipping S${scenarioIdx + 1} incremental save (no attempts).`);
-    return false;
-  }
-
-  try {
-    const participantId =
-      document.querySelector('input[name="participant_id"]')?.value?.trim() ||
-      (playerName !== 'You' ? playerName : 'anonymous');
-
-    const payload = {
-      type: 'incremental',
-      timestamp: new Date().toISOString(),
-      participant_id: participantId,
-      event_type: s?.eventType || 'prompt_attempt',
-      scenario_index: scenarioIdx + 1,
-      scenario_label: scenarios?.[scenarioIdx]?.title || scenarios?.[scenarioIdx]?.label || '',
-      session_duration_min: parseFloat(((Date.now() - sessionStart) / 60000).toFixed(1)),
-      attempt_number: s?.attemptNumber || s?.attempts || 0,
-      current_score: s?.currentScore ?? s?.bestScore ?? 0,
-      best_score: s?.bestScore || 0,
-      score_delta: s?.scoreDelta ?? '',
-      prompts: s?.lastPromptText || (s?.prompts || []).slice(-1)[0] || '',
-      final_response: s?.lastClaudeResponse || s?.finalResponse || '',
-      oscqr_lit: s?.lastQualityIndicators || s?.oscqrLit || '',
-      self_report: s?.selfReport || s?.prediction || '',
-      time_since_last_attempt_sec: s?.timeSinceLastAttemptSec ?? '',
-      screen_width: window.screen.width,
-      notes: s?.codingMemo || ''
-    };
-
-    return sendPayloadToSheets(payload, `Incremental Save S${scenarioIdx + 1}`);
-  } catch (err) {
-    console.error(`[PromptCraft] Incremental Save S${scenarioIdx + 1} Failed`, err);
-    return false;
->>>>>>> b96fdd72ba6e67d82fc4b392a1507bcc739fc42d
   }
 }
  
@@ -644,10 +541,7 @@ const sounds = audioReady ? {
   scenarioIntro4:    new Howl({ src: ['audio/scenario-5-intro.mp3'],   volume: 0.9 }),
   scenarioIntro5:    new Howl({ src: ['audio/scenario-6-intro.mp3'],   volume: 0.9 }),
   scenarioIntro6:    new Howl({ src: ['audio/scenario-7-intro.mp3'],   volume: 0.9 }),
-<<<<<<< HEAD
   // scenarioIntro7 intentionally omitted until audio/scenario-8-intro.mp3 exists.
-=======
->>>>>>> b96fdd72ba6e67d82fc4b392a1507bcc739fc42d
   // ── Special scenario moments ──────────────────────────
   s4Interrupt:       new Howl({ src: ['audio/s4-interrupt.mp3'],       volume: 0.9 }),
   s4Reveal:          new Howl({ src: ['audio/s4-reveal.mp3'],          volume: 0.9 }),
@@ -1224,7 +1118,7 @@ Their prompt score was ${score} out of 5 based on: learner context, clear goal, 
 Do NOT use phrases like "Great job" or "Well done" as openers — get straight to the specific observation. Do NOT list multiple tips. Do NOT mention that the response is an excerpt, cuts off, or is incomplete — treat it as the full response. End with a single italicised follow-up question on its own line, preceded by a line break, that pushes them toward their next attempt.`;
 
     const data = await callClaude({
-      model: CLAUDE_MODEL,
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 220,
       system: pixelSystem,
       messages: [{
@@ -1372,7 +1266,7 @@ async function sendScenario4(text) {
 
   try {
     const data = await callClaude({
-      model: CLAUDE_MODEL,
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
       system: scenarios[4].system,
       messages: history
@@ -2557,15 +2451,6 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
-
-function stopClaudeTTS() {
-  if (window.speechSynthesis?.speaking) {
-    window.speechSynthesis.cancel();
-  }
-  const btn = document.getElementById('claudeTTSBtn');
-  if (btn) btn.textContent = '🔊 Read Claude Output';
-}
-
 function closeClaudeConsultOverlay() {
   const cb = claudeTerminalCloseCallback;
   claudeTerminalCloseCallback = null;
@@ -2575,10 +2460,6 @@ function closeClaudeConsultOverlay() {
   setClaudeShelfState('idle', 'idle');
   setClaudeTerminalTextMode(false);
   setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
-<<<<<<< HEAD
-=======
-  stopClaudeTTS();
->>>>>>> b96fdd72ba6e67d82fc4b392a1507bcc739fc42d
   musicEndVN();
   if (cb) {
     setTimeout(cb, 250);
@@ -3286,7 +3167,7 @@ async function reviewS1Part(part) {
     const userPrompt = `SCENARIO: Fix a dead asynchronous discussion board.\n\nORIGINAL_WEAK_PROMPT:\n"What did you think about this week's reading? Reply to at least two classmates."\n\nSECTION_BEING_REVIEWED: ${sectionLabels[part] || part}\n\nUSER_RESPONSE:\n${sectionText}\n\nFULL_S1_CONTEXT:\nLearners/course: ${values.learners || '[not provided]'}\nProblem/failure: ${values.issue || '[not provided]'}\nInteraction repair: ${values.interaction || '[not provided]'}\nConstraints/success: ${values.constraints || '[not provided]'}\n\nReview only the section named above. The feedback should help the user revise before sending the full prompt.`;
 
     const data = await callClaude({
-      model: CLAUDE_MODEL,
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 260,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }]
@@ -3492,7 +3373,7 @@ async function sendMain(text) {
 
   try {
     const data = await callClaude({
-      model: CLAUDE_MODEL,
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
       system: scenarios[scenarioIndex].system,
       messages: history
@@ -3519,7 +3400,6 @@ async function sendMain(text) {
       return ind ? ind.label : id;
     }));
 
-<<<<<<< HEAD
     // Store attempt-level research data, then save without blocking the UI.
     const s = scenarioData[scenarioIndex];
     const activeLabels = active.map(id => {
@@ -3536,9 +3416,6 @@ async function sendMain(text) {
     s.timeSinceLastAttemptSec = previousAttemptAt ? Math.round((Date.now() - previousAttemptAt) / 1000) : '';
     s.lastAttemptAt = Date.now();
     s.previousBestScore = previousBestScore;
-=======
-    // Save every Claude submission immediately, but do not block the VN flow.
->>>>>>> b96fdd72ba6e67d82fc4b392a1507bcc739fc42d
     saveIncrementalData(scenarioIndex);
 
     // ── S8: show the AI message first, THEN handle round logic ──
@@ -3752,19 +3629,11 @@ function gainXP(amount) {
 function markScenarioComplete() {
   scenarioCompleted[scenarioIndex] = true;
 
-<<<<<<< HEAD
   // Save a separate completion event. The prompt attempt is already saved in sendMain().
   if (scenarioData?.[scenarioIndex]) {
     scenarioData[scenarioIndex].eventType = 'scenario_complete';
   }
-=======
-  // Save a separate scenario-complete event without blocking navigation.
-  const s = scenarioData?.[scenarioIndex];
-  const previousEventType = s?.eventType;
-  if (s) s.eventType = 'scenario_complete';
->>>>>>> b96fdd72ba6e67d82fc4b392a1507bcc739fc42d
   saveIncrementalData(scenarioIndex);
-  if (s) s.eventType = previousEventType || 'prompt_attempt';
 
   // Unlock next scenario at the right moments
   const s1s2s3done = scenarioCompleted[0] && scenarioCompleted[1] && scenarioCompleted[2];
@@ -3901,15 +3770,11 @@ async function handleReflectionSubmit(e) {
             s7_correct: g.s7_correct,
           }),
         });
-<<<<<<< HEAD
         fetch(SHEETS_URL, {
           method: 'POST', mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(growthPayload)
         }).catch(() => {});
-=======
-        sendPayloadToSheets(growthPayload, 'Growth summary update').catch(() => {});
->>>>>>> b96fdd72ba6e67d82fc4b392a1507bcc739fc42d
       }
     });
     return;
@@ -4711,7 +4576,6 @@ function clearVN(){
   document.getElementById('vnDialogue')?.classList.remove('has-choices');
   document.getElementById('vnCharacter')?.classList.remove('visible');
   document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
-  stopClaudeTTS();
 }
 
 const originalDevFillScenario = window.devFillScenario || (typeof devFillScenario === 'function' ? devFillScenario : null);
@@ -5205,45 +5069,3 @@ function addS2ClaudeResultCard(responseText) {
 
   console.info('[PromptCraft] DEV globals repaired:', window.devStatus());
 })();
-
-// Claude Speech Synthesis voice 
-let claudeSpeechUtterance = null;
-
-  function cleanClaudeSpeechText(text) {
-    return String(text || '')
-      .replace(/\*\*/g, '')
-      .replace(/#/g, '')
-      .replace(/[-]{3,}/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-
-  function toggleClaudeTTS() {
-    const btn = document.getElementById('claudeTTSBtn');
-
-    if (window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
-      if (btn) btn.textContent = '🔊 Read Claude Output';
-      return;
-    }
-
-    const output = document.getElementById('claudeTerminalOutput');
-    const text = cleanClaudeSpeechText(output?.textContent || '');
-
-    if (!text) return;
-
-    claudeSpeechUtterance = new SpeechSynthesisUtterance(text);
-    claudeSpeechUtterance.rate = 0.9;
-    claudeSpeechUtterance.pitch = 0.85;
-
-    claudeSpeechUtterance.onend = () => {
-      if (btn) btn.textContent = '🔊 Read Claude Output';
-    };
-
-    claudeSpeechUtterance.onerror = () => {
-      if (btn) btn.textContent = '🔊 Read Claude Output';
-    };
-
-    if (btn) btn.textContent = '⏹ Stop Reading';
-    window.speechSynthesis.speak(claudeSpeechUtterance);
-  }
