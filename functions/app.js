@@ -2679,6 +2679,7 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
 function closeClaudeConsultOverlay() {
+  window.pcPredictionContinuingToClaude = false;
   const cb = claudeTerminalCloseCallback;
   claudeTerminalCloseCallback = null;
   const overlay = document.getElementById('vnOverlay');
@@ -2812,6 +2813,37 @@ function vnSkipType() {
 
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');
+  const hint = document.getElementById('vnAdvanceHint');
+
+  // Prediction gates own their own flow. Do not let the generic VN tap handler
+  // skip, clear, or close the scene while the player is choosing a prediction
+  // or after the prediction has been logged and the green Continue button is
+  // waiting. This was causing a soft lock if users clicked "tap to continue"
+  // instead of "Continue to Claude". Obviously the page offered two doors and
+  // one opened into a broom closet.
+  if (
+    overlay &&
+    (overlay.classList.contains('claude-prediction') || overlay.classList.contains('pc-clean-prediction'))
+  ) {
+    const predictionChoicesVisible = !!(
+      document.querySelector('.vn-prediction-options') ||
+      document.querySelector('.pc-clean-choice-grid') ||
+      document.querySelector('.pc-choice-panel-final') ||
+      document.getElementById('vnPredictionChoicePanel')
+    );
+
+    const waitingForClaudeContinue = !!(
+      window.pcWaitingForClaudeContinue ||
+      window.pendingPromptAfterPrediction ||
+      document.getElementById('pcContinueToClaudeBtn')
+    );
+
+    if (predictionChoicesVisible || waitingForClaudeContinue) {
+      if (hint) hint.classList.remove('show');
+      document.getElementById('pcContinueToClaudeBtn')?.focus({ preventScroll: true });
+      return false;
+    }
+  }
 
   // Do not let the regular VN tap/continue handler mutate the dialogue while
   // Claude's terminal thinking screen is open. The terminal has its own Continue
@@ -2822,19 +2854,10 @@ function vnAdvance() {
     overlay.classList.contains('claude-terminal-consult') &&
     !document.querySelector('.terminal-return')
   ) {
-    const hint = document.getElementById('vnAdvanceHint');
     if (hint) hint.classList.remove('show');
     return false;
   }
 
-  // Do not auto-advance while prediction choices are visible.
-  if (
-    overlay &&
-    overlay.classList.contains('claude-prediction') &&
-    document.querySelector('.vn-prediction-options')
-  ) {
-    return;
-  }
   // If still typing, skip to end first
   if (document.getElementById('vnAdvanceHint').classList.contains('show') === false) {
     vnSkipType();
@@ -4827,23 +4850,32 @@ function pcChoosePrediction(choice){
   const vnText = document.getElementById('vnText');
   if (vnText) {
     vnText.innerHTML = `
-      <div class="pc-feedback-copy">
+      <div class="pc-feedback-copy pc-awaiting-claude-continue">
         <div><strong>Your prediction is logged.</strong></div>
         <div>${reaction}</div>
-        <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
+        <div class="pc-continue-row" style="padding-top:clamp(16px,2.5vh,28px);padding-bottom:clamp(28px,5vh,56px);">
+          <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
+        </div>
       </div>`;
-    document.getElementById('pcContinueToClaudeBtn')?.addEventListener('click', (ev) => {
+
+    const hint = document.getElementById('vnAdvanceHint');
+    if (hint) hint.classList.remove('show');
+
+    const continueBtn = document.getElementById('pcContinueToClaudeBtn');
+    continueBtn?.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
       pcContinueToClaudeAnalysis();
     });
+    setTimeout(() => continueBtn?.focus({ preventScroll: true }), 80);
   }
 }
 
 function pcContinueToClaudeAnalysis(){
   const text = window.pendingPromptAfterPrediction;
-  if (!text || window.isSubmittingToClaude || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return false;
+  if (!text || window.pcPredictionContinuingToClaude || window.isSubmittingToClaude || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return false;
 
+  window.pcPredictionContinuingToClaude = true;
   window.pendingPromptAfterPrediction = '';
   window.pcWaitingForClaudeContinue = false;
 
