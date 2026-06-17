@@ -131,6 +131,7 @@ function startGame() {
 const SURVEY_MODE   = 'sheets';
 const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbzN9bGwzKUcucCltXfj72pxee7y6t1reML6YRQNqCjxJ9Y3rDGp1a_FkYMzJmZROka5/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
+const CLAUDE_MODEL  = 'claude-sonnet-4-5-20250929';
 
 
 // ══════════════════════════════════════════════════════
@@ -360,7 +361,7 @@ Write the growth summary.`;
 
   try {
     const data = await callClaude({
-      model: 'claude-sonnet-4-20250514',
+      model: CLAUDE_MODEL,
       max_tokens: 400,
       system: systemPrompt,
       messages: [{ role: 'user', content: dataPrompt }]
@@ -1119,7 +1120,7 @@ Their prompt score was ${score} out of 5 based on: learner context, clear goal, 
 Do NOT use phrases like "Great job" or "Well done" as openers — get straight to the specific observation. Do NOT list multiple tips. Do NOT mention that the response is an excerpt, cuts off, or is incomplete — treat it as the full response. End with a single italicised follow-up question on its own line, preceded by a line break, that pushes them toward their next attempt.`;
 
     const data = await callClaude({
-      model: 'claude-sonnet-4-20250514',
+      model: CLAUDE_MODEL,
       max_tokens: 220,
       system: pixelSystem,
       messages: [{
@@ -1267,7 +1268,7 @@ async function sendScenario4(text) {
 
   try {
     const data = await callClaude({
-      model: 'claude-sonnet-4-20250514',
+      model: CLAUDE_MODEL,
       max_tokens: 1000,
       system: scenarios[4].system,
       messages: history
@@ -3168,7 +3169,7 @@ async function reviewS1Part(part) {
     const userPrompt = `SCENARIO: Fix a dead asynchronous discussion board.\n\nORIGINAL_WEAK_PROMPT:\n"What did you think about this week's reading? Reply to at least two classmates."\n\nSECTION_BEING_REVIEWED: ${sectionLabels[part] || part}\n\nUSER_RESPONSE:\n${sectionText}\n\nFULL_S1_CONTEXT:\nLearners/course: ${values.learners || '[not provided]'}\nProblem/failure: ${values.issue || '[not provided]'}\nInteraction repair: ${values.interaction || '[not provided]'}\nConstraints/success: ${values.constraints || '[not provided]'}\n\nReview only the section named above. The feedback should help the user revise before sending the full prompt.`;
 
     const data = await callClaude({
-      model: 'claude-sonnet-4-20250514',
+      model: CLAUDE_MODEL,
       max_tokens: 260,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }]
@@ -3374,7 +3375,7 @@ async function sendMain(text) {
 
   try {
     const data = await callClaude({
-      model: 'claude-sonnet-4-20250514',
+      model: CLAUDE_MODEL,
       max_tokens: 1000,
       system: scenarios[scenarioIndex].system,
       messages: history
@@ -3382,7 +3383,9 @@ async function sendMain(text) {
     removeTyping();
 
     if (data.error) {
-      addMsg('ai', `<span style="color:var(--red)">Error: ${data.error.message}</span>`);
+      const message = data.error?.message || 'Claude returned an error.';
+      showClaudeConsultResult(`Claude returned an error.\n\n${message}`, false);
+      addMsg('ai', `<span style="color:var(--red)">Error: ${esc(message)}</span>`);
       return;
     }
 
@@ -3463,7 +3466,14 @@ async function sendMain(text) {
 
   } catch(e) {
     removeTyping();
-    addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`);
+    const message = e?.message || 'Something went wrong. Please try again.';
+    console.warn('[PromptCraft] sendMain failed:', e);
+    try {
+      showClaudeConsultResult(`Claude could not complete the analysis.\n\n${message}\n\nClose this terminal, revise if needed, and try again.`, false);
+    } catch(_) {
+      closeClaudeConsultOverlay?.();
+    }
+    addMsg('ai', `<span style="color:var(--red)">${esc(message)}</span>`);
   } finally {
     isSubmittingToClaude = false;
     predictionGateActive = false;
