@@ -483,43 +483,102 @@ function buildSessionPayload(formData) {
   };
 }
  
-async function saveIncrementalData(scenarioIdx) {
-  // Don't save if no attempts were made — avoids phantom rows from dev navigation
-  if ((scenarioData[scenarioIdx]?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 6) return;
-  if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
+
+// Reliable Google Apps Script sender.
+// Apps Script web apps are most reliable from browsers with text/plain + no-cors.
+// no-cors means the browser cannot read the response, so success is confirmed in
+// the Apps Script execution log and the spreadsheet rows.
+async function sendPayloadToSheets(payload, label = 'PromptCraft save') {
+  if (
+    SURVEY_MODE !== 'sheets' ||
+    !SHEETS_URL ||
+    SHEETS_URL.trim() === '' ||
+    SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'
+  ) {
+    console.warn(`[PromptCraft] ${label} skipped. Sheets configuration missing.`);
+    return false;
+  }
+
   try {
-    const s = scenarioData[scenarioIdx];
-    const participantId = document.querySelector('input[name="participant_id"]')?.value?.trim() || (playerName !== 'You' ? playerName : 'anonymous');
- 
-    const payload = {
-      type:                 'incremental',
-      timestamp:            new Date().toISOString(),
-      participant_id:       participantId,
-      scenario_index:       scenarioIdx + 1,
-      session_duration_min: parseFloat(((Date.now() - sessionStart) / 60000).toFixed(1)),
-      attempts:             s.attempts         || 0,
-      best_score:           s.bestScore        || 0,
-      prompts:              (s.prompts || []).join(' | '),
-      final_response:       s.finalResponse    || '',
-      oscqr_lit:            s.oscqrLit         || '',
-      self_report:          s.selfReport       || s.prediction || '',
-      screen_width:         window.screen.width,
-    };
- 
-    console.log(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
- 
+    const body = JSON.stringify(payload || {});
+    console.log(`[PromptCraft] ${label} queued:`, payload);
+
     await fetch(SHEETS_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body
     });
- 
-  } catch(e) {
-    console.warn('[PromptCraft] Incremental save failed:', e.message);
+
+    console.log(`[PromptCraft] ${label} upload request sent.`);
+    return true;
+  } catch (err) {
+    console.warn(`[PromptCraft] ${label} failed:`, err?.message || err);
+    return false;
   }
 }
- 
+
+window.sendPayloadToSheets = sendPayloadToSheets;
+
+async function saveIncrementalData(scenarioIdx) {
+  const s = scenarioData?.[scenarioIdx];
+
+  // Do not create blank rows from dev navigation, but allow non-prompt scenarios
+  // to save their self-report / decision data.
+  if ((s?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 4 && scenarioIdx !== 6) {
+    console.log(`[PromptCraft] Skipping S${scenarioIdx + 1} save; no research data yet.`);
+    return false;
+  }
+
+  try {
+    const participantId =
+      document.querySelector('input[name="participant_id"]')?.value?.trim() ||
+      (playerName !== 'You' ? playerName : 'anonymous');
+
+    const payload = {
+      type: 'incremental',
+      timestamp: new Date().toISOString(),
+      participant_id: participantId,
+      scenario_index: scenarioIdx + 1,
+      scenario_label: `S${scenarioIdx + 1}: ${scenarioTitleForData(scenarioIdx)}`,
+      session_duration_min: parseFloat(((Date.now() - sessionStart) / 60000).toFixed(1)),
+      attempts: s?.attempts || 0,
+      best_score: s?.bestScore || 0,
+      prompts: (s?.prompts || []).join(' | '),
+      final_response: s?.finalResponse || s?.lastClaudeResponse || '',
+      oscqr_lit: s?.oscqrLit || s?.lastQualityIndicators || '',
+      self_report: s?.selfReport || s?.prediction || summarizeS7DecisionsForData(),
+      screen_width: window.screen.width,
+      notes: s?.codingMemo || s?.eventType || ''
+    };
+
+    console.log(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
+    return await sendPayloadToSheets(payload, `Incremental save S${scenarioIdx + 1}`);
+  } catch(e) {
+    console.warn('[PromptCraft] Incremental save failed:', e?.message || e);
+    return false;
+  }
+}
+
+function scenarioTitleForData(idx) {
+  const labels = [
+    'Engagement',
+    'Metacognition',
+    'Authentic Assessment',
+    'Sync Bias',
+    'Hallucination Hunt',
+    'Predict Output',
+    'Overreliance',
+    'Reflect & Revise'
+  ];
+  return labels[idx] || 'PromptCraft';
+}
+
+function summarizeS7DecisionsForData() {
+  const d = scenarioData?.[6]?.overrelianceDecisions || {};
+  return Object.keys(d).length ? JSON.stringify(d) : '';
+}
 
 // ══════════════════════════════════════════════════════
 //  AUDIO
@@ -2291,12 +2350,7 @@ async function autoSaveSession(label) {
     const payload = buildSessionPayload(null);
     payload.type = 'autosave';
     payload.autosave_trigger = label;
-    await fetch(SHEETS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    await sendPayloadToSheets(payload, `Autosave: ${label}`);
   } catch(e) {
     // silent fail — reflection form send is the primary
   }
@@ -2366,9 +2420,7 @@ function showClaudeConsultOverlay(partLabel) {
   // This is an interaction moment: Pixel consults Claude through the terminal close-up.
   vnQueue = [];
   clearTimeout(vnTypeTimer);
-  // Terminal mode is not a typewriter VN line. Keep vnTyping false so generic
-  // dialogue advancement cannot skip/replace the terminal status text.
-  vnTyping = false;
+  vnTyping = true;
   vnOnComplete = null;
   vnFullText = '';
   vnCurrentText = '';
@@ -2588,20 +2640,6 @@ function vnSkipType() {
 
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');
-
-  // Do not let the regular VN tap/continue handler mutate the dialogue while
-  // Claude's terminal thinking screen is open. The terminal has its own Continue
-  // button once analysis is ready. This prevents the bottom dialogue from turning
-  // blank if the user taps during "ANALYSIS IN PROGRESS...".
-  if (
-    overlay &&
-    overlay.classList.contains('claude-terminal-consult') &&
-    !document.querySelector('.terminal-return')
-  ) {
-    const hint = document.getElementById('vnAdvanceHint');
-    if (hint) hint.classList.remove('show');
-    return false;
-  }
 
   // Do not auto-advance while prediction choices are visible.
   if (
@@ -3399,9 +3437,7 @@ async function sendMain(text) {
     removeTyping();
 
     if (data.error) {
-      const message = data.error?.message || 'Claude returned an error.';
-      showClaudeConsultResult(`Claude returned an error.\n\n${message}`, false);
-      addMsg('ai', `<span style="color:var(--red)">Error: ${esc(message)}</span>`);
+      addMsg('ai', `<span style="color:var(--red)">Error: ${data.error.message}</span>`);
       return;
     }
 
@@ -3482,14 +3518,7 @@ async function sendMain(text) {
 
   } catch(e) {
     removeTyping();
-    const message = e?.message || 'Something went wrong. Please try again.';
-    console.warn('[PromptCraft] sendMain failed:', e);
-    try {
-      showClaudeConsultResult(`Claude could not complete the analysis.\n\n${message}\n\nClose this terminal, revise if needed, and try again.`, false);
-    } catch(_) {
-      closeClaudeConsultOverlay?.();
-    }
-    addMsg('ai', `<span style="color:var(--red)">${esc(message)}</span>`);
+    addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`);
   } finally {
     isSubmittingToClaude = false;
     predictionGateActive = false;
@@ -3634,82 +3663,6 @@ function fmt(text) {
     .replace(/\n/g, '<br>');
 }
 
-
-
-// Richer formatter for long Claude result drafts.
-// Keeps chat formatting light, but result cards need readable paragraphs/lists.
-function fmtResultMarkdown(text) {
-  const raw = String(text ?? '').replace(/\r\n/g, '\n').trim();
-  if (!raw) return '';
-
-  const inline = (value) => esc(value)
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>');
-
-  const lines = raw.split('\n');
-  let html = '';
-  let para = [];
-  let listType = null;
-
-  const flushPara = () => {
-    if (!para.length) return;
-    html += `<p>${inline(para.join(' ').replace(/\s+/g, ' ').trim())}</p>`;
-    para = [];
-  };
-  const closeList = () => {
-    if (!listType) return;
-    html += `</${listType}>`;
-    listType = null;
-  };
-  const openList = (type) => {
-    if (listType === type) return;
-    closeList();
-    listType = type;
-    html += `<${type}>`;
-  };
-
-  for (const sourceLine of lines) {
-    const line = sourceLine.trim();
-    if (!line) { flushPara(); closeList(); continue; }
-
-    const h = line.match(/^(#{1,3})\s+(.+)$/);
-    if (h) {
-      flushPara(); closeList();
-      const level = h[1].length === 1 ? 'h2' : 'h3';
-      html += `<${level}>${inline(h[2])}</${level}>`;
-      continue;
-    }
-
-    const boldHeading = line.match(/^\*\*(.+?)\*\*\s*$/);
-    if (boldHeading) {
-      flushPara(); closeList();
-      html += `<h3>${inline(boldHeading[1])}</h3>`;
-      continue;
-    }
-
-    const bullet = line.match(/^[-•]\s+(.+)$/);
-    if (bullet) {
-      flushPara(); openList('ul');
-      html += `<li>${inline(bullet[1])}</li>`;
-      continue;
-    }
-
-    const numbered = line.match(/^(\d+)\.\s+(.+)$/);
-    if (numbered) {
-      flushPara(); openList('ol');
-      html += `<li>${inline(numbered[2])}</li>`;
-      continue;
-    }
-
-    closeList();
-    para.push(line);
-  }
-
-  flushPara();
-  closeList();
-  return html;
-}
-
 function autoGrow(el) {
   if (!el) return;
   el.style.height = 'auto';
@@ -3815,12 +3768,7 @@ async function handleReflectionSubmit(e) {
       const payload = buildSessionPayload(formData);
       console.log('[PromptCraft] Submitting full session payload:', payload);
 
-      await fetch(SHEETS_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+      await sendPayloadToSheets(payload, 'Full reflection submission');
       console.log('[PromptCraft] Sheets submission sent');
     } catch(err) {
       console.warn('[PromptCraft] Sheets submission error:', err);
@@ -3873,11 +3821,7 @@ async function handleReflectionSubmit(e) {
             s7_correct: g.s7_correct,
           }),
         });
-        fetch(SHEETS_URL, {
-          method: 'POST', mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(growthPayload)
-        }).catch(() => {});
+        sendPayloadToSheets(growthPayload, 'Growth report update').catch(() => {});
       }
     });
     return;
@@ -4331,7 +4275,7 @@ function addS1ClaudeResultCard(responseText){
   card.innerHTML = `
     <div class="s1-result-eyebrow">Claude Draft</div>
     <div class="s1-result-title">Revised Discussion Prompt</div>
-    <div class="s1-result-body s1-result-body-readable">${fmtResultMarkdown(cleanS1ClaudeDraft(responseText))}</div>
+    <div class="s1-result-body">${fmt(cleanS1ClaudeDraft(responseText))}</div>
     <div class="s1-clean-reference">
       <div class="s1-clean-reference-title">Your Repair Notes</div>
       <div><strong>Learners:</strong> ${esc(values.learners || 'Not provided')}</div>
