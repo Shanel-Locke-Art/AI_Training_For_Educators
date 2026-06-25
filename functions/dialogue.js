@@ -2,6 +2,11 @@
    PromptCraft — dialogue.js
    Owns Professor Pixel dialogue sequences only.
 
+   Quick edit map:
+   - welcome: opening sequence
+   - scenarioStart_0 through scenarioStart_7: per-scenario VN intros
+   - scoreReflection_*: Pixel coaching after prompt attempts
+
    Keep dialogue text here so index.html can handle behavior and styling without being cluttered by long strings. This also makes it easier to edit dialogue without accidentally breaking something in the HTML.
    ══════════════════════════════════════════════════════ */
 
@@ -84,8 +89,8 @@ window.pixelDialogue = {
     { expr: 'encouraging', text: "Notice how the response changes when the prompt includes learners, constraints, and a clear interaction strategy." },
   ],
   scoreReflection_5: [
-    { expr: 'excited', text: "Excellent. Claude had very little guessing to do." },
-    { expr: 'proud', text: "Students were already doing what the prompt asked them to do. The challenge was designing better interaction, and that is exactly what you helped Claude understand." },
+    { expr: 'excited', text: "Claude spotted the core issue. Students were complying with the requirements, but the prompt was not creating meaningful interaction." },
+    { expr: 'proud', text: "To improve discussion quality, we need prompts that ask learners to extend, challenge, compare, or build on one another's ideas. That is exactly what your repair helped Claude design." },
   ],
   s2_scoreReflection_0_2: [
     { expr: 'skeptical', text: "Claude had to guess what metacognitive behavior you wanted students to practice." },

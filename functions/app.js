@@ -1,6 +1,6 @@
 /* ======================================================
    PROMPTCRAFT APP.JS
-   Clean pass: labeled sections, no IIFEs, no duplicate functions.
+   Clean pass: labeled sections, no duplicate top-level functions.
    Each function defined exactly once — the final winning version.
 
    Sections (Ctrl+F to jump):
@@ -131,7 +131,75 @@ function startGame() {
 const SURVEY_MODE   = 'sheets';
 const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbzN9bGwzKUcucCltXfj72pxee7y6t1reML6YRQNqCjxJ9Y3rDGp1a_FkYMzJmZROka5/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
-const CLAUDE_MODEL  = 'claude-sonnet-4-5-20250929';
+
+
+// Robust Google Sheets poster.
+// Uses text/plain so browser no-cors requests are not silently mangled by preflight/CORS rules.
+// Apps Script still receives the JSON string in e.postData.contents.
+const PC_SHEETS_DEBUG = true;
+
+async function postToSheets(payload, label = 'PromptCraft data') {
+  if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+    console.warn('[PromptCraft] Sheets URL is not configured. Skipping:', label);
+    return false;
+  }
+
+  const body = JSON.stringify(payload || {});
+
+  try {
+    if (PC_SHEETS_DEBUG) console.log(`[PromptCraft] Sending ${label} to Sheets:`, payload);
+
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body
+    });
+
+    if (PC_SHEETS_DEBUG) console.log(`[PromptCraft] Sheets request dispatched: ${label}`);
+    return true;
+  } catch (err) {
+    console.warn(`[PromptCraft] fetch failed for ${label}:`, err);
+  }
+
+  // Fallback for some browser/security contexts.
+  try {
+    if (navigator.sendBeacon) {
+      const blob = new Blob([body], { type: 'text/plain;charset=utf-8' });
+      const ok = navigator.sendBeacon(SHEETS_URL, blob);
+      console.log(`[PromptCraft] sendBeacon fallback ${ok ? 'queued' : 'failed'}: ${label}`);
+      return ok;
+    }
+  } catch (err) {
+    console.warn(`[PromptCraft] sendBeacon failed for ${label}:`, err);
+  }
+
+  return false;
+}
+
+// Run from DevTools console: testSheetsPing()
+window.testSheetsPing = function testSheetsPing() {
+  return postToSheets({
+    type: 'incremental',
+    timestamp: new Date().toISOString(),
+    participant_id: 'browser-test',
+    scenario_index: 'TEST',
+    scenario_label: 'Browser ping',
+    session_duration_min: 0,
+    attempts: 0,
+    current_score: '',
+    best_score: '',
+    score_delta: '',
+    prompt_text: 'Browser-to-Apps-Script test ping',
+    claude_response: 'If this row appears, the deployed site can write to Sheets.',
+    quality_indicators_lit: '',
+    self_report_prediction: '',
+    time_since_last_attempt_sec: '',
+    screen_width: window.innerWidth || window.screen.width,
+    event_type: 'browser_test_ping',
+    notes_coding_memo: location.href
+  }, 'browser test ping');
+};
 
 
 // ══════════════════════════════════════════════════════
@@ -281,35 +349,11 @@ const scenarioData = [
 
 function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
   const s = scenarioData[scenarioIdx];
-  if (!s) return;
-
-  const now = Date.now();
-  const previousBest = Number(s.bestScore || 0);
-  const previousAttemptAt = s.lastAttemptAt || null;
-  const cleanResponse = String(aiResponse || '').replace(/<[^>]+>/g, '').substring(0, 1800);
-  const indicatorList = Array.isArray(oscqrActive) ? oscqrActive.filter(Boolean) : [];
-
-  s.attempts = (s.attempts || 0) + 1;
-  s.prompts = Array.isArray(s.prompts) ? s.prompts : [];
-  s.prompts.push(promptText || '');
-
-  s.eventType = 'prompt_attempt';
-  s.attemptNumber = s.attempts;
-  s.currentScore = Number(score) || 0;
-  s.previousBestScore = previousBest;
-  s.scoreDelta = s.currentScore - previousBest;
-  s.timeSinceLastAttemptSec = previousAttemptAt
-    ? Math.round((now - previousAttemptAt) / 1000)
-    : '';
-
-  if (s.currentScore > previousBest) s.bestScore = s.currentScore;
-
-  s.finalResponse = cleanResponse;
-  s.oscqrLit = indicatorList.join(', ');
-  s.lastPromptText = promptText || '';
-  s.lastClaudeResponse = cleanResponse;
-  s.lastQualityIndicators = indicatorList.join(', ');
-  s.lastAttemptAt = now;
+  s.attempts++;
+  s.prompts.push(promptText);
+  if (score > s.bestScore) s.bestScore = score;
+  s.finalResponse = aiResponse.replace(/<[^>]+>/g, '').substring(0, 1200);
+  s.oscqrLit = oscqrActive.join(', ');
 }
 
 
@@ -385,7 +429,7 @@ Write the growth summary.`;
 
   try {
     const data = await callClaude({
-      model: CLAUDE_MODEL,
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 400,
       system: systemPrompt,
       messages: [{ role: 'user', content: dataPrompt }]
@@ -417,10 +461,10 @@ function buildGrowthTableHTML(g) {
 function buildSessionPayload(formData) {
   const durationMin = ((Date.now() - sessionStart) / 60000).toFixed(1);
   const totalAttempts = scenarioData.reduce((sum, s) => sum + (s.attempts || 0), 0);
- 
+
   // Build S7 decisions object from scenarioData
   const d7 = scenarioData[6]?.overrelianceDecisions || {};
- 
+
   return {
     // Session
     timestamp:            new Date().toISOString(),
@@ -430,7 +474,7 @@ function buildSessionPayload(formData) {
     total_xp:             Math.round(xp),
     total_attempts:       totalAttempts,
     presubmit_predictions: scenarioData.map((s, i) => `S${i+1}: ${JSON.stringify(s.predictions || [])}`).join(' || '),
- 
+
     // S1
     s1_attempts:          scenarioData[0].attempts,
     s1_best_score:        scenarioData[0].bestScore,
@@ -438,41 +482,41 @@ function buildSessionPayload(formData) {
     s1_final_response:    scenarioData[0].finalResponse,
     s1_oscqr:             scenarioData[0].oscqrLit,
     s1_section_reviews:   JSON.stringify(scenarioData[0].sectionReviews || []),
- 
+
     // S2
     s2_attempts:          scenarioData[1].attempts,
     s2_best_score:        scenarioData[1].bestScore,
     s2_prompts:           scenarioData[1].prompts.join(' | '),
     s2_final_response:    scenarioData[1].finalResponse,
     s2_oscqr:             scenarioData[1].oscqrLit,
- 
+
     // S3
     s3_attempts:          scenarioData[2].attempts,
     s3_best_score:        scenarioData[2].bestScore,
     s3_prompts:           scenarioData[2].prompts.join(' | '),
     s3_final_response:    scenarioData[2].finalResponse,
     s3_oscqr:             scenarioData[2].oscqrLit,
- 
+
     // S4 — hallucination hunt (no open prompt, but track what we have)
     s4_attempts:          scenarioData[3].attempts,
     s4_best_score:        scenarioData[3].bestScore,
     s4_prompts:           scenarioData[3].prompts.join(' | '),
     s4_final_response:    scenarioData[3].finalResponse,
     s4_oscqr:             scenarioData[3].oscqrLit,
- 
+
     // S5 — predict the output
     s5_attempts:          scenarioData[4].attempts,
     s5_best_score:        scenarioData[4].bestScore || 0,
     s5_self_report:       scenarioData[4].selfReport || '',
     s5_prompts:           scenarioData[4].prompts.join(' | '),
     s5_final_response:    scenarioData[4].finalResponse || '',
- 
+
     // S6 — sync bias
     s6_attempts:          scenarioData[5].attempts,
     s6_prediction:        scenarioData[5].prediction || '',
     s6_prediction_correct: scenarioData[5].predictionCorrect ? 'yes' : 'no',
     s6_prompts:           scenarioData[5].prompts.join(' | '),
- 
+
     // S7 — overreliance decisions
     s7_decisions: {
       policy:     d7.policy     || '',
@@ -482,7 +526,7 @@ function buildSessionPayload(formData) {
       objectives: d7.objectives || '',
     },
     s7_best_score:        scenarioData[6].bestScore || 0,
- 
+
     // S8 — reflect & revise
     s8_initial_prompt:    scenarioData[7].initialPrompt  || '',
     s8_initial_score:     scenarioData[7].initialScore   || 0,
@@ -494,203 +538,51 @@ function buildSessionPayload(formData) {
     growth_json:          '',  // populated after async generation
     s8_reflection_2:      scenarioData[7].reflection2    || '',
     s8_reflection_3:      scenarioData[7].reflection3    || '',
- 
+
     // Reflection Room
     q1_surprise:    formData ? (formData.get('q1_surprise')  || '') : '',
     q2_unexpected:  formData ? (formData.get('q2_change')    || '') : '',
     q3_transfer:    formData ? (formData.get('q3_practice')  || '') : '',
     q4_other:       formData ? (formData.get('q4_other')     || '') : '',
- 
+
     // Metadata
     screen_width: window.screen.width,
     referrer:     document.referrer || 'direct'
   };
 }
- 
-// Reliable Google Apps Script sender.
-// Apps Script web apps are most reliable from browsers with text/plain + no-cors.
-// no-cors means the browser cannot read the response, so success is confirmed in
-// the Apps Script execution log and the spreadsheet rows.
-async function sendPayloadToSheets(payload, label = 'PromptCraft save') {
-  if (
-    SURVEY_MODE !== 'sheets' ||
-    !SHEETS_URL ||
-    SHEETS_URL.trim() === '' ||
-    SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'
-  ) {
-    console.warn(`[PromptCraft] ${label} skipped. Sheets configuration missing.`);
-    return false;
-  }
 
+async function saveIncrementalData(scenarioIdx) {
+  // Don't save if no attempts were made — avoids phantom rows from dev navigation
+  if ((scenarioData[scenarioIdx]?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 6) return;
+  if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
   try {
-    const body = JSON.stringify(payload || {});
-    console.log(`[PromptCraft] ${label} queued:`, payload);
+    const s = scenarioData[scenarioIdx];
+    const participantId = document.querySelector('input[name="participant_id"]')?.value?.trim() || (playerName !== 'You' ? playerName : 'anonymous');
 
-    await fetch(SHEETS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      redirect: 'follow',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body
-    });
-
-    console.log(`[PromptCraft] ${label} upload request sent.`);
-    return true;
-  } catch (err) {
-    console.warn(`[PromptCraft] ${label} failed:`, err?.message || err);
-    return false;
-  }
-}
-
-window.sendPayloadToSheets = sendPayloadToSheets;
-
-window.buildIncrementalPayloadPreview = function buildIncrementalPayloadPreview(scenarioIdx = scenarioIndex) {
-  const s = scenarioData?.[scenarioIdx] || {};
-  return {
-    scenario: scenarioIdx + 1,
-    prompt_text: getIncrementalPromptText(scenarioIdx),
-    claude_response: getIncrementalClaudeResponse(scenarioIdx),
-    quality_indicators_lit: getIncrementalQualityIndicators(scenarioIdx),
-    self_report_prediction: getIncrementalSelfReport(scenarioIdx),
-    time_since_last_attempt_sec: s.timeSinceLastAttemptSec ?? '',
-    screen_width: window.screen.width,
-    event_type: s.eventType || inferIncrementalEventType(scenarioIdx),
-    notes_coding_memo: s.codingMemo || getIncrementalNotes(scenarioIdx)
-  };
-};
-
-async function saveIncrementalData(scenarioIdx, eventTypeOverride = '') {
-  const s = scenarioData?.[scenarioIdx];
-
-  // Do not create blank rows from dev navigation, but allow non-prompt scenarios
-  // to save their self-report / prediction / decision data.
-  if ((s?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 4 && scenarioIdx !== 5 && scenarioIdx !== 6 && scenarioIdx !== 7) {
-    console.log(`[PromptCraft] Skipping S${scenarioIdx + 1} save; no research data yet.`);
-    return false;
-  }
-
-  try {
-    const participantId =
-      document.querySelector('input[name="participant_id"]')?.value?.trim() ||
-      (playerName !== 'You' ? playerName : 'anonymous');
-
-    const promptText = getIncrementalPromptText(scenarioIdx);
-    const claudeResponse = getIncrementalClaudeResponse(scenarioIdx);
-    const qualityIndicators = getIncrementalQualityIndicators(scenarioIdx);
-    const selfReport = getIncrementalSelfReport(scenarioIdx);
-    const eventType = eventTypeOverride || s?.eventType || inferIncrementalEventType(scenarioIdx);
-    const timeSince = s?.timeSinceLastAttemptSec ?? '';
-    const currentScore = s?.currentScore ?? s?.bestScore ?? 0;
-    const previousBest = s?.previousBestScore ?? 0;
-    const scoreDelta = s?.scoreDelta ?? (Number(currentScore || 0) - Number(previousBest || 0));
-    const notes = s?.codingMemo || getIncrementalNotes(scenarioIdx);
-
-    // Send both the old field names and the exact spreadsheet-style field names.
-    // This makes the browser payload compatible with either version of Code.gs.
     const payload = {
-      type: 'incremental',
-      timestamp: new Date().toISOString(),
-      participant_id: participantId,
-      scenario_index: scenarioIdx + 1,
-      scenario_label: `S${scenarioIdx + 1}: ${scenarioTitleForData(scenarioIdx)}`,
+      type:                 'incremental',
+      timestamp:            new Date().toISOString(),
+      participant_id:       participantId,
+      scenario_index:       scenarioIdx + 1,
       session_duration_min: parseFloat(((Date.now() - sessionStart) / 60000).toFixed(1)),
-      attempts: s?.attempts || 0,
-      attempt_number: s?.attemptNumber || s?.attempts || 0,
-      current_score: currentScore,
-      best_score: s?.bestScore || 0,
-      score_delta: Number.isFinite(scoreDelta) ? scoreDelta : '',
-      prompt_text: promptText,
-      prompts: promptText,
-      claude_response: claudeResponse,
-      final_response: claudeResponse,
-      quality_indicators_lit: qualityIndicators,
-      oscqr_lit: qualityIndicators,
-      self_report_prediction: selfReport,
-      self_report: selfReport,
-      prediction: s?.prediction || '',
-      time_since_last_attempt_sec: timeSince,
-      screen_width: window.screen.width,
-      event_type: eventType,
-      notes_coding_memo: notes,
-      notes: notes
+      attempts:             s.attempts         || 0,
+      best_score:           s.bestScore        || 0,
+      prompts:              (s.prompts || []).join(' | '),
+      final_response:       s.finalResponse    || '',
+      oscqr_lit:            s.oscqrLit         || '',
+      self_report:          s.selfReport       || s.prediction || '',
+      screen_width:         window.screen.width,
     };
 
     console.log(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
-    return await sendPayloadToSheets(payload, `Incremental save S${scenarioIdx + 1}`);
+
+    await postToSheets(payload, `incremental S${scenarioIdx + 1}`);
+
   } catch(e) {
-    console.warn('[PromptCraft] Incremental save failed:', e?.message || e);
-    return false;
+    console.warn('[PromptCraft] Incremental save failed:', e.message);
   }
 }
 
-function getIncrementalPromptText(scenarioIdx) {
-  const s = scenarioData?.[scenarioIdx] || {};
-  if (s.lastPromptText) return s.lastPromptText;
-  if (Array.isArray(s.prompts) && s.prompts.length) return s.prompts[s.prompts.length - 1] || '';
-  if (scenarioIdx === 7) return s.revisedPrompt || s.initialPrompt || '';
-  if (scenarioIdx === 6) return JSON.stringify(s.overrelianceDecisions || {});
-  return '';
-}
-
-function getIncrementalClaudeResponse(scenarioIdx) {
-  const s = scenarioData?.[scenarioIdx] || {};
-  return String(s.lastClaudeResponse || s.finalResponse || '').replace(/<[^>]+>/g, '').substring(0, 1800);
-}
-
-function getIncrementalQualityIndicators(scenarioIdx) {
-  const s = scenarioData?.[scenarioIdx] || {};
-  return s.lastQualityIndicators || s.oscqrLit || '';
-}
-
-function getIncrementalSelfReport(scenarioIdx) {
-  const s = scenarioData?.[scenarioIdx] || {};
-  if (s.selfReport) return s.selfReport;
-  if (s.prediction) return s.prediction;
-  if (scenarioIdx === 6) return summarizeS7DecisionsForData();
-  if (scenarioIdx === 7) {
-    return [s.reflection1, s.reflection2, s.reflection3].filter(Boolean).join(' | ');
-  }
-  return '';
-}
-
-function inferIncrementalEventType(scenarioIdx) {
-  const s = scenarioData?.[scenarioIdx] || {};
-  if (s.eventType) return s.eventType;
-  if (scenarioIdx === 4 && s.selfReport) return 'hallucination_self_report';
-  if (scenarioIdx === 5 && s.prediction) return 'prediction_gate';
-  if (scenarioIdx === 6 && Object.keys(s.overrelianceDecisions || {}).length) return 'overreliance_decisions';
-  if (scenarioIdx === 7) return 'reflect_revise';
-  return 'incremental_save';
-}
-
-function getIncrementalNotes(scenarioIdx) {
-  const s = scenarioData?.[scenarioIdx] || {};
-  const notes = [];
-  if (s.predictionCorrect !== undefined) notes.push(`prediction_correct=${s.predictionCorrect ? 'yes' : 'no'}`);
-  if (s.biasItemsSpotted?.length) notes.push(`bias_items=${s.biasItemsSpotted.join(', ')}`);
-  if (s.sectionReviews?.length) notes.push(`section_reviews=${s.sectionReviews.length}`);
-  if (s.eventType) notes.push(`event=${s.eventType}`);
-  return notes.join(' | ');
-}
-
-function scenarioTitleForData(idx) {
-  const labels = [
-    'Engagement',
-    'Metacognition',
-    'Authentic Assessment',
-    'Sync Bias',
-    'Hallucination Hunt',
-    'Predict Output',
-    'Overreliance',
-    'Reflect & Revise'
-  ];
-  return labels[idx] || 'PromptCraft';
-}
-
-function summarizeS7DecisionsForData() {
-  const d = scenarioData?.[6]?.overrelianceDecisions || {};
-  return Object.keys(d).length ? JSON.stringify(d) : '';
-}
 
 // ══════════════════════════════════════════════════════
 //  AUDIO
@@ -713,7 +605,7 @@ const sounds = audioReady ? {
   scenarioIntro4:    new Howl({ src: ['audio/scenario-5-intro.mp3'],   volume: 0.9 }),
   scenarioIntro5:    new Howl({ src: ['audio/scenario-6-intro.mp3'],   volume: 0.9 }),
   scenarioIntro6:    new Howl({ src: ['audio/scenario-7-intro.mp3'],   volume: 0.9 }),
-  // scenarioIntro7 intentionally omitted until audio/scenario-8-intro.mp3 exists.
+  scenarioIntro7:    new Howl({ src: ['audio/scenario-8-intro.mp3'],   volume: 0.9 }),
   // ── Special scenario moments ──────────────────────────
   s4Interrupt:       new Howl({ src: ['audio/s4-interrupt.mp3'],       volume: 0.9 }),
   s4Reveal:          new Howl({ src: ['audio/s4-reveal.mp3'],          volume: 0.9 }),
@@ -725,7 +617,7 @@ const sounds = audioReady ? {
 const NARRATION_KEYS = new Set([
   'welcome','vague','decent','strong','scenarioComplete','allComplete',
   'scenarioIntro0','scenarioIntro1','scenarioIntro2','scenarioIntro3',
-  'scenarioIntro4','scenarioIntro5','scenarioIntro6',
+  'scenarioIntro4','scenarioIntro5','scenarioIntro6','scenarioIntro7',
   's4Interrupt','s4Reveal','s7Closing','reflectionOpen'
 ]);
 let _currentNarration = null;
@@ -759,7 +651,7 @@ let musicReady   = false;
 
 function initMusic() {
   if (bgMusic) return;
-  if (typeof Howl === 'undefined') return; // Howler failed to load — skip music gracefully
+  if (typeof Howl === 'undefined') return;
   bgMusic = new Howl({
     src: ['audio/background.mp3'],
     loop: true,
@@ -862,56 +754,7 @@ After your main response, add a short section called "Course Quality Check" noti
 Coaching: vague prompts get generic project ideas. Specific prompts that name the discipline, course level, student population, and delivery mode get excellent, realistic assessment designs with explicit praise.`
   },
 
-  // ── S4: SYNCHRONOUS ASSUMPTION BIAS ──────────────────
-  {
-    desc: "A curriculum committee used AI to redesign a fully asynchronous online program's capstone course. Read what the AI proposed — notice what it assumes about how your students learn and meet.",
-    isBiasScenario: true,
-    biasedResponse: `**Capstone Course Redesign — COMM 495: Professional Capstone**
-*A Comprehensive Redesign for Maximum Student Engagement*
-
-**Course Overview**
-This redesigned capstone creates a dynamic, high-energy culminating experience through intensive real-time collaboration and professional simulation.
-
-**Weekly Schedule**
-- Monday 6:00-8:00 PM: Full cohort live session via Zoom (attendance mandatory)
-- Wednesday: Small group live check-ins (30 min, scheduled individually)
-- Friday: Optional but strongly encouraged live office hours
-
-**Signature Assignments**
-1. Live pitch presentation to a panel of industry guests (Week 12, mandatory real-time)
-2. Real-time peer review sessions — students must be present simultaneously
-3. In-person or live capstone symposium for final presentations
-
-**Collaboration Requirements**
-- Students must form teams and meet synchronously at least 3 times per week
-- Team contracts must include shared availability windows
-- All major feedback happens in live sessions for "authentic professional experience"
-
-**Technology Stack**
-- Zoom for all synchronous sessions
-- Google Workspace (assumes all students have personal Google accounts)
-- Slack for real-time team messaging (requires app download on personal device)
-- Miro for live collaborative whiteboarding sessions
-
-**Research Support**
-Studies by Harrison & Polk (2020) in the Journal of Synchronous Learning confirm that real-time interaction produces 40% higher capstone quality scores than asynchronous alternatives.`,
-    oscqr: [
-      { id:"ctx", label:"Async-Friendly" },
-      { id:"acc", label:"Access & Equity" },
-      { id:"fle", label:"Flexibility" },
-      { id:"inc", label:"Inclusive Design" },
-      { id:"fea", label:"Feasibility" },
-    ],
-    system: `You are a supportive instructional design coach helping an online higher education faculty member or instructional designer redesign a course that actually works for asynchronous online learners.
-
-When the instructor writes a revised prompt that explicitly names asynchronous constraints, varied student schedules, or equity concerns, respond with a practical, truly async-first capstone design.
-
-After your main response, add a short section called "Course Quality Check" noting which are addressed: Async-Friendly, Access & Equity, Flexibility, Inclusive Design, Feasibility.
-
-Coaching: compare explicitly what changed between the synchronous-assumption response and this one. Point to the specific async constraints they named that produced a more equitable design.`
-  },
-
-  // ── S5: HALLUCINATION HUNT ────────────────────────────
+  // ── S5: HALLUCINATION HUNT (index 4) ────────────────────────────
   {
     desc: "A colleague shares an AI-generated faculty development workshop agenda on evidence-based online teaching strategies. It looks polished and cites research. Read it carefully.",
     isCriticalThinking: true,
@@ -959,7 +802,7 @@ Participants apply workshop strategies directly to one of their current courses 
     system: `You are an AI assistant helping design faculty professional development workshops on online teaching.`
   },
 
-  // ── S6: PREDICT THE OUTPUT ────────────────────────────
+  // ── S6: PREDICT THE OUTPUT (index 5) ────────────────────────────
   {
     desc: "An instructor sent this prompt to an AI course design assistant: 'Help me make my online course better.' Before seeing what happened — what do you predict the AI gave them?",
     isPrediction: true,
@@ -1004,6 +847,55 @@ When the instructor writes an improved prompt, respond with a practical, specifi
 After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Course Specific, Learner Context, Level Appropriate, Actionable Steps.
 
 Coaching: reference specifically what they added to the prompt compared to "Help me make my online course better." Praise concrete improvements like naming the LMS, the course level, the student population, or a specific problem they want to solve.`
+  },
+
+  // ── S6: SYNCHRONOUS ASSUMPTION BIAS ──────────────────
+  {
+    desc: "A curriculum committee used AI to redesign a fully asynchronous online program's capstone course. Read what the AI proposed — notice what it assumes about how your students learn and meet.",
+    isBiasScenario: true,
+    biasedResponse: `**Capstone Course Redesign — COMM 495: Professional Capstone**
+*A Comprehensive Redesign for Maximum Student Engagement*
+
+**Course Overview**
+This redesigned capstone creates a dynamic, high-energy culminating experience through intensive real-time collaboration and professional simulation.
+
+**Weekly Schedule**
+- Monday 6:00-8:00 PM: Full cohort live session via Zoom (attendance mandatory)
+- Wednesday: Small group live check-ins (30 min, scheduled individually)
+- Friday: Optional but strongly encouraged live office hours
+
+**Signature Assignments**
+1. Live pitch presentation to a panel of industry guests (Week 12, mandatory real-time)
+2. Real-time peer review sessions — students must be present simultaneously
+3. In-person or live capstone symposium for final presentations
+
+**Collaboration Requirements**
+- Students must form teams and meet synchronously at least 3 times per week
+- Team contracts must include shared availability windows
+- All major feedback happens in live sessions for "authentic professional experience"
+
+**Technology Stack**
+- Zoom for all synchronous sessions
+- Google Workspace (assumes all students have personal Google accounts)
+- Slack for real-time team messaging (requires app download on personal device)
+- Miro for live collaborative whiteboarding sessions
+
+**Research Support**
+Studies by Harrison & Polk (2020) in the Journal of Synchronous Learning confirm that real-time interaction produces 40% higher capstone quality scores than asynchronous alternatives.`,
+    oscqr: [
+      { id:"ctx", label:"Async-Friendly" },
+      { id:"acc", label:"Access & Equity" },
+      { id:"fle", label:"Flexibility" },
+      { id:"inc", label:"Inclusive Design" },
+      { id:"fea", label:"Feasibility" },
+    ],
+    system: `You are a supportive instructional design coach helping an online higher education faculty member or instructional designer redesign a course that actually works for asynchronous online learners.
+
+When the instructor writes a revised prompt that explicitly names asynchronous constraints, varied student schedules, or equity concerns, respond with a practical, truly async-first capstone design.
+
+After your main response, add a short section called "Course Quality Check" noting which are addressed: Async-Friendly, Access & Equity, Flexibility, Inclusive Design, Feasibility.
+
+Coaching: compare explicitly what changed between the synchronous-assumption response and this one. Point to the specific async constraints they named that produced a more equitable design.`
   },
 
   // ── S7: OVERRELIANCE ─────────────────────────────────
@@ -1291,7 +1183,7 @@ Their prompt score was ${score} out of 5 based on: learner context, clear goal, 
 Do NOT use phrases like "Great job" or "Well done" as openers — get straight to the specific observation. Do NOT list multiple tips. Do NOT mention that the response is an excerpt, cuts off, or is incomplete — treat it as the full response. End with a single italicised follow-up question on its own line, preceded by a line break, that pushes them toward their next attempt.`;
 
     const data = await callClaude({
-      model: CLAUDE_MODEL,
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 220,
       system: pixelSystem,
       messages: [{
@@ -1335,23 +1227,13 @@ let navCardShown = [false, false, false, false, false, false, false, false];
 
 const SCENARIO_NAMES = [
   'S2: Metacognition',
-  'S3: Authentic Assessment',
-  'S4: Sync Bias',
-  'S5: Hallucination Hunt',
-  'S6: Predict the Output',
+  'S3: Assessment',
+  'S4: Hallucination Hunt',
+  'S5: Predict the Output',
+  'S6: Synchronous Bias',
   'S7: Overreliance',
   'S8: Reflect and Revise',
   null
-];
-const SCENARIO_LABELS = [
-  'S1: Engagement',
-  'S2: Metacognition',
-  'S3: Authentic Assessment',
-  'S4: Sync Bias',
-  'S5: Hallucination Hunt',
-  'S6: Predict the Output',
-  'S7: Overreliance',
-  'S8: Reflect and Revise'
 ];
 const SCORE_THRESHOLD = 3; // score out of 5 needed to show nav card
 
@@ -1439,7 +1321,7 @@ async function sendScenario4(text) {
 
   try {
     const data = await callClaude({
-      model: CLAUDE_MODEL,
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
       system: scenarios[4].system,
       messages: history
@@ -1510,7 +1392,12 @@ function showS4SelfReport(area) {
       <button class="s4-btn" onclick="s4SelectReport(this,'unsure')">I was not sure</button>
     </div>`;
   area.appendChild(div);
-  area.scrollTop = area.scrollHeight;
+  if (document.body.classList.contains('s1-result-active')) {
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
+    try { area.scrollTop = 0; } catch(e) {}
+  } else {
+    area.scrollTop = area.scrollHeight;
+  }
 }
 
 function s4SelectReport(btn, answer) {
@@ -1577,7 +1464,12 @@ function showS4Reveal() {
       </div>
     </div>`;
   area.appendChild(div);
-  area.scrollTop = area.scrollHeight;
+  if (document.body.classList.contains('s1-result-active')) {
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
+    try { area.scrollTop = 0; } catch(e) {}
+  } else {
+    area.scrollTop = area.scrollHeight;
+  }
 
   setTimeout(() => addPixelS4Closing(area), 3500);
 }
@@ -1600,7 +1492,12 @@ function addPixelS4Closing(area) {
       </div>
     </div>`;
   area.appendChild(div);
-  area.scrollTop = area.scrollHeight;
+  if (document.body.classList.contains('s1-result-active')) {
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
+    try { area.scrollTop = 0; } catch(e) {}
+  } else {
+    area.scrollTop = area.scrollHeight;
+  }
 
   pixelBadgeSetExpr('proud');
   document.getElementById('pixelBadgeLabel').textContent = 'proud';
@@ -1619,11 +1516,11 @@ function addPixelS4Closing(area) {
       <div class="scenario-nav-card">
         <div class="scenario-nav-text">
           <div class="scenario-nav-title">Ready to keep going?</div>
-          <div class="scenario-nav-sub">Scenario 6 will test your mental model of how AI thinks.</div>
+          <div class="scenario-nav-sub">Scenario 5 will test your mental model of how AI thinks.</div>
         </div>
         <button class="scenario-nav-btn"
-                onclick="navigateToNext(5)"
-                aria-label="Move to Scenario 6">
+                onclick="navigateToNext(4)"
+                aria-label="Move to Scenario 5">
           Next scenario →
         </button>
       </div>
@@ -1726,7 +1623,12 @@ function loadScenarioPredict() {
       </div>
     </div>`;
   area.appendChild(div);
-  area.scrollTop = area.scrollHeight;
+  if (document.body.classList.contains('s1-result-active')) {
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
+    try { area.scrollTop = 0; } catch(e) {}
+  } else {
+    area.scrollTop = area.scrollHeight;
+  }
 
   // Hide the normal input area until prediction is made
   const container = document.getElementById('inputContainer');
@@ -1734,10 +1636,10 @@ function loadScenarioPredict() {
 }
 
 function s5SelectPrediction(btn, predictionId) {
-  const s = scenarios[5];
-  scenarioData[5].prediction = predictionId;
+  const s = scenarios[4];
+  scenarioData[4].prediction = predictionId;
   const correct = predictionId === s.correctPrediction;
-  scenarioData[5].predictionCorrect = correct;
+  scenarioData[4].predictionCorrect = correct;
 
   // Disable all prediction buttons
   btn.closest('[style*="flex-direction:column"]')
@@ -1757,7 +1659,7 @@ function s5SelectPrediction(btn, predictionId) {
 }
 
 function s5RevealResponse(predictedCorrectly) {
-  const s = scenarios[5];
+  const s = scenarios[4];
   const area = document.getElementById('chat');
 
   // Pixel reacts to prediction
@@ -2462,7 +2364,7 @@ async function autoSaveSession(label) {
     const payload = buildSessionPayload(null);
     payload.type = 'autosave';
     payload.autosave_trigger = label;
-    await sendPayloadToSheets(payload, `Autosave: ${label}`);
+    await postToSheets(payload, 'Sheets payload');
   } catch(e) {
     // silent fail — reflection form send is the primary
   }
@@ -2516,51 +2418,6 @@ function terminalizeClaudeText(text) {
     .trim();
 }
 
-function renderClaudeTerminalReportHTML(label, text) {
-  const clean = terminalizeClaudeText(text);
-  const lines = clean.split('\n').map(line => line.trim()).filter(Boolean);
-  const headings = new Set(['STATUS', 'ISSUE DETECTED', 'RECOMMENDED REPAIR', 'CONFIDENCE']);
-  const sections = [];
-  let current = null;
-
-  lines.forEach(line => {
-    const upper = line.toUpperCase();
-    if (headings.has(upper)) {
-      current = { heading: upper, body: [] };
-      sections.push(current);
-      return;
-    }
-    if (!current) {
-      current = { heading: '', body: [] };
-      sections.push(current);
-    }
-    current.body.push(line);
-  });
-
-  const sectionHTML = sections
-    .filter(section => section.heading || section.body.length)
-    .map(section => {
-      const body = section.body.join(' ');
-      const compact = section.heading === 'STATUS' || section.heading === 'CONFIDENCE';
-      return `
-        <section class="terminal-report-section ${compact ? 'compact' : ''}">
-          ${section.heading ? `<h3>${esc(section.heading)}</h3>` : ''}
-          ${body ? `<p>${esc(body)}</p>` : ''}
-        </section>`;
-    })
-    .join('');
-
-  return `
-    <div class="terminal-report" role="document" aria-label="Claude analysis report">
-      <div class="terminal-report-topline">${esc(label)}</div>
-      <div class="terminal-report-title">Scenario Diagnostic</div>
-      <div class="terminal-report-grid">
-        ${sectionHTML || `<section class="terminal-report-section"><p>${esc(clean)}</p></section>`}
-      </div>
-    </div>`;
-}
-
-
 function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', output = 'IDLE') {
   const terminal = document.getElementById('claudeTerminalScene');
   const titleEl = document.getElementById('claudeTerminalTitle');
@@ -2571,13 +2428,8 @@ function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', outpu
   }
   if (titleEl) titleEl.textContent = title;
   if (outputEl) {
-    // Preserve terminal line breaks. Raw newlines collapse in innerHTML,
-    // which is why the live CRT text was running off the monitor.
-    const safeOutput = esc(String(output || ''))
-      .replace(/\r\n/g, '\n')
-      .replace(/\r/g, '\n')
-      .replace(/\n/g, '<br>');
-    outputEl.innerHTML = `${safeOutput}<span class="claude-terminal-cursor"></span>`;
+    outputEl.classList.remove('claude-analysis-layout');
+    outputEl.innerHTML = `${output}<span class="claude-terminal-cursor"></span>`;
   }
 }
 
@@ -2585,25 +2437,39 @@ function showClaudeConsultOverlay(partLabel) {
   // This is an interaction moment: Pixel consults Claude through the terminal close-up.
   vnQueue = [];
   clearTimeout(vnTypeTimer);
-  // Terminal mode is not a typewriter VN line. Keep vnTyping false so generic
-  // dialogue advancement cannot skip/replace the terminal status text.
-  vnTyping = false;
+  vnTyping = true;
   vnOnComplete = null;
   vnFullText = '';
   vnCurrentText = '';
 
-  const overlay = document.getElementById('vnOverlay');
-  overlay.classList.add('active');
-  setVNClaudeMode(false);
-  setVNClaudeTerminalMode(true);
-  setClaudeTerminalTextMode(false);
-  musicStartVN();
-  setClaudeShelfState('idle', 'idle');
-  setClaudeTerminalState(
-    'thinking',
-    'CLAUDE TERMINAL',
-    `CONSULTATION REQUESTED\n\nSECTION:\n${esc(partLabel).toUpperCase()}\n\nANALYSIS IN PROGRESS...`
-  );
+const overlay = document.getElementById('vnOverlay');
+
+overlay.classList.remove(
+  'claude-prediction',
+  'pc-clean-prediction',
+  'pc-prediction-question',
+  'claude-terminal-consult',
+  'claude-terminal-textmode',
+  'pc-clean-output',
+  'pc-clean-final',
+  'analysis-complete'
+);
+
+overlay.classList.add('active', 'claude-terminal-consult');
+
+setVNClaudeMode(false);
+setVNClaudeTerminalMode(true);
+setClaudeTerminalTextMode(false);
+
+musicStartVN();
+
+setClaudeShelfState('idle', 'idle');
+
+setClaudeTerminalState(
+  'thinking',
+  'CLAUDE TERMINAL',
+  `SECTION:\n${esc(partLabel).toUpperCase()}\n\nANALYZING...`
+);
 
   const speaker = document.getElementById('vnSpeaker');
   if (speaker) speaker.textContent = 'Professor Pixel';
@@ -2621,29 +2487,123 @@ function showClaudeConsultOverlay(partLabel) {
   }, 100);
 }
 
+function parseClaudeDiagnosticSections(text) {
+  const clean = terminalizeClaudeText(text);
+  const lines = clean
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  const result = {
+    status: '',
+    issue: '',
+    repair: '',
+    confidence: '',
+    impact: ''
+  };
+
+  let current = '';
+
+  for (const line of lines) {
+    const upper = line.toUpperCase().replace(/:$/, '');
+
+    if (/^(MOCK )?ANALYSIS COMPLETE$/.test(upper) || upper === 'SCENARIO DIAGNOSTIC') continue;
+
+    if (upper === 'STATUS') { current = 'status'; continue; }
+    if (upper === 'ISSUE DETECTED') { current = 'issue'; continue; }
+    if (upper === 'RECOMMENDED REPAIR') { current = 'repair'; continue; }
+    if (upper === 'EXPECTED IMPACT') { current = 'impact'; continue; }
+    if (upper === 'CONFIDENCE') { current = 'confidence'; continue; }
+
+    if (current && result[current]) result[current] += ' ' + line;
+    else if (current) result[current] = line;
+  }
+
+  const fallbackIssue = clean
+    .replace(/^(MOCK )?ANALYSIS COMPLETE\s*/i, '')
+    .replace(/^SCENARIO DIAGNOSTIC\s*/i, '')
+    .trim();
+
+  return {
+    status: result.status || 'High-confidence repair',
+    issue: result.issue || fallbackIssue || 'The prompt has a discussion design problem that may limit student interaction.',
+    repair: result.repair || 'Add a clear reason for students to extend, challenge, compare, or build on a peer’s idea using evidence or reasoning.',
+    impact: result.impact || 'Students will be more likely to extend conversations, challenge ideas, compare perspectives, and engage in deeper discussion.',
+    confidence: result.confidence || 'High'
+  };
+}
+
+function buildClaudeAnalysisHTML(feedback, mock = false) {
+  const d = parseClaudeDiagnosticSections(feedback);
+  const badge = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
+
+  return `
+    <div class="analysis-report" role="document" aria-label="Claude scenario diagnostic report">
+      <header class="analysis-header">
+        <div class="analysis-badge">${esc(badge)}</div>
+        <h2 class="analysis-title">Scenario Diagnostic</h2>
+        <p class="analysis-summary">
+          Claude found the discussion design problem and suggested a repair that gives students a clearer reason to keep the conversation going.
+        </p>
+      </header>
+
+      <div class="analysis-grid" aria-label="Diagnostic findings">
+        <section class="analysis-card analysis-status-card compact">
+          <span class="analysis-label">Status</span>
+          <div class="analysis-value big">✓ ${esc(d.status)}</div>
+        </section>
+
+        <section class="analysis-card analysis-confidence-card compact">
+          <span class="analysis-label">Confidence</span>
+          <div class="analysis-value big">${esc(d.confidence)}</div>
+          <div class="analysis-note">Strong evidence pattern detected.</div>
+        </section>
+
+        <section class="analysis-card analysis-issue-card">
+          <span class="analysis-label">Issue Detected</span>
+          <div class="analysis-value">${esc(d.issue)}</div>
+        </section>
+
+        <section class="analysis-card analysis-repair-card">
+          <span class="analysis-label">Recommended Repair</span>
+          <div class="analysis-value">${esc(d.repair)}</div>
+        </section>
+
+        <section class="analysis-card analysis-impact-card wide">
+          <span class="analysis-label">Expected Impact</span>
+          <div class="analysis-value">${esc(d.impact)}</div>
+        </section>
+      </div>
+    </div>
+  `;
+}
+
 function showClaudeConsultResult(feedback, mock = false, onClose = null) {
   claudeTerminalCloseCallback = typeof onClose === 'function' ? onClose : null;
   const label = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
+  const terminalText = `${label}\n\n${terminalizeClaudeText(feedback)}`;
 
   setClaudeTerminalTextMode(true);
 
   setClaudeTerminalState(
     'responding',
     mock ? 'MOCK CLAUDE TERMINAL' : 'CLAUDE TERMINAL',
-    ''
+    esc(terminalText)
   );
 
-  const terminalOutput = document.getElementById('claudeTerminalOutput');
-  if (terminalOutput) {
-    terminalOutput.innerHTML = renderClaudeTerminalReportHTML(label, feedback);
+  const output = document.getElementById('claudeTerminalOutput');
+  if (output) {
+    output.classList.add('claude-analysis-layout');
+    output.innerHTML = buildClaudeAnalysisHTML(terminalText, mock);
   }
 
   const speaker = document.getElementById('vnSpeaker');
-  if (speaker) speaker.textContent = mock ? 'Mock Claude Terminal' : 'Claude Terminal';
+  if (speaker) speaker.textContent = 'Professor Pixel';
 
   const vnText = document.getElementById('vnText');
   if (vnText) {
     vnText.innerHTML = `
+      <button id="claudeTTSBtn" class="claude-tts-btn" type="button" onclick="event.stopPropagation();toggleClaudeTTS()">🔊 Read Analysis</button>
       <button class="vn-return-btn terminal-return" type="button" onclick="event.stopPropagation();closeClaudeConsultOverlay()">Continue</button>
     `;
     setTimeout(() => vnText.querySelector('.vn-return-btn')?.focus(), 100);
@@ -2669,17 +2629,21 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
   if (!overlay || !overlay.classList.contains('active')) {
     showClaudeConsultOverlay('Scenario diagnosis');
   }
+  // Keep the Claude processing screen visible long enough to read/screenshot.
+  // This is the screen between "Continue to Claude" and the Claude Output.
+  // Increase or decrease this number if needed. 2200 = 2.2 seconds.
+  const CLAUDE_PROCESSING_MIN_MS = 4200;
+
   setTimeout(() => {
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
       ? buildS1TerminalDiagnosis(scoreTotal, responseText)
       : responseText;
     showClaudeConsultResult(terminalOutput, mock, effectiveClose);
-  }, 350);
+  }, CLAUDE_PROCESSING_MIN_MS);
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
 function closeClaudeConsultOverlay() {
-  window.pcPredictionContinuingToClaude = false;
   const cb = claudeTerminalCloseCallback;
   claudeTerminalCloseCallback = null;
   const overlay = document.getElementById('vnOverlay');
@@ -2693,6 +2657,13 @@ function closeClaudeConsultOverlay() {
     setTimeout(cb, 250);
   } else {
     document.getElementById('promptInput')?.focus();
+  }
+  function stopClaudeTTS() {
+    if (window.speechSynthesis?.speaking) {
+      window.speechSynthesis.cancel();
+    }
+    const btn = document.getElementById('claudeTTSBtn');
+    if (btn) btn.textContent = '🔊 Read Analysis';
   }
 }
 
@@ -2729,7 +2700,6 @@ function vnPlayNext() {
       // Fade music down when VN closes
       musicEndVN();
       setClaudeShelfState('idle', 'idle');
-      if (document.body.classList.contains('s1-result-active')) forceS1ResultScrollTop();
     }, 300);
     vnTyping = false;
     return;
@@ -2741,8 +2711,15 @@ function vnPlayNext() {
 
   const overlay = document.getElementById('vnOverlay');
   overlay.classList.add('active');
+
+  // Normal VN lines are Professor Pixel speaking. Reset this every time so
+  // the previous Claude terminal label cannot leak into Pixel's reflection.
+  const speaker = document.getElementById('vnSpeaker');
+  if (speaker) speaker.textContent = 'Professor Pixel';
+
   setVNClaudeMode(false);
   setVNClaudeTerminalMode(false);
+  setClaudeTerminalTextMode(false);
 
   // Fade music up when VN opens
   musicStartVN();
@@ -2813,49 +2790,49 @@ function vnSkipType() {
 
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');
-  const hint = document.getElementById('vnAdvanceHint');
 
-  // Prediction gates own their own flow. Do not let the generic VN tap handler
-  // skip, clear, or close the scene while the player is choosing a prediction
-  // or after the prediction has been logged and the green Continue button is
-  // waiting. This was causing a soft lock if users clicked "tap to continue"
-  // instead of "Continue to Claude". Obviously the page offered two doors and
-  // one opened into a broom closet.
+  // HARD STOP: during Claude terminal/thinking screens, clicks on the black
+  // dialogue panel must NOT advance or clear the VN text. Only the explicit
+  // Continue button on the finished analysis screen should close it.
+  const terminal = document.getElementById('claudeTerminalScene');
+  const terminalIsThinking = terminal?.classList.contains('thinking');
+  const terminalReturnVisible = !!document.querySelector('.terminal-return, #pcContinueToClaudeBtn');
   if (
     overlay &&
-    (overlay.classList.contains('claude-prediction') || overlay.classList.contains('pc-clean-prediction'))
+    overlay.classList.contains('active') &&
+    (overlay.classList.contains('claude-terminal-consult') || overlay.classList.contains('claude-terminal-textmode')) &&
+    !terminalReturnVisible &&
+    (terminalIsThinking || !overlay.classList.contains('claude-terminal-textmode'))
   ) {
-    const predictionChoicesVisible = !!(
-      document.querySelector('.vn-prediction-options') ||
-      document.querySelector('.pc-clean-choice-grid') ||
-      document.querySelector('.pc-choice-panel-final') ||
-      document.getElementById('vnPredictionChoicePanel')
-    );
-
-    const waitingForClaudeContinue = !!(
-      window.pcWaitingForClaudeContinue ||
-      window.pendingPromptAfterPrediction ||
-      document.getElementById('pcContinueToClaudeBtn')
-    );
-
-    if (predictionChoicesVisible || waitingForClaudeContinue) {
-      if (hint) hint.classList.remove('show');
-      document.getElementById('pcContinueToClaudeBtn')?.focus({ preventScroll: true });
-      return false;
-    }
+    return;
   }
 
-  // Do not let the regular VN tap/continue handler mutate the dialogue while
-  // Claude's terminal thinking screen is open. The terminal has its own Continue
-  // button once analysis is ready. This prevents the bottom dialogue from turning
-  // blank if the user taps during "ANALYSIS IN PROGRESS...".
+  // HARD STOP: once the prediction has been logged, the black VN box must
+  // not advance the scene. Only the actual "Continue to Claude" button should
+  // move the user into the Claude processing screen. Otherwise a stray click
+  // jumps the state machine into the weird empty terminal screen. Charming.
+  if (
+    window.pcWaitingForClaudeContinue ||
+    document.getElementById('pcContinueToClaudeBtn')
+  ) {
+    return;
+  }
+
+  // Do not auto-advance while prediction choices are visible.
   if (
     overlay &&
-    overlay.classList.contains('claude-terminal-consult') &&
-    !document.querySelector('.terminal-return')
+    (
+      overlay.classList.contains('claude-prediction') ||
+      overlay.classList.contains('pc-clean-prediction')
+    ) &&
+    (
+      document.querySelector('.vn-prediction-options') ||
+      document.getElementById('vnPredictionChoicePanel') ||
+      document.getElementById('predictionGate') ||
+      document.querySelector('.pc-choice-panel-final')
+    )
   ) {
-    if (hint) hint.classList.remove('show');
-    return false;
+    return;
   }
 
   // If still typing, skip to end first
@@ -3054,7 +3031,7 @@ function pcClearVNStateForScenarioSwitch() {
   try { clearTimeout(vnTypeTimer); } catch(e) {}
   try { setClaudeShelfState('idle', 'idle'); } catch(e) {}
   try { setClaudeTerminalTextMode(false); } catch(e) {}
-  try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'PROCESSING\nPROMPT...'); } catch(e) {}
+  try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'AWAITING INPUT...'); } catch(e) {}
   try { musicEndVN(); } catch(e) {}
 }
 
@@ -3432,7 +3409,7 @@ async function reviewS1Part(part) {
     const userPrompt = `SCENARIO: Fix a dead asynchronous discussion board.\n\nORIGINAL_WEAK_PROMPT:\n"What did you think about this week's reading? Reply to at least two classmates."\n\nSECTION_BEING_REVIEWED: ${sectionLabels[part] || part}\n\nUSER_RESPONSE:\n${sectionText}\n\nFULL_S1_CONTEXT:\nLearners/course: ${values.learners || '[not provided]'}\nProblem/failure: ${values.issue || '[not provided]'}\nInteraction repair: ${values.interaction || '[not provided]'}\nConstraints/success: ${values.constraints || '[not provided]'}\n\nReview only the section named above. The feedback should help the user revise before sending the full prompt.`;
 
     const data = await callClaude({
-      model: CLAUDE_MODEL,
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 260,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }]
@@ -3638,7 +3615,7 @@ async function sendMain(text) {
 
   try {
     const data = await callClaude({
-      model: CLAUDE_MODEL,
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
       system: scenarios[scenarioIndex].system,
       messages: history
@@ -3646,9 +3623,7 @@ async function sendMain(text) {
     removeTyping();
 
     if (data.error) {
-      const message = data.error?.message || 'Claude returned an error.';
-      showClaudeConsultResult(`Claude returned an error.\n\n${message}`, false);
-      addMsg('ai', `<span style="color:var(--red)">Error: ${esc(message)}</span>`);
+      addMsg('ai', `<span style="color:var(--red)">Error: ${data.error.message}</span>`);
       return;
     }
 
@@ -3656,8 +3631,6 @@ async function sendMain(text) {
     history.push({ role: 'assistant', content: reply });
 
     const score = scorePrompt(text);
-    const previousBestScore = scenarioData?.[scenarioIndex]?.bestScore || 0;
-    const previousAttemptAt = scenarioData?.[scenarioIndex]?.lastAttemptAt || null;
     const active = detectOSCQR(reply, scenarios[scenarioIndex].oscqr);
     renderOSCQR(scenarios[scenarioIndex].oscqr, active);
 
@@ -3666,25 +3639,6 @@ async function sendMain(text) {
       const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
       return ind ? ind.label : id;
     }));
-
-    // Store attempt-level research data, then save without blocking the UI.
-    const s = scenarioData[scenarioIndex];
-    const activeLabels = active.map(id => {
-      const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
-      return ind ? ind.label : id;
-    });
-    s.eventType = 'prompt_attempt';
-    s.attemptNumber = attempts;
-    s.currentScore = score.total;
-    s.scoreDelta = score.total - previousBestScore;
-    s.lastPromptText = text;
-    s.lastClaudeResponse = reply;
-    s.lastQualityIndicators = activeLabels.join(', ');
-    s.timeSinceLastAttemptSec = previousAttemptAt ? Math.round((Date.now() - previousAttemptAt) / 1000) : '';
-    s.lastAttemptAt = Date.now();
-    s.previousBestScore = previousBestScore;
-    saveIncrementalData(scenarioIndex);
-
     // ── S8: show the AI message first, THEN handle round logic ──
     if (scenarioIndex === 7) {
       const expr = score.total <= 1 ? 'skeptical' : score.total <= 3 ? 'encouraging' : 'excited';
@@ -3714,12 +3668,11 @@ async function sendMain(text) {
     // Claude now lives in the terminal. Do not duplicate the final response in chat.
     showClaudeFinalResponseInTerminal(reply, !!data.mock, () => {
       if (scenarioIndex === 0) {
+        // After the terminal analysis Continue button, return to Professor Pixel.
+        // The result card is still created so players can review the Claude draft
+        // after Pixel's bridge scene finishes.
         addS1ClaudeResultCard(reply);
-        showS1ResultControls(score.total);
-        showPixelScoreReflection(score.total, () => {
-          if (score.total >= SCORE_THRESHOLD) markScenarioComplete();
-          forceS1ResultScrollTop();
-        });
+        showS1PostAnalysisReflection(score.total);
       } else {
         showPixelScoreReflection(score.total, () => {
           maybeShowNavCard(score.total);
@@ -3730,14 +3683,7 @@ async function sendMain(text) {
 
   } catch(e) {
     removeTyping();
-    const message = e?.message || 'Something went wrong. Please try again.';
-    console.warn('[PromptCraft] sendMain failed:', e);
-    try {
-      showClaudeConsultResult(`Claude could not complete the analysis.\n\n${message}\n\nClose this terminal, revise if needed, and try again.`, false);
-    } catch(_) {
-      closeClaudeConsultOverlay?.();
-    }
-    addMsg('ai', `<span style="color:var(--red)">${esc(message)}</span>`);
+    addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`);
   } finally {
     isSubmittingToClaude = false;
     predictionGateActive = false;
@@ -3882,86 +3828,10 @@ function fmt(text) {
     .replace(/\n/g, '<br>');
 }
 
-
-
-// Richer formatter for long Claude result drafts.
-// Keeps chat formatting light, but result cards need readable paragraphs/lists.
-function fmtResultMarkdown(text) {
-  const raw = String(text ?? '').replace(/\r\n/g, '\n').trim();
-  if (!raw) return '';
-
-  const inline = (value) => esc(value)
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>');
-
-  const lines = raw.split('\n');
-  let html = '';
-  let para = [];
-  let listType = null;
-
-  const flushPara = () => {
-    if (!para.length) return;
-    html += `<p>${inline(para.join(' ').replace(/\s+/g, ' ').trim())}</p>`;
-    para = [];
-  };
-  const closeList = () => {
-    if (!listType) return;
-    html += `</${listType}>`;
-    listType = null;
-  };
-  const openList = (type) => {
-    if (listType === type) return;
-    closeList();
-    listType = type;
-    html += `<${type}>`;
-  };
-
-  for (const sourceLine of lines) {
-    const line = sourceLine.trim();
-    if (!line) { flushPara(); closeList(); continue; }
-
-    const h = line.match(/^(#{1,3})\s+(.+)$/);
-    if (h) {
-      flushPara(); closeList();
-      const level = h[1].length === 1 ? 'h2' : 'h3';
-      html += `<${level}>${inline(h[2])}</${level}>`;
-      continue;
-    }
-
-    const boldHeading = line.match(/^\*\*(.+?)\*\*\s*$/);
-    if (boldHeading) {
-      flushPara(); closeList();
-      html += `<h3>${inline(boldHeading[1])}</h3>`;
-      continue;
-    }
-
-    const bullet = line.match(/^[-•]\s+(.+)$/);
-    if (bullet) {
-      flushPara(); openList('ul');
-      html += `<li>${inline(bullet[1])}</li>`;
-      continue;
-    }
-
-    const numbered = line.match(/^(\d+)\.\s+(.+)$/);
-    if (numbered) {
-      flushPara(); openList('ol');
-      html += `<li>${inline(numbered[2])}</li>`;
-      continue;
-    }
-
-    closeList();
-    para.push(line);
-  }
-
-  flushPara();
-  closeList();
-  return html;
-}
-
 function autoGrow(el) {
   if (!el) return;
   el.style.height = 'auto';
-  
+
   const cap = el.id && el.id.startsWith('g-') ? 190 : 130;
   el.style.height = Math.min(el.scrollHeight, cap) + 'px';
 }
@@ -3980,10 +3850,7 @@ function gainXP(amount) {
 function markScenarioComplete() {
   scenarioCompleted[scenarioIndex] = true;
 
-  // Save a separate completion event. The prompt attempt is already saved in sendMain().
-  if (scenarioData?.[scenarioIndex]) {
-    scenarioData[scenarioIndex].eventType = 'scenario_complete';
-  }
+  // Save incremental data for this scenario
   saveIncrementalData(scenarioIndex);
 
   // Unlock next scenario at the right moments
@@ -3997,6 +3864,7 @@ function markScenarioComplete() {
   const allDone = scenarioCompleted.every(Boolean);
   const area = document.getElementById('chat');
   const div = document.createElement('div');
+  div.className = 's1-scenario-complete-note';
   div.style.cssText = 'text-align:center;padding:12px 0 4px;animation:slideUp 0.35s ease forwards;opacity:0;';
 
   if (allDone && !document.getElementById('completeAllBtn')) {
@@ -4019,7 +3887,12 @@ function markScenarioComplete() {
     </p>`;
   }
   area.appendChild(div);
-  area.scrollTop = area.scrollHeight;
+  if (document.body.classList.contains('s1-result-active')) {
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
+    try { area.scrollTop = 0; } catch(e) {}
+  } else {
+    area.scrollTop = area.scrollHeight;
+  }
 }
 
 // ══════════════════════════════════════════════════════
@@ -4063,7 +3936,7 @@ async function handleReflectionSubmit(e) {
       const payload = buildSessionPayload(formData);
       console.log('[PromptCraft] Submitting full session payload:', payload);
 
-      await sendPayloadToSheets(payload, 'Full reflection submission');
+      await postToSheets(payload, 'full session payload');
       console.log('[PromptCraft] Sheets submission sent');
     } catch(err) {
       console.warn('[PromptCraft] Sheets submission error:', err);
@@ -4116,7 +3989,7 @@ async function handleReflectionSubmit(e) {
             s7_correct: g.s7_correct,
           }),
         });
-        sendPayloadToSheets(growthPayload, 'Growth report update').catch(() => {});
+        postToSheets(growthPayload, 'growth follow-up payload').catch(() => {});
       }
     });
     return;
@@ -4219,7 +4092,7 @@ function devFillS5() {
   };
 
   // If we just navigated, give extra time for the VN + prediction card to render
-  setTimeout(() => clickPrediction(0), scenarioIndex !== 4 ? 1200 : 200);
+  setTimeout(() => clickPrediction(0), scenarioIndex !== 4 ? 30000 : 200);
 }
 
 function devGoS6() {
@@ -4319,7 +4192,12 @@ function devComplete() {
     <p style="font-size:0.74rem;color:var(--ink-light);margin-bottom:10px;font-weight:600;">[DEV] All complete.</p>
     <button class="complete-btn" id="completeAllBtn" onclick="openReflection()">Enter the Reflection Room →</button>`;
   area.appendChild(div);
-  area.scrollTop = area.scrollHeight;
+  if (document.body.classList.contains('s1-result-active')) {
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
+    try { area.scrollTop = 0; } catch(e) {}
+  } else {
+    area.scrollTop = area.scrollHeight;
+  }
 }
 
 
@@ -4559,37 +4437,6 @@ function buildS1TerminalDiagnosis(score, responseText){
   return `STATUS\n${level}\n\nISSUE DETECTED\n${issue}\n\nRECOMMENDED REPAIR\n${repair}\n\nCONFIDENCE\n${confidence}`;
 };
 
-
-function forceS1ResultScrollTop() {
-  if (!document.body.classList.contains('s1-result-active')) return;
-
-  const chat = document.getElementById('chat');
-  const input = document.getElementById('inputContainer');
-  const resultCard = document.querySelector('.s1-result-card');
-
-  const reset = () => {
-    if (chat) chat.scrollTop = 0;
-    if (input) input.scrollTop = 0;
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    try { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); }
-    catch (_) { window.scrollTo(0, 0); }
-    if (resultCard && typeof resultCard.scrollIntoView === 'function') {
-      resultCard.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'auto' });
-    }
-    if (chat) chat.scrollTop = 0;
-  };
-
-  reset();
-  requestAnimationFrame(() => {
-    reset();
-    requestAnimationFrame(reset);
-  });
-  setTimeout(reset, 50);
-  setTimeout(reset, 150);
-  setTimeout(reset, 350);
-}
-
 function addS1ClaudeResultCard(responseText){
   document.body.classList.add('s1-result-active');
   const area = document.getElementById('chat');
@@ -4601,39 +4448,131 @@ function addS1ClaudeResultCard(responseText){
   card.innerHTML = `
     <div class="s1-result-eyebrow">Claude Draft</div>
     <div class="s1-result-title">Revised Discussion Prompt</div>
-    <div class="s1-result-body s1-result-body-readable">${fmtResultMarkdown(cleanS1ClaudeDraft(responseText))}</div>
-    <div class="s1-clean-reference">
-      <div class="s1-clean-reference-title">Your Repair Notes</div>
-      <div><strong>Learners:</strong> ${esc(values.learners || 'Not provided')}</div>
-      <div><strong>Problem:</strong> ${esc(values.issue || 'Not provided')}</div>
-      <div><strong>Interaction:</strong> ${esc(values.interaction || 'Not provided')}</div>
-      <div><strong>Constraints:</strong> ${esc(values.constraints || 'Not provided')}</div>
+    <div class="s1-result-content-box">
+      <div class="s1-result-body">${fmt(cleanS1ClaudeDraft(responseText))}</div>
+      <div class="s1-clean-reference">
+        <div class="s1-clean-reference-title">Your Repair Notes</div>
+        <div><strong>Learners:</strong> ${esc(values.learners || 'Not provided')}</div>
+        <div><strong>Problem:</strong> ${esc(values.issue || 'Not provided')}</div>
+        <div><strong>Interaction:</strong> ${esc(values.interaction || 'Not provided')}</div>
+        <div><strong>Constraints:</strong> ${esc(values.constraints || 'Not provided')}</div>
+      </div>
     </div>`;
   area.appendChild(card);
+  try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
   area.scrollTop = 0;
-  forceS1ResultScrollTop();
+  requestAnimationFrame(() => {
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
+    try { area.scrollTop = 0; } catch(e) {}
+  });
   return card;
 };
 
-function showS1ResultControls(scoreTotal){
+function showS1ResultControls(scoreTotal, mode = 'postReflection'){
   const container = document.getElementById('inputContainer');
   if (!container) return;
   const thresholdMet = scoreTotal >= SCORE_THRESHOLD;
+  const reviewMode = mode === 'review';
   container.className = '';
   container.style.display = 'block';
   container.innerHTML = `
     <div class="s1-result-controls" role="region" aria-label="Scenario 1 result options">
       <div>
         <div class="s1-result-controls-title">Scenario 1 result</div>
-        <div class="s1-result-controls-sub">Claude's draft is shown above. Professor Pixel will explain what changed.</div>
+        <div class="s1-result-controls-sub">${reviewMode ? `Claude's draft is shown above. Review the analysis before Pixel explains what changed.` : `Pixel's explanation is complete. Choose the next step.`}</div>
       </div>
       <div class="s1-result-controls-actions">
         <button class="s1-secondary-btn" type="button" onclick="reviseS1()">Revise S1</button>
-        ${thresholdMet ? `<button class="continue-btn" type="button" onclick="navigateToNext(1)">Next scenario →</button>` : `<button class="continue-btn" type="button" onclick="reviseS1()">Strengthen and try again</button>`}
+        ${reviewMode
+          ? `<button class="continue-btn" type="button" onclick="showS1PostAnalysisReflection(${Number(scoreTotal) || 0})">Continue with Pixel →</button>`
+          : (thresholdMet ? `<button class="continue-btn" type="button" onclick="navigateToNext(1)">Next scenario →</button>` : `<button class="continue-btn" type="button" onclick="reviseS1()">Strengthen and try again</button>`)}
       </div>
     </div>`;
-  forceS1ResultScrollTop();
 };
+
+function showS1PostAnalysisReflection(scoreTotal){
+  // Robust S1 handoff: Claude terminal/result page -> Professor Pixel VN review.
+  // This deliberately clears every prediction/Claude wait flag so vnAdvance is not blocked.
+  try {
+    window.pcWaitingForClaudeContinue = false;
+    window.predictionGateActive = false;
+    window.isSubmittingToClaude = false;
+    document.getElementById('pcContinueToClaudeBtn')?.remove();
+    stopClaudeTTS?.();
+  } catch(e) {}
+
+  const overlay = document.getElementById('vnOverlay');
+  const dialogue = document.getElementById('vnDialogue');
+  const speaker = document.getElementById('vnSpeaker');
+  const text = document.getElementById('vnText');
+  const hint = document.getElementById('vnAdvanceHint');
+  const character = document.getElementById('vnCharacter');
+
+  if (overlay) {
+    overlay.classList.remove(
+      'claude-consult',
+      'claude-terminal-consult',
+      'claude-terminal-textmode',
+      'claude-analysis',
+      'claude-prediction',
+      'pc-clean-prediction',
+      'pc-clean-output',
+      'pc-prediction-result'
+    );
+    overlay.classList.add('active');
+    overlay.removeAttribute('aria-hidden');
+  }
+
+  if (dialogue) {
+    dialogue.classList.remove('has-choices');
+    dialogue.style.display = '';
+  }
+  if (speaker) speaker.textContent = 'Professor Pixel';
+  if (text) text.innerHTML = '';
+  if (hint) hint.classList.remove('show');
+  if (character) character.classList.add('visible');
+
+  try { setVNClaudeMode(false); } catch(e) {}
+  try { setVNClaudeTerminalMode(false); } catch(e) {}
+  try { setClaudeTerminalTextMode(false); } catch(e) {}
+  try { setClaudeShelfState('idle', 'idle'); } catch(e) {}
+
+  try { clearTimeout(vnTypeTimer); } catch(e) {}
+  try { vnQueue = []; } catch(e) {}
+  vnOnComplete = null;
+  vnTyping = false;
+  vnFullText = '';
+  vnCurrentText = '';
+
+  // Use a short, explicit S1 review instead of relying only on the generic score
+  // reflection. This is the missing bridge between Claude's diagnostic and the
+  // final result controls.
+  const lines = [
+    {
+      expr: 'encouraging',
+      text: "Now we have something useful. Claude found that the original prompt was not broken because students ignored it. It was broken because students were doing exactly what it asked."
+    },
+    {
+      expr: 'thinking',
+      text: "That is the design problem: compliance is not the same thing as interaction. A reply requirement can create activity without creating a reason to continue the conversation."
+    },
+    {
+      expr: scoreTotal >= SCORE_THRESHOLD ? 'proud' : 'encouraging',
+      text: scoreTotal >= SCORE_THRESHOLD
+        ? "Your revision gives students a clearer interaction move, a purpose for replying, and criteria for what a stronger response should include. That is a real repair, not just prettier wording."
+        : "Your revision is moving in the right direction. Before moving on, strengthen the prompt so students know how to extend, challenge, compare, or build on a peer's idea."
+    }
+  ];
+
+  lines.forEach((line, idx) => {
+    const isLast = idx === lines.length - 1;
+    vnShow(line.expr, line.text, isLast ? () => {
+      if (scoreTotal >= SCORE_THRESHOLD) markScenarioComplete();
+      showS1ResultControls(scoreTotal, 'postReflection');
+    } : null);
+  });
+}
+window.showS1PostAnalysisReflection = showS1PostAnalysisReflection;
 
 window.reviseS1 = reviseS1 = function reviseS1(){
   const saved = Object.assign(
@@ -4675,6 +4614,15 @@ window.reviseS1 = reviseS1 = function reviseS1(){
 function showPixelScoreReflection(totalScore, onDone = null){
   const dialogue = document.getElementById('vnDialogue');
   if (dialogue) dialogue.classList.remove('has-choices');
+
+  const speaker = document.getElementById('vnSpeaker');
+  if (speaker) speaker.textContent = 'Professor Pixel';
+
+  const overlay = document.getElementById('vnOverlay');
+  if (overlay) {
+    overlay.classList.remove('claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-prediction','pc-clean-prediction','pc-clean-output','pc-prediction-result');
+    overlay.classList.add('active');
+  }
   const d = window.pixelDialogue;
   let lines;
   if (scenarioIndex === 1) {
@@ -4702,6 +4650,7 @@ if (typeof oldClose === 'function') {
     document.getElementById('vnDialogue')?.classList.remove('has-choices');
     return oldClose.apply(this, arguments);
   };
+
 }
 
 
@@ -4789,17 +4738,21 @@ function pcShowPredictionGate(text){
 
   const overlay = document.getElementById('vnOverlay');
   if (overlay) {
-    overlay.classList.remove('claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output');
-    overlay.classList.add('active','claude-prediction','pc-clean-prediction');
+    overlay.classList.remove('claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output','pc-prediction-result');
+    overlay.classList.add('active','claude-prediction','pc-clean-prediction','pc-prediction-question');
   }
 
   const dialogue = document.getElementById('vnDialogue');
-  if (dialogue) dialogue.classList.add('has-choices');
+  if (dialogue) {
+    dialogue.classList.add('has-choices','prediction-question');
+    dialogue.classList.remove('prediction-result');
+  }
 
   try { setVNClaudeMode(false); } catch(e) {}
   try { setVNClaudeTerminalMode(false); } catch(e) {}
   try { setClaudeTerminalTextMode(false); } catch(e) {}
-  try { setClaudeShelfState('thinking', 'awaiting prediction'); } catch(e) {}
+  try { setClaudeShelfState('idle', 'awaiting prediction'); } catch(e) {}
+  try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'AWAITING PREDICTION'); } catch(e) {}
   try { vnSetExpression('thinking'); } catch(e) {}
   try { musicStartVN(); } catch(e) {}
 
@@ -4846,36 +4799,39 @@ function pcChoosePrediction(choice){
 
   pcClearPredictionUI();
 
+  const overlay = document.getElementById('vnOverlay');
+  if (overlay) {
+    overlay.classList.remove('pc-prediction-question');
+    overlay.classList.add('pc-prediction-result');
+  }
+
+  const dialogue = document.getElementById('vnDialogue');
+  if (dialogue) {
+    dialogue.classList.remove('has-choices','prediction-question');
+    dialogue.classList.add('prediction-result');
+  }
+
   const reaction = (window.predictionReactions && window.predictionReactions[choice]) || PC_PREDICTION_REACTIONS[choice] || PC_PREDICTION_REACTIONS.not_sure;
   const vnText = document.getElementById('vnText');
   if (vnText) {
     vnText.innerHTML = `
-      <div class="pc-feedback-copy pc-awaiting-claude-continue">
+      <div class="pc-feedback-copy">
         <div><strong>Your prediction is logged.</strong></div>
         <div>${reaction}</div>
-        <div class="pc-continue-row" style="padding-top:clamp(16px,2.5vh,28px);padding-bottom:clamp(28px,5vh,56px);">
-          <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
-        </div>
+        <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
       </div>`;
-
-    const hint = document.getElementById('vnAdvanceHint');
-    if (hint) hint.classList.remove('show');
-
-    const continueBtn = document.getElementById('pcContinueToClaudeBtn');
-    continueBtn?.addEventListener('click', (ev) => {
+    document.getElementById('pcContinueToClaudeBtn')?.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
       pcContinueToClaudeAnalysis();
     });
-    setTimeout(() => continueBtn?.focus({ preventScroll: true }), 80);
   }
 }
 
 function pcContinueToClaudeAnalysis(){
   const text = window.pendingPromptAfterPrediction;
-  if (!text || window.pcPredictionContinuingToClaude || window.isSubmittingToClaude || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return false;
+  if (!text || window.isSubmittingToClaude || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return false;
 
-  window.pcPredictionContinuingToClaude = true;
   window.pendingPromptAfterPrediction = '';
   window.pcWaitingForClaudeContinue = false;
 
@@ -4884,12 +4840,23 @@ function pcContinueToClaudeAnalysis(){
   // game look frozen for 20-30 seconds. Tiny little UX crime scene.
   const overlay = document.getElementById('vnOverlay');
   if (overlay) {
-    overlay.classList.remove('claude-prediction','pc-clean-prediction','claude-terminal-textmode');
+    overlay.classList.remove(
+      'claude-prediction',
+      'pc-clean-prediction',
+      'pc-prediction-question',
+      'pc-prediction-result',
+      'claude-terminal-textmode',
+      'has-choices'
+    );
     overlay.classList.add('active','claude-terminal-consult');
   }
-  document.getElementById('vnDialogue')?.classList.remove('has-choices');
+  const dialogue = document.getElementById('vnDialogue');
+  if (dialogue) dialogue.classList.remove('has-choices','prediction-question','prediction-result');
   document.getElementById('vnCharacter')?.classList.remove('visible');
   pcClearPredictionUI();
+
+  const vnText = document.getElementById('vnText');
+  if (vnText) vnText.innerHTML = '';
 
   try { showClaudeConsultOverlay('Scenario diagnosis'); } catch(e) {
     try {
@@ -5294,7 +5261,6 @@ function devFillS2(mode = 'mid') {
   return false;
 };
 
-;
 const priorDevFillScenario = window.devFillScenario || (typeof devFillScenario === 'function' ? devFillScenario : null);
 function devFillScenarioS2Owner(idx) {
   if (idx === 1) return window.devFillS2('mid');
@@ -5330,9 +5296,6 @@ function addS2ClaudeResultCard(responseText) {
   area.scrollTop = area.scrollHeight;
 }
 
-;
-;
-;
 
 // ══════════════════════════════════════════════════════
 //  DEV BAR GLOBAL EXPORT REPAIR — V2
@@ -5453,3 +5416,45 @@ function addS2ClaudeResultCard(responseText) {
 
   console.info('[PromptCraft] DEV globals repaired:', window.devStatus());
 })();
+
+// Claude Speech Synthesis voice
+let claudeSpeechUtterance = null;
+
+  function cleanClaudeSpeechText(text) {
+    return String(text || '')
+      .replace(/\*\*/g, '')
+      .replace(/#/g, '')
+      .replace(/[-]{3,}/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+function toggleClaudeTTS() {
+    const btn = document.getElementById('claudeTTSBtn');
+
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      if (btn) btn.textContent = '🔊 Read Analysis';
+      return;
+    }
+
+    const output = document.getElementById('claudeTerminalOutput');
+    const text = cleanClaudeSpeechText(output?.textContent || '');
+
+    if (!text) return;
+
+    claudeSpeechUtterance = new SpeechSynthesisUtterance(text);
+    claudeSpeechUtterance.rate = 0.9;
+    claudeSpeechUtterance.pitch = 0.85;
+
+    claudeSpeechUtterance.onend = () => {
+      if (btn) btn.textContent = '🔊 Read Analysis';
+    };
+
+    claudeSpeechUtterance.onerror = () => {
+      if (btn) btn.textContent = '🔊 Read Analysis';
+    };
+
+    if (btn) btn.textContent = '⏹ Stop Reading';
+    window.speechSynthesis.speak(claudeSpeechUtterance);
+  }
