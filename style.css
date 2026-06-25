@@ -18192,3 +18192,170 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
+
+/* ══════════════════════════════════════════════════════
+   CLAUDE ANALYZING CURSOR + LIVE PROGRESSION SUPPORT — V51
+   Purpose:
+   - Use real structured HTML for the ANALYZING readout instead of a generated
+     ::before string.
+   - Put the blinking cursor directly after ANALYZING.
+   - Prevent the old generated block cursor from appearing.
+   - Only affects the Claude ANALYZING screen, not the completed diagnostic.
+   ══════════════════════════════════════════════════════ */
+
+@media (min-width: 901px) {
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output {
+    left: 37% !important;
+    top: 50% !important;
+
+    width: 74% !important;
+    max-width: 74% !important;
+    height: 74% !important;
+
+    display: block !important;
+    overflow: visible !important;
+
+    color: rgba(210, 255, 225, 0.9) !important;
+    font-size: clamp(0.82rem, 0.78vw, 1.05rem) !important;
+    line-height: 1.36 !important;
+    letter-spacing: 0.045em !important;
+    text-shadow:
+      0 0 5px rgba(200, 255, 218, 0.36),
+      0 0 15px rgba(22, 255, 66, 0.14) !important;
+  }
+
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output::before,
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output::after,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output::before,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output .pc-analyzing-readout,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output .pc-analyzing-readout {
+    position: absolute !important;
+    left: 0 !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+
+    display: block !important;
+    width: 100% !important;
+
+    font-family: "Source Code Pro", "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    font-weight: 900 !important;
+    letter-spacing: inherit !important;
+    color: inherit !important;
+    text-align: left !important;
+    text-transform: uppercase !important;
+    white-space: normal !important;
+  }
+
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) .pc-terminal-line,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) .pc-terminal-line {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) .pc-terminal-gap,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) .pc-terminal-gap {
+    display: block !important;
+    height: 1.15em !important;
+  }
+
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) .pc-analyzing-output .claude-terminal-cursor,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) .pc-analyzing-output .claude-terminal-cursor {
+    display: inline-block !important;
+    width: 0.66em !important;
+    height: 1em !important;
+    margin-left: 0.42em !important;
+
+    background: rgba(210, 255, 225, 0.9) !important;
+    box-shadow:
+      0 0 5px rgba(200, 255, 218, 0.42),
+      0 0 12px rgba(22, 255, 66, 0.16) !important;
+
+    vertical-align: -0.14em !important;
+
+    animation: pcTerminalCursorBlinkV51 0.82s steps(1, end) infinite !important;
+  }
+}
+
+@media (max-width: 900px) {
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output {
+    color: rgba(210, 255, 225, 0.92) !important;
+    font-size: clamp(1.02rem, 4vw, 1.28rem) !important;
+    line-height: 1.42 !important;
+  }
+
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output::before,
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output::after,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output::before,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput.pc-analyzing-output::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) .pc-analyzing-readout,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) .pc-analyzing-readout {
+    font-family: "Source Code Pro", "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.045em !important;
+    text-transform: uppercase !important;
+  }
+
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) .pc-terminal-gap,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) .pc-terminal-gap {
+    display: block !important;
+    height: 1.15em !important;
+  }
+
+  html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) .pc-analyzing-output .claude-terminal-cursor,
+  html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
+  #claudeTerminalScene.claude-terminal-scene:not(.responding) .pc-analyzing-output .claude-terminal-cursor {
+    display: inline-block !important;
+    width: 0.66em !important;
+    height: 1em !important;
+    margin-left: 0.42em !important;
+    background: rgba(210, 255, 225, 0.92) !important;
+    vertical-align: -0.14em !important;
+    animation: pcTerminalCursorBlinkV51 0.82s steps(1, end) infinite !important;
+  }
+}
+
+@keyframes pcTerminalCursorBlinkV51 {
+  0%, 48% { opacity: 1; }
+  49%, 100% { opacity: 0; }
+}
+
+

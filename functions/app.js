@@ -289,14 +289,22 @@ function mockClaudeResponse(payload, context = 'main') {
   });
 }
 
+const CLAUDE_REQUEST_TIMEOUT_MS = 15000;
+
 async function callClaude(payload, context = 'main') {
   if (USE_MOCK_CLAUDE) return mockClaudeResponse(payload, context);
+
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timeoutId = controller
+    ? setTimeout(() => controller.abort(), CLAUDE_REQUEST_TIMEOUT_MS)
+    : null;
 
   try {
     const res = await fetch('/.netlify/functions/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: controller ? controller.signal : undefined
     });
 
     if (!res.ok) throw new Error(`Claude function returned ${res.status}`);
@@ -304,11 +312,16 @@ async function callClaude(payload, context = 'main') {
     if (data.error) throw new Error(data.error?.message || 'Claude returned an error');
     return data;
   } catch (err) {
-    if (IS_LOCAL_TEST || FORCE_MOCK_CLAUDE) {
-      console.warn('[PromptCraft] Claude unavailable locally, using mock response:', err.message);
-      return mockClaudeResponse(payload, context);
-    }
-    throw err;
+    /*
+      Live-site protection:
+      If the Netlify function stalls, fails, or returns HTML instead of JSON,
+      keep the game moving with the local mock response instead of leaving
+      Professor Pixel stranded in terminal purgatory.
+    */
+    console.warn('[PromptCraft] Claude unavailable or timed out; using mock response:', err && err.message ? err.message : err);
+    return mockClaudeResponse(payload, context);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
   }
 }
 
@@ -346,6 +359,28 @@ const scenarioData = [
   { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', overrelianceDecisions: {} },
   { attempts: 0, prompts: [], initialPrompt: '', revisedPrompt: '', initialScore: 0, revisedScore: 0, scoreDelta: 0, finalResponse: '', oscqrLit: '', reflection1: '', reflection2: '', reflection3: '' },
 ];
+
+const PC_SCENARIO_LABELS = [
+  'S1: Engagement',
+  'S2: Metacognition',
+  'S3: Authentic Assessment',
+  'S4: Sync Bias',
+  'S5: Hallucination Hunt',
+  'S6: Predict the Output',
+  'S7: Overreliance',
+  'S8: Reflect & Revise'
+];
+
+const pcLastIncrementalSaveAt = {};
+
+function getPromptCraftScenarioLabel(scenarioIdx) {
+  return PC_SCENARIO_LABELS[scenarioIdx] || `S${scenarioIdx + 1}`;
+}
+
+function getPromptCraftViewportWidth() {
+  return window.innerWidth || document.documentElement.clientWidth || window.screen.width || '';
+}
+
 
 function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
   const s = scenarioData[scenarioIdx];
@@ -466,6 +501,8 @@ function buildSessionPayload(formData) {
   const d7 = scenarioData[6]?.overrelianceDecisions || {};
 
   return {
+    type: 'full_response',
+
     // Session
     timestamp:            new Date().toISOString(),
     participant_id:       (formData ? formData.get('participant_id') : null) || (playerName !== 'You' ? playerName : 'anonymous'),
@@ -546,38 +583,59 @@ function buildSessionPayload(formData) {
     q4_other:       formData ? (formData.get('q4_other')     || '') : '',
 
     // Metadata
-    screen_width: window.screen.width,
+    screen_width: getPromptCraftViewportWidth(),
     referrer:     document.referrer || 'direct'
   };
 }
 
 async function saveIncrementalData(scenarioIdx) {
-  // Don't save if no attempts were made — avoids phantom rows from dev navigation
+  // Don't save if no attempts were made — avoids phantom rows from dev navigation.
   if ((scenarioData[scenarioIdx]?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 6) return;
   if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
+
   try {
-    const s = scenarioData[scenarioIdx];
-    const participantId = document.querySelector('input[name="participant_id"]')?.value?.trim() || (playerName !== 'You' ? playerName : 'anonymous');
+    const s = scenarioData[scenarioIdx] || {};
+    const participantId = document.querySelector('input[name="participant_id"]')?.value?.trim()
+      || (playerName !== 'You' ? playerName : 'anonymous');
+
+    const now = Date.now();
+    const lastSaveAt = pcLastIncrementalSaveAt[scenarioIdx] || null;
+    const timeSinceLastAttemptSec = lastSaveAt ? Math.round((now - lastSaveAt) / 1000) : '';
+    pcLastIncrementalSaveAt[scenarioIdx] = now;
+
+    const prompts = Array.isArray(s.prompts) ? s.prompts : [];
+    const lastPrompt = prompts.length ? prompts[prompts.length - 1] : '';
+    const bestScore = Number(s.bestScore || s.revisedScore || s.initialScore || 0);
+    const currentScore = bestScore;
 
     const payload = {
-      type:                 'incremental',
-      timestamp:            new Date().toISOString(),
-      participant_id:       participantId,
-      scenario_index:       scenarioIdx + 1,
+      type: 'incremental',
+      timestamp: new Date().toISOString(),
+      participant_id: participantId,
+      scenario_index: scenarioIdx + 1,
+      scenario_label: getPromptCraftScenarioLabel(scenarioIdx),
       session_duration_min: parseFloat(((Date.now() - sessionStart) / 60000).toFixed(1)),
-      attempts:             s.attempts         || 0,
-      best_score:           s.bestScore        || 0,
-      prompts:              (s.prompts || []).join(' | '),
-      final_response:       s.finalResponse    || '',
-      oscqr_lit:            s.oscqrLit         || '',
-      self_report:          s.selfReport       || s.prediction || '',
-      screen_width:         window.screen.width,
+      attempts: s.attempts || 0,
+      current_score: currentScore,
+      best_score: bestScore,
+      score_delta: typeof s.scoreDelta === 'number' ? s.scoreDelta : '',
+      prompt_text: lastPrompt || prompts.join(' | '),
+      prompts: prompts.join(' | '),
+      claude_response: s.finalResponse || '',
+      final_response: s.finalResponse || '',
+      quality_indicators_lit: s.oscqrLit || '',
+      oscqr_lit: s.oscqrLit || '',
+      self_report_prediction: s.selfReport || s.prediction || (Array.isArray(s.predictions) ? s.predictions.join(' | ') : ''),
+      self_report: s.selfReport || '',
+      prediction: s.prediction || '',
+      time_since_last_attempt_sec: timeSinceLastAttemptSec,
+      screen_width: getPromptCraftViewportWidth(),
+      event_type: 'incremental_save',
+      notes_coding_memo: `${location.pathname} :: ${getPromptCraftScenarioLabel(scenarioIdx)}`
     };
 
     console.log(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
-
     await postToSheets(payload, `incremental S${scenarioIdx + 1}`);
-
   } catch(e) {
     console.warn('[PromptCraft] Incremental save failed:', e.message);
   }
@@ -2428,10 +2486,33 @@ function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', outpu
   }
   if (titleEl) titleEl.textContent = title;
   if (outputEl) {
-    outputEl.classList.remove('claude-analysis-layout');
+    outputEl.classList.remove('claude-analysis-layout', 'pc-analyzing-output');
     outputEl.innerHTML = `${output}<span class="claude-terminal-cursor"></span>`;
   }
 }
+
+
+function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
+  const outputEl = document.getElementById('claudeTerminalOutput');
+  if (!outputEl) return;
+
+  const sectionLabel = terminalizeClaudeText(partLabel || 'Scenario diagnosis').toUpperCase() || 'SCENARIO DIAGNOSIS';
+  outputEl.classList.remove('claude-analysis-layout');
+  outputEl.classList.add('pc-analyzing-output');
+
+  outputEl.innerHTML = `
+    <div class="pc-analyzing-readout" aria-label="Claude terminal analyzing">
+      <div class="pc-terminal-line pc-terminal-title-line">CLAUDE TERMINAL</div>
+      <div class="pc-terminal-gap" aria-hidden="true"></div>
+      <div class="pc-terminal-line">&gt; SECTION</div>
+      <div class="pc-terminal-line pc-terminal-indent">${esc(sectionLabel)}</div>
+      <div class="pc-terminal-gap" aria-hidden="true"></div>
+      <div class="pc-terminal-line">&gt; STATUS</div>
+      <div class="pc-terminal-line pc-terminal-indent pc-analyzing-status">ANALYZING<span class="claude-terminal-cursor" aria-hidden="true"></span></div>
+    </div>
+  `;
+}
+
 
 function showClaudeConsultOverlay(partLabel) {
   // This is an interaction moment: Pixel consults Claude through the terminal close-up.
@@ -2470,6 +2551,8 @@ setClaudeTerminalState(
   'CLAUDE TERMINAL',
   `SECTION:\n${esc(partLabel).toUpperCase()}\n\nANALYZING...`
 );
+
+renderClaudeAnalyzingReadout(partLabel);
 
   const speaker = document.getElementById('vnSpeaker');
   if (speaker) speaker.textContent = 'Professor Pixel';
@@ -4865,6 +4948,7 @@ function pcContinueToClaudeAnalysis(){
       setClaudeTerminalTextMode(false);
       setClaudeShelfState('thinking','analyzing');
       setClaudeTerminalState('thinking','CLAUDE TERMINAL','ANALYZING...');
+      renderClaudeAnalyzingReadout('Scenario diagnosis');
       musicStartVN();
     } catch(_) {}
   }
