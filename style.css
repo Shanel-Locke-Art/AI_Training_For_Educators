@@ -18359,3 +18359,25 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
+
+/* ══════════════════════════════════════════════════════
+   PIXEL BADGE HIDE — V57
+   Purpose:
+   - Hide the old persistent lower-right Pixel badge.
+   - It reappeared because V56 was rebuilt from the complete V51 package,
+     which still included the legacy "Professor Pixel integrated chat presence"
+     badge styles.
+   - This does NOT hide Professor Pixel in the visual novel scenes.
+   - It only hides the small fixed-position icon and its slide-out coach card.
+   ══════════════════════════════════════════════════════ */
+
+html body .pixel-badge,
+html body .pixel-coach-card,
+html body .pixel-popup {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+
