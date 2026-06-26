@@ -66,9 +66,35 @@ let playerName = 'You'; // updated by name entry modal
 // ── NAME MODAL ────────────────────────────────────────
 function showNameModal() {
   const overlay = document.getElementById('nameModalOverlay');
+
+  if (!overlay) {
+    console.warn('[PromptCraft] Name modal missing; starting game directly.');
+    startGame();
+    return;
+  }
+
+  overlay.style.display = '';
+  overlay.style.opacity = '';
+  overlay.style.pointerEvents = '';
   overlay.classList.add('visible');
-  // Focus the input after transition
-  setTimeout(() => document.getElementById('nameInput').focus(), 450);
+
+  // Focus the input after transition, but do not let a missing input break startup.
+  setTimeout(() => {
+    const input = document.getElementById('nameInput');
+    if (input) input.focus();
+
+    const style = window.getComputedStyle(overlay);
+    const modalFailedVisible =
+      style.display === 'none' ||
+      style.visibility === 'hidden' ||
+      Number(style.opacity || 1) < 0.05 ||
+      overlay.offsetParent === null;
+
+    if (modalFailedVisible && !window.pcGameStarted) {
+      console.warn('[PromptCraft] Name modal was not visible; continuing with default player name.');
+      startGame();
+    }
+  }, 450);
 }
 
 function submitName(skip = false) {
@@ -108,11 +134,21 @@ function getInitials(name) {
 }
 
 function startGame() {
+  if (window.pcGameStarted) return;
+  window.pcGameStarted = true;
+
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!reducedMotion) initMusic();
 
   window.scenarioIntroEnabled = false; // suppress during initial load
-  loadScenario(0);
+
+  try {
+    loadScenario(0);
+    window.pcInitialScenarioRendered = true;
+  } catch (err) {
+    console.error('[PromptCraft] Initial scenario render failed:', err);
+  }
+
   setTimeout(() => {
     playPixelSequence('scenarioStart_0', null);
     setTimeout(() => {
@@ -131,6 +167,8 @@ function startGame() {
 const SURVEY_MODE   = 'sheets';
 const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbzN9bGwzKUcucCltXfj72pxee7y6t1reML6YRQNqCjxJ9Y3rDGp1a_FkYMzJmZROka5/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
+const PC_APP_SCHEMA_VERSION = 'V58';
+const PC_APP_BUILD_LABEL = 'DATA_SCHEMA_DIAGNOSTIC_V58';
 
 
 // Robust Google Sheets poster.
@@ -181,6 +219,8 @@ async function postToSheets(payload, label = 'PromptCraft data') {
 window.testSheetsPing = function testSheetsPing() {
   return postToSheets({
     type: 'incremental',
+    schema_version: PC_APP_SCHEMA_VERSION,
+    app_build: PC_APP_BUILD_LABEL,
     timestamp: new Date().toISOString(),
     participant_id: 'browser-test',
     scenario_index: 'TEST',
@@ -504,6 +544,8 @@ function buildSessionPayload(formData) {
 
   return {
     type: 'full_response',
+    schema_version: PC_APP_SCHEMA_VERSION,
+    app_build: PC_APP_BUILD_LABEL,
 
     // Session
     timestamp:            new Date().toISOString(),
@@ -613,6 +655,9 @@ async function saveIncrementalData(scenarioIdx) {
 
     const payload = {
       type: 'incremental',
+      schema_version: PC_APP_SCHEMA_VERSION,
+      app_build: PC_APP_BUILD_LABEL,
+      payload_shape: 'named_current_incremental_v58',
       timestamp: new Date().toISOString(),
       participant_id: participantId,
       session_id: pcSessionId,
@@ -638,7 +683,7 @@ async function saveIncrementalData(scenarioIdx) {
       time_since_last_attempt_sec: timeSinceLastAttemptSec,
       screen_width: getPromptCraftViewportWidth(),
       event_type: 'scenario_complete',
-      notes_coding_memo: `${location.pathname} :: ${getPromptCraftScenarioLabel(scenarioIdx)} :: session ${pcSessionId}`
+      notes_coding_memo: `${location.pathname} :: ${getPromptCraftScenarioLabel(scenarioIdx)} :: session ${pcSessionId} :: ${PC_APP_BUILD_LABEL}`
     };
 
     console.log(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
@@ -3007,8 +3052,40 @@ function loadSceneImage(filename) {
 //  INIT
 // ══════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  // Show name modal first -- game starts after name is submitted
+  /*
+    Live boot protection:
+    Render S1 immediately behind the name modal. If the modal CSS fails or the
+    user refreshes into a half-state, the page no longer sits there with blank
+    challenge/input areas like it has forgotten its job.
+  */
+  window.scenarioIntroEnabled = false;
+
+  try {
+    loadScenario(0);
+    window.pcInitialScenarioRendered = true;
+  } catch (err) {
+    console.error('[PromptCraft] Initial background scenario render failed:', err);
+  }
+
+  // Show name modal first -- game starts after name is submitted.
   showNameModal();
+
+  // Safety check: if S1 content is still empty after load, render it again.
+  setTimeout(() => {
+    const scenarioText = document.getElementById('scenarioText');
+    const inputContainer = document.getElementById('inputContainer');
+
+    if ((!scenarioText || !scenarioText.textContent.trim()) ||
+        (!inputContainer || !inputContainer.textContent.trim())) {
+      console.warn('[PromptCraft] Startup watchdog repaired empty initial scenario render.');
+      try {
+        loadScenario(0);
+        window.pcInitialScenarioRendered = true;
+      } catch (err) {
+        console.error('[PromptCraft] Startup watchdog could not render S1:', err);
+      }
+    }
+  }, 900);
 });
 
 // ══════════════════════════════════════════════════════
