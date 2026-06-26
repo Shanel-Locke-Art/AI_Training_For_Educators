@@ -84,14 +84,20 @@ function showNameModal() {
     if (input) input.focus();
 
     const style = window.getComputedStyle(overlay);
+    const rect = overlay.getBoundingClientRect();
+
+    /*
+      Fixed-position overlays often have offsetParent === null even when they
+      are visible. The old check treated that as failure and skipped the name
+      modal. Because naturally CSS geometry needed a trap door.
+    */
     const modalFailedVisible =
       style.display === 'none' ||
       style.visibility === 'hidden' ||
-      Number(style.opacity || 1) < 0.05 ||
-      overlay.offsetParent === null;
+      (rect.width === 0 && rect.height === 0);
 
     if (modalFailedVisible && !window.pcGameStarted) {
-      console.warn('[PromptCraft] Name modal was not visible; continuing with default player name.');
+      console.warn('[PromptCraft] Name modal failed to render; continuing with default player name.');
       startGame();
     }
   }, 450);
@@ -99,7 +105,7 @@ function showNameModal() {
 
 function submitName(skip = false) {
   const input = document.getElementById('nameInput');
-  const raw = skip ? '' : input.value.trim();
+  const raw = skip ? '' : (input ? input.value.trim() : '');
 
   // Sanitise -- letters, spaces, hyphens, apostrophes, max 24 chars
   const clean = raw.replace(/[^a-zA-Z\s'\-\.]/g, '').trim().substring(0, 24);
@@ -167,8 +173,8 @@ function startGame() {
 const SURVEY_MODE   = 'sheets';
 const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbzN9bGwzKUcucCltXfj72pxee7y6t1reML6YRQNqCjxJ9Y3rDGp1a_FkYMzJmZROka5/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
-const PC_APP_SCHEMA_VERSION = 'V59';
-const PC_APP_BUILD_LABEL = 'CACHE_BUST_SCHEMA_DIAGNOSTIC_V59';
+const PC_APP_SCHEMA_VERSION = 'V60';
+const PC_APP_BUILD_LABEL = 'MODAL_AUDIO_CACHE_FIX_V60';
 console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 
@@ -658,7 +664,7 @@ async function saveIncrementalData(scenarioIdx) {
       type: 'incremental',
       schema_version: PC_APP_SCHEMA_VERSION,
       app_build: PC_APP_BUILD_LABEL,
-      payload_shape: 'named_current_incremental_v59',
+      payload_shape: 'named_current_incremental_v60',
       timestamp: new Date().toISOString(),
       participant_id: participantId,
       session_id: pcSessionId,
