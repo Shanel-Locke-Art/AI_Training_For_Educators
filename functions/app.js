@@ -167,8 +167,9 @@ function startGame() {
 const SURVEY_MODE   = 'sheets';
 const SHEETS_URL    = 'https://script.google.com/macros/s/AKfycbzN9bGwzKUcucCltXfj72pxee7y6t1reML6YRQNqCjxJ9Y3rDGp1a_FkYMzJmZROka5/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
-const PC_APP_SCHEMA_VERSION = 'V58';
-const PC_APP_BUILD_LABEL = 'DATA_SCHEMA_DIAGNOSTIC_V58';
+const PC_APP_SCHEMA_VERSION = 'V59';
+const PC_APP_BUILD_LABEL = 'CACHE_BUST_SCHEMA_DIAGNOSTIC_V59';
+console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 
 // Robust Google Sheets poster.
@@ -657,7 +658,7 @@ async function saveIncrementalData(scenarioIdx) {
       type: 'incremental',
       schema_version: PC_APP_SCHEMA_VERSION,
       app_build: PC_APP_BUILD_LABEL,
-      payload_shape: 'named_current_incremental_v58',
+      payload_shape: 'named_current_incremental_v59',
       timestamp: new Date().toISOString(),
       participant_id: participantId,
       session_id: pcSessionId,
