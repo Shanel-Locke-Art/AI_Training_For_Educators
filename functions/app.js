@@ -173,8 +173,8 @@ function startGame() {
 const SURVEY_MODE   = 'sheets';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzwE4R9C4F27rCP_NDkYaERtNb8rY6pV2pbsqUiNY7dDPoMpVURG-0NKTNAPqA8jm1-/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
-const PC_APP_SCHEMA_VERSION = 'V63';
-const PC_APP_BUILD_LABEL = 'NEW_DEPLOYMENT_SAFE_RECEIVER_V63';
+const PC_APP_SCHEMA_VERSION = 'V65';
+const PC_APP_BUILD_LABEL = 'TOTAL_XP_FIELD_V65';
 console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 
@@ -422,6 +422,80 @@ const PC_SCENARIO_LABELS = [
 
 const pcLastIncrementalSaveAt = {};
 
+
+
+function pcGetTotalXPForSave() {
+  /*
+    Prefer the live total XP value if the game has one, but fall back to
+    deriving XP from recorded best scores so checkpoint rows do not leave
+    PromptCraft Responses looking like it forgot arithmetic exists.
+  */
+  const candidates = [
+    window.totalXP,
+    window.pcTotalXP,
+    window.currentXP,
+    window.xp,
+    (typeof totalXP !== 'undefined' ? totalXP : undefined),
+    (typeof pcTotalXP !== 'undefined' ? pcTotalXP : undefined),
+    (typeof currentXP !== 'undefined' ? currentXP : undefined)
+  ];
+
+  for (const value of candidates) {
+    const n = Number(value);
+    if (!Number.isNaN(n) && n > 0) return Math.round(n);
+  }
+
+  if (Array.isArray(scenarioData)) {
+    return scenarioData.reduce((sum, s) => {
+      const score = Number((s && (s.bestScore || s.currentScore || s.revisedScore || s.initialScore)) || 0);
+      return sum + (Number.isNaN(score) ? 0 : Math.round(score * 25));
+    }, 0);
+  }
+
+  return 0;
+}
+
+function pcFormatPredictionChoice(choice) {
+  if (!choice) return '';
+  const labels = (typeof PC_PREDICTION_LABELS !== 'undefined' && PC_PREDICTION_LABELS) ? PC_PREDICTION_LABELS : {};
+  return labels[choice] || String(choice).replace(/_/g, ' ');
+}
+
+function pcFormatPredictionsForSave(s, scenarioIdx) {
+  if (!s) return '';
+
+  if (s.selfReport) return s.selfReport;
+
+  const predictions = Array.isArray(s.predictions) ? s.predictions : [];
+  if (predictions.length) {
+    return predictions.map((p, i) => {
+      if (!p || typeof p !== 'object') return String(p || '');
+      const attempt = p.attempt || (i + 1);
+      const choice = p.choice || p.prediction || '';
+      const label = pcFormatPredictionChoice(choice);
+      return `Attempt ${attempt}: ${label || choice}`;
+    }).filter(Boolean).join(' | ');
+  }
+
+  if (s.prediction) return pcFormatPredictionChoice(s.prediction);
+  return '';
+}
+
+function pcFormatAllPresubmitPredictions() {
+  return scenarioData.map((s, i) => {
+    const text = pcFormatPredictionsForSave(s, i);
+    return text ? `S${i + 1}: ${text}` : `S${i + 1}: none recorded`;
+  }).join(' || ');
+}
+
+function pcGetLatestPredictionChoice(s) {
+  if (!s) return '';
+  const predictions = Array.isArray(s.predictions) ? s.predictions : [];
+  const latest = predictions.length ? predictions[predictions.length - 1] : null;
+  return (latest && latest.choice) || s.prediction || '';
+}
+
+
 function getPromptCraftScenarioLabel(scenarioIdx) {
   return PC_SCENARIO_LABELS[scenarioIdx] || `S${scenarioIdx + 1}`;
 }
@@ -433,11 +507,23 @@ function getPromptCraftViewportWidth() {
 
 function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
   const s = scenarioData[scenarioIdx];
+  if (!s) return;
+
+  const now = Date.now();
+  const previousAttemptAt = typeof s.lastAttemptAt === 'number' ? s.lastAttemptAt : null;
+  const previousScore = typeof s.currentScore === 'number' ? s.currentScore : null;
+
+  s.timeSincePreviousAttemptSec = previousAttemptAt ? Math.round((now - previousAttemptAt) / 1000) : 0;
+  s.lastAttemptAt = now;
+
+  s.currentScore = Number(score || 0);
+  s.scoreDelta = previousScore === null ? 0 : Number((s.currentScore - previousScore).toFixed(2));
+
   s.attempts++;
   s.prompts.push(promptText);
-  if (score > s.bestScore) s.bestScore = score;
-  s.finalResponse = aiResponse.replace(/<[^>]+>/g, '').substring(0, 1200);
-  s.oscqrLit = oscqrActive.join(', ');
+  if (s.currentScore > s.bestScore) s.bestScore = s.currentScore;
+  s.finalResponse = String(aiResponse || '').replace(/<[^>]+>/g, '').substring(0, 1200);
+  s.oscqrLit = Array.isArray(oscqrActive) ? oscqrActive.join(', ') : String(oscqrActive || '');
 }
 
 
@@ -562,7 +648,7 @@ function buildSessionPayload(formData) {
     scenarios_completed:  scenarioCompleted.filter(Boolean).length,
     total_xp:             Math.round(xp),
     total_attempts:       totalAttempts,
-    presubmit_predictions: scenarioData.map((s, i) => `S${i+1}: ${JSON.stringify(s.predictions || [])}`).join(' || '),
+    presubmit_predictions: pcFormatAllPresubmitPredictions(),
 
     // S1
     s1_attempts:          scenarioData[0].attempts,
@@ -652,19 +738,22 @@ async function saveIncrementalData(scenarioIdx) {
 
     const now = Date.now();
     const lastSaveAt = pcLastIncrementalSaveAt[scenarioIdx] || null;
-    const timeSinceLastAttemptSec = lastSaveAt ? Math.round((now - lastSaveAt) / 1000) : '';
+    const timeSinceLastAttemptSec = (typeof s.timeSincePreviousAttemptSec === 'number') ? s.timeSincePreviousAttemptSec : (lastSaveAt ? Math.round((now - lastSaveAt) / 1000) : 0);
     pcLastIncrementalSaveAt[scenarioIdx] = now;
 
     const prompts = Array.isArray(s.prompts) ? s.prompts : [];
     const lastPrompt = prompts.length ? prompts[prompts.length - 1] : '';
     const bestScore = Number(s.bestScore || s.revisedScore || s.initialScore || 0);
-    const currentScore = bestScore;
+    const currentScore = (typeof s.currentScore === 'number') ? s.currentScore : bestScore;
+    const scoreDelta = (typeof s.scoreDelta === 'number') ? s.scoreDelta : 0;
+    const selfReportPrediction = pcFormatPredictionsForSave(s, scenarioIdx);
+    const latestPredictionChoice = pcGetLatestPredictionChoice(s);
 
     const payload = {
       type: 'incremental',
       schema_version: PC_APP_SCHEMA_VERSION,
       app_build: PC_APP_BUILD_LABEL,
-      payload_shape: 'named_current_incremental_v63',
+      payload_shape: 'named_current_incremental_v65',
       timestamp: new Date().toISOString(),
       participant_id: participantId,
       session_id: pcSessionId,
@@ -677,16 +766,16 @@ async function saveIncrementalData(scenarioIdx) {
       attempts: s.attempts || 0,
       current_score: currentScore,
       best_score: bestScore,
-      score_delta: typeof s.scoreDelta === 'number' ? s.scoreDelta : '',
+      score_delta: scoreDelta,
       prompt_text: lastPrompt || prompts.join(' | '),
       prompts: prompts.join(' | '),
       claude_response: s.finalResponse || '',
       final_response: s.finalResponse || '',
       quality_indicators_lit: s.oscqrLit || '',
       oscqr_lit: s.oscqrLit || '',
-      self_report_prediction: s.selfReport || s.prediction || (Array.isArray(s.predictions) ? s.predictions.join(' | ') : ''),
+      self_report_prediction: selfReportPrediction,
       self_report: s.selfReport || '',
-      prediction: s.prediction || '',
+      prediction: latestPredictionChoice,
       time_since_last_attempt_sec: timeSinceLastAttemptSec,
       screen_width: getPromptCraftViewportWidth(),
       event_type: 'scenario_complete',
@@ -4968,7 +5057,10 @@ function pcChoosePrediction(choice){
   const s = scenarioData && scenarioData[scenarioIndex];
   if (s) {
     if (!s.predictions) s.predictions = [];
-    s.predictions.push({ choice, prompt:text, attempt:(s.attempts || 0) + 1, timestamp:new Date().toISOString() });
+    const predictionRecord = { choice, label: pcFormatPredictionChoice(choice), prompt:text, attempt:(s.attempts || 0) + 1, timestamp:new Date().toISOString() };
+    s.predictions.push(predictionRecord);
+    s.prediction = choice;
+    s.selfReportPrediction = pcFormatPredictionsForSave(s, scenarioIndex);
   }
 
   pcClearPredictionUI();
