@@ -171,10 +171,10 @@ function startGame() {
 //  Paste your Google Apps Script Web App URL into SHEETS_URL
 // ══════════════════════════════════════════════════════
 const SURVEY_MODE   = 'sheets';
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzvCSy0uQOfnq3-7rst2A6tUNK9nAfQzuEpxt6Axr8Z_qkDS4hufTPUxl2VTtkHXQxm/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbylnSseQkSsPNKSjqoU2ui6yFa62YslQEq-nRyeC8MZFVnlmv-XYoi2EUJPZGvnKU1z/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
-const PC_APP_SCHEMA_VERSION = 'V67';
-const PC_APP_BUILD_LABEL = 'NEW_DEPLOYMENT_RESPONSE_FIELDS_V67';
+const PC_APP_SCHEMA_VERSION = 'V70';
+const PC_APP_BUILD_LABEL = 'NEW_WEB_APP_URL_V70';
 console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 
@@ -753,7 +753,7 @@ async function saveIncrementalData(scenarioIdx) {
       type: 'incremental',
       schema_version: PC_APP_SCHEMA_VERSION,
       app_build: PC_APP_BUILD_LABEL,
-      payload_shape: 'named_current_incremental_v67',
+      payload_shape: 'named_current_incremental_v70',
       timestamp: new Date().toISOString(),
       participant_id: participantId,
       session_id: pcSessionId,
