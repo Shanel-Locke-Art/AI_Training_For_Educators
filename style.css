@@ -18383,130 +18383,342 @@ html body .pixel-popup {
 
 
 /* ══════════════════════════════════════════════════════
-   LIVE SCALE + ANALYZING SKIP CLEANUP — V71
+   SAFE VISUAL ROLLBACK + SKIP CLEANUP — V72
    Purpose:
-   - Remove the Skip button from the Claude analyzing screen.
-   - Reduce the live visual novel/Claude close-up scale slightly so the scene
-     does not feel overly zoomed on the deployed site.
-   - Keep content large enough to read while allowing more of the scene to fit.
+   - Restore the normal VN visuals after the V71 scale patch over-corrected.
+   - Hide the Skip button in VN overlay scenes.
+   - Make the Claude computer scene slightly less zoomed without touching
+     the regular Professor Pixel / smartboard scenes.
    ══════════════════════════════════════════════════════ */
 
-/* Hide the legacy skip control during the Claude/analyzing visual novel state.
-   Other scenes can still use skip if they need it. */
-body.pc-claude-analyzing .vn-skip,
-body.pc-claude-analyzing button.vn-skip,
-body[data-vn-state="claude-analyzing"] .vn-skip,
-body[data-pc-state="claude-analyzing"] .vn-skip,
-.vn-overlay.pc-claude-analyzing .vn-skip,
-.vn-stage.pc-claude-analyzing .vn-skip,
-#vnOverlay.pc-claude-analyzing .vn-skip,
-#vnStage.pc-claude-analyzing .vn-skip,
-.claude-analyzing .vn-skip,
-.claude-analyzing-scene .vn-skip {
+/* Remove the floating Skip control from VN scenes. The bottom "tap to continue"
+   affordance remains available. */
+.vn-overlay .vn-skip,
+.vn-overlay.active .vn-skip,
+#vnOverlay .vn-skip,
+#vnOverlay.active .vn-skip {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;
 }
 
-/* Live site visual tuning.
-   The deployed version was reading as more zoomed-in than the test version.
-   These rules slightly reduce the Claude close-up art and reclaim height
-   without making the monitor text tiny. */
-:root {
-  --pc-live-vn-max-width: min(94vw, 1500px);
-  --pc-live-claude-scene-height: clamp(420px, 59vh, 650px);
-  --pc-live-dialogue-height: clamp(170px, 23vh, 255px);
+/* Undo any broad scale/height constraints from the failed V71 visual patch
+   if a browser kept them cached. */
+.vn-overlay,
+#vnOverlay,
+.vn-stage,
+#vnStage,
+.vn-scene {
+  max-width: none !important;
+  max-height: none !important;
+  transform: none !important;
+  overflow: hidden !important;
 }
 
-@media (min-width: 900px) {
-  .vn-stage,
-  .vn-scene,
-  .visual-novel-stage,
-  #vnStage {
-    max-width: var(--pc-live-vn-max-width) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-
-  .claude-closeup,
-  .claude-closeup-scene,
-  .claude-analyzing,
-  .claude-analyzing-scene,
-  .claude-terminal-scene,
-  #claudeCloseup,
-  #claudeAnalyzing {
-    max-height: var(--pc-live-claude-scene-height) !important;
-    min-height: 0 !important;
-  }
-
-  .vn-image-frame,
-  .vn-scene-frame,
-  .vn-visual-frame,
-  .claude-frame,
-  .claude-computer-frame,
-  .claude-closeup-frame {
-    max-height: var(--pc-live-claude-scene-height) !important;
-  }
-
-  .vn-image-frame img,
-  .vn-scene-frame img,
-  .vn-visual-frame img,
-  .claude-frame img,
-  .claude-computer-frame img,
-  .claude-closeup-frame img,
-  img.claude-closeup,
-  img.claude-analyzing {
-    max-height: var(--pc-live-claude-scene-height) !important;
-    object-fit: contain !important;
-  }
-
-  .vn-dialogue,
-  .vn-dialogue-box,
-  .pixel-dialogue,
-  .professor-pixel-dialogue,
-  #vnDialogue,
-  #pixelDialogue {
-    min-height: var(--pc-live-dialogue-height) !important;
-    max-height: var(--pc-live-dialogue-height) !important;
-    overflow-y: auto !important;
-  }
+/* Keep normal Professor Pixel scenes visible. */
+.vn-overlay.active:not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-clean-output) .vn-smartboard-wrap,
+.vn-overlay.active:not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-clean-output) .vn-character {
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
-/* Wide but short live screens, like the screenshot, need the strongest
-   height control because vertical space is the scarce resource. */
+/* Gently reduce ONLY the Claude computer/consultation scene.
+   This avoids the black empty VN stage problem because it does not scale
+   the entire overlay, scene, dialogue, or regular intro screens. */
+.vn-overlay.active.claude-terminal-consult #claudeTerminalScene,
+.vn-overlay.active.claude-terminal-consult .claude-terminal-scene.thinking,
+.vn-overlay.active.pc-clean-prediction #claudeTerminalScene,
+.vn-overlay.active.claude-prediction #claudeTerminalScene {
+  width: min(70vw, 980px) !important;
+  top: 30% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* On wide but short screens, give the dialogue enough room while keeping
+   the computer from eating the whole viewport like a retro beige kaiju. */
 @media (min-width: 1200px) and (max-height: 950px) {
-  :root {
-    --pc-live-claude-scene-height: clamp(390px, 56vh, 590px);
-    --pc-live-dialogue-height: clamp(160px, 22vh, 230px);
+  .vn-overlay.active.claude-terminal-consult #claudeTerminalScene,
+  .vn-overlay.active.claude-terminal-consult .claude-terminal-scene.thinking,
+  .vn-overlay.active.pc-clean-prediction #claudeTerminalScene,
+  .vn-overlay.active.claude-prediction #claudeTerminalScene {
+    width: min(66vw, 920px) !important;
+    top: 29% !important;
   }
 
-  .claude-closeup,
-  .claude-closeup-scene,
-  .claude-analyzing,
-  .claude-analyzing-scene,
-  .claude-terminal-scene,
-  #claudeCloseup,
-  #claudeAnalyzing {
-    transform: scale(0.92) !important;
-    transform-origin: top center !important;
+  .vn-dialogue {
+    min-height: 150px !important;
+    padding-top: 18px !important;
+    padding-bottom: 16px !important;
+  }
+
+  .vn-text {
+    font-size: clamp(0.95rem, 1.1vw, 1.08rem) !important;
+    line-height: 1.45 !important;
+  }
+
+  .vn-speaker {
+    font-size: clamp(1rem, 1.15vw, 1.18rem) !important;
   }
 }
 
-/* Keep the monitor copy readable after the scene is scaled down. */
+/* Keep terminal text readable after the computer scene is slightly reduced. */
 #claudeTerminalOutput,
-.claude-terminal-output,
-.claude-screen-text,
-.terminal-output {
-  font-size: clamp(0.82rem, 1.05vw, 1.08rem) !important;
+.claude-terminal-output {
+  font-size: clamp(0.82rem, 1vw, 1.05rem) !important;
   line-height: 1.25 !important;
 }
 
-/* The live page can inherit browser/host enlargement. This keeps the VN layer
-   from overflowing the viewport like it is trying to escape into orbit. */
-.vn-overlay,
-#vnOverlay {
-  overflow: hidden !important;
+
+
+/* ══════════════════════════════════════════════════════
+   COMPACT LIVE LAYOUT — V73
+   Purpose:
+   - Make the live S1 workbench feel less browser-zoomed.
+   - Reduce vertical bulk in the header/tabs/mission/workspace.
+   - Keep fields readable and avoid broad transform scaling.
+   - Keep the V72 safe VN rollback behavior.
+   ══════════════════════════════════════════════════════ */
+
+/* Global density tuning: smaller UI chrome, not tiny content. */
+body {
+  font-size: 14px !important;
+}
+
+/* Header and tab rows were eating vertical space on the live build. */
+header {
+  padding: 7px 16px !important;
+}
+
+.logo-icon {
+  width: 30px !important;
+  height: 30px !important;
+  font-size: 15px !important;
+}
+
+.logo-name {
+  font-size: 0.95rem !important;
+  line-height: 1.05 !important;
+}
+
+.logo-sub {
+  font-size: 0.55rem !important;
+}
+
+.header-right {
+  gap: 8px !important;
+}
+
+.level-tag {
+  font-size: 0.58rem !important;
+  padding: 3px 8px !important;
+}
+
+.tabs {
+  min-height: 38px !important;
+}
+
+.tab-btn {
+  padding: 8px 16px !important;
+  font-size: 0.78rem !important;
+}
+
+/* Dev toolbar compacting for live testing. It can sit there, but it does
+   not need to eat the top of the page like it bought the building. */
+.dev-bar,
+.dev-toolbar,
+#devBar,
+#devToolbar,
+.dev-controls,
+.debug-controls {
+  padding-block: 4px !important;
+  gap: 6px !important;
+  min-height: 32px !important;
+}
+
+.dev-bar button,
+.dev-toolbar button,
+#devBar button,
+#devToolbar button,
+.dev-controls button,
+.debug-controls button {
+  min-height: 28px !important;
+  padding: 4px 8px !important;
+  font-size: 0.68rem !important;
+}
+
+/* S1 workbench density. Scoped so result screens and VN scenes are not damaged. */
+body.s1-active:not(.s1-result-active) #inputContainer {
+  font-size: 0.92rem !important;
+}
+
+body.s1-active:not(.s1-result-active) #inputContainer .scaffold-area {
+  padding: 12px 14px !important;
+  gap: 12px 14px !important;
+  grid-template-columns: minmax(340px, 0.72fr) minmax(560px, 1.28fr) !important;
+}
+
+/* Mission briefing: still visually important, but no longer a billboard. */
+body.s1-active:not(.s1-result-active) .mission-briefing-card {
+  padding: 12px 16px !important;
+  border-radius: 12px !important;
+}
+
+body.s1-active:not(.s1-result-active) .mission-eyebrow {
+  font-size: 0.66rem !important;
+  margin-bottom: 4px !important;
+}
+
+body.s1-active:not(.s1-result-active) .mission-title {
+  font-size: clamp(1.65rem, 2.4vw, 2.3rem) !important;
+  line-height: 1.04 !important;
+  margin-bottom: 6px !important;
+}
+
+body.s1-active:not(.s1-result-active) .mission-copy,
+body.s1-active:not(.s1-result-active) .mission-briefing-card p {
+  font-size: clamp(0.92rem, 1.15vw, 1.08rem) !important;
+  line-height: 1.45 !important;
+}
+
+/* Left/right cards. */
+body.s1-active:not(.s1-result-active) .problem-artifact-card,
+body.s1-active:not(.s1-result-active) .s1-builder-card,
+body.s1-active:not(.s1-result-active) .guided-card,
+body.s1-active:not(.s1-result-active) .repair-workspace-card {
+  padding: 12px 14px !important;
+  border-radius: 10px !important;
+}
+
+body.s1-active:not(.s1-result-active) .problem-artifact-title,
+body.s1-active:not(.s1-result-active) .guided-title,
+body.s1-active:not(.s1-result-active) .repair-title,
+body.s1-active:not(.s1-result-active) .workspace-title {
+  font-size: clamp(1.08rem, 1.55vw, 1.35rem) !important;
+  line-height: 1.16 !important;
+  margin-bottom: 6px !important;
+}
+
+body.s1-active:not(.s1-result-active) .problem-artifact-eyebrow,
+body.s1-active:not(.s1-result-active) .ingredient-heading,
+body.s1-active:not(.s1-result-active) .guided-label {
+  font-size: 0.66rem !important;
+  margin-bottom: 4px !important;
+}
+
+/* Prompt and observed problems: reduce padding without making it cramped. */
+body.s1-active:not(.s1-result-active) .problem-artifact-content,
+body.s1-active:not(.s1-result-active) .problem-artifact-prompt,
+body.s1-active:not(.s1-result-active) .observed-problem,
+body.s1-active:not(.s1-result-active) .artifact-stat {
+  padding: 7px 10px !important;
+  margin-bottom: 6px !important;
+  line-height: 1.45 !important;
+}
+
+body.s1-active:not(.s1-result-active) .problem-artifact-stats {
+  gap: 6px !important;
+}
+
+/* Prompt ingredient chips: smaller row, still tappable. */
+body.s1-active:not(.s1-result-active) .ingredient-panel {
+  padding: 8px 10px !important;
+  margin-bottom: 8px !important;
+}
+
+body.s1-active:not(.s1-result-active) .ingredient-row {
+  gap: 5px !important;
+}
+
+body.s1-active:not(.s1-result-active) .ingredient-chip {
+  padding: 4px 9px !important;
+  font-size: 0.68rem !important;
+}
+
+/* Guided textarea grid: this is where the live site looked most "zoomed." */
+body.s1-active:not(.s1-result-active) .s1-clean-fields,
+body.s1-active:not(.s1-result-active) .guided-grid,
+body.s1-active:not(.s1-result-active) .repair-grid {
+  gap: 10px 12px !important;
+}
+
+body.s1-active:not(.s1-result-active) .guided-field {
+  margin: 0 !important;
+}
+
+body.s1-active:not(.s1-result-active) .s1-clean-textarea,
+body.s1-active:not(.s1-result-active) textarea {
+  min-height: 78px !important;
+  max-height: 150px !important;
+  padding: 8px 10px !important;
+  font-size: 0.88rem !important;
+  line-height: 1.35 !important;
+}
+
+body.s1-active:not(.s1-result-active) #g-learners,
+body.s1-active:not(.s1-result-active) #g-issue,
+body.s1-active:not(.s1-result-active) #g-interaction,
+body.s1-active:not(.s1-result-active) #g-constraints {
+  min-height: 80px !important;
+}
+
+/* Footer/nudge/action row. */
+body.s1-active:not(.s1-result-active) .s1-builder-nudge,
+body.s1-active:not(.s1-result-active) .guided-nudge {
+  padding: 7px 9px !important;
+  font-size: 0.78rem !important;
+  line-height: 1.35 !important;
+}
+
+body.s1-active:not(.s1-result-active) .guided-footer {
+  margin-top: 4px !important;
+  padding-top: 6px !important;
+}
+
+body.s1-active:not(.s1-result-active) .consult-btn,
+body.s1-active:not(.s1-result-active) .primary-action,
+body.s1-active:not(.s1-result-active) button[type="submit"] {
+  min-height: 44px !important;
+  padding: 8px 18px !important;
+  font-size: 0.9rem !important;
+}
+
+/* On shorter live screens, tighten a bit more but keep the two-column design. */
+@media (min-width: 1100px) and (max-height: 900px) {
+  body.s1-active:not(.s1-result-active) #inputContainer .scaffold-area {
+    padding: 10px 12px !important;
+    gap: 10px 12px !important;
+  }
+
+  body.s1-active:not(.s1-result-active) .mission-briefing-card {
+    padding: 10px 14px !important;
+  }
+
+  body.s1-active:not(.s1-result-active) .mission-title {
+    font-size: clamp(1.5rem, 2vw, 2rem) !important;
+  }
+
+  body.s1-active:not(.s1-result-active) .mission-copy,
+  body.s1-active:not(.s1-result-active) .mission-briefing-card p {
+    font-size: 0.9rem !important;
+    line-height: 1.38 !important;
+  }
+
+  body.s1-active:not(.s1-result-active) .s1-clean-textarea,
+  body.s1-active:not(.s1-result-active) textarea,
+  body.s1-active:not(.s1-result-active) #g-learners,
+  body.s1-active:not(.s1-result-active) #g-issue,
+  body.s1-active:not(.s1-result-active) #g-interaction,
+  body.s1-active:not(.s1-result-active) #g-constraints {
+    min-height: 70px !important;
+  }
+}
+
+/* Keep the layout usable if the browser window is narrower. */
+@media (max-width: 1050px) {
+  body.s1-active:not(.s1-result-active) #inputContainer .scaffold-area {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 
