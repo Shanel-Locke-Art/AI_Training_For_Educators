@@ -173,8 +173,8 @@ function startGame() {
 const SURVEY_MODE   = 'sheets';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzwE4R9C4F27rCP_NDkYaERtNb8rY6pV2pbsqUiNY7dDPoMpVURG-0NKTNAPqA8jm1-/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
-const PC_APP_SCHEMA_VERSION = 'V62';
-const PC_APP_BUILD_LABEL = 'NEW_SHEETS_URL_FIX_V62';
+const PC_APP_SCHEMA_VERSION = 'V63';
+const PC_APP_BUILD_LABEL = 'NEW_DEPLOYMENT_SAFE_RECEIVER_V63';
 console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 
@@ -664,7 +664,7 @@ async function saveIncrementalData(scenarioIdx) {
       type: 'incremental',
       schema_version: PC_APP_SCHEMA_VERSION,
       app_build: PC_APP_BUILD_LABEL,
-      payload_shape: 'named_current_incremental_v62',
+      payload_shape: 'named_current_incremental_v63',
       timestamp: new Date().toISOString(),
       participant_id: participantId,
       session_id: pcSessionId,
