@@ -173,8 +173,8 @@ function startGame() {
 const SURVEY_MODE   = 'sheets';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbylnSseQkSsPNKSjqoU2ui6yFa62YslQEq-nRyeC8MZFVnlmv-XYoi2EUJPZGvnKU1z/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
-const PC_APP_SCHEMA_VERSION = 'V70';
-const PC_APP_BUILD_LABEL = 'NEW_WEB_APP_URL_V70';
+const PC_APP_SCHEMA_VERSION = 'V121';
+const PC_APP_BUILD_LABEL = 'HARD_TERMINAL_OVERRIDE_V121';
 console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 
@@ -753,7 +753,7 @@ async function saveIncrementalData(scenarioIdx) {
       type: 'incremental',
       schema_version: PC_APP_SCHEMA_VERSION,
       app_build: PC_APP_BUILD_LABEL,
-      payload_shape: 'named_current_incremental_v70',
+      payload_shape: 'named_current_incremental_v121',
       timestamp: new Date().toISOString(),
       participant_id: participantId,
       session_id: pcSessionId,
@@ -2662,6 +2662,124 @@ function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
 }
 
 
+const PC_ANALYSIS_LAYOUT_CLASSES_V122 = [
+  'pc-analysis-green-panel',
+  'pc-analysis-computer-mode',
+  'pc-analysis-report-active-v119',
+  'pc-analysis-green-panel-v119',
+  'pc-analysis-computer-mode-v119',
+  'pc-analysis-terminal-panel-v120',
+  'pc-analysis-report-active-v122',
+  'pc-analysis-terminal-v122',
+  'pc-analysis-mobile-v122'
+];
+
+function pcAnalysisViewportWidthV122() {
+  const values = [
+    window.innerWidth,
+    document.documentElement ? document.documentElement.clientWidth : null,
+    window.visualViewport ? window.visualViewport.width : null
+  ].filter((value) => Number.isFinite(value) && value > 0);
+
+  return values.length ? Math.min(...values) : 9999;
+}
+
+function pcGetAnalysisLayoutV122() {
+  const width = pcAnalysisViewportWidthV122();
+  if (width <= 760) return 'mobile';
+  if (width <= 1510) return 'terminal';
+  return 'computer';
+}
+
+function pcClearLegacyAnalysisInlineStylesV122() {
+  const overlay = document.getElementById('vnOverlay');
+  const terminal = document.getElementById('claudeTerminalScene');
+  const photo = terminal ? terminal.querySelector('.claude-terminal-photo') : null;
+  const screen = terminal ? terminal.querySelector('.claude-terminal-screen') : null;
+  const dialogue = overlay ? overlay.querySelector('.vn-dialogue') : null;
+  const scene = overlay ? overlay.querySelector('.vn-scene') : null;
+
+  const clearProperties = (element, properties) => {
+    if (!element) return;
+    properties.forEach((property) => element.style.removeProperty(property));
+  };
+
+  clearProperties(terminal, [
+    'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
+    'max-width', 'max-height', 'min-height', 'aspect-ratio', 'transform',
+    'margin', 'padding', 'display', 'opacity', 'visibility', 'z-index'
+  ]);
+  clearProperties(photo, [
+    'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
+    'max-width', 'max-height', 'aspect-ratio', 'border-radius', 'padding',
+    'margin', 'background', 'background-image', 'border', 'box-shadow', 'display'
+  ]);
+  clearProperties(screen, [
+    'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
+    'border-radius', 'padding', 'box-sizing', 'overflow', 'overflow-y', 'z-index'
+  ]);
+  clearProperties(dialogue, [
+    'height', 'min-height', 'padding', 'overflow', 'background', 'border'
+  ]);
+  clearProperties(scene, ['flex', 'height', 'min-height']);
+}
+
+function pcIsAnalysisReportActiveV122() {
+  const overlay = document.getElementById('vnOverlay');
+  const output = document.getElementById('claudeTerminalOutput');
+
+  return Boolean(
+    overlay &&
+    overlay.classList.contains('active') &&
+    overlay.classList.contains('claude-terminal-textmode') &&
+    output &&
+    output.classList.contains('claude-analysis-layout')
+  );
+}
+
+function pcApplyAnalysisLayoutV122() {
+  const overlay = document.getElementById('vnOverlay');
+  const terminal = document.getElementById('claudeTerminalScene');
+  const output = document.getElementById('claudeTerminalOutput');
+  const targets = [overlay, terminal, output].filter(Boolean);
+  const isActive = pcIsAnalysisReportActiveV122();
+  const layout = isActive ? pcGetAnalysisLayoutV122() : null;
+
+  pcClearLegacyAnalysisInlineStylesV122();
+
+  targets.forEach((element) => {
+    element.classList.remove(...PC_ANALYSIS_LAYOUT_CLASSES_V122);
+
+    if (!isActive) return;
+    element.classList.add('pc-analysis-report-active-v122');
+
+    if (layout === 'terminal') {
+      element.classList.add('pc-analysis-terminal-v122');
+    } else if (layout === 'mobile') {
+      element.classList.add('pc-analysis-mobile-v122');
+    }
+  });
+}
+
+function pcClearAnalysisLayoutV122() {
+  const overlay = document.getElementById('vnOverlay');
+  const terminal = document.getElementById('claudeTerminalScene');
+  const output = document.getElementById('claudeTerminalOutput');
+
+  [overlay, terminal, output].filter(Boolean).forEach((element) => {
+    element.classList.remove(...PC_ANALYSIS_LAYOUT_CLASSES_V122);
+  });
+
+  pcClearLegacyAnalysisInlineStylesV122();
+}
+
+if (!window.pcAnalysisLayoutV122Installed) {
+  window.pcAnalysisLayoutV122Installed = true;
+  window.addEventListener('resize', pcApplyAnalysisLayoutV122, { passive: true });
+  window.addEventListener('orientationchange', pcApplyAnalysisLayoutV122, { passive: true });
+  window.visualViewport?.addEventListener('resize', pcApplyAnalysisLayoutV122, { passive: true });
+}
+
 function showClaudeConsultOverlay(partLabel) {
   // This is an interaction moment: Pixel consults Claude through the terminal close-up.
   vnQueue = [];
@@ -2672,6 +2790,8 @@ function showClaudeConsultOverlay(partLabel) {
   vnCurrentText = '';
 
 const overlay = document.getElementById('vnOverlay');
+
+pcClearAnalysisLayoutV122();
 
 overlay.classList.remove(
   'claude-prediction',
@@ -2809,6 +2929,7 @@ function buildClaudeAnalysisHTML(feedback, mock = false) {
   `;
 }
 
+
 function showClaudeConsultResult(feedback, mock = false, onClose = null) {
   claudeTerminalCloseCallback = typeof onClose === 'function' ? onClose : null;
   const label = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
@@ -2823,10 +2944,20 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
   );
 
   const output = document.getElementById('claudeTerminalOutput');
+
   if (output) {
     output.classList.add('claude-analysis-layout');
     output.innerHTML = buildClaudeAnalysisHTML(terminalText, mock);
   }
+
+  pcApplyAnalysisLayoutV122();
+
+  requestAnimationFrame(() => {
+    pcApplyAnalysisLayoutV122();
+    const screen = output?.closest('.claude-terminal-screen');
+    if (screen) screen.scrollTop = 0;
+    if (output) output.scrollTop = 0;
+  });
 
   const speaker = document.getElementById('vnSpeaker');
   if (speaker) speaker.textContent = 'Professor Pixel';
@@ -2878,6 +3009,7 @@ function closeClaudeConsultOverlay() {
   const cb = claudeTerminalCloseCallback;
   claudeTerminalCloseCallback = null;
   const overlay = document.getElementById('vnOverlay');
+  pcClearAnalysisLayoutV122();
   if (overlay) overlay.classList.remove('active', 'claude-consult', 'claude-terminal-consult', 'claude-terminal-textmode', 'claude-prediction');
   document.getElementById('vnCharacter')?.classList.remove('visible');
   setClaudeShelfState('idle', 'idle');
@@ -5725,3 +5857,6 @@ function toggleClaudeTTS() {
     if (btn) btn.textContent = '⏹ Stop Reading';
     window.speechSynthesis.speak(claudeSpeechUtterance);
   }
+
+
+
