@@ -481,37 +481,7 @@ header {
   animation-delay: 0.44s;
 }
 
-/* ── WELCOME CARD ──────────────────────────────────── */
-.welcome-card {
-  background: var(--chalk);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 18px 20px 18px 32px;
-  max-width: 520px;
-  box-shadow: 2px 3px 8px rgba(42,31,20,0.07);
-  position: relative;
-  overflow: hidden;
-}
-/* Red margin line */
-.welcome-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 28px;
-  width: 1.5px;
-  background: rgba(192,57,43,0.22);
-}
-.tip-row {
-  margin-top: 12px;
-  background: var(--amber-light);
-  border: 1px solid rgba(196,124,45,0.28);
-  border-radius: var(--radius);
-  padding: 9px 12px;
-  font-size: 0.78rem;
-  color: var(--amber-dark);
-  font-weight: 600;
-}
+/* Repeated welcome cards removed in V123; scenarios now share .scenario-mission. */
 
 /* ── INPUT AREA ────────────────────────────────────── */
 .input-area {
@@ -819,12 +789,6 @@ textarea::placeholder {
   }
   .ref-title {
     font-size: 1.05rem;
-  }
-  .welcome-card {
-    padding: 14px 16px;
-  }
-  .welcome-card::before {
-    display: none;
   }
 }
 @media (max-width: 360px) {
@@ -2173,7 +2137,7 @@ textarea::placeholder {
 }
 
 /* ── SELF-REPORT QUESTION ───────────────────────────── */
-.s4-self-report {
+.hallucination-self-report {
   background: var(--amber-light);
   border: 1.5px solid rgba(196,124,45,0.3);
   border-radius: var(--radius);
@@ -2181,14 +2145,14 @@ textarea::placeholder {
   margin-top: 12px;
   animation: slideUp 0.4s ease 0.6s both;
 }
-.s4-self-report-q {
+.hallucination-self-report-q {
   font-size: 0.84rem;
   font-weight: 700;
   color: var(--amber-dark);
   margin-bottom: 10px;
   line-height: 1.5;
 }
-.s4-self-report-btns {
+.hallucination-self-report-btns {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
@@ -6367,36 +6331,6 @@ body.s2-active .scenario-card, body.s2-active .oscqr-row {
   gap: 12px;
   min-height: 0;
 }
-.s2-mission-card {
-  background: linear-gradient(135deg, #163f2a 0%, #245a39 100%);
-  border: 2px solid #102d1d;
-  border-radius: var(--radius-lg);
-  color: #f2fff4;
-  padding: 14px 18px;
-  box-shadow: 0 4px 14px rgba(22,63,42,0.22);
-}
-.s2-mission-eyebrow, .s2-card-eyebrow, .s2-panel-eyebrow {
-  font-family: "Source Code Pro", monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-weight: 800;
-}
-.s2-mission-eyebrow {
-  color: #a8d5b5;
-  margin-bottom: 4px;
-}
-.s2-mission-title {
-  font-family: "Fraunces", serif;
-  font-size: clamp(1.3rem, 2vw, 1.85rem);
-  line-height: 1.12;
-  margin-bottom: 6px;
-}
-.s2-mission-copy {
-  font-size: clamp(0.94rem, 1vw, 1.04rem);
-  line-height: 1.55;
-  color: #e8f5ed;
-}
 .s2-panel, .s2-detective-card, .s2-context-panel {
   background: #fffaf2;
   border: 2px solid #bfa987;
@@ -6408,6 +6342,11 @@ body.s2-active .scenario-card, body.s2-active .oscqr-row {
 .s2-card-eyebrow, .s2-panel-eyebrow {
   color: #6f4b24;
   margin-bottom: 8px;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 .s2-panel-title {
   font-family: "Fraunces", serif;
@@ -15731,7 +15670,7 @@ body .vn-overlay.active .prediction-continue-btn:hover {
   body .vn-overlay.active:not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-board-text *,
   body .vn-overlay.active.pc-clean-output:not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question) .vn-board-text,
   body .vn-overlay.active.pc-clean-output:not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question) .vn-board-text * {
-    font-size: clamp(2rem, 3.95vw, 1.28rem) !important;
+    font-size: clamp(0.86rem, 2.2vw, 1.08rem) !important;
     line-height: 1.16 !important;
     font-weight: 800 !important;
   }
@@ -15747,7 +15686,7 @@ body .vn-overlay.active .prediction-continue-btn:hover {
   /* Give the black board text card enough room for the larger text. */
   body .vn-overlay.active:not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-board-text,
   body .vn-overlay.active.pc-clean-output:not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question) .vn-board-text {
-    max-width: min(76vw, 420px) !important;
+    max-width: none !important;
     padding: clamp(10px, 2.6vw, 16px) !important;
   }
 }
@@ -19164,3 +19103,295 @@ body.s1-active:not(.s1-result-active) button[type="submit"] {
     flex-wrap: nowrap !important;
   }
 }
+
+
+/* ══════════════════════════════════════════════════════
+   V123 — SHARED SCENARIO TEMPLATE
+   Scenario 1's mission anatomy now serves every scenario. Scenario-specific
+   activities keep their own components; repeated shell cards do not.
+   ══════════════════════════════════════════════════════ */
+.scenario-entry,
+.scenario-nav-wrap {
+  width: min(100%, 1100px);
+  margin: 0 auto 12px;
+  animation: slideUp 0.3s ease forwards;
+  opacity: 0;
+}
+
+.scenario-mission {
+  background: linear-gradient(135deg, var(--forest-dark), var(--forest));
+  border: 2px solid var(--forest-dark);
+  color: #e8f5ed;
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 8px 22px rgba(30, 61, 41, 0.18);
+}
+
+.scenario-mission .mission-eyebrow {
+  margin-bottom: 4px;
+  color: #a8d5b5;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.scenario-mission .mission-title {
+  margin-bottom: 4px;
+  color: #ffffff;
+  font-family: "Fraunces", serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.scenario-mission .mission-copy {
+  max-width: 980px;
+  color: rgba(232, 245, 237, 0.92);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.scenario-task-card {
+  background: var(--chalk);
+  border: 2px solid var(--border-strong);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 6px 16px rgba(42, 31, 20, 0.08);
+}
+
+.scenario-task-eyebrow {
+  margin-bottom: 7px;
+  color: var(--terracotta);
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.scenario-code-sample {
+  margin-bottom: 14px;
+  padding: 13px 15px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fffdf8;
+  color: var(--ink);
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.scenario-task-question {
+  margin-bottom: 10px;
+  color: var(--ink);
+  font-family: "Fraunces", serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.scenario-choice-list {
+  display: grid;
+  gap: 8px;
+}
+
+.scenario-choice-btn {
+  width: 100%;
+  text-align: left;
+}
+
+@media (max-width: 760px) {
+  .scenario-entry,
+  .scenario-nav-wrap {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .scenario-mission,
+  .scenario-task-card {
+    border-radius: 12px;
+    padding: 13px 14px;
+  }
+
+  .scenario-mission .mission-title {
+    font-size: 1.16rem;
+  }
+
+  .scenario-mission .mission-copy,
+  .scenario-code-sample {
+    font-size: 0.9rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   V125 — RESPONSIVE SMARTBOARD MISSION CARD RESET
+   Corrects the old mobile rule that forced 2rem text and a 420px card.
+   The mission card now uses the available board width and grows only as
+   tall as its actual content on normal Professor Pixel introduction screens.
+   ══════════════════════════════════════════════════════ */
+body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text {
+  box-sizing: border-box !important;
+  width: auto !important;
+  max-width: none !important;
+  height: max-content !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  left: 9.5% !important;
+  right: 9.5% !important;
+  margin: 0 !important;
+  padding: clamp(14px, 1.7vw, 22px) clamp(16px, 2.2vw, 30px) clamp(11px, 1.35vw, 17px) !important;
+  font-size: clamp(1rem, 1.22vw, 1.48rem) !important;
+  line-height: 1.22 !important;
+  overflow: visible !important;
+}
+
+body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text::before {
+  margin: 0 0 9px 0 !important;
+}
+
+/* Condensed widths and short browser windows share the same readable card.
+   Do not narrow it to 420px and do not enlarge the paragraph to 2rem. */
+@media (max-width: 900px), (max-height: 760px) {
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text,
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text * {
+    width: auto !important;
+    max-width: none !important;
+    height: max-content !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    font-size: clamp(0.86rem, 2.2vw, 1.08rem) !important;
+    line-height: 1.18 !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text {
+    left: 9.5% !important;
+    right: 9.5% !important;
+    padding: 12px 14px 9px !important;
+    overflow: visible !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text::before {
+    margin-bottom: 7px !important;
+    font-size: clamp(0.42rem, 1.25vw, 0.56rem) !important;
+  }
+}
+
+/* Very short screens need a slightly tighter card so Pixel and the dialogue
+   remain visible without turning the mission into a giant worksheet. */
+@media (max-height: 650px) {
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text,
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text * {
+    font-size: clamp(0.78rem, 1.9vw, 0.98rem) !important;
+    line-height: 1.14 !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text {
+    top: clamp(34px, 5.2vw, 48px) !important;
+    padding: 10px 12px 8px !important;
+  }
+}
+
+@media (max-width: 560px) {
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text,
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text * {
+    font-size: clamp(0.74rem, 3.4vw, 0.94rem) !important;
+    line-height: 1.14 !important;
+  }
+
+  body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text {
+    left: 8.5% !important;
+    right: 8.5% !important;
+    top: 36px !important;
+    padding: 9px 10px 7px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   V126 — SCENARIO INTRO PIXEL COMPOSITION
+   All scenario introductions now use Scenario 1's right-side portrait
+   composition. This overrides the older condensed/mobile rules that centered
+   and enlarged Pixel over the challenge card. Claude and post-analysis scenes
+   are deliberately excluded by the scenario-intro-active state class.
+   ══════════════════════════════════════════════════════ */
+body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) #vnCharacter,
+body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-character {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: absolute !important;
+  left: auto !important;
+  right: -2% !important;
+  bottom: 18px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: min(58vh, 600px) !important;
+  max-width: 38vw !important;
+  max-height: 600px !important;
+  transform: none !important;
+  transform-origin: right bottom !important;
+  align-items: flex-end !important;
+  justify-content: flex-end !important;
+  z-index: 7 !important;
+  pointer-events: none !important;
+}
+
+body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) #vnPortrait {
+  display: block !important;
+  width: auto !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: right bottom !important;
+}
+
+/* Short desktop/landscape screens: preserve the S1 right edge instead of
+   activating the old centered portrait rule through max-height: 760px. */
+@media (min-width: 901px) and (max-height: 760px) {
+  body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) #vnCharacter,
+  body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-character {
+    left: auto !important;
+    right: -2.5% !important;
+    bottom: 22px !important;
+    height: min(50vh, 350px) !important;
+    max-width: 32vw !important;
+    max-height: 350px !important;
+    transform: none !important;
+  }
+}
+
+/* Narrow screens: keep Pixel below the challenge text and mostly outside the
+   board's right edge. The dialogue still owns the bottom portion of the view. */
+@media (max-width: 900px) {
+  body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) #vnCharacter,
+  body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-character {
+    left: auto !important;
+    right: -8% !important;
+    bottom: clamp(220px, 30dvh, 270px) !important;
+    width: auto !important;
+    height: clamp(165px, 27dvh, 225px) !important;
+    max-width: 42vw !important;
+    max-height: 28dvh !important;
+    transform: none !important;
+    opacity: 1 !important;
+    z-index: 18 !important;
+  }
+
+  body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) #vnPortrait {
+    max-width: 42vw !important;
+    max-height: 28dvh !important;
+  }
+}
+
+@media (max-width: 560px) {
+  body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) #vnCharacter,
+  body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-character {
+    right: -10% !important;
+    bottom: clamp(205px, 29dvh, 245px) !important;
+    height: clamp(145px, 24dvh, 195px) !important;
+    max-width: 44vw !important;
+    max-height: 25dvh !important;
+  }
+}
+

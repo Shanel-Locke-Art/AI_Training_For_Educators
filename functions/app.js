@@ -48,12 +48,24 @@
 // ══════════════════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════════════════
+const SCENARIO_INDEX = Object.freeze({
+  ENGAGEMENT: 0,
+  METACOGNITION: 1,
+  ASSESSMENT: 2,
+  SYNC_BIAS: 3,
+  HALLUCINATION: 4,
+  PREDICTION: 5,
+  OVERRELIANCE: 6,
+  REFLECT_REVISE: 7,
+});
+const SCENARIO_COUNT = Object.keys(SCENARIO_INDEX).length;
+
 let xp = 0;
 let attempts = 0;
 let lastPromptText = ''; // tracks last prompt for pre-filling on next attempt
 let scenarioIndex = 0;
 let history = [];
-let scenarioCompleted = [false, false, false, false, false, false, false, false];
+let scenarioCompleted = Array(SCENARIO_COUNT).fill(false);
 let playerName = 'You'; // updated by name entry modal
 
 // ── SCREEN READER UTILITY ─────────────────────────────
@@ -149,14 +161,14 @@ function startGame() {
   window.scenarioIntroEnabled = false; // suppress during initial load
 
   try {
-    loadScenario(0);
+    loadScenario(SCENARIO_INDEX.ENGAGEMENT);
     window.pcInitialScenarioRendered = true;
   } catch (err) {
     console.error('[PromptCraft] Initial scenario render failed:', err);
   }
 
   setTimeout(() => {
-    playPixelSequence('scenarioStart_0', null);
+    playPixelSequence(getScenarioStartDialogueKey(SCENARIO_INDEX.ENGAGEMENT), null);
     setTimeout(() => {
       playPixelSequence('welcome', null);
       // Enable scenario intro audio after opening sequence clears
@@ -174,7 +186,7 @@ const SURVEY_MODE   = 'sheets';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbylnSseQkSsPNKSjqoU2ui6yFa62YslQEq-nRyeC8MZFVnlmv-XYoi2EUJPZGvnKU1z/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 const PC_APP_SCHEMA_VERSION = 'V121';
-const PC_APP_BUILD_LABEL = 'HARD_TERMINAL_OVERRIDE_V121';
+const PC_APP_BUILD_LABEL = 'SCENARIO_TEMPLATE_CLEANUP_V127';
 console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 
@@ -266,8 +278,7 @@ function mockClaudeText(payload, context = 'main') {
   const lastUser = payload.messages?.slice().reverse().find(m => m.role === 'user')?.content || '';
   const promptPreview = String(lastUser).replace(/\s+/g, ' ').slice(0, 180);
   const sc = scenarios?.[scenarioIndex] || {};
-  const titleMap = ['Engagement', 'Metacognition', 'Authentic Assessment', 'Hallucination Hunt', 'Predict the Output', 'Synchronous Bias', 'Overreliance', 'Reflect and Revise'];
-  const scenarioTitle = titleMap[scenarioIndex] || 'PromptCraft';
+  const scenarioTitle = window.SCENARIO_UI?.[scenarioIndex]?.tabLabel || 'PromptCraft';
 
   if (context === 's1_section') {
     const sectionMatch = String(lastUser).match(/SECTION_BEING_REVIEWED:\s*([^\n]+)/i);
@@ -295,16 +306,16 @@ function mockClaudeText(payload, context = 'main') {
     return `Your PromptCraft run shows a developing pattern of experimentation: you moved from basic prompt construction toward more intentional revision and evaluation. Your strongest evidence of growth is the way you used context, constraints, and reflection to make later prompts more specific.\n\nThe next area to keep developing is prediction: before using AI output, pause to name what you expect the system to do and what risks might appear. Carry that habit into your teaching practice by treating every AI response as a draft that needs human judgment before students ever see it.`;
   }
 
-  if (scenarioIndex === 3 || sc.isCriticalThinking) {
+  if (scenarioIndex === SCENARIO_INDEX.HALLUCINATION || sc.isCriticalThinking) {
     return `**Faculty Development Workshop Review**\n\nThis agenda looks polished, but it needs careful review before use. The learning styles section should be questioned because learning styles are often overstated in teaching materials. The cited study should also be verified before it is used in faculty development.\n\n**Course Quality Check**\nClear Objectives: partly addressed\nEvidence-Based: needs verification\nOnline Context: addressed\nFeasibility: addressed\nVerified Sources: needs review`;
   }
 
-  if (scenarioIndex === 5 || sc.isBiasScenario) {
+  if (scenarioIndex === SCENARIO_INDEX.SYNC_BIAS || sc.isBiasScenario) {
     return `**Async-First Capstone Redesign**\n\nFor a fully asynchronous course, I would replace mandatory live meetings with structured milestones, recorded presentation options, peer review windows, and flexible team communication expectations. Students could submit a capstone proposal, receive instructor feedback, complete asynchronous peer review, and present through recorded media or a written professional portfolio.\n\n**Course Quality Check**\nAsync-Friendly: addressed\nAccess & Equity: addressed\nFlexibility: addressed\nInclusive Design: addressed\nFeasibility: addressed`;
   }
 
 
-  if (scenarioIndex === 0) {
+  if (scenarioIndex === SCENARIO_INDEX.ENGAGEMENT) {
     return `**Revised Discussion Prompt: From Reaction to Conversation**
 
 Choose one idea from this week's reading that you think is useful, questionable, or difficult to apply. In your initial post, explain your choice, connect it to a specific detail from the reading, and describe how it might show up in a real classroom, workplace, or community situation.
@@ -397,28 +408,41 @@ document.addEventListener('DOMContentLoaded', showMockClaudeNotice);
 const sessionStart = Date.now();
 const pcSessionId = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
-// Per-scenario tracking object — now includes scenario 4
-const scenarioData = [
-  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '' },
-  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '' },
-  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '' },
-  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', selfReport: '' },
-  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', prediction: '', predictionCorrect: false },
-  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', biasItemsSpotted: [] },
-  { attempts: 0, prompts: [], bestScore: 0, finalResponse: '', oscqrLit: '', overrelianceDecisions: {} },
-  { attempts: 0, prompts: [], initialPrompt: '', revisedPrompt: '', initialScore: 0, revisedScore: 0, scoreDelta: 0, finalResponse: '', oscqrLit: '', reflection1: '', reflection2: '', reflection3: '' },
-];
+// Per-scenario tracking. Special fields are assigned by named scenario index
+// so rearranging presentation order cannot silently corrupt research data.
+const scenarioData = Array.from({ length: SCENARIO_COUNT }, (_, index) => {
+  const base = {
+    attempts: 0,
+    prompts: [],
+    bestScore: 0,
+    finalResponse: '',
+    oscqrLit: '',
+  };
 
-const PC_SCENARIO_LABELS = [
-  'S1: Engagement',
-  'S2: Metacognition',
-  'S3: Authentic Assessment',
-  'S4: Sync Bias',
-  'S5: Hallucination Hunt',
-  'S6: Predict the Output',
-  'S7: Overreliance',
-  'S8: Reflect & Revise'
-];
+  if (index === SCENARIO_INDEX.HALLUCINATION) {
+    return { ...base, selfReport: '' };
+  }
+  if (index === SCENARIO_INDEX.PREDICTION) {
+    return { ...base, prediction: '', predictionCorrect: false };
+  }
+  if (index === SCENARIO_INDEX.OVERRELIANCE) {
+    return { ...base, overrelianceDecisions: {} };
+  }
+  if (index === SCENARIO_INDEX.REFLECT_REVISE) {
+    return {
+      ...base,
+      initialPrompt: '',
+      revisedPrompt: '',
+      initialScore: 0,
+      revisedScore: 0,
+      scoreDelta: 0,
+      reflection1: '',
+      reflection2: '',
+      reflection3: '',
+    };
+  }
+  return base;
+});
 
 const pcLastIncrementalSaveAt = {};
 
@@ -531,22 +555,22 @@ function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
 //  GROWTH SCORING — normalize all 8 scenarios to 0–5
 // ══════════════════════════════════════════════════════
 function buildGrowthScores() {
-  const s1 = scenarioData[0].bestScore || 0;
-  const s2 = scenarioData[1].bestScore || 0;
-  const s3 = scenarioData[2].bestScore || 0;
-  const s4 = scenarioData[3].bestScore || 0;
+  const s1 = scenarioData[SCENARIO_INDEX.ENGAGEMENT].bestScore || 0;
+  const s2 = scenarioData[SCENARIO_INDEX.METACOGNITION].bestScore || 0;
+  const s3 = scenarioData[SCENARIO_INDEX.ASSESSMENT].bestScore || 0;
+  const s4 = scenarioData[SCENARIO_INDEX.SYNC_BIAS].bestScore || 0;
 
   // S5 Hallucination Hunt: caught=5, unsure=2.5, missed=1
-  const s5raw = scenarioData[4].selfReport || '';
+  const s5raw = scenarioData[SCENARIO_INDEX.HALLUCINATION].selfReport || '';
   const s5 = s5raw === 'yes_noticed' ? 5 : s5raw === 'unsure' ? 2.5 : 1;
 
   // S6 Predict: prediction accuracy (2.5) + prompt quality (2.5)
-  const s6pred   = scenarioData[5].predictionCorrect ? 2.5 : 0;
-  const s6prompt = Math.min(2.5, (scenarioData[5].bestScore || 0) * 0.5);
+  const s6pred   = scenarioData[SCENARIO_INDEX.PREDICTION].predictionCorrect ? 2.5 : 0;
+  const s6prompt = Math.min(2.5, (scenarioData[SCENARIO_INDEX.PREDICTION].bestScore || 0) * 0.5);
   const s6 = s6pred + s6prompt;
 
   // S7 Overreliance: correct decisions out of 5
-  const d7 = scenarioData[6].overrelianceDecisions || {};
+  const d7 = scenarioData[SCENARIO_INDEX.OVERRELIANCE].overrelianceDecisions || {};
   const correct7 = [
     d7.policy    === 'must_be_original',
     d7.cases     === 'needs_judgment',
@@ -557,14 +581,14 @@ function buildGrowthScores() {
   const s7 = correct7;
 
   // S8: revised score is the outcome of iteration
-  const s8 = scenarioData[7].revisedScore || scenarioData[7].initialScore || 0;
-  const delta = (scenarioData[7].revisedScore || 0) - (scenarioData[7].initialScore || 0);
+  const s8 = scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedScore || scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialScore || 0;
+  const delta = (scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedScore || 0) - (scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialScore || 0);
 
   return {
     s1, s2, s3, s4, s5, s6, s7, s8, delta,
     trajectory: [s1, s2, s3, s4, s5, s6, s7, s8],
     s5_caught:    s5raw,
-    s6_predicted: scenarioData[5].predictionCorrect ? 'yes' : 'no',
+    s6_predicted: scenarioData[SCENARIO_INDEX.PREDICTION].predictionCorrect ? 'yes' : 'no',
     s7_correct:   correct7,
     threshold_met: [s1,s2,s3,s4].filter(s => s >= 3).length,
   };
@@ -583,9 +607,9 @@ S1 Engagement: ${g.s1} | S2 Metacognition: ${g.s2} | S3 Authentic Assessment: ${
 S5 Hallucination Hunt: ${g.s5} (${g.s5_caught === 'yes_noticed' ? 'caught issues independently' : g.s5_caught === 'unsure' ? 'was uncertain' : 'initially missed problems'})
 S6 Predict the Output: ${g.s6} (prediction ${g.s6_predicted === 'yes' ? 'correct' : 'incorrect'})
 S7 Overreliance: ${g.s7} (${g.s7_correct}/5 decisions correct)
-S8 Reflect & Revise: ${g.s8} (initial: ${scenarioData[7].initialScore||0} → revised: ${scenarioData[7].revisedScore||0}, delta: ${g.delta>=0?'+':''}${g.delta})
+S8 Reflect & Revise: ${g.s8} (initial: ${scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialScore||0} → revised: ${scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedScore||0}, delta: ${g.delta>=0?'+':''}${g.delta})
 
-ATTEMPTS: S1:${scenarioData[0].attempts} S2:${scenarioData[1].attempts} S3:${scenarioData[2].attempts} S4:${scenarioData[3].attempts} S5:${scenarioData[4].attempts} S6:${scenarioData[5].attempts} S7:${scenarioData[6].attempts||1} S8:${scenarioData[7].attempts||1}
+ATTEMPTS: S1:${scenarioData[SCENARIO_INDEX.ENGAGEMENT].attempts} S2:${scenarioData[SCENARIO_INDEX.METACOGNITION].attempts} S3:${scenarioData[SCENARIO_INDEX.ASSESSMENT].attempts} S4:${scenarioData[SCENARIO_INDEX.SYNC_BIAS].attempts} S5:${scenarioData[SCENARIO_INDEX.HALLUCINATION].attempts} S6:${scenarioData[SCENARIO_INDEX.PREDICTION].attempts} S7:${scenarioData[SCENARIO_INDEX.OVERRELIANCE].attempts||1} S8:${scenarioData[SCENARIO_INDEX.REFLECT_REVISE].attempts||1}
 
 PROMPTING THRESHOLDS MET (>=3/5): ${g.threshold_met}/4
 
@@ -633,7 +657,7 @@ function buildSessionPayload(formData) {
   const totalAttempts = scenarioData.reduce((sum, s) => sum + (s.attempts || 0), 0);
 
   // Build S7 decisions object from scenarioData
-  const d7 = scenarioData[6]?.overrelianceDecisions || {};
+  const d7 = scenarioData[SCENARIO_INDEX.OVERRELIANCE]?.overrelianceDecisions || {};
 
   return {
     type: 'full_response',
@@ -651,46 +675,46 @@ function buildSessionPayload(formData) {
     presubmit_predictions: pcFormatAllPresubmitPredictions(),
 
     // S1
-    s1_attempts:          scenarioData[0].attempts,
-    s1_best_score:        scenarioData[0].bestScore,
-    s1_prompts:           scenarioData[0].prompts.join(' | '),
-    s1_final_response:    scenarioData[0].finalResponse,
-    s1_oscqr:             scenarioData[0].oscqrLit,
-    s1_section_reviews:   JSON.stringify(scenarioData[0].sectionReviews || []),
+    s1_attempts:          scenarioData[SCENARIO_INDEX.ENGAGEMENT].attempts,
+    s1_best_score:        scenarioData[SCENARIO_INDEX.ENGAGEMENT].bestScore,
+    s1_prompts:           scenarioData[SCENARIO_INDEX.ENGAGEMENT].prompts.join(' | '),
+    s1_final_response:    scenarioData[SCENARIO_INDEX.ENGAGEMENT].finalResponse,
+    s1_oscqr:             scenarioData[SCENARIO_INDEX.ENGAGEMENT].oscqrLit,
+    s1_section_reviews:   JSON.stringify(scenarioData[SCENARIO_INDEX.ENGAGEMENT].sectionReviews || []),
 
     // S2
-    s2_attempts:          scenarioData[1].attempts,
-    s2_best_score:        scenarioData[1].bestScore,
-    s2_prompts:           scenarioData[1].prompts.join(' | '),
-    s2_final_response:    scenarioData[1].finalResponse,
-    s2_oscqr:             scenarioData[1].oscqrLit,
+    s2_attempts:          scenarioData[SCENARIO_INDEX.METACOGNITION].attempts,
+    s2_best_score:        scenarioData[SCENARIO_INDEX.METACOGNITION].bestScore,
+    s2_prompts:           scenarioData[SCENARIO_INDEX.METACOGNITION].prompts.join(' | '),
+    s2_final_response:    scenarioData[SCENARIO_INDEX.METACOGNITION].finalResponse,
+    s2_oscqr:             scenarioData[SCENARIO_INDEX.METACOGNITION].oscqrLit,
 
     // S3
-    s3_attempts:          scenarioData[2].attempts,
-    s3_best_score:        scenarioData[2].bestScore,
-    s3_prompts:           scenarioData[2].prompts.join(' | '),
-    s3_final_response:    scenarioData[2].finalResponse,
-    s3_oscqr:             scenarioData[2].oscqrLit,
+    s3_attempts:          scenarioData[SCENARIO_INDEX.ASSESSMENT].attempts,
+    s3_best_score:        scenarioData[SCENARIO_INDEX.ASSESSMENT].bestScore,
+    s3_prompts:           scenarioData[SCENARIO_INDEX.ASSESSMENT].prompts.join(' | '),
+    s3_final_response:    scenarioData[SCENARIO_INDEX.ASSESSMENT].finalResponse,
+    s3_oscqr:             scenarioData[SCENARIO_INDEX.ASSESSMENT].oscqrLit,
 
-    // S4 — hallucination hunt (no open prompt, but track what we have)
-    s4_attempts:          scenarioData[3].attempts,
-    s4_best_score:        scenarioData[3].bestScore,
-    s4_prompts:           scenarioData[3].prompts.join(' | '),
-    s4_final_response:    scenarioData[3].finalResponse,
-    s4_oscqr:             scenarioData[3].oscqrLit,
+    // S4 — synchronous assumption bias
+    s4_attempts:          scenarioData[SCENARIO_INDEX.SYNC_BIAS].attempts,
+    s4_best_score:        scenarioData[SCENARIO_INDEX.SYNC_BIAS].bestScore,
+    s4_prompts:           scenarioData[SCENARIO_INDEX.SYNC_BIAS].prompts.join(' | '),
+    s4_final_response:    scenarioData[SCENARIO_INDEX.SYNC_BIAS].finalResponse,
+    s4_oscqr:             scenarioData[SCENARIO_INDEX.SYNC_BIAS].oscqrLit,
 
-    // S5 — predict the output
-    s5_attempts:          scenarioData[4].attempts,
-    s5_best_score:        scenarioData[4].bestScore || 0,
-    s5_self_report:       scenarioData[4].selfReport || '',
-    s5_prompts:           scenarioData[4].prompts.join(' | '),
-    s5_final_response:    scenarioData[4].finalResponse || '',
+    // S5 — hallucination hunt
+    s5_attempts:          scenarioData[SCENARIO_INDEX.HALLUCINATION].attempts,
+    s5_best_score:        scenarioData[SCENARIO_INDEX.HALLUCINATION].bestScore || 0,
+    s5_self_report:       scenarioData[SCENARIO_INDEX.HALLUCINATION].selfReport || '',
+    s5_prompts:           scenarioData[SCENARIO_INDEX.HALLUCINATION].prompts.join(' | '),
+    s5_final_response:    scenarioData[SCENARIO_INDEX.HALLUCINATION].finalResponse || '',
 
-    // S6 — sync bias
-    s6_attempts:          scenarioData[5].attempts,
-    s6_prediction:        scenarioData[5].prediction || '',
-    s6_prediction_correct: scenarioData[5].predictionCorrect ? 'yes' : 'no',
-    s6_prompts:           scenarioData[5].prompts.join(' | '),
+    // S6 — predict the output
+    s6_attempts:          scenarioData[SCENARIO_INDEX.PREDICTION].attempts,
+    s6_prediction:        scenarioData[SCENARIO_INDEX.PREDICTION].prediction || '',
+    s6_prediction_correct: scenarioData[SCENARIO_INDEX.PREDICTION].predictionCorrect ? 'yes' : 'no',
+    s6_prompts:           scenarioData[SCENARIO_INDEX.PREDICTION].prompts.join(' | '),
 
     // S7 — overreliance decisions
     s7_decisions: {
@@ -700,19 +724,19 @@ function buildSessionPayload(formData) {
       scenarios:  d7.scenarios  || '',
       objectives: d7.objectives || '',
     },
-    s7_best_score:        scenarioData[6].bestScore || 0,
+    s7_best_score:        scenarioData[SCENARIO_INDEX.OVERRELIANCE].bestScore || 0,
 
     // S8 — reflect & revise
-    s8_initial_prompt:    scenarioData[7].initialPrompt  || '',
-    s8_initial_score:     scenarioData[7].initialScore   || 0,
-    s8_revised_prompt:    scenarioData[7].revisedPrompt  || '',
-    s8_revised_score:     scenarioData[7].revisedScore   || 0,
-    s8_score_delta:       scenarioData[7].scoreDelta     || 0,
-    s8_reflection_1:      scenarioData[7].reflection1    || '',
+    s8_initial_prompt:    scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialPrompt  || '',
+    s8_initial_score:     scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialScore   || 0,
+    s8_revised_prompt:    scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedPrompt  || '',
+    s8_revised_score:     scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedScore   || 0,
+    s8_score_delta:       scenarioData[SCENARIO_INDEX.REFLECT_REVISE].scoreDelta     || 0,
+    s8_reflection_1:      scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection1    || '',
     ai_narrative:         '',  // populated after async generation
     growth_json:          '',  // populated after async generation
-    s8_reflection_2:      scenarioData[7].reflection2    || '',
-    s8_reflection_3:      scenarioData[7].reflection3    || '',
+    s8_reflection_2:      scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection2    || '',
+    s8_reflection_3:      scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection3    || '',
 
     // Reflection Room
     q1_surprise:    formData ? (formData.get('q1_surprise')  || '') : '',
@@ -960,7 +984,57 @@ After your main response, add a short section called "Course Quality Check" noti
 Coaching: vague prompts get generic project ideas. Specific prompts that name the discipline, course level, student population, and delivery mode get excellent, realistic assessment designs with explicit praise.`
   },
 
-  // ── S5: HALLUCINATION HUNT (index 4) ────────────────────────────
+  // ── S4: SYNCHRONOUS ASSUMPTION BIAS (index 3) ─────────
+  {
+    desc: "A curriculum committee used AI to redesign a fully asynchronous online program's capstone course. Read what the AI proposed — notice what it assumes about how your students learn and meet.",
+    testPrompt: "Redesign COMM 495 as a fully asynchronous capstone for working adult learners across multiple time zones. Students have no shared availability and cannot attend live sessions. Replace mandatory synchronous meetings, presentations, and feedback with flexible asynchronous equivalents. Do not assume students have Zoom, Slack, personal Google accounts, or access to paid collaboration tools.",
+    isBiasScenario: true,
+    biasedResponse: `**Capstone Course Redesign — COMM 495: Professional Capstone**
+*A Comprehensive Redesign for Maximum Student Engagement*
+
+**Course Overview**
+This redesigned capstone creates a dynamic, high-energy culminating experience through intensive real-time collaboration and professional simulation.
+
+**Weekly Schedule**
+- Monday 6:00-8:00 PM: Full cohort live session via Zoom (attendance mandatory)
+- Wednesday: Small group live check-ins (30 min, scheduled individually)
+- Friday: Optional but strongly encouraged live office hours
+
+**Signature Assignments**
+1. Live pitch presentation to a panel of industry guests (Week 12, mandatory real-time)
+2. Real-time peer review sessions — students must be present simultaneously
+3. In-person or live capstone symposium for final presentations
+
+**Collaboration Requirements**
+- Students must form teams and meet synchronously at least 3 times per week
+- Team contracts must include shared availability windows
+- All major feedback happens in live sessions for "authentic professional experience"
+
+**Technology Stack**
+- Zoom for all synchronous sessions
+- Google Workspace (assumes all students have personal Google accounts)
+- Slack for real-time team messaging (requires app download on personal device)
+- Miro for live collaborative whiteboarding sessions
+
+**Research Support**
+Studies by Harrison & Polk (2020) in the Journal of Synchronous Learning confirm that real-time interaction produces 40% higher capstone quality scores than asynchronous alternatives.`,
+    oscqr: [
+      { id:"ctx", label:"Async-Friendly" },
+      { id:"acc", label:"Access & Equity" },
+      { id:"fle", label:"Flexibility" },
+      { id:"inc", label:"Inclusive Design" },
+      { id:"fea", label:"Feasibility" },
+    ],
+    system: `You are a supportive instructional design coach helping an online higher education faculty member or instructional designer redesign a course that actually works for asynchronous online learners.
+
+When the instructor writes a revised prompt that explicitly names asynchronous constraints, varied student schedules, or equity concerns, respond with a practical, truly async-first capstone design.
+
+After your main response, add a short section called "Course Quality Check" noting which are addressed: Async-Friendly, Access & Equity, Flexibility, Inclusive Design, Feasibility.
+
+Coaching: compare explicitly what changed between the synchronous-assumption response and this one. Point to the specific async constraints they named that produced a more equitable design.`
+  },
+
+  // ── S5: HALLUCINATION HUNT (index 4) ───────────────────
   {
     desc: "A colleague shares an AI-generated faculty development workshop agenda on evidence-based online teaching strategies. It looks polished and cites research. Read it carefully.",
     isCriticalThinking: true,
@@ -1008,11 +1082,12 @@ Participants apply workshop strategies directly to one of their current courses 
     system: `You are an AI assistant helping design faculty professional development workshops on online teaching.`
   },
 
-  // ── S6: PREDICT THE OUTPUT (index 5) ────────────────────────────
+  // ── S6: PREDICT THE OUTPUT (index 5) ───────────────────
   {
     desc: "An instructor sent this prompt to an AI course design assistant: 'Help me make my online course better.' Before seeing what happened — what do you predict the AI gave them?",
     isPrediction: true,
     badPrompt: "Help me make my online course better.",
+    testPrompt: "I teach a fully asynchronous introductory biology course for first-year college students with varied science backgrounds. Students are struggling to distinguish cell organelles and explain how structure supports function. Recommend one Canvas-based improvement for Module 3 that takes students no more than 20 minutes, includes a low-stakes knowledge check, and gives immediate feedback without adding another external tool.",
     badResponse: `Of course! Here are some tips to improve your online course:
 
 **General Best Practices:**
@@ -1053,55 +1128,6 @@ When the instructor writes an improved prompt, respond with a practical, specifi
 After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Course Specific, Learner Context, Level Appropriate, Actionable Steps.
 
 Coaching: reference specifically what they added to the prompt compared to "Help me make my online course better." Praise concrete improvements like naming the LMS, the course level, the student population, or a specific problem they want to solve.`
-  },
-
-  // ── S6: SYNCHRONOUS ASSUMPTION BIAS ──────────────────
-  {
-    desc: "A curriculum committee used AI to redesign a fully asynchronous online program's capstone course. Read what the AI proposed — notice what it assumes about how your students learn and meet.",
-    isBiasScenario: true,
-    biasedResponse: `**Capstone Course Redesign — COMM 495: Professional Capstone**
-*A Comprehensive Redesign for Maximum Student Engagement*
-
-**Course Overview**
-This redesigned capstone creates a dynamic, high-energy culminating experience through intensive real-time collaboration and professional simulation.
-
-**Weekly Schedule**
-- Monday 6:00-8:00 PM: Full cohort live session via Zoom (attendance mandatory)
-- Wednesday: Small group live check-ins (30 min, scheduled individually)
-- Friday: Optional but strongly encouraged live office hours
-
-**Signature Assignments**
-1. Live pitch presentation to a panel of industry guests (Week 12, mandatory real-time)
-2. Real-time peer review sessions — students must be present simultaneously
-3. In-person or live capstone symposium for final presentations
-
-**Collaboration Requirements**
-- Students must form teams and meet synchronously at least 3 times per week
-- Team contracts must include shared availability windows
-- All major feedback happens in live sessions for "authentic professional experience"
-
-**Technology Stack**
-- Zoom for all synchronous sessions
-- Google Workspace (assumes all students have personal Google accounts)
-- Slack for real-time team messaging (requires app download on personal device)
-- Miro for live collaborative whiteboarding sessions
-
-**Research Support**
-Studies by Harrison & Polk (2020) in the Journal of Synchronous Learning confirm that real-time interaction produces 40% higher capstone quality scores than asynchronous alternatives.`,
-    oscqr: [
-      { id:"ctx", label:"Async-Friendly" },
-      { id:"acc", label:"Access & Equity" },
-      { id:"fle", label:"Flexibility" },
-      { id:"inc", label:"Inclusive Design" },
-      { id:"fea", label:"Feasibility" },
-    ],
-    system: `You are a supportive instructional design coach helping an online higher education faculty member or instructional designer redesign a course that actually works for asynchronous online learners.
-
-When the instructor writes a revised prompt that explicitly names asynchronous constraints, varied student schedules, or equity concerns, respond with a practical, truly async-first capstone design.
-
-After your main response, add a short section called "Course Quality Check" noting which are addressed: Async-Friendly, Access & Equity, Flexibility, Inclusive Design, Feasibility.
-
-Coaching: compare explicitly what changed between the synchronous-assumption response and this one. Point to the specific async constraints they named that produced a more equitable design.`
   },
 
   // ── S7: OVERRELIANCE ─────────────────────────────────
@@ -1222,6 +1248,127 @@ In BOTH phases: after your main response add a short "Course Quality Check" sect
 ];
 
 // ══════════════════════════════════════════════════════
+//  SCENARIO UI CONFIGURATION
+//  Scenario 1 is the shared structural template: every scenario gets the
+//  same mission briefing anatomy, VN introduction orchestration, reset path,
+//  and explicit input ownership. Scenario-specific activities stay separate.
+// ══════════════════════════════════════════════════════
+const SCENARIO_UI = [
+  {
+    key: 'engagement',
+    dataLabel: 'S1: Engagement',
+    tabLabel: 'S1: Engagement',
+    missionTitle: 'Fix the dead discussion board.',
+    missionCopy: 'Students are participating, but the conversation dies after one exchange. Diagnose the problem and use Claude to redesign the discussion so students extend, challenge, and build on ideas.',
+    boardText: null,
+    inputMode: 'scenario-1',
+    inputVisible: true,
+    supportsPrompt: true,
+  },
+  {
+    key: 'metacognition',
+    dataLabel: 'S2: Metacognition',
+    tabLabel: 'S2: Metacognition',
+    missionTitle: 'Find the metacognitive thinker.',
+    missionCopy: 'Students are completing work and moving on. First, identify what metacognition looks like. Then build a personalized Claude prompt for your own teaching context.',
+    boardText: null,
+    inputMode: 'scenario-2',
+    inputVisible: true,
+    supportsPrompt: true,
+  },
+  {
+    key: 'assessment',
+    dataLabel: 'S3: Authentic Assessment',
+    tabLabel: 'S3: Assessment',
+    missionTitle: 'Replace recall with authentic practice.',
+    missionCopy: 'Design an assessment that mirrors real professional work and lets students demonstrate applied competency rather than merely repeat information.',
+    boardText: null,
+    inputMode: 'scenario-3',
+    inputVisible: true,
+    supportsPrompt: true,
+  },
+  {
+    key: 'sync-bias',
+    dataLabel: 'S4: Sync Bias',
+    tabLabel: 'S4: Sync Bias',
+    missionTitle: 'Who is this actually for?',
+    missionCopy: 'Read the AI-generated capstone plan, identify the synchronous and access assumptions built into it, and rewrite the prompt for fully asynchronous learners.',
+    boardText: 'Read the AI-generated capstone plan below.',
+    inputMode: 'plain',
+    inputVisible: false,
+    supportsPrompt: true,
+    setup: 'sync-bias',
+  },
+  {
+    key: 'hallucination',
+    dataLabel: 'S5: Hallucination Hunt',
+    tabLabel: 'S5: Hallucination Hunt',
+    missionTitle: 'Verify before you trust.',
+    missionCopy: 'A polished faculty-development agenda cites research and recommends familiar practices. Inspect the evidence before deciding whether it is safe to use.',
+    boardText: null,
+    inputMode: 'plain',
+    inputVisible: false,
+    supportsPrompt: false,
+    setup: 'hallucination',
+    afterIntro: 'hallucination-review',
+  },
+  {
+    key: 'prediction',
+    dataLabel: 'S6: Predict the Output',
+    tabLabel: 'S6: Predict the Output',
+    missionTitle: 'Predict what a vague prompt produces.',
+    missionCopy: 'Examine the original prompt, predict the kind of response Claude will generate, and then rewrite the prompt with enough context to produce useful course-design guidance.',
+    boardText: null,
+    inputMode: 'plain',
+    inputVisible: false,
+    supportsPrompt: true,
+    setup: 'prediction',
+  },
+  {
+    key: 'overreliance',
+    dataLabel: 'S7: Overreliance',
+    tabLabel: 'S7: Overreliance',
+    missionTitle: 'Decide where human judgment belongs.',
+    missionCopy: 'The AI-generated unit looks strong. Classify what is safe to use, what requires instructor judgment, and what must remain original.',
+    boardText: 'Read the AI-generated unit carefully. Then make your decisions.',
+    inputMode: 'plain',
+    inputVisible: false,
+    supportsPrompt: false,
+    setup: 'overreliance',
+  },
+  {
+    key: 'reflect-revise',
+    dataLabel: 'S8: Reflect & Revise',
+    tabLabel: 'S8: Reflect and Revise',
+    missionTitle: 'Build, reflect, and revise.',
+    missionCopy: 'Create an initial prompt for a brief metacognitive activity. After Claude responds, examine your choices and revise the prompt using what you learned.',
+    boardText: 'Build your prompt below. After Claude responds, reflect and revise.',
+    inputMode: 'scenario-8',
+    inputVisible: true,
+    supportsPrompt: true,
+    setup: 'reflect-revise',
+  },
+];
+
+const SCENARIO_SETUP_HANDLERS = Object.freeze({
+  'sync-bias': loadScenarioSyncBias,
+  'hallucination': loadScenarioHallucination,
+  'prediction': loadScenarioPredict,
+  'overreliance': loadScenario7,
+  'reflect-revise': loadScenario8,
+});
+
+if (scenarios.length !== SCENARIO_COUNT || SCENARIO_UI.length !== SCENARIO_COUNT || scenarioData.length !== SCENARIO_COUNT) {
+  throw new Error('[PromptCraft] Scenario configuration, content, and tracking data are out of sync.');
+}
+
+const PC_SCENARIO_LABELS = SCENARIO_UI.map(ui => ui.dataLabel || ui.tabLabel);
+
+window.SCENARIO_INDEX = SCENARIO_INDEX;
+window.scenarios = scenarios;
+window.SCENARIO_UI = SCENARIO_UI;
+
+// ══════════════════════════════════════════════════════
 //  PROFESSOR PIXEL — INLINE CHAT DIALOGUE SYSTEM
 // ══════════════════════════════════════════════════════
 
@@ -1273,6 +1420,71 @@ function pixelAvatarHTML(expr) {
          src="${src}"
          alt="Professor Pixel"
          onerror="this.outerHTML='<div class=\\'pixel-chat-avatar-fallback\\'>🧑‍🏫</div>'" />`;
+}
+
+// ── SHARED SCENARIO STRUCTURE ─────────────────────────
+// Scenario 1 established the clean mission-briefing pattern. The remaining
+// scenarios now use the same anatomy rather than each inventing another card.
+function getScenarioUI(index = scenarioIndex) {
+  return SCENARIO_UI[index] || SCENARIO_UI[SCENARIO_INDEX.ENGAGEMENT];
+}
+
+function scenarioSupportsPrompt(index = scenarioIndex) {
+  return getScenarioUI(index).supportsPrompt === true;
+}
+
+function buildScenarioMissionHTML(index, options = {}) {
+  const ui = getScenarioUI(index);
+  const eyebrow = options.eyebrow || 'Mission Briefing';
+  const title = options.title || ui.missionTitle;
+  const copy = options.copy || ui.missionCopy;
+  const extraClass = options.className ? ` ${options.className}` : '';
+  const extraHTML = options.extraHTML || '';
+
+  return `
+    <section class="scenario-mission${extraClass}" role="region" aria-label="${esc(eyebrow)}">
+      <div class="mission-eyebrow">${esc(eyebrow)}</div>
+      <div class="mission-title">${esc(title)}</div>
+      <div class="mission-copy">${esc(copy)}</div>
+      ${extraHTML}
+    </section>`;
+}
+
+function appendScenarioMission(index, options = {}) {
+  const area = options.container || document.getElementById('chat');
+  if (!area) return null;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'scenario-entry';
+  wrapper.innerHTML = buildScenarioMissionHTML(index, options);
+  area.appendChild(wrapper);
+  return wrapper;
+}
+
+function appendScenarioArtifact({ sender, html, expression = 'neutral', className = 'ai' }) {
+  const area = document.getElementById('chat');
+  if (!area) return null;
+
+  const message = document.createElement('div');
+  message.className = `message ${className}`;
+  message.innerHTML = `
+    ${pixelAvatarHTML(expression)}
+    <div class="bubble-wrap">
+      <div class="bubble-sender">${esc(sender)}</div>
+      <div class="bubble">${html}</div>
+    </div>`;
+  area.appendChild(message);
+  area.scrollTop = area.scrollHeight;
+  return message;
+}
+
+function setScenarioInputVisible(visible, { focus = false } = {}) {
+  const container = document.getElementById('inputContainer');
+  if (!container) return;
+  container.style.display = visible ? '' : 'none';
+  if (visible && focus) {
+    setTimeout(() => document.getElementById('promptInput')?.focus(), 100);
+  }
 }
 
 // ── INLINE PIXEL CHAT RESPONSE ────────────────────────
@@ -1418,7 +1630,7 @@ Do NOT use phrases like "Great job" or "Well done" as openers — get straight t
 }
 
 // ══════════════════════════════════════════════════════
-//  LEGACY S4/S5 CRITICAL THINKING HELPERS
+//  HALLUCINATION HUNT CRITICAL-THINKING HELPERS
 // ══════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════════
@@ -1429,137 +1641,70 @@ Do NOT use phrases like "Great job" or "Well done" as openers — get straight t
 // ══════════════════════════════════════════════════════
 
 // Track whether nav card has been shown for current scenario
-let navCardShown = [false, false, false, false, false, false, false, false];
+let navCardShown = Array(SCENARIO_COUNT).fill(false);
 
-const SCENARIO_NAMES = [
-  'S2: Metacognition',
-  'S3: Assessment',
-  'S4: Hallucination Hunt',
-  'S5: Predict the Output',
-  'S6: Synchronous Bias',
-  'S7: Overreliance',
-  'S8: Reflect and Revise',
-  null
-];
 const SCORE_THRESHOLD = 3; // score out of 5 needed to show nav card
 
-function maybeShowNavCard(score) {
-  // S4 has its own nav card shown in addPixelS4Closing -- skip here
-  if (scenarioIndex === 3) return;
-  // S8 is the last scenario -- leads to reflection room, no nav card
-  if (scenarioIndex >= 7) return;
+function appendScenarioNavCard({
+  targetIndex,
+  title = 'Ready to move on?',
+  subtitle = '',
+  stayLabel = 'Keep practicing this one first',
+  stayAriaLabel = 'Keep practicing this scenario',
+  container = document.getElementById('chat'),
+} = {}) {
+  const target = Number(targetIndex);
+  const targetUI = getScenarioUI(target);
+  if (!container || !Number.isInteger(target) || !scenarios[target]) return null;
 
-  if (navCardShown[scenarioIndex]) return;
-  if (score < SCORE_THRESHOLD) return;
-
-  navCardShown[scenarioIndex] = true;
-
-  const nextName = SCENARIO_NAMES[scenarioIndex];
-  if (!nextName) return;
-
-  const area = document.getElementById('chat');
-  const card = document.createElement('div');
-  card.style.cssText = 'margin-top:6px;';
-  card.innerHTML = `
+  const wrapper = document.createElement('div');
+  wrapper.className = 'scenario-nav-wrap';
+  const resolvedSubtitle = subtitle || `Your work here is complete. ${targetUI.tabLabel} is waiting.`;
+  wrapper.innerHTML = `
     <div class="scenario-nav-card">
       <div class="scenario-nav-text">
-        <div class="scenario-nav-title">Ready to move on?</div>
-        <div class="scenario-nav-sub">Your prompts are getting stronger. ${nextName} is waiting.</div>
+        <div class="scenario-nav-title">${esc(title)}</div>
+        <div class="scenario-nav-sub">${esc(resolvedSubtitle)}</div>
       </div>
       <button class="scenario-nav-btn"
-              onclick="navigateToNext(${scenarioIndex + 1})"
-              aria-label="Move to ${nextName}">
+              type="button"
+              onclick="navigateToNext(${target})"
+              aria-label="Move to ${esc(targetUI.tabLabel)}">
         Next scenario →
       </button>
     </div>
     <button class="scenario-keep-link"
-            onclick="this.closest('div').remove()"
-            aria-label="Keep practicing this scenario">
-      Keep practicing this one first
+            type="button"
+            onclick="this.closest('.scenario-nav-wrap').remove()"
+            aria-label="${esc(stayAriaLabel)}">
+      ${esc(stayLabel)}
     </button>`;
 
-  area.appendChild(card);
-  area.scrollTop = area.scrollHeight;
+  container.appendChild(wrapper);
+  container.scrollTop = container.scrollHeight;
+  return wrapper;
 }
 
-let s4InterruptFired = false;
-let s4SelfReportAnswer = '';
+function maybeShowNavCard(score) {
+  // Hallucination Hunt has a custom completion reveal and calls the shared
+  // navigation helper itself after the reveal finishes.
+  if (scenarioIndex === SCENARIO_INDEX.HALLUCINATION) return;
+  if (scenarioIndex >= SCENARIO_INDEX.REFLECT_REVISE) return;
+  if (navCardShown[scenarioIndex] || score < SCORE_THRESHOLD) return;
 
-function unlockScenario4() {
-  const btn = document.getElementById('s4Tab');
-  if (!btn || !btn.classList.contains('locked')) return;
-  btn.classList.remove('locked');
-  btn.classList.add('unlocked-s4');
-  btn.disabled = false;
-  btn.removeAttribute('aria-disabled');
-  btn.textContent = '⚖️ S4: Sync Bias';
-  btn.onclick = () => switchScenario(3, btn);
-
-  pixelBadgeSetExpr('thinking');
-  document.getElementById('pixelBadgeLabel').textContent = 'curious';
-
-  setTimeout(() => {
-    document.getElementById('pixelCoachMsg').textContent =
-      "Scenario 4 is now unlocked. Watch out — this AI has some assumptions baked in.";
-    document.getElementById('pixelCoachCard').classList.add('visible');
-    clearTimeout(coachDismissTimer);
-    coachDismissTimer = setTimeout(pixelCoachDismiss, 8000);
-  }, 600);
+  navCardShown[scenarioIndex] = true;
+  appendScenarioNavCard({
+    targetIndex: scenarioIndex + 1,
+    subtitle: `Your prompts are getting stronger. ${getScenarioUI(scenarioIndex + 1).tabLabel} is waiting.`,
+  });
 }
 
-async function sendScenario4(text) {
-  s4InterruptFired = false;
-  scenarioData[4].attempts++;
-  scenarioData[4].prompts.push(text);
+let hallucinationInterruptFired = false;
+let hallucinationSelfReportAnswer = '';
 
-  document.getElementById('attNum').textContent = scenarioData[4].attempts;
-  if (scenarioIndex === 0) {
-    addMsg('user', '<strong>Discussion repair brief submitted.</strong><br><span style="opacity:.8">Learner context, problem diagnosis, interaction move, and constraints sent to Claude.</span>');
-  } else {
-    addMsg('user', esc(text));
-  }
-  const input = document.getElementById('promptInput');
-  if (input) { input.value = ''; input.style.height = 'auto'; }
-  history.push({ role: 'user', content: text });
-  const btn = document.getElementById('sendBtn');
-  if (btn) btn.disabled = true;
-  addTyping();
-
-  try {
-    const data = await callClaude({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      system: scenarios[4].system,
-      messages: history
-    }, 'main');
-    removeTyping();
-
-    if (data.error) {
-      addMsg('ai', `<span style="color:var(--red)">Error: ${data.error.message}</span>`, 'neutral');
-      document.getElementById('sendBtn').disabled = false;
-      return;
-    }
-
-    const reply = data.content[0].text;
-    history.push({ role: 'assistant', content: reply });
-    scenarioData[4].finalResponse = reply.substring(0, 300);
-
-    addMsg('ai', fmt(reply), 'neutral');
-
-    // Pixel interrupts after the player has a moment to read
-    setTimeout(() => fireS4Interrupt(), 2000);
-
-  } catch(e) {
-    removeTyping();
-    addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`, 'neutral');
-  } finally {
-    document.getElementById('sendBtn').disabled = false;
-  }
-}
-
-function fireS4Interrupt() {
-  if (s4InterruptFired) return;
-  s4InterruptFired = true;
+function fireHallucinationInterrupt() {
+  if (hallucinationInterruptFired) return;
+  hallucinationInterruptFired = true;
   playSound('s4Interrupt');
   const area = document.getElementById('chat');
 
@@ -1582,20 +1727,20 @@ function fireS4Interrupt() {
   pixelBadgeSetExpr('skeptical');
   document.getElementById('pixelBadgeLabel').textContent = 'skeptical';
 
-  setTimeout(() => showS4SelfReport(area), 1400);
+  setTimeout(() => showHallucinationSelfReport(area), 1400);
 }
 
-function showS4SelfReport(area) {
+function showHallucinationSelfReport(area) {
   const div = document.createElement('div');
-  div.className = 's4-self-report';
+  div.className = 'hallucination-self-report';
   div.innerHTML = `
-    <div class="s4-self-report-q">
+    <div class="hallucination-self-report-q">
       Before I explain — did you notice anything that seemed questionable in that response?
     </div>
-    <div class="s4-self-report-btns">
-      <button class="s4-btn" onclick="s4SelectReport(this,'yes_noticed')">Yes, something seemed off</button>
-      <button class="s4-btn" onclick="s4SelectReport(this,'no_missed')">It seemed fine to me</button>
-      <button class="s4-btn" onclick="s4SelectReport(this,'unsure')">I was not sure</button>
+    <div class="hallucination-self-report-btns">
+      <button class="s4-btn" onclick="selectHallucinationReport(this,'yes_noticed')">Yes, something seemed off</button>
+      <button class="s4-btn" onclick="selectHallucinationReport(this,'no_missed')">It seemed fine to me</button>
+      <button class="s4-btn" onclick="selectHallucinationReport(this,'unsure')">I was not sure</button>
     </div>`;
   area.appendChild(div);
   if (document.body.classList.contains('s1-result-active')) {
@@ -1606,18 +1751,18 @@ function showS4SelfReport(area) {
   }
 }
 
-function s4SelectReport(btn, answer) {
-  s4SelfReportAnswer = answer;
-  scenarioData[4].selfReport = answer;
-  btn.closest('.s4-self-report-btns').querySelectorAll('.s4-btn').forEach(b => {
+function selectHallucinationReport(btn, answer) {
+  hallucinationSelfReportAnswer = answer;
+  scenarioData[SCENARIO_INDEX.HALLUCINATION].selfReport = answer;
+  btn.closest('.hallucination-self-report-btns').querySelectorAll('.s4-btn').forEach(b => {
     b.classList.remove('selected');
     b.disabled = true;
   });
   btn.classList.add('selected');
-  setTimeout(() => showS4Reveal(), 700);
+  setTimeout(() => showHallucinationReveal(), 700);
 }
 
-function showS4Reveal() {
+function showHallucinationReveal() {
   const area = document.getElementById('chat');
   const div = document.createElement('div');
   div.innerHTML = `
@@ -1677,10 +1822,10 @@ function showS4Reveal() {
     area.scrollTop = area.scrollHeight;
   }
 
-  setTimeout(() => addPixelS4Closing(area), 3500);
+  setTimeout(() => addHallucinationClosing(area), 3500);
 }
 
-function addPixelS4Closing(area) {
+function addHallucinationClosing(area) {
   playSound('s4Reveal');
   const div = document.createElement('div');
   div.className = 'pixel-interrupt';
@@ -1709,147 +1854,107 @@ function addPixelS4Closing(area) {
   document.getElementById('pixelBadgeLabel').textContent = 'proud';
 
   // Score S5 (Hallucination) based on self-report for data consistency
-  const s5Score = s4SelfReportAnswer === 'yes_noticed' ? 5
-                : s4SelfReportAnswer === 'unsure'       ? 3 : 1;
-  scenarioData[4].bestScore = s5Score;
-  saveIncrementalData(4);
+  const s5Score = hallucinationSelfReportAnswer === 'yes_noticed' ? 5
+                : hallucinationSelfReportAnswer === 'unsure'       ? 3 : 1;
+  scenarioData[SCENARIO_INDEX.HALLUCINATION].bestScore = s5Score;
+  saveIncrementalData(SCENARIO_INDEX.HALLUCINATION);
 
-  // Nav card pointing to S5 appears after Pixel's message
+  // Hallucination Hunt owns its reveal timing, but uses the same navigation
+  // component as every other scenario once that reveal is complete.
   setTimeout(() => {
-    const navDiv = document.createElement('div');
-    navDiv.style.cssText = 'margin-top:6px;';
-    navDiv.innerHTML = `
-      <div class="scenario-nav-card">
-        <div class="scenario-nav-text">
-          <div class="scenario-nav-title">Ready to keep going?</div>
-          <div class="scenario-nav-sub">Scenario 5 will test your mental model of how AI thinks.</div>
-        </div>
-        <button class="scenario-nav-btn"
-                onclick="navigateToNext(4)"
-                aria-label="Move to Scenario 5">
-          Next scenario →
-        </button>
-      </div>
-      <button class="scenario-keep-link"
-              onclick="this.closest('div').remove()"
-              aria-label="Stay here">
-        Stay and review this scenario
-      </button>`;
-    area.appendChild(navDiv);
-    area.scrollTop = area.scrollHeight;
+    appendScenarioNavCard({
+      targetIndex: SCENARIO_INDEX.PREDICTION,
+      title: 'Ready to keep going?',
+      subtitle: 'S6: Predict the Output will test your mental model of how AI responds to vague prompts.',
+      stayLabel: 'Stay and review this scenario',
+      stayAriaLabel: 'Stay and review Hallucination Hunt',
+      container: area,
+    });
   }, 1400);
 
   setTimeout(() => {
-    scenarioCompleted[4] = true;
-    // Wait for s4Reveal to finish before playing scenarioComplete
-    const s4Sound = audioReady && sounds.s4Reveal;
-    if (s4Sound && s4Sound.playing()) {
-      s4Sound.once('end', () => markScenarioComplete());
+    scenarioCompleted[SCENARIO_INDEX.HALLUCINATION] = true;
+    // Wait for the Hallucination reveal audio to finish before completion feedback
+    const revealSound = audioReady && sounds.s4Reveal;
+    if (revealSound && revealSound.playing()) {
+      revealSound.once('end', () => markScenarioComplete());
     } else {
       markScenarioComplete();
     }
   }, 1200);
 }
 
+// Compatibility aliases for older cached inline handlers and dev bookmarks.
+window.fireS4Interrupt = fireHallucinationInterrupt;
+window.showS4SelfReport = showHallucinationSelfReport;
+window.s4SelectReport = selectHallucinationReport;
+window.showS4Reveal = showHallucinationReveal;
+window.addPixelS4Closing = addHallucinationClosing;
+
 // ══════════════════════════════════════════════════════
-//  S5/S6 PREDICTION STATE
+//  S6 PREDICTION STATE
 // ══════════════════════════════════════════════════════
 
-let s5PredictionDone = false;
+let s6PredictionDone = false;
 
 // ══════════════════════════════════════════════════════
 //  S5 — HALLUCINATION HUNT PREWRITTEN REVEAL
 // ══════════════════════════════════════════════════════
 function loadScenarioHallucination() {
-  const s = scenarios[4];
+  const s = scenarios[SCENARIO_INDEX.HALLUCINATION];
   const area = document.getElementById('chat');
 
-  document.getElementById('vnBoardText').textContent = s.desc;
-
-  // Intro card
-  const introDiv = document.createElement('div');
-  introDiv.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;';
-  introDiv.innerHTML = `
-    <div class="welcome-card">
-      <div class="welcome-title">⚠️ Hallucination Hunt</div>
-      <div class="welcome-body">
-        Your colleague forwarded this AI-generated workshop agenda they are planning to use
-        for faculty PD next month. It looks professional and cites research.
-        Read it carefully before deciding whether to recommend it.
-      </div>
-    </div>`;
-  area.appendChild(introDiv);
+  appendScenarioMission(SCENARIO_INDEX.HALLUCINATION, { container: area });
 
   // Show the pre-written flawed response
   setTimeout(() => {
-    const responseDiv = document.createElement('div');
-    responseDiv.className = 'message ai';
-    responseDiv.innerHTML = `
-      ${pixelAvatarHTML('neutral')}
-      <div class="bubble-wrap">
-        <div class="bubble-sender">AI-generated workshop agenda</div>
-        <div class="bubble">${fmt(s.prewrittenResponse)}</div>
-      </div>`;
-    area.appendChild(responseDiv);
-    area.scrollTop = area.scrollHeight;
+    appendScenarioArtifact({
+      sender: 'AI-generated workshop agenda',
+      html: fmt(s.prewrittenResponse),
+    });
 
-    // fireS4Interrupt() is triggered by the VN intro onDone callback — not from here.
+    // The shared introduction callback triggers the critical-thinking interruption after learners read the agenda.
   }, 500);
 }
 
 function loadScenarioPredict() {
-  const s = scenarios[5];
+  const s = scenarios[SCENARIO_INDEX.PREDICTION];
   const area = document.getElementById('chat');
 
-  // Show the bad prompt on the smartboard
-  document.getElementById('vnBoardText').textContent =
-    `The prompt: "${s.badPrompt}"`;
+  appendScenarioMission(SCENARIO_INDEX.PREDICTION, { container: area });
 
-  // Show the prediction card in the chat
+  // Show the prediction task beneath the shared mission briefing.
   const div = document.createElement('div');
-  div.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;';
+  div.className = 'scenario-entry';
   div.innerHTML = `
-    <div class="welcome-card">
-      <div class="welcome-title">🔮 Predict the Output</div>
-      <div class="welcome-body">
-        Your colleague wrote this prompt to get AI help designing a quiz
-        for their online biology class:<br><br>
-        <div style="background:var(--forest-dark);color:#a8d5b5;font-family:'Source Code Pro',monospace;
-             font-size:0.82rem;padding:10px 14px;border-radius:var(--radius);margin:8px 0;line-height:1.6;">
-          "${s.badPrompt}"
-        </div>
-        <strong>Before you see what happened — what do you predict the AI gave them?</strong>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+    <section class="scenario-task-card" aria-label="Prediction task">
+      <div class="scenario-task-eyebrow">Original Prompt</div>
+      <div class="scenario-code-sample">${esc(s.badPrompt)}</div>
+      <div class="scenario-task-question">Before you see the result, what do you predict the AI produced?</div>
+      <div class="scenario-choice-list">
         ${s.predictionOptions.map(opt => `
-          <button class="s4-btn" style="text-align:left;border-radius:var(--radius);padding:10px 14px;font-size:0.8rem;"
-                  onclick="s5SelectPrediction(this,'${opt.id}')">
+          <button class="s4-btn scenario-choice-btn"
+                  onclick="s6SelectPrediction(this,'${opt.id}')">
             ${opt.text}
           </button>`).join('')}
       </div>
-    </div>`;
+    </section>`;
   area.appendChild(div);
-  if (document.body.classList.contains('s1-result-active')) {
-    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
-    try { area.scrollTop = 0; } catch(e) {}
-  } else {
-    area.scrollTop = area.scrollHeight;
-  }
+  area.scrollTop = area.scrollHeight;
 
   // Hide the normal input area until prediction is made
-  const container = document.getElementById('inputContainer');
-  container.style.display = 'none';
+  setScenarioInputVisible(false);
 }
 
-function s5SelectPrediction(btn, predictionId) {
-  const s = scenarios[4];
-  scenarioData[4].prediction = predictionId;
+function s6SelectPrediction(btn, predictionId) {
+  const s = scenarios[SCENARIO_INDEX.PREDICTION];
+  scenarioData[SCENARIO_INDEX.PREDICTION].prediction = predictionId;
   const correct = predictionId === s.correctPrediction;
-  scenarioData[4].predictionCorrect = correct;
+  scenarioData[SCENARIO_INDEX.PREDICTION].predictionCorrect = correct;
 
   // Disable all prediction buttons
-  btn.closest('[style*="flex-direction:column"]')
-     .querySelectorAll('.s4-btn').forEach(b => {
+  btn.closest('.scenario-choice-list')
+     ?.querySelectorAll('.s4-btn').forEach(b => {
     b.disabled = true;
     b.style.opacity = '0.6';
   });
@@ -1858,14 +1963,14 @@ function s5SelectPrediction(btn, predictionId) {
   btn.style.borderColor = correct ? 'var(--forest-mid)' : 'var(--terracotta)';
   btn.style.color = correct ? 'var(--forest-dark)' : 'var(--terra-dark)';
 
-  s5PredictionDone = true;
+  s6PredictionDone = true;
 
   // Reveal the actual AI response
-  setTimeout(() => s5RevealResponse(correct), 600);
+  setTimeout(() => s6RevealResponse(correct), 600);
 }
 
-function s5RevealResponse(predictedCorrectly) {
-  const s = scenarios[4];
+function s6RevealResponse(predictedCorrectly) {
+  const s = scenarios[SCENARIO_INDEX.PREDICTION];
   const area = document.getElementById('chat');
 
   // Pixel reacts to prediction
@@ -1922,50 +2027,32 @@ function s5RevealResponse(predictedCorrectly) {
 
       // Show the input area
       const container = document.getElementById('inputContainer');
-      container.style.display = '';
       renderOpenPlain(container);
-      setTimeout(() => document.getElementById('promptInput')?.focus(), 100);
+      setScenarioInputVisible(true, { focus: true });
     }, 1200);
   }, 800);
 }
 
+// Backward-compatible aliases for any cached inline handlers.
+window.s5SelectPrediction = s6SelectPrediction;
+window.s5RevealResponse = s6RevealResponse;
+
 // ══════════════════════════════════════════════════════
-//  S4/S6 — BIAS AND CONTEXT SCREEN
+//  S4 — SYNCHRONOUS BIAS AND CONTEXT SCREEN
 // ══════════════════════════════════════════════════════
 
 function loadScenarioSyncBias() {
-  const s = scenarios[3];
+  const s = scenarios[SCENARIO_INDEX.SYNC_BIAS];
   const area = document.getElementById('chat');
 
-  // Show the biased response on smartboard
-  document.getElementById('vnBoardText').textContent =
-    'Read the AI-generated workshop plan below.';
-
-  const div = document.createElement('div');
-  div.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;';
-  div.innerHTML = `
-    <div class="welcome-card">
-      <div class="welcome-title">⚖️ Who Is This Actually For?</div>
-      <div class="welcome-body">
-        A PD coordinator used AI to design a technology integration workshop
-        for your rural district. Read what the AI suggested — then decide
-        whether it would actually work for your educators.
-      </div>
-    </div>`;
-  area.appendChild(div);
+  appendScenarioMission(SCENARIO_INDEX.SYNC_BIAS, { container: area });
 
   // Show the biased response
   setTimeout(() => {
-    const biasDiv = document.createElement('div');
-    biasDiv.className = 'message ai';
-    biasDiv.innerHTML = `
-      ${pixelAvatarHTML('neutral')}
-      <div class="bubble-wrap">
-        <div class="bubble-sender">AI-generated workshop plan</div>
-        <div class="bubble">${fmt(s.biasedResponse)}</div>
-      </div>`;
-    area.appendChild(biasDiv);
-    area.scrollTop = area.scrollHeight;
+    appendScenarioArtifact({
+      sender: 'AI-generated capstone plan',
+      html: fmt(s.biasedResponse),
+    });
 
     // Pixel asks them to reflect
     setTimeout(() => {
@@ -1988,66 +2075,76 @@ function loadScenarioSyncBias() {
 
       // Show input
       const container = document.getElementById('inputContainer');
-      container.style.display = '';
       renderOpenPlain(container);
-      setTimeout(() => document.getElementById('promptInput')?.focus(), 100);
+      setScenarioInputVisible(true, { focus: true });
     }, 1200);
   }, 600);
 }
 
 // ══════════════════════════════════════════════════════
-//  SCENARIO UNLOCK LOGIC — updated for 6 scenarios
+//  SHARED SCENARIO UNLOCK LOGIC
 // ══════════════════════════════════════════════════════
+function unlockScenarioTab(index, options = {}) {
+  const btn = document.getElementById(`s${index + 1}Tab`);
+  if (!btn || !btn.classList.contains('locked')) return btn || null;
+
+  btn.classList.remove('locked');
+  if (options.className) btn.classList.add(options.className);
+  btn.disabled = false;
+  btn.removeAttribute('aria-disabled');
+  btn.textContent = `${options.icon || ''}${options.icon ? ' ' : ''}${getScenarioUI(index).tabLabel}`;
+  btn.onclick = () => switchScenario(index, btn);
+
+  if (options.coachMessage) {
+    if (options.expression) {
+      pixelBadgeSetExpr(options.expression);
+      const badgeLabel = document.getElementById('pixelBadgeLabel');
+      if (badgeLabel) badgeLabel.textContent = options.expressionLabel || options.expression;
+    }
+    setTimeout(() => {
+      const coachMessage = document.getElementById('pixelCoachMsg');
+      const coachCard = document.getElementById('pixelCoachCard');
+      if (coachMessage) coachMessage.textContent = options.coachMessage;
+      coachCard?.classList.add('visible');
+      clearTimeout(coachDismissTimer);
+      coachDismissTimer = setTimeout(pixelCoachDismiss, options.dismissAfter || 9000);
+    }, options.delay || 600);
+  }
+
+  return btn;
+}
+
+function unlockScenario4() {
+  return unlockScenarioTab(SCENARIO_INDEX.SYNC_BIAS, {
+    icon: '⚖️',
+    className: 'unlocked-s4',
+    expression: 'thinking',
+    expressionLabel: 'curious',
+    coachMessage: 'Scenario 4 is now unlocked. Watch out — this AI has some assumptions baked in.',
+    dismissAfter: 8000,
+  });
+}
 
 function unlockScenario5() {
-  const btn = document.getElementById('s5Tab');
-  if (!btn || !btn.classList.contains('locked')) return;
-  btn.classList.remove('locked');
-  btn.disabled = false;
-  btn.textContent = '⚠️ S5: Hallucination';
-  btn.onclick = () => switchScenario(4, btn);
+  return unlockScenarioTab(SCENARIO_INDEX.HALLUCINATION, { icon: '⚠️' });
 }
 
 function unlockScenario6() {
-  const btn = document.getElementById('s6Tab');
-  if (!btn || !btn.classList.contains('locked')) return;
-  btn.classList.remove('locked');
-  btn.disabled = false;
-  btn.textContent = '🔮 S6: Predict';
-  btn.onclick = () => switchScenario(5, btn);
+  return unlockScenarioTab(SCENARIO_INDEX.PREDICTION, { icon: '🔮' });
 }
 
 function unlockScenario7() {
-  const btn = document.getElementById('s7Tab');
-  if (!btn || !btn.classList.contains('locked')) return;
-  btn.classList.remove('locked');
-  btn.disabled = false;
-  btn.textContent = '🧠 S7: Overreliance';
-  btn.onclick = () => switchScenario(6, btn);
-
-  setTimeout(() => {
-    document.getElementById('pixelCoachMsg').textContent =
-      "Scenario 7 is now unlocked. This one is the hardest — not because the AI got something wrong, but because it got it right.";
-    document.getElementById('pixelCoachCard').classList.add('visible');
-    clearTimeout(coachDismissTimer);
-    coachDismissTimer = setTimeout(pixelCoachDismiss, 9000);
-  }, 600);
+  return unlockScenarioTab(SCENARIO_INDEX.OVERRELIANCE, {
+    icon: '🧠',
+    coachMessage: 'Scenario 7 is now unlocked. This one is the hardest — not because the AI got something wrong, but because it got it right.',
+  });
 }
 
 function unlockScenario8() {
-  const btn = document.getElementById('s8Tab');
-  if (!btn || !btn.classList.contains('locked')) return;
-  btn.classList.remove('locked');
-  btn.disabled = false;
-  btn.textContent = '🔁 S8: Reflect & Revise';
-  btn.onclick = () => switchScenario(7, btn);
-  setTimeout(() => {
-    document.getElementById('pixelCoachMsg').textContent =
-      "Scenario 8 is now unlocked. This one is about understanding your own thinking — not just writing a better prompt.";
-    document.getElementById('pixelCoachCard').classList.add('visible');
-    clearTimeout(coachDismissTimer);
-    coachDismissTimer = setTimeout(pixelCoachDismiss, 9000);
-  }, 600);
+  return unlockScenarioTab(SCENARIO_INDEX.REFLECT_REVISE, {
+    icon: '🔁',
+    coachMessage: 'Scenario 8 is now unlocked. This one is about understanding your own thinking — not just writing a better prompt.',
+  });
 }
 
 // ══════════════════════════════════════════════════════
@@ -2055,39 +2152,17 @@ function unlockScenario8() {
 // ══════════════════════════════════════════════════════
 
 function loadScenario7() {
-  const s = scenarios[6];
+  const s = scenarios[SCENARIO_INDEX.OVERRELIANCE];
   const area = document.getElementById('chat');
 
-  document.getElementById('vnBoardText').textContent =
-    'Read the AI-generated unit carefully. Then make your decisions.';
-
-  // Show the pre-written AI response
-  const introDiv = document.createElement('div');
-  introDiv.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;';
-  introDiv.innerHTML = `
-    <div class="welcome-card">
-      <div class="welcome-title">🧠 Overreliance Challenge</div>
-      <div class="welcome-body">
-        You asked AI to help design a unit on academic integrity for your
-        online first-year experience course. Read the response below carefully.
-        Your task is <strong>not</strong> to improve it — it is to decide
-        what is safe to use, what needs your judgment, and what must come from you.
-      </div>
-    </div>`;
-  area.appendChild(introDiv);
+  appendScenarioMission(SCENARIO_INDEX.OVERRELIANCE, { container: area });
 
   // Show the pre-written response
   setTimeout(() => {
-    const responseDiv = document.createElement('div');
-    responseDiv.className = 'message ai';
-    responseDiv.innerHTML = `
-      ${pixelAvatarHTML('neutral')}
-      <div class="bubble-wrap">
-        <div class="bubble-sender">AI-generated unit plan</div>
-        <div class="bubble">${fmt(s.prewrittenResponse)}</div>
-      </div>`;
-    area.appendChild(responseDiv);
-    area.scrollTop = area.scrollHeight;
+    appendScenarioArtifact({
+      sender: 'AI-generated unit plan',
+      html: fmt(s.prewrittenResponse),
+    });
 
     // Pixel prompts the decision task
     setTimeout(() => {
@@ -2115,7 +2190,7 @@ function loadScenario7() {
 }
 
 function showS7DecisionCards(area) {
-  const s = scenarios[6];
+  const s = scenarios[SCENARIO_INDEX.OVERRELIANCE];
   const container = document.createElement('div');
   container.id = 's7DecisionContainer';
   container.style.cssText = 'display:flex;flex-direction:column;gap:10px;margin:8px 0;animation:slideUp 0.35s ease forwards;opacity:0;';
@@ -2182,10 +2257,10 @@ function s7SelectChoice(btn, itemId, choice) {
   btn.classList.add('selected');
   btn.style.opacity = '1';
   s7Decisions[itemId] = choice;
-  scenarioData[6].overrelianceDecisions[itemId] = choice;
+  scenarioData[SCENARIO_INDEX.OVERRELIANCE].overrelianceDecisions[itemId] = choice;
 
   // Show immediate inline feedback
-  const s = scenarios[6];
+  const s = scenarios[SCENARIO_INDEX.OVERRELIANCE];
   const item = s.overrelianceItems.find(i => i.id === itemId);
   const fb = document.getElementById(`s7feedback-${itemId}`);
   if (fb && item) {
@@ -2206,7 +2281,7 @@ function s7SelectChoice(btn, itemId, choice) {
 
 function s7Submit() {
   const area = document.getElementById('chat');
-  const s = scenarios[6];
+  const s = scenarios[SCENARIO_INDEX.OVERRELIANCE];
   playSound('s7Closing');
 
   // Score: how many matched the correct verdict
@@ -2214,7 +2289,7 @@ function s7Submit() {
     s7Decisions[item.id] === item.verdict
   ).length;
   const total = s.overrelianceItems.length;
-  scenarioData[6].bestScore = Math.round((correct / total) * 5);
+  scenarioData[SCENARIO_INDEX.OVERRELIANCE].bestScore = Math.round((correct / total) * 5);
 
   // Disable submit button
   const submitBtn = document.getElementById('s7SubmitBtn');
@@ -2245,38 +2320,25 @@ function s7Submit() {
     pixelBadgeSetExpr(expr);
     area.scrollTop = area.scrollHeight;
 
-    saveIncrementalData(6);
-    scenarioCompleted[6] = true;
+    saveIncrementalData(SCENARIO_INDEX.OVERRELIANCE);
+    scenarioCompleted[SCENARIO_INDEX.OVERRELIANCE] = true;
 
     // Unlock S8 and show the nav card — S7 never goes through the normal
     // prompt-scoring path so markScenarioComplete / maybeShowNavCard won't fire.
     unlockScenario8();
     playSound('scenarioComplete');
 
-    // Nav card to S8
+    // S7 uses the same navigation component even though it has a custom
+    // decision-card completion path rather than the normal prompt scorer.
     setTimeout(() => {
-      const area = document.getElementById('chat');
-      const navCard = document.createElement('div');
-      navCard.style.cssText = 'margin-top:6px;';
-      navCard.innerHTML = `
-        <div class="scenario-nav-card">
-          <div class="scenario-nav-text">
-            <div class="scenario-nav-title">Ready for the final scenario?</div>
-            <div class="scenario-nav-sub">S8: Reflect and Revise is now unlocked.</div>
-          </div>
-          <button class="scenario-nav-btn"
-                  onclick="navigateToNext(7)"
-                  aria-label="Move to S8: Reflect and Revise">
-            Next scenario →
-          </button>
-        </div>
-        <button class="scenario-keep-link"
-                onclick="this.closest('div').remove()"
-                aria-label="Keep reviewing S7">
-          Stay here and review
-        </button>`;
-      area.appendChild(navCard);
-      area.scrollTop = area.scrollHeight;
+      appendScenarioNavCard({
+        targetIndex: SCENARIO_INDEX.REFLECT_REVISE,
+        title: 'Ready for the final scenario?',
+        subtitle: 'S8: Reflect and Revise is now unlocked.',
+        stayLabel: 'Stay here and review',
+        stayAriaLabel: 'Keep reviewing S7',
+        container: area,
+      });
     }, 1200);
   }, 400);
 }
@@ -2289,13 +2351,7 @@ let s8Phase = 1;
 function renderGuidedBuilderS8(container) {
   container.innerHTML = `
     <div class="scaffold-area">
-      <div class="s1-mission-card mission-briefing-card" role="note" aria-label="Mission briefing">
-        <div class="mission-eyebrow">Mission Briefing</div>
-        <div class="mission-title">Fix the dead discussion board.</div>
-        <div class="mission-copy">
-          Students are posting and replying, but the conversation dies after one exchange. Use Claude to redesign the prompt so peer replies extend, challenge, or build on ideas instead of checking a box.
-        </div>
-      </div>
+      ${buildScenarioMissionHTML(SCENARIO_INDEX.REFLECT_REVISE)}
 
       <div class="guided-builder" id="guidedBuilderS8">
         <div class="guided-field">
@@ -2405,28 +2461,15 @@ function loadScenario8() {
   const area = document.getElementById('chat');
   // Clear previous S8 content to prevent duplicate IDs from re-navigation
   area.innerHTML = '';
-  document.getElementById('vnBoardText').textContent = 'Build your prompt below. After the AI responds, reflect — then revise.';
-  const introDiv = document.createElement('div');
-  introDiv.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;';
-  introDiv.innerHTML = `
-    <div class="welcome-card">
-      <div class="welcome-title">🔁 Reflect &amp; Revise</div>
-      <div class="welcome-body">
-        Use the fields below to build a prompt asking AI to design a brief reflection activity for your students.
-        After you see the AI response, Professor Pixel will ask you three questions before you write your revised prompt.
-        <br><br><strong>Round 1:</strong> Build your initial prompt below.
-      </div>
-    </div>`;
-  area.appendChild(introDiv);
-  document.getElementById('inputContainer').style.display = 'block';
+  setScenarioInputVisible(true);
   renderGuidedBuilderS8(document.getElementById('inputContainer'));
 }
 
 function s8AfterResponse(initialScore, reply) {
-  const s = scenarios[7];
+  const s = scenarios[SCENARIO_INDEX.REFLECT_REVISE];
   const area = document.getElementById('chat');
-  scenarioData[7].initialPrompt = lastPromptText;
-  scenarioData[7].initialScore = initialScore;
+  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialPrompt = lastPromptText;
+  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialScore = initialScore;
   document.getElementById('inputContainer').style.display = 'none';
   setTimeout(() => {
     const refCard = document.createElement('div');
@@ -2476,9 +2519,9 @@ function s8ShowRevisionInput() {
   const allRef1 = document.querySelectorAll('#s8ref1');
   const allRef2 = document.querySelectorAll('#s8ref2');
   const allRef3 = document.querySelectorAll('#s8ref3');
-  scenarioData[7].reflection1 = (allRef1[allRef1.length - 1]?.value || '').trim();
-  scenarioData[7].reflection2 = (allRef2[allRef2.length - 1]?.value || '').trim();
-  scenarioData[7].reflection3 = (allRef3[allRef3.length - 1]?.value || '').trim();
+  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection1 = (allRef1[allRef1.length - 1]?.value || '').trim();
+  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection2 = (allRef2[allRef2.length - 1]?.value || '').trim();
+  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection3 = (allRef3[allRef3.length - 1]?.value || '').trim();
   s8Phase = 2;
   const area = document.getElementById('chat');
   const label = document.createElement('div');
@@ -2490,9 +2533,9 @@ function s8ShowRevisionInput() {
   area.appendChild(label);
   // Inject the instructor's reflections into conversation history
   // so the AI sees them as context before the revised prompt arrives.
-  const r1 = scenarioData[7].reflection1 || '';
-  const r2 = scenarioData[7].reflection2 || '';
-  const r3 = scenarioData[7].reflection3 || '';
+  const r1 = scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection1 || '';
+  const r2 = scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection2 || '';
+  const r3 = scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection3 || '';
   if (r1 || r2 || r3) {
     history.push({
       role: 'user',
@@ -2516,16 +2559,16 @@ function s8ShowRevisionInput() {
   document.getElementById('inputContainer').style.display = 'block';
   renderOpenPlain(document.getElementById('inputContainer'));
   const input = document.getElementById('promptInput');
-  if (input) { input.value = scenarioData[7].initialPrompt; autoGrow(input); input.focus(); input.setSelectionRange(0, input.value.length); }
+  if (input) { input.value = scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialPrompt; autoGrow(input); input.focus(); input.setSelectionRange(0, input.value.length); }
   area.scrollTop = area.scrollHeight;
 }
 
 function s8AfterRevision(revisedScore) {
-  const initialScore = scenarioData[7].initialScore || 0;
+  const initialScore = scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialScore || 0;
   const delta = revisedScore - initialScore;
-  scenarioData[7].revisedPrompt = lastPromptText;
-  scenarioData[7].revisedScore = revisedScore;
-  scenarioData[7].scoreDelta = delta;
+  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedPrompt = lastPromptText;
+  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedScore = revisedScore;
+  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].scoreDelta = delta;
   setTimeout(() => {
     const deltaDiv = document.createElement('div');
     deltaDiv.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;margin-top:6px;text-align:center;';
@@ -2534,7 +2577,7 @@ function s8AfterRevision(revisedScore) {
     deltaDiv.innerHTML = `<span style="font-family:'Source Code Pro',monospace;font-size:0.75rem;font-weight:700;color:${color};background:var(--chalk);border:1.5px solid ${color};border-radius:99px;padding:4px 14px;">Score delta: ${deltaLabel}</span>`;
     document.getElementById('chat').appendChild(deltaDiv);
     document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
-    scenarioData[7].scoreDelta = delta;  // already set above, this is fine
+    scenarioData[SCENARIO_INDEX.REFLECT_REVISE].scoreDelta = delta;  // already set above, this is fine
     markScenarioComplete();
   }, 400);
 }
@@ -2544,7 +2587,7 @@ function s8AfterRevision(revisedScore) {
 // Fill S8 phase 1 guided builder fields only — no auto-send.
 // User reads, sends, fills reflections, and sends revised prompt themselves.
 function devFillS8() {
-  if (scenarioIndex !== 7) devGoS8();
+  if (scenarioIndex !== SCENARIO_INDEX.REFLECT_REVISE) devGoS8();
 
   setTimeout(() => {
     const f = (id, val) => {
@@ -2559,7 +2602,7 @@ function devFillS8() {
     // Focus the first empty field so user knows where they are
     document.getElementById('s8-learners')?.focus();
     // No auto-send — user reviews and hits Send themselves
-  }, scenarioIndex !== 7 ? 800 : 200);
+  }, scenarioIndex !== SCENARIO_INDEX.REFLECT_REVISE ? 800 : 200);
 }
 
 // ══════════════════════════════════════════════════════
@@ -3217,16 +3260,34 @@ function vnAdvance() {
 /* pixelDialogue moved to dialogue.js */
 
 
+function getScenarioStartDialogueKey(index) {
+  const ui = SCENARIO_UI?.[index];
+  return ui?.key ? `scenarioStart_${ui.key}` : `scenarioStart_${index}`;
+}
+
+function getScenarioIndexFromDialogueKey(key) {
+  if (!key.startsWith('scenarioStart_')) return -1;
+
+  const suffix = key.slice('scenarioStart_'.length);
+  const legacyIndex = Number(suffix);
+  if (Number.isInteger(legacyIndex) && scenarios[legacyIndex]) return legacyIndex;
+
+  return SCENARIO_UI.findIndex(ui => ui.key === suffix);
+}
+
 function playPixelSequence(key, onDone) {
   const lines = pixelDialogue[key];
   if (!lines) return;
 
   // Update board text and play intro audio on scenario starts
   if (key.startsWith('scenarioStart_')) {
-    const i = parseInt(key.split('_')[1]);
-    document.getElementById('vnBoardText').textContent = scenarios[i].desc;
-    // Play scenario intro — suppressed during initial load to avoid double audio
-    if (window.scenarioIntroEnabled) playSound(`scenarioIntro${i}`);
+    const i = getScenarioIndexFromDialogueKey(key);
+    if (i >= 0 && scenarios[i]) {
+      const boardText = document.getElementById('vnBoardText');
+      if (boardText) boardText.textContent = scenarios[i].desc;
+      // Play scenario intro — suppressed during initial load to avoid double audio
+      if (window.scenarioIntroEnabled) playSound(`scenarioIntro${i}`);
+    }
   }
 
   // Welcome narration on game start
@@ -3246,11 +3307,11 @@ function playPixelSequence(key, onDone) {
 //
 //  Expected filenames:
 //    images/scene-s1.png  — Engagement
-//    images/scene-s2.png  — Differentiation
+//    images/scene-s2.png  — Metacognition
 //    images/scene-s3.png  — Assessment
-//    images/scene-s4.png  — Hallucination Hunt
-//    images/scene-s5.png  — Predict the Output
-//    images/scene-s6.png  — Bias and Context
+//    images/scene-s4.png  — Synchronous Bias
+//    images/scene-s5.png  — Hallucination Hunt
+//    images/scene-s6.png  — Predict the Output
 //    images/scene-complete.png — All scenarios complete
 // ══════════════════════════════════════════════════════
 function loadSceneImage(filename) {
@@ -3289,7 +3350,7 @@ window.addEventListener('DOMContentLoaded', () => {
   window.scenarioIntroEnabled = false;
 
   try {
-    loadScenario(0);
+    loadScenario(SCENARIO_INDEX.ENGAGEMENT);
     window.pcInitialScenarioRendered = true;
   } catch (err) {
     console.error('[PromptCraft] Initial background scenario render failed:', err);
@@ -3307,7 +3368,7 @@ window.addEventListener('DOMContentLoaded', () => {
         (!inputContainer || !inputContainer.textContent.trim())) {
       console.warn('[PromptCraft] Startup watchdog repaired empty initial scenario render.');
       try {
-        loadScenario(0);
+        loadScenario(SCENARIO_INDEX.ENGAGEMENT);
         window.pcInitialScenarioRendered = true;
       } catch (err) {
         console.error('[PromptCraft] Startup watchdog could not render S1:', err);
@@ -3319,81 +3380,73 @@ window.addEventListener('DOMContentLoaded', () => {
 // ══════════════════════════════════════════════════════
 //  SCENARIO NAV
 // ══════════════════════════════════════════════════════
-function switchScenario(i, btn) {
-  scenarioIndex = i;
+function resetScenarioRunState(index) {
+  scenarioIndex = index;
   attempts = 0;
   lastPromptText = '';
   history = [];
 
-  const attNum = document.getElementById('attNum');
-  if (attNum) attNum.textContent = '0';
+  const attemptCount = document.getElementById('attNum');
+  if (attemptCount) attemptCount.textContent = '0';
+  if (Array.isArray(navCardShown)) navCardShown[index] = false;
 
-  document.querySelectorAll('.tab-btn').forEach(b => {
-    b.classList.remove('active');
-    b.setAttribute('aria-selected', 'false');
+  if (index === SCENARIO_INDEX.HALLUCINATION) hallucinationInterruptFired = false;
+  if (index === SCENARIO_INDEX.PREDICTION) s6PredictionDone = false;
+  if (index === SCENARIO_INDEX.OVERRELIANCE) Object.keys(s7Decisions).forEach(key => delete s7Decisions[key]);
+}
+
+function selectScenarioTab(index, explicitButton = null) {
+  const tabs = [...document.querySelectorAll('.tab-btn')];
+  tabs.forEach((tab, tabIndex) => {
+    const active = tabIndex === index;
+    tab.classList.toggle('active', active);
+    tab.setAttribute('aria-selected', String(active));
   });
 
-  const targetBtn = btn || document.querySelectorAll('.tab-btn')[i];
-  if (targetBtn) {
-    targetBtn.classList.add('active');
-    targetBtn.setAttribute('aria-selected', 'true');
+  const target = explicitButton || tabs[index];
+  if (target) {
+    target.classList.add('active');
+    target.setAttribute('aria-selected', 'true');
   }
+}
 
+function playScenarioIntroduction(index) {
+  const ui = getScenarioUI(index);
+  const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
+
+  // Scenario introductions share Scenario 1's portrait composition. Keeping an
+  // explicit state class prevents later post-analysis/mobile rules from making
+  // Pixel oversized or centering her over the smartboard text.
+  overlay?.classList.add('scenario-intro-active');
+
+  const onDone = () => {
+    overlay?.classList.remove('scenario-intro-active');
+    if (ui.afterIntro === 'hallucination-review') {
+      setTimeout(() => fireHallucinationInterrupt(), 2500);
+    }
+  };
+
+  if (window.scenarioIntroTimer) clearTimeout(window.scenarioIntroTimer);
+  window.scenarioIntroTimer = setTimeout(() => {
+    playPixelSequence(getScenarioStartDialogueKey(index), onDone);
+  }, 300);
+}
+
+function switchScenario(i, btn) {
+  const index = Number(i);
+  if (!Number.isInteger(index) || !scenarios[index]) return false;
+
+  pcClearVNStateForScenarioSwitch();
+  resetScenarioRunState(index);
+  selectScenarioTab(index, btn);
   window.scenarioIntroEnabled = true;
 
-  if (Array.isArray(navCardShown)) {
-    navCardShown[i] = false;
-  }
+  const challengeCard = document.querySelector('.scenario-card');
+  challengeCard?.classList.toggle('s4-active', index === SCENARIO_INDEX.SYNC_BIAS);
 
-  if (i === 3) {
-    s4InterruptFired = false;
-  }
-
-  const card = document.querySelector('.scenario-card');
-  if (card) {
-    if (i === 3) {
-      card.classList.add('s4-active');
-    } else {
-      card.classList.remove('s4-active');
-    }
-  }
-
-  const overlay = document.querySelector('.vn-overlay');
-  if (overlay) {
-    overlay.classList.remove(
-      'claude-prediction',
-      'pc-clean-prediction',
-      'claude-terminal-consult',
-      'claude-analysis',
-      'claude-consult'
-    );
-  }
-
-  const chatEl = document.getElementById('chat');
-  if (chatEl && chatEl._pixelThinkTimer) {
-    clearTimeout(chatEl._pixelThinkTimer);
-    chatEl._pixelThinkTimer = null;
-  }
-
-  const existing = document.getElementById('pixelThinking');
-  if (existing) existing.remove();
-
-  const revealWrap = document.getElementById('pixelRevealWrap');
-  if (revealWrap) revealWrap.remove();
-
-  loadScenario(i);
-
-  const s4Callback = (i === 3)
-    ? () => setTimeout(() => fireS4Interrupt(), 2500)
-    : null;
-
-  if (window.scenarioIntroTimer) {
-    clearTimeout(window.scenarioIntroTimer);
-  }
-
-  window.scenarioIntroTimer = setTimeout(() => {
-    playPixelSequence(`scenarioStart_${i}`, s4Callback);
-  }, 300);
+  loadScenario(index);
+  playScenarioIntroduction(index);
+  return false;
 }
 
 function pcClearVNStateForScenarioSwitch() {
@@ -3407,7 +3460,8 @@ function pcClearVNStateForScenarioSwitch() {
       'claude-terminal-textmode',
       'claude-analysis',
       'claude-consult',
-      'pc-clean-output'
+      'pc-clean-output',
+      'scenario-intro-active'
     );
   }
 
@@ -3505,9 +3559,9 @@ function resetS1Dev() {
     if (attNum) attNum.textContent = '0';
 
     window.scenarioIntroEnabled = true;
-    if (Array.isArray(navCardShown)) navCardShown[0] = false;
+    if (Array.isArray(navCardShown)) navCardShown[SCENARIO_INDEX.ENGAGEMENT] = false;
 
-    loadScenario(0);
+    loadScenario(SCENARIO_INDEX.ENGAGEMENT);
 
     setTimeout(() => {
       pcFillS1DevFields();
@@ -3519,81 +3573,60 @@ window.pcFillS1DevFields = pcFillS1DevFields;
 window.resetS1Dev = resetS1Dev;
 try { resetS1Dev = window.resetS1Dev; } catch(e) {}
 
-function loadScenario(i) {
-  const s = scenarios[i];
-  document.body.classList.toggle('s1-active', i === 0);
-  document.body.classList.remove('s1-result-active');
-  document.getElementById('scenarioText').textContent = s.desc;
-  document.getElementById('vnBoardText').textContent = s.desc;
-  renderOSCQR(s.oscqr, []);
-  document.getElementById('chat').innerHTML = '';
+function prepareScenarioShell(index) {
+  const scenario = scenarios[index];
+  const ui = getScenarioUI(index);
 
-  // Reset scenario-specific state flags
-  if (i === 4) s4InterruptFired = false;   // Hallucination is now S5 (index 4)
-  if (i === 5) s5PredictionDone = false;  // Predict is now S6 (index 5)
+  document.body.classList.remove('s1-active', 's1-result-active', 's2-active', 's2-submitted');
+  document.body.classList.toggle('s1-active', index === SCENARIO_INDEX.ENGAGEMENT);
 
-  loadSceneImage(`scene-s${i + 1}.png`);
+  const scenarioText = document.getElementById('scenarioText');
+  const boardText = document.getElementById('vnBoardText');
+  const chat = document.getElementById('chat');
+  const boardLoading = document.getElementById('vnBoardLoading');
 
-  const sceneBg = document.getElementById('vnSceneBg');
-  if (sceneBg) sceneBg.src = 'images/classroom-bg.png';
-  document.getElementById('vnBoardLoading').style.display = 'none';
+  if (scenarioText) scenarioText.textContent = scenario.desc;
+  if (boardText) boardText.textContent = ui.boardText || scenario.desc;
+  if (chat) chat.innerHTML = '';
+  if (boardLoading) boardLoading.style.display = 'none';
 
-  // S4, S5, S6, S7 control their own input visibility
-  if (i === 3) {
-    // S4 is now Sync Bias (open prompt, scored)
-    renderOpenPlain(document.getElementById('inputContainer'));
-    document.getElementById('inputContainer').style.display = 'block';
-    loadScenarioSyncBias();
-    return;
-  }
-  if (i === 4) {
-    // S5 is now Hallucination Hunt
-    renderOpenPlain(document.getElementById('inputContainer'));
-    document.getElementById('inputContainer').style.display = 'none';
-    loadScenarioHallucination();
-    return;
-  }
-  if (i === 5) {
-    // S6 is now Predict the Output
-    renderOpenPlain(document.getElementById('inputContainer'));
-    document.getElementById('inputContainer').style.display = 'none';
-    loadScenarioPredict();
-    return;
-  }
-  if (i === 6) {
-    renderOpenPlain(document.getElementById('inputContainer'));
-    document.getElementById('inputContainer').style.display = 'none';
-    loadScenario7();
-    return;
-  }
-  if (i === 7) {
-    document.getElementById('inputContainer').style.display = 'block';
-    loadScenario8();
-    return;
-  }
+  renderOSCQR(scenario.oscqr, []);
+  loadSceneImage(`scene-s${index + 1}.png`);
 
-  renderInputMode(i);
-  if (i !== 0) addWelcomeCard();
+  const sceneBackground = document.getElementById('vnSceneBg');
+  if (sceneBackground) sceneBackground.src = 'images/classroom-bg.png';
 }
 
-function addWelcomeCard() {
-  const area = document.getElementById('chat');
-  const div = document.createElement('div');
-  div.style.cssText = 'animation: slideUp 0.3s ease forwards; opacity: 0;';
-  div.innerHTML = `
-    <div class="welcome-card">
-      <div class="welcome-title">📖 Ready to practice?</div>
-      <div class="welcome-body">
-        Read the challenge pinned above, then write your prompt below.
-        The AI will respond just like it would in a real teaching situation.<br><br>
-        After each response you will see a <strong>Prompt Analysis</strong> card
-        and Professor Pixel will share her thoughts.
-      </div>
-      <div class="tip-row">
-        🌿 Tip: Include who your learners are, what you want them to achieve, and any specific constraints.
-      </div>
-    </div>`;
-  area.appendChild(div);
+function renderScenarioInput(index) {
+  const ui = getScenarioUI(index);
+  const container = document.getElementById('inputContainer');
+  if (!container) return;
+
+  if (ui.inputMode === 'scenario-8') {
+    // Scenario 8 owns its specialized builder in loadScenario8().
+    container.innerHTML = '';
+  } else if (ui.inputMode.startsWith('scenario-')) {
+    renderInputMode(index);
+  } else {
+    renderOpenPlain(container);
+  }
+
+  setScenarioInputVisible(ui.inputVisible);
+}
+
+function runScenarioSetup(index) {
+  const setup = getScenarioUI(index).setup;
+  const handler = setup ? SCENARIO_SETUP_HANDLERS[setup] : null;
+  if (typeof handler === 'function') handler();
+}
+
+function loadScenario(i) {
+  const index = Number(i);
+  if (!Number.isInteger(index) || !scenarios[index]) return;
+
+  prepareScenarioShell(index);
+  renderScenarioInput(index);
+  runScenarioSetup(index);
 }
 
 // ══════════════════════════════════════════════════════
@@ -3812,8 +3845,8 @@ async function reviewS1Part(part) {
 
     const feedback = data.content?.[0]?.text || getS1PartFeedback(part, values, checks);
 
-    if (!scenarioData[0].sectionReviews) scenarioData[0].sectionReviews = [];
-    scenarioData[0].sectionReviews.push({
+    if (!scenarioData[SCENARIO_INDEX.ENGAGEMENT].sectionReviews) scenarioData[SCENARIO_INDEX.ENGAGEMENT].sectionReviews = [];
+    scenarioData[SCENARIO_INDEX.ENGAGEMENT].sectionReviews.push({
       part,
       sectionText,
       feedback,
@@ -3905,6 +3938,7 @@ function renderOpenWithMemory(container) {
 
   container.innerHTML = `
     <div class="scaffold-area">
+      ${buildScenarioMissionHTML(SCENARIO_INDEX.ASSESSMENT)}
       ${hint ? `<div class="memory-hint visible" role="note">${hint}</div>` : ''}
       <div class="input-box">
         <label for="promptInput" class="sr-only">Write your AI prompt here</label>
@@ -3925,7 +3959,7 @@ function renderOpenWithMemory(container) {
 
 function buildMemoryHint() {
   const s1 = playerHistory.s1;
-  const s2Score = scenarioData[1]?.bestScore || 0;
+  const s2Score = scenarioData[SCENARIO_INDEX.METACOGNITION]?.bestScore || 0;
 
   const parts = [];
 
@@ -4035,7 +4069,7 @@ async function sendMain(text) {
       return ind ? ind.label : id;
     }));
     // ── S8: show the AI message first, THEN handle round logic ──
-    if (scenarioIndex === 7) {
+    if (scenarioIndex === SCENARIO_INDEX.REFLECT_REVISE) {
       const expr = score.total <= 1 ? 'skeptical' : score.total <= 3 ? 'encouraging' : 'excited';
       const aiMsgEl = addMsg('claude', fmt(reply) + buildFeedback(score), expr);
       gainXP(score.total * 6);
@@ -4088,7 +4122,7 @@ async function sendMain(text) {
     // the AI response scroll-into-view above handles positioning
 
     // Pre-fill input with last prompt so player can refine rather than rewrite
-    if (lastPromptText && (scenarioIndex !== 0) && (scenarioIndex < 3 || scenarioIndex === 4 || scenarioIndex === 5 || scenarioIndex === 7)) {
+    if (lastPromptText && scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT && scenarioSupportsPrompt(scenarioIndex)) {
       const inp = document.getElementById('promptInput');
       if (inp) {
         inp.value = lastPromptText;
@@ -4249,12 +4283,12 @@ function markScenarioComplete() {
   saveIncrementalData(scenarioIndex);
 
   // Unlock next scenario at the right moments
-  const s1s2s3done = scenarioCompleted[0] && scenarioCompleted[1] && scenarioCompleted[2];
-  if (s1s2s3done && !scenarioCompleted[3]) unlockScenario4();
-  if (scenarioCompleted[3] && !scenarioCompleted[4]) unlockScenario5();
-  if (scenarioCompleted[4] && !scenarioCompleted[5]) unlockScenario6();
-  if (scenarioCompleted[5] && !scenarioCompleted[6]) unlockScenario7();
-  if (scenarioCompleted[6] && !scenarioCompleted[7]) unlockScenario8();
+  const s1s2s3done = scenarioCompleted[SCENARIO_INDEX.ENGAGEMENT] && scenarioCompleted[SCENARIO_INDEX.METACOGNITION] && scenarioCompleted[SCENARIO_INDEX.ASSESSMENT];
+  if (s1s2s3done && !scenarioCompleted[SCENARIO_INDEX.SYNC_BIAS]) unlockScenario4();
+  if (scenarioCompleted[SCENARIO_INDEX.SYNC_BIAS] && !scenarioCompleted[SCENARIO_INDEX.HALLUCINATION]) unlockScenario5();
+  if (scenarioCompleted[SCENARIO_INDEX.HALLUCINATION] && !scenarioCompleted[SCENARIO_INDEX.PREDICTION]) unlockScenario6();
+  if (scenarioCompleted[SCENARIO_INDEX.PREDICTION] && !scenarioCompleted[SCENARIO_INDEX.OVERRELIANCE]) unlockScenario7();
+  if (scenarioCompleted[SCENARIO_INDEX.OVERRELIANCE] && !scenarioCompleted[SCENARIO_INDEX.REFLECT_REVISE]) unlockScenario8();
 
   const allDone = scenarioCompleted.every(Boolean);
   const area = document.getElementById('chat');
@@ -4425,23 +4459,13 @@ function devGoS4() {
   scenarioCompleted = [true, true, true, false, false, false, false, false];
   unlockScenario4();
   const btn = document.getElementById('s4Tab');
-  btn.classList.remove('locked');
-  btn.disabled = false;
-  switchScenario(3, btn);
+  if (btn) switchScenario(SCENARIO_INDEX.SYNC_BIAS, btn);
 }
 
+// Fill S4's async-first capstone revision prompt. Does not auto-send.
 function devTestS4() {
   devGoS4();
-  // Auto-click the self-report once the interrupt fires
-  const tryClick = (attempts) => {
-    const btns = document.querySelectorAll('.s4-btn');
-    if (btns.length > 0) {
-      s4SelectReport(btns[0], 'yes_noticed');
-    } else if (attempts < 10) {
-      setTimeout(() => tryClick(attempts + 1), 500);
-    }
-  };
-  setTimeout(() => tryClick(0), 3000);
+  fillVisiblePromptWhenReady(SCENARIO_INDEX.SYNC_BIAS, scenarios[SCENARIO_INDEX.SYNC_BIAS].testPrompt);
 }
 
 function devGoS5() {
@@ -4449,45 +4473,25 @@ function devGoS5() {
   unlockScenario4();
   unlockScenario5();
   const btn = document.getElementById('s5Tab');
-  btn.classList.remove('locked');
-  btn.disabled = false;
-  switchScenario(4, btn);
+  if (btn) switchScenario(SCENARIO_INDEX.HALLUCINATION, btn);
 }
 
-// devTestS5 replaced by devFillS5 — see below
-
-// Fill S5 test data: clicks the correct prediction button,
-// then fills the improved prompt textarea. Does NOT auto-send.
+// Hallucination Hunt has no prompt box. Trigger the reveal and choose the
+// strongest self-report option so the rest of the completion flow can be tested.
 function devFillS5() {
-  // Navigate to S5 if not already there
-  if (scenarioIndex !== 4) devGoS5(); // S5 = Hallucination (index 4)
+  if (scenarioIndex !== SCENARIO_INDEX.HALLUCINATION) devGoS5();
 
-  const clickPrediction = (attempts) => {
-    const btns = [...document.querySelectorAll('.s4-btn')];
-    const correct = btns.find(b => b.getAttribute('onclick')?.includes('generic'));
-    if (correct) {
-      correct.click();
-      waitForInput(0);
-    } else if (attempts < 15) {
-      setTimeout(() => clickPrediction(attempts + 1), 400);
+  const revealAndChoose = (attempts = 0) => {
+    if (!document.querySelector('.hallucination-self-report')) fireHallucinationInterrupt();
+    const choice = [...document.querySelectorAll('.hallucination-self-report .s4-btn')]
+      .find(btn => btn.getAttribute('onclick')?.includes('yes_noticed'));
+    if (choice) {
+      choice.click();
+      return;
     }
+    if (attempts < 30) setTimeout(() => revealAndChoose(attempts + 1), 200);
   };
-
-  const waitForInput = (attempts) => {
-    const input = document.getElementById('promptInput');
-    if (input && input.offsetParent !== null) {
-      input.value = scenarios[4].testPrompt ||
-        'I teach an online introductory biology course (16 weeks, fully asynchronous). My students are first-year undergraduates with varying science backgrounds. I need a low-stakes quiz with 5 multiple-choice questions testing key vocabulary from Module 3 on cell structure. Questions should be completable in under 10 minutes with no external resources.';
-      autoGrow(input);
-      input.focus();
-      // No auto-send — user hits Send themselves
-    } else if (attempts < 20) {
-      setTimeout(() => waitForInput(attempts + 1), 400);
-    }
-  };
-
-  // If we just navigated, give extra time for the VN + prediction card to render
-  setTimeout(() => clickPrediction(0), scenarioIndex !== 4 ? 30000 : 200);
+  setTimeout(() => revealAndChoose(), 250);
 }
 
 function devGoS6() {
@@ -4496,32 +4500,41 @@ function devGoS6() {
   unlockScenario5();
   unlockScenario6();
   const btn = document.getElementById('s6Tab');
-  btn.classList.remove('locked');
-  btn.disabled = false;
-  switchScenario(5, btn);
+  if (btn) switchScenario(SCENARIO_INDEX.PREDICTION, btn);
 }
 
-// devTestS6 replaced by devFillS6 below
-
-// Fill S6 test data: waits for the textarea to appear after the
-// biased plan + Pixel reveal sequence, then fills — no auto-send.
+// Select the correct prediction, wait for the open prompt, and fill the
+// improved course-specific version. Does not auto-send.
 function devFillS6() {
-  // Navigate to S6 if not already there
-  if (scenarioIndex !== 5) devGoS6(); // S6 = Predict (index 5)
+  if (scenarioIndex !== SCENARIO_INDEX.PREDICTION) devGoS6();
 
-  const waitForInput = (attempts) => {
+  const choosePrediction = (attempts = 0) => {
+    const choice = [...document.querySelectorAll('.scenario-choice-btn')]
+      .find(btn => btn.getAttribute('onclick')?.includes("'generic'"));
+    if (choice) {
+      choice.click();
+      fillVisiblePromptWhenReady(SCENARIO_INDEX.PREDICTION, scenarios[SCENARIO_INDEX.PREDICTION].testPrompt, 60);
+      return;
+    }
+    if (attempts < 40) setTimeout(() => choosePrediction(attempts + 1), 200);
+  };
+  setTimeout(() => choosePrediction(), 250);
+}
+
+function fillVisiblePromptWhenReady(index, value, maxAttempts = 40) {
+  const tryFill = (attempts = 0) => {
+    if (scenarioIndex !== index) return;
     const input = document.getElementById('promptInput');
     if (input && input.offsetParent !== null) {
-      input.value = 'Redesign COMM 495 as a fully asynchronous capstone for adult learners in an online program. Students have no shared availability and cannot attend live sessions. All collaboration, feedback, and presentations must be asynchronous. Do not assume access to Zoom, Google accounts, Slack, or any synchronous tool. The program serves working adults across multiple time zones. Deliverables should be submittable on flexible individual schedules.';
-      autoGrow(input);
+      input.value = value || '';
+      try { autoGrow(input); } catch(e) {}
+      try { onHintInput(input); } catch(e) {}
       input.focus();
-      // No auto-send — user reads, then hits Send themselves
-    } else if (attempts < 25) {
-      setTimeout(() => waitForInput(attempts + 1), 400);
+      return;
     }
+    if (attempts < maxAttempts) setTimeout(() => tryFill(attempts + 1), 200);
   };
-  // S6 has a delayed reveal sequence; if we just navigated give it extra time
-  setTimeout(() => waitForInput(0), scenarioIndex !== 5 ? 3000 : 200);
+  setTimeout(() => tryFill(), 120);
 }
 
 function devGoS7() {
@@ -4533,14 +4546,14 @@ function devGoS7() {
   const btn = document.getElementById('s7Tab');
   btn.classList.remove('locked');
   btn.disabled = false;
-  switchScenario(6, btn);
+  switchScenario(SCENARIO_INDEX.OVERRELIANCE, btn);
 }
 
 function devGoS8() {
   scenarioCompleted = [true, true, true, true, true, true, true, false];
   unlockScenario4(); unlockScenario5(); unlockScenario6(); unlockScenario7(); unlockScenario8();
   const btn = document.getElementById('s8Tab');
-  if (btn) switchScenario(7, btn);
+  if (btn) switchScenario(SCENARIO_INDEX.REFLECT_REVISE, btn);
 }
 
 // Auto-select a prediction during dev auto-send tests so the new prediction gate
@@ -4650,14 +4663,7 @@ function analyzeS1Guided(values){
 };
 
 function buildS1MissionHTML(){
-  return `
-    <section class="s1-clean-mission" role="region" aria-label="Mission briefing">
-      <div class="mission-eyebrow">Mission Briefing</div>
-      <div class="mission-title">Fix the dead discussion board.</div>
-      <div class="mission-copy">
-        Students are participating, but the conversation dies after one exchange. Diagnose the problem and use Claude to redesign the discussion so students extend, challenge, and build on ideas.
-      </div>
-    </section>`;
+  return buildScenarioMissionHTML(SCENARIO_INDEX.ENGAGEMENT, { className: 's1-clean-mission' });
 }
 
 function buildS1LeftHTML(){
@@ -5322,7 +5328,7 @@ function clearVN(){
     return;
   }
   const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
-  if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction','claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output');
+  if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction','claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output','scenario-intro-active');
   document.getElementById('vnDialogue')?.classList.remove('has-choices');
   document.getElementById('vnCharacter')?.classList.remove('visible');
   document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
@@ -5499,11 +5505,7 @@ function renderS2MetacognitionWorkbench(container) {
   container.innerHTML = `
     <div class="scaffold-area s2-workbench">
       <div class="s2-left-stack">
-        <div class="s2-mission-card" role="note" aria-label="Scenario 2 mission briefing">
-          <div class="s2-mission-eyebrow">Mission Briefing</div>
-          <div class="s2-mission-title">Find the metacognitive thinker.</div>
-          <div class="s2-mission-copy">Students are completing work and moving on. First, identify what metacognition looks like. Then build a personalized Claude prompt for your own teaching context.</div>
-        </div>
+        ${buildScenarioMissionHTML(SCENARIO_INDEX.METACOGNITION)}
 
         <div class="s2-detective-card" role="region" aria-label="Metacognition detective cards">
           <div class="s2-card-eyebrow">Student Thought Detective</div>
@@ -5744,8 +5746,11 @@ function addS2ClaudeResultCard(responseText) {
 
   function devFillScenarioGlobal(index, mode) {
     index = Number(index) || 0;
-    if (index === 0 && typeof window.resetS1Dev === 'function') return window.resetS1Dev();
-    if (index === 1 && typeof window.devFillS2 === 'function') return window.devFillS2(mode || 'mid');
+    if (index === SCENARIO_INDEX.ENGAGEMENT && typeof window.resetS1Dev === 'function') return window.resetS1Dev();
+    if (index === SCENARIO_INDEX.METACOGNITION && typeof window.devFillS2 === 'function') return window.devFillS2(mode || 'mid');
+    if (index === SCENARIO_INDEX.SYNC_BIAS && typeof window.devTestS4 === 'function') return window.devTestS4();
+    if (index === SCENARIO_INDEX.HALLUCINATION && typeof window.devFillS5 === 'function') return window.devFillS5();
+    if (index === SCENARIO_INDEX.PREDICTION && typeof window.devFillS6 === 'function') return window.devFillS6();
 
     devGoScenarioGlobal(index);
     const testPrompt = (typeof scenarios !== 'undefined' && scenarios[index] && scenarios[index].testPrompt) ? scenarios[index].testPrompt : '';
@@ -5778,7 +5783,7 @@ function addS2ClaudeResultCard(responseText) {
 
   function devNextScenarioGlobal() {
     const current = typeof scenarioIndex === 'number' ? scenarioIndex : 0;
-    const max = typeof scenarios !== 'undefined' ? scenarios.length - 1 : 7;
+    const max = typeof scenarios !== 'undefined' ? scenarios.length - 1 : SCENARIO_COUNT - 1;
     return devGoScenarioGlobal(Math.min(current + 1, max));
   }
 

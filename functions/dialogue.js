@@ -89,7 +89,7 @@ window.pixelDialogue = {
       "id": "p13"
     }
   ],
-  "scenarioStart_0": [
+  "scenarioStart_engagement": [
     {
       "expr": "neutral",
       "text": "A faculty member brought me this discussion prompt. Nothing is technically wrong with it.",
@@ -106,7 +106,7 @@ window.pixelDialogue = {
       "id": "p16"
     }
   ],
-  "scenarioStart_1": [
+  "scenarioStart_metacognition": [
     {
       "expr": "thinking",
       "text": "This scenario is about metacognition — helping online learners become more aware of how they are actually learning.",
@@ -118,7 +118,7 @@ window.pixelDialogue = {
       "id": "p18"
     }
   ],
-  "scenarioStart_2": [
+  "scenarioStart_assessment": [
     {
       "expr": "neutral",
       "text": "Your third scenario is about authentic assessment in online higher education.",
@@ -130,7 +130,7 @@ window.pixelDialogue = {
       "id": "p20"
     }
   ],
-  "scenarioStart_3": [
+  "scenarioStart_hallucination": [
     {
       "expr": "thinking",
       "text": "This challenge is a little different from the others. I want you to stay alert.",
@@ -142,10 +142,10 @@ window.pixelDialogue = {
       "id": "p22"
     }
   ],
-  "scenarioStart_4": [
+  "scenarioStart_prediction": [
     {
       "expr": "thinking",
-      "text": "Scenario 5 is about your mental model of how AI actually processes a request.",
+      "text": "This scenario is about your mental model of how AI actually processes a request.",
       "id": "p23"
     },
     {
@@ -154,10 +154,10 @@ window.pixelDialogue = {
       "id": "p24"
     }
   ],
-  "scenarioStart_5": [
+  "scenarioStart_sync-bias": [
     {
       "expr": "skeptical",
-      "text": "Scenario 6 is about something subtle — AI making assumptions about your teaching context that are not true.",
+      "text": "This scenario is about something subtle — AI making assumptions about your teaching context that are not true.",
       "id": "p25"
     },
     {
@@ -166,7 +166,7 @@ window.pixelDialogue = {
       "id": "p26"
     }
   ],
-  "scenarioStart_6": [
+  "scenarioStart_overreliance": [
     {
       "expr": "thinking",
       "text": "This one is different from everything before it.",
@@ -178,7 +178,7 @@ window.pixelDialogue = {
       "id": "p28"
     }
   ],
-  "scenarioStart_7": [
+  "scenarioStart_reflect-revise": [
     {
       "expr": "encouraging",
       "text": "You have written prompts, spotted hallucinations, caught bias, and evaluated AI judgment. Now I want you to look at your own thinking.",
@@ -321,9 +321,9 @@ window.pixelAudioByText = {
   "Think real professional practice, student agency, and meaningful feedback. This one is really satisfying to get right.": "p20",
   "This challenge is a little different from the others. I want you to stay alert.": "p21",
   "AI can sound confident and authoritative while recommending things the field has already moved past. Read carefully.": "p22",
-  "Scenario 5 is about your mental model of how AI actually processes a request.": "p23",
+  "This scenario is about your mental model of how AI actually processes a request.": "p23",
   "Before you see the response, you are going to predict what happened. That predictive instinct is the skill we are building.": "p24",
-  "Scenario 6 is about something subtle — AI making assumptions about your teaching context that are not true.": "p25",
+  "This scenario is about something subtle — AI making assumptions about your teaching context that are not true.": "p25",
   "Read the AI output carefully. Count what it assumes about how your students meet and collaborate. Then fix it.": "p26",
   "This one is different from everything before it.": "p27",
   "The AI did not hallucinate. It did not show bias. The output is genuinely good. Your job is to decide what that means for how you use it.": "p28",
@@ -466,103 +466,103 @@ window.pixelAudioLabels = {
     "notes": ""
   },
   "p14": {
-    "source": "scenarioStart_0",
+    "source": "scenarioStart_engagement",
     "expression": "neutral",
     "text": "A faculty member brought me this discussion prompt. Nothing is technically wrong with it.",
     "notes": ""
   },
   "p15": {
-    "source": "scenarioStart_0",
+    "source": "scenarioStart_engagement",
     "expression": "thinking",
     "text": "Students are posting. Students are replying. The assignment is being completed.",
     "notes": ""
   },
   "p16": {
-    "source": "scenarioStart_0",
+    "source": "scenarioStart_engagement",
     "expression": "encouraging",
     "text": "But the conversation dies after a single exchange. Let's figure out why.",
     "notes": ""
   },
   "p17": {
-    "source": "scenarioStart_1",
+    "source": "scenarioStart_metacognition",
     "expression": "thinking",
     "text": "This scenario is about metacognition — helping online learners become more aware of how they are actually learning.",
     "notes": ""
   },
   "p18": {
-    "source": "scenarioStart_1",
+    "source": "scenarioStart_metacognition",
     "expression": "encouraging",
     "text": "Think about what self-regulation looks like in an async course and what a realistic, low-barrier activity could be.",
     "notes": ""
   },
   "p19": {
-    "source": "scenarioStart_2",
+    "source": "scenarioStart_assessment",
     "expression": "neutral",
     "text": "Your third scenario is about authentic assessment in online higher education.",
     "notes": ""
   },
   "p20": {
-    "source": "scenarioStart_2",
+    "source": "scenarioStart_assessment",
     "expression": "excited",
     "text": "Think real professional practice, student agency, and meaningful feedback. This one is really satisfying to get right.",
     "notes": ""
   },
   "p21": {
-    "source": "scenarioStart_3",
+    "source": "scenarioStart_hallucination",
     "expression": "thinking",
     "text": "This challenge is a little different from the others. I want you to stay alert.",
     "notes": ""
   },
   "p22": {
-    "source": "scenarioStart_3",
+    "source": "scenarioStart_hallucination",
     "expression": "skeptical",
     "text": "AI can sound confident and authoritative while recommending things the field has already moved past. Read carefully.",
     "notes": ""
   },
   "p23": {
-    "source": "scenarioStart_4",
+    "source": "scenarioStart_prediction",
     "expression": "thinking",
-    "text": "Scenario 5 is about your mental model of how AI actually processes a request.",
+    "text": "This scenario is about your mental model of how AI actually processes a request.",
     "notes": ""
   },
   "p24": {
-    "source": "scenarioStart_4",
+    "source": "scenarioStart_prediction",
     "expression": "encouraging",
     "text": "Before you see the response, you are going to predict what happened. That predictive instinct is the skill we are building.",
     "notes": ""
   },
   "p25": {
-    "source": "scenarioStart_5",
+    "source": "scenarioStart_sync-bias",
     "expression": "skeptical",
-    "text": "Scenario 6 is about something subtle — AI making assumptions about your teaching context that are not true.",
+    "text": "This scenario is about something subtle — AI making assumptions about your teaching context that are not true.",
     "notes": ""
   },
   "p26": {
-    "source": "scenarioStart_5",
+    "source": "scenarioStart_sync-bias",
     "expression": "neutral",
     "text": "Read the AI output carefully. Count what it assumes about how your students meet and collaborate. Then fix it.",
     "notes": ""
   },
   "p27": {
-    "source": "scenarioStart_6",
+    "source": "scenarioStart_overreliance",
     "expression": "thinking",
     "text": "This one is different from everything before it.",
     "notes": ""
   },
   "p28": {
-    "source": "scenarioStart_6",
+    "source": "scenarioStart_overreliance",
     "expression": "neutral",
     "text": "The AI did not hallucinate. It did not show bias. The output is genuinely good. Your job is to decide what that means for how you use it.",
     "notes": ""
   },
   "p29": {
-    "source": "scenarioStart_7",
+    "source": "scenarioStart_reflect-revise",
     "expression": "encouraging",
     "text": "You have written prompts, spotted hallucinations, caught bias, and evaluated AI judgment. Now I want you to look at your own thinking.",
     "notes": ""
   },
   "p30": {
-    "source": "scenarioStart_7",
+    "source": "scenarioStart_reflect-revise",
     "expression": "thinking",
     "text": "Build your prompt using the fields below. After you see what the AI gives you, I will ask you three questions before you revise.",
     "notes": ""
