@@ -207,7 +207,7 @@ const SURVEY_MODE   = 'sheets';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbylnSseQkSsPNKSjqoU2ui6yFa62YslQEq-nRyeC8MZFVnlmv-XYoi2EUJPZGvnKU1z/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 const PC_APP_SCHEMA_VERSION = 'V121';
-const PC_APP_BUILD_LABEL = 'MAIN_MENU_V131';
+const PC_APP_BUILD_LABEL = 'MAIN_MENU_V132_CLEANUP';
 console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 
@@ -466,39 +466,6 @@ const scenarioData = Array.from({ length: SCENARIO_COUNT }, (_, index) => {
 });
 
 const pcLastIncrementalSaveAt = {};
-
-
-
-function pcGetTotalXPForSave() {
-  /*
-    Prefer the live total XP value if the game has one, but fall back to
-    deriving XP from recorded best scores so checkpoint rows do not leave
-    PromptCraft Responses looking like it forgot arithmetic exists.
-  */
-  const candidates = [
-    window.totalXP,
-    window.pcTotalXP,
-    window.currentXP,
-    window.xp,
-    (typeof totalXP !== 'undefined' ? totalXP : undefined),
-    (typeof pcTotalXP !== 'undefined' ? pcTotalXP : undefined),
-    (typeof currentXP !== 'undefined' ? currentXP : undefined)
-  ];
-
-  for (const value of candidates) {
-    const n = Number(value);
-    if (!Number.isNaN(n) && n > 0) return Math.round(n);
-  }
-
-  if (Array.isArray(scenarioData)) {
-    return scenarioData.reduce((sum, s) => {
-      const score = Number((s && (s.bestScore || s.currentScore || s.revisedScore || s.initialScore)) || 0);
-      return sum + (Number.isNaN(score) ? 0 : Math.round(score * 25));
-    }, 0);
-  }
-
-  return 0;
-}
 
 function pcFormatPredictionChoice(choice) {
   if (!choice) return '';
@@ -1734,148 +1701,6 @@ function setScenarioInputVisible(visible, { focus = false } = {}) {
   if (visible && focus) {
     setTimeout(() => document.getElementById('promptInput')?.focus(), 100);
   }
-}
-
-// ── INLINE PIXEL CHAT RESPONSE ────────────────────────
-// Shows thinking indicator, then a tap-to-reveal button,
-// then fetches a genuine AI-generated response from Pixel
-function schedulePixelResponse(playerPrompt, aiReply, score, scenarioDesc) {
-  const area = document.getElementById('chat');
-
-  // Step 1 — thinking indicator appears after 4 seconds
-  let thinkingEl = null;
-  const thinkTimer = setTimeout(() => {
-    thinkingEl = document.createElement('div');
-    thinkingEl.className = 'pixel-thinking-row';
-    thinkingEl.id = 'pixelThinking';
-    const tSrc = PIXEL_EXPR.thinking;
-    thinkingEl.innerHTML = `
-      <img class="pixel-thinking-avatar" src="${tSrc}" alt=""
-           onerror="this.style.display='none'" />
-      <span class="pixel-thinking-text">
-        Professor Pixel is thinking
-        <span class="pixel-thinking-dots">
-          <span></span><span></span><span></span>
-        </span>
-      </span>`;
-    area.appendChild(thinkingEl);
-    area.scrollTop = area.scrollHeight;
-
-    // Step 2 — reveal button replaces thinking after 2 more seconds
-    setTimeout(() => {
-      if (thinkingEl && thinkingEl.parentNode) {
-        thinkingEl.remove();
-      }
-      showPixelRevealButton(playerPrompt, aiReply, score, scenarioDesc, area);
-    }, 2000);
-
-  }, 4000);
-
-  // Store timer so we can cancel if scenario switches
-  area._pixelThinkTimer = thinkTimer;
-}
-
-function showPixelRevealButton(playerPrompt, aiReply, score, scenarioDesc, area) {
-  const btnWrap = document.createElement('div');
-  btnWrap.id = 'pixelRevealWrap';
-  btnWrap.style.cssText = 'display:flex;padding:2px 0;animation:slideUp 0.3s ease forwards;opacity:0;';
-
-  const expr = score <= 1 ? 'skeptical' : score <= 3 ? 'encouraging' : 'excited';
-  const rSrc = PIXEL_EXPR[expr];
-
-  const btn = document.createElement('button');
-  btn.className = 'pixel-reveal-btn';
-  btn.setAttribute('aria-label', "Hear Professor Pixel's thoughts on your prompt");
-
-  // Store data directly on the element -- avoids HTML attribute escaping issues
-  btn._pixelData = { playerPrompt, aiReply: aiReply.substring(0, 1800), score, scenarioDesc };
-
-  btn.innerHTML = `
-    <img class="pixel-reveal-avatar" src="${rSrc}" alt="Professor Pixel"
-         onerror="this.style.display='none'" />
-    Professor Pixel has thoughts — tap to hear them
-    <span class="pixel-reveal-arrow">›</span>`;
-
-  btn.addEventListener('click', () => triggerPixelResponse(btn));
-
-  btnWrap.appendChild(btn);
-  area.appendChild(btnWrap);
-  area.scrollTop = area.scrollHeight;
-}
-
-async function triggerPixelResponse(btn) {
-  // Read data stored directly on the button element
-  const { playerPrompt, aiReply, score, scenarioDesc } = btn._pixelData || {};
-  if (!playerPrompt) return;
-
-  const wrap = btn.closest('#pixelRevealWrap') || btn.parentNode;
-  const area = document.getElementById('chat');
-
-  const loadExpr = score <= 1 ? 'skeptical' : score <= 3 ? 'encouraging' : 'excited';
-  const loadSrc = PIXEL_EXPR[loadExpr];
-
-  const loadWrap = document.createElement('div');
-  loadWrap.className = 'message pixel';
-  loadWrap.innerHTML = `
-    <img class="pixel-chat-avatar" src="${loadSrc}" alt="Professor Pixel"
-         onerror="this.outerHTML='<div class=\\'pixel-chat-avatar-fallback\\'>🧑‍🏫</div>'" />
-    <div class="bubble-wrap">
-      <div class="bubble-sender" style="color:var(--forest-mid);">Professor Pixel</div>
-      <div class="bubble pixel-loading-bubble">
-        <div class="typing-dots"><span></span><span></span><span></span></div>
-      </div>
-    </div>`;
-
-  wrap.replaceWith(loadWrap);
-  area.scrollTop = area.scrollHeight;
-
-  // Update badge expression
-  pixelBadgeSetExpr(loadExpr);
-
-  try {
-    // Build a contextual system prompt for Pixel
-    const pixelSystem = `You are Professor Pixel, a warm, sharp, and genuinely helpful instructional design coach inside a training game for rural educators. You are reviewing a prompt that an educator just wrote and the AI response it generated.
-
-Your job is to give feedback that is:
-- Specific to THIS prompt and THIS response — never generic
-- Warm but honest — you notice what worked and what did not
-- Building on the conversation — reference actual words or phrases from their prompt
-- Focused on ONE main insight and ONE actionable question to push them forward
-- Short — 2 to 4 sentences maximum, then a follow-up question on a new line
-
-The scenario they are working on: "${scenarioDesc}"
-
-Their prompt score was ${score} out of 5 based on: learner context, clear goal, course context, constraints, and detail.
-
-Do NOT use phrases like "Great job" or "Well done" as openers — get straight to the specific observation. Do NOT list multiple tips. Do NOT mention that the response is an excerpt, cuts off, or is incomplete — treat it as the full response. End with a single italicised follow-up question on its own line, preceded by a line break, that pushes them toward their next attempt.`;
-
-    const data = await callClaude({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 220,
-      system: pixelSystem,
-      messages: [{
-        role: 'user',
-        content: `Educator's prompt: "${playerPrompt}"\n\nAI response they received:\n"${aiReply}"`
-      }]
-    }, 'pixel');
-    if (data.error || !data.content) throw new Error(data.error?.message || 'No response');
-
-    const pixelReply = data.content[0].text;
-
-    // Render Pixel's response inline
-    loadWrap.querySelector('.pixel-loading-bubble').innerHTML = fmt(pixelReply);
-
-    // Update badge
-    pixelBadgeSetExpr(loadExpr);
-    document.getElementById('pixelBadgeLabel').textContent = loadExpr;
-
-  } catch(e) {
-    // Graceful fallback if API call fails
-    loadWrap.querySelector('.pixel-loading-bubble').textContent =
-      "Hmm, I lost my train of thought — take a look at the Prompt Analysis panel and try another attempt.";
-  }
-
-  area.scrollTop = area.scrollHeight;
 }
 
 // ══════════════════════════════════════════════════════
@@ -3331,14 +3156,6 @@ function setClaudeShelfState(state = 'idle', label = '') {
   if (status) status.textContent = label || state;
 }
 
-function claudeShelfThink(label = 'consulting Claude') {
-  setClaudeShelfState('thinking', label);
-}
-
-function claudeShelfRespond(label = 'analysis ready') {
-  setClaudeShelfState('responding', label);
-}
-
 function vnShow(expression, text, onComplete) {
   // Add to queue
   vnQueue.push({ expression, text, onComplete });
@@ -3975,174 +3792,6 @@ function renderInputMode(idx) {
     document.body.classList.remove('s2-active', 's2-submitted');
     renderOpenPlain(container);
   }
-}
-
-// ── MODE 1: GUIDED BUILDER (Scenario 1) ──────────────
-function getS1SavedDraft() {
-  const s1 = playerHistory?.s1 || {};
-  return {
-    learners:    s1.learners    || '',
-    issue:       s1.issue       || s1.goal || '',
-    interaction: s1.interaction || '',
-    constraints: s1.constraints || '',
-  };
-}
-
-function s1ReferencePanelHTML() {
-  const s = getS1SavedDraft();
-  const hasAny = [s.learners, s.issue, s.interaction, s.constraints].some(Boolean);
-  if (!hasAny) return '';
-  const item = (label, value) => `
-    <div class="s1-user-reference-item">
-      <div class="s1-user-reference-label">${label}</div>
-      <div class="s1-user-reference-text">${esc(value || 'Not added yet.')}</div>
-    </div>`;
-  return `
-    <div class="s1-user-reference" role="region" aria-label="Your previous S1 input">
-      <div class="s1-user-reference-title">Your original repair notes</div>
-      <div class="s1-user-reference-grid">
-        ${item('Learners + course', s.learners)}
-        ${item('What is failing', s.issue)}
-        ${item('Interaction move', s.interaction)}
-        ${item('Constraints + success criteria', s.constraints)}
-      </div>
-    </div>`;
-}
-
-function showS1BuilderNudge(missing) {
-  const nudge = document.getElementById('s1BuilderNudge');
-  if (!nudge) return;
-  if (!missing.length) {
-    nudge.style.display = 'none';
-    nudge.innerHTML = '';
-    return;
-  }
-  nudge.style.display = 'block';
-  nudge.innerHTML = `<strong>Pixel's nudge:</strong> Before we test this, connect your prompt back to the dead discussion board. Add: ${missing.join(', ')}.`;
-}
-
-
-function getS1PartFeedback(part, values, checks) {
-  const feedback = {
-    learners: checks.audience
-      ? 'This gives Claude a usable picture of who the learners are. Stronger version: include course level, delivery mode, and anything that affects how students participate.'
-      : 'Claude still does not know who these students are. Add course level, online/asynchronous context, and any learner traits that explain why the discussion is falling flat.',
-    issue: checks.issue
-      ? 'Good. This names the actual failure instead of only asking for a better prompt. Stronger version: describe what the current posts look like and why the conversation stops.'
-      : 'This needs to point directly at the dead-discussion problem. Name the failure: one-sentence replies, required-but-empty peer responses, no follow-up, or no evidence of students building on each other.',
-    interaction: checks.interaction
-      ? 'This gives Claude an interaction move, which is the heart of the fix. Stronger version: tell students exactly how to respond to a peer, such as extend, challenge, compare, or ask a follow-up question.'
-      : 'This still needs the repair strategy. Ask for a specific peer interaction move, not just “better discussion.” Claude needs to know how students should build on one another.',
-    constraints: checks.constraints && checks.success
-      ? 'This gives Claude boundaries and a target for quality. Stronger version: include what a strong initial post and strong peer reply must contain.'
-      : 'This needs more guardrails. Add asynchronous limits, number of replies, no extra tools if needed, and what counts as a meaningful or successful reply.'
-  };
-  return feedback[part] || 'Review this section for specificity and connection to the original discussion problem.';
-}
-
-async function reviewS1Part(part) {
-  const values = getS1GuidedValues();
-  const checks = analyzeS1Guided(values);
-  const panel = document.getElementById(`s1-feedback-${part}`);
-  if (!panel) return;
-
-  const sectionLabels = {
-    learners: 'Learners + course context',
-    issue: 'What is failing in the current discussion?',
-    interaction: 'Interaction repair move',
-    constraints: 'Constraints + success criteria'
-  };
-
-  const sectionText = (values[part] || '').trim();
-  panel.classList.add('visible');
-
-  if (!sectionText) {
-    panel.classList.remove('loading');
-    panel.innerHTML = `<strong>Claude section analysis</strong><br>This section is empty. Add a few details first so Claude has something real to analyze instead of performing interpretive dance with a blank textbox.`;
-    return;
-  }
-
-  panel.classList.add('loading');
-  panel.innerHTML = `<strong>Claude section analysis</strong><br>Reviewing this part...`;
-  showClaudeConsultOverlay(sectionLabels[part] || part);
-
-  document.querySelectorAll('.s1-review-btn').forEach(btn => btn.disabled = true);
-
-  try {
-    const systemPrompt = `You are Professor Pixel, a warm but direct instructional design mentor inside PromptCraft. You are reviewing ONE section of a user's prompt before it is sent to Claude for a full response. Keep the feedback specific to that section only. Do not write the final activity. Do not score the user. Use this structure exactly:\n\n**What is working**\n1-2 sentences.\n\n**What to strengthen**\n1-2 sentences.\n\n**Try this revision move**\nOne concrete suggestion.\n\nKeep the total response under 95 words.`;
-
-    const userPrompt = `SCENARIO: Fix a dead asynchronous discussion board.\n\nORIGINAL_WEAK_PROMPT:\n"What did you think about this week's reading? Reply to at least two classmates."\n\nSECTION_BEING_REVIEWED: ${sectionLabels[part] || part}\n\nUSER_RESPONSE:\n${sectionText}\n\nFULL_S1_CONTEXT:\nLearners/course: ${values.learners || '[not provided]'}\nProblem/failure: ${values.issue || '[not provided]'}\nInteraction repair: ${values.interaction || '[not provided]'}\nConstraints/success: ${values.constraints || '[not provided]'}\n\nReview only the section named above. The feedback should help the user revise before sending the full prompt.`;
-
-    const data = await callClaude({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 260,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }]
-    }, 's1_section');
-
-    const feedback = data.content?.[0]?.text || getS1PartFeedback(part, values, checks);
-
-    if (!scenarioData[SCENARIO_INDEX.ENGAGEMENT].sectionReviews) scenarioData[SCENARIO_INDEX.ENGAGEMENT].sectionReviews = [];
-    scenarioData[SCENARIO_INDEX.ENGAGEMENT].sectionReviews.push({
-      part,
-      sectionText,
-      feedback,
-      mock: !!data.mock,
-      timestamp: new Date().toISOString()
-    });
-
-    showClaudeConsultResult(feedback, !!data.mock);
-    panel.classList.remove('loading');
-    panel.innerHTML = `<strong>✓ Claude consulted</strong><br><span class="s1-section-review-note">Review complete in the terminal. Revise this section if needed, then analyze again or continue to the final Claude test.</span>`;
-  } catch (e) {
-    console.warn('[PromptCraft] S1 section review failed:', e);
-    const fallback = getS1PartFeedback(part, values, checks);
-    showClaudeConsultResult(fallback, true);
-    panel.classList.remove('loading');
-    panel.innerHTML = `<strong>✓ Backup review complete</strong><br><span class="s1-section-review-note">Claude was unavailable, so a local checklist review was shown in the terminal.</span>`;
-  } finally {
-    document.querySelectorAll('.s1-review-btn').forEach(btn => btn.disabled = false);
-    const firstField = document.getElementById('g-learners');
-    if (firstField) onGuidedInput(firstField);
-  }
-}
-
-
-function switchToOpen() {
-  // Replaces guided builder with plain textarea mid-session
-  const container = document.getElementById('inputContainer');
-  renderOpenPlain(container);
-  setTimeout(() => document.getElementById('promptInput')?.focus(), 50);
-}
-
-// ── MODE 2: HINT CHIPS (Scenario 2) ──────────────────
-function renderHintChips(container) {
-  const chipsHTML = S2_CHIPS.map(c => `
-    <span class="hint-chip" id="chip-${c.key}" aria-label="${c.label} — not yet covered">
-      <span class="chip-check">✓</span>${c.label}
-    </span>`).join('');
-
-  container.innerHTML = `
-    <div class="scaffold-area">
-      <div class="hint-chip-label">Cover these elements as you write:</div>
-      <div class="hint-chip-row" role="list" aria-label="Prompt element checklist">
-        ${chipsHTML}
-      </div>
-      <div class="input-box">
-        <label for="promptInput" class="sr-only">Write your AI prompt here</label>
-        <textarea id="promptInput"
-          aria-label="Write your AI prompt"
-          placeholder="Write your prompt — the chips above light up as you cover each element."
-          oninput="onHintInput(this);autoGrow(this)"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOpen()}"></textarea>
-        <button class="send-btn" id="sendBtn"
-                onclick="sendOpen()" aria-label="Send prompt">↑</button>
-      </div>
-      <div class="input-footer-shared">
-        <span class="input-hint">Shift + Enter for a new line</span>
-        <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
-      </div>
-    </div>`;
 }
 
 function onHintInput(el) {
@@ -4793,56 +4442,9 @@ function devGoS8() {
   if (btn) switchScenario(SCENARIO_INDEX.REFLECT_REVISE, btn);
 }
 
-// Auto-select a prediction during dev auto-send tests so the new prediction gate
-// does not block the old testing workflow. Tiny mercy from the code swamp.
-function devAutoChoosePrediction(choice = 'targeted') {
-  const tryChoose = (attempts = 0) => {
-    const vnGate = document.querySelector('.vn-prediction-options');
-    const oldGate = document.getElementById('predictionGate');
-    if ((vnGate || oldGate || predictionGateActive) && window.pendingPromptForPrediction) {
-      choosePrediction(choice);
-    } else if (attempts < 20) {
-      setTimeout(() => tryChoose(attempts + 1), 250);
-    }
-  };
-  tryChoose();
-}
-
-// Dev shortcut: move to the next scenario and unlock it if needed.
-// Auto-fill test prompt and submit for S1-S3
-// Navigate to scenario without filling or sending
-// Fill the test prompt into the textarea — no auto-send
-// S1 still auto-fills and sends (guided builder needs it)
-function devVN(preset) {
-  const presets = {
-    welcome:  { expr:'excited',     text:"Welcome to the Prompt Lab! I am Professor Pixel. This is the dev test sequence." },
-    excited:  { expr:'excited',     text:"This is the excited expression. Strong prompts and major moments." },
-    skeptical:{ expr:'skeptical',   text:"Hmm. Skeptical expression — vague prompts and critical moments." },
-  };
-  const p = presets[preset];
-  if (p) vnShow(p.expr, p.text, null);
-}
-
 function devSkip() {
   scenarioCompleted = [true,true,true,false,false,false,false,false];
   openReflection();
-}
-
-function devComplete() {
-  scenarioCompleted = [true,true,true,false,false,false,false,false];
-  const area = document.getElementById('chat');
-  const div = document.createElement('div');
-  div.style.cssText = 'text-align:center;padding:12px 0 4px;';
-  div.innerHTML = `
-    <p style="font-size:0.74rem;color:var(--ink-light);margin-bottom:10px;font-weight:600;">[DEV] All complete.</p>
-    <button class="complete-btn" id="completeAllBtn" onclick="openReflection()">Enter the Reflection Room →</button>`;
-  area.appendChild(div);
-  if (document.body.classList.contains('s1-result-active')) {
-    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
-    try { area.scrollTop = 0; } catch(e) {}
-  } else {
-    area.scrollTop = area.scrollHeight;
-  }
 }
 
 
@@ -4854,10 +4456,6 @@ function devComplete() {
 //  These supersede the earlier definitions above.
 // ══════════════════════════════════════════════════════
 const S1_STORAGE_KEY = 'promptcraft_s1_clean_draft';
-
-function safeJsonParse(raw, fallback){
-  try { return raw ? JSON.parse(raw) : fallback; } catch(e) { return fallback; }
-}
 
 function getS1GuidedValues(){
   return {
@@ -5281,17 +4879,6 @@ function showPixelScoreReflection(totalScore, onDone = null){
   lines.forEach((line, idx) => vnShow(line.expr, line.text, idx === lines.length - 1 ? onDone : null));
 };
 
-// Clean up VN classes when advancing after a choice-heavy moment.
-const oldClose = window.closeClaudeConsultOverlay;
-if (typeof oldClose === 'function') {
-  function closeClaudeConsultOverlayClean(){
-    document.getElementById('vnDialogue')?.classList.remove('has-choices');
-    return oldClose.apply(this, arguments);
-  };
-
-}
-
-
 // ══════════════════════════════════════════════════════
 //  SEND + PREDICTION GATE — final owner
 //  Authoritative, non-recursive implementation.
@@ -5571,78 +5158,6 @@ function clearVN(){
   document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
 }
 
-const originalDevFillScenario = window.devFillScenario || (typeof devFillScenario === 'function' ? devFillScenario : null);
-
-function devFillScenarioFinal(idx){
-  if (idx === 0) {
-    return window.resetS1Dev();
-  }
-
-  if (typeof window.devGoScenario === 'function') window.devGoScenario(idx);
-  else if (typeof devGoScenario === 'function') devGoScenario(idx);
-
-  const testPrompt = window.scenarios?.[idx]?.testPrompt || (typeof scenarios !== 'undefined' ? scenarios[idx]?.testPrompt : '');
-  if (!testPrompt) return false;
-
-  const tryFill = (attempts = 0) => {
-    const input = document.getElementById('promptInput');
-    if (input && input.offsetParent !== null) {
-      input.value = testPrompt;
-      if (typeof autoGrow === 'function') autoGrow(input);
-      if (typeof onHintInput === 'function') onHintInput(input);
-      input.focus();
-      return;
-    }
-    if (attempts < 30) setTimeout(() => tryFill(attempts + 1), 200);
-  };
-  setTimeout(() => tryFill(), 300);
-  return false;
-};
-function devTestScenarioFinal(idx){
-  // S1 dev key now resets and fills only. No intro replay. No auto-submit.
-  if (idx === 0) return window.resetS1Dev();
-  return window.devFillScenario(idx);
-};
-function devGoScenarioFinalClean(idx){
-  const tabs = document.querySelectorAll('.tab-btn');
-  const btn = tabs[idx];
-  if (!btn) return false;
-  btn.disabled = false;
-  btn.classList.remove('locked');
-  btn.removeAttribute('aria-disabled');
-  document.body.classList.remove('s2-submitted');
-  clearVN();
-  if (typeof switchScenario === 'function') switchScenario(idx, btn);
-  return false;
-};
-function navigateToNextFinalClean(targetIndex){
-  const tabs = document.querySelectorAll('.tab-btn');
-  const targetTab = tabs[targetIndex];
-  if (!targetTab) return false;
-
-  try { scenarioCompleted[scenarioIndex] = true; } catch(e) {}
-  document.body.classList.remove('s2-submitted');
-
-  targetTab.disabled = false;
-  targetTab.classList.remove('locked');
-  targetTab.removeAttribute('aria-disabled');
-
-  clearVN();
-
-  const chat = document.getElementById('chat');
-  if (chat) chat.scrollTop = 0;
-
-  if (typeof switchScenario === 'function') switchScenario(targetIndex, targetTab);
-  return false;
-};
-function devNextScenarioFinalClean(){
-  const current = typeof scenarioIndex === 'number' ? scenarioIndex : 0;
-  const max = typeof scenarios !== 'undefined' ? scenarios.length - 1 : 7;
-  const next = Math.min(current + 1, max);
-  return window.navigateToNext(next);
-};
-try { devNextScenario = window.devNextScenario; } catch(e) {}
-
 
 // ══════════════════════════════════════════════════════
 //  S2 METACOGNITION WORKBENCH
@@ -5899,13 +5414,6 @@ function devFillS2(mode = 'mid') {
   return false;
 };
 
-const priorDevFillScenario = window.devFillScenario || (typeof devFillScenario === 'function' ? devFillScenario : null);
-function devFillScenarioS2Owner(idx) {
-  if (idx === 1) return window.devFillS2('mid');
-  if (typeof priorDevFillScenario === 'function') return priorDevFillScenario(idx);
-  return false;
-};
-try { devFillScenario = window.devFillScenario; } catch(e) {}
 
 window.devFillS2Weak = () => window.devFillS2('weak');
 window.devFillS2Mid = () => window.devFillS2('mid');
@@ -6099,6 +5607,5 @@ function toggleClaudeTTS() {
     if (btn) btn.textContent = '⏹ Stop Reading';
     window.speechSynthesis.speak(claudeSpeechUtterance);
   }
-
 
 

@@ -944,9 +944,6 @@ textarea::placeholder {
     padding: 0 12px;
     max-width: 100%;
   }
-  .vn-rail-left, .vn-rail-right {
-    display: none;
-  }
 }
 /* Corner screws -- dark on light bezel */
 .vn-screw {
@@ -2306,121 +2303,6 @@ textarea::placeholder {
 }
 
 /* ══════════════════════════════════════════════════════
-   PROFESSOR PIXEL — INLINE CHAT DIALOGUE SYSTEM
-   ══════════════════════════════════════════════════════ */
-
-/* ── PIXEL THINKING INDICATOR ───────────────────────── */
-/* Appears a few seconds after AI response */
-.pixel-thinking-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  animation: slideUp 0.25s ease forwards;
-  opacity: 0;
-  padding: 2px 0;
-}
-.pixel-thinking-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid var(--forest-mid);
-  object-fit: cover;
-  object-position: top center;
-  background: var(--forest-light);
-  flex-shrink: 0;
-}
-.pixel-thinking-text {
-  font-family: "Source Code Pro", monospace;
-  font-size: 0.62rem;
-  color: var(--ink-muted);
-  letter-spacing: 0.06em;
-  font-style: italic;
-}
-.pixel-thinking-dots {
-  display: inline-flex;
-  gap: 3px;
-  margin-left: 4px;
-  vertical-align: middle;
-}
-.pixel-thinking-dots span {
-  width: 5px;
-  height: 5px;
-  background: var(--ink-muted);
-  border-radius: 50%;
-  animation: blink 1.3s infinite;
-  display: inline-block;
-}
-.pixel-thinking-dots span:nth-child(2) {
-  animation-delay: 0.22s;
-}
-.pixel-thinking-dots span:nth-child(3) {
-  animation-delay: 0.44s;
-}
-
-/* ── PIXEL REVEAL BUTTON ────────────────────────────── */
-/* Replaces thinking indicator when ready */
-.pixel-reveal-btn:active {
-  transform: scale(0.97);
-}
-.pixel-reveal-avatar {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 1.5px solid var(--forest-mid);
-  object-fit: cover;
-  object-position: top center;
-  background: var(--forest-light);
-  flex-shrink: 0;
-}
-.pixel-reveal-arrow {
-  margin-left: 2px;
-  font-size: 0.7rem;
-  opacity: 0.6;
-}
-
-/* ── PIXEL INLINE CHAT BUBBLE ───────────────────────── */
-/* Her response in the chat -- distinct from AI bubbles */
-.message.pixel .bubble {
-  background: var(--forest-light);
-  border-color: rgba(45,90,61,0.25);
-  border-top-left-radius: 4px;
-  color: var(--forest-dark);
-  font-style: normal;
-}
-.message.pixel .bubble-sender {
-  color: var(--forest-mid);
-}
-.message.pixel .avatar {
-  border-color: var(--forest-mid);
-  background: var(--forest-light);
-}
-/* Pixel's follow-up question at the bottom of her bubble */
-.pixel-followup {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(45,90,61,0.15);
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--forest-dark);
-  font-style: italic;
-}
-
-/* ── PIXEL LOADING IN CHAT ──────────────────────────── */
-.pixel-loading-bubble {
-  background: var(--forest-light);
-  border: 1.5px solid rgba(45,90,61,0.2);
-  border-top-left-radius: 4px;
-  border-radius: var(--radius-lg);
-  padding: 10px 14px;
-}
-@media (max-width: 480px) {
-  .pixel-reveal-btn {
-    font-size: 0.7rem;
-    padding: 6px 12px 6px 7px;
-  }
-}
-
-/* ══════════════════════════════════════════════════════
    SCAFFOLDED INPUT SYSTEM
    ══════════════════════════════════════════════════════ */
 
@@ -2551,46 +2433,6 @@ textarea::placeholder {
 }
 
 /* ── SCENARIO 2: HINT CHIPS ──────────────────────────── */
-.hint-chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-bottom: 8px;
-}
-.hint-chip {
-  font-size: 0.68rem;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 99px;
-  border: 1.5px solid var(--border);
-  color: var(--ink-muted);
-  background: var(--cream);
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.hint-chip.covered {
-  border-color: var(--forest-mid);
-  color: var(--forest-dark);
-  background: var(--forest-light);
-}
-.hint-chip .chip-check {
-  opacity: 0;
-  transition: opacity 0.2s;
-  font-size: 0.7rem;
-}
-.hint-chip.covered .chip-check {
-  opacity: 1;
-}
-.hint-chip-label {
-  font-size: 0.62rem;
-  font-family: "Source Code Pro", monospace;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  margin-bottom: 5px;
-}
 
 /* ── SCENARIO 3: MEMORY HINT ─────────────────────────── */
 .memory-hint.visible {
@@ -2613,10 +2455,6 @@ textarea::placeholder {
   }
   .guided-label {
     font-size: 0.58rem;
-  }
-  .hint-chip {
-    font-size: 0.62rem;
-    padding: 3px 8px;
   }
   .memory-hint {
     font-size: 0.72rem;
@@ -2734,13 +2572,6 @@ textarea::placeholder {
 /* ══════════════════════════════════════════════════════
    MUSIC TOGGLE BUTTON
    ══════════════════════════════════════════════════════ */
-@media (max-width: 480px) {
-  .music-toggle {
-    width: 28px;
-    height: 28px;
-    font-size: 0.8rem;
-  }
-}
 
 /* ══════════════════════════════════════════════════════
    LORA FONT OVERRIDES — Cozy Academic Typography
@@ -3078,42 +2909,7 @@ textarea::placeholder {
    PIXEL REVEAL BUTTON — SLOW PULSE ANIMATION
    Draws attention without being intrusive
    ══════════════════════════════════════════════════════ */
-.pixel-reveal-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: none;
-  border: 1.5px solid var(--border);
-  border-radius: 99px;
-  padding: 6px 14px 6px 8px;
-  cursor: pointer;
-  font-family: "Nunito", sans-serif;
-  font-size: 0.76rem;
-  font-weight: 600;
-  color: var(--forest-dark);
-  transition: all 0.18s ease;
-  animation: slideUp 0.3s ease forwards, pixelPulse 2.4s ease-in-out 1s infinite !important;
-  opacity: 0;
-  min-height: 40px;
-  align-self: flex-start;
-}
-@keyframes pixelPulse {
-  0%, 100% {
-      box-shadow: 0 0 0 0 rgba(45,90,61,0);
-      border-color: var(--border);
-    }
-    50% {
-      box-shadow: 0 0 0 5px rgba(45,90,61,0.12);
-      border-color: var(--forest-mid);
-    }
-}
 /* Pause the pulse once hovered -- user has noticed it */
-.pixel-reveal-btn:hover {
-  background: var(--forest-light);
-  border-color: var(--forest-mid);
-  transform: translateX(3px);
-  animation: none !important;
-}
 
 /* ══════════════════════════════════════════════════════
    SCENARIO TEST BUTTONS (dev bar)
@@ -3450,11 +3246,6 @@ textarea::placeholder {
   opacity: 0.55;
   cursor: wait;
 }
-.s1-section-review-note {
-  font-size: 0.72rem;
-  color: var(--ink-muted);
-  margin-top: 4px;
-}
 
 /* ── BLOCK 4 ── */
 /* Sprint 2B: Claude gets a home. Placeholder shelf layout, not final art. */
@@ -3675,7 +3466,7 @@ textarea::placeholder {
 }
 
 /* [CLAUDE] Claude terminal, shelf, prediction, consultation, and analysis output */
-/* Sprint 3A: Claude Terminal consultation close-up./* Sprint 3A: Claude Terminal consultation close-up. The machine becomes the scene only when Claude is actually being consulted. */
+/* Claude Terminal consultation close-up. The machine becomes the scene only when Claude is actually being consulted. */
 .vn-overlay.active.claude-terminal-consult .vn-smartboard-wrap, .vn-overlay.active.claude-terminal-consult .vn-character, .vn-overlay.active.claude-terminal-consult .claude-shelf {
   opacity: 0;
   pointer-events: none;
@@ -4264,10 +4055,6 @@ body.s1-active:not(.s1-result-active) .guided-builder {
   display: none !important;
 }
 @media (max-width: 980px) {
-  body.s1-active:not(.s1-result-active) #inputContainer .scaffold-area {
-    display: flex !important;
-    flex-direction: column !important;
-  }
   body.s1-active:not(.s1-result-active) .problem-artifact-card {
     max-height: none !important;
   }
@@ -4463,12 +4250,6 @@ body.s1-active:not(.s1-result-active) .s1-right-stack .s1-mission-card {
   padding: 14px 16px;
   display: none !important;
 }
-@media (max-width: 980px) {
-  body.s1-active:not(.s1-result-active) #inputContainer .scaffold-area {
-    display: flex !important;
-    flex-direction: column !important;
-  }
-}
 
 /* ── BLOCK 14 ── */
 /* V15: clean S1 workbench + preserve user repair notes on revise. */
@@ -4515,20 +4296,10 @@ body.s1-active:not(.s1-result-active) .guided-input {
   border: 2px solid #bfa987;
   color: #1f160d;
 }
-.s1-user-reference-item {
-  background: var(--chalk);
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
-  padding: 8px 10px;
-  min-height: 52px;
-}
 @media (max-width: 980px) {
   body.s1-active:not(.s1-result-active) #inputContainer .scaffold-area {
     display: flex !important;
     flex-direction: column !important;
-  }
-  .s1-user-reference-grid {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -4984,43 +4755,6 @@ body.s1-result-active #inputContainer {
 .s1-result-actions-buttons button {
   min-width: 180px;
 }
-.s1-user-reference {
-  width: 100%;
-  margin-top: 16px;
-  background: var(--parchment);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px;
-}
-.s1-user-reference-title {
-  font-family: "Source Code Pro", monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  margin-bottom: 10px;
-  font-weight: 700;
-}
-.s1-user-reference-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-.s1-user-reference-label {
-  font-family: "Source Code Pro", monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--forest-dark);
-  margin-bottom: 3px;
-  font-weight: 700;
-}
-.s1-user-reference-text {
-  color: var(--ink-mid);
-  font-size: 0.82rem;
-  line-height: 1.55;
-  white-space: pre-wrap;
-}
 .vn-prediction-options {
   display: grid !important;
   gap: 10px;
@@ -5049,9 +4783,6 @@ body.s1-result-active #inputContainer {
   outline: 3px solid rgba(168,213,181,0.32);
 }
 @media (max-width: 760px) {
-  .s1-user-reference-grid {
-    grid-template-columns: 1fr;
-  }
   .vn-prediction-options {
     grid-template-columns: 1fr;
   }
@@ -6298,6 +6029,9 @@ body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claude
   gap: 8px;
   color: var(--ink-muted);
   font-size: 0.82rem;
+}
+.growth-loading-dot {
+  display: inline-block;
   animation: dot 0.9s infinite;
 }
 
@@ -7599,9 +7333,6 @@ body.s1-result-active .s1-result-controls > div:first-child {
     max-height: calc(100vh - 138px) !important;
     padding: 14px !important;
   }
-  body .analysis-grid {
-    grid-template-columns: 1fr !important;
-  }
   body.s1-result-active .chat-area, body.s1-result-active #chat {
     padding-bottom: 250px !important;
   }
@@ -7712,12 +7443,6 @@ body .analysis-card.wide, body .analysis-impact-card {
     inset: 20px !important;
     padding: 12px !important;
   }
-  body .analysis-grid {
-    grid-template-columns: 1fr !important;
-  }
-  body .analysis-title {
-    font-size: clamp(1.45rem, 6vw, 2rem) !important;
-  }
 }
 
 /* ══════════════════════════════════════════════════════
@@ -7756,9 +7481,6 @@ body .analysis-card.compact .analysis-value, body .analysis-status-card .analysi
   }
   body .vn-overlay.active.claude-terminal-textmode .claude-terminal-screen, body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .claude-terminal-screen {
     inset: 24px 18px 24px 18px !important;
-  }
-  body .analysis-grid {
-    grid-template-columns: 1fr !important;
   }
   body .analysis-title {
     font-size: clamp(1.45rem, 6vw, 2rem) !important;
@@ -8916,35 +8638,10 @@ body .vn-overlay.active.claude-prediction #vnText, body .vn-overlay.active.pc-cl
 body .vn-overlay.active.claude-terminal-consult:not(.claude-prediction):not(.pc-clean-prediction) .vn-character, body .vn-overlay.active.claude-terminal-textmode .vn-character, body .vn-overlay.active.pc-clean-output .vn-character {
   display: none !important;
 }
-@media (max-width: 1100px) {
-  body .vn-overlay.active.claude-prediction .vn-dialogue, body .vn-overlay.active.pc-clean-prediction .vn-dialogue, body .vn-overlay.active.pc-prediction-question .vn-dialogue, body .vn-overlay.active.pc-prediction-result .vn-dialogue, body .vn-overlay.active.claude-terminal-consult .vn-dialogue, body .vn-overlay.active.claude-terminal-textmode .vn-dialogue, body .vn-overlay.active.pc-clean-output .vn-dialogue {
-    padding-left: 34px !important;
-    padding-right: 34px !important;
-  }
-  body .vn-overlay.active.claude-prediction #vnText, body .vn-overlay.active.pc-clean-prediction #vnText, body .vn-overlay.active.pc-prediction-question #vnText, body .vn-overlay.active.pc-prediction-result #vnText, body .vn-overlay.active.claude-terminal-consult #vnText, body .vn-overlay.active.claude-terminal-textmode #vnText, body .vn-overlay.active.pc-clean-output #vnText, body .vn-overlay.active.claude-prediction .pc-feedback-copy, body .vn-overlay.active.pc-clean-prediction .pc-feedback-copy, body .vn-overlay.active.pc-prediction-question .pc-feedback-copy, body .vn-overlay.active.pc-prediction-result .pc-feedback-copy, body .vn-overlay.active.claude-terminal-consult .pc-feedback-copy, body .vn-overlay.active.claude-terminal-textmode .pc-feedback-copy, body .vn-overlay.active.pc-clean-output .pc-feedback-copy {
-    max-width: calc(100vw - 90px) !important;
-  }
-  body .vn-overlay.active.claude-prediction #vnPredictionChoicePanel, body .vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel, body .vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel, body .vn-overlay.active.claude-prediction .pc-choice-panel-final, body .vn-overlay.active.pc-clean-prediction .pc-choice-panel-final, body .vn-overlay.active.pc-prediction-question .pc-choice-panel-final, body .vn-overlay.active.claude-prediction .pc-clean-choice-grid, body .vn-overlay.active.pc-clean-prediction .pc-clean-choice-grid, body .vn-overlay.active.pc-prediction-question .pc-clean-choice-grid, body .vn-overlay.active.claude-prediction .vn-prediction-options, body .vn-overlay.active.pc-clean-prediction .vn-prediction-options, body .vn-overlay.active.pc-prediction-question .vn-prediction-options {
-    left: 34px !important;
-    right: 34px !important;
-    grid-template-columns: repeat(2, minmax(160px, 1fr)) !important;
-  }
-}
 @media (max-width: 640px) {
   body .vn-overlay.active.claude-prediction .vn-dialogue, body .vn-overlay.active.pc-clean-prediction .vn-dialogue, body .vn-overlay.active.pc-prediction-question .vn-dialogue {
     min-height: 344px !important;
     padding: 22px 18px 184px 18px !important;
-  }
-  body .vn-overlay.active.pc-prediction-result .vn-dialogue, body .vn-overlay.active.claude-terminal-consult .vn-dialogue, body .vn-overlay.active.claude-terminal-textmode .vn-dialogue, body .vn-overlay.active.pc-clean-output .vn-dialogue {
-    min-height: 210px !important;
-    padding: 24px 18px 30px 18px !important;
-  }
-  body .vn-overlay.active.claude-prediction #vnPredictionChoicePanel, body .vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel, body .vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel, body .vn-overlay.active.claude-prediction .pc-choice-panel-final, body .vn-overlay.active.pc-clean-prediction .pc-choice-panel-final, body .vn-overlay.active.pc-prediction-question .pc-choice-panel-final, body .vn-overlay.active.claude-prediction .pc-clean-choice-grid, body .vn-overlay.active.pc-clean-prediction .pc-clean-choice-grid, body .vn-overlay.active.pc-prediction-question .pc-clean-choice-grid, body .vn-overlay.active.claude-prediction .vn-prediction-options, body .vn-overlay.active.pc-clean-prediction .vn-prediction-options, body .vn-overlay.active.pc-prediction-question .vn-prediction-options {
-    left: 18px !important;
-    right: 18px !important;
-    bottom: 18px !important;
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
   }
   body .vn-overlay.active.claude-prediction .vn-skip, body .vn-overlay.active.pc-clean-prediction .vn-skip, body .vn-overlay.active.pc-prediction-question .vn-skip, body .vn-overlay.active.pc-prediction-result .vn-skip, body .vn-overlay.active.claude-terminal-consult .vn-skip, body .vn-overlay.active.claude-terminal-textmode .vn-skip, body .vn-overlay.active.pc-clean-output .vn-skip {
     right: 18px !important;
@@ -12939,7 +12636,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    SCENARIO DIAGNOSTIC SMALL-SCREEN FULL-PANEL ALIGNMENT — V14 — 2026-06-25
    Builds on V13.
@@ -12999,21 +12695,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
     padding-left: 0 !important;
     padding-right: 0 !important;
     box-sizing: border-box !important;
-  }
-
-  body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .analysis-card,
-  body .vn-overlay.active.pc-clean-output #claudeTerminalScene .analysis-card,
-  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .analysis-card,
-  body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .diagnostic-card,
-  body .vn-overlay.active.pc-clean-output #claudeTerminalScene .diagnostic-card,
-  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .diagnostic-card,
-  body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .pc-diagnostic-card,
-  body .vn-overlay.active.pc-clean-output #claudeTerminalScene .pc-diagnostic-card,
-  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .pc-diagnostic-card {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
   }
 
   /* Keep buttons inside the panel and visually attached to it. */
@@ -13284,22 +12965,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
     z-index: 8 !important;
   }
 
-  body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .claude-terminal-photo,
-  body .vn-overlay.active.pc-clean-output #claudeTerminalScene .claude-terminal-photo,
-  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .claude-terminal-photo {
-    position: absolute !important;
-    inset: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    background-size: contain !important;
-    background-position: center center !important;
-    background-repeat: no-repeat !important;
-
-    overflow: visible !important;
-  }
-
   /* Keep the diagnostic screen scaled with the enlarged computer art. */
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .claude-terminal-screen,
   body .vn-overlay.active.pc-clean-output #claudeTerminalScene .claude-terminal-screen,
@@ -13395,21 +13060,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
   }
 
   /* Re-lock the diagnostic overlay to the enlarged CRT area. */
-  body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .claude-terminal-screen,
-  body .vn-overlay.active.pc-clean-output #claudeTerminalScene .claude-terminal-screen,
-  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .claude-terminal-screen {
-    position: absolute !important;
-
-    left: 22.2% !important;
-    top: 17.1% !important;
-    width: 33.8% !important;
-    height: 49% !important;
-
-    max-width: none !important;
-    max-height: none !important;
-
-    overflow: hidden !important;
-  }
 
   /* Keep the bottom action buttons visible above the lower edge. */
   body .vn-overlay.active.claude-terminal-textmode #vnDialogue,
@@ -13494,7 +13144,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
     overflow: hidden !important;
   }
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -14424,7 +14073,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    SCENARIO DIAGNOSTIC DESKTOP SCREEN FIT + CENTER — V26
    Purpose:
@@ -14582,7 +14230,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    SCENARIO DIAGNOSTIC — DESKTOP SCROLLABLE REPORT — V27
    Purpose:
@@ -14663,7 +14310,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
     border: 2px solid rgba(0, 28, 12, 0.72) !important;
   }
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -14805,7 +14451,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    SCENARIO DIAGNOSTIC — DESKTOP TWO-COLUMN SCROLL REPORT — V29
    Purpose:
@@ -14852,18 +14497,8 @@ body .vn-overlay.active .prediction-continue-btn:hover {
   }
 
   /* Short cards can sit side-by-side. */
-  html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-status-card,
-  html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-confidence-card,
-  html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-issue-card,
-  html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-repair-card {
-    grid-column: auto !important;
-  }
 
   /* Longer final takeaway stays full width so it does not become microscopic nonsense. */
-  html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-impact-card,
-  html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-card.wide {
-    grid-column: 1 / -1 !important;
-  }
 
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-card.analysis-card,
   html body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-card.analysis-card,
@@ -14895,7 +14530,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
     line-height: 1.08 !important;
   }
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -15069,7 +14703,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    SCENARIO DIAGNOSTIC — SIDE PADDING TWEAK — V31
    Adds more left/right breathing room inside the CRT report.
@@ -15096,7 +14729,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
     padding-bottom: 10px !important;
   }
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -15302,7 +14934,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    VN MOBILE POST-ANALYSIS LAYOUT POLISH — V33
    Purpose:
@@ -15378,7 +15009,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
     opacity: 0.82 !important;
   }
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -15509,7 +15139,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    VN MOBILE POST-ANALYSIS BRACKETS + SMARTBOARD TEXT — V35
    Purpose:
@@ -15606,7 +15235,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    VN MOBILE POST-ANALYSIS BRACKET FIX + BOARD TEXT BUMP — V36
    Purpose:
@@ -15690,7 +15318,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
     padding: clamp(10px, 2.6vw, 16px) !important;
   }
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -16004,7 +15631,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
     bottom: max(20px, env(safe-area-inset-bottom)) !important;
   }
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -16494,7 +16120,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    MOBILE DIAGNOSTIC RESULT RESTORE — V40
    Purpose:
@@ -16803,7 +16428,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    CLAUDE TERMINAL MOBILE/DIAGNOSTIC CLEANUP — V41
    Aligned to style(27).css
@@ -17048,7 +16672,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
     letter-spacing: 0.045em !important;
   }
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -17370,7 +16993,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    VN DIALOGUE PADDING + CLAUDE ANALYZING TEXT ALIGNMENT — V43
    Aligned to style(27).css
@@ -17593,7 +17215,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    CLAUDE ANALYZING CRT TEXT REFORMAT — V44
    Aligned to style(27).css
@@ -17747,7 +17368,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
     vertical-align: -0.12em !important;
   }
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -17990,7 +17610,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    CLAUDE ANALYZING CRT TEXT CLIPPING FIX — V48
    Built from style(28).css
@@ -18133,7 +17752,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
     z-index: 1 !important;
   }
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -18302,7 +17920,6 @@ body .vn-overlay.active .prediction-continue-btn:hover {
 }
 
 
-
 /* ══════════════════════════════════════════════════════
    PIXEL BADGE HIDE — V57
    Purpose:
@@ -18322,7 +17939,6 @@ html body .pixel-popup {
   opacity: 0 !important;
   pointer-events: none !important;
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -18411,7 +18027,6 @@ html body .pixel-popup {
   font-size: clamp(0.82rem, 1vw, 1.05rem) !important;
   line-height: 1.25 !important;
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -18663,7 +18278,6 @@ body.s1-active:not(.s1-result-active) button[type="submit"] {
     grid-template-columns: 1fr !important;
   }
 }
-
 
 
 /* ══════════════════════════════════════════════════════
@@ -19915,7 +19529,6 @@ body.pc-main-menu-open .pixel-coach-card {
 }
 
 
-
 /* Menu access while the full-screen visual-novel layer covers the header. */
 .vn-main-menu-toggle {
   position: absolute;
@@ -20460,3 +20073,96 @@ body.pc-main-menu-open .pixel-coach-card {
     font-size: 1.25rem;
   }
 }
+
+/* ══════════════════════════════════════════════════════
+   V133 — REGRESSION FIXES
+   1. Restore accessible text sizing in the Scenario 1 Repair Workspace.
+   2. Make the small-screen Claude ANALYZING stage reach the full viewport.
+   Scope is intentionally narrow so the completed Scenario 1 and analysis
+   report layouts remain unchanged.
+   ══════════════════════════════════════════════════════ */
+
+/* Repair Workspace: a late compact-layout rule reduced learner-entered text
+   to 0.88rem. Keep form text at a reliable 16px minimum with readable spacing. */
+body.s1-active:not(.s1-result-active) .s1-clean-textarea,
+body.s1-active:not(.s1-result-active) textarea.s1-clean-textarea,
+body.s1-active:not(.s1-result-active) #g-learners,
+body.s1-active:not(.s1-result-active) #g-issue,
+body.s1-active:not(.s1-result-active) #g-interaction,
+body.s1-active:not(.s1-result-active) #g-constraints {
+  font-family: "Nunito", Arial, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  color: #211a15 !important;
+  background: #ffffff !important;
+  padding: 10px 12px !important;
+}
+
+body.s1-active:not(.s1-result-active) .s1-clean-textarea::placeholder,
+body.s1-active:not(.s1-result-active) textarea.s1-clean-textarea::placeholder {
+  color: #625447 !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  opacity: 1 !important;
+}
+
+/* Small-screen Claude thinking screen: remove the unused lower reserve and
+   let the green terminal treatment cover the complete dynamic viewport. */
+@media (max-width: 900px) {
+  html body #vnOverlay.vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) {
+    min-height: 100dvh !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+    background:
+      radial-gradient(circle at 50% 35%, rgba(18, 95, 45, 0.92), rgba(0, 34, 14, 0.98) 58%, rgba(0, 12, 4, 1) 100%),
+      repeating-linear-gradient(0deg, rgba(185, 230, 200, 0.035) 0 1px, transparent 1px 5px) !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) #vnScene.vn-scene {
+    flex: 0 0 100dvh !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background:
+      radial-gradient(circle at 50% 35%, rgba(18, 95, 45, 0.92), rgba(0, 34, 14, 0.98) 58%, rgba(0, 12, 4, 1) 100%),
+      repeating-linear-gradient(0deg, rgba(185, 230, 200, 0.035) 0 1px, transparent 1px 5px) !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) #claudeTerminalScene.claude-terminal-scene.thinking {
+    position: absolute !important;
+    inset: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) #claudeTerminalScene.claude-terminal-scene.thinking .claude-terminal-photo,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) #claudeTerminalScene.claude-terminal-scene.thinking .claude-terminal-screen {
+    position: absolute !important;
+    inset: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+  }
+}
+
