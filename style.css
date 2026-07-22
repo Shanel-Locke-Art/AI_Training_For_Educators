@@ -19395,3 +19395,1068 @@ body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-p
   }
 }
 
+/* ══════════════════════════════════════════════════════
+   [MAIN MENU] V128
+   Dedicated application-state overlay. Scoped IDs/classes keep it isolated
+   from the VN, Claude terminal, scenario cards, and the accumulated repairs
+   elsewhere in this stylesheet.
+   ══════════════════════════════════════════════════════ */
+.main-menu-toggle {
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid rgba(168, 213, 181, 0.65);
+  border-radius: 6px;
+  background: rgba(74, 124, 94, 0.18);
+  color: #d4edd9;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.main-menu-toggle:hover,
+.main-menu-toggle:focus-visible {
+  background: rgba(74, 124, 94, 0.42);
+  border-color: #a8d5b5;
+  outline: none;
+}
+
+.pc-main-menu[hidden],
+.pc-menu-panel[hidden],
+.pc-main-menu-close[hidden] {
+  display: none !important;
+}
+
+.pc-main-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647 !important;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 3vw, 38px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+
+.pc-main-menu.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.pc-main-menu-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(74, 124, 94, 0.22), transparent 38%),
+    linear-gradient(145deg, rgba(20, 31, 26, 0.96), rgba(44, 62, 53, 0.985));
+  backdrop-filter: blur(7px);
+}
+
+.pc-main-menu-shell {
+  position: relative;
+  width: min(1080px, 100%);
+  max-height: min(880px, calc(100dvh - 32px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(168, 213, 181, 0.38);
+  border-radius: 18px;
+  background:
+    linear-gradient(rgba(250, 246, 240, 0.985), rgba(242, 235, 224, 0.985)),
+    var(--cream);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.42);
+  transform: translateY(10px) scale(0.99);
+  transition: transform 0.18s ease;
+}
+
+.pc-main-menu.visible .pc-main-menu-shell {
+  transform: translateY(0) scale(1);
+}
+
+.pc-main-menu-topbar {
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px clamp(20px, 4vw, 42px);
+  background: var(--chalkboard);
+  border-bottom: 3px solid var(--chalk-green);
+  color: var(--chalk-white);
+}
+
+.pc-main-menu-brand {
+  min-width: 0;
+}
+
+.pc-main-menu-kicker,
+.pc-menu-eyebrow {
+  display: block;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.pc-main-menu-kicker {
+  color: #a8d5b5;
+}
+
+.pc-main-menu-brand h1 {
+  margin: 2px 0 0;
+  color: #ffffff;
+  font-family: "Fraunces", serif;
+  font-size: clamp(1.45rem, 2.7vw, 2rem);
+  line-height: 1.05;
+}
+
+.pc-main-menu-close {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(168, 213, 181, 0.48);
+  border-radius: 50%;
+  background: transparent;
+  color: #d4edd9;
+  font-size: 1.55rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pc-main-menu-close:hover,
+.pc-main-menu-close:focus-visible {
+  background: rgba(168, 213, 181, 0.14);
+  border-color: #a8d5b5;
+  outline: none;
+}
+
+.pc-menu-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: clamp(28px, 5vw, 62px) clamp(22px, 6vw, 72px);
+  scrollbar-gutter: stable;
+}
+
+.pc-menu-panel:focus {
+  outline: none;
+}
+
+.pc-menu-home-copy {
+  max-width: 760px;
+}
+
+.pc-menu-eyebrow {
+  margin-bottom: 10px;
+  color: var(--forest-mid);
+}
+
+.pc-menu-home-copy h2,
+.pc-menu-panel-heading h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Fraunces", serif;
+  font-size: clamp(2rem, 5vw, 3.65rem);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+}
+
+.pc-menu-home-copy > p:last-child,
+.pc-menu-panel-heading > p:last-child,
+.pc-menu-about-copy p {
+  max-width: 760px;
+  margin-top: 18px;
+  color: var(--ink-mid);
+  font-size: clamp(0.96rem, 1.6vw, 1.08rem);
+  line-height: 1.7;
+}
+
+.pc-menu-primary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.pc-menu-action {
+  min-height: 50px;
+  padding: 12px 22px;
+  border: 2px solid var(--forest);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--forest-dark);
+  font-family: "Nunito", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pc-menu-action-primary {
+  background: var(--forest);
+  color: #ffffff;
+}
+
+.pc-menu-action:hover,
+.pc-menu-action:focus-visible {
+  box-shadow: 0 0 0 3px rgba(45, 90, 61, 0.14);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.pc-menu-secondary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+
+.pc-menu-secondary-actions button,
+.pc-menu-back {
+  padding: 5px 0;
+  border: 0;
+  background: transparent;
+  color: var(--forest-dark);
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.pc-menu-secondary-actions button:hover,
+.pc-menu-secondary-actions button:focus-visible,
+.pc-menu-back:hover,
+.pc-menu-back:focus-visible {
+  color: var(--terracotta);
+  outline: none;
+}
+
+.pc-menu-panel-heading {
+  margin-bottom: 28px;
+}
+
+.pc-menu-back {
+  margin-bottom: 24px;
+}
+
+.pc-menu-scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.pc-menu-scenario-card {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  padding: 18px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+.pc-menu-scenario-card:hover,
+.pc-menu-scenario-card:focus-visible {
+  border-color: var(--forest-mid);
+  box-shadow: 0 8px 22px rgba(45, 90, 61, 0.12);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.pc-menu-scenario-card.is-current {
+  border-color: var(--terracotta);
+  background: var(--terra-light);
+}
+
+.pc-menu-scenario-card.is-complete {
+  border-color: var(--forest-mid);
+  background: var(--forest-light);
+}
+
+.pc-menu-scenario-card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.pc-menu-scenario-number {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--chalkboard);
+  color: #d4edd9;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.pc-menu-scenario-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pc-menu-scenario-title {
+  color: var(--forest-dark);
+  font-family: "Fraunces", serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.pc-menu-scenario-mission {
+  margin-top: 4px;
+  color: var(--ink-mid);
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.pc-menu-scenario-copy {
+  margin-top: 8px;
+  color: var(--ink-light);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.pc-menu-scenario-status {
+  grid-column: 2;
+  justify-self: start;
+  margin-top: 2px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--parchment-drk);
+  color: var(--ink-light);
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.pc-menu-scenario-card.is-current .pc-menu-scenario-status {
+  background: rgba(196, 98, 45, 0.14);
+  color: var(--terra-dark);
+}
+
+.pc-menu-scenario-card.is-complete .pc-menu-scenario-status {
+  background: rgba(45, 90, 61, 0.14);
+  color: var(--forest-dark);
+}
+
+.pc-menu-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.pc-menu-info-grid article {
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.pc-menu-info-grid article > span {
+  color: var(--terracotta);
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.pc-menu-info-grid h3 {
+  margin-top: 8px;
+  color: var(--forest-dark);
+  font-family: "Fraunces", serif;
+  font-size: 1.15rem;
+}
+
+.pc-menu-info-grid p {
+  margin-top: 8px;
+  color: var(--ink-light);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.pc-menu-about-copy {
+  max-width: 800px;
+  padding: 24px;
+  border-left: 4px solid var(--forest-mid);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.pc-menu-about-copy p:first-child {
+  margin-top: 0;
+}
+
+.pc-main-menu-footer {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px clamp(20px, 4vw, 42px);
+  border-top: 1px solid var(--border);
+  background: rgba(232, 222, 206, 0.65);
+  color: var(--ink-light);
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.03em;
+}
+
+body.pc-main-menu-open .pixel-badge,
+body.pc-main-menu-open .pixel-coach-card {
+  visibility: hidden !important;
+}
+
+@media (max-width: 760px) {
+  .pc-main-menu {
+    padding: 0;
+  }
+
+  .pc-main-menu-shell {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .pc-main-menu-topbar {
+    min-height: 72px;
+    padding: 14px 18px;
+  }
+
+  .pc-menu-panel {
+    padding: 26px 18px 34px;
+  }
+
+  .pc-menu-home-copy h2,
+  .pc-menu-panel-heading h2 {
+    font-size: clamp(1.9rem, 10vw, 2.8rem);
+  }
+
+  .pc-menu-primary-actions,
+  .pc-menu-primary-actions .pc-menu-action {
+    width: 100%;
+  }
+
+  .pc-menu-scenario-grid,
+  .pc-menu-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-menu-scenario-card {
+    grid-template-columns: 42px minmax(0, 1fr);
+    padding: 15px;
+  }
+
+  .pc-menu-scenario-number {
+    width: 42px;
+    height: 42px;
+  }
+
+  .pc-menu-scenario-copy {
+    font-size: 0.76rem;
+  }
+
+  .pc-main-menu-footer {
+    padding: 9px 18px;
+  }
+
+  .header-right {
+    gap: 7px;
+  }
+
+  .main-menu-toggle {
+    padding-inline: 9px;
+    font-size: 0.62rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .pc-main-menu-footer span:first-child {
+    max-width: 72%;
+  }
+
+  .pc-menu-secondary-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-main-menu,
+  .pc-main-menu-shell,
+  .pc-menu-scenario-card,
+  .pc-menu-action {
+    transition: none;
+  }
+}
+
+
+
+/* Menu access while the full-screen visual-novel layer covers the header. */
+.vn-main-menu-toggle {
+  position: absolute;
+  top: 26px;
+  left: 28px;
+  z-index: 60;
+  min-width: 70px;
+  min-height: 34px;
+  padding: 6px 14px;
+  border: 1px solid rgba(185, 230, 200, 0.6);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.48);
+  color: rgba(212, 237, 217, 0.98);
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.vn-main-menu-toggle:hover,
+.vn-main-menu-toggle:focus-visible {
+  border-color: #d4edd9;
+  background: rgba(0, 0, 0, 0.68);
+  outline: 2px solid rgba(212, 237, 217, 0.34);
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  .vn-main-menu-toggle {
+    top: 14px;
+    left: 14px;
+    min-width: 62px;
+    min-height: 32px;
+    padding: 5px 10px;
+    font-size: 0.64rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   [MAIN MENU ACCESSIBILITY] V130
+   Larger readable text, stronger contrast, visible keyboard focus,
+   and minimum 44px interactive targets. This block intentionally
+   overrides the original V128 menu styling without touching scenarios.
+   ══════════════════════════════════════════════════════ */
+
+/* Persistent menu controls */
+.main-menu-toggle,
+.vn-main-menu-toggle {
+  min-height: 44px;
+  min-width: 76px;
+  padding: 10px 14px;
+  border: 2px solid #d6f0dd;
+  background: #173d29;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.045em;
+}
+
+.main-menu-toggle:hover,
+.vn-main-menu-toggle:hover {
+  border-color: #ffffff;
+  background: #0d2d1d;
+  color: #ffffff;
+}
+
+.main-menu-toggle:focus-visible,
+.vn-main-menu-toggle:focus-visible {
+  border-color: #ffffff;
+  background: #0d2d1d;
+  color: #ffffff;
+  outline: 3px solid #f4b942;
+  outline-offset: 3px;
+}
+
+/* Menu surface and top bar */
+.pc-main-menu-shell {
+  border: 2px solid #d6f0dd;
+  background: #fffdf8;
+}
+
+.pc-main-menu-topbar {
+  background: #173d29;
+  border-bottom-color: #87c79a;
+  color: #ffffff;
+}
+
+.pc-main-menu-kicker,
+.pc-menu-eyebrow {
+  font-size: 0.875rem;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0.075em;
+}
+
+.pc-main-menu-kicker {
+  color: #d6f0dd;
+}
+
+.pc-main-menu-brand h1 {
+  color: #ffffff;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  line-height: 1.15;
+}
+
+.pc-main-menu-close {
+  width: 48px;
+  height: 48px;
+  border: 2px solid #d6f0dd;
+  background: #173d29;
+  color: #ffffff;
+  font-size: 1.75rem;
+}
+
+.pc-main-menu-close:hover {
+  border-color: #ffffff;
+  background: #0d2d1d;
+}
+
+.pc-main-menu-close:focus-visible {
+  border-color: #ffffff;
+  background: #0d2d1d;
+  outline: 3px solid #f4b942;
+  outline-offset: 3px;
+}
+
+/* Menu headings and explanatory text */
+.pc-menu-eyebrow {
+  color: #174b2f;
+}
+
+.pc-menu-home-copy h2,
+.pc-menu-panel-heading h2 {
+  color: #201a16;
+  line-height: 1.12;
+}
+
+.pc-menu-home-copy > p:last-child,
+.pc-menu-panel-heading > p:last-child,
+.pc-menu-about-copy p {
+  color: #332b25;
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.65;
+}
+
+/* Primary and secondary navigation */
+.pc-menu-action {
+  min-height: 48px;
+  padding: 12px 22px;
+  border: 2px solid #174b2f;
+  color: #173d29;
+  font-size: 1.0625rem;
+  line-height: 1.3;
+}
+
+.pc-menu-action-primary {
+  background: #174b2f;
+  color: #ffffff;
+}
+
+.pc-menu-action:hover {
+  border-color: #0d2d1d;
+  background: #e7f2ea;
+  color: #0d2d1d;
+  box-shadow: none;
+}
+
+.pc-menu-action-primary:hover {
+  background: #0d2d1d;
+  color: #ffffff;
+}
+
+.pc-menu-action:focus-visible,
+.pc-menu-action-primary:focus-visible {
+  border-color: #0d2d1d;
+  outline: 3px solid #f4b942;
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+.pc-menu-secondary-actions {
+  border-top-color: #8d8377;
+}
+
+.pc-menu-secondary-actions button,
+.pc-menu-back {
+  min-height: 44px;
+  padding: 10px 2px;
+  color: #173d29;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0.015em;
+}
+
+.pc-menu-secondary-actions button:hover,
+.pc-menu-back:hover {
+  color: #7a3212;
+}
+
+.pc-menu-secondary-actions button:focus-visible,
+.pc-menu-back:focus-visible {
+  color: #173d29;
+  outline: 3px solid #f4b942;
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+
+/* Scenario cards */
+.pc-menu-scenario-card {
+  gap: 16px;
+  padding: 20px;
+  border: 2px solid #72685d;
+  background: #ffffff;
+  color: #201a16;
+}
+
+.pc-menu-scenario-card:hover {
+  border-color: #174b2f;
+  box-shadow: 0 5px 14px rgba(23, 61, 41, 0.18);
+}
+
+.pc-menu-scenario-card:focus-visible {
+  border-color: #174b2f;
+  outline: 3px solid #f4b942;
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+.pc-menu-scenario-card.is-current {
+  border-color: #873b17;
+  background: #fff2e9;
+}
+
+.pc-menu-scenario-card.is-complete {
+  border-color: #174b2f;
+  background: #edf6ef;
+}
+
+.pc-menu-scenario-card:disabled {
+  opacity: 1;
+  border-color: #8d8377;
+  background: #ebe7e1;
+  color: #4a433c;
+}
+
+.pc-menu-scenario-number {
+  width: 52px;
+  height: 52px;
+  background: #173d29;
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+
+.pc-menu-scenario-title {
+  color: #173d29;
+  font-size: 1.3rem;
+  line-height: 1.25;
+}
+
+.pc-menu-scenario-mission {
+  margin-top: 6px;
+  color: #2d2823;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.pc-menu-scenario-copy {
+  margin-top: 9px;
+  color: #403832;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.pc-menu-scenario-status {
+  margin-top: 7px;
+  padding: 5px 9px;
+  background: #e3ddd4;
+  color: #29231f;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  letter-spacing: 0.025em;
+}
+
+.pc-menu-scenario-card.is-current .pc-menu-scenario-status {
+  background: #f2d2c0;
+  color: #64280d;
+}
+
+.pc-menu-scenario-card.is-complete .pc-menu-scenario-status {
+  background: #cfe5d5;
+  color: #12341f;
+}
+
+/* How-to-play and About panels */
+.pc-menu-info-grid article {
+  border: 2px solid #72685d;
+  background: #ffffff;
+}
+
+.pc-menu-info-grid article > span {
+  color: #7a3212;
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+
+.pc-menu-info-grid h3 {
+  color: #173d29;
+  font-size: 1.3rem;
+  line-height: 1.3;
+}
+
+.pc-menu-info-grid p {
+  color: #332b25;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.pc-menu-about-copy {
+  border-left-color: #174b2f;
+  background: #ffffff;
+}
+
+/* Footer */
+.pc-main-menu-footer {
+  min-height: 52px;
+  border-top: 2px solid #8d8377;
+  background: #e7e0d6;
+  color: #2b2520;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+}
+
+/* Never communicate unavailable scenarios with low opacity alone. */
+.pc-menu-scenario-card:disabled .pc-menu-scenario-number {
+  background: #4d4944;
+}
+
+/* Mobile menu retains the same readable type sizes. */
+@media (max-width: 760px) {
+  .pc-main-menu-topbar {
+    min-height: 80px;
+  }
+
+  .pc-menu-panel {
+    padding: 26px 20px 38px;
+  }
+
+  .pc-menu-scenario-card {
+    grid-template-columns: 48px minmax(0, 1fr);
+    padding: 17px;
+  }
+
+  .pc-menu-scenario-number {
+    width: 48px;
+    height: 48px;
+  }
+
+  .pc-menu-scenario-copy,
+  .pc-menu-scenario-mission,
+  .pc-menu-info-grid p {
+    font-size: 1rem;
+  }
+
+  .main-menu-toggle,
+  .vn-main-menu-toggle {
+    min-width: 72px;
+    min-height: 44px;
+    padding: 9px 12px;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .pc-main-menu-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .pc-main-menu-footer span:first-child {
+    max-width: none;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   V131 — About, developer, and research/privacy panels
+   Keeps project context and data disclosure visible, readable, and distinct.
+   ══════════════════════════════════════════════════════ */
+.pc-menu-data-summary {
+  max-width: 860px;
+  margin-top: 28px;
+  padding: 20px 22px;
+  border: 2px solid #7a3212;
+  border-radius: 12px;
+  background: #fff3e9;
+  color: #2b2520;
+}
+
+.pc-menu-data-summary h3 {
+  margin: 0;
+  color: #64280d;
+  font-family: "Fraunces", serif;
+  font-size: 1.3rem;
+  line-height: 1.3;
+}
+
+.pc-menu-data-summary p {
+  margin: 9px 0 0;
+  color: #332b25;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.pc-menu-data-summary button {
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: #64280d;
+  font-family: "Nunito", sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.pc-menu-data-summary button:hover {
+  color: #173d29;
+}
+
+.pc-menu-data-summary button:focus-visible {
+  border-radius: 3px;
+  outline: 3px solid #f4b942;
+  outline-offset: 4px;
+}
+
+.pc-menu-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.pc-menu-profile-card,
+.pc-menu-research-card {
+  padding: 24px;
+  border: 2px solid #72685d;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #2b2520;
+}
+
+.pc-menu-profile-card h3,
+.pc-menu-research-card h3 {
+  margin: 5px 0 0;
+  color: #173d29;
+  font-family: "Fraunces", serif;
+  font-size: 1.35rem;
+  line-height: 1.3;
+}
+
+.pc-menu-profile-card p,
+.pc-menu-research-card p {
+  margin: 10px 0 0;
+  color: #332b25;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.pc-menu-card-label {
+  margin: 0 !important;
+  color: #7a3212 !important;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.875rem !important;
+  font-weight: 800;
+  line-height: 1.35 !important;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.pc-menu-profile-card a {
+  color: #174b2f;
+  font-weight: 800;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.pc-menu-profile-card a:hover {
+  color: #7a3212;
+}
+
+.pc-menu-profile-card a:focus-visible {
+  border-radius: 3px;
+  outline: 3px solid #f4b942;
+  outline-offset: 4px;
+}
+
+.pc-menu-disclaimer-card {
+  border-color: #7a3212;
+  background: #fff3e9;
+}
+
+.pc-menu-research-stack {
+  display: grid;
+  gap: 16px;
+  max-width: 900px;
+}
+
+.pc-menu-research-warning {
+  border-color: #7a3212;
+  background: #fff3e9;
+}
+
+.pc-menu-research-warning h3 {
+  color: #64280d;
+}
+
+@media (max-width: 760px) {
+  .pc-menu-profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-menu-profile-card,
+  .pc-menu-research-card,
+  .pc-menu-data-summary {
+    padding: 20px;
+  }
+
+  .pc-menu-profile-card h3,
+  .pc-menu-research-card h3,
+  .pc-menu-data-summary h3 {
+    font-size: 1.25rem;
+  }
+}

@@ -68,6 +68,15 @@ let history = [];
 let scenarioCompleted = Array(SCENARIO_COUNT).fill(false);
 let playerName = 'You'; // updated by name entry modal
 
+// Main-menu state. Scenario content stays loaded behind the menu so opening and
+// closing it never rebuilds Scenario 1 or disturbs the active activity.
+let pcScenarioHasLaunched = false;
+let pcMainMenuInitialOpen = true;
+let pcMainMenuLastFocused = null;
+let pcNameConfirmed = false;
+let pcPendingScenarioIndex = null;
+const PC_MENU_PREVIEW_ALL_SCENARIOS = true;
+
 // ── SCREEN READER UTILITY ─────────────────────────────
 (function() {
   const s = document.createElement('style');
@@ -80,11 +89,18 @@ function showNameModal() {
   const overlay = document.getElementById('nameModalOverlay');
 
   if (!overlay) {
-    console.warn('[PromptCraft] Name modal missing; starting game directly.');
-    startGame();
+    console.warn('[PromptCraft] Name modal missing; continuing with the default player name.');
+    pcNameConfirmed = true;
+    const pendingIndex = pcPendingScenarioIndex;
+    pcPendingScenarioIndex = null;
+    if (Number.isInteger(pendingIndex)) {
+      launchScenarioFromMenu(pendingIndex, { skipNameGate: true });
+    }
     return;
   }
 
+  overlay.hidden = false;
+  overlay.setAttribute('aria-hidden', 'false');
   overlay.style.display = '';
   overlay.style.opacity = '';
   overlay.style.pointerEvents = '';
@@ -97,20 +113,19 @@ function showNameModal() {
 
     const style = window.getComputedStyle(overlay);
     const rect = overlay.getBoundingClientRect();
-
-    /*
-      Fixed-position overlays often have offsetParent === null even when they
-      are visible. The old check treated that as failure and skipped the name
-      modal. Because naturally CSS geometry needed a trap door.
-    */
     const modalFailedVisible =
       style.display === 'none' ||
       style.visibility === 'hidden' ||
       (rect.width === 0 && rect.height === 0);
 
-    if (modalFailedVisible && !window.pcGameStarted) {
-      console.warn('[PromptCraft] Name modal failed to render; continuing with default player name.');
-      startGame();
+    if (modalFailedVisible) {
+      console.warn('[PromptCraft] Name modal failed to render; continuing with the default player name.');
+      pcNameConfirmed = true;
+      const pendingIndex = pcPendingScenarioIndex;
+      pcPendingScenarioIndex = null;
+      if (Number.isInteger(pendingIndex)) {
+        launchScenarioFromMenu(pendingIndex, { skipNameGate: true });
+      }
     }
   }, 450);
 }
@@ -122,18 +137,28 @@ function submitName(skip = false) {
   // Sanitise -- letters, spaces, hyphens, apostrophes, max 24 chars
   const clean = raw.replace(/[^a-zA-Z\s'\-\.]/g, '').trim().substring(0, 24);
   playerName = clean || 'You';
+  pcNameConfirmed = true;
 
-  // Dismiss modal
+  // Dismiss modal, then continue the scenario selected from the main menu.
   const overlay = document.getElementById('nameModalOverlay');
-  overlay.style.opacity = '0';
-  overlay.style.pointerEvents = 'none';
-  setTimeout(() => overlay.style.display = 'none', 400);
+  if (overlay) {
+    overlay.classList.remove('visible');
+    overlay.setAttribute('aria-hidden', 'true');
+    overlay.style.opacity = '0';
+    overlay.style.pointerEvents = 'none';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      overlay.hidden = true;
+    }, 400);
+  }
 
-  // Update Pixel's welcome to use the name
   updatePixelWelcomeForName();
 
-  // Start the game
-  startGame();
+  const pendingIndex = pcPendingScenarioIndex;
+  pcPendingScenarioIndex = null;
+  if (Number.isInteger(pendingIndex)) {
+    setTimeout(() => launchScenarioFromMenu(pendingIndex, { skipNameGate: true }), 420);
+  }
 }
 
 function updatePixelWelcomeForName() {
@@ -158,7 +183,9 @@ function startGame() {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!reducedMotion) initMusic();
 
-  window.scenarioIntroEnabled = false; // suppress during initial load
+  // S1 remains rendered behind the menu as the safe default, but its VN intro
+  // does not begin until the learner actually chooses a scenario.
+  window.scenarioIntroEnabled = false;
 
   try {
     loadScenario(SCENARIO_INDEX.ENGAGEMENT);
@@ -167,14 +194,8 @@ function startGame() {
     console.error('[PromptCraft] Initial scenario render failed:', err);
   }
 
-  setTimeout(() => {
-    playPixelSequence(getScenarioStartDialogueKey(SCENARIO_INDEX.ENGAGEMENT), null);
-    setTimeout(() => {
-      playPixelSequence('welcome', null);
-      // Enable scenario intro audio after opening sequence clears
-      setTimeout(() => { window.scenarioIntroEnabled = true; }, 3000);
-    }, 200);
-  },1200);
+  renderMainMenu();
+  openMainMenu('home', { initial: true });
 }
 
 // ══════════════════════════════════════════════════════
@@ -186,7 +207,7 @@ const SURVEY_MODE   = 'sheets';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbylnSseQkSsPNKSjqoU2ui6yFa62YslQEq-nRyeC8MZFVnlmv-XYoi2EUJPZGvnKU1z/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 const PC_APP_SCHEMA_VERSION = 'V121';
-const PC_APP_BUILD_LABEL = 'SCENARIO_TEMPLATE_CLEANUP_V127';
+const PC_APP_BUILD_LABEL = 'MAIN_MENU_V131';
 console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 
@@ -1367,6 +1388,234 @@ const PC_SCENARIO_LABELS = SCENARIO_UI.map(ui => ui.dataLabel || ui.tabLabel);
 window.SCENARIO_INDEX = SCENARIO_INDEX;
 window.scenarios = scenarios;
 window.SCENARIO_UI = SCENARIO_UI;
+
+// ══════════════════════════════════════════════════════
+//  MAIN MENU
+//  The scenario cards are generated from SCENARIO_UI, so titles, descriptions,
+//  and navigation remain aligned with the same registry that owns the game.
+// ══════════════════════════════════════════════════════
+function getMainMenuOverlay() {
+  return document.getElementById('mainMenuOverlay');
+}
+
+function getMainMenuPanel(panelName) {
+  return document.querySelector(`[data-menu-panel="${panelName}"]`);
+}
+
+function getScenarioMenuStatus(index) {
+  if (scenarioCompleted[index]) return 'Completed';
+  if (pcScenarioHasLaunched && scenarioIndex === index) return 'Current scenario';
+
+  const tab = document.querySelectorAll('.tab-btn')[index];
+  const normallyAvailable = index <= SCENARIO_INDEX.ASSESSMENT || (tab && !tab.disabled);
+  if (normallyAvailable) return 'Available';
+  if (PC_MENU_PREVIEW_ALL_SCENARIOS) return 'Preview available';
+  return 'Locked';
+}
+
+function isScenarioAvailableFromMenu(index) {
+  if (PC_MENU_PREVIEW_ALL_SCENARIOS) return true;
+  if (index <= SCENARIO_INDEX.ASSESSMENT) return true;
+  const tab = document.querySelectorAll('.tab-btn')[index];
+  return !!tab && !tab.disabled;
+}
+
+function renderScenarioMenu() {
+  const grid = document.getElementById('mainMenuScenarioGrid');
+  if (!grid) return;
+
+  grid.innerHTML = SCENARIO_UI.map((ui, index) => {
+    const available = isScenarioAvailableFromMenu(index);
+    const status = getScenarioMenuStatus(index);
+    const stateClass = scenarioCompleted[index]
+      ? ' is-complete'
+      : (pcScenarioHasLaunched && scenarioIndex === index ? ' is-current' : '');
+
+    return `
+      <button class="pc-menu-scenario-card${stateClass}"
+              type="button"
+              ${available ? `onclick="launchScenarioFromMenu(${index})"` : 'disabled'}
+              aria-label="Open ${esc(ui.tabLabel)}. ${esc(status)}">
+        <span class="pc-menu-scenario-number">${String(index + 1).padStart(2, '0')}</span>
+        <span class="pc-menu-scenario-content">
+          <span class="pc-menu-scenario-title">${esc(ui.tabLabel.replace(/^S\d+:\s*/, ''))}</span>
+          <span class="pc-menu-scenario-mission">${esc(ui.missionTitle)}</span>
+          <span class="pc-menu-scenario-copy">${esc(ui.missionCopy)}</span>
+        </span>
+        <span class="pc-menu-scenario-status">${esc(status)}</span>
+      </button>`;
+  }).join('');
+}
+
+function updateMainMenuHome() {
+  const continueButton = document.getElementById('menuContinueBtn');
+  const status = document.getElementById('mainMenuStatus');
+  const closeButton = document.getElementById('mainMenuCloseBtn');
+
+  if (continueButton) {
+    continueButton.textContent = pcScenarioHasLaunched
+      ? `Continue ${getScenarioUI(scenarioIndex).tabLabel}`
+      : 'Start Scenario 1';
+  }
+
+  if (status) {
+    status.textContent = pcScenarioHasLaunched
+      ? `${getScenarioUI(scenarioIndex).tabLabel} is currently open.`
+      : 'Choose Start or open Scenario Select.';
+  }
+
+  if (closeButton) {
+    closeButton.hidden = !pcScenarioHasLaunched;
+  }
+}
+
+function renderMainMenu() {
+  updateMainMenuHome();
+  renderScenarioMenu();
+}
+
+function showMainMenuPanel(panelName = 'home') {
+  const requested = getMainMenuPanel(panelName) || getMainMenuPanel('home');
+  document.querySelectorAll('[data-menu-panel]').forEach(panel => {
+    panel.hidden = panel !== requested;
+  });
+
+  if (panelName === 'scenarios') renderScenarioMenu();
+  if (panelName === 'home') updateMainMenuHome();
+
+  const focusTarget = requested.querySelector('button:not([disabled]), a[href], input, textarea, [tabindex]:not([tabindex="-1"])');
+  setTimeout(() => focusTarget?.focus(), 20);
+}
+
+function openMainMenu(panelName = 'home', options = {}) {
+  const overlay = getMainMenuOverlay();
+  if (!overlay) return false;
+
+  pcMainMenuLastFocused = document.activeElement;
+  pcMainMenuInitialOpen = options.initial === true || !pcScenarioHasLaunched;
+
+  renderMainMenu();
+  overlay.hidden = false;
+  overlay.setAttribute('aria-hidden', 'false');
+  const vnOverlay = document.getElementById('vnOverlay');
+  if (vnOverlay?.classList.contains('active')) vnOverlay.setAttribute('aria-hidden', 'true');
+  document.body.classList.add('pc-main-menu-open');
+  overlay.classList.add('visible');
+  showMainMenuPanel(panelName);
+  return false;
+}
+
+function closeMainMenu(options = {}) {
+  const overlay = getMainMenuOverlay();
+  if (!overlay) return false;
+
+  // The first menu is the game entry point. It cannot be dismissed into an
+  // unstarted S1 shell, but every later menu can close normally.
+  if (!pcScenarioHasLaunched && options.force !== true) {
+    showMainMenuPanel('home');
+    return false;
+  }
+
+  overlay.classList.remove('visible');
+  overlay.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('pc-main-menu-open');
+  pcMainMenuInitialOpen = false;
+
+  const vnOverlay = document.getElementById('vnOverlay');
+  if (vnOverlay?.classList.contains('active')) vnOverlay.setAttribute('aria-hidden', 'false');
+
+  setTimeout(() => {
+    overlay.hidden = true;
+    const canRestoreFocus = pcMainMenuLastFocused
+      && typeof pcMainMenuLastFocused.focus === 'function'
+      && !pcMainMenuLastFocused.closest?.('[hidden]')
+      && pcMainMenuLastFocused.getClientRects?.().length;
+
+    if (canRestoreFocus) pcMainMenuLastFocused.focus();
+    else document.getElementById('mainMenuToggle')?.focus();
+  }, 180);
+  return false;
+}
+
+function pcUnlockScenarioForMenuPreview(index) {
+  if (index <= SCENARIO_INDEX.ASSESSMENT) return document.querySelectorAll('.tab-btn')[index] || null;
+
+  return unlockScenarioTab(index, {
+    icon: '📋',
+    className: 'menu-preview-unlocked',
+  });
+}
+
+function launchScenarioFromMenu(index, options = {}) {
+  index = Number(index);
+  if (!Number.isInteger(index) || !scenarios[index] || !isScenarioAvailableFromMenu(index)) return false;
+
+  // The main menu is the first screen. Ask for the learner's name only after
+  // they choose Start or select a scenario.
+  if (!pcNameConfirmed && options.skipNameGate !== true) {
+    pcPendingScenarioIndex = index;
+    closeMainMenu({ force: true });
+    showNameModal();
+    return false;
+  }
+
+  const firstLaunch = !pcScenarioHasLaunched;
+  pcScenarioHasLaunched = true;
+  pcMainMenuInitialOpen = false;
+
+  const tab = pcUnlockScenarioForMenuPreview(index) || document.querySelectorAll('.tab-btn')[index] || null;
+  closeMainMenu({ force: true });
+
+  // switchScenario owns all scene cleanup, input rendering, and introduction
+  // behavior. The menu merely routes into that established path.
+  switchScenario(index, tab);
+
+  // Preserve S1's existing opening sequence: its scenario introduction is
+  // followed by Professor Pixel's welcome the first time the game begins.
+  if (firstLaunch && index === SCENARIO_INDEX.ENGAGEMENT) {
+    setTimeout(() => playPixelSequence('welcome', null), 500);
+  }
+
+  window.scenarioIntroEnabled = true;
+  return false;
+}
+
+function continueFromMainMenu() {
+  if (!pcScenarioHasLaunched) return launchScenarioFromMenu(SCENARIO_INDEX.ENGAGEMENT);
+  return closeMainMenu({ force: true });
+}
+
+window.addEventListener('keydown', event => {
+  const overlay = getMainMenuOverlay();
+  if (!overlay || overlay.hidden || !overlay.classList.contains('visible')) return;
+
+  if (event.key === 'Escape' && pcScenarioHasLaunched) {
+    event.preventDefault();
+    closeMainMenu({ force: true });
+    return;
+  }
+
+  if (event.key !== 'Tab') return;
+  const focusable = [...overlay.querySelectorAll('button:not([disabled]):not([hidden]), a[href], input, textarea, [tabindex]:not([tabindex="-1"])')]
+    .filter(el => !el.closest('[hidden]'));
+  if (!focusable.length) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
+
+window.openMainMenu = openMainMenu;
+window.closeMainMenu = closeMainMenu;
+window.showMainMenuPanel = showMainMenuPanel;
+window.continueFromMainMenu = continueFromMainMenu;
+window.launchScenarioFromMenu = launchScenarioFromMenu;
 
 // ══════════════════════════════════════════════════════
 //  PROFESSOR PIXEL — INLINE CHAT DIALOGUE SYSTEM
@@ -3341,23 +3590,10 @@ function loadSceneImage(filename) {
 //  INIT
 // ══════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  /*
-    Live boot protection:
-    Render S1 immediately behind the name modal. If the modal CSS fails or the
-    user refreshes into a half-state, the page no longer sits there with blank
-    challenge/input areas like it has forgotten its job.
-  */
-  window.scenarioIntroEnabled = false;
-
-  try {
-    loadScenario(SCENARIO_INDEX.ENGAGEMENT);
-    window.pcInitialScenarioRendered = true;
-  } catch (err) {
-    console.error('[PromptCraft] Initial background scenario render failed:', err);
-  }
-
-  // Show name modal first -- game starts after name is submitted.
-  showNameModal();
+  // The main menu is the true application entry point. Scenario 1 is rendered
+  // quietly behind it as a safe fallback, but no dialogue begins until the
+  // learner chooses Start or selects a scenario.
+  startGame();
 
   // Safety check: if S1 content is still empty after load, render it again.
   setTimeout(() => {
@@ -3368,6 +3604,7 @@ window.addEventListener('DOMContentLoaded', () => {
         (!inputContainer || !inputContainer.textContent.trim())) {
       console.warn('[PromptCraft] Startup watchdog repaired empty initial scenario render.');
       try {
+        window.scenarioIntroEnabled = false;
         loadScenario(SCENARIO_INDEX.ENGAGEMENT);
         window.pcInitialScenarioRendered = true;
       } catch (err) {

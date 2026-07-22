@@ -12,13 +12,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=127">
+<link rel="stylesheet" href="style.css?v=131">
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
-<script src="functions/dialogue.js?v=127"></script>
-<script src="functions/app.js?v=127"></script>
+<script src="functions/dialogue.js?v=131"></script>
+<script src="functions/app.js?v=131"></script>
 
 <!-- Runtime override bucket: intentionally empty unless app.js injects temporary CSS -->
 <style id="stable-s1-overrides"></style>
@@ -36,7 +36,7 @@
      Purpose: Collects optional display name before the game begins.
      Functions used: submitName()
      ══════════════════════════════════════════════════════ -->
-<div class="name-modal-overlay" id="nameModalOverlay" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle">
+<div class="name-modal-overlay" id="nameModalOverlay" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle" aria-hidden="true" hidden>
   <div class="name-modal">
     <span class="name-modal-icon">🌿</span>
     <div class="name-modal-title" id="nameModalTitle">Welcome to the Prompt Lab</div>
@@ -113,6 +113,11 @@
         <div class="xp-fill" id="xpFill"></div>
       </div>
     </div>
+    <button class="main-menu-toggle" id="mainMenuToggle"
+            type="button"
+            onclick="openMainMenu('home')"
+            aria-label="Open main menu"
+            title="Main menu">Menu</button>
     <button class="music-toggle" id="musicToggle"
             onclick="toggleMusic()"
             aria-label="Toggle background music"
@@ -123,6 +128,182 @@
     </a>
   </div>
 </header>
+
+<!-- ══════════════════════════════════════════════════════
+     MAIN MENU
+     Purpose: Start or continue the game, jump directly to a scenario during
+     development, and provide expandable information panels.
+     Functions used: openMainMenu(), closeMainMenu(), showMainMenuPanel(),
+     continueFromMainMenu(), launchScenarioFromMenu()
+     ══════════════════════════════════════════════════════ -->
+<div class="pc-main-menu" id="mainMenuOverlay"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="mainMenuTitle"
+     aria-hidden="true"
+     hidden>
+  <div class="pc-main-menu-backdrop" aria-hidden="true"></div>
+  <div class="pc-main-menu-shell" role="document">
+    <div class="pc-main-menu-topbar">
+      <div class="pc-main-menu-brand">
+        <span class="pc-main-menu-kicker">PromptCraft</span>
+        <h1 id="mainMenuTitle">The Prompt Lab</h1>
+      </div>
+      <button class="pc-main-menu-close" id="mainMenuCloseBtn"
+              type="button"
+              onclick="closeMainMenu()"
+              aria-label="Close main menu">×</button>
+    </div>
+
+    <section class="pc-menu-panel" id="menuPanelHome" data-menu-panel="home">
+      <div class="pc-menu-home-copy">
+        <p class="pc-menu-eyebrow">Faculty AI training game</p>
+        <h2>Practice better prompting without surrendering your judgment.</h2>
+        <p>Work through short teaching scenarios with Professor Pixel, consult Claude, and revise your decisions as the consequences become visible.</p>
+      </div>
+
+      <div class="pc-menu-primary-actions">
+        <button class="pc-menu-action pc-menu-action-primary" id="menuContinueBtn"
+                type="button" onclick="continueFromMainMenu()">
+          Start Scenario 1
+        </button>
+        <button class="pc-menu-action" type="button" onclick="showMainMenuPanel('scenarios')">
+          Scenario Select
+        </button>
+      </div>
+
+      <div class="pc-menu-secondary-actions" aria-label="Menu information">
+        <button type="button" onclick="showMainMenuPanel('how-to-play')">How to Play</button>
+        <button type="button" onclick="showMainMenuPanel('about')">About PromptCraft</button>
+        <button type="button" onclick="showMainMenuPanel('research')">Research &amp; Privacy</button>
+      </div>
+
+      <aside class="pc-menu-data-summary" aria-labelledby="menuDataSummaryTitle">
+        <h3 id="menuDataSummaryTitle">Prototype data notice</h3>
+        <p>PromptCraft records activity such as prompts, choices, revisions, scores, reflections, timestamps, and completion progress for development and potential research use. Do not enter student names or other confidential information.</p>
+        <button type="button" onclick="showMainMenuPanel('research')">Read the full Research &amp; Privacy notice</button>
+      </aside>
+    </section>
+
+    <section class="pc-menu-panel" id="menuPanelScenarios" data-menu-panel="scenarios" hidden>
+      <div class="pc-menu-panel-heading">
+        <button class="pc-menu-back" type="button" onclick="showMainMenuPanel('home')">← Main Menu</button>
+        <p class="pc-menu-eyebrow">Scenario Select</p>
+        <h2>Choose a training scenario</h2>
+        <p>All scenarios are available here for development and review. Completion data is still recorded normally.</p>
+      </div>
+      <div class="pc-menu-scenario-grid" id="mainMenuScenarioGrid" aria-live="polite"></div>
+    </section>
+
+    <section class="pc-menu-panel" id="menuPanelHowToPlay" data-menu-panel="how-to-play" hidden>
+      <div class="pc-menu-panel-heading">
+        <button class="pc-menu-back" type="button" onclick="showMainMenuPanel('home')">← Main Menu</button>
+        <p class="pc-menu-eyebrow">How to Play</p>
+        <h2>Observe, predict, test, and revise.</h2>
+      </div>
+      <div class="pc-menu-info-grid">
+        <article>
+          <span>01</span>
+          <h3>Read the teaching problem</h3>
+          <p>Professor Pixel introduces the scenario and points you toward the design problem that matters.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Make a deliberate choice</h3>
+          <p>Build a prompt, identify a risk, or predict what the AI is likely to produce before seeing the answer.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Evaluate the output</h3>
+          <p>Claude provides a response, but your professional judgment determines what is useful, incomplete, or unsafe.</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h3>Revise and continue</h3>
+          <p>Use the feedback to improve the prompt or decision, then carry that reasoning into the next scenario.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="pc-menu-panel" id="menuPanelAbout" data-menu-panel="about" hidden>
+      <div class="pc-menu-panel-heading">
+        <button class="pc-menu-back" type="button" onclick="showMainMenuPanel('home')">← Main Menu</button>
+        <p class="pc-menu-eyebrow">About PromptCraft</p>
+        <h2>A visual novel about using AI with intention.</h2>
+        <p>PromptCraft combines scenario-based practice, reflective decision-making, and game-informed faculty development.</p>
+      </div>
+
+      <div class="pc-menu-profile-grid">
+        <article class="pc-menu-profile-card">
+          <p class="pc-menu-card-label">The project</p>
+          <h3>PromptCraft</h3>
+          <p>PromptCraft is a faculty-development experience focused on prompt design, course context, critical evaluation, and the limits of generative AI. Learners work through realistic teaching problems with Professor Pixel, consult Claude, and revise their decisions using evidence and professional judgment.</p>
+        </article>
+
+        <article class="pc-menu-profile-card">
+          <p class="pc-menu-card-label">Developer</p>
+          <h3>Shanel Lara Locke, MFA</h3>
+          <p>Shanel is an instructional designer in the Teaching &amp; Learning Center at Great Falls College MSU. Her work supports faculty development, online course design, digital accessibility, course review, instructional technology, and thoughtful uses of AI in teaching and learning.</p>
+          <p><a href="https://www.gfcmsu.edu/campus-departments/tlc/" target="_blank" rel="noopener noreferrer">Visit the Great Falls College MSU Teaching &amp; Learning Center <span class="sr-only">(opens in a new tab)</span></a></p>
+        </article>
+
+        <article class="pc-menu-profile-card">
+          <p class="pc-menu-card-label">Academic context</p>
+          <h3>Montana State University Ed.S.</h3>
+          <p>PromptCraft is connected to Shanel’s graduate work in Montana State University’s Education Specialist program. The project explores how scenario-based professional learning can help educators practice prompt design, evaluate AI output, and retain their professional judgment.</p>
+          <p><a href="https://www.montana.edu/academics/education-specialist-graduate/" target="_blank" rel="noopener noreferrer">Learn about the Education Specialist program at Montana State University <span class="sr-only">(opens in a new tab)</span></a></p>
+        </article>
+
+        <article class="pc-menu-profile-card pc-menu-disclaimer-card">
+          <p class="pc-menu-card-label">Institutional disclaimer</p>
+          <h3>Independent educational project</h3>
+          <p>PromptCraft is developed by Shanel as an educational and scholarly project. The content, interpretations, and design choices presented here do not necessarily represent official policy or positions of Great Falls College MSU, Montana State University, or the Montana University System.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="pc-menu-panel" id="menuPanelResearch" data-menu-panel="research" hidden>
+      <div class="pc-menu-panel-heading">
+        <button class="pc-menu-back" type="button" onclick="showMainMenuPanel('home')">← Main Menu</button>
+        <p class="pc-menu-eyebrow">Research &amp; Privacy</p>
+        <h2>Know what the prototype records.</h2>
+        <p>This plain-language notice describes the current development build. It is not a substitute for formal informed consent.</p>
+      </div>
+
+      <div class="pc-menu-research-stack">
+        <section class="pc-menu-research-card" aria-labelledby="researchCollectedTitle">
+          <h3 id="researchCollectedTitle">Information that may be collected</h3>
+          <p>PromptCraft may record an optional name or participant identifier, scenario choices, prompts and revisions, Claude responses, scores, predictions, reflections, timestamps, session duration, completion progress, and basic display information such as screen width.</p>
+        </section>
+
+        <section class="pc-menu-research-card" aria-labelledby="researchPurposeTitle">
+          <h3 id="researchPurposeTitle">Why the information is collected</h3>
+          <p>Information may be used to test the prototype, identify usability problems, improve the instructional design, evaluate learning activities, and support future research when the required institutional review and participant-consent processes are in place.</p>
+        </section>
+
+        <section class="pc-menu-research-card pc-menu-research-warning" aria-labelledby="researchDoNotEnterTitle">
+          <h3 id="researchDoNotEnterTitle">Do not enter confidential information</h3>
+          <p>Do not include student names, grades, course records, health information, employment records, passwords, or other private or legally protected information in any prompt or reflection. The name field may be skipped or replaced with a non-identifying participant code.</p>
+        </section>
+
+        <section class="pc-menu-research-card" aria-labelledby="researchAITitle">
+          <h3 id="researchAITitle">AI and external processing</h3>
+          <p>Depending on how PromptCraft is deployed, text submitted during an activity may be processed by an external generative AI service. Treat every prompt as information that could leave the local browser, and use fictional or generalized teaching examples rather than identifiable student information.</p>
+        </section>
+
+        <section class="pc-menu-research-card" aria-labelledby="researchConsentTitle">
+          <h3 id="researchConsentTitle">Formal research participation</h3>
+          <p>This menu notice does not indicate that a formal study has been approved, and it does not serve as informed consent. If PromptCraft is used in an approved research study, participants will receive separate information describing the study purpose, procedures, risks, benefits, confidentiality protections, data use, storage, voluntary participation, and researcher contacts before their data are used for research.</p>
+        </section>
+      </div>
+    </section>
+
+    <div class="pc-main-menu-footer">
+      <span id="mainMenuStatus">Select an option to begin.</span>
+      <span>Version 131</span>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════════════════════════════════════════════════
      SCENARIO TABS
@@ -327,6 +508,11 @@
 
 
   </div>
+
+  <!-- MAIN MENU ACCESS: remains available while the VN overlay covers the header -->
+  <button class="vn-main-menu-toggle" type="button"
+          onclick="event.stopPropagation();openMainMenu('home')"
+          aria-label="Open main menu">MENU</button>
 
   <!-- VN DIALOGUE BOX: click, Space, or Enter advances typed dialogue -->
   <div class="vn-dialogue" id="vnDialogue"
