@@ -2556,7 +2556,7 @@ function pcApplyS2CastResponsive() {
   const overlay = document.getElementById('vnOverlay');
   const pixel = document.getElementById('vnCharacter');
   const student = document.getElementById('vnStudentCharacter');
-  const compact = window.matchMedia?.('(max-width: 900px), (max-height: 720px)').matches;
+  const compact = window.matchMedia?.('(max-width: 620px), (max-height: 650px)').matches;
   if (!overlay?.classList.contains('s2-dual-character')) {
     if (pixel) pixel.style.display = '';
     if (student) student.style.display = '';
