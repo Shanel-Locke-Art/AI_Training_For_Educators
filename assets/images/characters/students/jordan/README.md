@@ -1,11 +1,12 @@
-# Jordan visual assets
+# Jordan placeholder portraits
 
-Use this folder for final transparent PNG portraits. Recommended names:
+Current S2 placeholder set:
 
-- `neutral.png`
-- `thinking.png`
-- `uncertain.png`
-- `frustrated.png`
-- `confident.png`
+- neutral.png
+- uncertain.png
+- frustrated.png
+- thinking.png
+- confident.png
 
-Keep early sketches and generated references inside `references/` so they are never confused with production portraits.
+These are temporary transparent PNGs for the S2 vertical slice. Replace them
+with Shanel's final artwork using the same filenames so no code changes are needed.

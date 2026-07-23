@@ -1,0 +1,52 @@
+{
+  "version": 138,
+  "runtime_images": {
+    "background.png": "assets/images/backgrounds/app-background.png",
+    "classroom-bg.png": "assets/images/backgrounds/classroom.png",
+    "pixel-neutral.png": "assets/images/characters/professor-pixel/neutral.png",
+    "pixel-thinking.png": "assets/images/characters/professor-pixel/thinking.png",
+    "pixel-excited.png": "assets/images/characters/professor-pixel/excited.png",
+    "pixel-encouraging.png": "assets/images/characters/professor-pixel/encouraging.png",
+    "pixel-skeptical.png": "assets/images/characters/professor-pixel/skeptical.png",
+    "pixel-proud.png": "assets/images/characters/professor-pixel/proud.png",
+    "scene-s1.png": "assets/images/scenes/scenario-01-engagement/scene.png",
+    "scene-s2.png": "assets/images/scenes/scenario-02-metacognition/scene.png",
+    "scene-s3.png": "assets/images/scenes/scenario-03-authentic-assessment/scene.png",
+    "scene-s4.png": "assets/images/scenes/scenario-04-sync-bias/scene.png",
+    "scene-s5.png": "assets/images/scenes/scenario-05-hallucination-hunt/scene.png",
+    "scene-s6.png": "assets/images/scenes/scenario-06-predict-output/scene.png",
+    "scene-complete.png": "assets/images/scenes/completion/all-scenarios-complete.png",
+    "jordan-neutral.png": "assets/images/characters/students/jordan/neutral.png",
+    "jordan-uncertain.png": "assets/images/characters/students/jordan/uncertain.png",
+    "jordan-frustrated.png": "assets/images/characters/students/jordan/frustrated.png",
+    "jordan-thinking.png": "assets/images/characters/students/jordan/thinking.png",
+    "jordan-confident.png": "assets/images/characters/students/jordan/confident.png"
+  },
+  "runtime_audio": {
+    "background.mp3": "assets/audio/music/background.mp3",
+    "welcome.mp3": "assets/audio/voice/professor-pixel/system/welcome.mp3",
+    "vague.mp3": "assets/audio/voice/professor-pixel/feedback/vague.mp3",
+    "decent.mp3": "assets/audio/voice/professor-pixel/feedback/decent.mp3",
+    "strong.mp3": "assets/audio/voice/professor-pixel/feedback/strong.mp3",
+    "scenario-1-intro.mp3": "assets/audio/voice/professor-pixel/scenario-01/intro.mp3",
+    "scenario-complete.mp3": "assets/audio/voice/professor-pixel/completion/scenario-complete.mp3",
+    "all-complete.mp3": "assets/audio/voice/professor-pixel/completion/all-complete.mp3",
+    "reflection-open.mp3": "assets/audio/voice/professor-pixel/reflection/open.mp3"
+  },
+  "legacy_audio_archive": [
+    "s4-interrupt.mp3",
+    "s4-reveal.mp3",
+    "s7-closing.mp3",
+    "scenario-2-intro.mp3",
+    "scenario-3-intro.mp3",
+    "scenario-4-intro.mp3",
+    "scenario-5-intro.mp3",
+    "scenario-6-intro.mp3",
+    "scenario-7-intro.mp3",
+    "scenario-8-intro.mp3"
+  ],
+  "planned_audio": {
+    "professor_pixel_s2": "assets/audio/voice/professor-pixel/scenario-02/p86.mp3 through p94.mp3",
+    "jordan_s2": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-01.mp3 through jordan-s2-03.mp3"
+  }
+}

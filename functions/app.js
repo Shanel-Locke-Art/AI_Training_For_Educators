@@ -18,7 +18,7 @@
      PIXEL INLINE CHAT         ← flagged for dialogue.js next pass
      SCENARIO NAVIGATION
      SCENARIO UNLOCK
-     S2–S8 — CLEAN DEVELOPMENT SHELLS
+     S2 OPENING + S3–S8 CLEAN DEVELOPMENT SHELLS
      AUTOSAVE
      VN ENGINE                 ← flagged for dialogue.js next pass
      SCENE IMAGE LOADER
@@ -34,7 +34,7 @@
      COMPLETION
      REFLECTION ROOM
      DEV FUNCTIONS
-     CLEAN SCENARIO SHELLS    ← S2–S8 placeholders
+     CLEAN SCENARIO SHELLS    ← S3–S8 placeholders
 
    NOTE: Functions marked [→ dialogue.js] should move there
    once dialogue.js is reviewed. Kept here so game stays functional.
@@ -63,6 +63,15 @@ let history = [];
 let scenarioCompleted = Array(SCENARIO_COUNT).fill(false);
 let playerName = 'You'; // updated by name entry modal
 
+// Audio begins in a fully silent state. The learner explicitly chooses a mode
+// after the optional name step. These flags control automatic narration and
+// background music; visible dialogue remains available in every mode.
+const audioPreferences = { voicesEnabled: false, musicEnabled: false };
+let pcAudioMode = 'silent';
+let pcAudioPreferenceConfirmed = false;
+let pcAudioSetupIsOnboarding = true;
+let pcAudioSetupLastFocused = null;
+
 // Main-menu state. Scenario content stays loaded behind the menu so opening and
 // closing it never rebuilds Scenario 1 or disturbs the active activity.
 let pcScenarioHasLaunched = false;
@@ -86,11 +95,7 @@ function showNameModal() {
   if (!overlay) {
     console.warn('[PromptCraft] Name modal missing; continuing with the default player name.');
     pcNameConfirmed = true;
-    const pendingIndex = pcPendingScenarioIndex;
-    pcPendingScenarioIndex = null;
-    if (Number.isInteger(pendingIndex)) {
-      launchScenarioFromMenu(pendingIndex, { skipNameGate: true });
-    }
+    showAudioSetup({ onboarding: true });
     return;
   }
 
@@ -116,11 +121,7 @@ function showNameModal() {
     if (modalFailedVisible) {
       console.warn('[PromptCraft] Name modal failed to render; continuing with the default player name.');
       pcNameConfirmed = true;
-      const pendingIndex = pcPendingScenarioIndex;
-      pcPendingScenarioIndex = null;
-      if (Number.isInteger(pendingIndex)) {
-        launchScenarioFromMenu(pendingIndex, { skipNameGate: true });
-      }
+      showAudioSetup({ onboarding: true });
     }
   }, 450);
 }
@@ -129,12 +130,11 @@ function submitName(skip = false) {
   const input = document.getElementById('nameInput');
   const raw = skip ? '' : (input ? input.value.trim() : '');
 
-  // Sanitise -- letters, spaces, hyphens, apostrophes, max 24 chars
+  // Sanitise -- letters, spaces, hyphens, apostrophes, max 24 chars.
   const clean = raw.replace(/[^a-zA-Z\s'\-\.]/g, '').trim().substring(0, 24);
   playerName = clean || 'You';
   pcNameConfirmed = true;
 
-  // Dismiss modal, then continue the scenario selected from the main menu.
   const overlay = document.getElementById('nameModalOverlay');
   if (overlay) {
     overlay.classList.remove('visible');
@@ -149,12 +149,125 @@ function submitName(skip = false) {
 
   updatePixelWelcomeForName();
 
-  const pendingIndex = pcPendingScenarioIndex;
-  pcPendingScenarioIndex = null;
-  if (Number.isInteger(pendingIndex)) {
-    setTimeout(() => launchScenarioFromMenu(pendingIndex, { skipNameGate: true }), 420);
-  }
+  // Audio is always the next onboarding step. Keep the pending scenario in
+  // place until the learner explicitly chooses full audio, voices, or silence.
+  setTimeout(() => showAudioSetup({ onboarding: true }), 420);
 }
+
+function getAudioSetupPrompt() {
+  return playerName === 'You'
+    ? 'Ready? Choose what you’d like to hear in the Prompt Lab.'
+    : `Ready, ${playerName}? Choose what you’d like to hear in the Prompt Lab.`;
+}
+
+function getAudioModeLabel(mode = pcAudioMode) {
+  if (mode === 'full') return 'Full audio';
+  if (mode === 'voices') return 'Voices only';
+  return 'Keep it quiet';
+}
+
+function showAudioSetup(options = {}) {
+  const overlay = document.getElementById('audioSetupOverlay');
+  pcAudioSetupIsOnboarding = options.onboarding !== false && !pcAudioPreferenceConfirmed;
+  pcAudioSetupLastFocused = document.activeElement;
+
+  if (!overlay) {
+    console.warn('[PromptCraft] Audio setup modal missing; continuing silently.');
+    applyAudioMode('silent');
+    pcAudioPreferenceConfirmed = true;
+    const pendingIndex = pcPendingScenarioIndex;
+    pcPendingScenarioIndex = null;
+    if (Number.isInteger(pendingIndex)) {
+      launchScenarioFromMenu(pendingIndex, { skipNameGate: true, skipAudioGate: true });
+    }
+    return false;
+  }
+
+  const title = document.getElementById('audioSetupTitle');
+  const continueBtn = document.getElementById('audioSetupContinueBtn');
+  const cancelBtn = document.getElementById('audioSetupCancelBtn');
+  const radios = [...overlay.querySelectorAll('input[name="audioMode"]')];
+
+  if (title) title.textContent = getAudioSetupPrompt();
+  if (continueBtn) {
+    continueBtn.textContent = pcAudioSetupIsOnboarding ? 'Begin the Prompt Lab' : 'Save audio settings';
+    continueBtn.disabled = pcAudioSetupIsOnboarding;
+  }
+  if (cancelBtn) cancelBtn.hidden = pcAudioSetupIsOnboarding;
+
+  radios.forEach(radio => {
+    radio.checked = !pcAudioSetupIsOnboarding && radio.value === pcAudioMode;
+  });
+
+  overlay.hidden = false;
+  overlay.setAttribute('aria-hidden', 'false');
+  overlay.classList.add('visible');
+  document.body.classList.add('pc-audio-setup-open');
+
+  setTimeout(() => {
+    const selected = overlay.querySelector('input[name="audioMode"]:checked');
+    (selected || radios[0] || continueBtn)?.focus();
+  }, 80);
+  return false;
+}
+
+function selectAudioPreference(mode) {
+  const valid = ['full', 'voices', 'silent'];
+  const continueBtn = document.getElementById('audioSetupContinueBtn');
+  if (continueBtn) continueBtn.disabled = !valid.includes(mode);
+}
+
+function hideAudioSetup() {
+  const overlay = document.getElementById('audioSetupOverlay');
+  if (!overlay) return;
+
+  overlay.classList.remove('visible');
+  overlay.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('pc-audio-setup-open');
+  setTimeout(() => { overlay.hidden = true; }, 220);
+}
+
+function closeAudioSetup() {
+  if (pcAudioSetupIsOnboarding) return false;
+  hideAudioSetup();
+  setTimeout(() => pcAudioSetupLastFocused?.focus?.(), 240);
+  return false;
+}
+
+function submitAudioPreference(event) {
+  event?.preventDefault?.();
+  const selected = document.querySelector('input[name="audioMode"]:checked');
+  if (!selected) return false;
+
+  applyAudioMode(selected.value);
+  pcAudioPreferenceConfirmed = true;
+  const wasOnboarding = pcAudioSetupIsOnboarding;
+  hideAudioSetup();
+
+  if (wasOnboarding) {
+    const pendingIndex = pcPendingScenarioIndex;
+    pcPendingScenarioIndex = null;
+    if (Number.isInteger(pendingIndex)) {
+      setTimeout(() => launchScenarioFromMenu(pendingIndex, {
+        skipNameGate: true,
+        skipAudioGate: true
+      }), 240);
+    }
+  } else {
+    setTimeout(() => pcAudioSetupLastFocused?.focus?.(), 240);
+  }
+  return false;
+}
+
+window.addEventListener('keydown', event => {
+  const overlay = document.getElementById('audioSetupOverlay');
+  if (!overlay || overlay.hidden || !overlay.classList.contains('visible')) return;
+
+  if (event.key === 'Escape' && !pcAudioSetupIsOnboarding) {
+    event.preventDefault();
+    closeAudioSetup();
+  }
+});
 
 function updatePixelWelcomeForName() {
   if (playerName !== 'You') {
@@ -174,9 +287,6 @@ function getInitials(name) {
 function startGame() {
   if (window.pcGameStarted) return;
   window.pcGameStarted = true;
-
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!reducedMotion) initMusic();
 
   // S1 remains rendered behind the menu as the safe default, but its VN intro
   // does not begin until the learner actually chooses a scenario.
@@ -202,55 +312,145 @@ const SURVEY_MODE   = 'sheets';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbylnSseQkSsPNKSjqoU2ui6yFa62YslQEq-nRyeC8MZFVnlmv-XYoi2EUJPZGvnKU1z/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 const PC_APP_SCHEMA_VERSION = 'V121';
-const PC_APP_BUILD_LABEL = 'ORGANIZED_ASSETS_V137';
+const PC_APP_BUILD_LABEL = 'IMAGE_PATH_FIX_V140';
 console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 // ══════════════════════════════════════════════════════
 //  ASSET PATHS
-//  Keep runtime asset locations here so future character and scenario files
-//  can be reorganized without hunting through the application code.
+//  Resolve every runtime asset from the project root, not from whichever URL
+//  the browser happens to treat as the current document. This keeps images
+//  working in nested hosting folders, Live Server, and copied project builds.
 // ══════════════════════════════════════════════════════
+const PC_APP_SCRIPT_URL = (() => {
+  const script = [...document.scripts].find(item => /(?:^|\/)functions\/app\.js(?:[?#]|$)/.test(item.src));
+  return script?.src || new URL('functions/app.js', document.baseURI).href;
+})();
+
+const PC_PROJECT_ROOT_URL = new URL('../', PC_APP_SCRIPT_URL);
+
+function pcProjectUrl(path = '') {
+  const cleanPath = String(path).replace(/^\.\//, '').replace(/^\//, '');
+  return new URL(cleanPath, PC_PROJECT_ROOT_URL).href;
+}
+
+function pcUseImageFallback(img, fallback = '') {
+  if (!img || img.dataset.pcFallbackApplied === 'true') return;
+  const fallbackPath = fallback || img.dataset.pcFallback || '';
+  if (!fallbackPath) return;
+  img.dataset.pcFallbackApplied = 'true';
+  img.src = /^([a-z]+:|data:|blob:)/i.test(fallbackPath)
+    ? fallbackPath
+    : pcProjectUrl(fallbackPath);
+}
+
+function pcSetImageSource(img, primary, fallback = '') {
+  if (!img || !primary) return;
+  img.dataset.pcFallback = fallback || '';
+  img.dataset.pcFallbackApplied = 'false';
+  img.onerror = () => pcUseImageFallback(img, fallback);
+  img.src = /^([a-z]+:|data:|blob:)/i.test(primary)
+    ? primary
+    : pcProjectUrl(primary);
+}
+
+function pcHydrateStaticImages() {
+  document.querySelectorAll('img[data-pc-image]').forEach(img => {
+    pcSetImageSource(img, img.dataset.pcImage, img.dataset.pcFallback || '');
+  });
+}
+
+window.pcProjectUrl = pcProjectUrl;
+window.pcUseImageFallback = pcUseImageFallback;
+window.pcSetImageSource = pcSetImageSource;
+
 const ASSETS = Object.freeze({
   images: Object.freeze({
     backgrounds: Object.freeze({
-      app: 'assets/images/backgrounds/app-background.png',
-      classroom: 'assets/images/backgrounds/classroom.png'
+      app: pcProjectUrl('assets/images/backgrounds/app-background.png'),
+      classroom: pcProjectUrl('assets/images/backgrounds/classroom.png')
     }),
     professorPixel: Object.freeze({
-      neutral: 'assets/images/characters/professor-pixel/neutral.png',
-      thinking: 'assets/images/characters/professor-pixel/thinking.png',
-      excited: 'assets/images/characters/professor-pixel/excited.png',
-      encouraging: 'assets/images/characters/professor-pixel/encouraging.png',
-      skeptical: 'assets/images/characters/professor-pixel/skeptical.png',
-      proud: 'assets/images/characters/professor-pixel/proud.png'
+      neutral: pcProjectUrl('assets/images/characters/professor-pixel/neutral.png'),
+      thinking: pcProjectUrl('assets/images/characters/professor-pixel/thinking.png'),
+      excited: pcProjectUrl('assets/images/characters/professor-pixel/excited.png'),
+      encouraging: pcProjectUrl('assets/images/characters/professor-pixel/encouraging.png'),
+      skeptical: pcProjectUrl('assets/images/characters/professor-pixel/skeptical.png'),
+      proud: pcProjectUrl('assets/images/characters/professor-pixel/proud.png')
+    }),
+    students: Object.freeze({
+      jordan: Object.freeze({
+        neutral: pcProjectUrl('assets/images/characters/students/jordan/neutral.png'),
+        uncertain: pcProjectUrl('assets/images/characters/students/jordan/uncertain.png'),
+        frustrated: pcProjectUrl('assets/images/characters/students/jordan/frustrated.png'),
+        thinking: pcProjectUrl('assets/images/characters/students/jordan/thinking.png'),
+        confident: pcProjectUrl('assets/images/characters/students/jordan/confident.png')
+      })
     }),
     scenes: Object.freeze({
-      0: 'assets/images/scenes/scenario-01-engagement/scene.png',
-      1: 'assets/images/scenes/scenario-02-metacognition/scene.png',
-      2: 'assets/images/scenes/scenario-03-authentic-assessment/scene.png',
-      3: 'assets/images/scenes/scenario-04-sync-bias/scene.png',
-      4: 'assets/images/scenes/scenario-05-hallucination-hunt/scene.png',
-      5: 'assets/images/scenes/scenario-06-predict-output/scene.png',
-      complete: 'assets/images/scenes/completion/all-scenarios-complete.png'
+      0: pcProjectUrl('assets/images/scenes/scenario-01-engagement/scene.png'),
+      1: pcProjectUrl('assets/images/scenes/scenario-02-metacognition/scene.png'),
+      2: pcProjectUrl('assets/images/scenes/scenario-03-authentic-assessment/scene.png'),
+      3: pcProjectUrl('assets/images/scenes/scenario-04-sync-bias/scene.png'),
+      4: pcProjectUrl('assets/images/scenes/scenario-05-hallucination-hunt/scene.png'),
+      5: pcProjectUrl('assets/images/scenes/scenario-06-predict-output/scene.png'),
+      complete: pcProjectUrl('assets/images/scenes/completion/all-scenarios-complete.png')
     })
   }),
   audio: Object.freeze({
     music: Object.freeze({
-      background: 'assets/audio/music/background.mp3'
+      background: pcProjectUrl('assets/audio/music/background.mp3')
     }),
     professorPixel: Object.freeze({
-      welcome: 'assets/audio/voice/professor-pixel/system/welcome.mp3',
-      vague: 'assets/audio/voice/professor-pixel/feedback/vague.mp3',
-      decent: 'assets/audio/voice/professor-pixel/feedback/decent.mp3',
-      strong: 'assets/audio/voice/professor-pixel/feedback/strong.mp3',
-      scenarioComplete: 'assets/audio/voice/professor-pixel/completion/scenario-complete.mp3',
-      allComplete: 'assets/audio/voice/professor-pixel/completion/all-complete.mp3',
-      scenarioIntro0: 'assets/audio/voice/professor-pixel/scenario-01/intro.mp3',
-      reflectionOpen: 'assets/audio/voice/professor-pixel/reflection/open.mp3'
+      welcome: pcProjectUrl('assets/audio/voice/professor-pixel/system/welcome.mp3'),
+      vague: pcProjectUrl('assets/audio/voice/professor-pixel/feedback/vague.mp3'),
+      decent: pcProjectUrl('assets/audio/voice/professor-pixel/feedback/decent.mp3'),
+      strong: pcProjectUrl('assets/audio/voice/professor-pixel/feedback/strong.mp3'),
+      scenarioComplete: pcProjectUrl('assets/audio/voice/professor-pixel/completion/scenario-complete.mp3'),
+      allComplete: pcProjectUrl('assets/audio/voice/professor-pixel/completion/all-complete.mp3'),
+      scenarioIntro0: pcProjectUrl('assets/audio/voice/professor-pixel/scenario-01/intro.mp3'),
+      reflectionOpen: pcProjectUrl('assets/audio/voice/professor-pixel/reflection/open.mp3')
     })
   })
 });
 
+const LEGACY_ASSETS = Object.freeze({
+  images: Object.freeze({
+    backgrounds: Object.freeze({
+      app: 'images/background.png',
+      classroom: 'images/classroom-bg.png'
+    }),
+    professorPixel: Object.freeze({
+      neutral: 'images/pixel-neutral.png',
+      thinking: 'images/pixel-thinking.png',
+      excited: 'images/pixel-excited.png',
+      encouraging: 'images/pixel-encouraging.png',
+      skeptical: 'images/pixel-skeptical.png',
+      proud: 'images/pixel-proud.png'
+    }),
+    students: Object.freeze({
+      jordan: Object.freeze({
+        neutral: 'images/characters/students/jordan/neutral.png',
+        uncertain: 'images/characters/students/jordan/uncertain.png',
+        frustrated: 'images/characters/students/jordan/frustrated.png',
+        thinking: 'images/characters/students/jordan/thinking.png',
+        confident: 'images/characters/students/jordan/confident.png'
+      })
+    }),
+    scenes: Object.freeze({
+      0: 'images/scene-s1.png',
+      1: 'images/scene-s2.png',
+      2: 'images/scene-s3.png',
+      3: 'images/scene-s4.png',
+      4: 'images/scene-s5.png',
+      5: 'images/scene-s6.png',
+      complete: 'images/scene-complete.png'
+    })
+  })
+});
+
+// Make CSS background paths use the same project-root resolution as JavaScript.
+document.documentElement.style.setProperty('--pc-app-background', `url("${ASSETS.images.backgrounds.app}")`);
+document.documentElement.style.setProperty('--pc-app-background-legacy', `url("${pcProjectUrl(LEGACY_ASSETS.images.backgrounds.app)}")`);
 
 
 // Robust Google Sheets poster.
@@ -435,6 +635,16 @@ const scenarioData = Array.from({ length: SCENARIO_COUNT }, (_, index) => {
     oscqrLit: '',
   };
 
+  if (index === SCENARIO_INDEX.METACOGNITION) {
+    return {
+      ...base,
+      diagnosisAttempts: [],
+      diagnosisFinal: [],
+      evidenceAttempts: [],
+      evidenceFinal: [],
+      openingCheckpointReached: false,
+    };
+  }
   if (index === SCENARIO_INDEX.HALLUCINATION) {
     return { ...base, selfReport: '' };
   }
@@ -739,85 +949,138 @@ const sounds = audioReady ? {
   reflectionOpen:    new Howl({ src: [ASSETS.audio.professorPixel.reflectionOpen],   volume: 0.9 })
 } : {};
 
-// Narration sounds that should not overlap each other
+// Narration sounds should not overlap one another.
 const NARRATION_KEYS = new Set(['welcome','vague','decent','strong','scenarioComplete','allComplete','scenarioIntro0','reflectionOpen']);
 let _currentNarration = null;
 
 function playSound(name) {
-  if (!audioReady || !sounds[name]) return;
-  // Stop any currently playing narration before starting a new one
+  if (!audioPreferences.voicesEnabled || !audioReady || !sounds[name]) return;
   if (NARRATION_KEYS.has(name)) {
-    if (_currentNarration && _currentNarration !== sounds[name]) {
-      _currentNarration.stop();
-    }
+    if (_currentNarration && _currentNarration !== sounds[name]) _currentNarration.stop();
     _currentNarration = sounds[name];
   }
   sounds[name].play();
 }
 
 // ── BACKGROUND MUSIC SYSTEM ───────────────────────────
-// Lo-fi background track: assets/audio/music/background.mp3
-// Recommended source: pixabay.com/music — search "lofi study"
-// Pick a CC0 track, download as MP3, rename to background.mp3
-// Fades in during VN moments, fades to barely-there during gameplay
+const MUSIC_VOL_VN   = 0.35;
+const MUSIC_VOL_GAME = 0.08;
+const MUSIC_FADE_MS  = 2000;
 
-const MUSIC_VOL_VN   = 0.35;  // volume during VN overlay
-const MUSIC_VOL_GAME = 0.08;  // near-silent during gameplay
-const MUSIC_FADE_MS  = 2000;  // fade duration ms
-
-let bgMusic      = null;
-let musicEnabled = false;
-let musicMuted   = false;
-let musicReady   = false;
+let bgMusic = null;
+let musicPlaybackStarted = false;
+let musicReady = false;
 
 function initMusic() {
-  if (bgMusic) return;
-  if (typeof Howl === 'undefined') return;
+  if (bgMusic || !audioPreferences.musicEnabled || typeof Howl === 'undefined') return;
   bgMusic = new Howl({
     src: [ASSETS.audio.music.background],
     loop: true,
     volume: 0,
-    html5: true,        // required for mobile autoplay
+    html5: true,
     onload: () => { musicReady = true; },
-    onloaderror: () => { bgMusic = null; }  // file not found — silent fail
+    onloaderror: () => { bgMusic = null; }
   });
 }
 
 function musicFadeTo(targetVol, durationMs) {
-  if (!bgMusic || !musicReady || musicMuted) return;
+  if (!audioPreferences.musicEnabled || !bgMusic) return;
   bgMusic.fade(bgMusic.volume(), targetVol, durationMs);
 }
 
 function musicStartVN() {
-  if (!bgMusic || musicMuted) return;
-  if (!musicEnabled) {
-    musicEnabled = true;
+  if (!audioPreferences.musicEnabled) return;
+  initMusic();
+  if (!bgMusic) return;
+
+  if (!musicPlaybackStarted) {
+    musicPlaybackStarted = true;
     bgMusic.play();
-    bgMusic.fade(0, MUSIC_VOL_VN, MUSIC_FADE_MS);
-  } else {
-    musicFadeTo(MUSIC_VOL_VN, MUSIC_FADE_MS);
+    bgMusic.volume(0);
   }
+  musicFadeTo(MUSIC_VOL_VN, MUSIC_FADE_MS);
 }
 
 function musicEndVN() {
+  if (!audioPreferences.musicEnabled) return;
   musicFadeTo(MUSIC_VOL_GAME, MUSIC_FADE_MS);
 }
 
-function toggleMusic() {
-  const btn = document.getElementById('musicToggle');
-  musicMuted = !musicMuted;
-  btn.classList.toggle('muted', musicMuted);
-  btn.setAttribute('aria-label', musicMuted ? 'Unmute background music' : 'Mute background music');
-  btn.textContent = musicMuted ? '🔇' : '🎵';
-  if (bgMusic && musicReady) {
-    if (musicMuted) {
-      bgMusic.fade(bgMusic.volume(), 0, 600);
-    } else if (musicEnabled) {
-      const isVNOpen = document.getElementById('vnOverlay')?.classList.contains('active');
-      bgMusic.fade(0, isVNOpen ? MUSIC_VOL_VN : MUSIC_VOL_GAME, 600);
-    }
+function stopAutomaticNarration() {
+  if (_currentNarration) {
+    try { _currentNarration.stop(); } catch (error) {}
+    _currentNarration = null;
+  }
+  Object.values(sounds).forEach(sound => {
+    try { sound.stop(); } catch (error) {}
+  });
+}
+
+function stopBackgroundMusic() {
+  if (!bgMusic) return;
+  try {
+    bgMusic.fade(bgMusic.volume(), 0, 350);
+    setTimeout(() => {
+      try { bgMusic.pause(); } catch (error) {}
+      musicPlaybackStarted = false;
+    }, 380);
+  } catch (error) {
+    try { bgMusic.pause(); } catch (_) {}
+    musicPlaybackStarted = false;
   }
 }
+
+function updateAudioSettingsButton() {
+  const btn = document.getElementById('musicToggle');
+  if (!btn) return;
+
+  const icon = pcAudioMode === 'full' ? '🔊' : pcAudioMode === 'voices' ? '🗣️' : '🔇';
+  const label = getAudioModeLabel();
+  btn.textContent = icon;
+  btn.classList.toggle('muted', pcAudioMode === 'silent');
+  btn.classList.toggle('voices-only', pcAudioMode === 'voices');
+  btn.classList.toggle('full-audio', pcAudioMode === 'full');
+  btn.setAttribute('aria-label', `Open audio settings. Current setting: ${label}`);
+  btn.title = `Audio settings: ${label}`;
+}
+
+function applyAudioMode(mode) {
+  const validMode = ['full', 'voices', 'silent'].includes(mode) ? mode : 'silent';
+  pcAudioMode = validMode;
+  audioPreferences.voicesEnabled = validMode === 'full' || validMode === 'voices';
+  audioPreferences.musicEnabled = validMode === 'full';
+
+  if (!audioPreferences.voicesEnabled) stopAutomaticNarration();
+
+  if (!audioPreferences.musicEnabled) {
+    stopBackgroundMusic();
+  } else {
+    initMusic();
+
+    // Begin the music stream at zero volume during the learner's explicit
+    // selection click. This satisfies browser audio-unlock rules without
+    // making noise before the scenario opens.
+    if (bgMusic && !musicPlaybackStarted) {
+      musicPlaybackStarted = true;
+      bgMusic.play();
+      bgMusic.volume(0);
+    }
+
+    if (pcScenarioHasLaunched) {
+      const vnIsOpen = document.getElementById('vnOverlay')?.classList.contains('active');
+      if (vnIsOpen) musicStartVN();
+      else musicFadeTo(MUSIC_VOL_GAME, 600);
+    }
+  }
+
+  updateAudioSettingsButton();
+}
+
+// Backward-compatible name retained for any old inline references.
+function toggleMusic() {
+  return showAudioSetup({ onboarding: false });
+}
+
 
 // ══════════════════════════════════════════════════════
 //  SCENARIOS
@@ -838,7 +1101,7 @@ When the instructor writes a prompt, respond with a practical, course-ready disc
 After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Student Interaction, Real-World Context, Inclusive Design, Measurable Outcomes.
 Coaching: vague prompts get generic outputs with gentle guidance. Specific prompts with learner context, course level, and format constraints get excellent, usable outputs with explicit praise.`
   },
-  { desc: "Scenario 2 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
+  { desc: "Mission: Listen to Jordan, diagnose the missing learning process, and distinguish metacognitive evidence from generic reflection.", oscqr: [], system: "" },
   { desc: "Scenario 3 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
   { desc: "Scenario 4 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
   { desc: "Scenario 5 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
@@ -873,9 +1136,9 @@ const SCENARIO_UI = [
     tabLabel: 'S2: Metacognition',
     missionTitle: 'Find the metacognitive thinker.',
     missionCopy: 'Listen to a student, identify the missing thinking move, audit Claude\'s reflection activity, repair it, and hear how the student\'s thinking changes.',
-    boardText: 'Scenario 2 is being rebuilt from a clean shell.',
-    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Next in development',
+    boardText: 'Jordan is completing the work, but he cannot explain what helped, what failed, or what he should try next.',
+    inputMode: 'scenario-2', inputVisible: true, supportsPrompt: false,
+    implemented: true, developmentStatus: 'Opening playable',
     plannedLoop: ['Listen to the student', 'Identify the missing thinking move', 'Audit Claude\'s activity', 'Repair one weak element', 'Hear the changed student response']
   },
   {
@@ -1103,6 +1366,13 @@ function launchScenarioFromMenu(index, options = {}) {
     return false;
   }
 
+  if (!pcAudioPreferenceConfirmed && options.skipAudioGate !== true) {
+    pcPendingScenarioIndex = index;
+    closeMainMenu({ force: true });
+    showAudioSetup({ onboarding: true });
+    return false;
+  }
+
   const firstLaunch = !pcScenarioHasLaunched;
   pcScenarioHasLaunched = true;
   pcMainMenuInitialOpen = false;
@@ -1175,8 +1445,9 @@ function pixelBadgeSetExpr(expr) {
   const src = PIXEL_EXPR[expr] || PIXEL_EXPR.neutral;
   const img = document.getElementById('pixelBadgeImg');
   const coachImg = document.getElementById('pixelCoachImg');
-  img.src = src;
-  if (coachImg) coachImg.src = src;
+  const fallback = LEGACY_ASSETS.images.professorPixel[expr] || LEGACY_ASSETS.images.professorPixel.neutral;
+  pcSetImageSource(img, src, fallback);
+  if (coachImg) pcSetImageSource(coachImg, src, fallback);
   img.classList.remove('reacting');
   void img.offsetWidth;
   img.classList.add('reacting');
@@ -1303,6 +1574,313 @@ function renderScenarioPlaceholder(index) {
   area.scrollTop = 0;
 }
 
+
+// ══════════════════════════════════════════════════════
+//  SCENARIO 2 — METACOGNITION DETECTIVE OPENING
+//  Vertical slice: Jordan VN introduction, diagnosis, and evidence sorting.
+// ══════════════════════════════════════════════════════
+const S2_DIAGNOSIS_OPTIONS = [
+  { id: 'motivation', label: 'Jordan needs stronger motivation to complete assignments.' },
+  { id: 'content', label: 'Jordan needs a clearer explanation of the course content.' },
+  { id: 'identify_strategy', label: 'Jordan needs to identify which learning strategy he used.' },
+  { id: 'evaluate_strategy', label: 'Jordan needs to evaluate whether that strategy actually helped.' },
+  { id: 'grading', label: 'Jordan needs more detailed information about the grading criteria.' },
+  { id: 'comparison', label: 'Jordan needs to compare his performance with classmates.' },
+  { id: 'transfer', label: 'Jordan needs to decide when an effective strategy should be used again.' },
+  { id: 'encouragement', label: 'Jordan needs more encouragement from the instructor.' },
+  { id: 'time', label: 'Jordan needs additional time to complete the assignment.' },
+  { id: 'difficulty', label: 'Jordan needs a more difficult assignment.' },
+];
+
+const S2_EVIDENCE_RESPONSES = [
+  { id: 'a', tag: 'A', title: 'Emotional reaction', text: 'The assignment was frustrating, but I was relieved when I finished.' },
+  { id: 'b', tag: 'B', title: 'Performance awareness', text: 'I earned a higher score than I did on the previous assignment.' },
+  { id: 'c', tag: 'C', title: 'Strategy identification', text: 'I made a comparison chart before answering the questions.' },
+  { id: 'd', tag: 'D', title: 'Monitoring', text: 'Halfway through, I noticed I could define each concept but still could not explain the difference between them.' },
+  { id: 'e', tag: 'E', title: 'Evaluation and adjustment', text: 'Rereading was not helping me compare the concepts, so I switched to creating examples and checking whether each example fit.' },
+  { id: 'f', tag: 'F', title: 'Transfer', text: 'The examples helped me notice the differences, so I will use that strategy before the next quiz.' },
+];
+
+function getS2Data() {
+  const data = scenarioData[SCENARIO_INDEX.METACOGNITION];
+  if (!Array.isArray(data.diagnosisAttempts)) data.diagnosisAttempts = [];
+  if (!Array.isArray(data.evidenceAttempts)) data.evidenceAttempts = [];
+  if (!Array.isArray(data.diagnosisFinal)) data.diagnosisFinal = [];
+  if (!Array.isArray(data.evidenceFinal)) data.evidenceFinal = [];
+  return data;
+}
+
+function buildS2JordanEvidenceHTML() {
+  return `
+    <aside class="s2-jordan-card" aria-label="Evidence from Jordan">
+      <img src="${ASSETS.images.students.jordan.uncertain}" alt="Jordan, an adult online learner, looking uncertain" />
+      <div class="s2-jordan-card-copy">
+        <div class="s2-kicker">Student evidence</div>
+        <h3>What Jordan told us</h3>
+        <blockquote>“I reread the chapter a few times. Some parts finally made more sense, but I couldn’t tell you what actually helped.”</blockquote>
+        <p>He completed the assignment and earned a better grade, but he cannot explain the learning process that produced it.</p>
+      </div>
+    </aside>`;
+}
+
+function renderS2Standby(container) {
+  if (!container) container = document.getElementById('inputContainer');
+  if (!container) return;
+  container.className = 's2-workbench';
+  container.style.display = 'flex';
+  container.innerHTML = `
+    <div class="s2-stage">
+      ${buildScenarioMissionHTML(SCENARIO_INDEX.METACOGNITION)}
+      <section class="s2-standby-card" aria-live="polite">
+        <div class="s2-kicker">Case file loading</div>
+        <h2>Listen before you diagnose.</h2>
+        <p>Pixel and Jordan will introduce the case. The first decision appears when their conversation ends.</p>
+      </section>
+    </div>`;
+}
+
+function renderS2DiagnosisActivity() {
+  const container = document.getElementById('inputContainer');
+  if (!container || scenarioIndex !== SCENARIO_INDEX.METACOGNITION) return;
+  container.className = 's2-workbench';
+  container.style.display = 'flex';
+  const options = S2_DIAGNOSIS_OPTIONS.map((option, index) => `
+    <label class="s2-choice-card" for="s2-diagnosis-${option.id}">
+      <input type="checkbox" id="s2-diagnosis-${option.id}" name="s2-diagnosis" value="${option.id}" />
+      <span class="s2-choice-number">${String(index + 1).padStart(2, '0')}</span>
+      <span class="s2-choice-copy">${esc(option.label)}</span>
+    </label>`).join('');
+
+  container.innerHTML = `
+    <div class="s2-stage">
+      ${buildScenarioMissionHTML(SCENARIO_INDEX.METACOGNITION, {
+        extraHTML: '<div class="s2-progress" aria-label="Scenario 2 progress"><span class="active">1 Diagnose</span><span>2 Examine evidence</span><span>3 Choose a thinking move</span></div>'
+      })}
+      <div class="s2-case-grid">
+        ${buildS2JordanEvidenceHTML()}
+        <section class="s2-task-card" aria-labelledby="s2DiagnosisTitle">
+          <div class="s2-kicker">Decision 1 · Diagnose the learning problem</div>
+          <h2 id="s2DiagnosisTitle">Which two instructional needs are most clearly supported by Jordan’s comments?</h2>
+          <p class="s2-task-instruction">Select exactly two. Several options sound educationally useful, but only two are the strongest diagnosis of this evidence.</p>
+          <div class="s2-choice-grid" id="s2DiagnosisChoices">${options}</div>
+          <div class="s2-selection-bar">
+            <span id="s2DiagnosisStatus" role="status" aria-live="polite">0 of 2 selected</span>
+            <button class="s2-primary-btn" id="s2DiagnosisSubmit" type="button" disabled>Submit diagnosis</button>
+          </div>
+          <div id="s2DiagnosisFeedback" aria-live="polite"></div>
+        </section>
+      </div>
+    </div>`;
+
+  wireS2ExactSelection({
+    rootId: 's2DiagnosisChoices',
+    inputName: 's2-diagnosis',
+    limit: 2,
+    statusId: 's2DiagnosisStatus',
+    submitId: 's2DiagnosisSubmit',
+    onSubmit: submitS2Diagnosis,
+  });
+  container.scrollTop = 0;
+  setTimeout(() => container.querySelector('input[name="s2-diagnosis"]')?.focus(), 80);
+}
+
+function wireS2ExactSelection({ rootId, inputName, limit, statusId, submitId, onSubmit }) {
+  const root = document.getElementById(rootId);
+  const status = document.getElementById(statusId);
+  const submit = document.getElementById(submitId);
+  if (!root || !status || !submit) return;
+  const inputs = [...root.querySelectorAll(`input[name="${inputName}"]`)];
+
+  const update = changed => {
+    let selected = inputs.filter(input => input.checked);
+    if (selected.length > limit && changed) {
+      changed.checked = false;
+      selected = inputs.filter(input => input.checked);
+      status.textContent = `Choose only ${limit}. ${selected.length} of ${limit} selected.`;
+    } else {
+      status.textContent = `${selected.length} of ${limit} selected`;
+    }
+    submit.disabled = selected.length !== limit;
+    inputs.forEach(input => input.closest('.s2-choice-card')?.classList.toggle('selected', input.checked));
+  };
+
+  inputs.forEach(input => input.addEventListener('change', () => update(input)));
+  submit.addEventListener('click', onSubmit);
+  update(null);
+}
+
+function getS2CheckedValues(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(input => input.value);
+}
+
+function classifyS2Diagnosis(selection) {
+  const selected = new Set(selection);
+  const correct = selected.has('identify_strategy') && selected.has('evaluate_strategy');
+  const correctCount = ['identify_strategy', 'evaluate_strategy'].filter(id => selected.has(id)).length;
+  if (correct) return { key: 's2_diagnosis_correct', level: 'strong', correctCount };
+  if (selected.has('transfer') && correctCount) return { key: 's2_diagnosis_transfer', level: 'partial', correctCount };
+  if (selected.has('motivation') || selected.has('encouragement')) return { key: 's2_diagnosis_motivation', level: 'reconsider', correctCount };
+  if (selected.has('grading') || selected.has('comparison')) return { key: 's2_diagnosis_grade', level: 'reconsider', correctCount };
+  return { key: 's2_diagnosis_evidence', level: correctCount ? 'partial' : 'reconsider', correctCount };
+}
+
+function submitS2Diagnosis() {
+  const selection = getS2CheckedValues('s2-diagnosis');
+  if (selection.length !== 2) return;
+  const result = classifyS2Diagnosis(selection);
+  const data = getS2Data();
+  const labels = selection.map(id => S2_DIAGNOSIS_OPTIONS.find(option => option.id === id)?.label || id);
+  data.attempts += 1;
+  data.diagnosisAttempts.push({ selection: [...selection], result: result.level, timestamp: new Date().toISOString() });
+  data.prompts.push(`S2 diagnosis: ${labels.join(' | ')}`);
+  data.finalResponse = pixelDialogue[result.key]?.[0]?.text || '';
+
+  document.querySelectorAll('input[name="s2-diagnosis"]').forEach(input => { input.disabled = true; });
+  const submit = document.getElementById('s2DiagnosisSubmit');
+  if (submit) submit.disabled = true;
+
+  playPixelSequence(result.key, () => renderS2DiagnosisFeedback(selection, result));
+}
+
+function renderS2DiagnosisFeedback(selection, result) {
+  const panel = document.getElementById('s2DiagnosisFeedback');
+  if (!panel) return;
+  const exact = result.key === 's2_diagnosis_correct';
+  const text = pixelDialogue[result.key]?.[0]?.text || '';
+  panel.innerHTML = `
+    <div class="s2-feedback-card ${exact ? 'is-strong' : 'is-developing'}">
+      <div class="s2-feedback-heading">${exact ? 'Diagnosis supported by the evidence' : 'A useful diagnosis needs one more pass'}</div>
+      <p>${esc(text)}</p>
+      <div class="s2-feedback-actions">
+        ${exact ? '' : '<button class="s2-secondary-btn" type="button" id="s2RetryDiagnosis">Revise diagnosis</button>'}
+        <button class="s2-primary-btn" type="button" id="s2ContinueEvidence">Examine student responses →</button>
+      </div>
+    </div>`;
+  document.getElementById('s2RetryDiagnosis')?.addEventListener('click', renderS2DiagnosisActivity);
+  document.getElementById('s2ContinueEvidence')?.addEventListener('click', () => {
+    const data = getS2Data();
+    data.diagnosisFinal = [...selection];
+    renderS2EvidenceActivity();
+  });
+  panel.querySelector('button')?.focus();
+}
+
+function renderS2EvidenceActivity() {
+  const container = document.getElementById('inputContainer');
+  if (!container) return;
+  const responses = S2_EVIDENCE_RESPONSES.map(response => `
+    <label class="s2-response-card" for="s2-evidence-${response.id}">
+      <input type="checkbox" id="s2-evidence-${response.id}" name="s2-evidence" value="${response.id}" />
+      <span class="s2-response-tag">${response.tag}</span>
+      <span class="s2-response-body">
+        <strong>${esc(response.title)}</strong>
+        <span>“${esc(response.text)}”</span>
+      </span>
+    </label>`).join('');
+
+  container.innerHTML = `
+    <div class="s2-stage">
+      ${buildScenarioMissionHTML(SCENARIO_INDEX.METACOGNITION, {
+        extraHTML: '<div class="s2-progress" aria-label="Scenario 2 progress"><span>1 Diagnose</span><span class="active">2 Examine evidence</span><span>3 Choose a thinking move</span></div>'
+      })}
+      <section class="s2-evidence-shell" aria-labelledby="s2EvidenceTitle">
+        <div class="s2-kicker">Decision 2 · Find the metacognitive thinker</div>
+        <h2 id="s2EvidenceTitle">Which two responses show the strongest metacognitive thinking?</h2>
+        <p class="s2-task-instruction">Select exactly two. One response is deliberately close because noticing a problem is meaningful, but it is not the entire learning cycle.</p>
+        <div class="s2-response-grid" id="s2EvidenceChoices">${responses}</div>
+        <div class="s2-selection-bar">
+          <span id="s2EvidenceStatus" role="status" aria-live="polite">0 of 2 selected</span>
+          <button class="s2-primary-btn" id="s2EvidenceSubmit" type="button" disabled>Submit evidence</button>
+        </div>
+        <div id="s2EvidenceFeedback" aria-live="polite"></div>
+      </section>
+    </div>`;
+
+  wireS2ExactSelection({
+    rootId: 's2EvidenceChoices',
+    inputName: 's2-evidence',
+    limit: 2,
+    statusId: 's2EvidenceStatus',
+    submitId: 's2EvidenceSubmit',
+    onSubmit: submitS2Evidence,
+  });
+  container.scrollTop = 0;
+  setTimeout(() => container.querySelector('input[name="s2-evidence"]')?.focus(), 80);
+}
+
+function submitS2Evidence() {
+  const selection = getS2CheckedValues('s2-evidence');
+  if (selection.length !== 2) return;
+  const selected = new Set(selection);
+  const exact = selected.has('e') && selected.has('f');
+  const includesMonitoring = selected.has('d');
+  const strongestCount = ['e', 'f'].filter(id => selected.has(id)).length;
+  const data = getS2Data();
+  const labels = selection.map(id => S2_EVIDENCE_RESPONSES.find(response => response.id === id)?.title || id);
+  data.attempts += 1;
+  data.evidenceAttempts.push({ selection: [...selection], exact, timestamp: new Date().toISOString() });
+  data.prompts.push(`S2 evidence: ${labels.join(' | ')}`);
+
+  document.querySelectorAll('input[name="s2-evidence"]').forEach(input => { input.disabled = true; });
+  const submit = document.getElementById('s2EvidenceSubmit');
+  if (submit) submit.disabled = true;
+
+  let heading = 'Keep distinguishing awareness from action.';
+  let copy = 'Some responses describe feelings, grades, or a strategy without evaluating what happened. Metacognition becomes stronger when the learner judges the strategy and makes a future decision.';
+  if (exact) {
+    heading = 'You found the strongest evidence.';
+    copy = 'Response E evaluates a strategy and changes course. Response F transfers the successful approach to a future task. Together they show a learner using evidence about learning to make a decision.';
+  } else if (includesMonitoring && strongestCount) {
+    heading = 'Monitoring is meaningful, but it is not the full cycle.';
+    copy = 'Response D shows Jordan noticing where understanding broke down. Responses E and F go further by evaluating a strategy, adjusting it, and deciding when to use the successful approach again.';
+  }
+  data.finalResponse = copy;
+
+  const panel = document.getElementById('s2EvidenceFeedback');
+  if (!panel) return;
+  panel.innerHTML = `
+    <div class="s2-feedback-card ${exact ? 'is-strong' : 'is-developing'}">
+      <div class="s2-feedback-heading">${esc(heading)}</div>
+      <p>${esc(copy)}</p>
+      <div class="s2-feedback-actions">
+        ${exact ? '' : '<button class="s2-secondary-btn" type="button" id="s2RetryEvidence">Review the responses</button>'}
+        <button class="s2-primary-btn" type="button" id="s2OpeningCheckpoint">Continue →</button>
+      </div>
+    </div>`;
+  document.getElementById('s2RetryEvidence')?.addEventListener('click', renderS2EvidenceActivity);
+  document.getElementById('s2OpeningCheckpoint')?.addEventListener('click', () => {
+    data.evidenceFinal = [...selection];
+    data.openingCheckpointReached = true;
+    renderS2OpeningCheckpoint();
+  });
+  panel.querySelector('button')?.focus();
+}
+
+function renderS2OpeningCheckpoint() {
+  const container = document.getElementById('inputContainer');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="s2-stage">
+      ${buildScenarioMissionHTML(SCENARIO_INDEX.METACOGNITION, {
+        extraHTML: '<div class="s2-progress" aria-label="Scenario 2 progress"><span>1 Diagnose</span><span>2 Examine evidence</span><span class="active">3 Choose a thinking move</span></div>'
+      })}
+      <section class="s2-checkpoint-card" aria-labelledby="s2CheckpointTitle">
+        <img src="${ASSETS.images.students.jordan.confident}" alt="Jordan looking more confident" />
+        <div>
+          <div class="s2-kicker">Opening vertical slice complete</div>
+          <h2 id="s2CheckpointTitle">The case is diagnosed.</h2>
+          <p>You identified the gap between completing work and understanding how learning happened. The next build will let the player choose whether Jordan needs to plan, monitor, evaluate, or transfer a strategy before Claude designs the activity.</p>
+          <div class="s2-feedback-actions">
+            <button class="s2-secondary-btn" type="button" onclick="switchScenario(1,document.querySelectorAll('.tab-btn')[1])">Replay S2 opening</button>
+            <button class="s2-primary-btn" type="button" onclick="openMainMenu('scenarios')">Return to Scenario Select</button>
+          </div>
+        </div>
+      </section>
+    </div>`;
+  container.querySelector('button')?.focus();
+}
+
+
 // ══════════════════════════════════════════════════════
 //  HALLUCINATION HUNT CRITICAL-THINKING HELPERS
 // ══════════════════════════════════════════════════════
@@ -1365,7 +1943,7 @@ function maybeShowNavCard(score) {
   appendScenarioNavCard({
     targetIndex: SCENARIO_INDEX.METACOGNITION,
     title: 'Scenario 1 is ready.',
-    subtitle: 'Scenario 2 is currently a clean development shell. You can preview its planned game loop or keep refining Scenario 1.',
+    subtitle: 'Scenario 2 now has a playable opening case with Jordan. You can begin the metacognition diagnosis or keep refining Scenario 1.',
     stayLabel: 'Keep practicing Scenario 1'
   });
 }
@@ -1820,7 +2398,9 @@ function closeClaudeConsultOverlay() {
   const overlay = document.getElementById('vnOverlay');
   pcClearAnalysisLayoutV122();
   if (overlay) overlay.classList.remove('active', 'claude-consult', 'claude-terminal-consult', 'claude-terminal-textmode', 'claude-prediction');
-  document.getElementById('vnCharacter')?.classList.remove('visible');
+  document.getElementById('vnCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
+  document.getElementById('vnStudentCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
+  overlay?.classList.remove('s2-dual-character');
   setClaudeShelfState('idle', 'idle');
   setClaudeTerminalTextMode(false);
   setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
@@ -1848,9 +2428,10 @@ function setClaudeShelfState(state = 'idle', label = '') {
   if (status) status.textContent = label || state;
 }
 
-function vnShow(expression, text, onComplete) {
-  // Add to queue
-  vnQueue.push({ expression, text, onComplete });
+function vnShow(expression, text, onComplete, meta = {}) {
+  // Add to queue. Meta keeps the shared VN system backward compatible while
+  // allowing S2 lines to identify Jordan as the speaker.
+  vnQueue.push({ expression, text, onComplete, ...meta });
   if (!vnTyping) vnPlayNext();
 }
 
@@ -1859,7 +2440,13 @@ function vnPlayNext() {
     setTimeout(() => {
       const overlay = document.getElementById('vnOverlay');
       overlay.classList.remove('active', 'claude-consult', 'claude-terminal-consult');
-      document.getElementById('vnCharacter').classList.remove('visible');
+      document.getElementById('vnCharacter').classList.remove('visible', 'is-active', 'is-inactive');
+      document.getElementById('vnStudentCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
+      const pixelCharacter = document.getElementById('vnCharacter');
+      const studentCharacter = document.getElementById('vnStudentCharacter');
+      if (pixelCharacter) pixelCharacter.style.removeProperty('display');
+      if (studentCharacter) studentCharacter.style.removeProperty('display');
+      overlay.classList.remove('s2-dual-character');
       document.getElementById('promptInput')?.focus();
       // Fade music down when VN closes
       musicEndVN();
@@ -1869,18 +2456,15 @@ function vnPlayNext() {
     return;
   }
 
-  const { expression, text, onComplete } = vnQueue.shift();
+  const { expression, text, onComplete, speaker = 'Professor Pixel', character = 'pixel' } = vnQueue.shift();
   vnOnComplete = onComplete || null;
   vnTyping = true;
 
   const overlay = document.getElementById('vnOverlay');
   overlay.classList.add('active');
 
-  // Normal VN lines are Professor Pixel speaking. Reset this every time so
-  // the previous Claude terminal label cannot leak into Pixel's reflection.
-  const speaker = document.getElementById('vnSpeaker');
-  if (speaker) speaker.textContent = 'Professor Pixel';
-
+  // Reset Claude modes, then configure the active VN speaker. S2 keeps Jordan
+  // opposite Pixel on wide screens and shows only the active speaker on small screens.
   setVNClaudeMode(false);
   setVNClaudeTerminalMode(false);
   setClaudeTerminalTextMode(false);
@@ -1889,10 +2473,9 @@ function vnPlayNext() {
   musicStartVN();
   setClaudeShelfState('idle', 'idle');
 
-  vnSetExpression(expression);
+  vnSetDialogueCharacter(character, expression, speaker);
 
   setTimeout(() => {
-    document.getElementById('vnCharacter').classList.add('visible');
     document.getElementById('vnDialogue').focus();
   }, 100);
 
@@ -1915,12 +2498,84 @@ function vnSetExpression(expr) {
   if (img.style.display !== 'none') {
     img.style.opacity = '0';
     setTimeout(() => {
-      img.src = src;
+      pcSetImageSource(img, src, LEGACY_ASSETS.images.professorPixel[expr] || LEGACY_ASSETS.images.professorPixel.neutral);
       img.style.opacity = '1';
     }, 150);
   } else {
-    img.src = src;
+    pcSetImageSource(img, src, LEGACY_ASSETS.images.professorPixel[expr] || LEGACY_ASSETS.images.professorPixel.neutral);
   }
+}
+
+
+function vnSetStudentExpression(expr) {
+  const img = document.getElementById('vnStudentPortrait');
+  const badge = document.getElementById('vnStudentExprBadge');
+  const expressions = ASSETS.images.students.jordan;
+  const src = expressions[expr] || expressions.neutral;
+  if (badge) badge.textContent = expr;
+  if (!img) return;
+  img.style.opacity = '0';
+  setTimeout(() => {
+    pcSetImageSource(img, src, LEGACY_ASSETS.images.students.jordan[expr] || LEGACY_ASSETS.images.students.jordan.neutral);
+    img.style.opacity = '1';
+  }, 120);
+}
+
+function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', speakerName = 'Professor Pixel') {
+  const overlay = document.getElementById('vnOverlay');
+  const pixel = document.getElementById('vnCharacter');
+  const student = document.getElementById('vnStudentCharacter');
+  const speaker = document.getElementById('vnSpeaker');
+  const dialogue = document.getElementById('vnDialogue');
+  const isJordan = character === 'jordan';
+  const useS2Cast = scenarioIndex === SCENARIO_INDEX.METACOGNITION && (isJordan || character === 'pixel');
+
+  if (speaker) speaker.textContent = speakerName || (isJordan ? 'Jordan' : 'Professor Pixel');
+  if (dialogue) dialogue.setAttribute('aria-label', `${speaker?.textContent || speakerName} is speaking. Press Space or Enter to continue.`);
+  overlay?.classList.toggle('s2-dual-character', useS2Cast);
+
+  if (useS2Cast) {
+    pixel?.classList.add('visible');
+    student?.classList.add('visible');
+    pixel?.classList.toggle('is-active', !isJordan);
+    pixel?.classList.toggle('is-inactive', isJordan);
+    student?.classList.toggle('is-active', isJordan);
+    student?.classList.toggle('is-inactive', !isJordan);
+  } else {
+    pixel?.classList.add('visible', 'is-active');
+    pixel?.classList.remove('is-inactive');
+    student?.classList.remove('visible', 'is-active', 'is-inactive');
+  }
+
+  pcApplyS2CastResponsive();
+  if (isJordan) vnSetStudentExpression(expression);
+  else vnSetExpression(expression);
+}
+
+function pcApplyS2CastResponsive() {
+  const overlay = document.getElementById('vnOverlay');
+  const pixel = document.getElementById('vnCharacter');
+  const student = document.getElementById('vnStudentCharacter');
+  const compact = window.matchMedia?.('(max-width: 900px), (max-height: 720px)').matches;
+  if (!overlay?.classList.contains('s2-dual-character')) {
+    if (pixel) pixel.style.display = '';
+    if (student) student.style.display = '';
+    return;
+  }
+  if (pixel) {
+    if (compact && pixel.classList.contains('is-inactive')) pixel.style.setProperty('display', 'none', 'important');
+    else pixel.style.removeProperty('display');
+  }
+  if (student) {
+    if (compact && student.classList.contains('is-inactive')) student.style.setProperty('display', 'none', 'important');
+    else student.style.removeProperty('display');
+  }
+}
+
+if (!window.pcS2CastResponsiveInstalled) {
+  window.pcS2CastResponsiveInstalled = true;
+  window.addEventListener('resize', pcApplyS2CastResponsive, { passive: true });
+  window.visualViewport?.addEventListener('resize', pcApplyS2CastResponsive, { passive: true });
 }
 
 function vnTypeWriter(text) {
@@ -2054,7 +2709,7 @@ function playPixelSequence(key, onDone) {
   // Queue all lines
   lines.forEach((line, idx) => {
     const isLast = idx === lines.length - 1;
-    vnShow(line.expr, line.text, isLast && onDone ? onDone : null);
+    vnShow(line.expr, line.text, isLast && onDone ? onDone : null, { speaker: line.speaker || 'Professor Pixel', character: line.character || 'pixel', id: line.id || '' });
   });
 }
 
@@ -2063,7 +2718,7 @@ function playPixelSequence(key, onDone) {
 //  Scene paths live in ASSETS.images.scenes. Add each new scenario image to
 //  its named folder and update the manifest once rather than scattering paths.
 // ══════════════════════════════════════════════════════
-function loadSceneImage(src) {
+function loadSceneImage(src, fallback = '') {
   const img = document.getElementById('vnBoardImg');
   const loading = document.getElementById('vnBoardLoading');
   if (!img) return;
@@ -2084,6 +2739,10 @@ function loadSceneImage(src) {
     img.classList.add('loaded');
   };
   test.onerror = () => {
+    if (fallback && test.src !== pcProjectUrl(fallback)) {
+      test.src = pcProjectUrl(fallback);
+      return;
+    }
     // A future scenario may not have final art yet. Fail silently and retain
     // the text-based smartboard rather than displaying a broken image icon.
     img.removeAttribute('src');
@@ -2097,9 +2756,11 @@ function loadSceneImage(src) {
 //  INIT
 // ══════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
+  pcHydrateStaticImages();
   // The main menu is the true application entry point. Scenario 1 is rendered
   // quietly behind it as a safe fallback, but no dialogue begins until the
   // learner chooses Start or selects a scenario.
+  updateAudioSettingsButton();
   startGame();
 
   // Safety check: if S1 content is still empty after load, render it again.
@@ -2156,7 +2817,10 @@ function playScenarioIntroduction(index) {
 
   const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
   overlay?.classList.add('scenario-intro-active');
-  const onDone = () => overlay?.classList.remove('scenario-intro-active');
+  const onDone = () => {
+    overlay?.classList.remove('scenario-intro-active');
+    if (index === SCENARIO_INDEX.METACOGNITION) renderS2DiagnosisActivity();
+  };
 
   if (window.scenarioIntroTimer) clearTimeout(window.scenarioIntroTimer);
   window.scenarioIntroTimer = setTimeout(() => {
@@ -2197,7 +2861,13 @@ function pcClearVNStateForScenarioSwitch() {
   }
 
   document.getElementById('vnDialogue')?.classList.remove('has-choices');
-  document.getElementById('vnCharacter')?.classList.remove('visible');
+  document.getElementById('vnCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
+  document.getElementById('vnStudentCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
+  const pixelCharacter = document.getElementById('vnCharacter');
+  const studentCharacter = document.getElementById('vnStudentCharacter');
+  if (pixelCharacter) pixelCharacter.style.removeProperty('display');
+  if (studentCharacter) studentCharacter.style.removeProperty('display');
+  overlay?.classList.remove('s2-dual-character');
   document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
 
   window.pendingPromptForPrediction = '';
@@ -2310,6 +2980,7 @@ function prepareScenarioShell(index) {
 
   document.body.classList.remove('s1-active', 's1-result-active', 's2-active', 's2-submitted');
   document.body.classList.toggle('s1-active', index === SCENARIO_INDEX.ENGAGEMENT && ui.implemented);
+  document.body.classList.toggle('s2-active', index === SCENARIO_INDEX.METACOGNITION && ui.implemented);
 
   const scenarioText = document.getElementById('scenarioText');
   const boardText = document.getElementById('vnBoardText');
@@ -2325,14 +2996,14 @@ function prepareScenarioShell(index) {
   renderOSCQR(scenario.oscqr || [], []);
 
   if (ui.implemented) {
-    loadSceneImage(ASSETS.images.scenes[index]);
+    loadSceneImage(ASSETS.images.scenes[index], LEGACY_ASSETS.images.scenes[index]);
   } else if (boardImage) {
     boardImage.src = '';
     boardImage.classList.remove('loaded');
   }
 
   const sceneBackground = document.getElementById('vnSceneBg');
-  if (sceneBackground) sceneBackground.src = ASSETS.images.backgrounds.classroom;
+  if (sceneBackground) pcSetImageSource(sceneBackground, ASSETS.images.backgrounds.classroom, LEGACY_ASSETS.images.backgrounds.classroom);
 }
 
 
@@ -2455,6 +3126,11 @@ function renderInputMode(idx) {
 
   if (idx === SCENARIO_INDEX.ENGAGEMENT) {
     renderGuidedBuilder(container);
+    return;
+  }
+
+  if (idx === SCENARIO_INDEX.METACOGNITION) {
+    renderS2Standby(container);
     return;
   }
 

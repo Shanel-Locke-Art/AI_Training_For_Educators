@@ -12,13 +12,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=137">
+<link rel="stylesheet" href="style.css?v=140">
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
-<script src="functions/dialogue.js?v=137"></script>
-<script src="functions/app.js?v=137"></script>
+<script src="functions/dialogue.js?v=140"></script>
+<script src="functions/app.js?v=140"></script>
 
 </head>
 
@@ -51,7 +51,7 @@
       autocomplete="given-name"
       onkeydown="if(event.key==='Enter'){event.preventDefault();submitName()}" />
     <button class="name-modal-btn" onclick="submitName()">
-      Let's get started →
+      Continue →
     </button>
     <button class="name-modal-skip" onclick="submitName(true)">
       Skip — just call me You
@@ -60,14 +60,82 @@
 </div>
 
 <!-- ══════════════════════════════════════════════════════
+     AUDIO SETUP MODAL
+     Purpose: Lets the learner choose automatic voices, music, or silence
+     after the optional name step. The same dialog can be reopened later.
+     Functions used: selectAudioPreference(), submitAudioPreference(),
+     closeAudioSetup()
+     ══════════════════════════════════════════════════════ -->
+<div class="audio-setup-overlay" id="audioSetupOverlay"
+     role="dialog" aria-modal="true"
+     aria-labelledby="audioSetupTitle"
+     aria-describedby="audioSetupHelp"
+     aria-hidden="true" hidden>
+  <div class="audio-setup-modal" role="document">
+    <div class="audio-setup-pixel" aria-hidden="true">
+      <img data-pc-image="assets/images/characters/professor-pixel/encouraging.png" data-pc-fallback="images/pixel-encouraging.png" alt="" />
+    </div>
+    <p class="audio-setup-speaker">Professor Pixel</p>
+    <h2 class="audio-setup-title" id="audioSetupTitle">
+      Ready? Choose what you’d like to hear in the Prompt Lab.
+    </h2>
+    <p class="audio-setup-help" id="audioSetupHelp">
+      PromptCraft stays silent until you choose. You can change this later from the audio button in the header.
+    </p>
+
+    <form id="audioSetupForm" onsubmit="submitAudioPreference(event)">
+      <fieldset class="audio-choice-fieldset">
+        <legend class="sr-only">Choose an audio experience</legend>
+
+        <label class="audio-choice-card">
+          <input type="radio" name="audioMode" value="full"
+                 onchange="selectAudioPreference(this.value)" />
+          <span class="audio-choice-copy">
+            <strong>Full audio</strong>
+            <span>Professor Pixel and student voices, plus background music.</span>
+          </span>
+        </label>
+
+        <label class="audio-choice-card">
+          <input type="radio" name="audioMode" value="voices"
+                 onchange="selectAudioPreference(this.value)" />
+          <span class="audio-choice-copy">
+            <strong>Voices only</strong>
+            <span>Recorded dialogue without background music.</span>
+          </span>
+        </label>
+
+        <label class="audio-choice-card">
+          <input type="radio" name="audioMode" value="silent"
+                 onchange="selectAudioPreference(this.value)" />
+          <span class="audio-choice-copy">
+            <strong>Keep it quiet</strong>
+            <span>No automatic audio. Every line remains visible as text.</span>
+          </span>
+        </label>
+      </fieldset>
+
+      <button class="audio-setup-primary" id="audioSetupContinueBtn"
+              type="submit" disabled>
+        Begin the Prompt Lab
+      </button>
+      <button class="audio-setup-cancel" id="audioSetupCancelBtn"
+              type="button" onclick="closeAudioSetup()" hidden>
+        Cancel
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
      DEV BAR — clean shell
-     S1 fill resets the playable baseline. S2–S8 open their development shells.
+     S1 fill resets the playable baseline. S2 opens its playable case; S3–S8 remain development shells.
 ══════════════════════════════════════════════════════ -->
 <div class="dev-bar" role="toolbar" aria-label="PromptCraft development shortcuts">
   <span class="dev-label">DEV</span>
   <button class="dev-btn" onclick="devGoScenario(0)">S1</button>
   <button class="dev-btn dev-btn-fill" onclick="devFillScenario(0)">S1 ✏️</button>
-  <button class="dev-btn" onclick="devGoScenario(1)">S2 shell</button>
+  <button class="dev-btn" onclick="devGoScenario(1)">S2</button>
   <button class="dev-btn" onclick="devGoScenario(2)">S3 shell</button>
   <button class="dev-btn" onclick="devGoScenario(3)">S4 shell</button>
   <button class="dev-btn" onclick="devGoScenario(4)">S5 shell</button>
@@ -79,8 +147,8 @@
 
 <!-- ══════════════════════════════════════════════════════
      MAIN GAME HEADER
-     Purpose: Persistent title, level, XP, music, and Ideas Wall link.
-     Functions used: toggleMusic()
+     Purpose: Persistent title, level, XP, audio settings, and Ideas Wall link.
+     Functions used: showAudioSetup()
      ══════════════════════════════════════════════════════ -->
 <header role="banner">
   <div class="logo">
@@ -104,9 +172,10 @@
             aria-label="Open main menu"
             title="Main menu">Menu</button>
     <button class="music-toggle" id="musicToggle"
-            onclick="toggleMusic()"
-            aria-label="Toggle background music"
-            title="Toggle music">🎵</button>
+            type="button"
+            onclick="showAudioSetup({onboarding:false})"
+            aria-label="Open audio settings. Current setting: Keep it quiet"
+            title="Audio settings: Keep it quiet">🔇</button>
     <a class="ideas-wall-btn" href="/wall.html" target="_blank" rel="noopener noreferrer"
        aria-label="Open the Ideas Wall">
       💡 Ideas Wall
@@ -285,7 +354,7 @@
 
     <div class="pc-main-menu-footer">
       <span id="mainMenuStatus">Select an option to begin.</span>
-      <span>Version 137</span>
+      <span>Version 139</span>
     </div>
   </div>
 </div>
@@ -347,7 +416,7 @@
      onkeydown="if(event.key==='Enter'||event.key===' '){pixelBadgeClick()}">
   <!-- Real portrait — shown when images exist -->
   <img class="pixel-badge-portrait" id="pixelBadgeImg"
-       src="assets/images/characters/professor-pixel/neutral.png"
+       data-pc-image="assets/images/characters/professor-pixel/neutral.png" data-pc-fallback="images/pixel-neutral.png"
        alt="Professor Pixel"
        onerror="this.style.display='none';document.getElementById('pixelBadgeFallback').style.display='flex';" />
   <!-- Fallback -->
@@ -358,7 +427,7 @@
 <!-- ── PROFESSOR PIXEL COACH CARD ──────────────────── -->
 <div class="pixel-coach-card" id="pixelCoachCard" role="status" aria-live="polite">
   <img class="pixel-coach-portrait" id="pixelCoachImg"
-       src="assets/images/characters/professor-pixel/neutral.png"
+       data-pc-image="assets/images/characters/professor-pixel/neutral.png" data-pc-fallback="images/pixel-neutral.png"
        alt="Professor Pixel"
        onerror="this.style.display='none';document.getElementById('pixelCoachFallback').style.display='flex';" />
   <div class="pixel-coach-fallback" id="pixelCoachFallback" style="display:none;">🧑‍🏫</div>
@@ -381,7 +450,7 @@
 <div class="vn-overlay" id="vnOverlay"
      role="dialog"
      aria-modal="true"
-     aria-label="Professor Pixel dialogue"
+     aria-label="PromptCraft character dialogue"
      aria-live="polite">
 
   <!-- VN SCENE STAGE: background, smartboard, Pixel, Claude visual systems -->
@@ -453,12 +522,23 @@
         <text x="100" y="310" text-anchor="middle" font-family="sans-serif" font-size="9" fill="rgba(168,213,181,0.6)">[placeholder — replace with your art]</text>
       </svg>
 
-      <img id="vnPortrait" src="assets/images/characters/professor-pixel/neutral.png"
+      <img id="vnPortrait" data-pc-image="assets/images/characters/professor-pixel/neutral.png" data-pc-fallback="images/pixel-neutral.png"
            alt=""
            aria-hidden="true"
            style="display:none;"
            onerror="this.style.display='none';document.getElementById('vnPortraitPlaceholder').style.display='block';"
            onload="this.style.display='block';document.getElementById('vnPortraitPlaceholder').style.display='none';" />
+    </div>
+
+
+
+    <!-- S2 STUDENT PORTRAIT: Jordan appears opposite Pixel during dialogue -->
+    <div class="vn-student-character" id="vnStudentCharacter" aria-hidden="true">
+      <div class="vn-expression-badge vn-student-expression-badge" id="vnStudentExprBadge">neutral</div>
+      <img id="vnStudentPortrait"
+           data-pc-image="assets/images/characters/students/jordan/neutral.png" data-pc-fallback="images/characters/students/jordan/neutral.png"
+           alt=""
+           aria-hidden="true" />
     </div>
 
     <!-- CLAUDE SHELF: legacy/ambient machine visual used by some VN states -->

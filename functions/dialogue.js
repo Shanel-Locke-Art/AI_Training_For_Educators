@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════════════════
-   PromptCraft — dialogue.js (v134 clean scenario shell)
-   Active runtime dialogue for shared systems and Scenario 1 only.
+   PromptCraft — dialogue.js (v138 S2 opening vertical slice)
+   Active runtime dialogue for shared systems, Scenario 1, and the Scenario 2 opening.
    Legacy Scenario 2–8 dialogue is preserved under archive/legacy-scenarios-v133/.
    ══════════════════════════════════════════════════════ */
 
@@ -98,6 +98,73 @@ window.pixelDialogue = {
       "text": "But the conversation dies after a single exchange. Let's figure out why.",
       "id": "p16"
     }
+  ],
+
+  "scenarioStart_metacognition": [
+    {
+      "speaker": "Professor Pixel",
+      "character": "pixel",
+      "expr": "neutral",
+      "text": "Meet Jordan. He submits every assignment on time, earns passing grades, and appears to be keeping up with the course.",
+      "id": "p86"
+    },
+    {
+      "speaker": "Jordan",
+      "character": "jordan",
+      "expr": "neutral",
+      "text": "I got an 84 on this assignment. That’s better than last time, so I guess something worked.",
+      "id": "jordan-s2-01"
+    },
+    {
+      "speaker": "Professor Pixel",
+      "character": "pixel",
+      "expr": "thinking",
+      "text": "A better result sounds promising. But it does not necessarily mean Jordan understands what produced it.",
+      "id": "p87"
+    },
+    {
+      "speaker": "Jordan",
+      "character": "jordan",
+      "expr": "uncertain",
+      "text": "I reread the chapter a few times. Some parts finally made more sense, but I couldn’t tell you what actually helped.",
+      "id": "jordan-s2-02"
+    },
+    {
+      "speaker": "Jordan",
+      "character": "jordan",
+      "expr": "frustrated",
+      "text": "When the next assignment starts, I’ll probably reread everything again and hope it works. That is more or less my entire academic strategy.",
+      "id": "jordan-s2-03"
+    },
+    {
+      "speaker": "Professor Pixel",
+      "character": "pixel",
+      "expr": "skeptical",
+      "text": "Jordan completed the work, so do not assume this is simply a motivation problem. Because his grade improved, the real problem is easy to overlook.",
+      "id": "p88"
+    },
+    {
+      "speaker": "Professor Pixel",
+      "character": "pixel",
+      "expr": "encouraging",
+      "text": "Listen to the evidence Jordan gave you. Choose the two instructional needs most clearly supported by his comments.",
+      "id": "p89"
+    }
+  ],
+  "s2_diagnosis_correct": [
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "Exactly. Jordan used a strategy, but he cannot name it clearly or judge whether it helped. Before he can improve the process, he needs to make that process visible.", "id": "p90" }
+  ],
+  "s2_diagnosis_transfer": [
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "You found an important part of the problem. Transfer matters, but Jordan first needs to identify and evaluate what happened during this task. Otherwise, his next plan is still a guess.", "id": "p91" }
+  ],
+  "s2_diagnosis_motivation": [
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "skeptical", "text": "Jordan completed the assignment and is actively trying to understand the result. His uncertainty is not evidence that he lacks motivation.", "id": "p92" }
+  ],
+  "s2_diagnosis_grade": [
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "Jordan already knows the outcome. What he cannot explain is the learning process that produced it.", "id": "p93" }
+  ],
+  "s2_diagnosis_evidence": [
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "Those concerns might matter in another case, but Jordan did not give us evidence for them. Stay with what he actually said rather than filling in the rest of his story for him.", "id": "p94" }
   ],
   "scoreReflection_0_1": [
     {
@@ -481,4 +548,22 @@ window.pixelAudioLabels = {
     "text": "Before we test this, connect your prompt back to the dead discussion board. Add: [missing items].",
     "notes": "Dynamic nudge. The missing items are inserted by the app."
   }
+};
+
+
+// S2 draft recording metadata. These files are planned but are not loaded until
+// completed recordings are placed at the listed paths.
+window.s2VoiceoverDrafts = {
+  p86: "assets/audio/voice/professor-pixel/scenario-02/p86.mp3",
+  p87: "assets/audio/voice/professor-pixel/scenario-02/p87.mp3",
+  p88: "assets/audio/voice/professor-pixel/scenario-02/p88.mp3",
+  p89: "assets/audio/voice/professor-pixel/scenario-02/p89.mp3",
+  p90: "assets/audio/voice/professor-pixel/scenario-02/p90.mp3",
+  p91: "assets/audio/voice/professor-pixel/scenario-02/p91.mp3",
+  p92: "assets/audio/voice/professor-pixel/scenario-02/p92.mp3",
+  p93: "assets/audio/voice/professor-pixel/scenario-02/p93.mp3",
+  p94: "assets/audio/voice/professor-pixel/scenario-02/p94.mp3",
+  "jordan-s2-01": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-01.mp3",
+  "jordan-s2-02": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-02.mp3",
+  "jordan-s2-03": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-03.mp3"
 };
