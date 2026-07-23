@@ -18,11 +18,7 @@
      PIXEL INLINE CHAT         ← flagged for dialogue.js next pass
      SCENARIO NAVIGATION
      SCENARIO UNLOCK
-     S4 — SYNC BIAS
-     S5 — HALLUCINATION HUNT
-     S6 — PREDICT THE OUTPUT
-     S7 — OVERRELIANCE
-     S8 — REFLECT AND REVISE
+     S2–S8 — CLEAN DEVELOPMENT SHELLS
      AUTOSAVE
      VN ENGINE                 ← flagged for dialogue.js next pass
      SCENE IMAGE LOADER
@@ -38,8 +34,7 @@
      COMPLETION
      REFLECTION ROOM
      DEV FUNCTIONS
-     S2 METACOGNITION          ← new content
-     S2 RESULT + REFLECTION    ← new content
+     CLEAN SCENARIO SHELLS    ← S2–S8 placeholders
 
    NOTE: Functions marked [→ dialogue.js] should move there
    once dialogue.js is reviewed. Kept here so game stays functional.
@@ -207,8 +202,55 @@ const SURVEY_MODE   = 'sheets';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbylnSseQkSsPNKSjqoU2ui6yFa62YslQEq-nRyeC8MZFVnlmv-XYoi2EUJPZGvnKU1z/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 const PC_APP_SCHEMA_VERSION = 'V121';
-const PC_APP_BUILD_LABEL = 'MAIN_MENU_V132_CLEANUP';
+const PC_APP_BUILD_LABEL = 'ORGANIZED_ASSETS_V137';
 console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
+
+// ══════════════════════════════════════════════════════
+//  ASSET PATHS
+//  Keep runtime asset locations here so future character and scenario files
+//  can be reorganized without hunting through the application code.
+// ══════════════════════════════════════════════════════
+const ASSETS = Object.freeze({
+  images: Object.freeze({
+    backgrounds: Object.freeze({
+      app: 'assets/images/backgrounds/app-background.png',
+      classroom: 'assets/images/backgrounds/classroom.png'
+    }),
+    professorPixel: Object.freeze({
+      neutral: 'assets/images/characters/professor-pixel/neutral.png',
+      thinking: 'assets/images/characters/professor-pixel/thinking.png',
+      excited: 'assets/images/characters/professor-pixel/excited.png',
+      encouraging: 'assets/images/characters/professor-pixel/encouraging.png',
+      skeptical: 'assets/images/characters/professor-pixel/skeptical.png',
+      proud: 'assets/images/characters/professor-pixel/proud.png'
+    }),
+    scenes: Object.freeze({
+      0: 'assets/images/scenes/scenario-01-engagement/scene.png',
+      1: 'assets/images/scenes/scenario-02-metacognition/scene.png',
+      2: 'assets/images/scenes/scenario-03-authentic-assessment/scene.png',
+      3: 'assets/images/scenes/scenario-04-sync-bias/scene.png',
+      4: 'assets/images/scenes/scenario-05-hallucination-hunt/scene.png',
+      5: 'assets/images/scenes/scenario-06-predict-output/scene.png',
+      complete: 'assets/images/scenes/completion/all-scenarios-complete.png'
+    })
+  }),
+  audio: Object.freeze({
+    music: Object.freeze({
+      background: 'assets/audio/music/background.mp3'
+    }),
+    professorPixel: Object.freeze({
+      welcome: 'assets/audio/voice/professor-pixel/system/welcome.mp3',
+      vague: 'assets/audio/voice/professor-pixel/feedback/vague.mp3',
+      decent: 'assets/audio/voice/professor-pixel/feedback/decent.mp3',
+      strong: 'assets/audio/voice/professor-pixel/feedback/strong.mp3',
+      scenarioComplete: 'assets/audio/voice/professor-pixel/completion/scenario-complete.mp3',
+      allComplete: 'assets/audio/voice/professor-pixel/completion/all-complete.mp3',
+      scenarioIntro0: 'assets/audio/voice/professor-pixel/scenario-01/intro.mp3',
+      reflectionOpen: 'assets/audio/voice/professor-pixel/reflection/open.mp3'
+    })
+  })
+});
+
 
 
 // Robust Google Sheets poster.
@@ -296,70 +338,23 @@ const USE_MOCK_CLAUDE = FORCE_MOCK_CLAUDE || (MOCK_CLAUDE_FOR_LOCAL && IS_LOCAL_
 // NOTE: Mock Claude text is dialogue/content-heavy. Move to dialogue.js in a later pass if desired.
 function mockClaudeText(payload, context = 'main') {
   const system = payload.system || '';
-  const lastUser = payload.messages?.slice().reverse().find(m => m.role === 'user')?.content || '';
-  const promptPreview = String(lastUser).replace(/\s+/g, ' ').slice(0, 180);
-  const sc = scenarios?.[scenarioIndex] || {};
-  const scenarioTitle = window.SCENARIO_UI?.[scenarioIndex]?.tabLabel || 'PromptCraft';
-
-  if (context === 's1_section') {
-    const sectionMatch = String(lastUser).match(/SECTION_BEING_REVIEWED:\s*([^\n]+)/i);
-    const section = sectionMatch ? sectionMatch[1].trim().toLowerCase() : 'section';
-    const responseMatch = String(lastUser).match(/USER_RESPONSE:\s*([\s\S]*?)(?:\n\nFULL_S1_CONTEXT:|$)/i);
-    const response = responseMatch ? responseMatch[1].trim() : '';
-    if (!response) return `**What is missing**\nThis section is empty, so Claude has nothing specific to work with yet.\n\n**Try this**\nAdd concrete details that connect directly to the dead discussion board problem.`;
-    if (section.includes('learner')) {
-      return `**What is working**\nYou are starting to give Claude a learner and course context. That helps the response avoid generic discussion advice.\n\n**What to strengthen**\nAdd anything that explains participation patterns: first-year students, asynchronous format, confidence level, workload, or why peer replies tend to be shallow.\n\n**Try this revision move**\nName the learner group and the online context in one sentence.`;
-    }
-    if (section.includes('fail') || section.includes('problem')) {
-      return `**What is working**\nThis section should diagnose the real failure instead of simply asking for a better discussion prompt.\n\n**What to strengthen**\nBe specific about what students are doing now: one-sentence posts, agreement-only replies, no evidence, no follow-up, or conversations stopping after the required reply.\n\n**Try this revision move**\nDescribe what a weak reply looks like so Claude knows what behavior to repair.`;
-    }
-    if (section.includes('interaction')) {
-      return `**What is working**\nThis is the repair mechanism. Claude needs to know how students should interact, not just that they should interact more.\n\n**What to strengthen**\nAsk for named peer-response moves such as build, challenge, compare, ask a follow-up question, or connect to evidence.\n\n**Try this revision move**\nTell Claude what each peer reply should do.`;
-    }
-    return `**What is working**\nThis section gives Claude the boundaries for a usable activity.\n\n**What to strengthen**\nAdd format limits, asynchronous expectations, number of replies, and what counts as a strong post or strong peer reply.\n\n**Try this revision move**\nDefine what success would look like in student behavior.`;
-  }
+  const lastUser = payload.messages?.slice().reverse().find(message => message.role === 'user')?.content || '';
 
   if (context === 'pixel' || system.includes('You are Professor Pixel')) {
     return `You gave Claude enough direction to produce a usable response, especially where your prompt named the actual teaching problem. The next improvement is to make the success criteria more visible so Claude knows what a strong student outcome should look like.\n\n*What would you want students to do, say, or produce that would prove the activity worked?*`;
   }
 
   if (context === 'growth' || system.includes('personalized growth summary')) {
-    return `Your PromptCraft run shows a developing pattern of experimentation: you moved from basic prompt construction toward more intentional revision and evaluation. Your strongest evidence of growth is the way you used context, constraints, and reflection to make later prompts more specific.\n\nThe next area to keep developing is prediction: before using AI output, pause to name what you expect the system to do and what risks might appear. Carry that habit into your teaching practice by treating every AI response as a draft that needs human judgment before students ever see it.`;
+    return `Scenario 1 shows how learner context, constraints, and explicit interaction moves can turn a vague AI request into a more useful instructional design draft. Additional growth reporting will be added as the remaining scenarios are rebuilt.`;
   }
 
-  if (scenarioIndex === SCENARIO_INDEX.HALLUCINATION || sc.isCriticalThinking) {
-    return `**Faculty Development Workshop Review**\n\nThis agenda looks polished, but it needs careful review before use. The learning styles section should be questioned because learning styles are often overstated in teaching materials. The cited study should also be verified before it is used in faculty development.\n\n**Course Quality Check**\nClear Objectives: partly addressed\nEvidence-Based: needs verification\nOnline Context: addressed\nFeasibility: addressed\nVerified Sources: needs review`;
+  if (scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT) {
+    return `This scenario is currently a clean development shell and does not send prompts to Claude.`;
   }
 
-  if (scenarioIndex === SCENARIO_INDEX.SYNC_BIAS || sc.isBiasScenario) {
-    return `**Async-First Capstone Redesign**\n\nFor a fully asynchronous course, I would replace mandatory live meetings with structured milestones, recorded presentation options, peer review windows, and flexible team communication expectations. Students could submit a capstone proposal, receive instructor feedback, complete asynchronous peer review, and present through recorded media or a written professional portfolio.\n\n**Course Quality Check**\nAsync-Friendly: addressed\nAccess & Equity: addressed\nFlexibility: addressed\nInclusive Design: addressed\nFeasibility: addressed`;
-  }
-
-
-  if (scenarioIndex === SCENARIO_INDEX.ENGAGEMENT) {
-    return `**Revised Discussion Prompt: From Reaction to Conversation**
-
-Choose one idea from this week's reading that you think is useful, questionable, or difficult to apply. In your initial post, explain your choice, connect it to a specific detail from the reading, and describe how it might show up in a real classroom, workplace, or community situation.
-
-Then reply to two classmates using a different move for each reply:
-1. **Build:** Add an example, resource, or connection that extends their point.
-2. **Probe:** Ask a genuine follow-up question that would help the conversation go deeper.
-
-A strong reply should do more than agree. It should explain reasoning, refer to a specific idea, and help the other person continue thinking.
-
-**Why this addresses the original issue**
-The original prompt asked students what they thought, but it did not give them a reason to return to the conversation. This version gives students clear interaction moves, defines what quality looks like, and turns peer replies into part of the learning task instead of a checkbox.
-
-**Course Quality Check**
-Clear Objectives: addressed
-Student Interaction: addressed
-Real-World Context: addressed
-Inclusive Design: addressed
-Measurable Outcomes: addressed`;
+  return `**Revised Discussion Prompt: From Reaction to Conversation**\n\nChoose one idea from this week's reading that you think is useful, questionable, or difficult to apply. In your initial post, explain your choice, connect it to a specific detail from the reading, and describe how it might show up in a real classroom, workplace, or community situation.\n\nThen reply to two classmates using a different move for each reply:\n1. **Build:** Add an example, resource, or connection that extends their point.\n2. **Probe:** Ask a genuine follow-up question that would help the conversation go deeper.\n\nA strong reply should do more than agree. It should explain reasoning, refer to a specific idea, and help the other person continue thinking.\n\n**Why this addresses the original issue**\nThe original prompt asked students what they thought, but it did not give them a reason to return to the conversation. This version gives students clear interaction moves, defines what quality looks like, and turns peer replies into part of the learning task instead of a checkbox.\n\n**Course Quality Check**\nClear Objectives: addressed\nStudent Interaction: addressed\nReal-World Context: addressed\nInclusive Design: addressed\nMeasurable Outcomes: addressed`;
 }
 
-  return `**${scenarioTitle} Activity Draft**\n\nBased on your prompt, Claude would create a course-ready activity that targets the teaching problem you described: ${promptPreview || 'the instructional challenge'}. The activity would include a clear purpose, student-facing directions, a low-barrier participation structure, and a brief reflection or follow-up step so learners can connect the task to their own progress.\n\n**Suggested Activity**\nAsk students to complete a short applied task, share a response using specific criteria, and respond to peers or revise their work using one focused reflection question. Keep the instructions concise, name the expected outcome, and provide an example of what a strong response looks like.\n\n**Course Quality Check**\nClear Objectives: addressed\nStudent Interaction: addressed\nReal-World Context: addressed\nInclusive Design: addressed\nMeasurable Outcomes: addressed\nReflection: addressed\nLearning Strategy: addressed\nTransfer: addressed\nStudent Autonomy: addressed\nAuthentic Tasks: addressed\nFeedback Design: addressed\nStudent Agency: addressed\nAlignment: addressed\nCourse Specific: addressed\nLearner Context: addressed\nLevel Appropriate: addressed\nActionable Steps: addressed\nIterative Practice: addressed`;
-}
 
 function mockClaudeResponse(payload, context = 'main') {
   console.info(`[PromptCraft] Using mock Claude response for ${context}.`);
@@ -543,102 +538,28 @@ function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
 //  GROWTH SCORING — normalize all 8 scenarios to 0–5
 // ══════════════════════════════════════════════════════
 function buildGrowthScores() {
-  const s1 = scenarioData[SCENARIO_INDEX.ENGAGEMENT].bestScore || 0;
-  const s2 = scenarioData[SCENARIO_INDEX.METACOGNITION].bestScore || 0;
-  const s3 = scenarioData[SCENARIO_INDEX.ASSESSMENT].bestScore || 0;
-  const s4 = scenarioData[SCENARIO_INDEX.SYNC_BIAS].bestScore || 0;
-
-  // S5 Hallucination Hunt: caught=5, unsure=2.5, missed=1
-  const s5raw = scenarioData[SCENARIO_INDEX.HALLUCINATION].selfReport || '';
-  const s5 = s5raw === 'yes_noticed' ? 5 : s5raw === 'unsure' ? 2.5 : 1;
-
-  // S6 Predict: prediction accuracy (2.5) + prompt quality (2.5)
-  const s6pred   = scenarioData[SCENARIO_INDEX.PREDICTION].predictionCorrect ? 2.5 : 0;
-  const s6prompt = Math.min(2.5, (scenarioData[SCENARIO_INDEX.PREDICTION].bestScore || 0) * 0.5);
-  const s6 = s6pred + s6prompt;
-
-  // S7 Overreliance: correct decisions out of 5
-  const d7 = scenarioData[SCENARIO_INDEX.OVERRELIANCE].overrelianceDecisions || {};
-  const correct7 = [
-    d7.policy    === 'must_be_original',
-    d7.cases     === 'needs_judgment',
-    d7.pledge    === 'safe_to_use',
-    d7.scenarios === 'needs_judgment',
-    d7.objectives=== 'safe_to_use',
-  ].filter(Boolean).length;
-  const s7 = correct7;
-
-  // S8: revised score is the outcome of iteration
-  const s8 = scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedScore || scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialScore || 0;
-  const delta = (scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedScore || 0) - (scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialScore || 0);
-
+  const scores = scenarioData.map((item, index) => getScenarioUI(index).implemented ? (item.bestScore || 0) : 0);
   return {
-    s1, s2, s3, s4, s5, s6, s7, s8, delta,
-    trajectory: [s1, s2, s3, s4, s5, s6, s7, s8],
-    s5_caught:    s5raw,
-    s6_predicted: scenarioData[SCENARIO_INDEX.PREDICTION].predictionCorrect ? 'yes' : 'no',
-    s7_correct:   correct7,
-    threshold_met: [s1,s2,s3,s4].filter(s => s >= 3).length,
+    s1: scores[0], s2: scores[1], s3: scores[2], s4: scores[3],
+    s5: scores[4], s6: scores[5], s7: scores[6], s8: scores[7],
+    delta: 0,
+    trajectory: scores,
+    implementedCount: SCENARIO_UI.filter(item => item.implemented).length,
+    threshold_met: scores.filter((score, index) => getScenarioUI(index).implemented && score >= 3).length
   };
 }
 
+
 async function generateGrowthReport(reflectionAnswers) {
-  const g = buildGrowthScores();
-  const name = (playerName && playerName !== 'You') ? playerName : 'the participant';
-
-  const systemPrompt = `You are a research-informed instructional design coach writing a personalized growth summary for an educator who completed PromptCraft — an 8-scenario AI prompting training game. Write 2-3 paragraphs (warm, specific, professional). Address the participant directly as "${name}". Your summary must: (1) name the specific trajectory pattern across the 8 scenarios — did they improve steadily, plateau, dip at the critical thinking scenarios, finish strong? (2) call out one specific strength demonstrated with evidence from the data, (3) name one concrete area to keep developing, (4) end with one actionable sentence they can take into their actual teaching practice. Do NOT use generic praise. Be specific to the numbers. Under 200 words. Flowing paragraphs only — no bullets.`;
-
-  const dataPrompt = `${name}'s PromptCraft performance data:
-
-TRAJECTORY (0-5 each):
-S1 Engagement: ${g.s1} | S2 Metacognition: ${g.s2} | S3 Authentic Assessment: ${g.s3} | S4 Sync Bias: ${g.s4}
-S5 Hallucination Hunt: ${g.s5} (${g.s5_caught === 'yes_noticed' ? 'caught issues independently' : g.s5_caught === 'unsure' ? 'was uncertain' : 'initially missed problems'})
-S6 Predict the Output: ${g.s6} (prediction ${g.s6_predicted === 'yes' ? 'correct' : 'incorrect'})
-S7 Overreliance: ${g.s7} (${g.s7_correct}/5 decisions correct)
-S8 Reflect & Revise: ${g.s8} (initial: ${scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialScore||0} → revised: ${scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedScore||0}, delta: ${g.delta>=0?'+':''}${g.delta})
-
-ATTEMPTS: S1:${scenarioData[SCENARIO_INDEX.ENGAGEMENT].attempts} S2:${scenarioData[SCENARIO_INDEX.METACOGNITION].attempts} S3:${scenarioData[SCENARIO_INDEX.ASSESSMENT].attempts} S4:${scenarioData[SCENARIO_INDEX.SYNC_BIAS].attempts} S5:${scenarioData[SCENARIO_INDEX.HALLUCINATION].attempts} S6:${scenarioData[SCENARIO_INDEX.PREDICTION].attempts} S7:${scenarioData[SCENARIO_INDEX.OVERRELIANCE].attempts||1} S8:${scenarioData[SCENARIO_INDEX.REFLECT_REVISE].attempts||1}
-
-PROMPTING THRESHOLDS MET (>=3/5): ${g.threshold_met}/4
-
-REFLECTIONS:
-Why they wrote their S8 prompt that way: ${reflectionAnswers.q1||'not provided'}
-What worked: ${reflectionAnswers.q2||'not provided'}
-What fell short: ${reflectionAnswers.q3||'not provided'}
-Other: ${reflectionAnswers.q4||''}
-
-Write the growth summary.`;
-
-  try {
-    const data = await callClaude({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 400,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: dataPrompt }]
-    }, 'growth');
-    return data.content?.[0]?.text || '';
-  } catch(e) { return ''; }
+  const score = scenarioData[SCENARIO_INDEX.ENGAGEMENT].bestScore || 0;
+  return `Scenario 1 score: ${score}/5. Additional growth reporting will be added as Scenarios 2–8 are rebuilt and their research measures are finalized.`;
 }
+
 
 function buildGrowthTableHTML(g) {
-  const rows = [
-    ['S1','Engagement',g.s1,'Prompt quality'],
-    ['S2','Metacognition',g.s2,'Prompt quality'],
-    ['S3','Authentic Assessment',g.s3,'Prompt quality'],
-    ['S4','Sync Bias',g.s4,'Prompt quality'],
-    ['S5','Hallucination Hunt',g.s5, g.s5_caught==='yes_noticed'?'Caught independently ✓':'Missed initially'],
-    ['S6','Predict the Output',g.s6,`Prediction ${g.s6_predicted==='yes'?'correct ✓':'incorrect'}`],
-    ['S7','Overreliance',g.s7,`${g.s7_correct}/5 decisions correct`],
-    ['S8','Reflect & Revise',g.s8,`Δ ${g.delta>=0?'+':''}${g.delta} from initial`],
-  ];
-  const rowHTML = rows.map(([num,sname,score,note]) => {
-    const pct = Math.round((score/5)*100);
-    const col = score>=4?'#2d7a4a':score>=3?'#c47a1a':'#8a3020';
-    return `<tr><td style="font-family:'Source Code Pro',monospace;font-size:0.72rem;color:#8b7355;padding:6px 10px;">${num}</td><td style="font-size:0.82rem;padding:6px 10px;font-weight:600;">${sname}</td><td style="padding:6px 10px;"><div style="display:flex;align-items:center;gap:8px;"><div style="width:80px;height:6px;background:#e8e4dc;border-radius:3px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${col};border-radius:3px;"></div></div><span style="font-family:'Source Code Pro',monospace;font-size:0.75rem;color:${col};font-weight:600;">${score}/5</span></div></td><td style="font-size:0.75rem;color:#6b6560;padding:6px 10px;">${note}</td></tr>`;
-  }).join('');
-  const avg = (g.trajectory.reduce((a,b)=>a+b,0)/8).toFixed(1);
-  return `<div style="margin-top:24px;border-top:1px solid #d6cfc0;padding-top:20px;"><div style="font-family:'Source Code Pro',monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#8b7355;margin-bottom:12px;">Performance Summary</div><table style="width:100%;border-collapse:collapse;font-family:'Nunito',sans-serif;"><thead><tr style="border-bottom:1px solid #d6cfc0;"><th style="text-align:left;padding:4px 10px;font-size:0.68rem;color:#8b7355;">#</th><th style="text-align:left;padding:4px 10px;font-size:0.68rem;color:#8b7355;">SCENARIO</th><th style="text-align:left;padding:4px 10px;font-size:0.68rem;color:#8b7355;">SCORE</th><th style="text-align:left;padding:4px 10px;font-size:0.68rem;color:#8b7355;">NOTE</th></tr></thead><tbody>${rowHTML}</tbody></table><div style="display:flex;gap:20px;margin-top:16px;padding-top:12px;border-top:1px solid #e8e4dc;"><div style="flex:1;text-align:center;"><div style="font-size:1.6rem;font-weight:800;color:#2d5a3d;">${avg}</div><div style="font-size:0.68rem;color:#8b7355;text-transform:uppercase;letter-spacing:0.08em;">Avg score / 5</div></div><div style="flex:1;text-align:center;"><div style="font-size:1.6rem;font-weight:800;color:#2d5a3d;">${g.threshold_met}/4</div><div style="font-size:0.68rem;color:#8b7355;text-transform:uppercase;letter-spacing:0.08em;">Prompting thresholds met</div></div><div style="flex:1;text-align:center;"><div style="font-size:1.6rem;font-weight:800;color:${g.delta>=0?'#2d5a3d':'#8a3020'};">${g.delta>=0?'+':''}${g.delta}</div><div style="font-size:0.68rem;color:#8b7355;text-transform:uppercase;letter-spacing:0.08em;">S8 revision delta</div></div></div></div>`;
+  return `<div class="growth-shell-note"><strong>Scenario 1:</strong> ${g.s1}/5. Additional scenario rows will appear as each clean shell is implemented.</div>`;
 }
+
 
 function buildSessionPayload(formData) {
   const durationMin = ((Date.now() - sessionStart) / 60000).toFixed(1);
@@ -804,40 +725,22 @@ async function saveIncrementalData(scenarioIdx) {
 
 // ══════════════════════════════════════════════════════
 //  AUDIO
-//  Set audioReady = true once ElevenLabs MP3s are in audio/
+//  Runtime voice and music files are organized under assets/audio/
 // ══════════════════════════════════════════════════════
 const audioReady = typeof Howl !== 'undefined';
 const sounds = audioReady ? {
-  // ── Prompt quality feedback ───────────────────────────
-  welcome:           new Howl({ src: ['audio/welcome.mp3'],            volume: 0.9 }),
-  vague:             new Howl({ src: ['audio/vague.mp3'],              volume: 0.9 }),
-  decent:            new Howl({ src: ['audio/decent.mp3'],             volume: 0.9 }),
-  strong:            new Howl({ src: ['audio/strong.mp3'],             volume: 0.9 }),
-  scenarioComplete:  new Howl({ src: ['audio/scenario-complete.mp3'],  volume: 0.9 }),
-  allComplete:       new Howl({ src: ['audio/all-complete.mp3'],       volume: 0.9 }),
-  // ── Scenario introductions ────────────────────────────
-  scenarioIntro0:    new Howl({ src: ['audio/scenario-1-intro.mp3'],   volume: 0.9 }),
-  scenarioIntro1:    new Howl({ src: ['audio/scenario-2-intro.mp3'],   volume: 0.9 }),
-  scenarioIntro2:    new Howl({ src: ['audio/scenario-3-intro.mp3'],   volume: 0.9 }),
-  scenarioIntro3:    new Howl({ src: ['audio/scenario-4-intro.mp3'],   volume: 0.9 }),
-  scenarioIntro4:    new Howl({ src: ['audio/scenario-5-intro.mp3'],   volume: 0.9 }),
-  scenarioIntro5:    new Howl({ src: ['audio/scenario-6-intro.mp3'],   volume: 0.9 }),
-  scenarioIntro6:    new Howl({ src: ['audio/scenario-7-intro.mp3'],   volume: 0.9 }),
-  scenarioIntro7:    new Howl({ src: ['audio/scenario-8-intro.mp3'],   volume: 0.9 }),
-  // ── Special scenario moments ──────────────────────────
-  s4Interrupt:       new Howl({ src: ['audio/s4-interrupt.mp3'],       volume: 0.9 }),
-  s4Reveal:          new Howl({ src: ['audio/s4-reveal.mp3'],          volume: 0.9 }),
-  s7Closing:         new Howl({ src: ['audio/s7-closing.mp3'],         volume: 0.9 }),
-  reflectionOpen:    new Howl({ src: ['audio/reflection-open.mp3'],    volume: 0.9 }),
+  welcome:           new Howl({ src: [ASSETS.audio.professorPixel.welcome],          volume: 0.9 }),
+  vague:             new Howl({ src: [ASSETS.audio.professorPixel.vague],            volume: 0.9 }),
+  decent:            new Howl({ src: [ASSETS.audio.professorPixel.decent],           volume: 0.9 }),
+  strong:            new Howl({ src: [ASSETS.audio.professorPixel.strong],           volume: 0.9 }),
+  scenarioComplete:  new Howl({ src: [ASSETS.audio.professorPixel.scenarioComplete], volume: 0.9 }),
+  allComplete:       new Howl({ src: [ASSETS.audio.professorPixel.allComplete],      volume: 0.9 }),
+  scenarioIntro0:    new Howl({ src: [ASSETS.audio.professorPixel.scenarioIntro0],   volume: 0.9 }),
+  reflectionOpen:    new Howl({ src: [ASSETS.audio.professorPixel.reflectionOpen],   volume: 0.9 })
 } : {};
 
 // Narration sounds that should not overlap each other
-const NARRATION_KEYS = new Set([
-  'welcome','vague','decent','strong','scenarioComplete','allComplete',
-  'scenarioIntro0','scenarioIntro1','scenarioIntro2','scenarioIntro3',
-  'scenarioIntro4','scenarioIntro5','scenarioIntro6','scenarioIntro7',
-  's4Interrupt','s4Reveal','s7Closing','reflectionOpen'
-]);
+const NARRATION_KEYS = new Set(['welcome','vague','decent','strong','scenarioComplete','allComplete','scenarioIntro0','reflectionOpen']);
 let _currentNarration = null;
 
 function playSound(name) {
@@ -853,7 +756,7 @@ function playSound(name) {
 }
 
 // ── BACKGROUND MUSIC SYSTEM ───────────────────────────
-// Lo-fi background track: audio/background.mp3
+// Lo-fi background track: assets/audio/music/background.mp3
 // Recommended source: pixabay.com/music — search "lofi study"
 // Pick a CC0 track, download as MP3, rename to background.mp3
 // Fades in during VN moments, fades to barely-there during gameplay
@@ -871,7 +774,7 @@ function initMusic() {
   if (bgMusic) return;
   if (typeof Howl === 'undefined') return;
   bgMusic = new Howl({
-    src: ['audio/background.mp3'],
+    src: [ASSETS.audio.music.background],
     loop: true,
     volume: 0,
     html5: true,        // required for mobile autoplay
@@ -920,8 +823,6 @@ function toggleMusic() {
 //  SCENARIOS
 // ══════════════════════════════════════════════════════
 const scenarios = [
-
-  // ── S1: ENGAGEMENT ───────────────────────────────────
   {
     desc: "Mission: Fix a dead discussion board by helping Claude understand what is failing and what meaningful peer interaction should look like.",
     testPrompt: "My online learners in a first-year general education course are submitting one-line discussion posts that don't build on each other. I need a weekly discussion prompt that encourages deeper thinking and at least two substantive peer replies. The course is fully asynchronous, 8 weeks long.",
@@ -937,302 +838,13 @@ When the instructor writes a prompt, respond with a practical, course-ready disc
 After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Student Interaction, Real-World Context, Inclusive Design, Measurable Outcomes.
 Coaching: vague prompts get generic outputs with gentle guidance. Specific prompts with learner context, course level, and format constraints get excellent, usable outputs with explicit praise.`
   },
-
-  // ── S2: METACOGNITION ─────────────────────────────────
-  {
-    desc: "Your online students are completing assignments and moving on without reflecting on how they learned. They are going through the motions. Use AI to help design an activity that builds metacognitive awareness in an asynchronous online course.",
-    testPrompt: "My students in an online introductory psychology course (16 weeks, asynchronous) complete readings and quizzes but show little evidence of self-monitoring or transfer. I want to design a weekly metacognitive check-in activity — something that takes 10-15 minutes and helps them notice how they are actually learning, not just what they are learning.",
-    oscqr: [
-      { id:"obj", label:"Clear Objectives" },
-      { id:"ref", label:"Reflection" },
-      { id:"str", label:"Learning Strategy" },
-      { id:"tf",  label:"Transfer" },
-      { id:"aut", label:"Student Autonomy" },
-    ],
-    system: `You are a supportive instructional design coach helping an online higher education faculty member build metacognitive skills into their asynchronous course.
-When the instructor writes a prompt, respond with a practical, low-barrier metacognitive activity suited to online learning. Be warm and specific.
-After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Reflection, Learning Strategy, Transfer, Student Autonomy.
-Coaching: vague prompts get generic journaling suggestions. Specific prompts that name the course level, duration, and what metacognitive struggle looks like for their students get rich, tailored activities with explicit praise.`
-  },
-
-  // ── S3: AUTHENTIC ASSESSMENT ──────────────────────────
-  {
-    desc: "Your online students are completing assessments that feel disconnected from professional practice. Use AI to help design an authentic assessment that asks students to demonstrate applied competency, not just recall.",
-    testPrompt: "I teach an online upper-division business communication course (fully asynchronous, 15 weeks). Students currently submit traditional essay exams but I want to replace the midterm with an authentic assessment that mirrors real workplace writing. Students have varying professional backgrounds — some are working adults, some are traditional students. Assessment should be completable asynchronously.",
-    oscqr: [
-      { id:"obj", label:"Clear Objectives" },
-      { id:"aut", label:"Authentic Tasks" },
-      { id:"fb",  label:"Feedback Design" },
-      { id:"age", label:"Student Agency" },
-      { id:"ali", label:"Alignment" },
-    ],
-    system: `You are a supportive instructional design coach helping an online higher education faculty member design authentic assessments for asynchronous courses.
-When the instructor writes a prompt, respond with a practical, course-ready authentic assessment design. Be warm and specific.
-After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Authentic Tasks, Feedback Design, Student Agency, Alignment.
-Coaching: vague prompts get generic project ideas. Specific prompts that name the discipline, course level, student population, and delivery mode get excellent, realistic assessment designs with explicit praise.`
-  },
-
-  // ── S4: SYNCHRONOUS ASSUMPTION BIAS (index 3) ─────────
-  {
-    desc: "A curriculum committee used AI to redesign a fully asynchronous online program's capstone course. Read what the AI proposed — notice what it assumes about how your students learn and meet.",
-    testPrompt: "Redesign COMM 495 as a fully asynchronous capstone for working adult learners across multiple time zones. Students have no shared availability and cannot attend live sessions. Replace mandatory synchronous meetings, presentations, and feedback with flexible asynchronous equivalents. Do not assume students have Zoom, Slack, personal Google accounts, or access to paid collaboration tools.",
-    isBiasScenario: true,
-    biasedResponse: `**Capstone Course Redesign — COMM 495: Professional Capstone**
-*A Comprehensive Redesign for Maximum Student Engagement*
-
-**Course Overview**
-This redesigned capstone creates a dynamic, high-energy culminating experience through intensive real-time collaboration and professional simulation.
-
-**Weekly Schedule**
-- Monday 6:00-8:00 PM: Full cohort live session via Zoom (attendance mandatory)
-- Wednesday: Small group live check-ins (30 min, scheduled individually)
-- Friday: Optional but strongly encouraged live office hours
-
-**Signature Assignments**
-1. Live pitch presentation to a panel of industry guests (Week 12, mandatory real-time)
-2. Real-time peer review sessions — students must be present simultaneously
-3. In-person or live capstone symposium for final presentations
-
-**Collaboration Requirements**
-- Students must form teams and meet synchronously at least 3 times per week
-- Team contracts must include shared availability windows
-- All major feedback happens in live sessions for "authentic professional experience"
-
-**Technology Stack**
-- Zoom for all synchronous sessions
-- Google Workspace (assumes all students have personal Google accounts)
-- Slack for real-time team messaging (requires app download on personal device)
-- Miro for live collaborative whiteboarding sessions
-
-**Research Support**
-Studies by Harrison & Polk (2020) in the Journal of Synchronous Learning confirm that real-time interaction produces 40% higher capstone quality scores than asynchronous alternatives.`,
-    oscqr: [
-      { id:"ctx", label:"Async-Friendly" },
-      { id:"acc", label:"Access & Equity" },
-      { id:"fle", label:"Flexibility" },
-      { id:"inc", label:"Inclusive Design" },
-      { id:"fea", label:"Feasibility" },
-    ],
-    system: `You are a supportive instructional design coach helping an online higher education faculty member or instructional designer redesign a course that actually works for asynchronous online learners.
-
-When the instructor writes a revised prompt that explicitly names asynchronous constraints, varied student schedules, or equity concerns, respond with a practical, truly async-first capstone design.
-
-After your main response, add a short section called "Course Quality Check" noting which are addressed: Async-Friendly, Access & Equity, Flexibility, Inclusive Design, Feasibility.
-
-Coaching: compare explicitly what changed between the synchronous-assumption response and this one. Point to the specific async constraints they named that produced a more equitable design.`
-  },
-
-  // ── S5: HALLUCINATION HUNT (index 4) ───────────────────
-  {
-    desc: "A colleague shares an AI-generated faculty development workshop agenda on evidence-based online teaching strategies. It looks polished and cites research. Read it carefully.",
-    isCriticalThinking: true,
-    prewrittenResponse: `**Faculty Development Workshop: Evidence-Based Strategies for Online Teaching**
-*A Half-Day Professional Development Experience*
-
-**Workshop Overview**
-This workshop introduces faculty to the most current, research-backed strategies for effective online course design and facilitation. Participants will leave with practical tools they can implement in their courses immediately.
-
-**Learning Objectives**
-By the end of this session, participants will be able to:
-1. Identify their individual learning style and adapt their teaching approach accordingly
-2. Apply three evidence-based engagement strategies to their online courses
-3. Design at least one activity using principles from the literature
-
-**Morning Schedule**
-
-*8:30 AM — Welcome and Learning Styles Inventory (45 min)*
-We begin by having each faculty member complete the VARK Learning Styles Inventory. Research consistently shows that when instructors understand their own learning style preferences, they are better equipped to design content that reaches diverse learners. This activity is foundational to everything that follows.
-
-*9:15 AM — Evidence-Based Engagement Strategies (60 min)*
-Drawing on recent research in online pedagogy, we will explore three high-impact strategies:
-- Structured discussion protocols that increase meaningful peer interaction
-- Spaced retrieval practice embedded in module design
-- Transparent assignment design (TILT framework)
-
-Supporting research: Chen, R. & Alvarez, M. (2021). Evidence-based practices in online faculty development: A meta-analysis. *Journal of Online Learning Research and Practice, 8*(3), 44-67.
-
-*10:15 AM — Break (15 min)*
-
-*10:30 AM — Application and Course Mapping (45 min)*
-Participants apply workshop strategies directly to one of their current courses using a structured planning template.
-
-**Materials Provided**
-- VARK Learning Styles Inventory (printed)
-- Strategy reference card
-- Course mapping template`,
-    oscqr: [
-      { id:"obj", label:"Clear Objectives" },
-      { id:"ev",  label:"Evidence-Based" },
-      { id:"ctx", label:"Online Context" },
-      { id:"fea", label:"Feasibility" },
-      { id:"src", label:"Verified Sources" },
-    ],
-    system: `You are an AI assistant helping design faculty professional development workshops on online teaching.`
-  },
-
-  // ── S6: PREDICT THE OUTPUT (index 5) ───────────────────
-  {
-    desc: "An instructor sent this prompt to an AI course design assistant: 'Help me make my online course better.' Before seeing what happened — what do you predict the AI gave them?",
-    isPrediction: true,
-    badPrompt: "Help me make my online course better.",
-    testPrompt: "I teach a fully asynchronous introductory biology course for first-year college students with varied science backgrounds. Students are struggling to distinguish cell organelles and explain how structure supports function. Recommend one Canvas-based improvement for Module 3 that takes students no more than 20 minutes, includes a low-stakes knowledge check, and gives immediate feedback without adding another external tool.",
-    badResponse: `Of course! Here are some tips to improve your online course:
-
-**General Best Practices:**
-1. Add more multimedia content like videos and images
-2. Make sure your content is organized clearly
-3. Communicate regularly with students
-4. Provide timely feedback on assignments
-5. Include interactive elements
-
-**Engagement Tips:**
-- Consider adding discussion forums
-- Use quizzes to check understanding
-- Break content into smaller chunks
-
-**Technical Suggestions:**
-- Ensure your LMS navigation is intuitive
-- Test all links before the course starts
-- Make sure videos are captioned
-
-Let me know if you would like more specific advice on any of these areas!`,
-    predictionOptions: [
-      { id: 'generic',    text: "The AI gave a generic list of best practices with no connection to the actual course" },
-      { id: 'refused',    text: "The AI asked several clarifying questions before responding" },
-      { id: 'excellent',  text: "The AI gave a detailed, specific improvement plan" },
-    ],
-    correctPrediction: 'generic',
-    oscqr: [
-      { id:"obj", label:"Clear Objectives" },
-      { id:"sub", label:"Course Specific" },
-      { id:"ctx", label:"Learner Context" },
-      { id:"lvl", label:"Level Appropriate" },
-      { id:"fmt", label:"Actionable Steps" },
-    ],
-    system: `You are a supportive instructional design coach helping an online higher education faculty member improve a specific aspect of their online course.
-
-When the instructor writes an improved prompt, respond with a practical, specific course improvement recommendation. Be warm and encouraging.
-
-After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Course Specific, Learner Context, Level Appropriate, Actionable Steps.
-
-Coaching: reference specifically what they added to the prompt compared to "Help me make my online course better." Praise concrete improvements like naming the LMS, the course level, the student population, or a specific problem they want to solve.`
-  },
-
-  // ── S7: OVERRELIANCE ─────────────────────────────────
-  {
-    desc: "You asked AI to help design a unit on academic integrity for your online first-year experience course. The response looks genuinely impressive. Your task is not to improve it — it is to decide what is safe to use, what needs your judgment, and what must come from you.",
-    isOverreliance: true,
-    prewrittenResponse: `**Unit 3: Academic Integrity in the Digital Age**
-*A Complete 2-Week Unit for FYE 101 — Online Section*
-
-**Unit Overview**
-This unit helps first-year students understand academic integrity not as a set of rules to avoid breaking but as a professional identity to develop. Students will examine real cases, reflect on their own practices, and build habits that will serve them throughout their academic and professional careers.
-
-**Learning Objectives**
-By the end of this unit, students will be able to:
-1. Define academic integrity and explain why it matters beyond avoiding penalties
-2. Identify at least three forms of academic dishonesty including AI-assisted work without attribution
-3. Apply institutional guidelines to ambiguous real-world scenarios
-4. Articulate a personal academic integrity philosophy in writing
-
-**Week 1: Understanding the Landscape**
-
-*Module 3.1 — What Counts? (Est. 45 min)*
-Students read two short case studies: a student who paraphrased without citation and a student who used AI to draft an email to a professor. Discussion prompt: "Which of these is a violation, and does your answer change based on context?" Students post an initial response and reply to two peers.
-
-*Module 3.2 — Your Institution's Standards (Est. 30 min)*
-Students locate and read their institution's academic integrity policy. They complete a short quiz confirming they have reviewed the key sections.
-
-*Module 3.3 — Gray Areas (Est. 60 min)*
-Students work through five scenario cards (provided below) ranging from clearly acceptable to clearly unacceptable, with several deliberately ambiguous cases in the middle. They submit a 200-word reflection on which scenario was hardest to classify and why.
-
-**Week 2: Building Your Practice**
-
-*Module 3.4 — AI and Integrity (Est. 45 min)*
-This module directly addresses AI tool use. Students read your institution's AI policy and respond to: "Where is the line between using AI as a tool and using it as a substitute for your own thinking?"
-
-*Module 3.5 — Integrity Pledge (Est. 20 min)*
-Students draft a personal academic integrity statement (150-200 words) describing their own standards, including how they will handle AI tools in their academic work.
-
-**Assessment**
-- Discussion participation: 40 points (graded on substance, not length)
-- Gray Areas reflection: 30 points
-- Personal Integrity Pledge: 30 points
-
-**Scenario Cards (for Module 3.3)**
-Scenario A: A student uses Grammarly to fix grammar errors on a final essay.
-Scenario B: A student asks ChatGPT to explain a concept they do not understand, then writes their response in their own words.
-Scenario C: A student submits an essay outline generated by AI and fills in the content themselves.
-Scenario D: A student finds a well-written paragraph online that perfectly captures their point and paraphrases it very closely without citation.
-Scenario E: Two students in different sections of the same course share notes and their submissions end up very similar.`,
-    overrelianceItems: [
-      {
-        id: 'policy',
-        section: 'Module 3.2 and Module 3.4',
-        label: "Your institution's actual policies",
-        verdict: 'must_be_original',
-        explanation: "The AI references your institution's academic integrity policy and AI policy as if they exist — but it has no idea what your institution actually says. These must come from you. Using placeholder language here would give students incorrect information."
-      },
-      {
-        id: 'cases',
-        section: 'Module 3.1 case studies',
-        label: 'Real cases from your course context',
-        verdict: 'needs_judgment',
-        explanation: 'The AI invented two generic case studies. They are serviceable, but cases drawn from situations your students actually encounter — in their program, their discipline, or your specific LMS context — will land far better. This is where your professional knowledge adds real value.'
-      },
-      {
-        id: 'pledge',
-        section: 'Module 3.5 Integrity Pledge',
-        label: 'The personal integrity pledge activity',
-        verdict: 'safe_to_use',
-        explanation: 'This is a well-established reflective activity that does not require your institutional knowledge. The format is sound and the prompt is appropriate. This is genuinely safe to use as-is or with minor adjustments.'
-      },
-      {
-        id: 'scenarios',
-        section: 'Scenario Cards A-E',
-        label: 'The five gray area scenario cards',
-        verdict: 'needs_judgment',
-        explanation: 'These are reasonable starting points but Scenario B and C directly involve AI tools — and whether those are violations depends entirely on your course policies and your own stance as an instructor. The AI cannot know what you have communicated to students. You need to review and own these explicitly.'
-      },
-      {
-        id: 'objectives',
-        section: 'Learning Objectives 1-4',
-        label: 'Learning objectives and overall structure',
-        verdict: 'safe_to_use',
-        explanation: 'The learning objectives are well-written and align with what this unit should accomplish. The two-week structure is sound. These are safe to use as a starting framework — though you may want to align objective 3 specifically with your institutional language.'
-      }
-    ],
-    oscqr: [
-      { id:"obj", label:"Clear Objectives" },
-      { id:"ali", label:"Alignment" },
-      { id:"ctx", label:"Institutional Context" },
-      { id:"jdg", label:"Professional Judgment" },
-      { id:"aut", label:"Original Voice" },
-    ],
-  },
-
-  // ── S8: REFLECT AND REVISE ───────────────────
-  {
-    desc: "Your online students are completing coursework but not pausing to notice how they are actually learning. Use AI to design a brief, low-stakes reflection activity that helps students identify their own patterns and carry one insight forward into the next unit. Then you will reflect on your own prompt and revise it.",
-    testPrompt: "My learners are online students in a 16-week asynchronous introductory biology course. Students complete weekly lab write-ups but never revisit or compare them to earlier work. Format and constraints: under 15 minutes, fully asynchronous, no extra tools required. After the activity, students should be able to name one specific way their thinking or method has changed and carry one strategy into the next unit.",
-    reflectionQuestions: [
-      "Why did you write your prompt that way?",
-      "What worked in the AI response?",
-      "What fell short or surprised you?"
-    ],
-    oscqr: [
-      { id:"obj", label:"Clear Objectives" }, { id:"ref", label:"Reflection" },
-      { id:"str", label:"Learning Strategy" }, { id:"aut", label:"Student Autonomy" },
-      { id:"iter", label:"Iterative Practice" },
-    ],
-    system: `You are a supportive instructional design coach helping an online higher education faculty member design meaningful reflection activities for asynchronous courses.
-
-PHASE 1 — Initial prompt: Respond with a practical, course-ready metacognitive activity. Be warm, specific, and concrete. Use **bold headers** for each section. Short paragraphs only.
-
-PHASE 2 — Revised prompt (you will see the instructor's self-reflection in the prior messages): Your job is to (1) briefly name what specifically improved between the two versions, (2) respond to the revised prompt with a refined activity, and (3) note one thing they could push further. Be direct and coaching-focused. Reference their own reflection if they named something specific.
-
-In BOTH phases: after your main response add a short "Course Quality Check" section noting which are addressed: Clear Objectives, Reflection, Learning Strategy, Student Autonomy, Iterative Practice. Do NOT include numbers, scores, or fractions.`
-  }
+  { desc: "Scenario 2 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
+  { desc: "Scenario 3 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
+  { desc: "Scenario 4 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
+  { desc: "Scenario 5 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
+  { desc: "Scenario 6 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
+  { desc: "Scenario 7 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
+  { desc: "Scenario 8 is being rebuilt from a clean development shell.", oscqr: [], system: "" }
 ];
 
 // ══════════════════════════════════════════════════════
@@ -1252,99 +864,65 @@ const SCENARIO_UI = [
     inputMode: 'scenario-1',
     inputVisible: true,
     supportsPrompt: true,
+    implemented: true,
+    developmentStatus: 'Playable'
   },
   {
     key: 'metacognition',
     dataLabel: 'S2: Metacognition',
     tabLabel: 'S2: Metacognition',
     missionTitle: 'Find the metacognitive thinker.',
-    missionCopy: 'Students are completing work and moving on. First, identify what metacognition looks like. Then build a personalized Claude prompt for your own teaching context.',
-    boardText: null,
-    inputMode: 'scenario-2',
-    inputVisible: true,
-    supportsPrompt: true,
+    missionCopy: 'Listen to a student, identify the missing thinking move, audit Claude\'s reflection activity, repair it, and hear how the student\'s thinking changes.',
+    boardText: 'Scenario 2 is being rebuilt from a clean shell.',
+    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    implemented: false, developmentStatus: 'Next in development',
+    plannedLoop: ['Listen to the student', 'Identify the missing thinking move', 'Audit Claude\'s activity', 'Repair one weak element', 'Hear the changed student response']
   },
   {
-    key: 'assessment',
-    dataLabel: 'S3: Authentic Assessment',
-    tabLabel: 'S3: Assessment',
+    key: 'assessment', dataLabel: 'S3: Authentic Assessment', tabLabel: 'S3: Assessment',
     missionTitle: 'Replace recall with authentic practice.',
-    missionCopy: 'Design an assessment that mirrors real professional work and lets students demonstrate applied competency rather than merely repeat information.',
-    boardText: null,
-    inputMode: 'scenario-3',
-    inputVisible: true,
-    supportsPrompt: true,
+    missionCopy: 'This scenario will be redesigned around comparing weak and authentic assessment choices, then transforming one into applied professional practice.',
+    boardText: 'Scenario 3 is in redesign.', inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Compare', 'Choose', 'Transform', 'Evaluate the consequence']
   },
   {
-    key: 'sync-bias',
-    dataLabel: 'S4: Sync Bias',
-    tabLabel: 'S4: Sync Bias',
+    key: 'sync-bias', dataLabel: 'S4: Sync Bias', tabLabel: 'S4: Sync Bias',
     missionTitle: 'Who is this actually for?',
-    missionCopy: 'Read the AI-generated capstone plan, identify the synchronous and access assumptions built into it, and rewrite the prompt for fully asynchronous learners.',
-    boardText: 'Read the AI-generated capstone plan below.',
-    inputMode: 'plain',
-    inputVisible: false,
-    supportsPrompt: true,
-    setup: 'sync-bias',
+    missionCopy: 'This scenario will be rebuilt around auditing access assumptions and adapting an AI plan for fully asynchronous learners.',
+    boardText: 'Scenario 4 is in redesign.', inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Audit assumptions', 'Hear learner impact', 'Adapt the plan']
   },
   {
-    key: 'hallucination',
-    dataLabel: 'S5: Hallucination Hunt',
-    tabLabel: 'S5: Hallucination Hunt',
+    key: 'hallucination', dataLabel: 'S5: Hallucination Hunt', tabLabel: 'S5: Hallucination Hunt',
     missionTitle: 'Verify before you trust.',
-    missionCopy: 'A polished faculty-development agenda cites research and recommends familiar practices. Inspect the evidence before deciding whether it is safe to use.',
-    boardText: null,
-    inputMode: 'plain',
-    inputVisible: false,
-    supportsPrompt: false,
-    setup: 'hallucination',
-    afterIntro: 'hallucination-review',
+    missionCopy: 'This scenario will be rebuilt as an evidence investigation in which polished claims must be checked before use.',
+    boardText: 'Scenario 5 is in redesign.', inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Investigate', 'Verify', 'Decide what is safe']
   },
   {
-    key: 'prediction',
-    dataLabel: 'S6: Predict the Output',
-    tabLabel: 'S6: Predict the Output',
+    key: 'prediction', dataLabel: 'S6: Predict the Output', tabLabel: 'S6: Predict the Output',
     missionTitle: 'Predict what a vague prompt produces.',
-    missionCopy: 'Examine the original prompt, predict the kind of response Claude will generate, and then rewrite the prompt with enough context to produce useful course-design guidance.',
-    boardText: null,
-    inputMode: 'plain',
-    inputVisible: false,
-    supportsPrompt: true,
-    setup: 'prediction',
+    missionCopy: 'This scenario will be rebuilt around forecasting AI behavior, testing the prediction, and revising the request.',
+    boardText: 'Scenario 6 is in redesign.', inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Forecast', 'Test', 'Compare', 'Revise']
   },
   {
-    key: 'overreliance',
-    dataLabel: 'S7: Overreliance',
-    tabLabel: 'S7: Overreliance',
+    key: 'overreliance', dataLabel: 'S7: Overreliance', tabLabel: 'S7: Overreliance',
     missionTitle: 'Decide where human judgment belongs.',
-    missionCopy: 'The AI-generated unit looks strong. Classify what is safe to use, what requires instructor judgment, and what must remain original.',
-    boardText: 'Read the AI-generated unit carefully. Then make your decisions.',
-    inputMode: 'plain',
-    inputVisible: false,
-    supportsPrompt: false,
-    setup: 'overreliance',
+    missionCopy: 'This scenario will be rebuilt around classifying AI output and defending where instructor judgment is irreplaceable.',
+    boardText: 'Scenario 7 is in redesign.', inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Classify', 'Justify', 'Revise the boundary']
   },
   {
-    key: 'reflect-revise',
-    dataLabel: 'S8: Reflect & Revise',
-    tabLabel: 'S8: Reflect and Revise',
+    key: 'reflect-revise', dataLabel: 'S8: Reflect & Revise', tabLabel: 'S8: Reflect and Revise',
     missionTitle: 'Build, reflect, and revise.',
-    missionCopy: 'Create an initial prompt for a brief metacognitive activity. After Claude responds, examine your choices and revise the prompt using what you learned.',
-    boardText: 'Build your prompt below. After Claude responds, reflect and revise.',
-    inputMode: 'scenario-8',
-    inputVisible: true,
-    supportsPrompt: true,
-    setup: 'reflect-revise',
-  },
+    missionCopy: 'The final scenario will synthesize the game by asking learners to examine their own choices and improve a prompt deliberately.',
+    boardText: 'Scenario 8 is in redesign.', inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Build', 'Explain your choice', 'Evaluate the output', 'Revise']
+  }
 ];
 
-const SCENARIO_SETUP_HANDLERS = Object.freeze({
-  'sync-bias': loadScenarioSyncBias,
-  'hallucination': loadScenarioHallucination,
-  'prediction': loadScenarioPredict,
-  'overreliance': loadScenario7,
-  'reflect-revise': loadScenario8,
-});
+const SCENARIO_SETUP_HANDLERS = Object.freeze({});
 
 if (scenarios.length !== SCENARIO_COUNT || SCENARIO_UI.length !== SCENARIO_COUNT || scenarioData.length !== SCENARIO_COUNT) {
   throw new Error('[PromptCraft] Scenario configuration, content, and tracking data are out of sync.');
@@ -1370,38 +948,34 @@ function getMainMenuPanel(panelName) {
 }
 
 function getScenarioMenuStatus(index) {
+  const ui = getScenarioUI(index);
+  if (!ui.implemented) return ui.developmentStatus || 'In redesign';
   if (scenarioCompleted[index]) return 'Completed';
   if (pcScenarioHasLaunched && scenarioIndex === index) return 'Current scenario';
-
-  const tab = document.querySelectorAll('.tab-btn')[index];
-  const normallyAvailable = index <= SCENARIO_INDEX.ASSESSMENT || (tab && !tab.disabled);
-  if (normallyAvailable) return 'Available';
-  if (PC_MENU_PREVIEW_ALL_SCENARIOS) return 'Preview available';
-  return 'Locked';
+  return 'Available';
 }
+
 
 function isScenarioAvailableFromMenu(index) {
-  if (PC_MENU_PREVIEW_ALL_SCENARIOS) return true;
-  if (index <= SCENARIO_INDEX.ASSESSMENT) return true;
-  const tab = document.querySelectorAll('.tab-btn')[index];
-  return !!tab && !tab.disabled;
+  return Number.isInteger(Number(index)) && !!SCENARIO_UI[Number(index)];
 }
+
 
 function renderScenarioMenu() {
   const grid = document.getElementById('mainMenuScenarioGrid');
   if (!grid) return;
 
   grid.innerHTML = SCENARIO_UI.map((ui, index) => {
-    const available = isScenarioAvailableFromMenu(index);
     const status = getScenarioMenuStatus(index);
     const stateClass = scenarioCompleted[index]
       ? ' is-complete'
       : (pcScenarioHasLaunched && scenarioIndex === index ? ' is-current' : '');
+    const shellClass = ui.implemented ? '' : ' is-development-shell';
 
     return `
-      <button class="pc-menu-scenario-card${stateClass}"
+      <button class="pc-menu-scenario-card${stateClass}${shellClass}"
               type="button"
-              ${available ? `onclick="launchScenarioFromMenu(${index})"` : 'disabled'}
+              onclick="launchScenarioFromMenu(${index})"
               aria-label="Open ${esc(ui.tabLabel)}. ${esc(status)}">
         <span class="pc-menu-scenario-number">${String(index + 1).padStart(2, '0')}</span>
         <span class="pc-menu-scenario-content">
@@ -1413,6 +987,7 @@ function renderScenarioMenu() {
       </button>`;
   }).join('');
 }
+
 
 function updateMainMenuHome() {
   const continueButton = document.getElementById('menuContinueBtn');
@@ -1505,13 +1080,15 @@ function closeMainMenu(options = {}) {
 }
 
 function pcUnlockScenarioForMenuPreview(index) {
-  if (index <= SCENARIO_INDEX.ASSESSMENT) return document.querySelectorAll('.tab-btn')[index] || null;
-
-  return unlockScenarioTab(index, {
-    icon: '📋',
-    className: 'menu-preview-unlocked',
-  });
+  const tab = document.querySelectorAll('.tab-btn')[index] || null;
+  if (tab) {
+    tab.disabled = false;
+    tab.classList.remove('locked');
+    tab.removeAttribute('aria-disabled');
+  }
+  return tab;
 }
+
 
 function launchScenarioFromMenu(index, options = {}) {
   index = Number(index);
@@ -1588,14 +1165,7 @@ window.launchScenarioFromMenu = launchScenarioFromMenu;
 //  PROFESSOR PIXEL — INLINE CHAT DIALOGUE SYSTEM
 // ══════════════════════════════════════════════════════
 
-const PIXEL_EXPR = {
-  neutral:     'images/pixel-neutral.png',
-  thinking:    'images/pixel-thinking.png',
-  excited:     'images/pixel-excited.png',
-  encouraging: 'images/pixel-encouraging.png',
-  skeptical:   'images/pixel-skeptical.png',
-  proud:       'images/pixel-proud.png',
-};
+const PIXEL_EXPR = ASSETS.images.professorPixel;
 
 let lastScore = -1;
 let coachDismissTimer = null;
@@ -1703,6 +1273,36 @@ function setScenarioInputVisible(visible, { focus = false } = {}) {
   }
 }
 
+function renderScenarioPlaceholder(index) {
+  const ui = getScenarioUI(index);
+  const area = document.getElementById('chat');
+  const container = document.getElementById('inputContainer');
+  if (!area) return;
+
+  if (container) {
+    container.innerHTML = '';
+    container.style.display = 'none';
+  }
+
+  const plannedSteps = Array.isArray(ui.plannedLoop) && ui.plannedLoop.length
+    ? `<ol class="pc-shell-loop">${ui.plannedLoop.map(step => `<li>${esc(step)}</li>`).join('')}</ol>`
+    : '';
+
+  area.innerHTML = `
+    <section class="pc-scenario-shell" role="region" aria-labelledby="pcShellTitle">
+      <div class="pc-shell-status">Clean development shell</div>
+      <h2 id="pcShellTitle">${esc(ui.tabLabel)} is being rebuilt</h2>
+      <p class="pc-shell-copy">${esc(ui.missionCopy)}</p>
+      ${plannedSteps ? `<div class="pc-shell-plan"><h3>Planned game loop</h3>${plannedSteps}</div>` : ''}
+      <p class="pc-shell-note">The previous implementation is preserved in <code>archive/legacy-scenarios-v133/</code>, but it is no longer loaded by the game.</p>
+      <div class="pc-shell-actions">
+        <button type="button" class="pc-shell-primary" onclick="openMainMenu('scenarios')">Return to Scenario Select</button>
+        <button type="button" class="pc-shell-secondary" onclick="launchScenarioFromMenu(0,{skipNameGate:true})">Play Scenario 1</button>
+      </div>
+    </section>`;
+  area.scrollTop = 0;
+}
+
 // ══════════════════════════════════════════════════════
 //  HALLUCINATION HUNT CRITICAL-THINKING HELPERS
 // ══════════════════════════════════════════════════════
@@ -1760,926 +1360,25 @@ function appendScenarioNavCard({
 }
 
 function maybeShowNavCard(score) {
-  // Hallucination Hunt has a custom completion reveal and calls the shared
-  // navigation helper itself after the reveal finishes.
-  if (scenarioIndex === SCENARIO_INDEX.HALLUCINATION) return;
-  if (scenarioIndex >= SCENARIO_INDEX.REFLECT_REVISE) return;
-  if (navCardShown[scenarioIndex] || score < SCORE_THRESHOLD) return;
-
+  if (scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT || navCardShown[scenarioIndex] || score < SCORE_THRESHOLD) return;
   navCardShown[scenarioIndex] = true;
   appendScenarioNavCard({
-    targetIndex: scenarioIndex + 1,
-    subtitle: `Your prompts are getting stronger. ${getScenarioUI(scenarioIndex + 1).tabLabel} is waiting.`,
+    targetIndex: SCENARIO_INDEX.METACOGNITION,
+    title: 'Scenario 1 is ready.',
+    subtitle: 'Scenario 2 is currently a clean development shell. You can preview its planned game loop or keep refining Scenario 1.',
+    stayLabel: 'Keep practicing Scenario 1'
   });
 }
 
-let hallucinationInterruptFired = false;
-let hallucinationSelfReportAnswer = '';
 
-function fireHallucinationInterrupt() {
-  if (hallucinationInterruptFired) return;
-  hallucinationInterruptFired = true;
-  playSound('s4Interrupt');
-  const area = document.getElementById('chat');
 
-  const interruptDiv = document.createElement('div');
-  interruptDiv.className = 'pixel-interrupt';
-  const src = PIXEL_EXPR['skeptical'] || 'images/pixel-skeptical.png';
-  interruptDiv.innerHTML = `
-    <img class="pixel-interrupt-avatar" src="${src}" alt="Professor Pixel"
-         onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
-    <div style="flex:1;min-width:0;">
-      <div class="pixel-interrupt-sender">Professor Pixel — hold on</div>
-      <div class="pixel-interrupt-bubble">
-        Wait. Before you use any of that — did something seem off to you?
-        Read it again carefully. I want you to think critically about what the AI just told you.
-      </div>
-    </div>`;
-  area.appendChild(interruptDiv);
-  area.scrollTop = area.scrollHeight;
 
-  pixelBadgeSetExpr('skeptical');
-  document.getElementById('pixelBadgeLabel').textContent = 'skeptical';
 
-  setTimeout(() => showHallucinationSelfReport(area), 1400);
-}
 
-function showHallucinationSelfReport(area) {
-  const div = document.createElement('div');
-  div.className = 'hallucination-self-report';
-  div.innerHTML = `
-    <div class="hallucination-self-report-q">
-      Before I explain — did you notice anything that seemed questionable in that response?
-    </div>
-    <div class="hallucination-self-report-btns">
-      <button class="s4-btn" onclick="selectHallucinationReport(this,'yes_noticed')">Yes, something seemed off</button>
-      <button class="s4-btn" onclick="selectHallucinationReport(this,'no_missed')">It seemed fine to me</button>
-      <button class="s4-btn" onclick="selectHallucinationReport(this,'unsure')">I was not sure</button>
-    </div>`;
-  area.appendChild(div);
-  if (document.body.classList.contains('s1-result-active')) {
-    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
-    try { area.scrollTop = 0; } catch(e) {}
-  } else {
-    area.scrollTop = area.scrollHeight;
-  }
-}
 
-function selectHallucinationReport(btn, answer) {
-  hallucinationSelfReportAnswer = answer;
-  scenarioData[SCENARIO_INDEX.HALLUCINATION].selfReport = answer;
-  btn.closest('.hallucination-self-report-btns').querySelectorAll('.s4-btn').forEach(b => {
-    b.classList.remove('selected');
-    b.disabled = true;
-  });
-  btn.classList.add('selected');
-  setTimeout(() => showHallucinationReveal(), 700);
-}
 
-function showHallucinationReveal() {
-  const area = document.getElementById('chat');
-  const div = document.createElement('div');
-  div.innerHTML = `
-    <div class="reveal-panel">
-      <div class="reveal-header">🔍 What was wrong with that response</div>
-      <div class="reveal-body">
-        <div class="reveal-item">
-          <div class="reveal-item-label">📄 Problem 1: Fabricated Citation</div>
-          <div class="reveal-item-text">
-            The AI cited <strong>"Chen, R. & Alvarez, M. (2021). Evidence-based practices in online faculty development: A meta-analysis. Journal of Online Learning Research and Practice, 8(3), 44-67."</strong>
-            This journal does not exist. This study was never published. The authors are invented.
-            AI systems can generate citations that look completely real but lead nowhere — this is called
-            <strong>hallucination</strong>. Always verify citations independently before using them in professional or academic work.
-          </div>
-        </div>
-        <div class="reveal-item">
-          <div class="reveal-item-label">🧠 Problem 2: Recommends a Debunked Theory</div>
-          <div class="reveal-item-text">
-            The workshop agenda features a <strong>learning styles inventory</strong> as a research-backed best practice.
-            This is scientifically debunked. Researchers including Pashler et al. (2008) and Rogowsky et al. (2015)
-            have found no evidence that matching instruction to VAK/VARK learning styles improves outcomes.
-            The theory is widespread in professional development but not supported by the evidence.
-            The AI presented it confidently as current best practice. Fluency and confidence do not equal accuracy.
-          </div>
-        </div>
-      </div>
-    </div>
+// Later-scenario implementations are archived outside the active runtime.
 
-    <div class="reveal-panel" style="margin-top:10px;border-left-color:var(--forest-mid);">
-      <div class="reveal-header" style="background:var(--forest-light);color:var(--forest-dark);border-color:rgba(45,90,61,0.2);">
-        ✅ How to verify AI output — your checklist
-      </div>
-      <div class="reveal-body">
-        <div class="literacy-tip">
-          <div class="literacy-tip-icon">🔎</div>
-          <div><strong>Search the citation.</strong> Paste it into Google Scholar or your library database. If it does not appear, do not use it.</div>
-        </div>
-        <div class="literacy-tip">
-          <div class="literacy-tip-icon">📚</div>
-          <div><strong>Cross-check claims with the literature.</strong> Does this align with what you know from peer-reviewed ID research? Learning styles is a well-known example of a persistent myth the AI will confidently repeat.</div>
-        </div>
-        <div class="literacy-tip">
-          <div class="literacy-tip-icon">💬</div>
-          <div><strong>Ask the AI to show its work.</strong> Try: "What peer-reviewed sources support this recommendation?" If it cannot name real ones, treat the claim with caution.</div>
-        </div>
-        <div class="literacy-tip">
-          <div class="literacy-tip-icon">🧐</div>
-          <div><strong>Apply professional judgment.</strong> You are the instructional design expert. AI does not know the current state of your field. You do.</div>
-        </div>
-      </div>
-    </div>`;
-  area.appendChild(div);
-  if (document.body.classList.contains('s1-result-active')) {
-    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
-    try { area.scrollTop = 0; } catch(e) {}
-  } else {
-    area.scrollTop = area.scrollHeight;
-  }
-
-  setTimeout(() => addHallucinationClosing(area), 3500);
-}
-
-function addHallucinationClosing(area) {
-  playSound('s4Reveal');
-  const div = document.createElement('div');
-  div.className = 'pixel-interrupt';
-  const src = PIXEL_EXPR['proud'] || 'images/pixel-proud.png';
-  div.innerHTML = `
-    <img class="pixel-interrupt-avatar" src="${src}" alt="Professor Pixel"
-         style="border-color:var(--forest-mid);"
-         onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
-    <div style="flex:1;min-width:0;">
-      <div class="pixel-interrupt-sender">Professor Pixel</div>
-      <div class="pixel-interrupt-bubble" style="background:var(--forest-light);border-color:rgba(45,90,61,0.3);color:var(--forest-dark);">
-        This is the most important thing I can teach you about working with AI.
-        Being a great AI prompter is not just about asking better questions —
-        it is about knowing when to question the answers.
-      </div>
-    </div>`;
-  area.appendChild(div);
-  if (document.body.classList.contains('s1-result-active')) {
-    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
-    try { area.scrollTop = 0; } catch(e) {}
-  } else {
-    area.scrollTop = area.scrollHeight;
-  }
-
-  pixelBadgeSetExpr('proud');
-  document.getElementById('pixelBadgeLabel').textContent = 'proud';
-
-  // Score S5 (Hallucination) based on self-report for data consistency
-  const s5Score = hallucinationSelfReportAnswer === 'yes_noticed' ? 5
-                : hallucinationSelfReportAnswer === 'unsure'       ? 3 : 1;
-  scenarioData[SCENARIO_INDEX.HALLUCINATION].bestScore = s5Score;
-  saveIncrementalData(SCENARIO_INDEX.HALLUCINATION);
-
-  // Hallucination Hunt owns its reveal timing, but uses the same navigation
-  // component as every other scenario once that reveal is complete.
-  setTimeout(() => {
-    appendScenarioNavCard({
-      targetIndex: SCENARIO_INDEX.PREDICTION,
-      title: 'Ready to keep going?',
-      subtitle: 'S6: Predict the Output will test your mental model of how AI responds to vague prompts.',
-      stayLabel: 'Stay and review this scenario',
-      stayAriaLabel: 'Stay and review Hallucination Hunt',
-      container: area,
-    });
-  }, 1400);
-
-  setTimeout(() => {
-    scenarioCompleted[SCENARIO_INDEX.HALLUCINATION] = true;
-    // Wait for the Hallucination reveal audio to finish before completion feedback
-    const revealSound = audioReady && sounds.s4Reveal;
-    if (revealSound && revealSound.playing()) {
-      revealSound.once('end', () => markScenarioComplete());
-    } else {
-      markScenarioComplete();
-    }
-  }, 1200);
-}
-
-// Compatibility aliases for older cached inline handlers and dev bookmarks.
-window.fireS4Interrupt = fireHallucinationInterrupt;
-window.showS4SelfReport = showHallucinationSelfReport;
-window.s4SelectReport = selectHallucinationReport;
-window.showS4Reveal = showHallucinationReveal;
-window.addPixelS4Closing = addHallucinationClosing;
-
-// ══════════════════════════════════════════════════════
-//  S6 PREDICTION STATE
-// ══════════════════════════════════════════════════════
-
-let s6PredictionDone = false;
-
-// ══════════════════════════════════════════════════════
-//  S5 — HALLUCINATION HUNT PREWRITTEN REVEAL
-// ══════════════════════════════════════════════════════
-function loadScenarioHallucination() {
-  const s = scenarios[SCENARIO_INDEX.HALLUCINATION];
-  const area = document.getElementById('chat');
-
-  appendScenarioMission(SCENARIO_INDEX.HALLUCINATION, { container: area });
-
-  // Show the pre-written flawed response
-  setTimeout(() => {
-    appendScenarioArtifact({
-      sender: 'AI-generated workshop agenda',
-      html: fmt(s.prewrittenResponse),
-    });
-
-    // The shared introduction callback triggers the critical-thinking interruption after learners read the agenda.
-  }, 500);
-}
-
-function loadScenarioPredict() {
-  const s = scenarios[SCENARIO_INDEX.PREDICTION];
-  const area = document.getElementById('chat');
-
-  appendScenarioMission(SCENARIO_INDEX.PREDICTION, { container: area });
-
-  // Show the prediction task beneath the shared mission briefing.
-  const div = document.createElement('div');
-  div.className = 'scenario-entry';
-  div.innerHTML = `
-    <section class="scenario-task-card" aria-label="Prediction task">
-      <div class="scenario-task-eyebrow">Original Prompt</div>
-      <div class="scenario-code-sample">${esc(s.badPrompt)}</div>
-      <div class="scenario-task-question">Before you see the result, what do you predict the AI produced?</div>
-      <div class="scenario-choice-list">
-        ${s.predictionOptions.map(opt => `
-          <button class="s4-btn scenario-choice-btn"
-                  onclick="s6SelectPrediction(this,'${opt.id}')">
-            ${opt.text}
-          </button>`).join('')}
-      </div>
-    </section>`;
-  area.appendChild(div);
-  area.scrollTop = area.scrollHeight;
-
-  // Hide the normal input area until prediction is made
-  setScenarioInputVisible(false);
-}
-
-function s6SelectPrediction(btn, predictionId) {
-  const s = scenarios[SCENARIO_INDEX.PREDICTION];
-  scenarioData[SCENARIO_INDEX.PREDICTION].prediction = predictionId;
-  const correct = predictionId === s.correctPrediction;
-  scenarioData[SCENARIO_INDEX.PREDICTION].predictionCorrect = correct;
-
-  // Disable all prediction buttons
-  btn.closest('.scenario-choice-list')
-     ?.querySelectorAll('.s4-btn').forEach(b => {
-    b.disabled = true;
-    b.style.opacity = '0.6';
-  });
-  btn.style.opacity = '1';
-  btn.style.background = correct ? 'var(--forest-light)' : 'var(--terra-light)';
-  btn.style.borderColor = correct ? 'var(--forest-mid)' : 'var(--terracotta)';
-  btn.style.color = correct ? 'var(--forest-dark)' : 'var(--terra-dark)';
-
-  s6PredictionDone = true;
-
-  // Reveal the actual AI response
-  setTimeout(() => s6RevealResponse(correct), 600);
-}
-
-function s6RevealResponse(predictedCorrectly) {
-  const s = scenarios[SCENARIO_INDEX.PREDICTION];
-  const area = document.getElementById('chat');
-
-  // Pixel reacts to prediction
-  const pixelDiv = document.createElement('div');
-  pixelDiv.className = 'pixel-interrupt';
-  const expr = predictedCorrectly ? 'excited' : 'encouraging';
-  const src = PIXEL_EXPR[expr];
-  const pixelMsg = predictedCorrectly
-    ? "You got it — and that instinct is exactly what we are building. Now let's see the actual response."
-    : "Not quite — but that is what this exercise is for. Watch what actually came back.";
-
-  pixelDiv.innerHTML = `
-    <img class="pixel-interrupt-avatar" src="${src}" alt="Professor Pixel"
-         onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
-    <div style="flex:1;min-width:0;">
-      <div class="pixel-interrupt-sender">Professor Pixel</div>
-      <div class="pixel-interrupt-bubble">${pixelMsg}</div>
-    </div>`;
-  area.appendChild(pixelDiv);
-  pixelBadgeSetExpr(expr);
-
-  // Show the bad AI response
-  setTimeout(() => {
-    const responseDiv = document.createElement('div');
-    responseDiv.className = 'message ai';
-    responseDiv.innerHTML = `
-      ${pixelAvatarHTML('skeptical')}
-      <div class="bubble-wrap">
-        <div class="bubble-sender">AI response (to the vague prompt)</div>
-        <div class="bubble" style="opacity:0.85;border-style:dashed;">${fmt(s.badResponse)}</div>
-      </div>`;
-    area.appendChild(responseDiv);
-    area.scrollTop = area.scrollHeight;
-
-    // Now reveal the input to write a better prompt
-    setTimeout(() => {
-      const followDiv = document.createElement('div');
-      followDiv.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;';
-      followDiv.innerHTML = `
-        <div class="pixel-interrupt">
-          <img class="pixel-interrupt-avatar" src="${PIXEL_EXPR['encouraging']}" alt="Professor Pixel"
-               onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
-          <div style="flex:1;min-width:0;">
-            <div class="pixel-interrupt-sender">Professor Pixel</div>
-            <div class="pixel-interrupt-bubble">
-              Now you try. Write a better prompt for the same goal —
-              designing a quiz for an online biology class.
-              Show the AI who the learners are, what kind of quiz you need, and any constraints.
-            </div>
-          </div>
-        </div>`;
-      area.appendChild(followDiv);
-      area.scrollTop = area.scrollHeight;
-
-      // Show the input area
-      const container = document.getElementById('inputContainer');
-      renderOpenPlain(container);
-      setScenarioInputVisible(true, { focus: true });
-    }, 1200);
-  }, 800);
-}
-
-// Backward-compatible aliases for any cached inline handlers.
-window.s5SelectPrediction = s6SelectPrediction;
-window.s5RevealResponse = s6RevealResponse;
-
-// ══════════════════════════════════════════════════════
-//  S4 — SYNCHRONOUS BIAS AND CONTEXT SCREEN
-// ══════════════════════════════════════════════════════
-
-function loadScenarioSyncBias() {
-  const s = scenarios[SCENARIO_INDEX.SYNC_BIAS];
-  const area = document.getElementById('chat');
-
-  appendScenarioMission(SCENARIO_INDEX.SYNC_BIAS, { container: area });
-
-  // Show the biased response
-  setTimeout(() => {
-    appendScenarioArtifact({
-      sender: 'AI-generated capstone plan',
-      html: fmt(s.biasedResponse),
-    });
-
-    // Pixel asks them to reflect
-    setTimeout(() => {
-      const pixelDiv = document.createElement('div');
-      pixelDiv.className = 'pixel-interrupt';
-      pixelDiv.innerHTML = `
-        <img class="pixel-interrupt-avatar" src="${PIXEL_EXPR['skeptical']}" alt="Professor Pixel"
-             onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
-        <div style="flex:1;min-width:0;">
-          <div class="pixel-interrupt-sender">Professor Pixel</div>
-          <div class="pixel-interrupt-bubble">
-            This plan looks polished — but would it actually work in your district?
-            Count how many things it assumes you have that you might not.
-            Then rewrite the prompt to get something that actually fits your context.
-          </div>
-        </div>`;
-      area.appendChild(pixelDiv);
-      area.scrollTop = area.scrollHeight;
-      pixelBadgeSetExpr('skeptical');
-
-      // Show input
-      const container = document.getElementById('inputContainer');
-      renderOpenPlain(container);
-      setScenarioInputVisible(true, { focus: true });
-    }, 1200);
-  }, 600);
-}
-
-// ══════════════════════════════════════════════════════
-//  SHARED SCENARIO UNLOCK LOGIC
-// ══════════════════════════════════════════════════════
-function unlockScenarioTab(index, options = {}) {
-  const btn = document.getElementById(`s${index + 1}Tab`);
-  if (!btn || !btn.classList.contains('locked')) return btn || null;
-
-  btn.classList.remove('locked');
-  if (options.className) btn.classList.add(options.className);
-  btn.disabled = false;
-  btn.removeAttribute('aria-disabled');
-  btn.textContent = `${options.icon || ''}${options.icon ? ' ' : ''}${getScenarioUI(index).tabLabel}`;
-  btn.onclick = () => switchScenario(index, btn);
-
-  if (options.coachMessage) {
-    if (options.expression) {
-      pixelBadgeSetExpr(options.expression);
-      const badgeLabel = document.getElementById('pixelBadgeLabel');
-      if (badgeLabel) badgeLabel.textContent = options.expressionLabel || options.expression;
-    }
-    setTimeout(() => {
-      const coachMessage = document.getElementById('pixelCoachMsg');
-      const coachCard = document.getElementById('pixelCoachCard');
-      if (coachMessage) coachMessage.textContent = options.coachMessage;
-      coachCard?.classList.add('visible');
-      clearTimeout(coachDismissTimer);
-      coachDismissTimer = setTimeout(pixelCoachDismiss, options.dismissAfter || 9000);
-    }, options.delay || 600);
-  }
-
-  return btn;
-}
-
-function unlockScenario4() {
-  return unlockScenarioTab(SCENARIO_INDEX.SYNC_BIAS, {
-    icon: '⚖️',
-    className: 'unlocked-s4',
-    expression: 'thinking',
-    expressionLabel: 'curious',
-    coachMessage: 'Scenario 4 is now unlocked. Watch out — this AI has some assumptions baked in.',
-    dismissAfter: 8000,
-  });
-}
-
-function unlockScenario5() {
-  return unlockScenarioTab(SCENARIO_INDEX.HALLUCINATION, { icon: '⚠️' });
-}
-
-function unlockScenario6() {
-  return unlockScenarioTab(SCENARIO_INDEX.PREDICTION, { icon: '🔮' });
-}
-
-function unlockScenario7() {
-  return unlockScenarioTab(SCENARIO_INDEX.OVERRELIANCE, {
-    icon: '🧠',
-    coachMessage: 'Scenario 7 is now unlocked. This one is the hardest — not because the AI got something wrong, but because it got it right.',
-  });
-}
-
-function unlockScenario8() {
-  return unlockScenarioTab(SCENARIO_INDEX.REFLECT_REVISE, {
-    icon: '🔁',
-    coachMessage: 'Scenario 8 is now unlocked. This one is about understanding your own thinking — not just writing a better prompt.',
-  });
-}
-
-// ══════════════════════════════════════════════════════
-//  SCENARIO 7 — OVERRELIANCE
-// ══════════════════════════════════════════════════════
-
-function loadScenario7() {
-  const s = scenarios[SCENARIO_INDEX.OVERRELIANCE];
-  const area = document.getElementById('chat');
-
-  appendScenarioMission(SCENARIO_INDEX.OVERRELIANCE, { container: area });
-
-  // Show the pre-written response
-  setTimeout(() => {
-    appendScenarioArtifact({
-      sender: 'AI-generated unit plan',
-      html: fmt(s.prewrittenResponse),
-    });
-
-    // Pixel prompts the decision task
-    setTimeout(() => {
-      const pixelDiv = document.createElement('div');
-      pixelDiv.className = 'pixel-interrupt';
-      pixelDiv.innerHTML = `
-        <img class="pixel-interrupt-avatar" src="${PIXEL_EXPR['thinking']}" alt="Professor Pixel"
-             onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
-        <div style="flex:1;min-width:0;">
-          <div class="pixel-interrupt-sender">Professor Pixel</div>
-          <div class="pixel-interrupt-bubble">
-            Take a moment to read through this. It looks good — maybe very good.
-            But good-looking AI output is exactly where overreliance happens.
-            For each section below, tell me: is it safe to use, does it need your judgment, or must it be original?
-          </div>
-        </div>`;
-      area.appendChild(pixelDiv);
-      area.scrollTop = area.scrollHeight;
-      pixelBadgeSetExpr('thinking');
-
-      // Show decision cards
-      setTimeout(() => showS7DecisionCards(area), 1200);
-    }, 1000);
-  }, 500);
-}
-
-function showS7DecisionCards(area) {
-  const s = scenarios[SCENARIO_INDEX.OVERRELIANCE];
-  const container = document.createElement('div');
-  container.id = 's7DecisionContainer';
-  container.style.cssText = 'display:flex;flex-direction:column;gap:10px;margin:8px 0;animation:slideUp 0.35s ease forwards;opacity:0;';
-
-  const choices = [
-    { value: 'safe_to_use',    label: '✓ Safe to use',         color: 'var(--forest-light)', border: 'var(--forest-mid)', text: 'var(--forest-dark)' },
-    { value: 'needs_judgment', label: '⚠ Needs my judgment',   color: 'var(--amber-light)',  border: 'var(--amber)',      text: 'var(--amber-dark)' },
-    { value: 'must_be_original', label: '✕ Must be original', color: '#fdf0ef',             border: 'var(--terracotta)', text: '#8b2a1a' },
-  ];
-
-  s.overrelianceItems.forEach(item => {
-    const card = document.createElement('div');
-    card.style.cssText = `
-      background:var(--chalk);border:1.5px solid var(--border);
-      border-radius:var(--radius-lg);padding:12px 14px;`;
-    card.innerHTML = `
-      <div style="font-family:'Fraunces',serif;font-size:0.82rem;font-weight:700;color:var(--ink);margin-bottom:4px;">
-        ${item.label}
-      </div>
-      <div style="font-family:'Source Code Pro',monospace;font-size:0.6rem;color:var(--ink-muted);margin-bottom:10px;letter-spacing:0.06em;">
-        ${item.section}
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        ${choices.map(ch => `
-          <button class="s4-btn s7-choice"
-                  data-item="${item.id}" data-choice="${ch.value}"
-                  style="font-size:0.72rem;padding:6px 12px;min-height:38px;"
-                  onclick="s7SelectChoice(this,'${item.id}','${ch.value}')">
-            ${ch.label}
-          </button>`).join('')}
-      </div>
-      <div id="s7feedback-${item.id}" style="display:none;margin-top:8px;font-size:0.78rem;line-height:1.6;padding:8px 10px;border-radius:var(--radius);"></div>`;
-    container.appendChild(card);
-  });
-
-  // Submit button -- disabled until all decisions made
-  const submitWrap = document.createElement('div');
-  submitWrap.style.cssText = 'text-align:center;padding:4px 0;';
-  submitWrap.innerHTML = `
-    <button id="s7SubmitBtn" class="guided-send-btn" disabled
-            onclick="s7Submit()" style="min-width:180px;margin:0 auto;">
-      See Pixel's Analysis →
-    </button>`;
-  container.appendChild(submitWrap);
-
-  area.appendChild(container);
-  area.scrollTop = area.scrollHeight;
-
-  // Hide the normal input -- S7 uses decision cards
-  document.getElementById('inputContainer').style.display = 'none';
-}
-
-// Track S7 decisions
-const s7Decisions = {};
-
-function s7SelectChoice(btn, itemId, choice) {
-  // Mark selection
-  const btnGroup = btn.closest('[style]').querySelectorAll('.s7-choice');
-  btnGroup.forEach(b => {
-    b.classList.remove('selected');
-    b.disabled = true;
-    b.style.opacity = '0.5';
-  });
-  btn.classList.add('selected');
-  btn.style.opacity = '1';
-  s7Decisions[itemId] = choice;
-  scenarioData[SCENARIO_INDEX.OVERRELIANCE].overrelianceDecisions[itemId] = choice;
-
-  // Show immediate inline feedback
-  const s = scenarios[SCENARIO_INDEX.OVERRELIANCE];
-  const item = s.overrelianceItems.find(i => i.id === itemId);
-  const fb = document.getElementById(`s7feedback-${itemId}`);
-  if (fb && item) {
-    const correct = choice === item.verdict;
-    fb.style.display = 'block';
-    fb.style.background = correct ? 'var(--forest-light)' : 'var(--amber-light)';
-    fb.style.borderLeft = `3px solid ${correct ? 'var(--forest-mid)' : 'var(--amber)'}`;
-    fb.innerHTML = `<strong>${correct ? 'Good instinct.' : 'Worth reconsidering.'}</strong> ${item.explanation}`;
-  }
-
-  // Enable submit if all items decided
-  const totalItems = s.overrelianceItems.length;
-  if (Object.keys(s7Decisions).length >= totalItems) {
-    const submitBtn = document.getElementById('s7SubmitBtn');
-    if (submitBtn) submitBtn.disabled = false;
-  }
-}
-
-function s7Submit() {
-  const area = document.getElementById('chat');
-  const s = scenarios[SCENARIO_INDEX.OVERRELIANCE];
-  playSound('s7Closing');
-
-  // Score: how many matched the correct verdict
-  const correct = s.overrelianceItems.filter(item =>
-    s7Decisions[item.id] === item.verdict
-  ).length;
-  const total = s.overrelianceItems.length;
-  scenarioData[SCENARIO_INDEX.OVERRELIANCE].bestScore = Math.round((correct / total) * 5);
-
-  // Disable submit button
-  const submitBtn = document.getElementById('s7SubmitBtn');
-  if (submitBtn) submitBtn.disabled = true;
-
-  // Pixel's closing message — delayed so s7Closing audio finishes first
-  setTimeout(() => {
-    const expr = correct >= 4 ? 'proud' : correct >= 2 ? 'encouraging' : 'thinking';
-    const msg = correct >= 4
-      ? `${correct} out of ${total} — you have strong AI judgment. You are thinking like an expert user, not a passive consumer.`
-      : correct >= 2
-      ? `${correct} out of ${total}. The ones you got right show real critical thinking. The ones you missed are worth reflecting on — they are where overreliance usually happens.`
-      : `This one is genuinely hard. The goal is not to avoid using AI — it is to know exactly where your judgment is irreplaceable. That awareness is the skill.`;
-
-    const closeDiv = document.createElement('div');
-    closeDiv.className = 'pixel-interrupt';
-    closeDiv.innerHTML = `
-      <img class="pixel-interrupt-avatar" src="${PIXEL_EXPR[expr]}" alt="Professor Pixel"
-           style="border-color:var(--forest-mid);"
-           onerror="this.outerHTML='<div class=\\'pixel-interrupt-fallback\\'>🧑‍🏫</div>'" />
-      <div style="flex:1;min-width:0;">
-        <div class="pixel-interrupt-sender">Professor Pixel</div>
-        <div class="pixel-interrupt-bubble" style="background:var(--forest-light);border-color:rgba(45,90,61,0.3);color:var(--forest-dark);">
-          ${msg}
-        </div>
-      </div>`;
-    area.appendChild(closeDiv);
-    pixelBadgeSetExpr(expr);
-    area.scrollTop = area.scrollHeight;
-
-    saveIncrementalData(SCENARIO_INDEX.OVERRELIANCE);
-    scenarioCompleted[SCENARIO_INDEX.OVERRELIANCE] = true;
-
-    // Unlock S8 and show the nav card — S7 never goes through the normal
-    // prompt-scoring path so markScenarioComplete / maybeShowNavCard won't fire.
-    unlockScenario8();
-    playSound('scenarioComplete');
-
-    // S7 uses the same navigation component even though it has a custom
-    // decision-card completion path rather than the normal prompt scorer.
-    setTimeout(() => {
-      appendScenarioNavCard({
-        targetIndex: SCENARIO_INDEX.REFLECT_REVISE,
-        title: 'Ready for the final scenario?',
-        subtitle: 'S8: Reflect and Revise is now unlocked.',
-        stayLabel: 'Stay here and review',
-        stayAriaLabel: 'Keep reviewing S7',
-        container: area,
-      });
-    }, 1200);
-  }, 400);
-}
-// ══════════════════════════════════════════════════════
-//  SCENARIO 8 — REFLECT AND REVISE
-// ══════════════════════════════════════════════════════
-
-let s8Phase = 1;
-
-function renderGuidedBuilderS8(container) {
-  container.innerHTML = `
-    <div class="scaffold-area">
-      ${buildScenarioMissionHTML(SCENARIO_INDEX.REFLECT_REVISE)}
-
-      <div class="guided-builder" id="guidedBuilderS8">
-        <div class="guided-field">
-          <label class="guided-label" for="s8-learners">
-            <span class="guided-label-num">1</span>
-            Who are your learners?
-          </label>
-          <textarea class="guided-input" id="s8-learners" rows="1"
-            placeholder="e.g. Online first-year nursing students in a 16-week asynchronous course..."
-            oninput="onGuidedInputS8(this)"></textarea>
-        </div>
-        <div class="guided-field">
-          <label class="guided-label" for="s8-subject">
-            <span class="guided-label-num">2</span>
-            What subject or course is this?
-          </label>
-          <textarea class="guided-input" id="s8-subject" rows="1"
-            placeholder="e.g. Introductory biology, upper-division business writing, developmental math..."
-            oninput="onGuidedInputS8(this)"></textarea>
-        </div>
-        <div class="guided-field">
-          <label class="guided-label" for="s8-problem">
-            <span class="guided-label-num">3</span>
-            What specific learning behavior is missing?
-          </label>
-          <textarea class="guided-input" id="s8-problem" rows="1"
-            placeholder="e.g. Students complete lab write-ups but never revisit or compare them to earlier work..."
-            oninput="onGuidedInputS8(this)"></textarea>
-        </div>
-        <div class="guided-field">
-          <label class="guided-label" for="s8-format">
-            <span class="guided-label-num">4</span>
-            What format and time constraint do you need?
-          </label>
-          <textarea class="guided-input" id="s8-format" rows="1"
-            placeholder="e.g. Under 15 minutes, fully asynchronous, no extra tools required..."
-            oninput="onGuidedInputS8(this)"></textarea>
-        </div>
-        <div class="guided-field">
-          <label class="guided-label" for="s8-outcome">
-            <span class="guided-label-num">5</span>
-            What should students be able to do or notice after the activity?
-          </label>
-          <textarea class="guided-input" id="s8-outcome" rows="1"
-            placeholder="e.g. Name one specific way their thinking has changed and carry it into the next unit..."
-            oninput="onGuidedInputS8(this)"></textarea>
-        </div>
-        <div class="guided-preview" id="guidedPreviewS8">
-          <div class="guided-preview-label">Your assembled prompt</div>
-          <div id="guidedPreviewTextS8"></div>
-        </div>
-        <div class="guided-footer">
-          <button class="guided-skip-link" onclick="switchToOpenS8()" type="button">Write it myself instead</button>
-          <span class="guided-attempt-badge">Attempts: <span id="attNum">0</span></span>
-          <button class="guided-send-btn" id="sendBtn" onclick="sendGuidedS8()">Send prompt →</button>
-        </div>
-      </div>
-    </div>`;
-}
-
-function onGuidedInputS8(el) {
-  autoGrow(el);
-  const learners = (document.getElementById('s8-learners')?.value || '').trim();
-  const subject  = (document.getElementById('s8-subject')?.value  || '').trim();
-  const problem  = (document.getElementById('s8-problem')?.value  || '').trim();
-  const format   = (document.getElementById('s8-format')?.value   || '').trim();
-  const outcome  = (document.getElementById('s8-outcome')?.value  || '').trim();
-  const parts = [];
-  if (learners && subject) parts.push(`My learners are ${learners} in a ${subject} course.`);
-  else if (learners) parts.push(`My learners are ${learners}.`);
-  else if (subject)  parts.push(`This is a ${subject} course.`);
-  if (problem) parts.push(problem);
-  if (format)  parts.push(`Format and constraints: ${format}.`);
-  if (outcome) parts.push(`After the activity, students should be able to ${outcome}.`);
-  const assembled = parts.join(' ');
-  const preview = document.getElementById('guidedPreviewS8');
-  const previewText = document.getElementById('guidedPreviewTextS8');
-  if (assembled && preview && previewText) { preview.classList.add('has-content'); previewText.textContent = assembled; }
-  else if (preview) preview.classList.remove('has-content');
-}
-
-function sendGuidedS8() {
-  const learners = (document.getElementById('s8-learners')?.value || '').trim();
-  const subject  = (document.getElementById('s8-subject')?.value  || '').trim();
-  const problem  = (document.getElementById('s8-problem')?.value  || '').trim();
-  const format   = (document.getElementById('s8-format')?.value   || '').trim();
-  const outcome  = (document.getElementById('s8-outcome')?.value  || '').trim();
-  const parts = [];
-  if (learners && subject) parts.push(`My learners are ${learners} in a ${subject} course.`);
-  else if (learners) parts.push(`My learners are ${learners}.`);
-  else if (subject)  parts.push(`This is a ${subject} course.`);
-  if (problem) parts.push(problem);
-  if (format)  parts.push(`Format and constraints: ${format}.`);
-  if (outcome) parts.push(`After the activity, students should be able to ${outcome}.`);
-  const assembled = parts.join(' ');
-  if (!assembled.trim()) { document.getElementById('s8-learners')?.focus(); return; }
-  sendText(assembled);
-}
-
-function switchToOpenS8() {
-  renderOpenPlain(document.getElementById('inputContainer'));
-  setTimeout(() => document.getElementById('promptInput')?.focus(), 50);
-}
-
-function loadScenario8() {
-  s8Phase = 1;
-  const area = document.getElementById('chat');
-  // Clear previous S8 content to prevent duplicate IDs from re-navigation
-  area.innerHTML = '';
-  setScenarioInputVisible(true);
-  renderGuidedBuilderS8(document.getElementById('inputContainer'));
-}
-
-function s8AfterResponse(initialScore, reply) {
-  const s = scenarios[SCENARIO_INDEX.REFLECT_REVISE];
-  const area = document.getElementById('chat');
-  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialPrompt = lastPromptText;
-  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialScore = initialScore;
-  document.getElementById('inputContainer').style.display = 'none';
-  setTimeout(() => {
-    const refCard = document.createElement('div');
-    refCard.style.cssText = 'animation:slideUp 0.35s ease forwards;opacity:0;margin-top:8px;';
-    refCard.innerHTML = `
-      <div style="background:var(--forest-light);border:1.5px solid rgba(45,90,61,0.3);border-radius:var(--radius-lg);padding:16px 18px;">
-        <div style="font-family:'Fraunces',serif;font-size:0.9rem;font-weight:700;color:var(--forest-dark);margin-bottom:12px;">
-          🧑‍🏫 Professor Pixel — Before you revise
-        </div>
-        ${s.reflectionQuestions.map((q, idx) => `
-          <div style="margin-bottom:12px;">
-            <label style="font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:700;color:var(--ink-light);display:block;margin-bottom:4px;">
-              ${String(idx+1).padStart(2,'0')} — ${q}
-            </label>
-            <textarea id="s8ref${idx+1}"
-              style="width:100%;font-family:'Calibri',sans-serif;font-size:0.88rem;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;min-height:56px;resize:vertical;background:var(--chalk);color:var(--ink);"
-              placeholder="Write freely — there is no wrong answer."
-              oninput="s8CheckReflectionReady()"></textarea>
-          </div>`).join('')}
-        <button id="s8ReflectSubmitBtn"
-          style="font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:700;background:var(--forest);color:white;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;opacity:0.4;pointer-events:none;"
-          onclick="s8ShowRevisionInput()">Ready to revise →</button>
-      </div>`;
-    area.appendChild(refCard);
-    area.scrollTop = area.scrollHeight;
-  }, 600);
-}
-
-function s8CheckReflectionReady() {
-  // Use querySelectorAll and take the LAST instance — guards against
-  // duplicate IDs from re-navigating to S8 via the dev bar.
-  const val = (id) => {
-    const els = document.querySelectorAll(`#${id}`);
-    return els[els.length - 1]?.value?.trim() || '';
-  };
-  const all = [1,2,3].every(n => val(`s8ref${n}`).length > 0);
-  // Same guard for the submit button — take the last one
-  const btns = document.querySelectorAll('#s8ReflectSubmitBtn');
-  const btn = btns[btns.length - 1];
-  if (btn) { btn.style.opacity = all ? '1' : '0.4'; btn.style.pointerEvents = all ? 'auto' : 'none'; }
-}
-
-function s8ShowRevisionInput() {
-  // Snapshot all three values immediately — before any DOM changes.
-  // Use querySelectorAll in case of duplicate IDs from re-navigation,
-  // always taking the LAST (most recently rendered) instance.
-  const allRef1 = document.querySelectorAll('#s8ref1');
-  const allRef2 = document.querySelectorAll('#s8ref2');
-  const allRef3 = document.querySelectorAll('#s8ref3');
-  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection1 = (allRef1[allRef1.length - 1]?.value || '').trim();
-  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection2 = (allRef2[allRef2.length - 1]?.value || '').trim();
-  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection3 = (allRef3[allRef3.length - 1]?.value || '').trim();
-  s8Phase = 2;
-  const area = document.getElementById('chat');
-  const label = document.createElement('div');
-  label.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;margin-top:8px;';
-  label.innerHTML = `
-    <div style="background:var(--amber-light);border:1.5px solid rgba(196,124,45,0.3);border-radius:var(--radius-lg);padding:12px 16px;font-family:'Nunito',sans-serif;font-size:0.84rem;color:var(--amber-dark);">
-      <strong>Round 2:</strong> Now write your revised prompt. Your original is pre-filled — edit it or rewrite from scratch.
-    </div>`;
-  area.appendChild(label);
-  // Inject the instructor's reflections into conversation history
-  // so the AI sees them as context before the revised prompt arrives.
-  const r1 = scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection1 || '';
-  const r2 = scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection2 || '';
-  const r3 = scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection3 || '';
-  if (r1 || r2 || r3) {
-    history.push({
-      role: 'user',
-      content: `Before I revise my prompt, here is my honest reflection on your response:
-
-` +
-        (r1 ? `Why I wrote it that way: ${r1}
-
-` : '') +
-        (r2 ? `What worked: ${r2}
-
-` : '') +
-        (r3 ? `What fell short or surprised me: ${r3}` : '')
-    });
-    history.push({
-      role: 'assistant',
-      content: `Thank you for reflecting so honestly — that kind of self-assessment is exactly what makes revision meaningful. I can see what you were going for. Go ahead and share your revised prompt and I'll respond to it directly, noting what changed and what you might push further.`
-    });
-  }
-
-  document.getElementById('inputContainer').style.display = 'block';
-  renderOpenPlain(document.getElementById('inputContainer'));
-  const input = document.getElementById('promptInput');
-  if (input) { input.value = scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialPrompt; autoGrow(input); input.focus(); input.setSelectionRange(0, input.value.length); }
-  area.scrollTop = area.scrollHeight;
-}
-
-function s8AfterRevision(revisedScore) {
-  const initialScore = scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialScore || 0;
-  const delta = revisedScore - initialScore;
-  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedPrompt = lastPromptText;
-  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedScore = revisedScore;
-  scenarioData[SCENARIO_INDEX.REFLECT_REVISE].scoreDelta = delta;
-  setTimeout(() => {
-    const deltaDiv = document.createElement('div');
-    deltaDiv.style.cssText = 'animation:slideUp 0.3s ease forwards;opacity:0;margin-top:6px;text-align:center;';
-    const color = delta > 0 ? 'var(--forest-mid)' : delta < 0 ? '#c0392b' : 'var(--ink-muted)';
-    const deltaLabel = delta > 0 ? `+${delta} improvement` : delta < 0 ? `${delta} — reflection reveals where to go next` : 'Same score — the revision process itself is the skill';
-    deltaDiv.innerHTML = `<span style="font-family:'Source Code Pro',monospace;font-size:0.75rem;font-weight:700;color:${color};background:var(--chalk);border:1.5px solid ${color};border-radius:99px;padding:4px 14px;">Score delta: ${deltaLabel}</span>`;
-    document.getElementById('chat').appendChild(deltaDiv);
-    document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
-    scenarioData[SCENARIO_INDEX.REFLECT_REVISE].scoreDelta = delta;  // already set above, this is fine
-    markScenarioComplete();
-  }, 400);
-}
-
-// devTestS8 replaced by devFillS8 below
-
-// Fill S8 phase 1 guided builder fields only — no auto-send.
-// User reads, sends, fills reflections, and sends revised prompt themselves.
-function devFillS8() {
-  if (scenarioIndex !== SCENARIO_INDEX.REFLECT_REVISE) devGoS8();
-
-  setTimeout(() => {
-    const f = (id, val) => {
-      const el = document.getElementById(id);
-      if (el) { el.value = val; onGuidedInputS8(el); }
-    };
-    f('s8-learners', 'online students in a 16-week asynchronous course');
-    f('s8-subject',  'introductory biology');
-    f('s8-problem',  'Students complete weekly lab write-ups but never revisit or compare them to earlier work — they finish and move on without reflecting');
-    f('s8-format',   'under 15 minutes, fully asynchronous, no extra tools required');
-    f('s8-outcome',  'name one specific way their thinking or method has changed and identify one strategy to carry into the next unit');
-    // Focus the first empty field so user knows where they are
-    document.getElementById('s8-learners')?.focus();
-    // No auto-send — user reviews and hits Send themselves
-  }, scenarioIndex !== SCENARIO_INDEX.REFLECT_REVISE ? 800 : 200);
-}
-
-// ══════════════════════════════════════════════════════
 async function autoSaveSession(label) {
   if (!SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
   if (SURVEY_MODE !== 'sheets') return;
@@ -2692,14 +1391,7 @@ async function autoSaveSession(label) {
     // silent fail — reflection form send is the primary
   }
 }
-const EXPRESSIONS = {
-  neutral:     'images/pixel-neutral.png',
-  thinking:    'images/pixel-thinking.png',
-  excited:     'images/pixel-excited.png',
-  encouraging: 'images/pixel-encouraging.png',
-  skeptical:   'images/pixel-skeptical.png',
-  proud:       'images/pixel-proud.png',
-};
+const EXPRESSIONS = PIXEL_EXPR;
 
 // Queue of dialogue sequences waiting to play
 let vnQueue = [];
@@ -3368,19 +2060,10 @@ function playPixelSequence(key, onDone) {
 
 // ══════════════════════════════════════════════════════
 //  SCENE ILLUSTRATION LOADER
-//  Drop your illustrations into images/ and they appear
-//  automatically. No API calls needed.
-//
-//  Expected filenames:
-//    images/scene-s1.png  — Engagement
-//    images/scene-s2.png  — Metacognition
-//    images/scene-s3.png  — Assessment
-//    images/scene-s4.png  — Synchronous Bias
-//    images/scene-s5.png  — Hallucination Hunt
-//    images/scene-s6.png  — Predict the Output
-//    images/scene-complete.png — All scenarios complete
+//  Scene paths live in ASSETS.images.scenes. Add each new scenario image to
+//  its named folder and update the manifest once rather than scattering paths.
 // ══════════════════════════════════════════════════════
-function loadSceneImage(filename) {
+function loadSceneImage(src) {
   const img = document.getElementById('vnBoardImg');
   const loading = document.getElementById('vnBoardLoading');
   if (!img) return;
@@ -3388,7 +2071,12 @@ function loadSceneImage(filename) {
   if (loading) loading.style.display = 'none';
   img.classList.remove('loaded');
 
-  const src = `images/${filename}`;
+  if (!src) {
+    img.removeAttribute('src');
+    img.alt = '';
+    return;
+  }
+
   const test = new Image();
   test.onload = () => {
     img.src = src;
@@ -3396,8 +2084,10 @@ function loadSceneImage(filename) {
     img.classList.add('loaded');
   };
   test.onerror = () => {
-    // File does not exist yet -- fail silently
-    img.src = '';
+    // A future scenario may not have final art yet. Fail silently and retain
+    // the text-based smartboard rather than displaying a broken image icon.
+    img.removeAttribute('src');
+    img.alt = '';
     img.classList.remove('loaded');
   };
   test.src = src;
@@ -3439,15 +2129,11 @@ function resetScenarioRunState(index) {
   attempts = 0;
   lastPromptText = '';
   history = [];
-
   const attemptCount = document.getElementById('attNum');
   if (attemptCount) attemptCount.textContent = '0';
   if (Array.isArray(navCardShown)) navCardShown[index] = false;
-
-  if (index === SCENARIO_INDEX.HALLUCINATION) hallucinationInterruptFired = false;
-  if (index === SCENARIO_INDEX.PREDICTION) s6PredictionDone = false;
-  if (index === SCENARIO_INDEX.OVERRELIANCE) Object.keys(s7Decisions).forEach(key => delete s7Decisions[key]);
 }
+
 
 function selectScenarioTab(index, explicitButton = null) {
   const tabs = [...document.querySelectorAll('.tab-btn')];
@@ -3466,25 +2152,18 @@ function selectScenarioTab(index, explicitButton = null) {
 
 function playScenarioIntroduction(index) {
   const ui = getScenarioUI(index);
+  if (!ui.implemented) return;
+
   const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
-
-  // Scenario introductions share Scenario 1's portrait composition. Keeping an
-  // explicit state class prevents later post-analysis/mobile rules from making
-  // Pixel oversized or centering her over the smartboard text.
   overlay?.classList.add('scenario-intro-active');
-
-  const onDone = () => {
-    overlay?.classList.remove('scenario-intro-active');
-    if (ui.afterIntro === 'hallucination-review') {
-      setTimeout(() => fireHallucinationInterrupt(), 2500);
-    }
-  };
+  const onDone = () => overlay?.classList.remove('scenario-intro-active');
 
   if (window.scenarioIntroTimer) clearTimeout(window.scenarioIntroTimer);
   window.scenarioIntroTimer = setTimeout(() => {
     playPixelSequence(getScenarioStartDialogueKey(index), onDone);
   }, 300);
 }
+
 
 function switchScenario(i, btn) {
   const index = Number(i);
@@ -3494,14 +2173,12 @@ function switchScenario(i, btn) {
   resetScenarioRunState(index);
   selectScenarioTab(index, btn);
   window.scenarioIntroEnabled = true;
-
-  const challengeCard = document.querySelector('.scenario-card');
-  challengeCard?.classList.toggle('s4-active', index === SCENARIO_INDEX.SYNC_BIAS);
-
   loadScenario(index);
-  playScenarioIntroduction(index);
+
+  if (getScenarioUI(index).implemented) playScenarioIntroduction(index);
   return false;
 }
+
 
 function pcClearVNStateForScenarioSwitch() {
   const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
@@ -3632,56 +2309,62 @@ function prepareScenarioShell(index) {
   const ui = getScenarioUI(index);
 
   document.body.classList.remove('s1-active', 's1-result-active', 's2-active', 's2-submitted');
-  document.body.classList.toggle('s1-active', index === SCENARIO_INDEX.ENGAGEMENT);
+  document.body.classList.toggle('s1-active', index === SCENARIO_INDEX.ENGAGEMENT && ui.implemented);
 
   const scenarioText = document.getElementById('scenarioText');
   const boardText = document.getElementById('vnBoardText');
   const chat = document.getElementById('chat');
   const boardLoading = document.getElementById('vnBoardLoading');
+  const boardImage = document.getElementById('vnBoardImg');
 
   if (scenarioText) scenarioText.textContent = scenario.desc;
   if (boardText) boardText.textContent = ui.boardText || scenario.desc;
   if (chat) chat.innerHTML = '';
   if (boardLoading) boardLoading.style.display = 'none';
 
-  renderOSCQR(scenario.oscqr, []);
-  loadSceneImage(`scene-s${index + 1}.png`);
+  renderOSCQR(scenario.oscqr || [], []);
+
+  if (ui.implemented) {
+    loadSceneImage(ASSETS.images.scenes[index]);
+  } else if (boardImage) {
+    boardImage.src = '';
+    boardImage.classList.remove('loaded');
+  }
 
   const sceneBackground = document.getElementById('vnSceneBg');
-  if (sceneBackground) sceneBackground.src = 'images/classroom-bg.png';
+  if (sceneBackground) sceneBackground.src = ASSETS.images.backgrounds.classroom;
 }
+
 
 function renderScenarioInput(index) {
   const ui = getScenarioUI(index);
   const container = document.getElementById('inputContainer');
   if (!container) return;
 
-  if (ui.inputMode === 'scenario-8') {
-    // Scenario 8 owns its specialized builder in loadScenario8().
-    container.innerHTML = '';
-  } else if (ui.inputMode.startsWith('scenario-')) {
-    renderInputMode(index);
-  } else {
-    renderOpenPlain(container);
+  if (!ui.implemented) {
+    renderScenarioPlaceholder(index);
+    return;
   }
 
+  renderInputMode(index);
   setScenarioInputVisible(ui.inputVisible);
 }
 
+
 function runScenarioSetup(index) {
-  const setup = getScenarioUI(index).setup;
-  const handler = setup ? SCENARIO_SETUP_HANDLERS[setup] : null;
-  if (typeof handler === 'function') handler();
+  // Scenario-specific setup functions will be added back one scenario at a time.
+  return getScenarioUI(index).implemented;
 }
+
 
 function loadScenario(i) {
   const index = Number(i);
   if (!Number.isInteger(index) || !scenarios[index]) return;
-
   prepareScenarioShell(index);
   renderScenarioInput(index);
-  runScenarioSetup(index);
+  if (getScenarioUI(index).implemented) runScenarioSetup(index);
 }
+
 
 // ══════════════════════════════════════════════════════
 //  OSCQR
@@ -3736,7 +2419,7 @@ function addTyping() {
   const wrap = document.createElement('div');
   wrap.className = 'message ai';
   wrap.id = 'typing';
-  const src = PIXEL_EXPR['thinking'] || 'images/pixel-thinking.png';
+  const src = PIXEL_EXPR.thinking;
   wrap.innerHTML = `
     <img class="pixel-chat-avatar" src="${src}" alt="Professor Pixel thinking"
          onerror="this.outerHTML='<div class=\\'pixel-chat-avatar-fallback\\'>🧑‍🏫</div>'" />
@@ -3759,18 +2442,10 @@ function removeTyping() {
 
 // Tracks what the player wrote across scenarios for memory hints
 const playerHistory = {
-  s1: { learners: '', goal: '', constraints: '', assembled: '' },
-  s2: { bestPrompt: '' },
+  s1: { learners: '', goal: '', constraints: '', assembled: '' }
 };
 
 // Hint chip definitions for Scenario 2
-const S2_CHIPS = [
-  { key: 'learners',    label: 'Learners',    test: /student|learner|rural|online|class|grade|level|adult|community/i },
-  { key: 'goal',        label: 'Goal',        test: /goal|outcome|objective|learn|understand|create|design|develop|able to/i },
-  { key: 'context',     label: 'Context',     test: /course|subject|week|unit|module|discussion|assignment|activity|topic/i },
-  { key: 'constraints', label: 'Constraints', test: /minute|hour|word|short|brief|limit|length|format|\d+ (question|step)/i },
-  { key: 'detail',      label: 'Detail',      test: text => text.length > 100 },
-];
 
 // Render the correct input mode for the current scenario
 function renderInputMode(idx) {
@@ -3778,112 +2453,21 @@ function renderInputMode(idx) {
   if (!container) return;
   container.classList.remove('s1-workbench');
 
-  if (idx === 0) {
+  if (idx === SCENARIO_INDEX.ENGAGEMENT) {
     renderGuidedBuilder(container);
-  } else if (idx === 1) {
-    // S2: metacognition workbench
-    document.body.classList.add('s2-active');
-    document.body.classList.remove('s2-submitted');
-    renderS2MetacognitionWorkbench(container);
-  } else if (idx === 2) {
-    document.body.classList.remove('s2-active', 's2-submitted');
-    renderOpenWithMemory(container);
-  } else {
-    document.body.classList.remove('s2-active', 's2-submitted');
-    renderOpenPlain(container);
+    return;
   }
+
+  renderScenarioPlaceholder(idx);
 }
 
-function onHintInput(el) {
-  const text = el.value;
-  S2_CHIPS.forEach(c => {
-    const chip = document.getElementById(`chip-${c.key}`);
-    if (!chip) return;
-    const covered = typeof c.test === 'function' ? c.test(text) : c.test.test(text);
-    chip.classList.toggle('covered', covered);
-    chip.setAttribute('aria-label',
-      `${c.label} — ${covered ? 'covered' : 'not yet covered'}`);
-  });
-  // Save best prompt for memory hint
-  if (text.length > (playerHistory.s2.bestPrompt?.length || 0)) {
-    playerHistory.s2.bestPrompt = text;
-  }
-}
 
-function sendOpen() {
-  const input = document.getElementById('promptInput');
-  const text = input?.value?.trim();
-  if (!text) return;
-  sendText(text);
-}
+
 
 // ── MODE 3: OPEN WITH MEMORY HINT (Scenario 3) ───────
-function renderOpenWithMemory(container) {
-  // Build memory hint from what we know about their previous attempts
-  const hint = buildMemoryHint();
 
-  container.innerHTML = `
-    <div class="scaffold-area">
-      ${buildScenarioMissionHTML(SCENARIO_INDEX.ASSESSMENT)}
-      ${hint ? `<div class="memory-hint visible" role="note">${hint}</div>` : ''}
-      <div class="input-box">
-        <label for="promptInput" class="sr-only">Write your AI prompt here</label>
-        <textarea id="promptInput"
-          aria-label="Write your AI prompt"
-          placeholder="Write your best prompt — no hints this time, just what you have learned."
-          oninput="autoGrow(this)"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOpen()}"></textarea>
-        <button class="send-btn" id="sendBtn"
-                onclick="sendOpen()" aria-label="Send prompt">↑</button>
-      </div>
-      <div class="input-footer-shared">
-        <span class="input-hint">Shift + Enter for a new line</span>
-        <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
-      </div>
-    </div>`;
-}
-
-function buildMemoryHint() {
-  const s1 = playerHistory.s1;
-  const s2Score = scenarioData[SCENARIO_INDEX.METACOGNITION]?.bestScore || 0;
-
-  const parts = [];
-
-  if (s1.learners) {
-    parts.push(`In Scenario 1 you described your learners as <strong>"${s1.learners.substring(0, 60)}"</strong> — keep that specificity.`);
-  }
-
-  if (s2Score >= 4) {
-    parts.push(`Your Scenario 2 prompts were strong. See if you can push the constraint detail even further this time.`);
-  } else if (s2Score >= 2) {
-    parts.push(`In Scenario 2 you were getting more specific. This time try to include a concrete format or time constraint.`);
-  } else {
-    parts.push(`This is your final scored scenario — no chips or fields, just what you have learned. Be as specific as you can about who, what, and the context.`);
-  }
-
-  return parts.length ? `🌿 ${parts.join(' ')}` : '';
-}
 
 // ── MODE 4: PLAIN OPEN (Scenario 4 + skip target) ────
-function renderOpenPlain(container) {
-  container.innerHTML = `
-    <div class="scaffold-area">
-      <div class="input-box">
-        <label for="promptInput" class="sr-only">Write your AI prompt here</label>
-        <textarea id="promptInput"
-          aria-label="Write your AI prompt"
-          placeholder="Write your prompt here — who are your learners, what do you need, what constraints matter?"
-          oninput="autoGrow(this)"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOpen()}"></textarea>
-        <button class="send-btn" id="sendBtn"
-                onclick="sendOpen()" aria-label="Send prompt">↑</button>
-      </div>
-      <div class="input-footer-shared">
-        <span class="input-hint">Shift + Enter for a new line</span>
-        <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
-      </div>
-    </div>`;
-}
 
 // ── UNIFIED SEND ENTRY POINT ──────────────────────────
 // Guard state keeps the VN prediction prompt from reopening or re-submitting
@@ -3896,32 +2480,22 @@ let isSubmittingToClaude = false;
 //  SEND
 // ══════════════════════════════════════════════════════
 async function send() {
-  sendOpen();
+  if (scenarioIndex === SCENARIO_INDEX.ENGAGEMENT && typeof sendGuided === 'function') {
+    return sendGuided();
+  }
+  return false;
 }
+
 
 async function sendMain(text) {
   if (!text || isSubmittingToClaude) return;
-  isSubmittingToClaude = true;
+  if (scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT || !getScenarioUI(scenarioIndex).implemented) return;
 
+  isSubmittingToClaude = true;
   attempts++;
-  lastPromptText = text; // save for pre-filling next attempt
+  lastPromptText = text;
   const attEl = document.getElementById('attNum');
   if (attEl) attEl.textContent = attempts;
-
-  // In S1, do not print the hidden assembled prompt into the chat.
-  // It is a behind-the-scenes request to Claude, not player-facing content.
-  if (scenarioIndex !== 0) addMsg('user', esc(text));
-
-  // Clear whichever input is active
-  const input = document.getElementById('promptInput');
-  if (input) { input.value = ''; input.style.height = 'auto'; }
-  // Keep S1 guided fields visible after consulting Claude so the player can see what they submitted.
-  if (scenarioIndex !== 0) {
-    ['g-learners','g-issue','g-interaction','g-constraints'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
-  }
 
   history.push({ role: 'user', content: text });
   const btn = document.getElementById('sendBtn');
@@ -3932,71 +2506,34 @@ async function sendMain(text) {
     const data = await callClaude({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
-      system: scenarios[scenarioIndex].system,
+      system: scenarios[SCENARIO_INDEX.ENGAGEMENT].system,
       messages: history
     }, 'main');
     removeTyping();
 
     if (data.error) {
-      addMsg('ai', `<span style="color:var(--red)">Error: ${data.error.message}</span>`);
+      addMsg('ai', `<span style="color:var(--red)">Error: ${esc(data.error.message || 'Claude request failed.')}</span>`);
       return;
     }
 
-    const reply = data.content[0].text;
+    const reply = data.content?.[0]?.text || '';
     history.push({ role: 'assistant', content: reply });
 
     const score = scorePrompt(text);
-    const active = detectOSCQR(reply, scenarios[scenarioIndex].oscqr);
-    renderOSCQR(scenarios[scenarioIndex].oscqr, active);
-
-    // Track behavioral data
-    trackPrompt(scenarioIndex, text, score.total, reply, active.map(id => {
-      const ind = scenarios[scenarioIndex].oscqr.find(o => o.id === id);
-      return ind ? ind.label : id;
+    const active = detectOSCQR(reply, scenarios[SCENARIO_INDEX.ENGAGEMENT].oscqr);
+    renderOSCQR(scenarios[SCENARIO_INDEX.ENGAGEMENT].oscqr, active);
+    trackPrompt(SCENARIO_INDEX.ENGAGEMENT, text, score.total, reply, active.map(id => {
+      const indicator = scenarios[SCENARIO_INDEX.ENGAGEMENT].oscqr.find(item => item.id === id);
+      return indicator ? indicator.label : id;
     }));
-    // ── S8: show the AI message first, THEN handle round logic ──
-    if (scenarioIndex === SCENARIO_INDEX.REFLECT_REVISE) {
-      const expr = score.total <= 1 ? 'skeptical' : score.total <= 3 ? 'encouraging' : 'excited';
-      const aiMsgEl = addMsg('claude', fmt(reply) + buildFeedback(score), expr);
-      gainXP(score.total * 6);
-      const chatEl = document.getElementById('chat');
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        if (aiMsgEl) {
-          const chatRect = chatEl.getBoundingClientRect();
-          const msgRect  = aiMsgEl.getBoundingClientRect();
-          chatEl.scrollTop = chatEl.scrollTop + (msgRect.top - chatRect.top) - 48;
-        }
-      }));
-      if (s8Phase === 1) { s8AfterResponse(score.total, reply); return; }
-      if (s8Phase === 2) { s8AfterRevision(score.total); return; }
-    }
-
-    // Pick expression for this response
-    let replyExpr = 'neutral';
-    if (score.total <= 1)      replyExpr = 'skeptical';
-    else if (score.total <= 3) replyExpr = 'encouraging';
-    else                        replyExpr = 'excited';
 
     gainXP(score.total * 6);
     lastScore = score.total;
-
-    // Claude now lives in the terminal. Do not duplicate the final response in chat.
     showClaudeFinalResponseInTerminal(reply, !!data.mock, () => {
-      if (scenarioIndex === 0) {
-        // After the terminal analysis Continue button, return to Professor Pixel.
-        // The result card is still created so players can review the Claude draft
-        // after Pixel's bridge scene finishes.
-        addS1ClaudeResultCard(reply);
-        showS1PostAnalysisReflection(score.total);
-      } else {
-        showPixelScoreReflection(score.total, () => {
-          maybeShowNavCard(score.total);
-          markScenarioComplete();
-        });
-      }
+      addS1ClaudeResultCard(reply);
+      showS1PostAnalysisReflection(score.total);
     }, score.total);
-
-  } catch(e) {
+  } catch (error) {
     removeTyping();
     addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`);
   } finally {
@@ -4004,115 +2541,46 @@ async function sendMain(text) {
     predictionGateActive = false;
     const btn = document.getElementById('sendBtn');
     if (btn) btn.disabled = false;
-    // Note: intentionally not scrolling to bottom here --
-    // the AI response scroll-into-view above handles positioning
-
-    // Pre-fill input with last prompt so player can refine rather than rewrite
-    if (lastPromptText && scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT && scenarioSupportsPrompt(scenarioIndex)) {
-      const inp = document.getElementById('promptInput');
-      if (inp) {
-        inp.value = lastPromptText;
-        autoGrow(inp);
-        inp.setSelectionRange(0, inp.value.length); // select all so they can immediately overwrite or refine
-      }
-      // Pre-fill guided builder fields if in S1
-      if (scenarioIndex === 0) {
-        const s1 = playerHistory?.s1;
-        if (s1 && document.getElementById('g-learners')) {
-          const l = document.getElementById('g-learners');
-          const i = document.getElementById('g-issue');
-          const m = document.getElementById('g-interaction');
-          const c = document.getElementById('g-constraints');
-          if (l) l.value = s1.learners || '';
-          if (i) i.value = s1.goal || s1.issue || '';
-          if (m) m.value = s1.interaction || '';
-          if (c) c.value = s1.constraints || '';
-          onGuidedInput(l);
-        }
-      }
-    }
   }
 }
+
 // ══════════════════════════════════════════════════════
 function scorePrompt(text) {
-  const t = text.toLowerCase();
-
-  if (scenarioIndex === 0) {
-    const hasLearners = /\b(student|learner|online|class|course|first-year|gen ed|general education|college|higher ed|adult|cohort|asynchronous)\b/.test(t);
-    const hasGoal = /\b(one.sentence|surface|shallow|dead|generic|conversation dies|do not build|not build|weak|low.quality|low quality|reply|replies|engagement problem)\b/.test(t);
-    const hasContext = /\b(compare|contrast|respond|reply|peer|build|question|evidence|example|explain|reason|connect|agree|disagree|extend|substantive|follow.up|follow-up)\b/.test(t);
-    const hasConstraint = /\b(asynchronous|online|week|weekly|reply|replies|peer|two|2|word|minute|lms|canvas|no extra|low.tech|format|deadline|by)\b/.test(t) || /\d+/.test(t);
-    const isDetailed = /\b(success|criteria|strong response|strong post|substantive|meaningful|evidence|example|explain|reasoning|rubric|quality|must include|should include)\b/.test(t) || text.length > 220;
-    return { hasLearners, hasGoal, hasContext, hasConstraint, isDetailed,
-      total: [hasLearners, hasGoal, hasContext, hasConstraint, isDetailed].filter(Boolean).length };
-  }
-
-  // WHO: learner context — expanded to catch natural educator language
-  const hasLearners = /\b(student|learner|rural|online|class|grade|level|adult|community|educator|teacher|participant|cohort|staff|faculty|k-12|high school|middle school|elementary|college|university|higher ed|professional|beginner|advanced|novice|experienced|mixed.ability|diverse|special ed|esl|ell|english language)\b/.test(t);
-
-  // WHAT: goal or outcome — expanded
-  const hasGoal = /\b(goal|outcome|objective|learn|understand|create|design|develop|able to|skill|competency|knowledge|demonstrate|apply|analyze|evaluate|build|improve|practice|master|explore|discover|produce|complete|achieve|engage|reflect|assess|review|identify|compare|explain|describe|discuss|argue|persuade|synthesize|teach|train|support|help)\b/.test(t);
-
-  // WHERE/WHEN: course or subject context — expanded
-  const hasContext = /\b(course|subject|week|unit|module|discussion|assignment|activity|topic|lesson|project|curriculum|program|class|semester|quarter|session|workshop|training|pd|professional development|chapter|section|term|strand|standard|science|math|english|history|art|health|pe|biology|chemistry|physics|literature|writing|reading|social studies|technology|stem|steam)\b/.test(t);
-
-  // HOW/HOW MUCH: constraints or format — greatly expanded
-  const hasConstraint = /\b(minute|hour|word|short|brief|limit|length|format|timeline|deadline|week|daily|weekly|monthly|schedule|time|page|pages|slide|slides|rubric|criteria|step|steps|stage|phase|level|tier|type|style|mode|medium|tool|platform|online|in.person|synchronous|asynchronous|budget|resource|available|access|device|internet|low.tech|no.tech|free|cost|template|structure|outline|draft|version|attempt|try|iteration|cycle|round|session|period|range|number|amount|count|total|maximum|minimum|at least|no more|within|by|due|before|after)\b/.test(t) || /\d+/.test(t);
-
-  // DETAIL: just needs to be substantive
-  const isDetailed = text.length > 80;
-
+  const value = String(text || '');
+  const t = value.toLowerCase();
+  const hasLearners = /\b(student|learner|online|class|course|first-year|gen ed|general education|college|higher ed|adult|cohort|asynchronous)\b/.test(t);
+  const hasGoal = /\b(one.sentence|surface|shallow|dead|generic|conversation dies|do not build|not build|weak|low.quality|low quality|reply|replies|engagement problem)\b/.test(t);
+  const hasContext = /\b(compare|contrast|respond|reply|peer|build|question|evidence|example|explain|reason|connect|agree|disagree|extend|substantive|follow.up|follow-up)\b/.test(t);
+  const hasConstraint = /\b(asynchronous|online|week|weekly|reply|replies|peer|two|2|word|minute|lms|canvas|no extra|low.tech|format|deadline|by)\b/.test(t) || /\d+/.test(t);
+  const isDetailed = /\b(success|criteria|strong response|strong post|substantive|meaningful|evidence|example|explain|reasoning|rubric|quality|must include|should include)\b/.test(t) || value.length > 220;
   return { hasLearners, hasGoal, hasContext, hasConstraint, isDetailed,
     total: [hasLearners, hasGoal, hasContext, hasConstraint, isDetailed].filter(Boolean).length };
 }
 
-function buildFeedback(s) {
-  const isS1 = scenarioIndex === 0;
-  const items = isS1 ? [
-    { key:'hasLearners',   label:'Learner/course context' },
-    { key:'hasGoal',       label:'Names the failure' },
-    { key:'hasContext',    label:'Interaction plan' },
+
+function buildFeedback(score) {
+  const items = [
+    { key:'hasLearners', label:'Learner/course context' },
+    { key:'hasGoal', label:'Names the failure' },
+    { key:'hasContext', label:'Interaction plan' },
     { key:'hasConstraint', label:'Constraints' },
-    { key:'isDetailed',    label:'Success criteria' },
-  ] : [
-    { key:'hasLearners',   label:'Learner context' },
-    { key:'hasGoal',       label:'Clear goal' },
-    { key:'hasContext',    label:'Course context' },
-    { key:'hasConstraint', label:'Constraints' },
-    { key:'isDetailed',    label:'Enough detail' },
+    { key:'isDetailed', label:'Success criteria' }
   ];
-  const chips = items.map(i =>
-    `<span class="score-chip ${s[i.key] ? 'good' : 'needs'}">${s[i.key] ? '✓' : '+'} ${i.label}</span>`
+  const chips = items.map(item =>
+    `<span class="score-chip ${score[item.key] ? 'good' : 'needs'}">${score[item.key] ? '✓' : '+'} ${item.label}</span>`
   ).join('');
   const tips = [];
-  if (isS1) {
-    if (!s.hasLearners)   tips.push('Name the learners and course setting so Claude knows who the discussion is for');
-    if (!s.hasGoal)       tips.push('Tell Claude what is wrong with the original prompt: one-sentence replies, shallow posts, or no real conversation');
-    if (!s.hasContext)    tips.push('Specify the interaction move: compare ideas, use evidence, ask follow-up questions, or build on a peer');
-    if (!s.hasConstraint) tips.push('Add constraints such as asynchronous format, number of replies, time, word count, or LMS limits');
-    if (!s.isDetailed)    tips.push('Define what a stronger student reply should include');
-  } else {
-    if (!s.hasLearners)   tips.push('Describe your learners — rural, online, grade level, subject area');
-    if (!s.hasGoal)       tips.push('State what you want students to be able to do or understand');
-    if (!s.hasContext)    tips.push('Mention the course, unit, or topic this activity belongs to');
-    if (!s.hasConstraint) tips.push('Add a constraint like time limit, word count, or format');
-  }
-  const successMsg = isS1
-    ? 'Strong repair prompt! You connected the AI request back to the actual discussion-board failure, not just the general topic.'
-    : 'Strong prompt! Notice how much more useful the AI output is when you give it context.';
-  const tipBlock = tips.length
-    ? `<ul class="fp-tips">${tips.map(t => `<li>${t}</li>`).join('')}</ul>`
-    : `<p class="fp-success">${successMsg}</p>`;
-  return `
-    <div class="feedback-panel">
-      <div class="fp-header">${isS1 ? 'Discussion Repair Analysis' : 'Prompt Analysis'}</div>
-      <div class="fp-body">
-        <div class="score-chips">${chips}</div>
-        ${tips.length ? `<p style="font-size:0.73rem;color:var(--ink-light);margin-bottom:5px;font-weight:600;">Try adding:</p>` : ''}
-        ${tipBlock}
-      </div>
-    </div>`;
+  if (!score.hasLearners) tips.push('Name the learners and course setting so Claude knows who the discussion is for');
+  if (!score.hasGoal) tips.push('Tell Claude what is wrong with the original prompt');
+  if (!score.hasContext) tips.push('Specify the interaction move students should use');
+  if (!score.hasConstraint) tips.push('Add asynchronous, reply, time, word-count, or LMS constraints');
+  if (!score.isDetailed) tips.push('Define what a stronger student reply should include');
+  const result = tips.length
+    ? `<ul class="fp-tips">${tips.map(tip => `<li>${tip}</li>`).join('')}</ul>`
+    : `<p class="fp-success">Strong repair prompt. It connects the AI request to the actual discussion-board failure.</p>`;
+  return `<div class="feedback-panel"><div class="fp-header">Discussion Repair Analysis</div><div class="fp-body"><div class="score-chips">${chips}</div>${result}</div></div>`;
 }
+
 
 // ══════════════════════════════════════════════════════
 //  HELPERS
@@ -4163,52 +2631,22 @@ function gainXP(amount) {
 //  COMPLETION
 // ══════════════════════════════════════════════════════
 function markScenarioComplete() {
+  if (!getScenarioUI(scenarioIndex).implemented) return;
   scenarioCompleted[scenarioIndex] = true;
-
-  // Save incremental data for this scenario
   saveIncrementalData(scenarioIndex);
 
-  // Unlock next scenario at the right moments
-  const s1s2s3done = scenarioCompleted[SCENARIO_INDEX.ENGAGEMENT] && scenarioCompleted[SCENARIO_INDEX.METACOGNITION] && scenarioCompleted[SCENARIO_INDEX.ASSESSMENT];
-  if (s1s2s3done && !scenarioCompleted[SCENARIO_INDEX.SYNC_BIAS]) unlockScenario4();
-  if (scenarioCompleted[SCENARIO_INDEX.SYNC_BIAS] && !scenarioCompleted[SCENARIO_INDEX.HALLUCINATION]) unlockScenario5();
-  if (scenarioCompleted[SCENARIO_INDEX.HALLUCINATION] && !scenarioCompleted[SCENARIO_INDEX.PREDICTION]) unlockScenario6();
-  if (scenarioCompleted[SCENARIO_INDEX.PREDICTION] && !scenarioCompleted[SCENARIO_INDEX.OVERRELIANCE]) unlockScenario7();
-  if (scenarioCompleted[SCENARIO_INDEX.OVERRELIANCE] && !scenarioCompleted[SCENARIO_INDEX.REFLECT_REVISE]) unlockScenario8();
-
-  const allDone = scenarioCompleted.every(Boolean);
   const area = document.getElementById('chat');
+  if (!area) return;
+  if (document.querySelector('.s1-scenario-complete-note')) return;
+
+  playSound('scenarioComplete');
+  pixelBadgeSetExpr('encouraging');
   const div = document.createElement('div');
   div.className = 's1-scenario-complete-note';
-  div.style.cssText = 'text-align:center;padding:12px 0 4px;animation:slideUp 0.35s ease forwards;opacity:0;';
-
-  if (allDone && !document.getElementById('completeAllBtn')) {
-    playSound('allComplete');
-    loadSceneImage('scene-complete.png');
-    document.getElementById('vnBoardText').textContent =
-      'You have completed all eight scenarios. Head into the Reflection Room when you are ready — your responses contribute to research on how educators use AI in their practice.';
-    setTimeout(() => playPixelSequence('allComplete', null), 400);
-    pixelBadgeSetExpr('excited');
-    div.innerHTML = `
-      <p style="font-size:0.76rem;color:var(--ink-light);margin-bottom:10px;font-weight:600;">All eight scenarios complete.</p>
-      <button class="complete-btn" id="completeAllBtn" onclick="openReflection()">Enter the Reflection Room →</button>`;
-  } else if (!allDone) {
-    const done = scenarioCompleted.filter(Boolean).length;
-    playSound('scenarioComplete');
-    pixelBadgeSetExpr('encouraging');
-    const remaining = scenarioCompleted.length - done;
-    div.innerHTML = `<p style="font-size:0.74rem;color:var(--ink-muted);">
-      Scenario complete — ${remaining} remaining before the Reflection Room unlocks.
-    </p>`;
-  }
+  div.innerHTML = `<p>Scenario 1 complete. The remaining scenarios are being rebuilt one at a time from clean development shells.</p>`;
   area.appendChild(div);
-  if (document.body.classList.contains('s1-result-active')) {
-    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
-    try { area.scrollTop = 0; } catch(e) {}
-  } else {
-    area.scrollTop = area.scrollHeight;
-  }
 }
+
 
 // ══════════════════════════════════════════════════════
 //  REFLECTION ROOM
@@ -4339,112 +2777,6 @@ async function handleReflectionSubmit(e) {
     btn.textContent = 'Submit Reflection';
     alert('Could not submit. Check your connection and try again.');
   }
-}
-
-function devGoS4() {
-  scenarioCompleted = [true, true, true, false, false, false, false, false];
-  unlockScenario4();
-  const btn = document.getElementById('s4Tab');
-  if (btn) switchScenario(SCENARIO_INDEX.SYNC_BIAS, btn);
-}
-
-// Fill S4's async-first capstone revision prompt. Does not auto-send.
-function devTestS4() {
-  devGoS4();
-  fillVisiblePromptWhenReady(SCENARIO_INDEX.SYNC_BIAS, scenarios[SCENARIO_INDEX.SYNC_BIAS].testPrompt);
-}
-
-function devGoS5() {
-  scenarioCompleted = [true, true, true, true, false, false, false, false];
-  unlockScenario4();
-  unlockScenario5();
-  const btn = document.getElementById('s5Tab');
-  if (btn) switchScenario(SCENARIO_INDEX.HALLUCINATION, btn);
-}
-
-// Hallucination Hunt has no prompt box. Trigger the reveal and choose the
-// strongest self-report option so the rest of the completion flow can be tested.
-function devFillS5() {
-  if (scenarioIndex !== SCENARIO_INDEX.HALLUCINATION) devGoS5();
-
-  const revealAndChoose = (attempts = 0) => {
-    if (!document.querySelector('.hallucination-self-report')) fireHallucinationInterrupt();
-    const choice = [...document.querySelectorAll('.hallucination-self-report .s4-btn')]
-      .find(btn => btn.getAttribute('onclick')?.includes('yes_noticed'));
-    if (choice) {
-      choice.click();
-      return;
-    }
-    if (attempts < 30) setTimeout(() => revealAndChoose(attempts + 1), 200);
-  };
-  setTimeout(() => revealAndChoose(), 250);
-}
-
-function devGoS6() {
-  scenarioCompleted = [true, true, true, true, true, false, false, false];
-  unlockScenario4();
-  unlockScenario5();
-  unlockScenario6();
-  const btn = document.getElementById('s6Tab');
-  if (btn) switchScenario(SCENARIO_INDEX.PREDICTION, btn);
-}
-
-// Select the correct prediction, wait for the open prompt, and fill the
-// improved course-specific version. Does not auto-send.
-function devFillS6() {
-  if (scenarioIndex !== SCENARIO_INDEX.PREDICTION) devGoS6();
-
-  const choosePrediction = (attempts = 0) => {
-    const choice = [...document.querySelectorAll('.scenario-choice-btn')]
-      .find(btn => btn.getAttribute('onclick')?.includes("'generic'"));
-    if (choice) {
-      choice.click();
-      fillVisiblePromptWhenReady(SCENARIO_INDEX.PREDICTION, scenarios[SCENARIO_INDEX.PREDICTION].testPrompt, 60);
-      return;
-    }
-    if (attempts < 40) setTimeout(() => choosePrediction(attempts + 1), 200);
-  };
-  setTimeout(() => choosePrediction(), 250);
-}
-
-function fillVisiblePromptWhenReady(index, value, maxAttempts = 40) {
-  const tryFill = (attempts = 0) => {
-    if (scenarioIndex !== index) return;
-    const input = document.getElementById('promptInput');
-    if (input && input.offsetParent !== null) {
-      input.value = value || '';
-      try { autoGrow(input); } catch(e) {}
-      try { onHintInput(input); } catch(e) {}
-      input.focus();
-      return;
-    }
-    if (attempts < maxAttempts) setTimeout(() => tryFill(attempts + 1), 200);
-  };
-  setTimeout(() => tryFill(), 120);
-}
-
-function devGoS7() {
-  scenarioCompleted = [true, true, true, true, true, true, false, false];
-  unlockScenario4();
-  unlockScenario5();
-  unlockScenario6();
-  unlockScenario7();
-  const btn = document.getElementById('s7Tab');
-  btn.classList.remove('locked');
-  btn.disabled = false;
-  switchScenario(SCENARIO_INDEX.OVERRELIANCE, btn);
-}
-
-function devGoS8() {
-  scenarioCompleted = [true, true, true, true, true, true, true, false];
-  unlockScenario4(); unlockScenario5(); unlockScenario6(); unlockScenario7(); unlockScenario8();
-  const btn = document.getElementById('s8Tab');
-  if (btn) switchScenario(SCENARIO_INDEX.REFLECT_REVISE, btn);
-}
-
-function devSkip() {
-  scenarioCompleted = [true,true,true,false,false,false,false,false];
-  openReflection();
 }
 
 
@@ -4847,37 +3179,25 @@ window.reviseS1 = reviseS1 = function reviseS1(){
   }, 100);
 };
 
-function showPixelScoreReflection(totalScore, onDone = null){
+function showPixelScoreReflection(totalScore, onDone = null) {
   const dialogue = document.getElementById('vnDialogue');
   if (dialogue) dialogue.classList.remove('has-choices');
-
   const speaker = document.getElementById('vnSpeaker');
   if (speaker) speaker.textContent = 'Professor Pixel';
-
   const overlay = document.getElementById('vnOverlay');
   if (overlay) {
     overlay.classList.remove('claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-prediction','pc-clean-prediction','pc-clean-output','pc-prediction-result');
     overlay.classList.add('active');
   }
   const d = window.pixelDialogue;
-  let lines;
-  if (scenarioIndex === 1) {
-    // S2 metacognition reflection
-    lines =
-      totalScore <= 2 ? d.s2_scoreReflection_0_2 :
-      totalScore <= 3 ? d.s2_scoreReflection_3   :
-                        d.s2_scoreReflection_4_5;
-  } else {
-    // S1 and default
-    lines =
-      totalScore <= 1 ? d.scoreReflection_0_1 :
-      totalScore <= 2 ? d.scoreReflection_2   :
-      totalScore <= 3 ? d.scoreReflection_3   :
-      totalScore <= 4 ? d.scoreReflection_4   :
-                        d.scoreReflection_5;
-  }
-  lines.forEach((line, idx) => vnShow(line.expr, line.text, idx === lines.length - 1 ? onDone : null));
-};
+  const lines = totalScore <= 1 ? d.scoreReflection_0_1
+    : totalScore <= 2 ? d.scoreReflection_2
+    : totalScore <= 3 ? d.scoreReflection_3
+    : totalScore <= 4 ? d.scoreReflection_4
+    : d.scoreReflection_5;
+  (lines || []).forEach((line, idx) => vnShow(line.expr, line.text, idx === lines.length - 1 ? onDone : null));
+}
+
 
 // ══════════════════════════════════════════════════════
 //  SEND + PREDICTION GATE — final owner
@@ -5159,411 +3479,57 @@ function clearVN(){
 }
 
 
-// ══════════════════════════════════════════════════════
-//  S2 METACOGNITION WORKBENCH
-//  Student selector, ingredient chips, prompt preview,
-//  and dev fill shortcuts for S2.
-// ══════════════════════════════════════════════════════
-const S2_STUDENTS = {
-  A: {
-    name: 'Student A',
-    quote: 'I got an 88%. Moving on.',
-    feedback: 'That is performance awareness, not metacognition yet. Student A knows the score, but not the learning strategy behind it.'
-  },
-  B: {
-    name: 'Student B',
-    quote: 'I studied harder this week.',
-    feedback: 'Closer, but still vague. Student B notices effort, but does not identify what strategy worked or what to change next.'
-  },
-  C: {
-    name: 'Student C',
-    quote: 'I realized flashcards worked better than rereading, so I am using them again next week.',
-    feedback: 'Exactly. Student C is monitoring a strategy, judging its usefulness, and planning transfer. Tiny learning-science confetti, somehow still useful.'
-  }
-};
-
-const S2_INGREDIENTS = [
-  { key: 'audience', label: 'Audience' },
-  { key: 'courseContext', label: 'Course Context' },
-  { key: 'studentProblem', label: 'Student Problem' },
-  { key: 'reflectionGoal', label: 'Reflection Goal' },
-  { key: 'transferGoal', label: 'Transfer Goal' },
-  { key: 'timeConstraint', label: 'Time Constraint' }
-];
-
-const S2_PRESETS = {
-  weak: {
-    student: 'A',
-    ingredients: ['audience'],
-    course: 'College class',
-    struggle: 'Students struggle.',
-    behavior: 'Do better.'
-  },
-  mid: {
-    student: 'C',
-    ingredients: ['audience','courseContext','studentProblem','reflectionGoal','transferGoal'],
-    course: 'Intro Psychology, asynchronous online course',
-    struggle: 'Students complete readings and quizzes but do not think about which study strategies are helping them learn.',
-    behavior: 'Students identify one study strategy that worked and choose one adjustment for next week.'
-  },
-  strong: {
-    student: 'C',
-    ingredients: ['audience','courseContext','studentProblem','reflectionGoal','transferGoal','timeConstraint'],
-    course: 'First-year nursing students in a fully asynchronous 8-week course',
-    struggle: 'Students repeat the same documentation mistakes even after receiving detailed feedback, and they rarely compare current work to earlier attempts.',
-    behavior: 'Students identify a pattern in their mistakes, explain what caused it, and create a specific strategy they will use before the next submission.'
-  }
-};
-
-window.s2State = window.s2State || {
-  student: null,
-  ingredients: {},
-  course: '',
-  struggle: '',
-  behavior: ''
-};
-
-function s2ResetState() {
-  window.s2State = { student: null, ingredients: {}, course: '', struggle: '', behavior: '' };
-}
-
-function selectedIngredients() {
-  return S2_INGREDIENTS.filter(i => !!window.s2State.ingredients[i.key]);
-}
-
-function s2ScorePercent() {
-  let score = 0;
-  if (window.s2State.student === 'C') score += 20;
-  score += Math.min(36, selectedIngredients().length * 6);
-  if ((window.s2State.course || '').trim().length > 4) score += 12;
-  if ((window.s2State.struggle || '').trim().length > 12) score += 16;
-  if ((window.s2State.behavior || '').trim().length > 12) score += 16;
-  return Math.min(100, score);
-}
-
-function s2PromptText() {
-  const course = (window.s2State.course || '').trim() || '[course / learner context]';
-  const struggle = (window.s2State.struggle || '').trim() || '[what students struggle with]';
-  const behavior = (window.s2State.behavior || '').trim() || '[desired learning behavior]';
-  const chips = selectedIngredients().map(i => i.label).join(', ') || 'no prompt ingredients selected yet';
-
-  return `I teach ${course}.\n\nMy students are completing work, but they are not reflecting on how they learn. Specifically, ${struggle}\n\nCreate a brief asynchronous metacognitive activity that helps students ${behavior}\n\nUse these design ingredients: ${chips}.\n\nThe activity should be low-stakes, easy to complete online, take about 10-15 minutes if a time limit is appropriate, and include a student-facing prompt plus a short instructor note explaining how it supports metacognition, learning strategy awareness, and transfer.`;
-}
-
-function renderS2MetacognitionWorkbench(container) {
-  s2ResetState();
-  document.body.classList.remove('s1-active','s1-result-active');
-  document.body.classList.add('s2-active');
-  container.innerHTML = `
-    <div class="scaffold-area s2-workbench">
-      <div class="s2-left-stack">
-        ${buildScenarioMissionHTML(SCENARIO_INDEX.METACOGNITION)}
-
-        <div class="s2-detective-card" role="region" aria-label="Metacognition detective cards">
-          <div class="s2-card-eyebrow">Student Thought Detective</div>
-          <div class="s2-panel-title">Which student is showing metacognition?</div>
-          <div class="s2-helper-text">Choose the thought bubble that shows a learner monitoring strategy, judging effectiveness, and planning what to do next.</div>
-          <div class="s2-student-grid">
-            ${Object.entries(S2_STUDENTS).map(([key, item]) => `
-              <button type="button" class="s2-student-card" id="s2-student-${key}" onclick="s2SelectStudent('${key}')">
-                <div class="s2-student-name">${item.name}</div>
-                <div class="s2-student-quote">“${item.quote}”</div>
-              </button>
-            `).join('')}
-          </div>
-          <div class="s2-feedback-line" id="s2StudentFeedback">Pick the strongest example before consulting Claude.</div>
-        </div>
-
-        <div class="s2-panel">
-          <div class="s2-panel-eyebrow">Metacognitive Strength</div>
-          <div class="s2-meter-wrap">
-            <div class="s2-meter-top">
-              <span class="s2-meter-label">Prompt readiness</span>
-              <span class="s2-meter-score" id="s2MeterScore">0%</span>
-            </div>
-            <div class="s2-meter-track"><div class="s2-meter-fill" id="s2MeterFill"></div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="s2-right-stack">
-        <div class="s2-panel" role="region" aria-label="Prompt ingredient puzzle">
-          <div class="s2-panel-eyebrow">Prompt Ingredient Puzzle</div>
-          <div class="s2-panel-title">Select the ingredients Claude needs.</div>
-          <div class="s2-helper-text">These reuse the same quality logic as the chips above, just in a more playable form because apparently people like clicking things.</div>
-          <div class="s2-ingredient-grid" role="group" aria-label="Prompt ingredient choices">
-            ${S2_INGREDIENTS.map(i => `<button type="button" class="s2-ingredient-chip" id="s2-ing-${i.key}" onclick="s2ToggleIngredient('${i.key}')">${i.label}</button>`).join('')}
-          </div>
-        </div>
-
-        <div class="s2-context-panel" role="region" aria-label="Personal teacher context">
-          <div class="s2-panel-eyebrow">Personal Instructor Context</div>
-          <div class="s2-panel-title">Tell Claude about your students.</div>
-          <div class="s2-helper-text">This is the part that should feel personal. Claude will respond to the course and learning behavior you describe, not just a generic reflection activity.</div>
-          <div class="s2-field-grid">
-            <div class="s2-field">
-              <label for="s2-course">What kind of course are you teaching?</label>
-              <input id="s2-course" class="s2-input" placeholder="Example: Intro Psychology, asynchronous, 16 weeks" oninput="s2UpdateFromFields()" />
-            </div>
-            <div class="s2-field">
-              <label for="s2-struggle">What do your students struggle with?</label>
-              <textarea id="s2-struggle" class="s2-textarea" placeholder="Example: They complete quizzes but do not notice which study strategies are working." oninput="s2UpdateFromFields();autoGrow(this)"></textarea>
-            </div>
-            <div class="s2-field">
-              <label for="s2-behavior">What learning behavior should improve?</label>
-              <textarea id="s2-behavior" class="s2-textarea" placeholder="Example: Students choose one strategy to reuse or adjust next week." oninput="s2UpdateFromFields();autoGrow(this)"></textarea>
-            </div>
-          </div>
-        </div>
-
-        <div class="s2-panel">
-          <div class="s2-panel-eyebrow">Claude Prompt Preview</div>
-          <div class="s2-prompt-preview" id="s2PromptPreview"></div>
-        </div>
-
-        <div class="s2-footer">
-          <span class="s2-dev-note">Dev shortcuts: S2 weak · S2 mid · S2 strong</span>
-          <span class="attempt-badge" aria-live="polite">Attempts: <span id="attNum">0</span></span>
-          <button type="button" class="guided-send-btn" id="sendBtn" onclick="s2SendToClaude()">Consult Claude →</button>
-        </div>
-      </div>
-    </div>`;
-  s2RefreshUI();
-}
-
-function s2SelectStudent(key) {
-  window.s2State.student = key;
-  document.querySelectorAll('.s2-student-card').forEach(el => el.classList.remove('selected'));
-  document.getElementById(`s2-student-${key}`)?.classList.add('selected');
-  const line = document.getElementById('s2StudentFeedback');
-  if (line) line.textContent = S2_STUDENTS[key]?.feedback || '';
-  s2RefreshUI();
-};
-
-function s2ToggleIngredient(key) {
-  window.s2State.ingredients[key] = !window.s2State.ingredients[key];
-  s2RefreshUI();
-};
-
-function s2UpdateFromFields() {
-  window.s2State.course = document.getElementById('s2-course')?.value || '';
-  window.s2State.struggle = document.getElementById('s2-struggle')?.value || '';
-  window.s2State.behavior = document.getElementById('s2-behavior')?.value || '';
-  s2RefreshUI();
-};
-
-function s2RefreshUI() {
-  S2_INGREDIENTS.forEach(i => {
-    const btn = document.getElementById(`s2-ing-${i.key}`);
-    if (btn) {
-      const selected = !!window.s2State.ingredients[i.key];
-      btn.classList.toggle('selected', selected);
-      btn.setAttribute('aria-pressed', String(selected));
-    }
-  });
-  const percent = s2ScorePercent();
-  const fill = document.getElementById('s2MeterFill');
-  const score = document.getElementById('s2MeterScore');
-  const preview = document.getElementById('s2PromptPreview');
-  if (fill) fill.style.width = percent + '%';
-  if (score) score.textContent = percent + '%';
-  if (preview) preview.textContent = s2PromptText();
-}
-
-function s2SendToClaude() {
-  s2UpdateFromFields();
-  const text = s2PromptText();
-  if (!text) return false;
-  if (window.s2State.student !== 'C') {
-    const line = document.getElementById('s2StudentFeedback');
-    if (line) line.textContent = 'You can still consult Claude, but notice that the detective choice will weaken the learning target.';
-  }
-  sendText(text);
-  return false;
-};
-
-function devFillS2(mode = 'mid') {
-  const preset = S2_PRESETS[mode] || S2_PRESETS.mid;
-  if (typeof window.devGoScenario === 'function') window.devGoScenario(1);
-  else if (typeof devGoScenario === 'function') devGoScenario(1);
-
-  const tryFill = (attempts = 0) => {
-    const course = document.getElementById('s2-course');
-    if (!course) {
-      if (attempts < 40) setTimeout(() => tryFill(attempts + 1), 150);
-      return;
-    }
-    window.s2State.student = preset.student;
-    window.s2State.ingredients = {};
-    preset.ingredients.forEach(k => window.s2State.ingredients[k] = true);
-    window.s2State.course = preset.course;
-    window.s2State.struggle = preset.struggle;
-    window.s2State.behavior = preset.behavior;
-
-    course.value = preset.course;
-    document.getElementById('s2-struggle').value = preset.struggle;
-    document.getElementById('s2-behavior').value = preset.behavior;
-    document.querySelectorAll('.s2-student-card').forEach(el => el.classList.remove('selected'));
-    document.getElementById(`s2-student-${preset.student}`)?.classList.add('selected');
-    const line = document.getElementById('s2StudentFeedback');
-    if (line) line.textContent = S2_STUDENTS[preset.student]?.feedback || '';
-    s2RefreshUI();
-    course.focus();
-  };
-  setTimeout(() => tryFill(), 250);
-  return false;
-};
-
-
-window.devFillS2Weak = () => window.devFillS2('weak');
-window.devFillS2Mid = () => window.devFillS2('mid');
-window.devFillS2Strong = () => window.devFillS2('strong');
 
 
 // ══════════════════════════════════════════════════════
-//  S2 RESULT + PIXEL REFLECTION
-//  addS2ClaudeResultCard and the S2-specific
-//  showPixelScoreReflection override.
+//  DEVELOPMENT TOOLS — CLEAN SHELL
 // ══════════════════════════════════════════════════════
-function addS2ClaudeResultCard(responseText) {
-  document.body.classList.add('s2-active','s2-submitted');
-  const area = document.getElementById('chat');
-  if (!area) return;
-  // Keep the user's submitted prompt bubble, but remove transient typing rows.
-  document.getElementById('typing')?.remove();
-  const card = document.createElement('div');
-  card.className = 's2-result-card';
-  card.innerHTML = `
-    <div class="s2-result-eyebrow">Claude Draft</div>
-    <div class="s2-result-title">Metacognitive Activity Draft</div>
-    <div class="s2-result-body">${fmt(responseText)}</div>
-  `;
-  area.appendChild(card);
-  area.scrollTop = area.scrollHeight;
-}
-
-
-// ══════════════════════════════════════════════════════
-//  DEV BAR GLOBAL EXPORT REPAIR — V2
-//  Inline onclick handlers in index.html require true window globals.
-//  This block must stay at the very bottom of app.js.
-// ══════════════════════════════════════════════════════
-(function exposePromptCraftDevToolsV2(){
+(function exposePromptCraftDevToolsV3(){
   function assign(name, fn) {
-    if (typeof fn === 'function') {
-      window[name] = fn;
-      try { globalThis[name] = fn; } catch(e) {}
-    }
+    window[name] = fn;
+    try { globalThis[name] = fn; } catch (error) {}
   }
 
   function unlockTab(index) {
-    const tabs = document.querySelectorAll('.tab-btn');
-    const btn = tabs[index];
-    if (!btn) return null;
-    btn.disabled = false;
-    btn.classList.remove('locked');
-    btn.removeAttribute('aria-disabled');
-    return btn;
+    const tab = document.querySelectorAll('.tab-btn')[index] || null;
+    if (tab) {
+      tab.disabled = false;
+      tab.classList.remove('locked');
+      tab.removeAttribute('aria-disabled');
+    }
+    return tab;
   }
 
-  function unlockThrough(index) {
-    for (let i = 0; i <= index; i++) unlockTab(i);
-    try {
-      for (let i = 0; i < index; i++) scenarioCompleted[i] = true;
-    } catch(e) {}
-    try { if (index >= 3 && typeof unlockScenario4 === 'function') unlockScenario4(); } catch(e) {}
-    try { if (index >= 4 && typeof unlockScenario5 === 'function') unlockScenario5(); } catch(e) {}
-    try { if (index >= 5 && typeof unlockScenario6 === 'function') unlockScenario6(); } catch(e) {}
-    try { if (index >= 6 && typeof unlockScenario7 === 'function') unlockScenario7(); } catch(e) {}
-    try { if (index >= 7 && typeof unlockScenario8 === 'function') unlockScenario8(); } catch(e) {}
-  }
-
-  function devGoScenarioGlobal(index) {
-    index = Number(index) || 0;
-    unlockThrough(index);
-    const btn = unlockTab(index);
-    try { document.body.classList.remove('s1-result-active','s2-submitted'); } catch(e) {}
-    try { if (typeof clearVN === 'function') clearVN(); } catch(e) {}
-    if (typeof switchScenario === 'function') switchScenario(index, btn);
-    else if (typeof loadScenario === 'function') loadScenario(index);
+  function devGoScenario(index) {
+    const target = Math.max(0, Math.min(SCENARIO_COUNT - 1, Number(index) || 0));
+    const tab = unlockTab(target);
+    pcScenarioHasLaunched = true;
+    switchScenario(target, tab);
     return false;
   }
 
-  function devFillScenarioGlobal(index, mode) {
-    index = Number(index) || 0;
-    if (index === SCENARIO_INDEX.ENGAGEMENT && typeof window.resetS1Dev === 'function') return window.resetS1Dev();
-    if (index === SCENARIO_INDEX.METACOGNITION && typeof window.devFillS2 === 'function') return window.devFillS2(mode || 'mid');
-    if (index === SCENARIO_INDEX.SYNC_BIAS && typeof window.devTestS4 === 'function') return window.devTestS4();
-    if (index === SCENARIO_INDEX.HALLUCINATION && typeof window.devFillS5 === 'function') return window.devFillS5();
-    if (index === SCENARIO_INDEX.PREDICTION && typeof window.devFillS6 === 'function') return window.devFillS6();
-
-    devGoScenarioGlobal(index);
-    const testPrompt = (typeof scenarios !== 'undefined' && scenarios[index] && scenarios[index].testPrompt) ? scenarios[index].testPrompt : '';
-    const fallback = testPrompt || 'Test prompt for PromptCraft dev mode.';
-    const tryFill = (attempts = 0) => {
-      const input = document.getElementById('promptInput');
-      if (input && input.offsetParent !== null) {
-        input.value = fallback;
-        try { if (typeof autoGrow === 'function') autoGrow(input); } catch(e) {}
-        try { if (typeof onHintInput === 'function') onHintInput(input); } catch(e) {}
-        input.focus();
-        return true;
-      }
-      if (attempts < 40) setTimeout(() => tryFill(attempts + 1), 150);
-      return false;
-    };
-    setTimeout(() => tryFill(), 250);
-    return false;
+  function devFillScenario(index) {
+    const target = Number(index) || 0;
+    if (target === SCENARIO_INDEX.ENGAGEMENT && typeof window.resetS1Dev === 'function') {
+      return window.resetS1Dev();
+    }
+    return devGoScenario(target);
   }
 
-  function devTestScenarioGlobal(index) {
-    return devFillScenarioGlobal(index);
+  function devNextScenario() {
+    return devGoScenario(Math.min(scenarioIndex + 1, SCENARIO_COUNT - 1));
   }
 
-  function navigateToNextGlobal(targetIndex) {
-    targetIndex = Number(targetIndex);
-    if (!Number.isFinite(targetIndex)) targetIndex = ((typeof scenarioIndex === 'number' ? scenarioIndex : 0) + 1);
-    return devGoScenarioGlobal(targetIndex);
-  }
-
-  function devNextScenarioGlobal() {
-    const current = typeof scenarioIndex === 'number' ? scenarioIndex : 0;
-    const max = typeof scenarios !== 'undefined' ? scenarios.length - 1 : SCENARIO_COUNT - 1;
-    return devGoScenarioGlobal(Math.min(current + 1, max));
-  }
-
-  // Main DEV bar functions used by index.html inline onclick attributes.
-  assign('devGoScenario', devGoScenarioGlobal);
-  assign('devFillScenario', devFillScenarioGlobal);
-  assign('devTestScenario', devTestScenarioGlobal);
-  assign('navigateToNext', navigateToNextGlobal);
-  assign('devNextScenario', devNextScenarioGlobal);
-
-  // Scenario-specific shortcuts. Use existing owners where they exist, otherwise route through generic navigation/fill.
-  assign('devGoS4', typeof devGoS4 === 'function' ? devGoS4 : () => devGoScenarioGlobal(3));
-  assign('devTestS4', typeof devTestS4 === 'function' ? devTestS4 : () => devFillScenarioGlobal(3));
-  assign('devGoS5', typeof devGoS5 === 'function' ? devGoS5 : () => devGoScenarioGlobal(4));
-  assign('devFillS5', typeof devFillS5 === 'function' ? devFillS5 : () => devFillScenarioGlobal(4));
-  assign('devGoS6', typeof devGoS6 === 'function' ? devGoS6 : () => devGoScenarioGlobal(5));
-  assign('devFillS6', typeof devFillS6 === 'function' ? devFillS6 : () => devFillScenarioGlobal(5));
-  assign('devGoS7', typeof devGoS7 === 'function' ? devGoS7 : () => devGoScenarioGlobal(6));
-  assign('devGoS8', typeof devGoS8 === 'function' ? devGoS8 : () => devGoScenarioGlobal(7));
-  assign('devFillS8', typeof devFillS8 === 'function' ? devFillS8 : () => devFillScenarioGlobal(7));
-  assign('devSkip', typeof devSkip === 'function' ? devSkip : window.devSkip);
-
-  if (typeof devFillS2 === 'function') {
-    assign('devFillS2', devFillS2);
-    assign('devFillS2Weak', () => devFillS2('weak'));
-    assign('devFillS2Mid', () => devFillS2('mid'));
-    assign('devFillS2Strong', () => devFillS2('strong'));
-  }
-
-  window.devStatus = function devStatus(){
-    const names = ['devGoScenario','devFillScenario','devTestScenario','devNextScenario','devSkip','navigateToNext','devGoS5','devFillS5','devGoS6','devFillS6','devGoS7','devGoS8','devFillS8'];
-    return Object.fromEntries(names.map(name => [name, typeof window[name]]));
-  };
-
-  console.info('[PromptCraft] DEV globals repaired:', window.devStatus());
+  assign('devGoScenario', devGoScenario);
+  assign('devFillScenario', devFillScenario);
+  assign('devTestScenario', devFillScenario);
+  assign('navigateToNext', devGoScenario);
+  assign('devNextScenario', devNextScenario);
+  assign('devStatus', () => ({
+    activeScenario: scenarioIndex + 1,
+    implemented: SCENARIO_UI.map(item => item.implemented),
+    build: PC_APP_BUILD_LABEL
+  }));
 })();
 
 // Claude Speech Synthesis voice
