@@ -648,8 +648,6 @@ textarea::placeholder {
 /* ── MOBILE ─────────────────────────────────────────── */
 @media (max-width: 480px) {
   .vn-smartboard-wrap {
-    left: 2%;
-    top: 2%;
     width: 88%;
     aspect-ratio: 16 / 11;
   }
@@ -659,9 +657,7 @@ textarea::placeholder {
   }
   .vn-board-text {
     font-size: 0.9rem;
-    line-height: 1.5;
     padding: 0 12px;
-    max-width: 100%;
   }
 }
 /* Corner screws -- dark on light bezel */
@@ -905,8 +901,6 @@ textarea::placeholder {
   }
   .vn-board-text {
     font-size: 1.5rem;
-    line-height: 1.5;
-    max-width: 100%;
     padding: 0 14px;
   }
 
@@ -1326,7 +1320,6 @@ textarea::placeholder {
     width: 44px;
     height: 44px;
     bottom: 10px;
-    right: 10px;
   }
 
 }
@@ -2868,12 +2861,10 @@ body.s1-active:not(.s1-result-active) .mission-copy {
 
   .vn-overlay.active.claude-prediction .claude-terminal-scene {
     opacity: 0.45 !important;
-    right: 4vw !important;
     top: 6vh !important;
     width: 54vw !important;
   }
   .vn-overlay.active.claude-prediction .vn-dialogue {
-    width: 100vw !important;
     min-height: 210px !important;
     max-height: 42vh !important;
     padding: 20px 24px !important;
@@ -2883,8 +2874,6 @@ body.s1-active:not(.s1-result-active) .mission-copy {
     left: 24px !important;
     right: 24px !important;
     bottom: 58px !important;
-    width: auto !important;
-    grid-template-columns: 1fr !important;
   }
   .vn-overlay.active.claude-prediction .vn-prediction-note {
     left: 24px !important;
@@ -2931,7 +2920,6 @@ body.s1-active:not(.s1-result-active) .mission-copy {
 }
 @media (max-width: 980px) {
   .vn-overlay.active.claude-prediction .vn-character {
-    left: 3vw !important;
     bottom: 190px !important;
     height: min(42vh, 420px) !important;
     opacity: 0.92 !important;
@@ -2949,12 +2937,6 @@ body.s1-active:not(.s1-result-active) .mission-copy {
     padding: 18px 22px !important;
   }
   .vn-overlay.active.claude-prediction .vn-prediction-options {
-    left: 20px !important;
-    right: 20px !important;
-    top: auto !important;
-    bottom: 158px !important;
-    width: auto !important;
-    grid-template-columns: 1fr !important;
     padding: 12px !important;
   }
 }
@@ -4304,7 +4286,7 @@ body .vn-overlay.active.pc-clean-prediction .claude-terminal-photo, body .vn-ove
 body .vn-overlay.active.pc-clean-prediction .claude-terminal-screen, body .vn-overlay.active.claude-prediction .claude-terminal-screen, body .vn-overlay.active.claude-terminal-consult #claudeTerminalScene.thinking .claude-terminal-screen {
   position: absolute !important;
   left: 24.3% !important;
-  top: 24% !important;
+  top: 24.8% !important;
   width: 26.7% !important;
   height: 41% !important;
   border-radius: 12px !important;
@@ -4579,6 +4561,15 @@ body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-cle
   transform-origin: left top !important;
   z-index: 3 !important;
 }
+/* S1 desktop opening: reduce the smartboard slightly without changing the
+   shared normal-scene layout or Scenario 2's dual-character composition. */
+@media (min-width: 901px) and (min-height: 761px) {
+  body.s1-active .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-smartboard-wrap {
+    width: min(54vw, 820px) !important;
+    max-width: 820px !important;
+  }
+}
+
 body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-smartboard {
   width: 100% !important;
   height: 100% !important;
@@ -4646,7 +4637,6 @@ body .vn-overlay.active:not(.claude-terminal-textmode) .vn-dialogue {
   }
   body .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-board-text {
     font-size: clamp(0.9rem, 3.2vw, 1.28rem) !important;
-    line-height: 1.2 !important;
     max-height: 48% !important;
   }
 }
@@ -4975,14 +4965,11 @@ body .analysis-badge {
   justify-self: start !important;
   padding: 5px 10px !important;
   border: 1px solid rgba(32,255,0,.62) !important;
-  background: rgba(32,255,0,.12) !important;
   color: #42ff42 !important;
   font-family: "Source Code Pro", monospace !important;
   font-size: clamp(.72rem, .82vw, .88rem) !important;
   font-weight: 800 !important;
-  letter-spacing: .08em !important;
   line-height: 1.1 !important;
-  text-transform: uppercase !important;
 }
 body .analysis-title {
   font-family: "Source Code Pro", monospace !important;
@@ -5062,7 +5049,6 @@ body .analysis-note {
     gap: 8px !important;
   }
   body .analysis-grid {
-    grid-template-columns: 1fr !important;
     gap: 8px !important;
   }
   body .analysis-card, body .analysis-card.compact, body .analysis-card.wide, body .analysis-status-card, body .analysis-confidence-card {
@@ -5431,7 +5417,6 @@ body.s1-result-active .s1-result-controls .s1-secondary-btn:focus-visible, body.
     min-height: 176px !important;
     align-items: stretch !important;
     flex-direction: column !important;
-    gap: 12px !important;
   }
   body.s1-result-active .s1-result-controls-actions {
     justify-content: stretch !important;
@@ -5616,13 +5601,10 @@ body .analysis-card.wide, body .analysis-impact-card {
     padding: 8px 8px 72px !important;
   }
   body .vn-overlay.active.claude-terminal-textmode .claude-terminal-scene, body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .claude-terminal-scene {
-    width: 100vw !important;
     height: calc(100dvh - 80px) !important;
   }
   body .vn-overlay.active.claude-terminal-textmode .claude-terminal-photo, body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .claude-terminal-photo {
-    width: calc(100vw - 12px) !important;
     height: calc(100dvh - 86px) !important;
-    border-width: 10px !important;
     border-radius: 18px !important;
   }
   body .vn-overlay.active.claude-terminal-textmode .claude-terminal-screen, body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .claude-terminal-screen {
@@ -5651,12 +5633,10 @@ body .analysis-card.compact .analysis-value, body .analysis-status-card .analysi
   body .vn-overlay.active.claude-terminal-textmode .claude-terminal-scene, body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .claude-terminal-scene {
     width: 100vw !important;
     height: calc(100dvh - 86px) !important;
-    min-height: 0 !important;
   }
   body .vn-overlay.active.claude-terminal-textmode .claude-terminal-photo, body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .claude-terminal-photo {
     width: calc(100vw - 10px) !important;
     height: calc(100dvh - 92px) !important;
-    min-height: 0 !important;
     border-width: 10px !important;
     border-radius: 20px !important;
   }
@@ -6758,10 +6738,8 @@ body .vn-overlay.active.claude-terminal-consult:not(.claude-prediction):not(.pc-
 @media (max-width: 640px) {
   body .vn-overlay.active.claude-prediction .vn-dialogue, body .vn-overlay.active.pc-clean-prediction .vn-dialogue, body .vn-overlay.active.pc-prediction-question .vn-dialogue {
     min-height: 344px !important;
-    padding: 22px 18px 184px 18px !important;
   }
   body .vn-overlay.active.claude-prediction .vn-skip, body .vn-overlay.active.pc-clean-prediction .vn-skip, body .vn-overlay.active.pc-prediction-question .vn-skip, body .vn-overlay.active.pc-prediction-result .vn-skip, body .vn-overlay.active.claude-terminal-consult .vn-skip, body .vn-overlay.active.claude-terminal-textmode .vn-skip, body .vn-overlay.active.pc-clean-output .vn-skip {
-    right: 18px !important;
     bottom: 142px !important;
   }
 }
@@ -7620,9 +7598,6 @@ body.s1-result-active .s1-result-controls {
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 8px !important;
-  }
-  body .header-right{
-    justify-content: flex-start !important;
   }
   body .scenario-tabs > *{
     flex: 1 1 calc(50% - 6px) !important;
@@ -8553,13 +8528,7 @@ body .vn-overlay.active.pc-prediction-question .vn-skip {
   body .vn-overlay.active.claude-prediction #claudeTerminalScene,
   body .vn-overlay.active.pc-clean-prediction #claudeTerminalScene,
   body .vn-overlay.active.pc-prediction-question #claudeTerminalScene {
-    left: 50% !important;
-    top: 27% !important;
     width: min(64vw, 1120px) !important;
-    height: auto !important;
-    aspect-ratio: 2.08 / 1 !important;
-    transform: translate(-50%, -50%) !important;
-    overflow: visible !important;
   }
 
   body .vn-overlay.active.claude-prediction #claudeTerminalScene .claude-terminal-photo,
@@ -8578,22 +8547,13 @@ body .vn-overlay.active.pc-prediction-question .vn-skip {
   body .vn-overlay.active.claude-prediction #claudeTerminalScene,
   body .vn-overlay.active.pc-clean-prediction #claudeTerminalScene,
   body .vn-overlay.active.pc-prediction-question #claudeTerminalScene {
-    position: absolute !important;
-    inset: 0 !important;
     left: 0 !important;
     top: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
     min-width: 0 !important;
     min-height: 0 !important;
-    max-width: none !important;
-    max-height: none !important;
     aspect-ratio: auto !important;
-    transform: none !important;
-    overflow: hidden !important;
-    z-index: 2 !important;
   }
 
   /* Keep the parent alive because the green screen is inside it, but remove the computer artwork. */
@@ -8604,8 +8564,6 @@ body .vn-overlay.active.pc-prediction-question .vn-skip {
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    background: transparent !important;
-    background-image: none !important;
     border: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
@@ -8648,11 +8606,7 @@ body .vn-overlay.active.pc-prediction-question .vn-skip {
       radial-gradient(circle at center, rgba(14, 80, 38, 0.88), rgba(0, 10, 4, 0.98) 72%),
       repeating-linear-gradient(0deg, rgba(32, 255, 0, 0.06) 0 1px, transparent 1px 5px) !important;
     box-shadow: inset 0 0 72px rgba(32, 255, 0, 0.16) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
     overflow: hidden !important;
-    z-index: 2 !important;
   }
 
   body .vn-overlay.active.claude-prediction #claudeTerminalScene .claude-terminal-output,
@@ -8661,20 +8615,11 @@ body .vn-overlay.active.pc-prediction-question .vn-skip {
   body .vn-overlay.active.claude-prediction #claudeTerminalOutput,
   body .vn-overlay.active.pc-clean-prediction #claudeTerminalOutput,
   body .vn-overlay.active.pc-prediction-question #claudeTerminalOutput {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    height: 100% !important;
     padding: 24px 18px 210px !important;
-    text-align: center !important;
     font-size: clamp(1.1rem, 5vw, 1.65rem) !important;
     line-height: 1.35 !important;
-    letter-spacing: 0.08em !important;
-    color: #d9ffe5 !important;
     text-shadow: 0 0 8px rgba(180, 255, 200, 0.6) !important;
     white-space: pre-wrap !important;
-    overflow: hidden !important;
   }
 
   /* Remove Pixel only for the prediction gate so the terminal can fill the scene. */
@@ -8834,16 +8779,12 @@ body .vn-overlay.active.pc-prediction-question .vn-skip {
   body .vn-overlay.active.claude-prediction .vn-character,
   body .vn-overlay.active.pc-clean-prediction .vn-character,
   body .vn-overlay.active.pc-prediction-question .vn-character {
-    display: block !important;
-    opacity: 1 !important;
-    left: 18px !important;
     right: auto !important;
     bottom: 206px !important;
     height: min(34vh, 300px) !important;
     max-height: 300px !important;
     width: auto !important;
     z-index: 16 !important;
-    transform: none !important;
   }
 
   body .vn-overlay.active.claude-prediction #vnPortrait,
@@ -8982,9 +8923,6 @@ body .vn-overlay.active.pc-prediction-question .vn-skip {
   body .vn-overlay.active.claude-prediction .vn-expression-badge,
   body .vn-overlay.active.pc-clean-prediction .vn-expression-badge,
   body .vn-overlay.active.pc-prediction-question .vn-expression-badge {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
     pointer-events: none !important;
   }
 }
@@ -9007,7 +8945,6 @@ body .vn-overlay.active.pc-prediction-question .vn-skip {
     max-height: 42vh !important;
 
     padding: 16px 18px 128px 18px !important;
-    overflow: visible !important;
 
     display: flex !important;
     flex-direction: column !important;
@@ -9034,16 +8971,11 @@ body .vn-overlay.active.pc-prediction-question .vn-skip {
   body .vn-overlay.active.claude-prediction .vn-text,
   body .vn-overlay.active.pc-clean-prediction .vn-text,
   body .vn-overlay.active.pc-prediction-question .vn-text {
-    max-width: 100% !important;
     width: 100% !important;
     min-height: 0 !important;
 
     font-size: clamp(0.86rem, 2.8vw, 1rem) !important;
     line-height: 1.35 !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: visible !important;
   }
 
   /* Keep the prediction buttons centered and clear of the text. */
@@ -9061,28 +8993,9 @@ body .vn-overlay.active.pc-prediction-question .vn-skip {
   body .vn-overlay.active.pc-prediction-question .pc-clean-choice-grid {
     position: fixed !important;
 
-    left: 50% !important;
-    right: auto !important;
-    bottom: 16px !important;
-
     width: min(calc(100vw - 32px), 700px) !important;
     max-width: 700px !important;
     min-height: 0 !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 10px !important;
-
-    transform: translateX(-50%) !important;
-    align-items: stretch !important;
-    justify-items: stretch !important;
-    justify-content: center !important;
-
-    z-index: 42 !important;
-    pointer-events: auto !important;
   }
 
   body .vn-overlay.active.claude-prediction #vnPredictionChoicePanel button,
@@ -9097,17 +9010,9 @@ body .vn-overlay.active.pc-prediction-question .vn-skip {
   body .vn-overlay.active.claude-prediction .pc-clean-choice-grid button,
   body .vn-overlay.active.pc-clean-prediction .pc-clean-choice-grid button,
   body .vn-overlay.active.pc-prediction-question .pc-clean-choice-grid button {
-    width: 100% !important;
-    min-width: 0 !important;
     min-height: 40px !important;
 
-    padding: 9px 10px !important;
-    margin: 0 !important;
-
     font-size: clamp(0.7rem, 2.2vw, 0.84rem) !important;
-    line-height: 1.18 !important;
-    text-align: center !important;
-    white-space: normal !important;
   }
 
   /* Hide advance hint here; the choice buttons are the action. */
@@ -9128,9 +9033,7 @@ body .vn-overlay.active.pc-prediction-question .vn-skip {
     left: 18px !important;
     height: min(30vh, 275px) !important;
     max-height: 275px !important;
-    opacity: 1 !important;
     display: block !important;
-    z-index: 18 !important;
   }
 }
 
@@ -9756,15 +9659,9 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
 
     left: 10px !important;
     right: 10px !important;
-    top: 10px !important;
     bottom: 82px !important;
-
-    width: auto !important;
-    height: auto !important;
     max-width: none !important;
     max-height: none !important;
-
-    transform: none !important;
     overflow: visible !important;
     z-index: 9 !important;
   }
@@ -9817,11 +9714,7 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     max-width: none !important;
     max-height: none !important;
 
-    display: flex !important;
-    flex-direction: column !important;
-
     padding: clamp(18px, 4.5vw, 28px) !important;
-    box-sizing: border-box !important;
 
     border: 2px solid rgba(32, 255, 0, 0.82) !important;
     border-radius: 12px !important;
@@ -9848,8 +9741,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .claude-terminal-output.claude-analysis-layout {
     flex: 1 1 auto !important;
     min-height: 0 !important;
-
-    width: 100% !important;
     max-width: none !important;
     height: 100% !important;
     max-height: none !important;
@@ -9864,8 +9755,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     line-height: 1.45 !important;
     white-space: normal !important;
     overflow-wrap: break-word !important;
-
-    color: #f7fff8 !important;
     text-shadow: 0 0 5px rgba(185, 255, 205, 0.34) !important;
 
     scrollbar-gutter: stable !important;
@@ -10004,15 +9893,11 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
 
     width: auto !important;
     min-width: min(42vw, 160px) !important;
-    min-height: 44px !important;
 
     margin: 0 !important;
     padding: 10px 14px !important;
 
     background: rgba(0, 42, 24, 0.92) !important;
-    color: #f5fff6 !important;
-    border: 1.5px solid rgba(185, 230, 200, 0.96) !important;
-    border-radius: 10px !important;
 
     font-family: "Source Code Pro", monospace !important;
     font-size: clamp(0.72rem, 2.45vw, 0.86rem) !important;
@@ -10041,9 +9926,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene,
   body .vn-overlay.active.pc-clean-output #claudeTerminalScene,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene {
-    top: 10px !important;
-    left: 8px !important;
-    right: 8px !important;
     bottom: 86px !important;
   }
 
@@ -10071,7 +9953,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.pc-clean-output #claudeTerminalScene .claude-terminal-output.claude-analysis-layout,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .claude-terminal-output.claude-analysis-layout {
     font-size: clamp(1.06rem, 3.9vw, 1.22rem) !important;
-    line-height: 1.5 !important;
     padding: 0 10px 16px 0 !important;
     color: #f7fff8 !important;
     text-shadow: 0 0 4px rgba(185, 230, 200, 0.30) !important;
@@ -10094,7 +9975,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
 
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .analysis-card, body .vn-overlay.active.pc-clean-output #claudeTerminalScene .analysis-card, body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .analysis-card{
     padding: 13px 13px !important;
-    border-color: rgba(146, 220, 191, 0.82) !important;
     background: rgba(0, 28, 13, 0.46) !important;
   }
 
@@ -10111,29 +9991,12 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-textmode .vn-dialogue,
   body .vn-overlay.active.pc-clean-output .vn-dialogue,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .vn-dialogue {
-    position: fixed !important;
-    left: 0 !important;
-    right: 0 !important;
     bottom: 16px !important;
 
-    width: 100% !important;
-    min-height: 54px !important;
-    height: 54px !important;
-    max-height: 54px !important;
-
     padding: 0 10px !important;
-    margin: 0 !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
-    border: 0 !important;
     outline: 0 !important;
-    box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 
@@ -10180,19 +10043,11 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     max-width: calc(100vw - 24px) !important;
 
     margin: 0 !important;
-    padding: 0 !important;
 
     display: flex !important;
     flex-wrap: nowrap !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 10px !important;
-
-    background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
-    border: 0 !important;
-    box-shadow: none !important;
     overflow: visible !important;
   }
 
@@ -10208,10 +10063,7 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     min-width: min(43vw, 158px) !important;
     min-height: 42px !important;
     padding: 9px 13px !important;
-
-    background: rgba(0, 42, 24, 0.88) !important;
     color: #f4fff6 !important;
-    border: 1.5px solid rgba(185, 230, 200, 0.96) !important;
     border-radius: 10px !important;
 
     font-size: clamp(0.72rem, 2.5vw, 0.86rem) !important;
@@ -10229,9 +10081,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     right: 8px !important;
     top: 10px !important;
     bottom: 10px !important;
-
-    width: auto !important;
-    height: auto !important;
     transform: none !important;
   }
 
@@ -10323,26 +10172,12 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-textmode .vn-dialogue,
   body .vn-overlay.active.pc-clean-output .vn-dialogue,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .vn-dialogue {
-    position: fixed !important;
     left: 8px !important;
     right: 8px !important;
     bottom: 20px !important;
-
-    width: auto !important;
     height: 54px !important;
     min-height: 54px !important;
     max-height: 54px !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
 
     z-index: 70 !important;
   }
@@ -10356,14 +10191,7 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     width: min(calc(100vw - 96px), 360px) !important;
     height: 54px !important;
     padding: 0 !important;
-    margin: 0 auto !important;
-
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 10px !important;
-
-    align-items: center !important;
-    justify-content: center !important;
 
     background: transparent !important;
     border: 0 !important;
@@ -10397,24 +10225,12 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene,
   body .vn-overlay.active.pc-clean-output #claudeTerminalScene,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene {
-    left: 4px !important;
-    right: 4px !important;
-    top: 4px !important;
-    bottom: 4px !important;
-    width: auto !important;
-    height: auto !important;
     z-index: 50 !important;
   }
 
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .claude-terminal-screen,
   body .vn-overlay.active.pc-clean-output #claudeTerminalScene .claude-terminal-screen,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .claude-terminal-screen {
-    min-height: calc(100vh - 8px) !important;
-    height: calc(100vh - 8px) !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
     padding:
       18px
       16px
@@ -10426,11 +10242,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .claude-terminal-output, body .vn-overlay.active.pc-clean-output #claudeTerminalScene .claude-terminal-output, body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .claude-terminal-output, body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .claude-analysis-layout, body .vn-overlay.active.pc-clean-output #claudeTerminalScene .claude-analysis-layout, body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .claude-analysis-layout{
     width: min(100%, 460px) !important;
     max-width: 460px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    box-sizing: border-box !important;
   }
 
   /* Keep buttons inside the panel and visually attached to it. */
@@ -10455,9 +10266,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .vn-text {
     width: min(calc(100vw - 56px), 440px) !important;
     max-width: 440px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    gap: 12px !important;
   }
 }
 
@@ -10514,19 +10322,11 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-textmode .vn-dialogue,
   body .vn-overlay.active.pc-clean-output .vn-dialogue,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode .vn-dialogue {
-    position: fixed !important;
     left: 0 !important;
     right: 0 !important;
     bottom: 24px !important;
     width: 100% !important;
     margin: 0 auto !important;
-    padding: 0 !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
     z-index: 90 !important;
   }
 
@@ -10540,11 +10340,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     max-width: 404px !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 12px !important;
-    align-items: center !important;
-    justify-content: center !important;
   }
 }
 
@@ -10638,38 +10433,20 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene,
   body .vn-overlay.active.pc-clean-output #claudeTerminalScene,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene {
-    position: absolute !important;
-
-    left: 50% !important;
     top: 42% !important;
 
     width: min(92vw, 1760px) !important;
-    height: auto !important;
-    aspect-ratio: 2.08 / 1 !important;
-
-    max-width: none !important;
-    max-height: none !important;
-
-    transform: translate(-50%, -50%) !important;
-    overflow: visible !important;
-    z-index: 8 !important;
   }
 
   /* Keep the diagnostic screen scaled with the enlarged computer art. */
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .claude-terminal-screen,
   body .vn-overlay.active.pc-clean-output #claudeTerminalScene .claude-terminal-screen,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .claude-terminal-screen {
-    position: absolute !important;
 
     left: 22.7% !important;
     top: 17.5% !important;
     width: 33.2% !important;
     height: 48% !important;
-
-    max-width: none !important;
-    max-height: none !important;
-
-    overflow: hidden !important;
   }
 }
 
@@ -10678,11 +10455,8 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene,
   body .vn-overlay.active.pc-clean-output #claudeTerminalScene,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene {
-    left: 50% !important;
     top: 44.5% !important;
     width: min(104vw, 1980px) !important;
-    aspect-ratio: 2.08 / 1 !important;
-    transform: translate(-50%, -50%) !important;
   }
 
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .claude-terminal-screen,
@@ -10690,7 +10464,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .claude-terminal-screen {
     left: 22.3% !important;
     top: 17.2% !important;
-    width: 33.8% !important;
     height: 48.8% !important;
   }
 }
@@ -10700,37 +10473,9 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene,
   body .vn-overlay.active.pc-clean-output #claudeTerminalScene,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene {
-    position: absolute !important;
-
-    left: 50% !important;
     top: 49% !important;
 
     width: min(132vw, 2420px) !important;
-    height: auto !important;
-    aspect-ratio: 2.08 / 1 !important;
-
-    max-width: none !important;
-    max-height: none !important;
-
-    transform: translate(-50%, -50%) !important;
-    overflow: visible !important;
-    z-index: 8 !important;
-  }
-
-  body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .claude-terminal-photo,
-  body .vn-overlay.active.pc-clean-output #claudeTerminalScene .claude-terminal-photo,
-  body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .claude-terminal-photo {
-    position: absolute !important;
-    inset: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    background-size: contain !important;
-    background-position: center center !important;
-    background-repeat: no-repeat !important;
-
-    overflow: visible !important;
   }
 
   /* Re-lock the diagnostic overlay to the enlarged CRT area. */
@@ -10752,57 +10497,27 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene,
   body .vn-overlay.active.pc-clean-output #claudeTerminalScene,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene {
-    position: absolute !important;
-
-    left: 50% !important;
     top: 45.5% !important;
 
     width: min(96vw, 1760px) !important;
-    height: auto !important;
-    aspect-ratio: 2.08 / 1 !important;
-
-    max-width: none !important;
-    max-height: none !important;
-
-    transform: translate(-50%, -50%) !important;
-    overflow: visible !important;
-    z-index: 8 !important;
   }
 
   /* This is the important change: scale the actual computer art, not only the outer wrapper. */
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .claude-terminal-photo,
   body .vn-overlay.active.pc-clean-output #claudeTerminalScene .claude-terminal-photo,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .claude-terminal-photo {
-    position: absolute !important;
-    inset: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    background-size: contain !important;
-    background-position: center center !important;
-    background-repeat: no-repeat !important;
 
     transform: scale(1.28) !important;
-    transform-origin: center center !important;
-
-    overflow: visible !important;
   }
 
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene .claude-terminal-screen,
   body .vn-overlay.active.pc-clean-output #claudeTerminalScene .claude-terminal-screen,
   body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene .claude-terminal-screen {
-    position: absolute !important;
 
     left: 22.2% !important;
     top: 17.1% !important;
     width: 33.8% !important;
     height: 49% !important;
-
-    max-width: none !important;
-    max-height: none !important;
-
-    overflow: hidden !important;
   }
 }
 
@@ -11246,19 +10961,11 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   }
 
   html body .vn-overlay.active:has(#claudeTerminalScene.textmode.responding) #vnText {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
     gap: 16px !important;
-
-    width: auto !important;
     max-width: calc(100vw - 32px) !important;
 
     height: auto !important;
     min-height: 0 !important;
-
-    margin: 0 auto !important;
     padding: 0 !important;
 
     background: transparent !important;
@@ -11275,7 +10982,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   html body .vn-overlay.active:has(#claudeTerminalScene.textmode.responding) .terminal-return,
   html body .vn-overlay.active:has(#claudeTerminalScene.textmode.responding) .prediction-continue-btn {
     position: static !important;
-    min-width: 170px !important;
     pointer-events: auto !important;
   }
 }
@@ -11702,18 +11408,12 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     width: 28% !important;
     height: 41% !important;
 
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
     padding: 0 !important;
     margin: 0 !important;
 
     background: transparent !important;
     border: 0 !important;
     box-shadow: none !important;
-
-    overflow: hidden !important;
     z-index: 12 !important;
   }
 
@@ -11731,36 +11431,17 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     max-height: none !important;
 
     margin: 0 auto !important;
-    padding: 0 !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
 
     transform: none !important;
-    overflow: hidden !important;
   }
 
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report,
   html body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report,
   html body .vn-overlay.active.pc-clean-output #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report,
   html body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report {
-    width: 100% !important;
-    height: 100% !important;
     max-width: 100% !important;
-
-    margin: 0 auto !important;
     padding: 14px !important;
-    box-sizing: border-box !important;
-
-    display: flex !important;
-    flex-direction: column !important;
     justify-content: flex-start !important;
-    gap: 10px !important;
 
     background:
       radial-gradient(circle at 50% 30%, rgba(20, 96, 53, 0.34), rgba(0, 22, 10, 0.94) 76%) !important;
@@ -11777,7 +11458,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 10px !important;
-    align-content: start !important;
   }
 
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-card.analysis-card {
@@ -11836,19 +11516,12 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
 
 @media (min-width: 901px) {
   /* Keep the monitor itself clipped, but allow the report inside to scroll. */
-  html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .claude-terminal-screen.claude-terminal-screen,
-  html body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .claude-terminal-screen.claude-terminal-screen,
-  html body .vn-overlay.active.pc-clean-output #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .claude-terminal-screen.claude-terminal-screen,
-  html body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .claude-terminal-screen.claude-terminal-screen {
-    overflow: hidden !important;
-  }
 
   /* The wrapper must not create the scroll. The report itself should scroll. */
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding #claudeTerminalOutput.claude-terminal-output.claude-analysis-layout,
   html body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding #claudeTerminalOutput.claude-terminal-output.claude-analysis-layout,
   html body .vn-overlay.active.pc-clean-output #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding #claudeTerminalOutput.claude-terminal-output.claude-analysis-layout,
   html body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding #claudeTerminalOutput.claude-terminal-output.claude-analysis-layout {
-    overflow: hidden !important;
     min-height: 0 !important;
   }
 
@@ -11857,14 +11530,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   html body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report,
   html body .vn-overlay.active.pc-clean-output #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report,
   html body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report {
-    height: 100% !important;
-    max-height: 100% !important;
-    min-height: 0 !important;
-
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    overscroll-behavior: contain !important;
-    -webkit-overflow-scrolling: touch !important;
     scrollbar-gutter: stable !important;
 
     padding-right: 18px !important;
@@ -11912,29 +11577,18 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   html body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report,
   html body .vn-overlay.active.pc-clean-output #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report,
   html body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report {
-    height: 100% !important;
-    max-height: 100% !important;
-    min-height: 0 !important;
 
     display: block !important;
-
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
     overscroll-behavior: contain !important;
     -webkit-overflow-scrolling: touch !important;
-
-    padding: 10px 18px 14px 10px !important;
-    box-sizing: border-box !important;
   }
 
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-header.analysis-header {
     display: block !important;
     margin: 0 0 8px 0 !important;
-    padding: 0 !important;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-    overflow: visible !important;
   }
 
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-badge.analysis-badge {
@@ -11950,12 +11604,9 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
 
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-summary.analysis-summary {
     display: block !important;
-    margin: 0 !important;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-    overflow: visible !important;
-    line-height: 1.22 !important;
   }
 
 
@@ -11965,17 +11616,8 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   html body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-grid.analysis-grid {
     display: flex !important;
     flex-direction: column !important;
-    gap: 7px !important;
-
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
 
     padding: 0 0 12px 0 !important;
-    margin: 0 !important;
-
-    overflow: visible !important;
   }
 
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-card.analysis-card,
@@ -11985,15 +11627,8 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     display: block !important;
 
     width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
 
     padding: 7px 9px !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-
-    overflow: visible !important;
   }
 
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-label.analysis-label,
@@ -12009,19 +11644,16 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-label.analysis-label {
     margin: 0 0 3px 0 !important;
     font-size: clamp(8px, 0.52vw, 10px) !important;
-    line-height: 1.05 !important;
   }
 
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-value.analysis-value,
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-value.analysis-value * {
     font-size: clamp(10px, 0.76vw, 13px) !important;
     line-height: 1.14 !important;
-    overflow-wrap: anywhere !important;
   }
 
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-status-card .analysis-value {
     font-size: clamp(11px, 0.84vw, 14px) !important;
-    line-height: 1.08 !important;
   }
 
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-confidence-card .analysis-value,
@@ -12037,8 +11669,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   html body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report,
   html body .vn-overlay.active.pc-clean-output #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report,
   html body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report.analysis-report {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
     padding: 10px 18px 14px 10px !important;
   }
 
@@ -12047,23 +11677,14 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   html body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-grid.analysis-grid,
   html body .vn-overlay.active.pc-clean-output #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-grid.analysis-grid,
   html body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-grid.analysis-grid {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
     grid-auto-rows: auto !important;
     gap: 7px !important;
-
-    width: 100% !important;
     height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
 
     align-items: start !important;
     align-content: start !important;
 
     padding: 0 0 14px 0 !important;
-    margin: 0 !important;
-
-    overflow: visible !important;
   }
 
   /* Short cards can sit side-by-side. */
@@ -12074,11 +11695,7 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   html body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-card.analysis-card,
   html body .vn-overlay.active.pc-clean-output #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-card.analysis-card,
   html body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-card.analysis-card {
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
     padding: 6px 8px !important;
-    overflow: visible !important;
   }
 
   /* Make side-by-side card copy a little more compact but still readable. */
@@ -12092,7 +11709,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-value.analysis-value * {
     font-size: clamp(9px, 0.68vw, 12px) !important;
     line-height: 1.12 !important;
-    overflow-wrap: anywhere !important;
   }
 
   html body .vn-overlay.active #claudeTerminalScene#claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-status-card .analysis-value {
@@ -12401,8 +12017,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     max-width: 68vw !important;
     max-height: 32dvh !important;
 
-    transform: translateX(-50%) !important;
-
     z-index: 18 !important;
     pointer-events: none !important;
   }
@@ -12411,7 +12025,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.pc-clean-output:not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question) #vnPortrait {
     max-width: 68vw !important;
     max-height: 32dvh !important;
-    object-fit: contain !important;
   }
 
   /* Dialogue stays fixed at the bottom. */
@@ -12433,8 +12046,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
 
     background: linear-gradient(180deg, rgba(0,0,0,0.86), rgba(0,0,0,0.96)) !important;
     border-top: 1.5px solid rgba(185, 230, 200, 0.85) !important;
-
-    overflow: hidden !important;
     z-index: 30 !important;
 
     transform: none !important;
@@ -12454,16 +12065,12 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
 
     font-size: clamp(0.94rem, 3.25vw, 1.05rem) !important;
     line-height: 1.42 !important;
-
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
   }
 
   body .vn-overlay.active:not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-advance,
   body .vn-overlay.active.pc-clean-output:not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question) .vn-advance {
     position: absolute !important;
     right: 18px !important;
-    bottom: max(18px, env(safe-area-inset-bottom)) !important;
     z-index: 34 !important;
   }
 
@@ -12486,7 +12093,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     bottom: clamp(158px, 25dvh, 218px) !important;
     height: clamp(145px, 27dvh, 230px) !important;
     max-height: 30dvh !important;
-    z-index: 22 !important;
   }
 
   body .vn-overlay.active:not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnPortrait,
@@ -13312,52 +12918,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene.claude-terminal-scene.textmode.responding .claude-terminal-photo {
     display: none !important;
   }
-
-  body .vn-overlay.active #claudeTerminalScene.claude-terminal-scene.textmode.responding .claude-terminal-screen,
-  body .vn-overlay.active.pc-clean-output #claudeTerminalScene.claude-terminal-scene.textmode.responding .claude-terminal-screen,
-  body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene.claude-terminal-scene.textmode.responding .claude-terminal-screen {
-    position: fixed !important;
-    left: clamp(8px, 2vw, 16px) !important;
-    right: clamp(8px, 2vw, 16px) !important;
-    top: clamp(8px, 2vw, 16px) !important;
-    bottom: clamp(76px, 12dvh, 96px) !important;
-    width: auto !important;
-    height: auto !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    border: 1.5px solid rgba(22, 255, 66, 0.92) !important;
-    border-radius: 14px !important;
-    background:
-      radial-gradient(circle at 50% 34%, rgba(18, 91, 48, 0.34), rgba(0, 21, 9, 0.98) 76%) !important;
-    box-shadow:
-      0 0 18px rgba(22, 255, 66, 0.18),
-      inset 0 0 28px rgba(22, 255, 66, 0.08) !important;
-  }
-
-  body .vn-overlay.active #claudeTerminalScene.claude-terminal-scene.textmode.responding #claudeTerminalOutput.claude-analysis-layout,
-  body .vn-overlay.active.pc-clean-output #claudeTerminalScene.claude-terminal-scene.textmode.responding #claudeTerminalOutput.claude-analysis-layout,
-  body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene.claude-terminal-scene.textmode.responding #claudeTerminalOutput.claude-analysis-layout {
-    width: 100% !important;
-    height: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-  }
-
-  body .vn-overlay.active #claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report,
-  body .vn-overlay.active.pc-clean-output #claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report,
-  body .vn-overlay.active.claude-terminal-textmode #claudeTerminalScene.claude-terminal-scene.textmode.responding .analysis-report {
-    width: 100% !important;
-    height: 100% !important;
-    padding: clamp(18px, 4vw, 28px) !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    background: transparent !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-  }
 }
 
 
@@ -13422,9 +12982,7 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     box-sizing: border-box !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
     font-size: clamp(0.82rem, 0.82vw, 1.08rem) !important;
-    line-height: 1.42 !important;
     overflow: hidden !important;
   }
 
@@ -13470,37 +13028,16 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
 
   body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output) #claudeTerminalScene.claude-terminal-scene:not(.responding) .claude-terminal-screen,
   body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output) #claudeTerminalScene.claude-terminal-scene:not(.responding) .claude-terminal-screen {
-    position: absolute !important;
     inset: clamp(14px, 4vw, 22px) !important;
-    width: auto !important;
-    height: auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 !important;
-    margin: 0 !important;
     background:
       radial-gradient(circle at 50% 38%, rgba(16, 91, 50, 0.32), rgba(0, 20, 8, 0.96) 74%) !important;
-    border: 1.5px solid rgba(146, 220, 191, 0.86) !important;
-    border-radius: 14px !important;
-    box-shadow:
-      0 0 18px rgba(146, 220, 191, 0.16),
-      inset 0 0 32px rgba(146, 220, 191, 0.08) !important;
-    overflow: hidden !important;
   }
 
   body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output) #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput,
   body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output) #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput {
-    width: 100% !important;
-    height: 100% !important;
     padding: clamp(22px, 6vw, 34px) !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
     font-size: clamp(1rem, 4vw, 1.22rem) !important;
     line-height: 1.45 !important;
-    overflow: hidden !important;
   }
 
   body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output) #vnDialogue,
@@ -13735,27 +13272,14 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   */
   body .vn-overlay.active:has(#claudeTerminalScene.textmode.responding) #vnDialogue,
   body .vn-overlay.active:has(#claudeTerminalScene.textmode.responding) .vn-dialogue {
-    position: fixed !important;
 
     left: 0 !important;
     right: 0 !important;
     bottom: max(10px, env(safe-area-inset-bottom)) !important;
 
     width: 100vw !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    height: auto !important;
 
     padding: 0 12px !important;
-    margin: 0 !important;
-
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
-
-    overflow: visible !important;
-    pointer-events: none !important;
-    z-index: 96 !important;
   }
 
   body .vn-overlay.active:has(#claudeTerminalScene.textmode.responding) #vnDialogue::before,
@@ -13770,21 +13294,8 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   }
 
   body .vn-overlay.active:has(#claudeTerminalScene.textmode.responding) #vnText {
-    width: 100% !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-
-    display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 10px !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
-
-    pointer-events: auto !important;
   }
 
   body .vn-overlay.active:has(#claudeTerminalScene.textmode.responding) #vnText > div {
@@ -13794,21 +13305,12 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   body .vn-overlay.active:has(#claudeTerminalScene.textmode.responding) #vnText button,
   body .vn-overlay.active:has(#claudeTerminalScene.textmode.responding) .terminal-return,
   body .vn-overlay.active:has(#claudeTerminalScene.textmode.responding) .prediction-continue-btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    min-width: 0 !important;
-    width: 100% !important;
-    min-height: 46px !important;
-    height: 46px !important;
 
     padding: 0 12px !important;
 
     background: rgba(0, 42, 24, 0.88) !important;
     color: #f4fff6 !important;
     border: 1.5px solid rgba(185, 230, 200, 0.96) !important;
-    border-radius: 10px !important;
     box-shadow: 0 0 14px rgba(185, 230, 200, 0.16) !important;
 
     font-family: "Source Code Pro", monospace !important;
@@ -13816,8 +13318,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     font-weight: 800 !important;
     letter-spacing: 0.02em !important;
     text-align: center !important;
-
-    transform: none !important;
   }
 }
 
@@ -14173,8 +13673,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     top: 24.4% !important;
     width: 24.9% !important;
     height: 37.4% !important;
-
-    overflow: hidden !important;
   }
 
   html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output) #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput,
@@ -14183,27 +13681,15 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     height: 100% !important;
 
     padding: 11% 13% 10% 18% !important;
-    box-sizing: border-box !important;
 
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
     justify-content: center !important;
-
-    font-family: "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
     font-size: clamp(0.72rem, 0.68vw, 0.92rem) !important;
     line-height: 1.55 !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.045em !important;
 
     color: rgba(204, 246, 216, 0.88) !important;
-    text-align: left !important;
-    text-transform: uppercase !important;
-    white-space: pre-line !important;
-
-    text-shadow:
-      0 0 4px rgba(185, 230, 200, 0.26),
-      0 0 12px rgba(22, 255, 66, 0.08) !important;
 
     background:
       linear-gradient(rgba(255,255,255,0.018) 50%, rgba(0,0,0,0.04) 50%) !important;
@@ -14214,18 +13700,13 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
 
   html body .vn-overlay.active.claude-terminal-consult:not(.pc-clean-output) #claudeTerminalScene.claude-terminal-scene:not(.responding) .claude-terminal-title,
   html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output) #claudeTerminalScene.claude-terminal-scene:not(.responding) .claude-terminal-title {
-    display: block !important;
     align-self: flex-start !important;
 
     margin: 0 0 clamp(12px, 1.05vw, 20px) 0 !important;
 
     font-size: clamp(0.64rem, 0.58vw, 0.78rem) !important;
-    line-height: 1.15 !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.075em !important;
 
     color: rgba(204, 246, 216, 0.70) !important;
-    text-shadow: 0 0 5px rgba(185, 230, 200, 0.18) !important;
   }
 }
 
@@ -14570,23 +14051,10 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
   #claudeTerminalScene.claude-terminal-scene:not(.responding) .claude-terminal-screen {
     /* Fits the actual CRT glass better */
-    position: absolute !important;
     left: 30.9% !important;
     top: 23.7% !important;
     width: 25.8% !important;
     height: 39.2% !important;
-
-    display: block !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
-
-    overflow: hidden !important;
-    z-index: 22 !important;
   }
 
   /*
@@ -14599,7 +14067,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput,
   html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
   #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput {
-    position: absolute !important;
 
     left: 50% !important;
     top: 52% !important;
@@ -14608,12 +14075,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     max-width: 70% !important;
     height: auto !important;
     max-height: 82% !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-
-    transform: translate(-50%, -50%) !important;
 
     display: flex !important;
     flex-direction: column !important;
@@ -14635,12 +14096,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     text-shadow:
       0 0 5px rgba(190, 255, 210, 0.28),
       0 0 14px rgba(24, 255, 90, 0.10) !important;
-
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
-
-    overflow: visible !important;
   }
 
   /* Title should read like a terminal header, not a microscopic apology. */
@@ -14702,10 +14157,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     position: absolute !important;
 
     /* CRT glass alignment */
-    left: 31.15% !important;
-    top: 23.9% !important;
-    width: 25.15% !important;
-    height: 38.35% !important;
 
     display: block !important;
 
@@ -14715,8 +14166,6 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
     background: transparent !important;
     border: 0 !important;
     box-shadow: none !important;
-
-    overflow: hidden !important;
     z-index: 22 !important;
   }
 
@@ -14741,30 +14190,10 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput,
   html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
   #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput {
-    position: absolute !important;
 
     left: 45% !important;
-    top: 50% !important;
 
     width: 72% !important;
-    height: 74% !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-
-    transform: translate(-50%, -50%) !important;
-
-    display: block !important;
-
-    color: transparent !important;
-    font-size: 0 !important;
-    line-height: 0 !important;
-    text-shadow: none !important;
-
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
 
     overflow: hidden !important;
   }
@@ -14773,42 +14202,9 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput::before,
   html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
   #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput::before {
-    content:
-      "CLAUDE TERMINAL\A "
-      "\A "
-      "> SECTION\A "
-      "  SCENARIO DIAGNOSIS\A "
-      "\A "
-      "> STATUS\A "
-      "  ANALYZING  █" !important;
-
-    position: absolute !important;
     left: -10% !important;
-    top: 50% !important;
-
-    width: 100% !important;
-
-    transform: translateY(-50%) !important;
-
-    display: block !important;
-
-    white-space: pre !important;
-
-    font-family: "Source Code Pro", "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
-    font-size: clamp(0.82rem, 0.78vw, 1.05rem) !important;
-    line-height: 1.36 !important;
-    font-weight: 900 !important;
-    letter-spacing: 0.045em !important;
 
     color: rgba(210, 255, 225, 0.88) !important;
-    text-align: left !important;
-    text-transform: uppercase !important;
-
-    text-shadow:
-      0 0 5px rgba(200, 255, 218, 0.36),
-      0 0 15px rgba(22, 255, 66, 0.14) !important;
-
-    opacity: 0.96 !important;
   }
 
   /*
@@ -14819,22 +14215,14 @@ body .vn-overlay.active.claude-prediction #vnText button:not(.vn-skip):hover, bo
   #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput::after,
   html body .vn-overlay.active.claude-terminal-textmode:not(.pc-clean-output)
   #claudeTerminalScene.claude-terminal-scene:not(.responding) #claudeTerminalOutput::after {
-    content: "" !important;
-
-    position: absolute !important;
-    inset: -2px !important;
-
-    pointer-events: none !important;
 
     background:
       linear-gradient(
         rgba(255,255,255,0.025) 50%,
         rgba(0,0,0,0.05) 50%
       ) !important;
-    background-size: 100% 4px !important;
 
     opacity: 0.32 !important;
-    mix-blend-mode: screen !important;
   }
 }
 
@@ -16205,7 +15593,6 @@ body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-p
 
 .pc-main-menu-brand h1 {
   margin: 2px 0 0;
-  color: #ffffff;
   font-family: "Fraunces", serif;
   font-size: clamp(1.45rem, 2.7vw, 2rem);
   line-height: 1.05;
@@ -16279,7 +15666,6 @@ body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-p
 
 .pc-menu-action {
   min-height: 50px;
-  padding: 12px 22px;
   border: 2px solid var(--forest);
   border-radius: 9px;
   background: transparent;
@@ -16292,7 +15678,6 @@ body .vn-overlay.active.scenario-intro-active:not(.claude-consult):not(.claude-p
 
 .pc-menu-action-primary {
   background: var(--forest);
-  color: #ffffff;
 }
 
 .pc-menu-action:hover,
@@ -18181,7 +17566,7 @@ body.s2-active #inputContainer {
 
 .audio-setup-pixel {
   position: absolute;
-  top: -38px;
+  top: -5px;
   right: 22px;
   width: 132px;
   height: 126px;
@@ -18344,7 +17729,7 @@ body #musicToggle.full-audio {
 
 @media (max-width: 760px) {
   .audio-setup-pixel {
-    top: -34px;
+    top: -5px;
     right: 16px;
     width: 112px;
     height: 108px;
@@ -18374,7 +17759,7 @@ body #musicToggle.full-audio {
   }
 
   .audio-setup-pixel {
-    top: -30px;
+    top: -5px;
     right: 12px;
     width: 96px;
     height: 94px;
@@ -18409,7 +17794,7 @@ body #musicToggle.full-audio {
   }
 
   .audio-setup-pixel {
-    top: -26px;
+    top: 20px;
     right: 10px;
     width: 82px;
     height: 82px;
@@ -18672,5 +18057,2614 @@ body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claude
   body .vn-overlay.active.pc-clean-prediction #claudeTerminalOutput,
   body .vn-overlay.active.claude-prediction #claudeTerminalOutput {
     font-size: clamp(0.74rem, 2.8vw, 0.96rem) !important;
+  }
+}
+
+
+/* ==================================================
+   v147 MODERN TERMINAL CONTENT LAYOUTS
+   Shared measured screen bounds are applied by app.js. These rules only
+   control what appears inside that screen for analyzing and final reports.
+================================================== */
+
+/* Analyzing state: center the readout inside the physical monitor. */
+body .vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode)
+#claudeTerminalOutput.pc-analyzing-output {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: clamp(18px, 2.2vw, 34px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  white-space: normal !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+}
+
+body .vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode)
+#claudeTerminalOutput.pc-analyzing-output .pc-analyzing-readout {
+  width: min(100%, 520px) !important;
+  margin: 0 auto !important;
+  font-size: clamp(0.86rem, 1.18vw, 1.22rem) !important;
+  line-height: 1.24 !important;
+  letter-spacing: 0.025em !important;
+}
+
+body .vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode)
+#claudeTerminalOutput.pc-analyzing-output .pc-terminal-gap {
+  height: clamp(12px, 1.4vw, 22px) !important;
+}
+
+/* Wide-screen completed analysis: keep the diagnostic compact enough to live
+   inside the monitor rather than expanding over the entire computer image. */
+@media (min-width: 1511px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalOutput.claude-analysis-layout {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: clamp(8px, 0.8vw, 13px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    white-space: normal !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalOutput.claude-analysis-layout .analysis-report {
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    color: #eaffee !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-header {
+    margin: 0 0 6px !important;
+    padding: 7px 9px !important;
+    border-width: 1px !important;
+    box-shadow: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-badge {
+    margin: 0 0 4px !important;
+    padding: 2px 6px !important;
+    font-size: clamp(0.48rem, 0.48vw, 0.64rem) !important;
+    line-height: 1 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-title {
+    margin: 0 0 3px !important;
+    font-size: clamp(1.12rem, 1.35vw, 1.55rem) !important;
+    line-height: 1 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-summary {
+    margin: 0 !important;
+    font-size: clamp(0.62rem, 0.68vw, 0.78rem) !important;
+    line-height: 1.18 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 6px !important;
+    margin: 0 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-card.compact,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-card.wide {
+    margin: 0 !important;
+    padding: 6px 8px !important;
+    min-height: 0 !important;
+    border-width: 1px !important;
+    box-shadow: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-impact-card {
+    grid-column: 1 / -1 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-label {
+    margin: 0 0 2px !important;
+    font-size: clamp(0.46rem, 0.48vw, 0.6rem) !important;
+    line-height: 1 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-value,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-value.big {
+    font-size: clamp(0.58rem, 0.64vw, 0.75rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-note {
+    margin-top: 2px !important;
+    font-size: clamp(0.5rem, 0.52vw, 0.64rem) !important;
+    line-height: 1.1 !important;
+  }
+}
+
+
+/* ==================================================
+   v149 RESPONSIVE CLAUDE ANALYSIS
+   1511px+: computer artwork with report inside monitor
+   761–1510px: terminal-only report
+   760px and below: stacked mobile report cards
+================================================== */
+
+/* Medium terminal-only layout. */
+@media (min-width: 761px) and (max-width: 1510px) {
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 {
+    background: rgba(0, 10, 5, 0.97) !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalScene {
+    position: absolute !important;
+    inset: 18px 22px 92px 22px !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    transform: none !important;
+    overflow: visible !important;
+    z-index: 20 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalScene .claude-terminal-photo {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: none !important;
+    background-image: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalScene .claude-terminal-photo::before,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalScene .claude-terminal-photo::after,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalScene::before,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalScene::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalScene .claude-terminal-screen {
+    position: absolute !important;
+    inset: 0 !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: clamp(22px, 3vw, 38px) !important;
+    display: block !important;
+    transform: none !important;
+    overflow: hidden !important;
+    border: 2px solid rgba(60, 255, 105, 0.9) !important;
+    border-radius: 16px !important;
+    background:
+      radial-gradient(circle at 50% 22%, rgba(22, 92, 46, 0.56), rgba(0, 28, 12, 0.98) 68%),
+      repeating-linear-gradient(0deg, rgba(190,255,205,0.035) 0 1px, transparent 1px 5px) !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalOutput.claude-analysis-layout {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 10px 12px 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    white-space: normal !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-report {
+    display: block !important;
+    width: min(100%, 1120px) !important;
+    min-width: 0 !important;
+    max-width: 1120px !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-card {
+    min-width: 0 !important;
+    width: auto !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-impact-card {
+    grid-column: 1 / -1 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .vn-dialogue {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 82px !important;
+    min-height: 82px !important;
+    max-height: 82px !important;
+    padding: 10px 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(0, 8, 4, 0.98) !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    z-index: 50 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .vn-dialogue #vnSpeaker,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .vn-dialogue .vn-speaker,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .vn-dialogue .vn-advance,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .vn-dialogue .vn-skip,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .vn-dialogue #vnText > div {
+    display: none !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .vn-dialogue #vnText {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 14px !important;
+    overflow: visible !important;
+  }
+}
+
+/* Phone layout: one full-width column with readable cards. */
+@media (max-width: 760px) {
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalScene {
+    position: absolute !important;
+    inset: 8px 6px 76px 6px !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    transform: none !important;
+    overflow: visible !important;
+    z-index: 20 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalScene .claude-terminal-photo {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: none !important;
+    background-image: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalScene .claude-terminal-screen {
+    position: absolute !important;
+    inset: 0 !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 16px 14px !important;
+    display: block !important;
+    transform: none !important;
+    overflow: hidden !important;
+    border: 2px solid rgba(60, 255, 105, 0.92) !important;
+    border-radius: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  #claudeTerminalOutput.claude-analysis-layout {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 8px 12px 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-report {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-header {
+    width: 100% !important;
+    margin: 0 0 10px !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-title {
+    margin: 4px 0 8px !important;
+    font-size: clamp(1.38rem, 7vw, 2rem) !important;
+    line-height: 1.05 !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-summary {
+    font-size: clamp(0.92rem, 4vw, 1.05rem) !important;
+    line-height: 1.42 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-card,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-card.compact,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-card.wide {
+    grid-column: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-value,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-value.big {
+    font-size: clamp(0.92rem, 4vw, 1.05rem) !important;
+    line-height: 1.35 !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .vn-dialogue {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 70px !important;
+    min-height: 70px !important;
+    max-height: 70px !important;
+    padding: 7px 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(0, 8, 4, 0.99) !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    z-index: 50 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .vn-dialogue #vnText {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 6px !important;
+    align-items: center !important;
+    overflow: visible !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .vn-dialogue button,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .terminal-return,
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .prediction-continue-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 48px !important;
+    margin: 0 !important;
+    padding: 8px 6px !important;
+    font-size: clamp(0.68rem, 3.2vw, 0.82rem) !important;
+    box-sizing: border-box !important;
+  }
+}
+
+
+/* v150 terminal polish -------------------------------------------------- */
+/* Consultation / "analyzing" screen: let the text breathe and scale up a bit.
+   This is the first Claude screen before the structured report appears. */
+html body .vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) #claudeTerminalScene .claude-terminal-screen,
+html body .vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) .claude-terminal-screen {
+  padding: 16px 8% 14px 13% !important;
+}
+html body .vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) #claudeTerminalScene .claude-terminal-title,
+html body .vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) .claude-terminal-title {
+  font-size: clamp(0.68rem, 0.95vw, 0.98rem) !important;
+  line-height: 1.24 !important;
+  letter-spacing: 0.09em !important;
+  margin-bottom: 0.45em !important;
+}
+html body .vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) #claudeTerminalScene .claude-terminal-output,
+html body .vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) .claude-terminal-output {
+  font-size: clamp(0.64rem, 0.98vw, 0.98rem) !important;
+  line-height: 1.42 !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Desktop analysis report inside the monitor: nudge the panel inward a touch
+   so the border reads centered within the bezel. */
+@media (min-width: 1511px) {
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-report {
+    width: 96.5% !important;
+    max-width: 96.5% !important;
+    margin: 0 auto !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   MOBILE COMPACT NAVIGATION — 640px AND BELOW
+   Desktop and tablet layouts retain the original DEV toolbar and scenario tabs.
+   ══════════════════════════════════════════════════════ */
+.mobile-compact-menu {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .dev-bar,
+  .scenario-tabs {
+    display: none !important;
+  }
+
+  .mobile-compact-menu {
+    display: block;
+    position: relative;
+    flex: 0 0 auto;
+    width: 100%;
+    z-index: 120;
+  }
+
+  .mobile-dev-menu {
+    background: var(--chalkboard);
+    border-bottom: 2px solid var(--chalk-green);
+    padding: 6px 12px;
+  }
+
+  .mobile-scenario-menu {
+    background: var(--parchment);
+    border-bottom: 2px solid var(--border);
+    padding: 7px 12px;
+  }
+
+  .mobile-dropdown-toggle {
+    width: 100%;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-align: left;
+  }
+
+  .mobile-dev-menu .mobile-dropdown-toggle {
+    color: #d4edd9;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--chalk-green);
+    padding: 8px 12px;
+  }
+
+  .mobile-scenario-menu .mobile-dropdown-toggle {
+    color: #183d2b;
+    background: #f7f2e8;
+    border: 1px solid #a99d87;
+    padding: 8px 12px;
+  }
+
+  .mobile-dropdown-toggle:hover,
+  .mobile-dropdown-toggle:focus-visible {
+    outline: 3px solid rgba(237, 170, 0, 0.45);
+    outline-offset: 2px;
+  }
+
+  .mobile-dropdown-caret {
+    flex: 0 0 auto;
+    transition: transform 0.18s ease;
+  }
+
+  .mobile-compact-menu.is-open .mobile-dropdown-caret {
+    transform: rotate(180deg);
+  }
+
+  .mobile-dropdown-panel {
+    position: absolute;
+    top: calc(100% - 2px);
+    left: 12px;
+    right: 12px;
+    max-height: min(58vh, 430px);
+    overflow-y: auto;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 12px 24px rgba(17, 28, 22, 0.28);
+    z-index: 121;
+  }
+
+  .mobile-dropdown-panel[hidden] {
+    display: none !important;
+  }
+
+  .mobile-dev-menu .mobile-dropdown-panel {
+    background: #20362c;
+    border: 1px solid var(--chalk-green);
+    border-top: 0;
+  }
+
+  .mobile-scenario-menu .mobile-dropdown-panel {
+    background: #fffdf8;
+    border: 1px solid #a99d87;
+    border-top: 0;
+  }
+
+  .mobile-dropdown-option {
+    width: 100%;
+    min-height: 44px;
+    display: block;
+    border: 0;
+    border-bottom: 1px solid rgba(127, 127, 127, 0.25);
+    border-radius: 0;
+    padding: 10px 12px;
+    cursor: pointer;
+    font-family: "Nunito", sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: left;
+  }
+
+  .mobile-dropdown-option:last-child {
+    border-bottom: 0;
+  }
+
+  .mobile-dev-menu .mobile-dropdown-option {
+    color: #e6f4e9;
+    background: transparent;
+  }
+
+  .mobile-dev-menu .mobile-dropdown-option:hover,
+  .mobile-dev-menu .mobile-dropdown-option:focus-visible {
+    color: #10251b;
+    background: #a8d5b5;
+  }
+
+  .mobile-scenario-menu .mobile-dropdown-option {
+    color: #3f3328;
+    background: #fffdf8;
+  }
+
+  .mobile-scenario-menu .mobile-dropdown-option:hover,
+  .mobile-scenario-menu .mobile-dropdown-option:focus-visible,
+  .mobile-scenario-menu .mobile-dropdown-option.is-active {
+    color: #092719;
+    background: #e2eadf;
+  }
+
+  .mobile-dropdown-option:focus-visible {
+    position: relative;
+    z-index: 1;
+    outline: 3px solid #edaa00;
+    outline-offset: -3px;
+  }
+
+  .mobile-dropdown-option:disabled,
+  .mobile-dropdown-option.is-locked {
+    cursor: not-allowed;
+    opacity: 0.62;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   V164 — UNIFIED APP HEADER + COMPACT NAVIGATION
+   Collapses DEV and scenario navigation at every viewport while preserving
+   the original controls as hidden behavior sources.
+   ══════════════════════════════════════════════════════ */
+
+/* The original rows still drive app.js and the compact proxy menus. */
+.dev-bar,
+.scenario-tabs {
+  display: none !important;
+}
+
+/* ── APP HEADER ─────────────────────────────────────── */
+.pc-app-header {
+  display: grid !important;
+  grid-template-columns: auto minmax(260px, 1fr) auto;
+  align-items: center;
+  gap: 18px !important;
+  min-height: 62px;
+  padding: 9px 16px !important;
+  background:
+    linear-gradient(90deg, rgba(17, 48, 34, 0.98), rgba(34, 64, 50, 0.98)),
+    var(--chalkboard) !important;
+  border-bottom: 1px solid rgba(168, 213, 181, 0.42) !important;
+  box-shadow: 0 3px 12px rgba(15, 35, 25, 0.16);
+}
+
+.pc-app-header .logo {
+  min-width: max-content;
+  gap: 10px;
+}
+
+.pc-app-header .logo-icon {
+  width: 38px !important;
+  height: 38px !important;
+  border: 1px solid rgba(168, 213, 181, 0.72) !important;
+  border-radius: 10px !important;
+  background: rgba(74, 124, 94, 0.34) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  font-size: 18px !important;
+}
+
+.pc-app-header .logo-copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.pc-app-header .logo-name,
+.pc-app-header .logo-name span {
+  font-family: "Fraunces", Georgia, serif !important;
+  font-size: 1.08rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.pc-app-header .logo-name {
+  color: #ffffff !important;
+}
+
+.pc-app-header .logo-name span {
+  color: #b8ddc3 !important;
+}
+
+.pc-app-header .logo-sub {
+  margin: 1px 0 0 !important;
+  color: rgba(240, 247, 242, 0.68) !important;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.57rem !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.09em !important;
+}
+
+.header-status {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pc-app-header .level-tag {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px !important;
+  border: 1px solid rgba(168, 213, 181, 0.55) !important;
+  border-radius: 7px !important;
+  background: rgba(4, 28, 17, 0.22) !important;
+  color: #e2f3e7 !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.045em !important;
+}
+
+.pc-app-header .xp-group {
+  min-height: 36px;
+  gap: 8px;
+  padding: 0 2px;
+}
+
+.pc-app-header .xp-label {
+  color: rgba(236, 247, 240, 0.82) !important;
+  font-size: 0.68rem !important;
+  font-weight: 700;
+}
+
+.pc-app-header .xp-track {
+  width: clamp(82px, 8vw, 116px);
+  height: 9px;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: max-content;
+}
+
+/* The normal green MENU button keeps its existing appearance and behavior. */
+.pc-app-header .music-toggle {
+  width: 42px;
+  height: 42px;
+  border-color: rgba(168, 213, 181, 0.46);
+  background: rgba(74, 124, 94, 0.16);
+}
+
+.pc-app-header .ideas-wall-btn {
+  min-height: 42px;
+  padding: 8px 13px;
+  border-color: rgba(224, 163, 37, 0.72);
+  background: rgba(170, 108, 16, 0.2);
+  color: #f2c75d;
+  font-size: 0.78rem;
+}
+
+.ideas-wall-icon,
+.ideas-wall-text {
+  display: inline-block;
+}
+
+/* ── ONE-ROW COMPACT NAVIGATION ────────────────────── */
+.pc-compact-nav {
+  position: relative;
+  z-index: 135;
+  display: grid;
+  grid-template-columns: minmax(140px, 180px) minmax(290px, 440px);
+  align-items: stretch;
+  justify-content: start;
+  gap: 10px;
+  width: 100%;
+  min-height: 54px;
+  padding: 7px 16px;
+  background: #f3ede1;
+  border-bottom: 1px solid #b9ab95;
+  box-shadow: 0 2px 7px rgba(61, 49, 36, 0.08);
+}
+
+.pc-compact-nav .mobile-compact-menu {
+  display: block !important;
+  position: relative;
+  width: auto;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  z-index: 136;
+}
+
+.pc-compact-nav .mobile-dropdown-toggle {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pc-compact-nav .mobile-dev-menu .mobile-dropdown-toggle {
+  border: 1px solid #527c62;
+  background: #1d412e;
+  color: #eef8f1;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+}
+
+.pc-compact-nav .mobile-scenario-menu .mobile-dropdown-toggle {
+  border: 1px solid #a99d87;
+  background: #fffdf8;
+  color: #2a3e31;
+  font-family: "Nunito", sans-serif;
+}
+
+.pc-compact-nav .mobile-dropdown-toggle:hover {
+  box-shadow: 0 2px 8px rgba(43, 54, 45, 0.11);
+}
+
+.pc-compact-nav .mobile-dropdown-toggle:focus-visible {
+  outline: 3px solid rgba(237, 170, 0, 0.58);
+  outline-offset: 2px;
+}
+
+.mobile-dropdown-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-dropdown-copy {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.mobile-dropdown-eyebrow {
+  color: #766c5e;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.55rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.08em;
+}
+
+.mobile-scenario-current {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #173e2b;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.pc-compact-nav .mobile-dropdown-caret {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  transition: transform 0.18s ease;
+}
+
+.pc-compact-nav .mobile-compact-menu.is-open .mobile-dropdown-caret {
+  transform: rotate(180deg);
+}
+
+.pc-compact-nav .mobile-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  max-height: min(58vh, 430px);
+  overflow-y: auto;
+  padding: 6px;
+  border-radius: 8px;
+  box-shadow: 0 14px 30px rgba(20, 34, 26, 0.25);
+  z-index: 140;
+}
+
+.pc-compact-nav .mobile-dropdown-panel[hidden] {
+  display: none !important;
+}
+
+.pc-compact-nav .mobile-dev-menu .mobile-dropdown-panel {
+  width: min(410px, calc(100vw - 32px));
+  background: #20362c;
+  border: 1px solid #6a9979;
+}
+
+.pc-compact-nav .mobile-scenario-menu .mobile-dropdown-panel {
+  width: min(520px, calc(100vw - 32px));
+  background: #fffdf8;
+  border: 1px solid #a99d87;
+}
+
+.pc-compact-nav .mobile-dropdown-option {
+  width: 100%;
+  min-height: 42px;
+  display: block;
+  padding: 9px 11px;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.pc-compact-nav .mobile-dev-menu .mobile-dropdown-option {
+  color: #e6f4e9;
+  background: transparent;
+}
+
+.pc-compact-nav .mobile-dev-menu .mobile-dropdown-option:hover,
+.pc-compact-nav .mobile-dev-menu .mobile-dropdown-option:focus-visible {
+  color: #10251b;
+  background: #a8d5b5;
+}
+
+.pc-compact-nav .mobile-scenario-menu .mobile-dropdown-option {
+  color: #3f3328;
+  background: #fffdf8;
+}
+
+.pc-compact-nav .mobile-scenario-menu .mobile-dropdown-option:hover,
+.pc-compact-nav .mobile-scenario-menu .mobile-dropdown-option:focus-visible,
+.pc-compact-nav .mobile-scenario-menu .mobile-dropdown-option.is-active {
+  color: #092719;
+  background: #e2eadf;
+}
+
+.pc-compact-nav .mobile-dropdown-option:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid #edaa00;
+  outline-offset: -3px;
+}
+
+.pc-compact-nav .mobile-dropdown-option:disabled,
+.pc-compact-nav .mobile-dropdown-option.is-locked {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+/* Tablet: retain the same compact pattern, with slightly tighter spacing. */
+@media (max-width: 900px) {
+  .pc-app-header {
+    grid-template-columns: auto minmax(220px, 1fr) auto;
+    gap: 12px !important;
+  }
+
+  .pc-app-header .ideas-wall-btn {
+    padding-inline: 10px;
+  }
+
+  .pc-compact-nav {
+    grid-template-columns: minmax(132px, 165px) minmax(250px, 1fr);
+  }
+}
+
+/* Mobile: brand/actions share the first row; status uses a calm second row.
+   DEV and scenario controls remain together in one compact navigation row. */
+@media (max-width: 640px) {
+  .pc-app-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand actions"
+      "status status";
+    gap: 8px 10px !important;
+    min-height: 0;
+    padding: 9px 12px 8px !important;
+  }
+
+  .pc-app-header .logo {
+    grid-area: brand;
+    min-width: 0;
+  }
+
+  .pc-app-header .logo-icon {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+  }
+
+  .pc-app-header .logo-name,
+  .pc-app-header .logo-name span {
+    font-size: 1rem !important;
+  }
+
+  .pc-app-header .logo-sub {
+    font-size: 0.52rem !important;
+  }
+
+  .header-actions {
+    grid-area: actions;
+    gap: 6px;
+  }
+
+  .header-status {
+    grid-area: status;
+    justify-self: stretch;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    padding-top: 7px;
+    border-top: 1px solid rgba(168, 213, 181, 0.22);
+  }
+
+  .pc-app-header .level-tag {
+    min-height: 32px;
+    max-width: 55%;
+    padding: 4px 9px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.66rem !important;
+  }
+
+  .pc-app-header .xp-group {
+    min-width: 120px;
+    min-height: 32px;
+    justify-content: flex-end;
+  }
+
+  .pc-app-header .xp-track {
+    width: clamp(72px, 25vw, 104px);
+  }
+
+
+  .pc-app-header .music-toggle,
+  .pc-app-header .ideas-wall-btn {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .pc-app-header .ideas-wall-text {
+    display: none;
+  }
+
+  .pc-compact-nav {
+    grid-template-columns: minmax(102px, 118px) minmax(0, 1fr);
+    gap: 7px;
+    min-height: 52px;
+    padding: 6px 12px;
+  }
+
+  .pc-compact-nav .mobile-dropdown-toggle {
+    min-height: 40px;
+    padding: 6px 10px;
+  }
+
+  .pc-compact-nav .mobile-dev-menu .mobile-dropdown-toggle {
+    font-size: 0.66rem;
+  }
+
+  .mobile-dropdown-eyebrow {
+    font-size: 0.5rem;
+  }
+
+  .mobile-scenario-current {
+    font-size: 0.73rem;
+  }
+
+  .pc-compact-nav .mobile-dropdown-panel {
+    grid-template-columns: 1fr;
+    max-height: min(60vh, 420px);
+  }
+
+  .pc-compact-nav .mobile-dev-menu .mobile-dropdown-panel {
+    left: 0;
+    width: calc(100vw - 24px);
+  }
+
+  .pc-compact-nav .mobile-scenario-menu .mobile-dropdown-panel {
+    left: auto;
+    right: 0;
+    width: calc(100vw - 24px);
+  }
+}
+
+@media (max-width: 390px) {
+  .pc-app-header {
+    gap: 7px !important;
+  }
+
+  .header-actions {
+    gap: 4px;
+  }
+
+  .pc-app-header .logo-icon {
+    width: 31px !important;
+    height: 31px !important;
+  }
+
+  .pc-app-header .logo-name,
+  .pc-app-header .logo-name span {
+    font-size: 0.93rem !important;
+  }
+
+  .pc-app-header .logo-sub {
+    display: none;
+  }
+
+
+  .pc-app-header .music-toggle,
+  .pc-app-header .ideas-wall-btn {
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    min-height: 38px;
+  }
+
+  .pc-compact-nav {
+    grid-template-columns: 104px minmax(0, 1fr);
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   V165 — MOBILE HEADER SPECIFICITY REPAIR
+   Legacy responsive rules used body-qualified selectors with !important.
+   These final overrides ensure the compact header wins at 640px and below.
+   ══════════════════════════════════════════════════════ */
+@media screen and (max-width: 640px) {
+  html body > .dev-bar,
+  html body > nav.scenario-tabs,
+  html body .dev-bar,
+  html body .scenario-tabs {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html body header.pc-app-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      "brand actions"
+      "status status" !important;
+    align-items: center !important;
+    gap: 8px 10px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 9px 12px 8px !important;
+    overflow: visible !important;
+  }
+
+  html body header.pc-app-header .logo {
+    grid-area: brand !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  html body header.pc-app-header .header-actions {
+    grid-area: actions !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+    width: auto !important;
+    min-width: max-content !important;
+    margin: 0 !important;
+  }
+
+  html body header.pc-app-header .header-status {
+    grid-area: status !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 7px 0 0 !important;
+  }
+
+  html body header.pc-app-header .level-tag {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+    max-width: 55% !important;
+  }
+
+  html body header.pc-app-header .xp-group {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    min-width: 110px !important;
+    max-width: 48% !important;
+    justify-content: flex-end !important;
+  }
+
+  html body .pc-compact-nav {
+    position: relative !important;
+    z-index: 135 !important;
+    display: grid !important;
+    grid-template-columns: minmax(102px, 118px) minmax(0, 1fr) !important;
+    align-items: stretch !important;
+    gap: 7px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-height: 52px !important;
+    margin: 0 !important;
+    padding: 6px 12px !important;
+    border-top: 0 !important;
+    overflow: visible !important;
+  }
+
+  html body .pc-compact-nav .mobile-compact-menu {
+    display: block !important;
+    position: relative !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    visibility: visible !important;
+    overflow: visible !important;
+  }
+
+  html body .pc-compact-nav .mobile-dropdown-toggle {
+    display: flex !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 40px !important;
+    margin: 0 !important;
+    padding: 6px 10px !important;
+  }
+
+  html body .pc-compact-nav .mobile-dev-menu .mobile-dropdown-panel {
+    left: 0 !important;
+    right: auto !important;
+    width: calc(100vw - 24px) !important;
+  }
+
+  html body .pc-compact-nav .mobile-scenario-menu .mobile-dropdown-panel {
+    left: auto !important;
+    right: 0 !important;
+    width: calc(100vw - 24px) !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   V166 — FULL-SCREEN COMPACT NAVIGATION RESTORE
+   Supports both the current wrapped markup and older builds where the two
+   dropdowns still sit in separate locations until index.html normalizes them.
+   ══════════════════════════════════════════════════════ */
+
+/* The compact navigation is part of the interface at every viewport size. */
+html body .pc-compact-nav {
+  position: relative !important;
+  z-index: 135 !important;
+  display: grid !important;
+  grid-template-columns: minmax(140px, 180px) minmax(290px, 440px) !important;
+  align-items: stretch !important;
+  justify-content: start !important;
+  gap: 10px !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 54px !important;
+  margin: 0 !important;
+  padding: 7px 16px !important;
+  visibility: visible !important;
+  overflow: visible !important;
+  background: #f3ede1 !important;
+  border-top: 0 !important;
+  border-bottom: 1px solid #b9ab95 !important;
+  box-shadow: 0 2px 7px rgba(61, 49, 36, 0.08) !important;
+}
+
+html body .pc-compact-nav > .mobile-compact-menu {
+  position: relative !important;
+  z-index: 136 !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  visibility: visible !important;
+  overflow: visible !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* Fallback for an older index.html. It keeps both controls visible until the
+   normalization script moves them into .pc-compact-nav. */
+html body > .mobile-compact-menu {
+  position: relative !important;
+  z-index: 135 !important;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 7px 16px !important;
+  visibility: visible !important;
+  overflow: visible !important;
+}
+
+html body > .mobile-dev-menu {
+  background: #173b2a !important;
+  border-bottom: 1px solid rgba(168, 213, 181, 0.52) !important;
+}
+
+html body > .mobile-scenario-menu {
+  background: #f3ede1 !important;
+  border-bottom: 1px solid #b9ab95 !important;
+}
+
+html body > .mobile-compact-menu .mobile-dropdown-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  width: min(440px, 100%) !important;
+  min-height: 40px !important;
+  margin: 0 !important;
+  padding: 6px 12px !important;
+  border-radius: 7px !important;
+  cursor: pointer !important;
+  text-align: left !important;
+}
+
+html body > .mobile-dev-menu .mobile-dropdown-toggle {
+  color: #eef8f1 !important;
+  background: #1d412e !important;
+  border: 1px solid #527c62 !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.055em !important;
+}
+
+html body > .mobile-scenario-menu .mobile-dropdown-toggle {
+  color: #2a3e31 !important;
+  background: #fffdf8 !important;
+  border: 1px solid #a99d87 !important;
+  font-family: "Nunito", sans-serif !important;
+}
+
+html body > .mobile-compact-menu .mobile-dropdown-panel {
+  position: absolute !important;
+  top: calc(100% - 2px) !important;
+  left: 16px !important;
+  right: auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1px !important;
+  width: min(520px, calc(100vw - 32px)) !important;
+  max-height: min(58vh, 430px) !important;
+  overflow-y: auto !important;
+  padding: 6px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 14px 30px rgba(20, 34, 26, 0.25) !important;
+  z-index: 140 !important;
+}
+
+html body > .mobile-compact-menu .mobile-dropdown-panel[hidden] {
+  display: none !important;
+}
+
+html body > .mobile-dev-menu .mobile-dropdown-panel {
+  background: #20362c !important;
+  border: 1px solid #6a9979 !important;
+}
+
+html body > .mobile-scenario-menu .mobile-dropdown-panel {
+  background: #fffdf8 !important;
+  border: 1px solid #a99d87 !important;
+}
+
+@media screen and (max-width: 900px) and (min-width: 641px) {
+  html body .pc-compact-nav {
+    grid-template-columns: minmax(132px, 165px) minmax(250px, 1fr) !important;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  html body .pc-compact-nav {
+    grid-template-columns: minmax(102px, 118px) minmax(0, 1fr) !important;
+    gap: 7px !important;
+    min-height: 52px !important;
+    padding: 6px 12px !important;
+  }
+
+  html body > .mobile-compact-menu {
+    padding: 6px 12px !important;
+  }
+
+  html body > .mobile-compact-menu .mobile-dropdown-toggle {
+    width: 100% !important;
+  }
+
+  html body > .mobile-compact-menu .mobile-dropdown-panel {
+    left: 12px !important;
+    width: calc(100vw - 24px) !important;
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   V167 — MOBILE HEADER + S1 ACTION POLISH
+   Keeps the desktop/tablet layouts intact. At 640px and below, the header
+   uses three clear rows and the repair nudge/button stack vertically.
+   ══════════════════════════════════════════════════════ */
+@media screen and (max-width: 640px) {
+  /* Mobile app header: brand, progress, then evenly aligned actions. */
+  html body header.pc-app-header {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas:
+      "brand"
+      "status"
+      "actions" !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
+  }
+
+  html body header.pc-app-header .logo {
+    grid-area: brand !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding-bottom: 1px !important;
+  }
+
+  html body header.pc-app-header .header-status {
+    grid-area: status !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(116px, 0.9fr) !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    padding: 7px 8px !important;
+    border: 1px solid rgba(168, 213, 181, 0.24) !important;
+    border-radius: 8px !important;
+    background: rgba(4, 28, 17, 0.16) !important;
+  }
+
+  html body header.pc-app-header .level-tag {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    min-height: 34px !important;
+    justify-content: flex-start !important;
+    padding: 5px 9px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  html body header.pc-app-header .xp-group {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 7px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 34px !important;
+    justify-content: stretch !important;
+  }
+
+  html body header.pc-app-header .xp-label {
+    width: auto !important;
+    max-width: none !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+    font-size: 0.7rem !important;
+  }
+
+  html body header.pc-app-header .xp-track {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  html body header.pc-app-header .header-actions {
+    grid-area: actions !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1.45fr) !important;
+    align-items: stretch !important;
+    gap: 7px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  html body header.pc-app-header .main-menu-toggle,
+  html body header.pc-app-header .music-toggle,
+  html body header.pc-app-header .ideas-wall-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+  }
+
+  html body header.pc-app-header .main-menu-toggle {
+    padding: 8px 10px !important;
+  }
+
+  html body header.pc-app-header .music-toggle {
+    padding: 0 !important;
+  }
+
+  html body header.pc-app-header .ideas-wall-btn {
+    padding: 8px 10px !important;
+    gap: 6px !important;
+  }
+
+  html body header.pc-app-header .ideas-wall-text {
+    display: inline-block !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* S1 mobile repair controls: readable nudge first, full-width action below. */
+  html body.s1-active:not(.s1-result-active) .s1-clean-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+    margin-top: 12px !important;
+    padding-top: 12px !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-nudge {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 11px 12px !important;
+    font-size: 0.96rem !important;
+    line-height: 1.5 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-submit {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 54px !important;
+    padding: 13px 16px !important;
+    white-space: normal !important;
+    text-align: center !important;
+  }
+}
+
+@media screen and (max-width: 340px) {
+  html body header.pc-app-header .header-status {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  html body header.pc-app-header .xp-group {
+    grid-template-columns: 24px minmax(0, 1fr) !important;
+  }
+
+  html body header.pc-app-header .header-actions {
+    grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1.35fr) !important;
+    gap: 6px !important;
+  }
+
+  html body header.pc-app-header .ideas-wall-btn {
+    font-size: 0.8rem !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   V168 — INTERACTIVE COMPACT NAV + EQUAL S1 PANELS
+   Hidden modal layers must not remain above the page after closing. The S1
+   desktop workspace also stretches both cards to the same grid-row height.
+   ══════════════════════════════════════════════════════ */
+
+/* Several modal rules intentionally use display:flex. Honor the HTML hidden
+   state explicitly so a transparent closed modal cannot capture pointer input. */
+html body .name-modal-overlay[hidden],
+html body .audio-setup-overlay[hidden],
+html body .pc-main-menu[hidden],
+html body .vn-overlay[hidden],
+html body .reflection-overlay[hidden] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Keep the compact navigation above normal page content and make its controls
+   explicit pointer targets at desktop, tablet, and mobile widths. */
+html body .pc-compact-nav,
+html body .pc-compact-nav > .mobile-compact-menu,
+html body .pc-compact-nav .mobile-dropdown-toggle,
+html body .pc-compact-nav .mobile-dropdown-panel,
+html body .pc-compact-nav .mobile-dropdown-option {
+  pointer-events: auto !important;
+}
+
+html body .pc-compact-nav {
+  isolation: isolate !important;
+  z-index: 500 !important;
+}
+
+html body .pc-compact-nav > .mobile-compact-menu {
+  z-index: 501 !important;
+}
+
+html body .pc-compact-nav .mobile-dropdown-panel {
+  z-index: 502 !important;
+}
+
+/* On the two-column S1 desktop workspace, stretch the shorter Faculty
+   Submission card to the Repair Workspace card's row height. */
+@media screen and (min-width: 1101px) {
+  html body.s1-active:not(.s1-result-active) .s1-clean-grid {
+    align-items: stretch !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-card,
+  html body.s1-active:not(.s1-result-active) .s1-clean-builder {
+    align-self: stretch !important;
+    height: 100% !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   V169 — OPEN DROPDOWN STACKING ORDER
+   The two compact menus are sibling stacking contexts. Raise whichever menu
+   is open so its panel always paints above the closed sibling control.
+   ══════════════════════════════════════════════════════ */
+html body .pc-compact-nav > .mobile-compact-menu {
+  position: relative !important;
+  z-index: 501 !important;
+}
+
+html body .pc-compact-nav > .mobile-compact-menu.is-open {
+  z-index: 540 !important;
+}
+
+html body .pc-compact-nav > .mobile-compact-menu.is-open .mobile-dropdown-panel {
+  z-index: 541 !important;
+}
+
+
+
+/* ══════════════════════════════════════════════════════
+   V170 — NATIVE COMPACT MENUS + EXPANDED REPAIR WORKSPACE
+   Native details/summary controls make DEV and scenario navigation clickable
+   without relying on the previous proxy-menu initialization. The desktop S1
+   builder now uses the height shared with Faculty Submission instead of leaving
+   an unused blank area below the action row.
+   ══════════════════════════════════════════════════════ */
+
+/* Native disclosure reset and reliable hit targets at every viewport. */
+html body .pc-compact-nav details.pc-native-dropdown {
+  position: relative !important;
+  display: block !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+  z-index: 501 !important;
+}
+
+html body .pc-compact-nav details.pc-native-dropdown > summary.mobile-dropdown-toggle {
+  list-style: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+}
+
+html body .pc-compact-nav details.pc-native-dropdown > summary.mobile-dropdown-toggle::-webkit-details-marker,
+html body .pc-compact-nav details.pc-native-dropdown > summary.mobile-dropdown-toggle::marker {
+  display: none !important;
+  content: "" !important;
+}
+
+html body .pc-compact-nav details.pc-native-dropdown:not([open]) > .mobile-dropdown-panel {
+  display: none !important;
+}
+
+html body .pc-compact-nav details.pc-native-dropdown[open] {
+  z-index: 700 !important;
+}
+
+html body .pc-compact-nav details.pc-native-dropdown[open] > .mobile-dropdown-panel {
+  display: grid !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  z-index: 701 !important;
+}
+
+html body .pc-compact-nav details.pc-native-dropdown[open] .mobile-dropdown-caret {
+  transform: rotate(180deg) !important;
+}
+
+/* Desktop Repair Workspace: make the four response areas meaningfully larger
+   and distribute them through the card's available height. */
+@media screen and (min-width: 1101px) {
+  html body.s1-active:not(.s1-result-active) .s1-clean-right,
+  html body.s1-active:not(.s1-result-active) .s1-clean-builder {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-builder {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+    align-content: stretch !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-fields {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(132px, 1fr)) !important;
+    align-items: stretch !important;
+    gap: 14px 14px !important;
+    min-height: 0 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-field {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    min-height: 0 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-textarea,
+  html body.s1-active:not(.s1-result-active) textarea.s1-clean-textarea,
+  html body.s1-active:not(.s1-result-active) #g-learners,
+  html body.s1-active:not(.s1-result-active) #g-issue,
+  html body.s1-active:not(.s1-result-active) #g-interaction,
+  html body.s1-active:not(.s1-result-active) #g-constraints {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 132px !important;
+    max-height: none !important;
+    resize: vertical !important;
+    padding: 13px 14px !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-actions {
+    margin-top: 14px !important;
+    padding-top: 14px !important;
+  }
+}
+
+/* At shorter desktop heights, retain larger fields without forcing the page
+   into an unnecessarily tall composition. */
+@media screen and (min-width: 1101px) and (max-height: 820px) {
+  html body.s1-active:not(.s1-result-active) .s1-clean-fields {
+    grid-template-rows: repeat(2, minmax(108px, 1fr)) !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-textarea,
+  html body.s1-active:not(.s1-result-active) textarea.s1-clean-textarea,
+  html body.s1-active:not(.s1-result-active) #g-learners,
+  html body.s1-active:not(.s1-result-active) #g-issue,
+  html body.s1-active:not(.s1-result-active) #g-interaction,
+  html body.s1-active:not(.s1-result-active) #g-constraints {
+    min-height: 108px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   V173 — SIMPLE BOTTOM BORDER BELOW THE S1 WORKSPACE
+   Keep the existing Faculty Submission and Repair Workspace cards unchanged.
+   Add only a subtle tan line beneath the two-card section.
+   ══════════════════════════════════════════════════════ */
+
+html body.s1-active:not(.s1-result-active) .s1-clean-grid {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 2px solid var(--pc-a11y-border, #9d8468) !important;
+  border-radius: 0 !important;
+  padding: 0 0 10px !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 760px) {
+  html body.s1-active:not(.s1-result-active) .s1-clean-grid {
+    padding-bottom: 8px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   V174 — MATCH PROMPT INGREDIENTS TO OBSERVED PROBLEMS
+   ══════════════════════════════════════════════════════ */
+html body.s1-active:not(.s1-result-active) .s1-clean-ingredients .ingredient-heading {
+  font-family: "Fraunces", serif !important;
+  font-size: clamp(1.25rem, 1.3vw, 1.55rem) !important;
+  line-height: 1.25 !important;
+  color: var(--pc-a11y-ink, #24170f) !important;
+  font-weight: 700 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  margin-bottom: 10px !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   V175 — HIDE COMPACT NAVIGATION DURING VN SCENES
+   DEV and scenario navigation belongs to the workspace, not the full-screen
+   Professor Pixel introduction / Claude visual-novel layer.
+   ══════════════════════════════════════════════════════ */
+html body:has(.vn-overlay.active) .pc-compact-nav {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   V176 — TRUE BOTTOM DIVIDER + UNBOXED INGREDIENT TITLE
+   Let the two-card grid size to its content so the divider follows the actual
+   bottom of both cards. Keep the Prompt Ingredients heading outside the tan
+   chip tray.
+   ══════════════════════════════════════════════════════ */
+
+/* The earlier flex sizing let the cards overflow the grid, which caused the
+   divider to cross through them. Size the grid from its contents instead. */
+html body.s1-active:not(.s1-result-active) .s1-clean-grid {
+  flex: 0 0 auto !important;
+  min-height: auto !important;
+  height: auto !important;
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 2px solid var(--pc-a11y-border, #9d8468) !important;
+  padding: 0 0 10px !important;
+}
+
+/* Remove the tan box from the whole Prompt Ingredients block. */
+html body.s1-active:not(.s1-result-active) .s1-clean-ingredients {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Keep only the chips in a small tan tray beneath the heading. */
+html body.s1-active:not(.s1-result-active) .s1-clean-ingredients .ingredient-row {
+  background: #f2eadc !important;
+  border: 1.5px solid var(--pc-a11y-border, #9d8468) !important;
+  border-radius: 14px !important;
+  padding: 10px 12px !important;
+  box-sizing: border-box !important;
+}
+
+html body.s1-active:not(.s1-result-active) .s1-clean-ingredients .ingredient-heading {
+  margin: 0 0 8px !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   V177 — REMOVE THE ACCIDENTAL BOTTOM DIVIDER
+   The S1 cards already provide their own borders; no additional horizontal
+   rule is needed below the workspace.
+   ══════════════════════════════════════════════════════ */
+html body.s1-active:not(.s1-result-active) .s1-clean-grid {
+  border-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   V184 — ONBOARDING NAV VISIBILITY + MOBILE INTRO BOARD
+   Keep workspace navigation out of onboarding dialogs, and lower the S1
+   smartboard enough to clear the mobile MENU control.
+   ══════════════════════════════════════════════════════ */
+
+/* The compact DEV/scenario bar belongs to the workspace, not onboarding. */
+html body:has(#nameModalOverlay.visible) .pc-compact-nav,
+html body:has(#nameModalOverlay:not([hidden])) .pc-compact-nav,
+html body:has(#audioSetupOverlay:not([hidden])) .pc-compact-nav {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Mobile S1 introduction: lower the smartboard so it no longer sits behind
+   the persistent MENU button. Prediction and Claude terminal scenes are
+   intentionally excluded. */
+@media screen and (max-width: 700px) {
+  html body.s1-active .vn-overlay.active:not(.claude-consult):not(.claude-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.claude-terminal-consult):not(.claude-terminal-textmode):not(.pc-clean-output) .vn-smartboard-wrap {
+    top: 86px !important;
+  }
+}
+
+
+
+
+/* ══════════════════════════════════════════════════════
+   V186 — SINGLE PREDICTION LAYOUT OWNER
+   Prediction geometry below the full desktop breakpoint is CSS-owned. The
+   photographed computer remains exclusive to widths above 1510px.
+   ══════════════════════════════════════════════════════ */
+
+@media screen and (max-width: 1510px) {
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction,
+  html body #vnOverlay.vn-overlay.active.claude-prediction,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question {
+    --pc-prediction-dialogue-height: clamp(270px, 32dvh, 300px);
+    overflow: hidden !important;
+    background: #111713 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnScene,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnScene,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnScene {
+    position: absolute !important;
+    inset: 0 0 var(--pc-prediction-dialogue-height) 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    background:
+      linear-gradient(180deg, rgba(5,15,10,.28), rgba(4,12,8,.58)),
+      #142019 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnSceneBg,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnSceneBg,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnSceneBg {
+    display: block !important;
+    opacity: .38 !important;
+    visibility: visible !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    filter: brightness(.5) saturate(.78) !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction .vn-smartboard-wrap,
+  html body #vnOverlay.vn-overlay.active.claude-prediction .vn-smartboard-wrap,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question .vn-smartboard-wrap,
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeShelf,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeShelf,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeShelf {
+    display: none !important;
+  }
+
+  /* One green prediction screen. No photographed computer and no nested boxes. */
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalScene,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalScene,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalScene {
+    display: block !important;
+    position: absolute !important;
+    inset: auto !important;
+    left: 50% !important;
+    right: auto !important;
+    top: clamp(82px, 10dvh, 104px) !important;
+    bottom: auto !important;
+    width: min(58vw, 700px) !important;
+    max-width: calc(100% - 48px) !important;
+    height: clamp(104px, 14dvh, 124px) !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    z-index: 24 !important;
+    pointer-events: none !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalScene .claude-terminal-photo,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalScene .claude-terminal-photo,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalScene .claude-terminal-photo {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    transform: none !important;
+    overflow: visible !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalScene .claude-terminal-photo::before,
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalScene .claude-terminal-photo::after,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalScene .claude-terminal-photo::before,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalScene .claude-terminal-photo::after,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalScene .claude-terminal-photo::before,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalScene .claude-terminal-photo::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalScene .claude-terminal-screen,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalScene .claude-terminal-screen,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalScene .claude-terminal-screen {
+    display: flex !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 12px 18px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: radial-gradient(circle at 50% 45%, rgba(62,235,139,.25), rgba(0,58,30,.82) 58%, rgba(0,18,9,.98)) !important;
+    border: 0 !important;
+    border-radius: 8px !important;
+    box-shadow: inset 0 0 34px rgba(0,0,0,.5), 0 0 22px rgba(65,255,173,.10) !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    transform: none !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalTitle,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalTitle,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalTitle {
+    display: none !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalOutput,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalOutput,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalOutput {
+    position: static !important;
+    inset: auto !important;
+    display: block !important;
+    width: auto !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: #d8ffe4 !important;
+    font-family: "Source Code Pro", monospace !important;
+    font-size: clamp(.78rem, 1.45vw, 1rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+    letter-spacing: .015em !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    text-shadow: 0 0 8px rgba(124,255,181,.72) !important;
+  }
+
+  /* Pixel belongs to the stage and meets the top edge of the dialogue. */
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnCharacter,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnCharacter,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnCharacter {
+    display: block !important;
+    position: absolute !important;
+    left: clamp(34px, 7vw, 96px) !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: -2px !important;
+    width: auto !important;
+    height: clamp(220px, 30dvh, 278px) !important;
+    max-height: 45% !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 32 !important;
+  }
+
+  /* The question and buttons are normal grid content, not fixed overlays. */
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnDialogue.vn-dialogue,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnDialogue.vn-dialogue,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnDialogue.vn-dialogue {
+    display: grid !important;
+    grid-template-rows: auto auto minmax(0, 1fr) !important;
+    position: absolute !important;
+    inset: auto 0 0 !important;
+    width: 100% !important;
+    height: var(--pc-prediction-dialogue-height) !important;
+    min-height: var(--pc-prediction-dialogue-height) !important;
+    max-height: var(--pc-prediction-dialogue-height) !important;
+    margin: 0 !important;
+    padding: 18px clamp(24px, 4vw, 54px) 18px !important;
+    overflow: hidden !important;
+    background: linear-gradient(180deg, rgba(0,0,0,.88), rgba(0,0,0,.98)) !important;
+    border: 1.5px solid rgba(168,213,181,.86) !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+    z-index: 40 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnSpeaker,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnSpeaker,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnSpeaker {
+    margin: 0 0 10px !important;
+    color: #b8f2c9 !important;
+    font-family: "Fraunces", serif !important;
+    font-size: clamp(1.05rem, 1.8vw, 1.3rem) !important;
+    line-height: 1.15 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnText,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnText,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnText {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    color: #fff !important;
+    font-size: clamp(.92rem, 1.6vw, 1.06rem) !important;
+    line-height: 1.34 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction .pc-feedback-copy,
+  html body #vnOverlay.vn-overlay.active.claude-prediction .pc-feedback-copy,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question .pc-feedback-copy {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(50px, auto)) !important;
+    gap: 10px 14px !important;
+    position: static !important;
+    inset: auto !important;
+    width: min(100%, 920px) !important;
+    max-width: 920px !important;
+    height: auto !important;
+    margin: 18px auto 0 !important;
+    padding: 0 !important;
+    align-self: end !important;
+    pointer-events: auto !important;
+    z-index: auto !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel button,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnPredictionChoicePanel button,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 52px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 9px 12px !important;
+    border: 2px solid rgba(168,213,181,.78) !important;
+    border-radius: 11px !important;
+    background: rgba(5,28,18,.95) !important;
+    color: #eaffef !important;
+    font-family: "Nunito", sans-serif !important;
+    font-size: clamp(.76rem, 1.3vw, .9rem) !important;
+    font-weight: 900 !important;
+    line-height: 1.18 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction .vn-skip,
+  html body #vnOverlay.vn-overlay.active.claude-prediction .vn-skip,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question .vn-skip,
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnAdvanceHint,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnAdvanceHint,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnAdvanceHint {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction,
+  html body #vnOverlay.vn-overlay.active.claude-prediction,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question {
+    --pc-prediction-dialogue-height: clamp(252px, 31dvh, 270px);
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalScene,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalScene,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalScene {
+    top: 86px !important;
+    width: calc(100% - 38px) !important;
+    max-width: 410px !important;
+    height: 96px !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalOutput,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalOutput,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalOutput {
+    font-size: clamp(.72rem, 3.2vw, .86rem) !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnCharacter,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnCharacter,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnCharacter {
+    left: 24px !important;
+    height: clamp(205px, 30dvh, 244px) !important;
+    max-height: 43% !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnDialogue.vn-dialogue,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnDialogue.vn-dialogue,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnDialogue.vn-dialogue {
+    padding: 12px 10px 10px !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnSpeaker,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnSpeaker,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnSpeaker {
+    margin-bottom: 8px !important;
+    font-size: clamp(.96rem, 4.3vw, 1.1rem) !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnText,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnText,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnText {
+    font-size: clamp(.8rem, 3.45vw, .91rem) !important;
+    line-height: 1.25 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel {
+    grid-template-rows: repeat(2, 45px) !important;
+    gap: 7px !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel button,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnPredictionChoicePanel button,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel button {
+    min-height: 45px !important;
+    height: 45px !important;
+    padding: 5px 6px !important;
+    font-size: clamp(.64rem, 2.75vw, .74rem) !important;
+    line-height: 1.12 !important;
+  }
+}
+
+@media screen and (max-width: 700px) and (max-height: 700px) {
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction,
+  html body #vnOverlay.vn-overlay.active.claude-prediction,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question {
+    --pc-prediction-dialogue-height: 246px;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalScene,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalScene,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalScene {
+    top: 76px !important;
+    height: 86px !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnCharacter,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnCharacter,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnCharacter {
+    height: 172px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   V187 — SMALL/MIDDLE PREDICTION GRID GEOMETRY
+   Clear the legacy translate transform that was shifting the two-column
+   prediction grid half off-screen after it moved back into normal flow.
+   ══════════════════════════════════════════════════════ */
+
+@media screen and (max-width: 1510px) {
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction,
+  html body #vnOverlay.vn-overlay.active.claude-prediction,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question {
+    --pc-prediction-dialogue-height: clamp(248px, 29dvh, 270px);
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel.pc-choice-panel-final,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnPredictionChoicePanel.pc-choice-panel-final,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel.pc-choice-panel-final {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    inset: auto !important;
+    translate: none !important;
+    transform: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 920px !important;
+    margin: 16px auto 0 !important;
+    box-sizing: border-box !important;
+    justify-self: stretch !important;
+    align-self: end !important;
+    overflow: visible !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel button,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnPredictionChoicePanel button,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel button {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    transform: none !important;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction,
+  html body #vnOverlay.vn-overlay.active.claude-prediction,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question {
+    --pc-prediction-dialogue-height: clamp(232px, 29dvh, 250px);
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnDialogue.vn-dialogue,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnDialogue.vn-dialogue,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnDialogue.vn-dialogue {
+    padding-inline: 12px !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 9px 0 0 !important;
+    gap: 7px !important;
+    transform: none !important;
+  }
+}
+
+@media screen and (max-width: 700px) and (max-height: 700px) {
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction,
+  html body #vnOverlay.vn-overlay.active.claude-prediction,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question {
+    --pc-prediction-dialogue-height: 230px;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   V188 — FULL TERMINAL STAGE FOR PHONE + MIDDLE WIDTHS
+   The compact prediction screen now owns the entire upper scene instead of
+   floating as a card. Mobile dialogue padding is increased, and the middle
+   choice grid is centered within the black dialogue panel.
+   ══════════════════════════════════════════════════════ */
+
+@media screen and (max-width: 1510px) {
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnScene,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnScene,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnScene {
+    background:
+      radial-gradient(circle at 50% 38%, rgba(57, 238, 141, .20), rgba(0, 63, 34, .80) 54%, rgba(0, 24, 13, .98) 100%) !important;
+  }
+
+  /* Remove the classroom photograph so the upper scene reads as one terminal. */
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnSceneBg,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnSceneBg,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnSceneBg {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalScene,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalScene,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalScene {
+    position: absolute !important;
+    inset: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    max-height: none !important;
+    transform: none !important;
+    overflow: hidden !important;
+    z-index: 20 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalScene .claude-terminal-photo,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalScene .claude-terminal-photo,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalScene .claude-terminal-photo,
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalScene .claude-terminal-screen,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalScene .claude-terminal-screen,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalScene .claude-terminal-screen {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    transform: none !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalScene .claude-terminal-photo,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalScene .claude-terminal-photo,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalScene .claude-terminal-photo {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalScene .claude-terminal-screen,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalScene .claude-terminal-screen,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalScene .claude-terminal-screen {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+    background:
+      radial-gradient(circle at 50% 38%, rgba(70, 255, 158, .18), rgba(0, 70, 38, .46) 46%, rgba(0, 30, 16, .42) 100%) !important;
+    box-shadow: inset 0 0 90px rgba(0, 0, 0, .48) !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #claudeTerminalOutput,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #claudeTerminalOutput,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #claudeTerminalOutput {
+    position: relative !important;
+    z-index: 2 !important;
+  }
+}
+
+/* Middle widths: center the answer grid within the black dialogue panel. */
+@media screen and (min-width: 701px) and (max-width: 1510px) {
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel {
+    width: min(74%, 760px) !important;
+    max-width: 760px !important;
+    margin: 18px auto 0 !important;
+    justify-self: center !important;
+    align-self: end !important;
+  }
+}
+
+/* Phone widths: add breathing room between text and the dialogue border. */
+@media screen and (max-width: 700px) {
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnDialogue.vn-dialogue,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnDialogue.vn-dialogue,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnDialogue.vn-dialogue {
+    padding: 14px 16px 12px !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.claude-prediction #vnPredictionChoicePanel,
+  html body #vnOverlay.vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 10px auto 0 !important;
+    justify-self: center !important;
   }
 }

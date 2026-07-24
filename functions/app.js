@@ -79,7 +79,6 @@ let pcMainMenuInitialOpen = true;
 let pcMainMenuLastFocused = null;
 let pcNameConfirmed = false;
 let pcPendingScenarioIndex = null;
-const PC_MENU_PREVIEW_ALL_SCENARIOS = true;
 
 // ── SCREEN READER UTILITY ─────────────────────────────
 (function() {
@@ -87,6 +86,15 @@ const PC_MENU_PREVIEW_ALL_SCENARIOS = true;
   s.textContent = '.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}';
   document.head.appendChild(s);
 })();
+
+// Release focus before a modal or overlay becomes hidden. This prevents
+// aria-hidden from concealing the element that still owns keyboard focus.
+function pcReleaseFocusBeforeHide(container) {
+  const active = document.activeElement;
+  if (container && active && container.contains(active)) {
+    active.blur?.();
+  }
+}
 
 // ── NAME MODAL ────────────────────────────────────────
 function showNameModal() {
@@ -99,6 +107,7 @@ function showNameModal() {
     return;
   }
 
+  overlay.inert = false;
   overlay.hidden = false;
   overlay.setAttribute('aria-hidden', 'false');
   overlay.style.display = '';
@@ -137,8 +146,10 @@ function submitName(skip = false) {
 
   const overlay = document.getElementById('nameModalOverlay');
   if (overlay) {
+    pcReleaseFocusBeforeHide(overlay);
     overlay.classList.remove('visible');
     overlay.setAttribute('aria-hidden', 'true');
+    overlay.inert = true;
     overlay.style.opacity = '0';
     overlay.style.pointerEvents = 'none';
     setTimeout(() => {
@@ -199,6 +210,7 @@ function showAudioSetup(options = {}) {
     radio.checked = !pcAudioSetupIsOnboarding && radio.value === pcAudioMode;
   });
 
+  overlay.inert = false;
   overlay.hidden = false;
   overlay.setAttribute('aria-hidden', 'false');
   overlay.classList.add('visible');
@@ -221,8 +233,10 @@ function hideAudioSetup() {
   const overlay = document.getElementById('audioSetupOverlay');
   if (!overlay) return;
 
+  pcReleaseFocusBeforeHide(overlay);
   overlay.classList.remove('visible');
   overlay.setAttribute('aria-hidden', 'true');
+  overlay.inert = true;
   document.body.classList.remove('pc-audio-setup-open');
   setTimeout(() => { overlay.hidden = true; }, 220);
 }
@@ -287,6 +301,7 @@ function getInitials(name) {
 function startGame() {
   if (window.pcGameStarted) return;
   window.pcGameStarted = true;
+  pcSyncAppVersionLabels();
 
   // S1 remains rendered behind the menu as the safe default, but its VN intro
   // does not begin until the learner actually chooses a scenario.
@@ -311,8 +326,29 @@ function startGame() {
 const SURVEY_MODE   = 'sheets';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbylnSseQkSsPNKSjqoU2ui6yFa62YslQEq-nRyeC8MZFVnlmv-XYoi2EUJPZGvnKU1z/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
+
+// ══════════════════════════════════════════════════════
+//  BUILD + DATA SCHEMA VERSIONING
+//  The app version is read from the app.js cache-busting query in index.html.
+//  Update functions/app.js?v=### once and the console build label and main-menu
+//  version will stay synchronized automatically. Change the schema only when
+//  the saved research-data structure changes.
+// ══════════════════════════════════════════════════════
+const PC_APP_SCRIPT_URL = (() => {
+  const script = [...document.scripts].find(item => /(?:^|\/)functions\/app\.js(?:[?#]|$)/.test(item.src));
+  return script?.src || new URL('functions/app.js', document.baseURI).href;
+})();
+const PC_APP_VERSION = new URL(PC_APP_SCRIPT_URL).searchParams.get('v') || 'DEV';
 const PC_APP_SCHEMA_VERSION = 'V121';
-const PC_APP_BUILD_LABEL = 'IMAGE_PATH_FIX_V140';
+const PC_APP_BUILD_LABEL = `PROMPTCRAFT_V${PC_APP_VERSION}`;
+
+function pcSyncAppVersionLabels() {
+  const versionText = `Version ${PC_APP_VERSION}`;
+  document.querySelectorAll('[data-pc-app-version], #mainMenuVersion').forEach((element) => {
+    element.textContent = versionText;
+  });
+}
+
 console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 // ══════════════════════════════════════════════════════
@@ -321,11 +357,6 @@ console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:',
 //  the browser happens to treat as the current document. This keeps images
 //  working in nested hosting folders, Live Server, and copied project builds.
 // ══════════════════════════════════════════════════════
-const PC_APP_SCRIPT_URL = (() => {
-  const script = [...document.scripts].find(item => /(?:^|\/)functions\/app\.js(?:[?#]|$)/.test(item.src));
-  return script?.src || new URL('functions/app.js', document.baseURI).href;
-})();
-
 const PC_PROJECT_ROOT_URL = new URL('../', PC_APP_SCRIPT_URL);
 
 function pcProjectUrl(path = '') {
@@ -450,7 +481,7 @@ const LEGACY_ASSETS = Object.freeze({
 
 // Make CSS background paths use the same project-root resolution as JavaScript.
 document.documentElement.style.setProperty('--pc-app-background', `url("${ASSETS.images.backgrounds.app}")`);
-document.documentElement.style.setProperty('--pc-app-background-legacy', `url("${pcProjectUrl(LEGACY_ASSETS.images.backgrounds.app)}")`);
+document.documentElement.style.setProperty('--pc-app-background-legacy', 'none');
 
 
 // Robust Google Sheets poster.
@@ -1076,11 +1107,6 @@ function applyAudioMode(mode) {
   updateAudioSettingsButton();
 }
 
-// Backward-compatible name retained for any old inline references.
-function toggleMusic() {
-  return showAudioSetup({ onboarding: false });
-}
-
 
 // ══════════════════════════════════════════════════════
 //  SCENARIOS
@@ -1184,8 +1210,6 @@ const SCENARIO_UI = [
     implemented: false, developmentStatus: 'Planned', plannedLoop: ['Build', 'Explain your choice', 'Evaluate the output', 'Revise']
   }
 ];
-
-const SCENARIO_SETUP_HANDLERS = Object.freeze({});
 
 if (scenarios.length !== SCENARIO_COUNT || SCENARIO_UI.length !== SCENARIO_COUNT || scenarioData.length !== SCENARIO_COUNT) {
   throw new Error('[PromptCraft] Scenario configuration, content, and tracking data are out of sync.');
@@ -1300,10 +1324,15 @@ function openMainMenu(panelName = 'home', options = {}) {
   pcMainMenuInitialOpen = options.initial === true || !pcScenarioHasLaunched;
 
   renderMainMenu();
+  overlay.inert = false;
   overlay.hidden = false;
   overlay.setAttribute('aria-hidden', 'false');
   const vnOverlay = document.getElementById('vnOverlay');
-  if (vnOverlay?.classList.contains('active')) vnOverlay.setAttribute('aria-hidden', 'true');
+  if (vnOverlay?.classList.contains('active')) {
+    pcReleaseFocusBeforeHide(vnOverlay);
+    vnOverlay.setAttribute('aria-hidden', 'true');
+    vnOverlay.inert = true;
+  }
   document.body.classList.add('pc-main-menu-open');
   overlay.classList.add('visible');
   showMainMenuPanel(panelName);
@@ -1321,13 +1350,18 @@ function closeMainMenu(options = {}) {
     return false;
   }
 
+  pcReleaseFocusBeforeHide(overlay);
   overlay.classList.remove('visible');
   overlay.setAttribute('aria-hidden', 'true');
+  overlay.inert = true;
   document.body.classList.remove('pc-main-menu-open');
   pcMainMenuInitialOpen = false;
 
   const vnOverlay = document.getElementById('vnOverlay');
-  if (vnOverlay?.classList.contains('active')) vnOverlay.setAttribute('aria-hidden', 'false');
+  if (vnOverlay?.classList.contains('active')) {
+    vnOverlay.inert = false;
+    vnOverlay.setAttribute('aria-hidden', 'false');
+  }
 
   setTimeout(() => {
     overlay.hidden = true;
@@ -1486,10 +1520,6 @@ function getScenarioUI(index = scenarioIndex) {
   return SCENARIO_UI[index] || SCENARIO_UI[SCENARIO_INDEX.ENGAGEMENT];
 }
 
-function scenarioSupportsPrompt(index = scenarioIndex) {
-  return getScenarioUI(index).supportsPrompt === true;
-}
-
 function buildScenarioMissionHTML(index, options = {}) {
   const ui = getScenarioUI(index);
   const eyebrow = options.eyebrow || 'Mission Briefing';
@@ -1505,34 +1535,6 @@ function buildScenarioMissionHTML(index, options = {}) {
       <div class="mission-copy">${esc(copy)}</div>
       ${extraHTML}
     </section>`;
-}
-
-function appendScenarioMission(index, options = {}) {
-  const area = options.container || document.getElementById('chat');
-  if (!area) return null;
-
-  const wrapper = document.createElement('div');
-  wrapper.className = 'scenario-entry';
-  wrapper.innerHTML = buildScenarioMissionHTML(index, options);
-  area.appendChild(wrapper);
-  return wrapper;
-}
-
-function appendScenarioArtifact({ sender, html, expression = 'neutral', className = 'ai' }) {
-  const area = document.getElementById('chat');
-  if (!area) return null;
-
-  const message = document.createElement('div');
-  message.className = `message ${className}`;
-  message.innerHTML = `
-    ${pixelAvatarHTML(expression)}
-    <div class="bubble-wrap">
-      <div class="bubble-sender">${esc(sender)}</div>
-      <div class="bubble">${html}</div>
-    </div>`;
-  area.appendChild(message);
-  area.scrollTop = area.scrollHeight;
-  return message;
 }
 
 function setScenarioInputVisible(visible, { focus = false } = {}) {
@@ -1937,17 +1939,6 @@ function appendScenarioNavCard({
   return wrapper;
 }
 
-function maybeShowNavCard(score) {
-  if (scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT || navCardShown[scenarioIndex] || score < SCORE_THRESHOLD) return;
-  navCardShown[scenarioIndex] = true;
-  appendScenarioNavCard({
-    targetIndex: SCENARIO_INDEX.METACOGNITION,
-    title: 'Scenario 1 is ready.',
-    subtitle: 'Scenario 2 now has a playable opening case with Jordan. You can begin the metacognition diagnosis or keep refining Scenario 1.',
-    stayLabel: 'Keep practicing Scenario 1'
-  });
-}
-
 
 
 
@@ -2027,6 +2018,313 @@ function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', outpu
 }
 
 
+
+// v159: Capture the prediction computer relative to the VN scene, not the
+// browser viewport. The terminal is absolutely positioned inside #vnScene, so
+// viewport coordinates caused the analyzing computer to shift even when the
+// stored rectangle itself was accurate.
+let pcPredictionTerminalFrameV159 = null;
+
+function pcSetImportantStyles(element, declarations) {
+  if (!element) return;
+  declarations.forEach(([property, value]) => {
+    element.style.setProperty(property, value, 'important');
+  });
+}
+
+function pcRemoveInlineStyles(element, properties) {
+  if (!element) return;
+  properties.forEach((property) => element.style.removeProperty(property));
+}
+
+function pcCapturePredictionTerminalFrameV159(terminal) {
+  const scene = document.getElementById('vnScene');
+  if (!terminal || !scene) return false;
+
+  const terminalRect = terminal.getBoundingClientRect();
+  const sceneRect = scene.getBoundingClientRect();
+
+  if (
+    terminalRect.width < 10 ||
+    terminalRect.height < 10 ||
+    sceneRect.width < 10 ||
+    sceneRect.height < 10
+  ) return false;
+
+  pcPredictionTerminalFrameV159 = {
+    leftPct: ((terminalRect.left - sceneRect.left) / sceneRect.width) * 100,
+    topPct: ((terminalRect.top - sceneRect.top) / sceneRect.height) * 100,
+    widthPct: (terminalRect.width / sceneRect.width) * 100,
+    heightPct: (terminalRect.height / sceneRect.height) * 100
+  };
+
+  return true;
+}
+
+function pcApplyPredictionTerminalFrameV159(terminal, photo) {
+  const scene = document.getElementById('vnScene');
+  const frame = pcPredictionTerminalFrameV159;
+  if (!terminal || !photo || !scene || !frame) return false;
+
+  pcSetImportantStyles(scene, [
+    ['position', 'relative']
+  ]);
+
+  pcSetImportantStyles(terminal, [
+    ['position', 'absolute'],
+    ['inset', 'auto'],
+    ['left', `${frame.leftPct}%`],
+    ['top', `${frame.topPct}%`],
+    ['right', 'auto'],
+    ['bottom', 'auto'],
+    ['width', `${frame.widthPct}%`],
+    ['height', `${frame.heightPct}%`],
+    ['max-width', 'none'],
+    ['max-height', 'none'],
+    ['aspect-ratio', 'auto'],
+    ['transform', 'none'],
+    ['margin', '0']
+  ]);
+
+  pcSetImportantStyles(photo, [
+    ['position', 'relative'],
+    ['inset', 'auto'],
+    ['width', '100%'],
+    ['height', '100%'],
+    ['max-width', 'none'],
+    ['max-height', 'none'],
+    ['aspect-ratio', 'auto'],
+    ['margin', '0'],
+    ['background-size', 'contain'],
+    ['background-position', 'center center'],
+    ['background-repeat', 'no-repeat']
+  ]);
+
+  return true;
+}
+
+// Expose the captured frame for inspection without mutating it.
+window.pcGetPredictionTerminalFrame = () => (
+  pcPredictionTerminalFrameV159 ? { ...pcPredictionTerminalFrameV159 } : null
+);
+window.pcCapturePredictionTerminalFrame = () => {
+  const terminal = document.getElementById('claudeTerminalScene');
+  const captured = pcCapturePredictionTerminalFrameV159(terminal);
+  return captured ? { ...pcPredictionTerminalFrameV159 } : null;
+};
+
+// v186: Remove prediction-only geometry that earlier builds wrote inline.
+// This deliberately does not touch class names or terminal content.
+function pcClearPredictionLayoutInlineStylesV186() {
+  const terminal = document.getElementById('claudeTerminalScene');
+  const photo = terminal?.querySelector('.claude-terminal-photo');
+  const screen = terminal?.querySelector('.claude-terminal-screen');
+  const output = document.getElementById('claudeTerminalOutput');
+
+  pcRemoveInlineStyles(terminal, [
+    'position','inset','left','right','top','bottom','width','height',
+    'min-width','min-height','max-width','max-height','aspect-ratio',
+    'transform','margin','padding','display','opacity','visibility','overflow',
+    'background','background-image','border','border-radius','box-shadow','z-index'
+  ]);
+  pcRemoveInlineStyles(photo, [
+    'position','inset','left','right','top','bottom','width','height',
+    'min-width','min-height','max-width','max-height','aspect-ratio',
+    'transform','margin','padding','display','overflow','background',
+    'background-image','background-size','background-position','background-repeat',
+    'border','border-radius','box-shadow','filter'
+  ]);
+  pcRemoveInlineStyles(screen, [
+    'position','inset','left','right','top','bottom','width','height',
+    'min-width','min-height','max-width','max-height','transform','margin','padding',
+    'display','align-items','justify-content','overflow','background','border',
+    'border-radius','box-shadow','box-sizing'
+  ]);
+  pcRemoveInlineStyles(output, [
+    'position','inset','left','right','top','bottom','width','height',
+    'min-width','min-height','max-width','max-height','margin','padding','display',
+    'overflow','background','border','border-radius','box-shadow','text-align',
+    'white-space'
+  ]);
+}
+window.pcClearPredictionLayoutInlineStyles = pcClearPredictionLayoutInlineStylesV186;
+
+// v186: Align the physical monitor only when the computer artwork is visible.
+// Medium and mobile completed-analysis layouts are terminal-only, so all
+// desktop inline geometry is removed and responsive CSS owns those screens.
+function pcAlignModernTerminalScreenV149() {
+  const overlay = document.getElementById('vnOverlay');
+  const terminal = document.getElementById('claudeTerminalScene');
+  const photo = terminal?.querySelector('.claude-terminal-photo');
+  const screen = terminal?.querySelector('.claude-terminal-screen');
+  const output = document.getElementById('claudeTerminalOutput');
+
+  if (!overlay || !terminal || !photo || !screen) return;
+
+  const predictionOpen = overlay.classList.contains('claude-prediction') ||
+    overlay.classList.contains('pc-clean-prediction');
+  const consultThinking = overlay.classList.contains('claude-terminal-consult') &&
+    !overlay.classList.contains('claude-terminal-textmode');
+  const analysisOpen = overlay.classList.contains('claude-terminal-textmode') &&
+    output?.classList.contains('claude-analysis-layout');
+  const viewportWidth = pcAnalysisViewportWidthV122();
+
+  if (!predictionOpen && !consultThinking && !analysisOpen) return;
+
+  // v186: Prediction layouts below the full desktop breakpoint are owned by
+  // one CSS section. Clear every layout style left by earlier screen states and
+  // return before JavaScript can impose desktop geometry.
+  if (predictionOpen && viewportWidth <= 1510) {
+    pcPredictionTerminalFrameV159 = null;
+    pcClearPredictionLayoutInlineStylesV186();
+    return;
+  }
+
+  // A wide prediction still uses the photographed workstation. Clear compact
+  // leftovers before applying only the physical monitor-screen coordinates.
+  if (predictionOpen) {
+    pcClearPredictionLayoutInlineStylesV186();
+  }
+
+  // Prediction remains CSS-driven. Capture its final rendered frame so the
+  // following analyzing state can reuse the exact same outer computer size.
+  if (predictionOpen) {
+    requestAnimationFrame(() => pcCapturePredictionTerminalFrameV159(terminal));
+  }
+
+  // The analyzing screen must use the same outer computer frame as prediction.
+  // Without this, identical inner-screen percentages point at different pixels.
+  if (consultThinking) {
+    pcApplyPredictionTerminalFrameV159(terminal, photo);
+  }
+
+  // Completed reports below the wide breakpoint intentionally abandon the
+  // computer artwork. Clear every inline desktop value so CSS can render the
+  // terminal-only and stacked mobile layouts at full width.
+  if (analysisOpen && viewportWidth <= 1510) {
+    pcClearLegacyAnalysisInlineStylesV122();
+    return;
+  }
+
+  // v159: Prediction and live analyzing share the same physical monitor bounds.
+  // Only the completed diagnostic report uses a separate fit.
+  let geometry = { left: '19.8%', top: '15.2%', width: '38.3%', height: '44.5%' };
+
+  if (analysisOpen) {
+    geometry = { left: '20%', top: '14.8%', width: '39%', height: '45.6%' };
+  }
+
+  pcSetImportantStyles(photo, [
+    ['position', 'relative']
+  ]);
+  pcSetImportantStyles(screen, [
+    ['position', 'absolute'],
+    ['inset', 'auto'],
+    ['left', geometry.left],
+    ['top', geometry.top],
+    ['width', geometry.width],
+    ['height', geometry.height],
+    ['box-sizing', 'border-box'],
+    ['transform', 'none']
+  ]);
+
+  if (analysisOpen) {
+    pcSetImportantStyles(terminal, [
+      ['position', 'absolute'],
+      ['left', '50%'],
+      ['right', 'auto'],
+      ['top', '43%'],
+      ['bottom', 'auto'],
+      ['width', 'min(92vw, 1580px)'],
+      ['height', 'auto'],
+      ['aspect-ratio', '2.05 / 1'],
+      ['transform', 'translate(-50%, -50%)'],
+      ['overflow', 'visible'],
+      ['z-index', '60']
+    ]);
+
+    pcSetImportantStyles(photo, [
+      ['inset', 'auto'],
+      ['width', '100%'],
+      ['height', '100%'],
+      ['aspect-ratio', '2.05 / 1'],
+      ['background-image', 'var(--pc-app-background)'],
+      ['background-size', 'contain'],
+      ['background-position', 'center center'],
+      ['background-repeat', 'no-repeat'],
+      ['overflow', 'hidden']
+    ]);
+
+    pcSetImportantStyles(screen, [
+      ['overflow', 'hidden'],
+      ['padding', '0']
+    ]);
+  }
+}
+
+// Expose a stable debugging hook in DevTools.
+window.pcAlignModernTerminalScreen = pcAlignModernTerminalScreenV149;
+
+function pcQueueModernTerminalAlignmentV147() {
+  requestAnimationFrame(pcAlignModernTerminalScreenV149);
+  window.setTimeout(pcAlignModernTerminalScreenV149, 40);
+  window.setTimeout(pcAlignModernTerminalScreenV149, 180);
+}
+
+if (!window.pcModernTerminalAlignmentV147Installed) {
+  window.pcModernTerminalAlignmentV147Installed = true;
+  window.addEventListener('resize', pcQueueModernTerminalAlignmentV147, { passive: true });
+  window.addEventListener('orientationchange', pcQueueModernTerminalAlignmentV147, { passive: true });
+  window.visualViewport?.addEventListener('resize', pcQueueModernTerminalAlignmentV147, { passive: true });
+}
+
+// v161: Position the live analyzing readout inside the already-aligned
+// monitor rectangle. These percentages are relative to the physical green
+// screen, not to the full computer artwork.
+const PC_ANALYZING_READOUT_LEFT = '33%';
+const PC_ANALYZING_READOUT_TOP = '12%';
+const PC_ANALYZING_READOUT_WIDTH = '78%';
+
+function positionClaudeAnalyzingReadoutV161() {
+  const outputEl = document.getElementById('claudeTerminalOutput');
+  const readout = outputEl?.querySelector('.pc-analyzing-readout');
+  if (!outputEl || !readout) return false;
+
+  // Neutralize older layout rules on the output wrapper.
+  pcSetImportantStyles(outputEl, [
+    ['position', 'absolute'],
+    ['inset', '0'],
+    ['width', '100%'],
+    ['height', '100%'],
+    ['margin', '0'],
+    ['padding', '0'],
+    ['display', 'block'],
+    ['overflow', 'hidden'],
+    ['transform', 'none']
+  ]);
+
+  // Place the visible text block inside the monitor screen itself.
+  pcSetImportantStyles(readout, [
+    ['position', 'absolute'],
+    ['left', PC_ANALYZING_READOUT_LEFT],
+    ['top', PC_ANALYZING_READOUT_TOP],
+    ['right', 'auto'],
+    ['bottom', 'auto'],
+    ['width', PC_ANALYZING_READOUT_WIDTH],
+    ['max-width', PC_ANALYZING_READOUT_WIDTH],
+    ['height', 'auto'],
+    ['margin', '0'],
+    ['padding', '0'],
+    ['transform', 'none'],
+    ['text-align', 'left'],
+    ['box-sizing', 'border-box']
+  ]);
+
+  return true;
+}
+
+window.pcPositionClaudeAnalyzingReadout = positionClaudeAnalyzingReadoutV161;
+
 function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
   const outputEl = document.getElementById('claudeTerminalOutput');
   if (!outputEl) return;
@@ -2046,6 +2344,11 @@ function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
       <div class="pc-terminal-line pc-terminal-indent pc-analyzing-status">ANALYZING<span class="claude-terminal-cursor" aria-hidden="true"></span></div>
     </div>
   `;
+
+  positionClaudeAnalyzingReadoutV161();
+  requestAnimationFrame(positionClaudeAnalyzingReadoutV161);
+  window.setTimeout(positionClaudeAnalyzingReadoutV161, 60);
+  window.setTimeout(positionClaudeAnalyzingReadoutV161, 220);
 }
 
 
@@ -2086,29 +2389,27 @@ function pcClearLegacyAnalysisInlineStylesV122() {
   const dialogue = overlay ? overlay.querySelector('.vn-dialogue') : null;
   const scene = overlay ? overlay.querySelector('.vn-scene') : null;
 
-  const clearProperties = (element, properties) => {
-    if (!element) return;
-    properties.forEach((property) => element.style.removeProperty(property));
-  };
-
-  clearProperties(terminal, [
+  pcRemoveInlineStyles(terminal, [
     'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
     'max-width', 'max-height', 'min-height', 'aspect-ratio', 'transform',
-    'margin', 'padding', 'display', 'opacity', 'visibility', 'z-index'
+    'margin', 'padding', 'display', 'opacity', 'visibility', 'z-index', 'overflow'
   ]);
-  clearProperties(photo, [
+  pcRemoveInlineStyles(photo, [
     'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
     'max-width', 'max-height', 'aspect-ratio', 'border-radius', 'padding',
-    'margin', 'background', 'background-image', 'border', 'box-shadow', 'display'
+    'margin', 'background', 'background-image', 'border', 'box-shadow', 'display',
+    'overflow', 'z-index', 'transform'
   ]);
-  clearProperties(screen, [
+  pcRemoveInlineStyles(screen, [
     'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
-    'border-radius', 'padding', 'box-sizing', 'overflow', 'overflow-y', 'z-index'
+    'border-radius', 'padding', 'box-sizing', 'overflow', 'overflow-y', 'overflow-x',
+    'z-index', 'transform', 'display', 'flex-direction', 'margin', 'max-width',
+    'max-height', 'min-width', 'min-height', 'background', 'border', 'box-shadow'
   ]);
-  clearProperties(dialogue, [
+  pcRemoveInlineStyles(dialogue, [
     'height', 'min-height', 'padding', 'overflow', 'background', 'border'
   ]);
-  clearProperties(scene, ['flex', 'height', 'min-height']);
+  pcRemoveInlineStyles(scene, ['flex', 'height', 'min-height']);
 }
 
 function pcIsAnalysisReportActiveV122() {
@@ -2208,6 +2509,7 @@ setClaudeTerminalState(
 );
 
 renderClaudeAnalyzingReadout(partLabel);
+pcQueueModernTerminalAlignmentV147();
 
   const speaker = document.getElementById('vnSpeaker');
   if (speaker) speaker.textContent = 'Professor Pixel';
@@ -2338,9 +2640,11 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
   }
 
   pcApplyAnalysisLayoutV122();
+  pcQueueModernTerminalAlignmentV147();
 
   requestAnimationFrame(() => {
     pcApplyAnalysisLayoutV122();
+    pcQueueModernTerminalAlignmentV147();
     const screen = output?.closest('.claude-terminal-screen');
     if (screen) screen.scrollTop = 0;
     if (output) output.scrollTop = 0;
@@ -2378,17 +2682,24 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
   if (!overlay || !overlay.classList.contains('active')) {
     showClaudeConsultOverlay('Scenario diagnosis');
   }
-  // Keep the Claude processing screen visible long enough to read/screenshot.
-  // This is the screen between "Continue to Claude" and the Claude Output.
-  // Increase or decrease this number if needed. 2200 = 2.2 seconds.
-  const CLAUDE_PROCESSING_MIN_MS = 4200;
+  // v156: Keep the Claude analyzing screen visible long enough to inspect.
+  // Change this from DevTools before opening Claude when a longer pause is useful:
+  //   PC_CLAUDE_PROCESSING_HOLD_MS = 60000
+  // The default is 30 seconds.
+  if (!Number.isFinite(Number(window.PC_CLAUDE_PROCESSING_HOLD_MS))) {
+    window.PC_CLAUDE_PROCESSING_HOLD_MS = 30000;
+  }
+  const claudeProcessingHoldMs = Math.max(
+    0,
+    Number(window.PC_CLAUDE_PROCESSING_HOLD_MS) || 30000
+  );
 
   setTimeout(() => {
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
       ? buildS1TerminalDiagnosis(scoreTotal, responseText)
       : responseText;
     showClaudeConsultResult(terminalOutput, mock, effectiveClose);
-  }, CLAUDE_PROCESSING_MIN_MS);
+  }, claudeProcessingHoldMs);
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
@@ -2816,9 +3127,13 @@ function playScenarioIntroduction(index) {
   if (!ui.implemented) return;
 
   const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
-  overlay?.classList.add('scenario-intro-active');
+  // S1 now uses the established normal VN composition from its first line onward.
+  // The older scenario-intro layout is retained for S2, where it still supports
+  // the dual-character opening and compact responsive behavior.
+  const useSpecialIntroLayout = index !== SCENARIO_INDEX.ENGAGEMENT;
+  overlay?.classList.toggle('scenario-intro-active', useSpecialIntroLayout);
   const onDone = () => {
-    overlay?.classList.remove('scenario-intro-active');
+    if (useSpecialIntroLayout) overlay?.classList.remove('scenario-intro-active');
     if (index === SCENARIO_INDEX.METACOGNITION) renderS2DiagnosisActivity();
   };
 
@@ -3234,30 +3549,6 @@ function scorePrompt(text) {
 }
 
 
-function buildFeedback(score) {
-  const items = [
-    { key:'hasLearners', label:'Learner/course context' },
-    { key:'hasGoal', label:'Names the failure' },
-    { key:'hasContext', label:'Interaction plan' },
-    { key:'hasConstraint', label:'Constraints' },
-    { key:'isDetailed', label:'Success criteria' }
-  ];
-  const chips = items.map(item =>
-    `<span class="score-chip ${score[item.key] ? 'good' : 'needs'}">${score[item.key] ? '✓' : '+'} ${item.label}</span>`
-  ).join('');
-  const tips = [];
-  if (!score.hasLearners) tips.push('Name the learners and course setting so Claude knows who the discussion is for');
-  if (!score.hasGoal) tips.push('Tell Claude what is wrong with the original prompt');
-  if (!score.hasContext) tips.push('Specify the interaction move students should use');
-  if (!score.hasConstraint) tips.push('Add asynchronous, reply, time, word-count, or LMS constraints');
-  if (!score.isDetailed) tips.push('Define what a stronger student reply should include');
-  const result = tips.length
-    ? `<ul class="fp-tips">${tips.map(tip => `<li>${tip}</li>`).join('')}</ul>`
-    : `<p class="fp-success">Strong repair prompt. It connects the AI request to the actual discussion-board failure.</p>`;
-  return `<div class="feedback-panel"><div class="fp-header">Discussion Repair Analysis</div><div class="fp-body"><div class="score-chips">${chips}</div>${result}</div></div>`;
-}
-
-
 // ══════════════════════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════════════════════
@@ -3321,16 +3612,6 @@ function markScenarioComplete() {
   div.className = 's1-scenario-complete-note';
   div.innerHTML = `<p>Scenario 1 complete. The remaining scenarios are being rebuilt one at a time from clean development shells.</p>`;
   area.appendChild(div);
-}
-
-
-// ══════════════════════════════════════════════════════
-//  REFLECTION ROOM
-// ══════════════════════════════════════════════════════
-function openReflection() {
-  autoSaveSession('reflection_room_opened');
-  playSound('reflectionOpen');
-  document.getElementById('reflectionOverlay').classList.add('visible');
 }
 
 function closeReflection() {
@@ -3855,25 +4136,6 @@ window.reviseS1 = reviseS1 = function reviseS1(){
   }, 100);
 };
 
-function showPixelScoreReflection(totalScore, onDone = null) {
-  const dialogue = document.getElementById('vnDialogue');
-  if (dialogue) dialogue.classList.remove('has-choices');
-  const speaker = document.getElementById('vnSpeaker');
-  if (speaker) speaker.textContent = 'Professor Pixel';
-  const overlay = document.getElementById('vnOverlay');
-  if (overlay) {
-    overlay.classList.remove('claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-prediction','pc-clean-prediction','pc-clean-output','pc-prediction-result');
-    overlay.classList.add('active');
-  }
-  const d = window.pixelDialogue;
-  const lines = totalScore <= 1 ? d.scoreReflection_0_1
-    : totalScore <= 2 ? d.scoreReflection_2
-    : totalScore <= 3 ? d.scoreReflection_3
-    : totalScore <= 4 ? d.scoreReflection_4
-    : d.scoreReflection_5;
-  (lines || []).forEach((line, idx) => vnShow(line.expr, line.text, idx === lines.length - 1 ? onDone : null));
-}
-
 
 // ══════════════════════════════════════════════════════
 //  SEND + PREDICTION GATE — final owner
@@ -3974,6 +4236,8 @@ function pcShowPredictionGate(text){
   try { setClaudeTerminalTextMode(false); } catch(e) {}
   try { setClaudeShelfState('idle', 'awaiting prediction'); } catch(e) {}
   try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'AWAITING PREDICTION'); } catch(e) {}
+  try { pcClearPredictionLayoutInlineStylesV186(); } catch(e) {}
+  pcQueueModernTerminalAlignmentV147();
   try { vnSetExpression('thinking'); } catch(e) {}
   try { musicStartVN(); } catch(e) {}
 
@@ -4056,6 +4320,17 @@ function pcContinueToClaudeAnalysis(){
   const text = window.pendingPromptAfterPrediction;
   if (!text || window.isSubmittingToClaude || (typeof isSubmittingToClaude !== 'undefined' && isSubmittingToClaude)) return false;
 
+  // v160: Capture the correctly rendered prediction computer synchronously,
+  // before any overlay classes are changed. The earlier asynchronous capture
+  // could run after the prediction layout had already been removed, leaving the
+  // stored frame null and giving the analyzing screen nothing useful to reuse.
+  const predictionTerminal = document.getElementById('claudeTerminalScene');
+  const predictionFrameCaptured = pcCapturePredictionTerminalFrameV159(predictionTerminal);
+  console.info(
+    '[PromptCraft] Prediction terminal frame capture:',
+    predictionFrameCaptured ? { ...pcPredictionTerminalFrameV159 } : null
+  );
+
   window.pendingPromptAfterPrediction = '';
   window.pcWaitingForClaudeContinue = false;
 
@@ -4094,6 +4369,19 @@ function pcContinueToClaudeAnalysis(){
     } catch(_) {}
   }
 
+  // Reapply the captured prediction frame after the analyzing DOM state and
+  // its CSS classes have finished changing. Multiple passes cover the first
+  // layout frame and late font/image sizing without relying on resize events.
+  const applyCapturedPredictionFrame = () => {
+    const terminal = document.getElementById('claudeTerminalScene');
+    const photo = terminal?.querySelector('.claude-terminal-photo');
+    if (terminal && photo) pcApplyPredictionTerminalFrameV159(terminal, photo);
+    pcAlignModernTerminalScreenV149();
+  };
+  requestAnimationFrame(applyCapturedPredictionFrame);
+  window.setTimeout(applyCapturedPredictionFrame, 50);
+  window.setTimeout(applyCapturedPredictionFrame, 220);
+
   sendMain(text);
   return false;
 }
@@ -4104,17 +4392,6 @@ function sendText(text){
   if (btn) btn.disabled = true;
   return pcShowPredictionGate(text);
 }
-
-// Legacy names used by inline handlers and older patches. Keep all roads pointed
-// at the non-recursive implementation above. Yes, this is ridiculous. It is also JavaScript.
-var showPredictionGate = pcShowPredictionGate;
-var choosePrediction = pcChoosePrediction;
-var finalChoosePrediction = pcChoosePrediction;
-var finalContinueToClaude = pcContinueToClaudeAnalysis;
-var hardShowPredictionGate = pcShowPredictionGate;
-var hardChoosePrediction = pcChoosePrediction;
-var hardContinueToClaude = pcContinueToClaudeAnalysis;
-var hardSendText = sendText;
 
 window.pcShowPredictionGate = pcShowPredictionGate;
 window.showPredictionGate = pcShowPredictionGate;
@@ -4204,7 +4481,9 @@ function clearVN(){
   assign('devStatus', () => ({
     activeScenario: scenarioIndex + 1,
     implemented: SCENARIO_UI.map(item => item.implemented),
-    build: PC_APP_BUILD_LABEL
+    version: PC_APP_VERSION,
+    build: PC_APP_BUILD_LABEL,
+    schema: PC_APP_SCHEMA_VERSION
   }));
 })();
 

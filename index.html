@@ -12,13 +12,49 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=145">
+<link rel="stylesheet" href="style.css?v=188">
+<style id="pc-compact-nav-critical">
+/* Critical visibility rules keep the compact controls available even if an
+   older cached responsive block tries to treat them as mobile-only. */
+html body .pc-compact-nav {
+  display: grid !important;
+  visibility: visible !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 54px !important;
+  overflow: visible !important;
+}
+html body .pc-compact-nav > .mobile-compact-menu {
+  display: block !important;
+  visibility: visible !important;
+  width: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+@media screen and (max-width: 640px) {
+  html body > .dev-bar,
+  html body > nav.scenario-tabs,
+  html body .dev-bar,
+  html body .scenario-tabs {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: hidden !important;
+  }
+}
+</style>
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
 <script src="functions/dialogue.js?v=141"></script>
-<script src="functions/app.js?v=145"></script>
+<script src="functions/app.js?v=188"></script>
 
 </head>
 
@@ -151,15 +187,16 @@
      Purpose: Persistent title, level, XP, audio settings, and Ideas Wall link.
      Functions used: showAudioSetup()
      ══════════════════════════════════════════════════════ -->
-<header role="banner">
+<header role="banner" class="pc-app-header">
   <div class="logo">
     <div class="logo-icon" aria-hidden="true">🌿</div>
-    <div>
+    <div class="logo-copy">
       <div class="logo-name">Prompt<span>Craft</span></div>
       <div class="logo-sub">The Prompt Lab</div>
     </div>
   </div>
-  <div class="header-right">
+
+  <div class="header-status" aria-label="Player progress">
     <div class="level-tag" id="levelTag" aria-label="Current level" aria-live="polite">substitute · novice</div>
     <div class="xp-group" aria-label="Experience points">
       <span class="xp-label" aria-hidden="true">XP</span>
@@ -167,6 +204,9 @@
         <div class="xp-fill" id="xpFill"></div>
       </div>
     </div>
+  </div>
+
+  <div class="header-actions" aria-label="PromptCraft actions">
     <button class="main-menu-toggle" id="mainMenuToggle"
             type="button"
             onclick="openMainMenu('home')"
@@ -179,10 +219,59 @@
             title="Audio settings: Keep it quiet">🔇</button>
     <a class="ideas-wall-btn" href="/wall.html" target="_blank" rel="noopener noreferrer"
        aria-label="Open the Ideas Wall">
-      💡 Ideas Wall
+      <span class="ideas-wall-icon" aria-hidden="true">💡</span>
+      <span class="ideas-wall-text">Ideas Wall</span>
     </a>
   </div>
 </header>
+
+<!-- Compact navigation uses native disclosure controls so opening the menus
+     does not depend on a JavaScript initialization pass. The original hidden
+     controls remain the source of truth for existing scenario and DEV logic. -->
+<nav class="pc-compact-nav" aria-label="PromptCraft navigation">
+  <details class="mobile-compact-menu mobile-dev-menu pc-native-dropdown"
+           name="promptcraft-compact-navigation"
+           ontoggle="if(this.open){document.querySelectorAll('.pc-compact-nav details[open]').forEach((menu)=>{if(menu!==this)menu.removeAttribute('open')})}">
+    <summary class="mobile-dropdown-toggle">
+      <span class="mobile-dropdown-title">DEV TOOLS</span>
+      <span class="mobile-dropdown-caret" aria-hidden="true">▾</span>
+    </summary>
+    <div class="mobile-dropdown-panel" id="mobileDevToolsPanel" role="menu">
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[0]?.click()">S1</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[1]?.click()">S1 ✏️</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[2]?.click()">S2</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[3]?.click()">S3 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[4]?.click()">S4 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[5]?.click()">S5 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[6]?.click()">S6 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[7]?.click()">S7 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[8]?.click()">S8 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[9]?.click()">Next →</button>
+    </div>
+  </details>
+
+  <details class="mobile-compact-menu mobile-scenario-menu pc-native-dropdown"
+           name="promptcraft-compact-navigation"
+           ontoggle="if(this.open){document.querySelectorAll('.pc-compact-nav details[open]').forEach((menu)=>{if(menu!==this)menu.removeAttribute('open')})}">
+    <summary class="mobile-dropdown-toggle">
+      <span class="mobile-dropdown-copy">
+        <span class="mobile-dropdown-eyebrow">SCENARIO MENU</span>
+        <span class="mobile-scenario-current">S1: Engagement</span>
+      </span>
+      <span class="mobile-dropdown-caret" aria-hidden="true">▾</span>
+    </summary>
+    <div class="mobile-dropdown-panel" id="mobileScenarioMenuPanel" role="menu">
+      <button class="mobile-dropdown-option is-active" data-source-index="0" type="button" role="menuitem" aria-current="page" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[0]?.click()">S1: Engagement</button>
+      <button class="mobile-dropdown-option" data-source-index="1" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[1]?.click()">S2: Metacognition</button>
+      <button class="mobile-dropdown-option" data-source-index="2" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[2]?.click()">S3: Assessment</button>
+      <button class="mobile-dropdown-option" data-source-index="3" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[3]?.click()">S4: Sync Bias</button>
+      <button class="mobile-dropdown-option" data-source-index="4" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[4]?.click()">S5: Hallucination</button>
+      <button class="mobile-dropdown-option" data-source-index="5" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[5]?.click()">S6: Prediction</button>
+      <button class="mobile-dropdown-option" data-source-index="6" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[6]?.click()">S7: Overreliance</button>
+      <button class="mobile-dropdown-option" data-source-index="7" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[7]?.click()">S8: Reflect &amp; Revise</button>
+    </div>
+  </details>
+</nav>
 
 <!-- ══════════════════════════════════════════════════════
      MAIN MENU
@@ -355,7 +444,7 @@
 
     <div class="pc-main-menu-footer">
       <span id="mainMenuStatus">Select an option to begin.</span>
-      <span>Version 139</span>
+      <span id="mainMenuVersion" data-pc-app-version>Version 188</span>
     </div>
   </div>
 </div>
@@ -613,25 +702,25 @@
       <form name="promptcraft-reflection" method="POST" data-netlify="true" onsubmit="handleReflectionSubmit(event)">
         <input type="hidden" name="form-name" value="promptcraft-reflection" />
         <div class="ref-question">
-          <label class="ref-label"><span>01</span>What surprised you most about how AI responded to your prompts during these scenarios?</label>
-          <textarea class="ref-textarea" name="q1_surprise" placeholder="Write freely — there is no wrong answer."></textarea>
+          <label class="ref-label" for="reflectionQ1"><span>01</span>What surprised you most about how AI responded to your prompts during these scenarios?</label>
+          <textarea id="reflectionQ1" class="ref-textarea" name="q1_surprise" placeholder="Write freely — there is no wrong answer."></textarea>
         </div>
         <div class="ref-question">
-          <label class="ref-label"><span>02</span>What is one thing you noticed about AI that you did not expect — either a strength or a limitation?</label>
-          <textarea class="ref-textarea" name="q2_change" placeholder="Think about the hallucination scenario, the prediction, or any moment that shifted your thinking."></textarea>
+          <label class="ref-label" for="reflectionQ2"><span>02</span>What is one thing you noticed about AI that you did not expect — either a strength or a limitation?</label>
+          <textarea id="reflectionQ2" class="ref-textarea" name="q2_change" placeholder="Think about the hallucination scenario, the prediction, or any moment that shifted your thinking."></textarea>
         </div>
         <div class="ref-question">
-          <label class="ref-label"><span>03</span>How has this experience changed how you plan to use — or not use — AI in your actual teaching or course design work?</label>
-          <textarea class="ref-textarea" name="q3_practice" placeholder="Be as specific as you can — a concrete change in practice, not just a general attitude."></textarea>
+          <label class="ref-label" for="reflectionQ3"><span>03</span>How has this experience changed how you plan to use — or not use — AI in your actual teaching or course design work?</label>
+          <textarea id="reflectionQ3" class="ref-textarea" name="q3_practice" placeholder="Be as specific as you can — a concrete change in practice, not just a general attitude."></textarea>
         </div>
         <div class="ref-question">
-          <label class="ref-label"><span>04</span>Is there anything else you want to share about your experience today?</label>
-          <textarea class="ref-textarea ref-textarea-short" name="q4_other" placeholder="Optional."></textarea>
+          <label class="ref-label" for="reflectionQ4"><span>04</span>Is there anything else you want to share about your experience today?</label>
+          <textarea id="reflectionQ4" class="ref-textarea ref-textarea-short" name="q4_other" placeholder="Optional."></textarea>
         </div>
         <div class="ref-divider">
           <div class="ref-question ref-question-last">
-            <label class="ref-label">Participant ID <span class="ref-label-note">(only if your study protocol asks for it)</span></label>
-            <input class="ref-input" type="text" name="participant_id" placeholder="Leave blank to remain anonymous" />
+            <label class="ref-label" for="reflectionParticipantId">Participant ID <span class="ref-label-note">(only if your study protocol asks for it)</span></label>
+            <input id="reflectionParticipantId" class="ref-input" type="text" name="participant_id" placeholder="Leave blank to remain anonymous" />
           </div>
         </div>
         <button class="ref-submit" type="submit" id="refSubmitBtn">Submit Reflection</button>
@@ -670,6 +759,46 @@
     </div>
   </div>
 </div>
+
+
+<script>
+/* Keep the native Scenario Menu label synchronized with the hidden source tabs. */
+(function () {
+  function syncCompactScenarioMenu() {
+    const tabs = Array.from(document.querySelectorAll('.scenario-tabs .tab-btn'));
+    const activeIndex = Math.max(0, tabs.findIndex((tab) =>
+      tab.classList.contains('active') || tab.getAttribute('aria-selected') === 'true'
+    ));
+    const activeTab = tabs[activeIndex];
+    const current = document.querySelector('.mobile-scenario-current');
+    if (current && activeTab) current.textContent = activeTab.textContent.trim();
+
+    document.querySelectorAll('.mobile-scenario-menu .mobile-dropdown-option').forEach((option) => {
+      const isActive = Number(option.dataset.sourceIndex) === activeIndex;
+      option.classList.toggle('is-active', isActive);
+      if (isActive) option.setAttribute('aria-current', 'page');
+      else option.removeAttribute('aria-current');
+    });
+  }
+
+  function initializeCompactScenarioSync() {
+    const tabs = document.querySelectorAll('.scenario-tabs .tab-btn');
+    tabs.forEach((tab) => {
+      new MutationObserver(syncCompactScenarioMenu).observe(tab, {
+        attributes: true,
+        attributeFilter: ['class', 'aria-selected']
+      });
+    });
+    syncCompactScenarioMenu();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeCompactScenarioSync, { once: true });
+  } else {
+    initializeCompactScenarioSync();
+  }
+})();
+</script>
 
 </body>
 </html>
