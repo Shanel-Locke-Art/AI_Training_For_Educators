@@ -25,6 +25,42 @@ function pcViewportHeight() {
   return values.length ? Math.min(...values) : window.innerHeight;
 }
 
+function pcGetViewportWidthV273() {
+  const values = [
+    window.innerWidth,
+    document.documentElement?.clientWidth,
+    window.visualViewport?.width
+  ].filter((value) => Number.isFinite(value) && value > 0);
+
+  return values.length ? Math.min(...values) : window.innerWidth;
+}
+
+function pcGetViewportFamilyV273() {
+  const width = pcGetViewportWidthV273();
+  const height = pcViewportHeight();
+  const aspectRatio = width / Math.max(height, 1);
+
+  // Width has to participate before height. Otherwise a 1024 × 600 display
+  // is mistaken for a phone and receives a nearly 100vw smartboard.
+  if (width >= 760 && height <= 720) return 'short-landscape';
+  if (width <= 380 || (width <= 560 && height <= 720)) return 'compact-phone';
+  if (width <= 560) return 'standard-phone';
+  if (width <= 1100 && aspectRatio < 0.9) return 'portrait-tablet';
+  if (width <= 1400 && height <= 950) return 'compact-desktop';
+  return 'desktop';
+}
+
+function pcApplyViewportFamilyV273() {
+  const family = pcGetViewportFamilyV273();
+  const html = document.documentElement;
+  const body = document.body;
+  const overlay = document.getElementById('vnOverlay');
+
+  if (html) html.dataset.pcViewportFamily = family;
+  if (body) body.dataset.pcViewportFamily = family;
+  if (overlay) overlay.dataset.pcViewportFamily = family;
+}
+
 // [WORKSTATION FRAME]
 // v159: Capture the prediction computer relative to the VN scene, not the
 // browser viewport. The terminal is absolutely positioned inside #vnScene, so
@@ -152,36 +188,18 @@ function pcApplyIpadLayoutV200(){
     }
   }
 
-  // Phone dialogue keeps its compact scale. Wider VN typography is owned by
-  // the consolidated CSS block so resize events do not rewrite it inline.
-  if (isRegularMobileDialogue) {
-    pcRemoveInlineStyles(dialogue, ['padding-left', 'padding-right']);
-    pcSetImportantStyles(speaker, [
-      ['font-family', '"Lora", Georgia, serif'],
-      ['font-size', 'clamp(1.05rem, 3.8vw, 1.2rem)'],
-      ['font-weight', '700'],
-      ['font-style', 'italic'],
-      ['line-height', '1.2'],
-      ['margin-bottom', '8px']
-    ]);
-    pcSetImportantStyles(vnText, [
-      ['font-family', '"Lora", Georgia, serif'],
-      ['font-size', 'clamp(1rem, 3.45vw, 1.12rem)'],
-      ['font-weight', '600'],
-      ['line-height', '1.5']
-    ]);
-    pcRemoveInlineStyles(advanceHint, ['font-size']);
-  } else {
-    pcRemoveInlineStyles(dialogue, ['padding-left', 'padding-right']);
-    pcRemoveInlineStyles(speaker, [
-      'font-family', 'font-size', 'font-weight', 'font-style',
-      'line-height', 'margin-bottom'
-    ]);
-    pcRemoveInlineStyles(vnText, [
-      'font-family', 'font-size', 'font-weight', 'line-height'
-    ]);
-    pcRemoveInlineStyles(advanceHint, ['font-size']);
-  }
+  // Shared CSS owns dialogue typography at every width. JavaScript only clears
+  // stale inline values left by older prediction and tablet layouts. Keeping
+  // font sizes out of resize handlers prevents the 700/701 and 1180/1181 jumps.
+  pcRemoveInlineStyles(dialogue, ['padding-left', 'padding-right']);
+  pcRemoveInlineStyles(speaker, [
+    'font-family', 'font-size', 'font-weight', 'font-style',
+    'line-height', 'margin-bottom'
+  ]);
+  pcRemoveInlineStyles(vnText, [
+    'font-family', 'font-size', 'font-weight', 'line-height'
+  ]);
+  pcRemoveInlineStyles(advanceHint, ['font-size']);
 }
 
 let pcResponsiveChromeFrameV262 = 0;
@@ -189,6 +207,7 @@ function pcScheduleResponsiveChromeV262() {
   if (pcResponsiveChromeFrameV262) cancelAnimationFrame(pcResponsiveChromeFrameV262);
   pcResponsiveChromeFrameV262 = requestAnimationFrame(() => {
     pcResponsiveChromeFrameV262 = 0;
+    pcApplyViewportFamilyV273();
     pcApplyIpadLayoutV200();
   });
 }
@@ -1897,7 +1916,7 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
 
 // NOTE: Terminal diagnosis copy is still inline. Candidate for dialogue.js or scenario-data.js.
 function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose = null, scoreTotal = null) {
-  // S2: wrap onClose to render the result card after terminal closes
+  // Scenario-specific result handoff: S2 currently uses the shared terminal flow.
   let effectiveClose = onClose;
   if (scenarioIndex === 1) {
     effectiveClose = function() {
@@ -1939,7 +1958,7 @@ function closeClaudeConsultOverlay() {
   if (overlay) overlay.classList.remove('active', 'claude-consult', 'claude-terminal-consult', 'claude-terminal-textmode', 'claude-prediction');
   document.getElementById('vnCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
   document.getElementById('vnStudentCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
-  overlay?.classList.remove('s2-dual-character');
+  overlay?.classList.remove('pc-dual-character');
   setClaudeShelfState('idle', 'idle');
   setClaudeTerminalTextMode(false);
   setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
@@ -1969,7 +1988,7 @@ function setClaudeShelfState(state = 'idle', label = '') {
 
 function vnShow(expression, text, onComplete, meta = {}) {
   // Add to queue. Meta keeps the shared VN system backward compatible while
-  // allowing S2 lines to identify Jordan as the speaker.
+  // allowing any scenario line to identify a secondary speaker.
   vnQueue.push({ expression, text, onComplete, ...meta });
   if (!vnTyping) vnPlayNext();
 }
@@ -1985,7 +2004,7 @@ function vnPlayNext() {
       const studentCharacter = document.getElementById('vnStudentCharacter');
       if (pixelCharacter) pixelCharacter.style.removeProperty('display');
       if (studentCharacter) studentCharacter.style.removeProperty('display');
-      overlay.classList.remove('s2-dual-character');
+      overlay.classList.remove('pc-dual-character');
       document.getElementById('promptInput')?.focus();
       // Fade music down when VN closes
       musicEndVN();
@@ -2002,8 +2021,8 @@ function vnPlayNext() {
   const overlay = document.getElementById('vnOverlay');
   overlay.classList.add('active');
 
-  // Reset Claude modes, then configure the active VN speaker. S2 keeps Jordan
-  // opposite Pixel on wide screens and shows only the active speaker on small screens.
+  // Reset Claude modes, then configure the active VN speaker. Dual-cast scenes keep
+  // the secondary character opposite Pixel on wide screens and show one on small screens.
   setVNClaudeMode(false);
   setVNClaudeTerminalMode(false);
   setClaudeTerminalTextMode(false);
@@ -2065,13 +2084,13 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
   const speaker = document.getElementById('vnSpeaker');
   const dialogue = document.getElementById('vnDialogue');
   const isJordan = character === 'jordan';
-  const useS2Cast = scenarioIndex === SCENARIO_INDEX.METACOGNITION && (isJordan || character === 'pixel');
+  const useDualCast = getScenarioUI(scenarioIndex).introCast === 'dual' && (isJordan || character === 'pixel');
 
   if (speaker) speaker.textContent = speakerName || (isJordan ? 'Jordan' : 'Professor Pixel');
   if (dialogue) dialogue.setAttribute('aria-label', `${speaker?.textContent || speakerName} is speaking. Press Space or Enter to continue.`);
-  overlay?.classList.toggle('s2-dual-character', useS2Cast);
+  overlay?.classList.toggle('pc-dual-character', useDualCast);
 
-  if (useS2Cast) {
+  if (useDualCast) {
     pixel?.classList.add('visible');
     student?.classList.add('visible');
     pixel?.classList.toggle('is-active', !isJordan);
@@ -2084,17 +2103,17 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
     student?.classList.remove('visible', 'is-active', 'is-inactive');
   }
 
-  pcApplyS2CastResponsive();
+  pcApplyDualCastResponsive();
   if (isJordan) vnSetStudentExpression(expression);
   else vnSetExpression(expression);
 }
 
-function pcApplyS2CastResponsive() {
+function pcApplyDualCastResponsive() {
   const overlay = document.getElementById('vnOverlay');
   const pixel = document.getElementById('vnCharacter');
   const student = document.getElementById('vnStudentCharacter');
   const compact = window.matchMedia?.('(max-width: 620px), (max-height: 650px)').matches;
-  if (!overlay?.classList.contains('s2-dual-character')) {
+  if (!overlay?.classList.contains('pc-dual-character')) {
     if (pixel) pixel.style.display = '';
     if (student) student.style.display = '';
     return;
@@ -2109,10 +2128,10 @@ function pcApplyS2CastResponsive() {
   }
 }
 
-if (!window.pcS2CastResponsiveInstalled) {
-  window.pcS2CastResponsiveInstalled = true;
-  window.addEventListener('resize', pcApplyS2CastResponsive, { passive: true });
-  window.visualViewport?.addEventListener('resize', pcApplyS2CastResponsive, { passive: true });
+if (!window.pcDualCastResponsiveInstalled) {
+  window.pcDualCastResponsiveInstalled = true;
+  window.addEventListener('resize', pcApplyDualCastResponsive, { passive: true });
+  window.visualViewport?.addEventListener('resize', pcApplyDualCastResponsive, { passive: true });
 }
 
 function vnTypeWriter(text) {

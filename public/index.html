@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- ══════════════════════════════════════════════════════
+     DOCUMENT METADATA + GLOBAL ASSETS
+     ══════════════════════════════════════════════════════ -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2c3e35">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>PromptCraft – The Prompt Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/promptcraft.bundle.css?v=279">
+<!-- Production CSS is generated from the modular owner files by tools/build-production.py. -->
+<!-- External libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+
+<!-- PromptCraft game scripts -->
+<script src="scripts/dialogue.js?v=279"></script>
+<script src="scripts/app.bundle.js?v=279"></script>
+
+</head>
+
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     ACCESSIBILITY
+     ══════════════════════════════════════════════════════ -->
+<a href="#chat" class="skip-link">Skip to main content</a>
+
+<!-- ══════════════════════════════════════════════════════
+     NAME ENTRY MODAL
+     Purpose: Collects optional display name before the game begins.
+     Functions used: submitName()
+     ══════════════════════════════════════════════════════ -->
+<div class="name-modal-overlay" id="nameModalOverlay" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle" aria-hidden="true" hidden>
+  <div class="name-modal">
+    <span class="name-modal-icon">🌿</span>
+    <div class="name-modal-title" id="nameModalTitle">Welcome to the Prompt Lab</div>
+    <div class="name-modal-sub">
+      What should Professor Pixel call you?
+    </div>
+    <input
+      class="name-modal-input"
+      id="nameInput"
+      type="text"
+      maxlength="24"
+      placeholder="Enter your name"
+      aria-label="Your name"
+      autocomplete="given-name"
+      onkeydown="if(event.key==='Enter'){event.preventDefault();submitName()}" />
+    <button class="name-modal-btn" onclick="submitName()">
+      Continue →
+    </button>
+    <button class="name-modal-skip" onclick="submitName(true)">
+      Skip — just call me You
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     AUDIO SETUP MODAL
+     Purpose: Lets the learner choose automatic voices, music, or silence
+     after the optional name step. The same dialog can be reopened later.
+     Functions used: selectAudioPreference(), submitAudioPreference(),
+     closeAudioSetup()
+     ══════════════════════════════════════════════════════ -->
+<div class="audio-setup-overlay" id="audioSetupOverlay"
+     role="dialog" aria-modal="true"
+     aria-labelledby="audioSetupTitle"
+     aria-describedby="audioSetupHelp"
+     aria-hidden="true" hidden>
+  <div class="audio-setup-modal" role="document">
+    <div class="audio-setup-pixel" aria-hidden="true">
+      <img data-pc-image="assets/images/characters/professor-pixel/encouraging.png" data-pc-fallback="images/pixel-encouraging.png" alt="" />
+    </div>
+
+    <p class="audio-setup-speaker">Professor Pixel</p>
+    <h2 class="audio-setup-title" id="audioSetupTitle">
+      Ready? Choose what you’d like to hear in the Prompt Lab.
+    </h2>
+    <p class="audio-setup-help" id="audioSetupHelp">
+      PromptCraft stays silent until you choose. You can change this later from the audio button in the header.
+    </p>
+
+    <form id="audioSetupForm" onsubmit="submitAudioPreference(event)">
+      <fieldset class="audio-choice-fieldset">
+        <legend class="sr-only">Choose an audio experience</legend>
+
+        <label class="audio-choice-card">
+          <input type="radio" name="audioMode" value="full"
+                 onchange="selectAudioPreference(this.value)" />
+          <span class="audio-choice-copy">
+            <strong>Full audio</strong>
+            <span>Professor Pixel and student voices, plus background music.</span>
+          </span>
+        </label>
+
+        <label class="audio-choice-card">
+          <input type="radio" name="audioMode" value="voices"
+                 onchange="selectAudioPreference(this.value)" />
+          <span class="audio-choice-copy">
+            <strong>Voices only</strong>
+            <span>Recorded dialogue without background music.</span>
+          </span>
+        </label>
+
+        <label class="audio-choice-card">
+          <input type="radio" name="audioMode" value="silent"
+                 onchange="selectAudioPreference(this.value)" />
+          <span class="audio-choice-copy">
+            <strong>Keep it quiet</strong>
+            <span>No automatic audio. Every line remains visible as text.</span>
+          </span>
+        </label>
+      </fieldset>
+
+      <button class="audio-setup-primary" id="audioSetupContinueBtn"
+              type="submit" disabled>
+        Begin the Prompt Lab
+      </button>
+      <button class="audio-setup-cancel" id="audioSetupCancelBtn"
+              type="button" onclick="closeAudioSetup()" hidden>
+        Cancel
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     DEV BAR — clean shell
+     S1 fill resets the playable baseline. S2 opens its playable case; S3–S8 remain development shells.
+══════════════════════════════════════════════════════ -->
+<div class="dev-bar" role="toolbar" aria-label="PromptCraft development shortcuts">
+  <span class="dev-label">DEV</span>
+  <button class="dev-btn" onclick="devGoScenario(0)">S1</button>
+  <button class="dev-btn dev-btn-fill" onclick="devFillScenario(0)">S1 ✏️</button>
+  <button class="dev-btn" onclick="devGoScenario(1)">S2</button>
+  <button class="dev-btn" onclick="devGoScenario(2)">S3 shell</button>
+  <button class="dev-btn" onclick="devGoScenario(3)">S4 shell</button>
+  <button class="dev-btn" onclick="devGoScenario(4)">S5 shell</button>
+  <button class="dev-btn" onclick="devGoScenario(5)">S6 shell</button>
+  <button class="dev-btn" onclick="devGoScenario(6)">S7 shell</button>
+  <button class="dev-btn" onclick="devGoScenario(7)">S8 shell</button>
+  <button class="dev-btn" onclick="devNextScenario()">Next →</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     MAIN GAME HEADER
+     Purpose: Persistent title, level, XP, audio settings, and Ideas Wall link.
+     Functions used: showAudioSetup()
+     ══════════════════════════════════════════════════════ -->
+<header role="banner" class="pc-app-header">
+  <div class="logo">
+    <div class="logo-icon" aria-hidden="true">🌿</div>
+    <div class="logo-copy">
+      <div class="logo-name">Prompt<span>Craft</span></div>
+      <div class="logo-sub">The Prompt Lab</div>
+    </div>
+  </div>
+
+  <div class="header-status" aria-label="Player progress">
+    <div class="level-tag" id="levelTag" aria-label="Current level" aria-live="polite">substitute · novice</div>
+    <div class="xp-group" aria-label="Experience points">
+      <span class="xp-label" aria-hidden="true">XP</span>
+      <div class="xp-track" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" aria-label="XP progress">
+        <div class="xp-fill" id="xpFill"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-actions" aria-label="PromptCraft actions">
+    <button class="main-menu-toggle" id="mainMenuToggle"
+            type="button"
+            onclick="openMainMenu('home')"
+            aria-label="Open main menu"
+            title="Main menu">Menu</button>
+    <button class="music-toggle" id="musicToggle"
+            type="button"
+            onclick="showAudioSetup({onboarding:false})"
+            aria-label="Open audio settings. Current setting: Keep it quiet"
+            title="Audio settings: Keep it quiet">🔇</button>
+    <a class="ideas-wall-btn" href="/wall.html" target="_blank" rel="noopener noreferrer"
+       aria-label="Open the Ideas Wall">
+      <span class="ideas-wall-icon" aria-hidden="true">💡</span>
+      <span class="ideas-wall-text">Ideas Wall</span>
+    </a>
+  </div>
+</header>
+
+<!-- Compact navigation uses native disclosure controls so opening the menus
+     does not depend on a JavaScript initialization pass. The original hidden
+     controls remain the source of truth for existing scenario and DEV logic. -->
+<nav class="pc-compact-nav" aria-label="PromptCraft navigation">
+  <details class="mobile-compact-menu mobile-dev-menu pc-native-dropdown"
+           name="promptcraft-compact-navigation"
+           ontoggle="if(this.open){document.querySelectorAll('.pc-compact-nav details[open]').forEach((menu)=>{if(menu!==this)menu.removeAttribute('open')})}">
+    <summary class="mobile-dropdown-toggle">
+      <span class="mobile-dropdown-title">DEV TOOLS</span>
+      <span class="mobile-dropdown-caret" aria-hidden="true">▾</span>
+    </summary>
+    <div class="mobile-dropdown-panel" id="mobileDevToolsPanel" role="menu">
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[0]?.click()">S1</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[1]?.click()">S1 ✏️</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[2]?.click()">S2</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[3]?.click()">S3 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[4]?.click()">S4 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[5]?.click()">S5 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[6]?.click()">S6 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[7]?.click()">S7 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[8]?.click()">S8 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[9]?.click()">Next →</button>
+    </div>
+  </details>
+
+  <details class="mobile-compact-menu mobile-scenario-menu pc-native-dropdown"
+           name="promptcraft-compact-navigation"
+           ontoggle="if(this.open){document.querySelectorAll('.pc-compact-nav details[open]').forEach((menu)=>{if(menu!==this)menu.removeAttribute('open')})}">
+    <summary class="mobile-dropdown-toggle">
+      <span class="mobile-dropdown-copy">
+        <span class="mobile-dropdown-eyebrow">SCENARIO MENU</span>
+        <span class="mobile-scenario-current">S1: Engagement</span>
+      </span>
+      <span class="mobile-dropdown-caret" aria-hidden="true">▾</span>
+    </summary>
+    <div class="mobile-dropdown-panel" id="mobileScenarioMenuPanel" role="menu">
+      <button class="mobile-dropdown-option is-active" data-source-index="0" type="button" role="menuitem" aria-current="page" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[0]?.click()">S1: Engagement</button>
+      <button class="mobile-dropdown-option" data-source-index="1" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[1]?.click()">S2: Metacognition</button>
+      <button class="mobile-dropdown-option" data-source-index="2" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[2]?.click()">S3: Assessment</button>
+      <button class="mobile-dropdown-option" data-source-index="3" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[3]?.click()">S4: Sync Bias</button>
+      <button class="mobile-dropdown-option" data-source-index="4" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[4]?.click()">S5: Hallucination</button>
+      <button class="mobile-dropdown-option" data-source-index="5" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[5]?.click()">S6: Prediction</button>
+      <button class="mobile-dropdown-option" data-source-index="6" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[6]?.click()">S7: Overreliance</button>
+      <button class="mobile-dropdown-option" data-source-index="7" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[7]?.click()">S8: Reflect &amp; Revise</button>
+    </div>
+  </details>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════
+     MAIN MENU
+     Purpose: Start or continue the game, jump directly to a scenario during
+     development, and provide expandable information panels.
+     Functions used: openMainMenu(), closeMainMenu(), showMainMenuPanel(),
+     continueFromMainMenu(), launchScenarioFromMenu()
+     ══════════════════════════════════════════════════════ -->
+<div class="pc-main-menu" id="mainMenuOverlay"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="mainMenuTitle"
+     aria-hidden="true"
+     hidden>
+  <div class="pc-main-menu-backdrop" aria-hidden="true"></div>
+  <div class="pc-main-menu-shell" role="document">
+    <div class="pc-main-menu-topbar">
+      <div class="pc-main-menu-brand">
+        <span class="pc-main-menu-kicker">PromptCraft</span>
+        <h1 id="mainMenuTitle">The Prompt Lab</h1>
+      </div>
+      <button class="pc-main-menu-close" id="mainMenuCloseBtn"
+              type="button"
+              onclick="closeMainMenu()"
+              aria-label="Close main menu">×</button>
+    </div>
+
+    <section class="pc-menu-panel" id="menuPanelHome" data-menu-panel="home">
+      <div class="pc-menu-home-copy">
+        <p class="pc-menu-eyebrow">Faculty AI training game</p>
+        <h2>Practice better prompting without surrendering your judgment.</h2>
+        <p>Work through short teaching scenarios with Professor Pixel, consult Claude, and revise your decisions as the consequences become visible.</p>
+      </div>
+
+      <div class="pc-menu-primary-actions">
+        <button class="pc-menu-action pc-menu-action-primary" id="menuContinueBtn"
+                type="button" onclick="continueFromMainMenu()">
+          Start Scenario 1
+        </button>
+        <button class="pc-menu-action" type="button" onclick="showMainMenuPanel('scenarios')">
+          Scenario Select
+        </button>
+      </div>
+
+      <div class="pc-menu-secondary-actions" aria-label="Menu information">
+        <button type="button" onclick="showMainMenuPanel('how-to-play')">How to Play</button>
+        <button type="button" onclick="showMainMenuPanel('about')">About PromptCraft</button>
+        <button type="button" onclick="showMainMenuPanel('research')">Research &amp; Privacy</button>
+      </div>
+
+      <aside class="pc-menu-data-summary" aria-labelledby="menuDataSummaryTitle">
+        <h3 id="menuDataSummaryTitle">Prototype data notice</h3>
+        <p>PromptCraft records activity such as prompts, choices, revisions, scores, reflections, timestamps, and completion progress for development and potential research use. Do not enter student names or other confidential information.</p>
+        <button type="button" onclick="showMainMenuPanel('research')">Read the full Research &amp; Privacy notice</button>
+      </aside>
+    </section>
+
+    <section class="pc-menu-panel" id="menuPanelScenarios" data-menu-panel="scenarios" hidden>
+      <div class="pc-menu-panel-heading">
+        <button class="pc-menu-back" type="button" onclick="showMainMenuPanel('home')">← Main Menu</button>
+        <p class="pc-menu-eyebrow">Scenario Select</p>
+        <h2>Choose a training scenario</h2>
+        <p>All scenarios are available here for development and review. Completion data is still recorded normally.</p>
+      </div>
+      <div class="pc-menu-scenario-grid" id="mainMenuScenarioGrid" aria-live="polite"></div>
+    </section>
+
+    <section class="pc-menu-panel" id="menuPanelHowToPlay" data-menu-panel="how-to-play" hidden>
+      <div class="pc-menu-panel-heading">
+        <button class="pc-menu-back" type="button" onclick="showMainMenuPanel('home')">← Main Menu</button>
+        <p class="pc-menu-eyebrow">How to Play</p>
+        <h2>Observe, predict, test, and revise.</h2>
+      </div>
+      <div class="pc-menu-info-grid">
+        <article>
+          <span>01</span>
+          <h3>Read the teaching problem</h3>
+          <p>Professor Pixel introduces the scenario and points you toward the design problem that matters.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Make a deliberate choice</h3>
+          <p>Build a prompt, identify a risk, or predict what the AI is likely to produce before seeing the answer.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Evaluate the output</h3>
+          <p>Claude provides a response, but your professional judgment determines what is useful, incomplete, or unsafe.</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h3>Revise and continue</h3>
+          <p>Use the feedback to improve the prompt or decision, then carry that reasoning into the next scenario.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="pc-menu-panel" id="menuPanelAbout" data-menu-panel="about" hidden>
+      <div class="pc-menu-panel-heading">
+        <button class="pc-menu-back" type="button" onclick="showMainMenuPanel('home')">← Main Menu</button>
+        <p class="pc-menu-eyebrow">About PromptCraft</p>
+        <h2>A visual novel about using AI with intention.</h2>
+        <p>PromptCraft combines scenario-based practice, reflective decision-making, and game-informed faculty development.</p>
+      </div>
+
+      <div class="pc-menu-profile-grid">
+        <article class="pc-menu-profile-card">
+          <p class="pc-menu-card-label">The project</p>
+          <h3>PromptCraft</h3>
+          <p>PromptCraft is a faculty-development experience focused on prompt design, course context, critical evaluation, and the limits of generative AI. Learners work through realistic teaching problems with Professor Pixel, consult Claude, and revise their decisions using evidence and professional judgment.</p>
+        </article>
+
+        <article class="pc-menu-profile-card">
+          <p class="pc-menu-card-label">Developer</p>
+          <h3>Shanel Lara Locke, MFA</h3>
+          <p>Shanel is an instructional designer in the Teaching &amp; Learning Center at Great Falls College MSU. Her work supports faculty development, online course design, digital accessibility, course review, instructional technology, and thoughtful uses of AI in teaching and learning.</p>
+          <p><a href="https://www.gfcmsu.edu/campus-departments/tlc/" target="_blank" rel="noopener noreferrer">Visit the Great Falls College MSU Teaching &amp; Learning Center <span class="sr-only">(opens in a new tab)</span></a></p>
+        </article>
+
+        <article class="pc-menu-profile-card">
+          <p class="pc-menu-card-label">Academic context</p>
+          <h3>Montana State University Ed.S.</h3>
+          <p>PromptCraft is connected to Shanel’s graduate work in Montana State University’s Education Specialist program. The project explores how scenario-based professional learning can help educators practice prompt design, evaluate AI output, and retain their professional judgment.</p>
+          <p><a href="https://www.montana.edu/academics/education-specialist-graduate/" target="_blank" rel="noopener noreferrer">Learn about the Education Specialist program at Montana State University <span class="sr-only">(opens in a new tab)</span></a></p>
+        </article>
+
+        <article class="pc-menu-profile-card pc-menu-disclaimer-card">
+          <p class="pc-menu-card-label">Institutional disclaimer</p>
+          <h3>Independent educational project</h3>
+          <p>PromptCraft is developed by Shanel as an educational and scholarly project. The content, interpretations, and design choices presented here do not necessarily represent official policy or positions of Great Falls College MSU, Montana State University, or the Montana University System.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="pc-menu-panel" id="menuPanelResearch" data-menu-panel="research" hidden>
+      <div class="pc-menu-panel-heading">
+        <button class="pc-menu-back" type="button" onclick="showMainMenuPanel('home')">← Main Menu</button>
+        <p class="pc-menu-eyebrow">Research &amp; Privacy</p>
+        <h2>Know what the prototype records.</h2>
+        <p>This plain-language notice describes the current development build. It is not a substitute for formal informed consent.</p>
+      </div>
+
+      <div class="pc-menu-research-stack">
+        <section class="pc-menu-research-card" aria-labelledby="researchCollectedTitle">
+          <h3 id="researchCollectedTitle">Information that may be collected</h3>
+          <p>PromptCraft may record an optional name or participant identifier, scenario choices, prompts and revisions, Claude responses, scores, predictions, reflections, timestamps, session duration, completion progress, and basic display information such as screen width.</p>
+        </section>
+
+        <section class="pc-menu-research-card" aria-labelledby="researchPurposeTitle">
+          <h3 id="researchPurposeTitle">Why the information is collected</h3>
+          <p>Information may be used to test the prototype, identify usability problems, improve the instructional design, evaluate learning activities, and support future research when the required institutional review and participant-consent processes are in place.</p>
+        </section>
+
+        <section class="pc-menu-research-card pc-menu-research-warning" aria-labelledby="researchDoNotEnterTitle">
+          <h3 id="researchDoNotEnterTitle">Do not enter confidential information</h3>
+          <p>Do not include student names, grades, course records, health information, employment records, passwords, or other private or legally protected information in any prompt or reflection. The name field may be skipped or replaced with a non-identifying participant code.</p>
+        </section>
+
+        <section class="pc-menu-research-card" aria-labelledby="researchAITitle">
+          <h3 id="researchAITitle">AI and external processing</h3>
+          <p>Depending on how PromptCraft is deployed, text submitted during an activity may be processed by an external generative AI service. Treat every prompt as information that could leave the local browser, and use fictional or generalized teaching examples rather than identifiable student information.</p>
+        </section>
+
+        <section class="pc-menu-research-card" aria-labelledby="researchConsentTitle">
+          <h3 id="researchConsentTitle">Formal research participation</h3>
+          <p>This menu notice does not indicate that a formal study has been approved, and it does not serve as informed consent. If PromptCraft is used in an approved research study, participants will receive separate information describing the study purpose, procedures, risks, benefits, confidentiality protections, data use, storage, voluntary participation, and researcher contacts before their data are used for research.</p>
+        </section>
+      </div>
+    </section>
+
+    <div class="pc-main-menu-footer">
+      <span id="mainMenuStatus">Select an option to begin.</span>
+      <span id="mainMenuVersion" data-pc-app-version>Version 279</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SCENARIO TABS
+     Purpose: Scenario navigation. Locked scenarios are enabled by app.js.
+     Functions used: switchScenario()
+     ══════════════════════════════════════════════════════ -->
+
+<nav class="scenario-tabs" role="tablist" aria-label="Training scenarios">
+  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" onclick="switchScenario(0,this)">S1: Engagement</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(1,this)">S2: Metacognition</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(2,this)">S3: Assessment</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(3,this)">S4: Sync Bias</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(4,this)">S5: Hallucination</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(5,this)">S6: Prediction</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(6,this)">S7: Overreliance</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(7,this)">S8: Reflect &amp; Revise</button>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════
+     CURRENT SCENARIO BRIEF
+     Purpose: Displays the active scenario challenge and OSCQR alignment.
+     Updated by: loadScenario()
+     ══════════════════════════════════════════════════════ -->
+
+<div class="scenario-card" role="region" aria-label="Current scenario challenge">
+  <span class="scenario-label" aria-hidden="true">Your Challenge</span>
+  <span class="scenario-desc" id="scenarioText" aria-live="polite"></span>
+</div>
+
+<div class="oscqr-row" role="region" aria-label="OSCQR quality alignment indicators">
+  <span class="oscqr-heading" aria-hidden="true">OSCQR Alignment</span>
+  <div id="oscqrChips" class="oscqr-chips" aria-live="polite" aria-label="Active OSCQR indicators"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     CHAT + PROMPT INPUT AREA
+     Purpose: Main conversation area and dynamic prompt workspace.
+     Updated by: renderInputMode(), addMessage(), scenario-specific builders.
+     ══════════════════════════════════════════════════════ -->
+
+<main class="chat-area" id="chat" role="main" aria-label="Conversation with AI" aria-live="polite"></main>
+
+<!-- DYNAMIC INPUT AREA — content rendered by renderInputMode() -->
+<div id="inputContainer" role="region" aria-label="Prompt input"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     PROFESSOR PIXEL HUD
+     Purpose: Persistent badge and coach card outside the VN overlay.
+     Functions used: pixelBadgeClick(), pixelCoachDismiss()
+     ══════════════════════════════════════════════════════ -->
+<div class="pixel-badge" id="pixelBadge"
+     onclick="pixelBadgeClick()"
+     role="button"
+     tabindex="0"
+     aria-label="Professor Pixel — click to see her latest feedback"
+     onkeydown="if(event.key==='Enter'||event.key===' '){pixelBadgeClick()}">
+  <!-- Real portrait — shown when images exist -->
+  <img class="pixel-badge-portrait" id="pixelBadgeImg"
+       data-pc-image="assets/images/characters/professor-pixel/neutral.png" data-pc-fallback="images/pixel-neutral.png"
+       alt="Professor Pixel"
+       onerror="this.style.display='none';document.getElementById('pixelBadgeFallback').style.display='flex';" />
+  <!-- Fallback -->
+  <div class="pixel-badge-fallback" id="pixelBadgeFallback" style="display:none;">🧑‍🏫</div>
+  <div class="pixel-badge-label" id="pixelBadgeLabel">Pixel</div>
+</div>
+
+<!-- ── PROFESSOR PIXEL COACH CARD ──────────────────── -->
+<div class="pixel-coach-card" id="pixelCoachCard" role="status" aria-live="polite">
+  <img class="pixel-coach-portrait" id="pixelCoachImg"
+       data-pc-image="assets/images/characters/professor-pixel/neutral.png" data-pc-fallback="images/pixel-neutral.png"
+       alt="Professor Pixel"
+       onerror="this.style.display='none';document.getElementById('pixelCoachFallback').style.display='flex';" />
+  <div class="pixel-coach-fallback" id="pixelCoachFallback" style="display:none;">🧑‍🏫</div>
+  <div class="pixel-coach-body">
+    <div class="pixel-coach-name">Professor Pixel</div>
+    <div class="pixel-coach-msg" id="pixelCoachMsg"></div>
+  </div>
+  <button class="pixel-coach-dismiss"
+          aria-label="Dismiss Professor Pixel's feedback"
+          onclick="pixelCoachDismiss()">✕</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     VISUAL NOVEL OVERLAY
+     Purpose: Professor Pixel scenario intros, Claude consultation scenes,
+     prediction choices, and guided narrative transitions.
+     Functions used: vnAdvance(), vnSkipType(), playPixelSequence()
+     Content source: functions/dialogue.js
+     ══════════════════════════════════════════════════════ -->
+<div class="vn-overlay" id="vnOverlay"
+     role="dialog"
+     aria-modal="true"
+     aria-label="PromptCraft character dialogue"
+     aria-live="polite">
+
+  <!-- VN SCENE STAGE: background, smartboard, Pixel, Claude visual systems -->
+  <div class="vn-scene" id="vnScene">
+  <img id="vnSceneBg" class="vn-bg" alt="" aria-hidden="true" />
+
+    <!-- SMARTBOARD: displays the current scenario challenge -->
+    <div class="vn-smartboard-wrap" role="region" aria-label="Smartboard challenge display">
+
+      <!-- Outer bezel -->
+      <div class="vn-smartboard" aria-hidden="true">
+        <!-- Corner screws -->
+        <div class="vn-screw vn-screw-tl"></div>
+        <div class="vn-screw vn-screw-tr"></div>
+        <div class="vn-screw vn-screw-bl"></div>
+        <div class="vn-screw vn-screw-br"></div>
+
+        <!-- Touch sensors on sides -->
+        <div class="vn-sensor-left"></div>
+        <div class="vn-sensor-right"></div>
+
+        <!-- Screen -->
+        <div class="vn-screen">
+          <img class="vn-board-img" id="vnBoardImg" alt="" aria-hidden="true" />
+          <div class="vn-screen-inner-border"></div>
+          <div class="vn-board-label">Today's Challenge</div>
+          <div class="vn-board-text" id="vnBoardText" aria-label="Scenario challenge text"></div>
+          <div class="vn-board-loading" id="vnBoardLoading" style="display:none;" aria-live="polite">
+            loading scene...
+          </div>
+        </div>
+
+        <!-- Pen tray (black, blue, red, green pen slots + eraser) -->
+        <div class="vn-control-rail">
+          <div class="vn-light"></div>
+          <div class="vn-light"></div>
+          <div class="vn-light"></div>
+          <div class="vn-light dim"></div>
+          <span class="vn-brand">PromptCraft</span>
+          <div class="vn-usb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFESSOR PIXEL PORTRAIT: image fallback included for missing assets -->
+    <div class="vn-character" id="vnCharacter" aria-hidden="true">
+<svg id="vnPortraitPlaceholder"
+           viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg"
+           aria-hidden="true"
+           class="vn-portrait-placeholder-svg">
+        <ellipse cx="100" cy="280" rx="70" ry="50" fill="#3d7a54" opacity="0.9"/>
+        <rect x="60" y="160" width="80" height="100" rx="10" fill="#4a7c5e"/>
+        <rect x="90" y="145" width="20" height="25" fill="#c8956c"/>
+        <ellipse cx="100" cy="120" rx="42" ry="48" fill="#c8956c"/>
+        <ellipse cx="100" cy="95" rx="46" ry="38" fill="#3d2b1a"/>
+        <ellipse cx="100" cy="78" rx="40" ry="28" fill="#4a3522"/>
+        <rect x="72" y="114" width="22" height="15" rx="5" fill="none" stroke="#2a1f14" stroke-width="2.5"/>
+        <rect x="106" y="114" width="22" height="15" rx="5" fill="none" stroke="#2a1f14" stroke-width="2.5"/>
+        <line x1="94" y1="121" x2="106" y2="121" stroke="#2a1f14" stroke-width="2"/>
+        <circle cx="83" cy="121" r="4" fill="#2a1f14"/>
+        <circle cx="117" cy="121" r="4" fill="#2a1f14"/>
+        <circle cx="85" cy="119" r="1.5" fill="white"/>
+        <circle cx="119" cy="119" r="1.5" fill="white"/>
+        <path d="M 88 138 Q 100 148 112 138" fill="none" stroke="#2a1f14" stroke-width="2" stroke-linecap="round"/>
+        <rect x="28" y="168" width="32" height="14" rx="7" fill="#4a7c5e" transform="rotate(20,44,175)"/>
+        <rect x="140" y="168" width="32" height="14" rx="7" fill="#4a7c5e" transform="rotate(-20,156,175)"/>
+        <text x="100" y="310" text-anchor="middle" font-family="sans-serif" font-size="9" fill="rgba(168,213,181,0.6)">[placeholder — replace with your art]</text>
+      </svg>
+
+      <img id="vnPortrait" data-pc-image="assets/images/characters/professor-pixel/neutral.png" data-pc-fallback="images/pixel-neutral.png"
+           alt=""
+           aria-hidden="true"
+           style="display:none;"
+           onerror="this.style.display='none';document.getElementById('vnPortraitPlaceholder').style.display='block';"
+           onload="this.style.display='block';document.getElementById('vnPortraitPlaceholder').style.display='none';" />
+    </div>
+
+
+
+    <!-- S2 STUDENT PORTRAIT: Jordan appears opposite Pixel during dialogue -->
+    <div class="vn-student-character" id="vnStudentCharacter" aria-hidden="true">
+<img id="vnStudentPortrait"
+           data-pc-image="assets/images/characters/students/jordan/neutral.png" data-pc-fallback="images/characters/students/jordan/neutral.png"
+           alt=""
+           aria-hidden="true" />
+    </div>
+
+    <!-- CLAUDE SHELF: legacy/ambient machine visual used by some VN states -->
+    <div class="claude-shelf idle" id="claudeShelf" aria-hidden="true">
+      <div class="claude-shelf-inner">
+        <div class="claude-shelf-label">
+          <span>Claude Shelf</span>
+          <span class="claude-status-dot"></span>
+        </div>
+        <div class="claude-crt"></div>
+        <div class="claude-bookshelf">
+          <span class="claude-book b1"></span>
+          <span class="claude-book b2"></span>
+          <span class="claude-book b3"></span>
+          <span class="claude-book b4"></span>
+          <span class="claude-book b5"></span>
+        </div>
+        <div class="claude-card-stack"><span></span><span></span><span></span></div>
+        <div class="claude-response-slot" id="claudeShelfStatus">idle</div>
+      </div>
+    </div>
+
+    <!-- CLAUDE TERMINAL: prediction, consultation, and terminal result visual -->
+    <div class="claude-terminal-scene idle" id="claudeTerminalScene" aria-hidden="true">
+      <div class="claude-terminal-photo" role="img" aria-label="Claude terminal, a retro computer used for AI analysis">
+        <div class="claude-terminal-screen">
+          <div class="claude-terminal-title" id="claudeTerminalTitle">CLAUDE TERMINAL</div>
+          <div class="claude-terminal-output" id="claudeTerminalOutput">IDLE<span class="claude-terminal-cursor"></span></div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- MAIN MENU ACCESS: remains available while the VN overlay covers the header -->
+  <button class="vn-main-menu-toggle" type="button"
+          onclick="event.stopPropagation();openMainMenu('home')"
+          aria-label="Open main menu">MENU</button>
+
+  <!-- VN DIALOGUE BOX: click, Space, or Enter advances typed dialogue -->
+  <div class="vn-dialogue" id="vnDialogue"
+       role="button"
+       tabindex="0"
+       aria-label="Professor Pixel is speaking. Press Space or Enter to continue."
+       onclick="vnAdvance()"
+       onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();vnAdvance();}">
+    <button class="vn-skip" aria-label="Skip to end of dialogue" onclick="event.stopPropagation();vnSkipType()">SKIP</button>
+    <div class="vn-speaker" id="vnSpeaker">Professor Pixel</div>
+    <div class="vn-text" id="vnText" aria-live="polite"></div>
+    <div class="vn-advance" id="vnAdvanceHint" aria-hidden="true">▼ tap to continue</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     REFLECTION ROOM OVERLAY
+     Purpose: Final study reflection form and growth summary.
+     Functions used: handleReflectionSubmit(), closeReflection()
+     Note: Reflection questions are form copy, not VN dialogue.
+     ══════════════════════════════════════════════════════ -->
+<div class="reflection-overlay" id="reflectionOverlay">
+  <div class="reflection-room">
+    <div id="refForm">
+      <div class="ref-eyebrow">PromptCraft · Reflection Room</div>
+      <div class="ref-title">You have completed all eight scenarios.</div>
+      <div class="ref-subtitle">
+        Take a few quiet minutes to reflect on your experience.<br>
+        There are no right answers here. Your honest responses make this research meaningful.
+      </div>
+      <form name="promptcraft-reflection" method="POST" data-netlify="true" onsubmit="handleReflectionSubmit(event)">
+        <input type="hidden" name="form-name" value="promptcraft-reflection" />
+        <div class="ref-question">
+          <label class="ref-label" for="reflectionQ1"><span>01</span>What surprised you most about how AI responded to your prompts during these scenarios?</label>
+          <textarea id="reflectionQ1" class="ref-textarea" name="q1_surprise" placeholder="Write freely — there is no wrong answer."></textarea>
+        </div>
+        <div class="ref-question">
+          <label class="ref-label" for="reflectionQ2"><span>02</span>What is one thing you noticed about AI that you did not expect — either a strength or a limitation?</label>
+          <textarea id="reflectionQ2" class="ref-textarea" name="q2_change" placeholder="Think about the hallucination scenario, the prediction, or any moment that shifted your thinking."></textarea>
+        </div>
+        <div class="ref-question">
+          <label class="ref-label" for="reflectionQ3"><span>03</span>How has this experience changed how you plan to use — or not use — AI in your actual teaching or course design work?</label>
+          <textarea id="reflectionQ3" class="ref-textarea" name="q3_practice" placeholder="Be as specific as you can — a concrete change in practice, not just a general attitude."></textarea>
+        </div>
+        <div class="ref-question">
+          <label class="ref-label" for="reflectionQ4"><span>04</span>Is there anything else you want to share about your experience today?</label>
+          <textarea id="reflectionQ4" class="ref-textarea ref-textarea-short" name="q4_other" placeholder="Optional."></textarea>
+        </div>
+        <div class="ref-divider">
+          <div class="ref-question ref-question-last">
+            <label class="ref-label" for="reflectionParticipantId">Participant ID <span class="ref-label-note">(only if your study protocol asks for it)</span></label>
+            <input id="reflectionParticipantId" class="ref-input" type="text" name="participant_id" placeholder="Leave blank to remain anonymous" />
+          </div>
+        </div>
+        <button class="ref-submit" type="submit" id="refSubmitBtn">Submit Reflection</button>
+        <p class="ref-note">Responses go directly to the research team. Not connected to any account or tracking system.</p>
+      </form>
+    </div>
+    <div id="refSuccess" style="display:none;">
+      <div class="ref-success">
+        <span class="ref-success-icon">📚</span>
+        <div class="ref-success-title">Thank you for your reflection.</div>
+        <div class="ref-success-body">
+          Your responses will contribute to research on how educators can use AI more effectively.
+        </div>
+
+        <!-- Growth report — injected after AI call -->
+        <div id="growthReportWrap" class="growth-report-wrap">
+          <div id="growthNarrativeWrap" class="growth-narrative-wrap">
+            <div class="growth-section-label">Your Growth Summary</div>
+            <div id="growthNarrative" class="growth-narrative-text">
+              <div class="growth-loading">
+                <span class="growth-loading-dot" aria-hidden="true">●</span> Generating your personal summary…
+              </div>
+            </div>
+          </div>
+          <div id="growthTable"></div>
+        </div>
+
+        <div class="ref-success-actions">
+          <a href="/wall.html" target="_blank" rel="noopener noreferrer"
+             class="ideas-wall-success-btn">
+            💡 See the Ideas Wall →
+          </a>
+          <button class="ref-close-btn" onclick="closeReflection()">Return to the Prompt Lab</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</body>
+</html>

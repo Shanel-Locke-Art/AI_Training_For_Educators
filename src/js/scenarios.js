@@ -42,6 +42,10 @@ const SCENARIO_UI = [
     missionTitle: 'Fix the dead discussion board.',
     missionCopy: 'Students are participating, but the conversation dies after one exchange. Diagnose the problem and use Claude to redesign the discussion so students extend, challenge, and build on ideas.',
     boardText: null,
+    rendererKey: 'guided-builder',
+    workspaceMode: 'guided',
+    introLayout: 'standard',
+    introCast: 'single',
     inputMode: 'scenario-1',
     inputVisible: true,
     supportsPrompt: true,
@@ -55,6 +59,11 @@ const SCENARIO_UI = [
     missionTitle: 'Find the metacognitive thinker.',
     missionCopy: 'Listen to a student, identify the missing thinking move, audit Claude\'s reflection activity, repair it, and hear how the student\'s thinking changes.',
     boardText: 'Jordan is completing the work, but he cannot explain what helped, what failed, or what he should try next.',
+    rendererKey: 'metacognition-opening',
+    workspaceMode: 'activity',
+    introLayout: 'special',
+    introCast: 'dual',
+    afterIntroAction: 's2-diagnosis',
     inputMode: 'scenario-2', inputVisible: true, supportsPrompt: false,
     implemented: true, developmentStatus: 'Opening playable',
     plannedLoop: ['Listen to the student', 'Identify the missing thinking move', 'Audit Claude\'s activity', 'Repair one weak element', 'Hear the changed student response']
@@ -63,42 +72,48 @@ const SCENARIO_UI = [
     key: 'assessment', dataLabel: 'S3: Authentic Assessment', tabLabel: 'S3: Assessment',
     missionTitle: 'Replace recall with authentic practice.',
     missionCopy: 'This scenario will be redesigned around comparing weak and authentic assessment choices, then transforming one into applied professional practice.',
-    boardText: 'Scenario 3 is in redesign.', inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    boardText: 'Scenario 3 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
+    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
     implemented: false, developmentStatus: 'Planned', plannedLoop: ['Compare', 'Choose', 'Transform', 'Evaluate the consequence']
   },
   {
     key: 'sync-bias', dataLabel: 'S4: Sync Bias', tabLabel: 'S4: Sync Bias',
     missionTitle: 'Who is this actually for?',
     missionCopy: 'This scenario will be rebuilt around auditing access assumptions and adapting an AI plan for fully asynchronous learners.',
-    boardText: 'Scenario 4 is in redesign.', inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    boardText: 'Scenario 4 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
+    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
     implemented: false, developmentStatus: 'Planned', plannedLoop: ['Audit assumptions', 'Hear learner impact', 'Adapt the plan']
   },
   {
     key: 'hallucination', dataLabel: 'S5: Hallucination Hunt', tabLabel: 'S5: Hallucination Hunt',
     missionTitle: 'Verify before you trust.',
     missionCopy: 'This scenario will be rebuilt as an evidence investigation in which polished claims must be checked before use.',
-    boardText: 'Scenario 5 is in redesign.', inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    boardText: 'Scenario 5 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
+    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
     implemented: false, developmentStatus: 'Planned', plannedLoop: ['Investigate', 'Verify', 'Decide what is safe']
   },
   {
     key: 'prediction', dataLabel: 'S6: Predict the Output', tabLabel: 'S6: Predict the Output',
     missionTitle: 'Predict what a vague prompt produces.',
     missionCopy: 'This scenario will be rebuilt around forecasting AI behavior, testing the prediction, and revising the request.',
-    boardText: 'Scenario 6 is in redesign.', inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    boardText: 'Scenario 6 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
+    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
     implemented: false, developmentStatus: 'Planned', plannedLoop: ['Forecast', 'Test', 'Compare', 'Revise']
   },
   {
     key: 'overreliance', dataLabel: 'S7: Overreliance', tabLabel: 'S7: Overreliance',
     missionTitle: 'Decide where human judgment belongs.',
     missionCopy: 'This scenario will be rebuilt around classifying AI output and defending where instructor judgment is irreplaceable.',
-    boardText: 'Scenario 7 is in redesign.', inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    boardText: 'Scenario 7 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
+    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
     implemented: false, developmentStatus: 'Planned', plannedLoop: ['Classify', 'Justify', 'Revise the boundary']
   },
   {
     key: 'reflect-revise', dataLabel: 'S8: Reflect & Revise', tabLabel: 'S8: Reflect and Revise',
     missionTitle: 'Build, reflect, and revise.',
     missionCopy: 'The final scenario will synthesize the game by asking learners to examine their own choices and improve a prompt deliberately.',
-    boardText: 'Scenario 8 is in redesign.', inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    boardText: 'Scenario 8 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
+    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
     implemented: false, developmentStatus: 'Planned', plannedLoop: ['Build', 'Explain your choice', 'Evaluate the output', 'Revise']
   }
 ];
@@ -167,6 +182,38 @@ function renderScenarioMenu() {
   }).join('');
 }
 
+
+
+// The compact mobile menu is another view of the same scenario registry. Keep
+// it synchronized here instead of maintaining a second inline script in HTML.
+function syncCompactScenarioMenu() {
+  const tabs = Array.from(document.querySelectorAll('.scenario-tabs .tab-btn'));
+  const activeIndex = Math.max(0, tabs.findIndex(tab =>
+    tab.classList.contains('active') || tab.getAttribute('aria-selected') === 'true'
+  ));
+  const activeTab = tabs[activeIndex];
+  const current = document.querySelector('.mobile-scenario-current');
+  if (current && activeTab) current.textContent = activeTab.textContent.trim();
+
+  document.querySelectorAll('.mobile-scenario-menu .mobile-dropdown-option').forEach(option => {
+    const isActive = Number(option.dataset.sourceIndex) === activeIndex;
+    option.classList.toggle('is-active', isActive);
+    if (isActive) option.setAttribute('aria-current', 'page');
+    else option.removeAttribute('aria-current');
+  });
+}
+
+function initializeCompactScenarioSync() {
+  document.querySelectorAll('.scenario-tabs .tab-btn').forEach(tab => {
+    new MutationObserver(syncCompactScenarioMenu).observe(tab, {
+      attributes: true,
+      attributeFilter: ['class', 'aria-selected']
+    });
+  });
+  syncCompactScenarioMenu();
+}
+
+document.addEventListener('DOMContentLoaded', initializeCompactScenarioSync, { once: true });
 
 function updateMainMenuHome() {
   const continueButton = document.getElementById('menuContinueBtn');
@@ -456,6 +503,7 @@ function renderScenarioPlaceholder(index) {
   if (!area) return;
 
   if (container) {
+    container.className = 'pc-scenario-placeholder-host';
     container.innerHTML = '';
     container.style.display = 'none';
   }
@@ -470,7 +518,7 @@ function renderScenarioPlaceholder(index) {
       <h2 id="pcShellTitle">${esc(ui.tabLabel)} is being rebuilt</h2>
       <p class="pc-shell-copy">${esc(ui.missionCopy)}</p>
       ${plannedSteps ? `<div class="pc-shell-plan"><h3>Planned game loop</h3>${plannedSteps}</div>` : ''}
-      <p class="pc-shell-note">The previous implementation is preserved in <code>archive/legacy-scenarios-v133/</code>, but it is no longer loaded by the game.</p>
+      <p class="pc-shell-note">The previous implementation is preserved in the source project archive, but it is no longer loaded by the game.</p>
       <div class="pc-shell-actions">
         <button type="button" class="pc-shell-primary" onclick="openMainMenu('scenarios')">Return to Scenario Select</button>
         <button type="button" class="pc-shell-secondary" onclick="launchScenarioFromMenu(0,{skipNameGate:true})">Play Scenario 1</button>
@@ -481,9 +529,142 @@ function renderScenarioPlaceholder(index) {
 
 
 // ══════════════════════════════════════════════════════
-//  SCENARIO 2 — METACOGNITION DETECTIVE OPENING
-//  Vertical slice: Jordan VN introduction, diagnosis, and evidence sorting.
+//  SHARED SCENARIO ACTIVITY COMPONENTS
+//  These builders are scenario-neutral. S2 is the first user, and S3–S8 can
+//  reuse the same mission, progress, evidence, choice, feedback, and action
+//  anatomy without cloning another screen system.
 // ══════════════════════════════════════════════════════
+function buildScenarioProgressHTML({ steps = [], activeIndex = 0, ariaLabel = 'Scenario progress' } = {}) {
+  if (!steps.length) return '';
+  return `
+    <div class="pc-scenario-progress" aria-label="${esc(ariaLabel)}">
+      ${steps.map((step, index) => `<span${index === activeIndex ? ' class="active" aria-current="step"' : ''}>${esc(step)}</span>`).join('')}
+    </div>`;
+}
+
+function buildScenarioChoiceCardsHTML({
+  items = [],
+  inputName,
+  idPrefix,
+  variant = 'compact',
+  marker = (_, index) => String(index + 1).padStart(2, '0')
+} = {}) {
+  return items.map((item, index) => {
+    const inputId = `${idPrefix}-${item.id}`;
+    const markerText = typeof marker === 'function' ? marker(item, index) : item[marker] || '';
+    const body = variant === 'detail'
+      ? `<span class="pc-choice-body"><strong>${esc(item.title)}</strong><span>“${esc(item.text)}”</span></span>`
+      : `<span class="pc-choice-copy">${esc(item.label)}</span>`;
+    return `
+      <label class="pc-choice-card pc-choice-card--${esc(variant)}" for="${esc(inputId)}">
+        <input type="checkbox" id="${esc(inputId)}" name="${esc(inputName)}" value="${esc(item.id)}" />
+        <span class="pc-choice-marker">${esc(markerText)}</span>
+        ${body}
+      </label>`;
+  }).join('');
+}
+
+function buildScenarioTaskCardHTML({
+  titleId,
+  kicker,
+  title,
+  instruction,
+  choiceGridId,
+  choicesHTML,
+  statusId,
+  submitId,
+  submitLabel,
+  feedbackId,
+  gridClass = ''
+} = {}) {
+  return `
+    <section class="pc-activity-card pc-activity-task" aria-labelledby="${esc(titleId)}">
+      <div class="pc-activity-kicker">${esc(kicker)}</div>
+      <h2 id="${esc(titleId)}">${esc(title)}</h2>
+      <p class="pc-activity-instruction">${esc(instruction)}</p>
+      <div class="pc-choice-grid${gridClass ? ` ${esc(gridClass)}` : ''}" id="${esc(choiceGridId)}">${choicesHTML}</div>
+      <div class="pc-selection-bar">
+        <span id="${esc(statusId)}" role="status" aria-live="polite">0 selected</span>
+        <button class="pc-button pc-button--primary" id="${esc(submitId)}" type="button" disabled>${esc(submitLabel)}</button>
+      </div>
+      <div id="${esc(feedbackId)}" aria-live="polite"></div>
+    </section>`;
+}
+
+function mountScenarioActivity({
+  container = document.getElementById('inputContainer'),
+  scenarioIndex: index = scenarioIndex,
+  progressHTML = '',
+  contentHTML = '',
+  focusSelector = ''
+} = {}) {
+  if (!container) return false;
+  container.className = 'pc-scenario-workbench';
+  container.style.display = 'flex';
+  container.innerHTML = `
+    <div class="pc-scenario-stage">
+      ${buildScenarioMissionHTML(index, { extraHTML: progressHTML })}
+      ${contentHTML}
+    </div>`;
+  container.scrollTop = 0;
+  if (focusSelector) setTimeout(() => container.querySelector(focusSelector)?.focus(), 80);
+  return true;
+}
+
+function wireExactSelection({ rootId, inputName, limit, statusId, submitId, onSubmit }) {
+  const root = document.getElementById(rootId);
+  const status = document.getElementById(statusId);
+  const submit = document.getElementById(submitId);
+  if (!root || !status || !submit) return;
+  const inputs = [...root.querySelectorAll(`input[name="${inputName}"]`)];
+
+  const update = changed => {
+    let selected = inputs.filter(input => input.checked);
+    if (selected.length > limit && changed) {
+      changed.checked = false;
+      selected = inputs.filter(input => input.checked);
+      status.textContent = `Choose only ${limit}. ${selected.length} of ${limit} selected.`;
+    } else {
+      status.textContent = `${selected.length} of ${limit} selected`;
+    }
+    submit.disabled = selected.length !== limit;
+    inputs.forEach(input => input.closest('.pc-choice-card')?.classList.toggle('selected', input.checked));
+  };
+
+  inputs.forEach(input => input.addEventListener('change', () => update(input)));
+  submit.addEventListener('click', onSubmit);
+  update(null);
+}
+
+function getCheckedValues(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(input => input.value);
+}
+
+function disableScenarioChoices(name, submitId) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(input => { input.disabled = true; });
+  const submit = document.getElementById(submitId);
+  if (submit) submit.disabled = true;
+}
+
+function renderScenarioFeedback({ panelId, tone = 'developing', heading, text, actionsHTML = '' } = {}) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return null;
+  panel.innerHTML = `
+    <div class="pc-feedback-card is-${esc(tone)}">
+      <div class="pc-feedback-heading">${esc(heading)}</div>
+      <p>${esc(text)}</p>
+      <div class="pc-feedback-actions">${actionsHTML}</div>
+    </div>`;
+  panel.querySelector('button')?.focus();
+  return panel;
+}
+
+// ══════════════════════════════════════════════════════
+//  SCENARIO 2 — METACOGNITION DETECTIVE OPENING
+//  Vertical slice implemented with the shared activity component system.
+// ══════════════════════════════════════════════════════
+const S2_PROGRESS_STEPS = ['1 Diagnose', '2 Examine evidence', '3 Choose a thinking move'];
+
 const S2_DIAGNOSIS_OPTIONS = [
   { id: 'motivation', label: 'Jordan needs stronger motivation to complete assignments.' },
   { id: 'content', label: 'Jordan needs a clearer explanation of the course content.' },
@@ -517,10 +698,10 @@ function getS2Data() {
 
 function buildS2JordanEvidenceHTML() {
   return `
-    <aside class="s2-jordan-card" aria-label="Evidence from Jordan">
+    <aside class="pc-evidence-card" aria-label="Evidence from Jordan">
       <img src="${ASSETS.images.students.jordan.uncertain}" alt="Jordan, an adult online learner, looking uncertain" />
-      <div class="s2-jordan-card-copy">
-        <div class="s2-kicker">Student evidence</div>
+      <div class="pc-evidence-card-copy">
+        <div class="pc-activity-kicker">Student evidence</div>
         <h3>What Jordan told us</h3>
         <blockquote>“I reread the chapter a few times. Some parts finally made more sense, but I couldn’t tell you what actually helped.”</blockquote>
         <p>He completed the assignment and earned a better grade, but he cannot explain the learning process that produced it.</p>
@@ -529,55 +710,48 @@ function buildS2JordanEvidenceHTML() {
 }
 
 function renderS2Standby(container) {
-  if (!container) container = document.getElementById('inputContainer');
-  if (!container) return;
-  container.className = 's2-workbench';
-  container.style.display = 'flex';
-  container.innerHTML = `
-    <div class="s2-stage">
-      ${buildScenarioMissionHTML(SCENARIO_INDEX.METACOGNITION)}
-      <section class="s2-standby-card" aria-live="polite">
-        <div class="s2-kicker">Case file loading</div>
+  mountScenarioActivity({
+    container,
+    scenarioIndex: SCENARIO_INDEX.METACOGNITION,
+    contentHTML: `
+      <section class="pc-activity-card pc-activity-standby" aria-live="polite">
+        <div class="pc-activity-kicker">Case file loading</div>
         <h2>Listen before you diagnose.</h2>
         <p>Pixel and Jordan will introduce the case. The first decision appears when their conversation ends.</p>
-      </section>
-    </div>`;
+      </section>`
+  });
 }
 
 function renderS2DiagnosisActivity() {
   const container = document.getElementById('inputContainer');
   if (!container || scenarioIndex !== SCENARIO_INDEX.METACOGNITION) return;
-  container.className = 's2-workbench';
-  container.style.display = 'flex';
-  const options = S2_DIAGNOSIS_OPTIONS.map((option, index) => `
-    <label class="s2-choice-card" for="s2-diagnosis-${option.id}">
-      <input type="checkbox" id="s2-diagnosis-${option.id}" name="s2-diagnosis" value="${option.id}" />
-      <span class="s2-choice-number">${String(index + 1).padStart(2, '0')}</span>
-      <span class="s2-choice-copy">${esc(option.label)}</span>
-    </label>`).join('');
+  const choicesHTML = buildScenarioChoiceCardsHTML({
+    items: S2_DIAGNOSIS_OPTIONS,
+    inputName: 's2-diagnosis',
+    idPrefix: 's2-diagnosis'
+  });
+  const taskHTML = buildScenarioTaskCardHTML({
+    titleId: 's2DiagnosisTitle',
+    kicker: 'Decision 1 · Diagnose the learning problem',
+    title: 'Which two instructional needs are most clearly supported by Jordan’s comments?',
+    instruction: 'Select exactly two. Several options sound educationally useful, but only two are the strongest diagnosis of this evidence.',
+    choiceGridId: 's2DiagnosisChoices',
+    choicesHTML,
+    statusId: 's2DiagnosisStatus',
+    submitId: 's2DiagnosisSubmit',
+    submitLabel: 'Submit diagnosis',
+    feedbackId: 's2DiagnosisFeedback'
+  });
 
-  container.innerHTML = `
-    <div class="s2-stage">
-      ${buildScenarioMissionHTML(SCENARIO_INDEX.METACOGNITION, {
-        extraHTML: '<div class="s2-progress" aria-label="Scenario 2 progress"><span class="active">1 Diagnose</span><span>2 Examine evidence</span><span>3 Choose a thinking move</span></div>'
-      })}
-      <div class="s2-case-grid">
-        ${buildS2JordanEvidenceHTML()}
-        <section class="s2-task-card" aria-labelledby="s2DiagnosisTitle">
-          <div class="s2-kicker">Decision 1 · Diagnose the learning problem</div>
-          <h2 id="s2DiagnosisTitle">Which two instructional needs are most clearly supported by Jordan’s comments?</h2>
-          <p class="s2-task-instruction">Select exactly two. Several options sound educationally useful, but only two are the strongest diagnosis of this evidence.</p>
-          <div class="s2-choice-grid" id="s2DiagnosisChoices">${options}</div>
-          <div class="s2-selection-bar">
-            <span id="s2DiagnosisStatus" role="status" aria-live="polite">0 of 2 selected</span>
-            <button class="s2-primary-btn" id="s2DiagnosisSubmit" type="button" disabled>Submit diagnosis</button>
-          </div>
-          <div id="s2DiagnosisFeedback" aria-live="polite"></div>
-        </section>
-      </div>
-    </div>`;
+  mountScenarioActivity({
+    container,
+    scenarioIndex: SCENARIO_INDEX.METACOGNITION,
+    progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 0, ariaLabel: 'Scenario 2 progress' }),
+    contentHTML: `<div class="pc-activity-layout">${buildS2JordanEvidenceHTML()}${taskHTML}</div>`,
+    focusSelector: 'input[name="s2-diagnosis"]'
+  });
 
-  wireS2ExactSelection({
+  wireExactSelection({
     rootId: 's2DiagnosisChoices',
     inputName: 's2-diagnosis',
     limit: 2,
@@ -585,37 +759,6 @@ function renderS2DiagnosisActivity() {
     submitId: 's2DiagnosisSubmit',
     onSubmit: submitS2Diagnosis,
   });
-  container.scrollTop = 0;
-  setTimeout(() => container.querySelector('input[name="s2-diagnosis"]')?.focus(), 80);
-}
-
-function wireS2ExactSelection({ rootId, inputName, limit, statusId, submitId, onSubmit }) {
-  const root = document.getElementById(rootId);
-  const status = document.getElementById(statusId);
-  const submit = document.getElementById(submitId);
-  if (!root || !status || !submit) return;
-  const inputs = [...root.querySelectorAll(`input[name="${inputName}"]`)];
-
-  const update = changed => {
-    let selected = inputs.filter(input => input.checked);
-    if (selected.length > limit && changed) {
-      changed.checked = false;
-      selected = inputs.filter(input => input.checked);
-      status.textContent = `Choose only ${limit}. ${selected.length} of ${limit} selected.`;
-    } else {
-      status.textContent = `${selected.length} of ${limit} selected`;
-    }
-    submit.disabled = selected.length !== limit;
-    inputs.forEach(input => input.closest('.s2-choice-card')?.classList.toggle('selected', input.checked));
-  };
-
-  inputs.forEach(input => input.addEventListener('change', () => update(input)));
-  submit.addEventListener('click', onSubmit);
-  update(null);
-}
-
-function getS2CheckedValues(name) {
-  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(input => input.value);
 }
 
 function classifyS2Diagnosis(selection) {
@@ -630,7 +773,7 @@ function classifyS2Diagnosis(selection) {
 }
 
 function submitS2Diagnosis() {
-  const selection = getS2CheckedValues('s2-diagnosis');
+  const selection = getCheckedValues('s2-diagnosis');
   if (selection.length !== 2) return;
   const result = classifyS2Diagnosis(selection);
   const data = getS2Data();
@@ -640,68 +783,59 @@ function submitS2Diagnosis() {
   data.prompts.push(`S2 diagnosis: ${labels.join(' | ')}`);
   data.finalResponse = pixelDialogue[result.key]?.[0]?.text || '';
 
-  document.querySelectorAll('input[name="s2-diagnosis"]').forEach(input => { input.disabled = true; });
-  const submit = document.getElementById('s2DiagnosisSubmit');
-  if (submit) submit.disabled = true;
-
+  disableScenarioChoices('s2-diagnosis', 's2DiagnosisSubmit');
   playPixelSequence(result.key, () => renderS2DiagnosisFeedback(selection, result));
 }
 
 function renderS2DiagnosisFeedback(selection, result) {
-  const panel = document.getElementById('s2DiagnosisFeedback');
-  if (!panel) return;
   const exact = result.key === 's2_diagnosis_correct';
   const text = pixelDialogue[result.key]?.[0]?.text || '';
-  panel.innerHTML = `
-    <div class="s2-feedback-card ${exact ? 'is-strong' : 'is-developing'}">
-      <div class="s2-feedback-heading">${exact ? 'Diagnosis supported by the evidence' : 'A useful diagnosis needs one more pass'}</div>
-      <p>${esc(text)}</p>
-      <div class="s2-feedback-actions">
-        ${exact ? '' : '<button class="s2-secondary-btn" type="button" id="s2RetryDiagnosis">Revise diagnosis</button>'}
-        <button class="s2-primary-btn" type="button" id="s2ContinueEvidence">Examine student responses →</button>
-      </div>
-    </div>`;
+  renderScenarioFeedback({
+    panelId: 's2DiagnosisFeedback',
+    tone: exact ? 'strong' : 'developing',
+    heading: exact ? 'Diagnosis supported by the evidence' : 'A useful diagnosis needs one more pass',
+    text,
+    actionsHTML: `
+      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryDiagnosis">Revise diagnosis</button>'}
+      <button class="pc-button pc-button--primary" type="button" id="s2ContinueEvidence">Examine student responses →</button>`
+  });
   document.getElementById('s2RetryDiagnosis')?.addEventListener('click', renderS2DiagnosisActivity);
   document.getElementById('s2ContinueEvidence')?.addEventListener('click', () => {
     const data = getS2Data();
     data.diagnosisFinal = [...selection];
     renderS2EvidenceActivity();
   });
-  panel.querySelector('button')?.focus();
 }
 
 function renderS2EvidenceActivity() {
-  const container = document.getElementById('inputContainer');
-  if (!container) return;
-  const responses = S2_EVIDENCE_RESPONSES.map(response => `
-    <label class="s2-response-card" for="s2-evidence-${response.id}">
-      <input type="checkbox" id="s2-evidence-${response.id}" name="s2-evidence" value="${response.id}" />
-      <span class="s2-response-tag">${response.tag}</span>
-      <span class="s2-response-body">
-        <strong>${esc(response.title)}</strong>
-        <span>“${esc(response.text)}”</span>
-      </span>
-    </label>`).join('');
+  const choicesHTML = buildScenarioChoiceCardsHTML({
+    items: S2_EVIDENCE_RESPONSES,
+    inputName: 's2-evidence',
+    idPrefix: 's2-evidence',
+    variant: 'detail',
+    marker: item => item.tag
+  });
+  const taskHTML = buildScenarioTaskCardHTML({
+    titleId: 's2EvidenceTitle',
+    kicker: 'Decision 2 · Find the metacognitive thinker',
+    title: 'Which two responses show the strongest metacognitive thinking?',
+    instruction: 'Select exactly two. One response is deliberately close because noticing a problem is meaningful, but it is not the entire learning cycle.',
+    choiceGridId: 's2EvidenceChoices',
+    choicesHTML,
+    statusId: 's2EvidenceStatus',
+    submitId: 's2EvidenceSubmit',
+    submitLabel: 'Submit evidence',
+    feedbackId: 's2EvidenceFeedback'
+  });
 
-  container.innerHTML = `
-    <div class="s2-stage">
-      ${buildScenarioMissionHTML(SCENARIO_INDEX.METACOGNITION, {
-        extraHTML: '<div class="s2-progress" aria-label="Scenario 2 progress"><span>1 Diagnose</span><span class="active">2 Examine evidence</span><span>3 Choose a thinking move</span></div>'
-      })}
-      <section class="s2-evidence-shell" aria-labelledby="s2EvidenceTitle">
-        <div class="s2-kicker">Decision 2 · Find the metacognitive thinker</div>
-        <h2 id="s2EvidenceTitle">Which two responses show the strongest metacognitive thinking?</h2>
-        <p class="s2-task-instruction">Select exactly two. One response is deliberately close because noticing a problem is meaningful, but it is not the entire learning cycle.</p>
-        <div class="s2-response-grid" id="s2EvidenceChoices">${responses}</div>
-        <div class="s2-selection-bar">
-          <span id="s2EvidenceStatus" role="status" aria-live="polite">0 of 2 selected</span>
-          <button class="s2-primary-btn" id="s2EvidenceSubmit" type="button" disabled>Submit evidence</button>
-        </div>
-        <div id="s2EvidenceFeedback" aria-live="polite"></div>
-      </section>
-    </div>`;
+  mountScenarioActivity({
+    scenarioIndex: SCENARIO_INDEX.METACOGNITION,
+    progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 1, ariaLabel: 'Scenario 2 progress' }),
+    contentHTML: taskHTML,
+    focusSelector: 'input[name="s2-evidence"]'
+  });
 
-  wireS2ExactSelection({
+  wireExactSelection({
     rootId: 's2EvidenceChoices',
     inputName: 's2-evidence',
     limit: 2,
@@ -709,12 +843,10 @@ function renderS2EvidenceActivity() {
     submitId: 's2EvidenceSubmit',
     onSubmit: submitS2Evidence,
   });
-  container.scrollTop = 0;
-  setTimeout(() => container.querySelector('input[name="s2-evidence"]')?.focus(), 80);
 }
 
 function submitS2Evidence() {
-  const selection = getS2CheckedValues('s2-evidence');
+  const selection = getCheckedValues('s2-evidence');
   if (selection.length !== 2) return;
   const selected = new Set(selection);
   const exact = selected.has('e') && selected.has('f');
@@ -726,9 +858,7 @@ function submitS2Evidence() {
   data.evidenceAttempts.push({ selection: [...selection], exact, timestamp: new Date().toISOString() });
   data.prompts.push(`S2 evidence: ${labels.join(' | ')}`);
 
-  document.querySelectorAll('input[name="s2-evidence"]').forEach(input => { input.disabled = true; });
-  const submit = document.getElementById('s2EvidenceSubmit');
-  if (submit) submit.disabled = true;
+  disableScenarioChoices('s2-evidence', 's2EvidenceSubmit');
 
   let heading = 'Keep distinguishing awareness from action.';
   let copy = 'Some responses describe feelings, grades, or a strategy without evaluating what happened. Metacognition becomes stronger when the learner judges the strategy and makes a future decision.';
@@ -741,48 +871,42 @@ function submitS2Evidence() {
   }
   data.finalResponse = copy;
 
-  const panel = document.getElementById('s2EvidenceFeedback');
-  if (!panel) return;
-  panel.innerHTML = `
-    <div class="s2-feedback-card ${exact ? 'is-strong' : 'is-developing'}">
-      <div class="s2-feedback-heading">${esc(heading)}</div>
-      <p>${esc(copy)}</p>
-      <div class="s2-feedback-actions">
-        ${exact ? '' : '<button class="s2-secondary-btn" type="button" id="s2RetryEvidence">Review the responses</button>'}
-        <button class="s2-primary-btn" type="button" id="s2OpeningCheckpoint">Continue →</button>
-      </div>
-    </div>`;
+  renderScenarioFeedback({
+    panelId: 's2EvidenceFeedback',
+    tone: exact ? 'strong' : 'developing',
+    heading,
+    text: copy,
+    actionsHTML: `
+      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryEvidence">Review the responses</button>'}
+      <button class="pc-button pc-button--primary" type="button" id="s2OpeningCheckpoint">Continue →</button>`
+  });
   document.getElementById('s2RetryEvidence')?.addEventListener('click', renderS2EvidenceActivity);
   document.getElementById('s2OpeningCheckpoint')?.addEventListener('click', () => {
     data.evidenceFinal = [...selection];
     data.openingCheckpointReached = true;
     renderS2OpeningCheckpoint();
   });
-  panel.querySelector('button')?.focus();
 }
 
 function renderS2OpeningCheckpoint() {
-  const container = document.getElementById('inputContainer');
-  if (!container) return;
-  container.innerHTML = `
-    <div class="s2-stage">
-      ${buildScenarioMissionHTML(SCENARIO_INDEX.METACOGNITION, {
-        extraHTML: '<div class="s2-progress" aria-label="Scenario 2 progress"><span>1 Diagnose</span><span>2 Examine evidence</span><span class="active">3 Choose a thinking move</span></div>'
-      })}
-      <section class="s2-checkpoint-card" aria-labelledby="s2CheckpointTitle">
+  mountScenarioActivity({
+    scenarioIndex: SCENARIO_INDEX.METACOGNITION,
+    progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 2, ariaLabel: 'Scenario 2 progress' }),
+    contentHTML: `
+      <section class="pc-activity-card pc-activity-checkpoint" aria-labelledby="s2CheckpointTitle">
         <img src="${ASSETS.images.students.jordan.confident}" alt="Jordan looking more confident" />
         <div>
-          <div class="s2-kicker">Opening vertical slice complete</div>
+          <div class="pc-activity-kicker">Opening vertical slice complete</div>
           <h2 id="s2CheckpointTitle">The case is diagnosed.</h2>
           <p>You identified the gap between completing work and understanding how learning happened. The next build will let the player choose whether Jordan needs to plan, monitor, evaluate, or transfer a strategy before Claude designs the activity.</p>
-          <div class="s2-feedback-actions">
-            <button class="s2-secondary-btn" type="button" onclick="switchScenario(1,document.querySelectorAll('.tab-btn')[1])">Replay S2 opening</button>
-            <button class="s2-primary-btn" type="button" onclick="openMainMenu('scenarios')">Return to Scenario Select</button>
+          <div class="pc-feedback-actions">
+            <button class="pc-button pc-button--secondary" type="button" onclick="switchScenario(1,document.querySelectorAll('.tab-btn')[1])">Replay S2 opening</button>
+            <button class="pc-button pc-button--primary" type="button" onclick="openMainMenu('scenarios')">Return to Scenario Select</button>
           </div>
         </div>
-      </section>
-    </div>`;
-  container.querySelector('button')?.focus();
+      </section>`
+  });
+  document.querySelector('#inputContainer button')?.focus();
 }
 
 

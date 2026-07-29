@@ -1982,32 +1982,32 @@ body.pc-main-menu-open .pixel-coach-card {
   left: 8px;
   right: auto;
 }
-body .vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-smartboard-wrap {
+body .vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-smartboard-wrap {
   left: 50% !important;
   top: 3% !important;
   width: min(47vw, 710px) !important;
   transform: translateX(-50%) !important;
   z-index: 3 !important;
 }
-body .vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character {
+body .vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character {
   right: 1.5% !important;
   bottom: 8px !important;
   height: min(70vh, 740px) !important;
   z-index: 6 !important;
 }
-.vn-overlay.s2-dual-character .vn-character.is-active,
-.vn-overlay.s2-dual-character .vn-student-character.is-active {
+.vn-overlay.pc-dual-character .vn-character.is-active,
+.vn-overlay.pc-dual-character .vn-student-character.is-active {
   opacity: 1 !important;
   filter: none;
   transform: translateX(0) scale(1) !important;
 }
-.vn-overlay.s2-dual-character .vn-character.is-inactive,
-.vn-overlay.s2-dual-character .vn-student-character.is-inactive {
+.vn-overlay.pc-dual-character .vn-character.is-inactive,
+.vn-overlay.pc-dual-character .vn-student-character.is-inactive {
   opacity: .48 !important;
   filter: saturate(.55) brightness(.72);
   transform: scale(.96) !important;
 }
-body .vn-overlay.active.s2-dual-character:not(.claude-terminal-textmode) .vn-dialogue {
+body .vn-overlay.active.pc-dual-character:not(.claude-terminal-textmode) .vn-dialogue {
   left: 13% !important;
   right: 13% !important;
   padding: 22px 76px 20px 30px !important;
@@ -2019,372 +2019,40 @@ body .vn-overlay.active.s2-dual-character:not(.claude-terminal-textmode) .vn-dia
   display: none !important;
 }
 
-body.s2-active .chat-area,
-body.s2-active #chat {
-  display: none !important;
-}
-body.s2-active #inputContainer {
-  flex: 1 1 auto;
-  min-height: 0;
-  max-height: none !important;
-  overflow-y: auto !important;
-  border-top: 0 !important;
-  background: var(--cream);
-}
-.s2-workbench {
-  display: flex;
-  flex-direction: column;
-  background: var(--cream);
-}
-.s2-stage {
-  width: min(100%, 1500px);
-  margin: 0 auto;
-  padding: 14px 18px 34px;
-}
-.s2-progress {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 13px;
-}
-.s2-progress span {
-  border: 1px solid rgba(255,255,255,.4);
-  border-radius: 999px;
-  padding: 5px 10px;
-  font-size: .72rem;
-  letter-spacing: .04em;
-  color: rgba(255,255,255,.76);
-}
-.s2-progress span.active {
-  background: #fff;
-  color: var(--forest-dark);
-  font-weight: 800;
-}
-.s2-standby-card,
-.s2-task-card,
-.s2-evidence-shell,
-.s2-checkpoint-card,
-.s2-jordan-card {
-  background: #fffdf9;
-  border: 1.5px solid var(--border-strong);
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(45,34,20,.08);
-}
-.s2-standby-card {
-  margin-top: 14px;
-  padding: 30px;
-  text-align: center;
-}
-.s2-standby-card h2,
-.s2-task-card h2,
-.s2-evidence-shell h2,
-.s2-checkpoint-card h2 {
-  font-family: "Lora", Georgia, serif;
-  color: var(--forest-dark);
-  margin: 5px 0 10px;
-}
-.s2-kicker {
-  font-family: "Source Code Pro", monospace;
-  color: var(--terracotta);
-  font-size: .72rem;
-  font-weight: 800;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-.s2-case-grid {
-  display: grid;
-  grid-template-columns: minmax(285px, .72fr) minmax(0, 1.65fr);
-  gap: 16px;
-  margin-top: 14px;
-  align-items: start;
-}
-.s2-jordan-card {
-  overflow: hidden;
-  position: sticky;
-  top: 10px;
-}
-.s2-jordan-card img {
-  width: 100%;
-  height: min(44vh, 470px);
-  object-fit: contain;
-  object-position: center bottom;
-  background: linear-gradient(145deg, #241a29, #5e4766);
-  display: block;
-}
-.s2-jordan-card-copy {
-  padding: 22px;
-}
-.s2-jordan-card h3 {
-  margin: 5px 0 12px;
-  font-family: "Lora", Georgia, serif;
-  color: var(--forest-dark);
-}
-.s2-jordan-card blockquote {
-  margin: 0 0 12px;
-  padding: 14px 16px;
-  border-left: 4px solid var(--terracotta);
-  background: var(--terra-light);
-  color: var(--ink-mid);
-  line-height: 1.55;
-}
-.s2-jordan-card p {
-  margin: 0;
-  color: var(--ink-light);
-  line-height: 1.55;
-}
-.s2-task-card,
-.s2-evidence-shell {
-  padding: clamp(22px, 3vw, 36px);
-}
-.s2-task-instruction {
-  margin: 0 0 18px;
-  color: var(--ink-light);
-  line-height: 1.55;
-}
-.s2-choice-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-.s2-choice-card,
-.s2-response-card {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  background: #fff;
-  padding: 14px;
-  cursor: pointer;
-  transition: border-color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease;
-}
-.s2-choice-card:hover,
-.s2-response-card:hover {
-  border-color: var(--forest-mid);
-  transform: translateY(-1px);
-  box-shadow: 0 7px 18px rgba(45,90,61,.09);
-}
-.s2-choice-card.selected,
-.s2-response-card.selected {
-  border-color: var(--forest-mid);
-  background: var(--forest-light);
-  box-shadow: inset 0 0 0 1px var(--forest-mid);
-}
-.s2-choice-card:has(input:focus-visible),
-.s2-response-card:has(input:focus-visible) {
-  outline: 4px solid rgba(196,124,45,.35);
-  outline-offset: 2px;
-}
-.s2-choice-card input,
-.s2-response-card input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-.s2-choice-number,
-.s2-response-tag {
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  background: var(--parchment);
-  color: var(--forest-dark);
-  font-family: "Source Code Pro", monospace;
-  font-weight: 800;
-}
-.s2-choice-copy {
-  color: var(--ink-mid);
-  line-height: 1.45;
-  font-weight: 650;
-}
-.s2-selection-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-  color: var(--ink-light);
-  font-weight: 700;
-}
-.s2-primary-btn,
-.s2-secondary-btn {
-  min-height: 44px;
-  border-radius: 9px;
-  padding: 10px 17px;
-  font-weight: 800;
-  cursor: pointer;
-}
-.s2-primary-btn {
-  border: 2px solid var(--forest-dark);
-  background: var(--forest-dark);
-  color: #fff;
-}
-.s2-primary-btn:hover,
-.s2-primary-btn:focus-visible {
-  background: var(--forest-mid);
-  border-color: var(--forest-mid);
-}
-.s2-primary-btn:disabled {
-  opacity: .45;
-  cursor: not-allowed;
-}
-.s2-secondary-btn {
-  border: 2px solid var(--forest-dark);
-  background: #fff;
-  color: var(--forest-dark);
-}
-.s2-primary-btn:focus-visible,
-.s2-secondary-btn:focus-visible {
-  outline: 4px solid rgba(196,124,45,.36);
-  outline-offset: 2px;
-}
-.s2-feedback-card {
-  margin-top: 18px;
-  border-radius: 12px;
-  padding: 18px;
-  border: 1.5px solid var(--border);
-}
-.s2-feedback-card.is-strong {
-  background: var(--forest-light);
-  border-color: var(--forest-mid);
-}
-.s2-feedback-card.is-developing {
-  background: var(--amber-light);
-  border-color: var(--amber);
-}
-.s2-feedback-heading {
-  color: var(--forest-dark);
-  font-family: "Lora", Georgia, serif;
-  font-size: 1.06rem;
-  font-weight: 800;
-}
-.s2-feedback-card p {
-  color: var(--ink-mid);
-  line-height: 1.55;
-}
-.s2-feedback-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 14px;
-}
-.s2-response-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-.s2-response-card {
-  min-height: 132px;
-}
-.s2-response-body {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  color: var(--ink-mid);
-  line-height: 1.5;
-}
-.s2-response-body strong {
-  color: var(--forest-dark);
-}
-.s2-checkpoint-card {
-  display: grid;
-  grid-template-columns: minmax(220px, 34%) 1fr;
-  gap: 28px;
-  align-items: center;
-  margin-top: 14px;
-  padding: 28px;
-}
-.s2-checkpoint-card img {
-  width: 100%;
-  max-height: 480px;
-  object-fit: contain;
-  object-position: center bottom;
-  border-radius: 14px;
-  background: linear-gradient(145deg, #241a29, #5e4766);
-}
-.s2-checkpoint-card p {
-  color: var(--ink-mid);
-  line-height: 1.65;
-}
-
 @media (max-width: 900px), (max-height: 720px) {
-  body .vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-smartboard-wrap {
+  body .vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-smartboard-wrap {
     width: min(92vw, 650px) !important;
   }
-  .vn-overlay.s2-dual-character .vn-character.is-inactive,
-  .vn-overlay.s2-dual-character .vn-student-character.is-inactive {
+  .vn-overlay.pc-dual-character .vn-character.is-inactive,
+  .vn-overlay.pc-dual-character .vn-student-character.is-inactive {
     display: none !important;
   }
-  body .vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character,
-  body .vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
+  body .vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character,
+  body .vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
     left: 50% !important;
     right: auto !important;
     bottom: 120px !important;
     height: min(40vh, 370px) !important;
     transform: translateX(-50%) !important;
   }
-  .vn-overlay.s2-dual-character .vn-character.is-active,
-  .vn-overlay.s2-dual-character .vn-student-character.is-active {
+  .vn-overlay.pc-dual-character .vn-character.is-active,
+  .vn-overlay.pc-dual-character .vn-student-character.is-active {
     transform: translateX(-50%) scale(1) !important;
   }
-  body .vn-overlay.active.s2-dual-character:not(.claude-terminal-textmode) .vn-dialogue {
+  body .vn-overlay.active.pc-dual-character:not(.claude-terminal-textmode) .vn-dialogue {
     left: 0 !important;
     right: 0 !important;
     padding: 20px 64px 18px 20px !important;
   }
-  .s2-case-grid,
-  .s2-checkpoint-card {
-    grid-template-columns: 1fr;
-  }
-  .s2-jordan-card {
-    position: static;
-    display: grid;
-    grid-template-columns: minmax(180px, 32%) 1fr;
-  }
-  .s2-jordan-card img {
-    height: 100%;
-    min-height: 280px;
-  }
-}
-@media (max-width: 680px) {
-  .s2-stage {
-    padding: 10px 9px 28px;
-  }
-  .s2-choice-grid,
-  .s2-response-grid {
-    grid-template-columns: 1fr;
-  }
-  .s2-jordan-card {
-    display: block;
-  }
-  .s2-jordan-card img {
-    height: 330px;
-  }
-  .s2-selection-bar {
-    align-items: stretch;
-    flex-direction: column;
-  }
-  .s2-selection-bar button,
-  .s2-feedback-actions button {
-    width: 100%;
-  }
-  .s2-checkpoint-card {
-    padding: 20px;
-  }
 }
 
-/* S2 compact intro: override the legacy scenario-intro rule that forces Pixel
+/* Shared compact dual-cast intro: override the legacy scenario-intro rule that forces Pixel
    to display even when Jordan is the active speaker. */
 @media (max-width: 900px), (max-height: 720px) {
-  body .vn-overlay.active.scenario-intro-active.s2-dual-character #vnCharacter.is-inactive,
-  body .vn-overlay.active.scenario-intro-active.s2-dual-character .vn-character.is-inactive,
-  body .vn-overlay.active.s2-dual-character #vnStudentCharacter.is-inactive,
-  body .vn-overlay.active.s2-dual-character .vn-student-character.is-inactive {
+  body .vn-overlay.active.scenario-intro-active.pc-dual-character #vnCharacter.is-inactive,
+  body .vn-overlay.active.scenario-intro-active.pc-dual-character .vn-character.is-inactive,
+  body .vn-overlay.active.pc-dual-character #vnStudentCharacter.is-inactive,
+  body .vn-overlay.active.pc-dual-character .vn-student-character.is-inactive {
     display: none !important;
   }
 }
@@ -2696,10 +2364,10 @@ body #musicToggle.full-audio {
 /* Medium screens: keep Jordan and Pixel on opposite sides and use the open space
    between the smartboard and dialogue instead of shrinking them into tiny busts. */
 @media (min-width: 621px) and (max-width: 900px) and (min-height: 651px) {
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnStudentCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnCharacter,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnStudentCharacter,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
     display: flex !important;
     visibility: visible !important;
     bottom: clamp(198px, 23dvh, 220px) !important;
@@ -2711,37 +2379,37 @@ body #musicToggle.full-audio {
     align-items: flex-end !important;
   }
 
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnStudentCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnStudentCharacter,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
     left: clamp(16px, 3.5vw, 42px) !important;
     right: auto !important;
     justify-content: flex-start !important;
   }
 
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnCharacter,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character {
     left: auto !important;
     right: clamp(14px, 3vw, 38px) !important;
     justify-content: flex-end !important;
   }
 
-  html body #vnOverlay#vnOverlay.vn-overlay.s2-dual-character #vnCharacter.is-active,
-  html body #vnOverlay#vnOverlay.vn-overlay.s2-dual-character #vnStudentCharacter.is-active {
+  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnCharacter.is-active,
+  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnStudentCharacter.is-active {
     display: flex !important;
     opacity: 1 !important;
     filter: none !important;
     transform: none !important;
   }
 
-  html body #vnOverlay#vnOverlay.vn-overlay.s2-dual-character #vnCharacter.is-inactive,
-  html body #vnOverlay#vnOverlay.vn-overlay.s2-dual-character #vnStudentCharacter.is-inactive {
+  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnCharacter.is-inactive,
+  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnStudentCharacter.is-inactive {
     display: flex !important;
     opacity: .48 !important;
     filter: saturate(.55) brightness(.72) !important;
     transform: scale(.94) !important;
   }
 
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character #vnStudentPortrait {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character #vnStudentPortrait {
     display: block !important;
     width: auto !important;
     height: 100% !important;
@@ -2751,7 +2419,7 @@ body #musicToggle.full-audio {
     object-position: left bottom !important;
   }
 
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character #vnPortrait {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character #vnPortrait {
     display: block !important;
     width: auto !important;
     height: 100% !important;
@@ -2765,10 +2433,10 @@ body #musicToggle.full-audio {
 /* Phones: show only the current speaker, centered and large enough to read as a
    character rather than a decorative head peeking over the dialogue panel. */
 @media (max-width: 620px), (max-height: 650px) {
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnStudentCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnCharacter,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnStudentCharacter,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
     left: 50% !important;
     right: auto !important;
     bottom: clamp(210px, 26dvh, 238px) !important;
@@ -2782,13 +2450,13 @@ body #musicToggle.full-audio {
     z-index: 22 !important;
   }
 
-  html body #vnOverlay#vnOverlay.vn-overlay.s2-dual-character #vnCharacter.is-inactive,
-  html body #vnOverlay#vnOverlay.vn-overlay.s2-dual-character #vnStudentCharacter.is-inactive {
+  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnCharacter.is-inactive,
+  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnStudentCharacter.is-inactive {
     display: none !important;
   }
 
-  html body #vnOverlay#vnOverlay.vn-overlay.s2-dual-character #vnCharacter.is-active,
-  html body #vnOverlay#vnOverlay.vn-overlay.s2-dual-character #vnStudentCharacter.is-active {
+  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnCharacter.is-active,
+  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnStudentCharacter.is-active {
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -2796,7 +2464,7 @@ body #musicToggle.full-audio {
     transform: translateX(-50%) !important;
   }
 
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character #vnStudentPortrait {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character #vnStudentPortrait {
     display: block !important;
     width: auto !important;
     height: 100% !important;
@@ -2806,7 +2474,7 @@ body #musicToggle.full-audio {
     object-position: center bottom !important;
   }
 
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character #vnPortrait {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character #vnPortrait {
     display: block !important;
     width: auto !important;
     height: 100% !important;
@@ -2818,10 +2486,10 @@ body #musicToggle.full-audio {
 }
 
 @media (max-width: 430px) and (min-height: 651px) {
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnStudentCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.s2-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnCharacter,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnStudentCharacter,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
     bottom: clamp(205px, 25dvh, 225px) !important;
     height: clamp(255px, 33dvh, 300px) !important;
   }

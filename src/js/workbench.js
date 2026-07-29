@@ -37,14 +37,15 @@ function playScenarioIntroduction(index) {
   }
 
   const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
-  // S1 now uses the established normal VN composition from its first line onward.
-  // The older scenario-intro layout is retained for S2, where it still supports
-  // the dual-character opening and compact responsive behavior.
-  const useSpecialIntroLayout = index !== SCENARIO_INDEX.ENGAGEMENT;
+  const useSpecialIntroLayout = ui.introLayout === 'special';
   overlay?.classList.toggle('scenario-intro-active', useSpecialIntroLayout);
+  const afterIntroActions = {
+    's2-diagnosis': renderS2DiagnosisActivity
+  };
   const onDone = () => {
     if (useSpecialIntroLayout) overlay?.classList.remove('scenario-intro-active');
-    if (index === SCENARIO_INDEX.METACOGNITION) renderS2DiagnosisActivity();
+    const action = afterIntroActions[ui.afterIntroAction];
+    if (typeof action === 'function') action();
   };
 
   if (window.scenarioIntroTimer) clearTimeout(window.scenarioIntroTimer);
@@ -104,7 +105,7 @@ function pcClearVNStateForScenarioSwitch() {
   const studentCharacter = document.getElementById('vnStudentCharacter');
   if (pixelCharacter) pixelCharacter.style.removeProperty('display');
   if (studentCharacter) studentCharacter.style.removeProperty('display');
-  overlay?.classList.remove('s2-dual-character');
+  overlay?.classList.remove('pc-dual-character');
   document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
   if (typeof pcClearPredictionPresentationV191 === 'function') pcClearPredictionPresentationV191();
 
@@ -216,9 +217,11 @@ function prepareScenarioShell(index) {
   const scenario = scenarios[index];
   const ui = getScenarioUI(index);
 
-  document.body.classList.remove('s1-active', 's1-result-active', 's2-active', 's2-submitted');
-  document.body.classList.toggle('s1-active', index === SCENARIO_INDEX.ENGAGEMENT && ui.implemented);
-  document.body.classList.toggle('s2-active', index === SCENARIO_INDEX.METACOGNITION && ui.implemented);
+  document.body.classList.remove('s1-active', 's1-result-active', 'pc-scenario-activity-active');
+  document.body.classList.toggle('s1-active', ui.workspaceMode === 'guided' && ui.implemented);
+  document.body.classList.toggle('pc-scenario-activity-active', ui.workspaceMode === 'activity' && ui.implemented);
+  document.body.dataset.pcScenario = ui.key;
+  document.body.dataset.pcWorkspace = ui.workspaceMode || 'development';
 
   const scenarioText = document.getElementById('scenarioText');
   const boardText = document.getElementById('vnBoardText');
@@ -358,24 +361,21 @@ const playerHistory = {
 // Hint chip definitions for Scenario 2
 
 // Render the correct input mode for the current scenario
+const PC_SCENARIO_RENDERERS = Object.freeze({
+  'guided-builder': ({ container }) => renderGuidedBuilder(container),
+  'metacognition-opening': ({ container }) => renderS2Standby(container),
+  'development-shell': ({ index }) => renderScenarioPlaceholder(index)
+});
+
 function renderInputMode(idx) {
   const container = document.getElementById('inputContainer');
   if (!container) return;
-  container.classList.remove('s1-workbench');
+  container.classList.remove('s1-workbench', 's1-clean-workbench', 'pc-scenario-workbench');
 
-  if (idx === SCENARIO_INDEX.ENGAGEMENT) {
-    renderGuidedBuilder(container);
-    return;
-  }
-
-  if (idx === SCENARIO_INDEX.METACOGNITION) {
-    renderS2Standby(container);
-    return;
-  }
-
-  renderScenarioPlaceholder(idx);
+  const ui = getScenarioUI(idx);
+  const renderer = PC_SCENARIO_RENDERERS[ui.rendererKey] || PC_SCENARIO_RENDERERS['development-shell'];
+  renderer({ index: idx, container, ui });
 }
-
 
 
 
@@ -728,7 +728,7 @@ function buildS1LeftHTML(){
           What did you think about this week's reading?<br><br>
           Reply to at least two classmates.
         </div>
-        <div class="s1-clean-title" style="font-size:0.98rem;margin-bottom:7px;">Observed Problems</div>
+        <div class="s1-clean-title s1-clean-title--small">Observed Problems</div>
         <div class="s1-clean-observed">
           <div><strong>Post quality:</strong> Mostly one-sentence reactions.</div>
           <div><strong>Peer replies:</strong> Feel required, not conversational.</div>

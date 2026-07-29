@@ -21,7 +21,7 @@
   }
 
   html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #vnSpeaker {
-    font-size: 1.15rem !important;
+    font-size: var(--pc-type-speaker) !important;
     line-height: 1.15 !important;
     margin: 0 0 8px !important;
   }
@@ -33,7 +33,7 @@
     padding-left: 0 !important;
     padding-right: 0 !important;
     box-sizing: border-box !important;
-    font-size: 1rem !important;
+    font-size: var(--pc-type-dialogue) !important;
     line-height: 1.45 !important;
   }
 
@@ -55,7 +55,7 @@
 /* Tablet and intermediate laptop: one stable presentation from 701–1510px. */
 @media screen and (min-width: 701px) and (max-width: 1510px) {
   html body #vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #vnSpeaker {
-    font-size: 22px !important;
+    font-size: var(--pc-type-speaker) !important;
     line-height: 1.18 !important;
     margin-bottom: 10px !important;
   }
@@ -64,7 +64,7 @@
   html body #vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result :is(.pc-feedback-copy, .pc-feedback-message) {
     width: 100% !important;
     max-width: none !important;
-    font-size: 18px !important;
+    font-size: var(--pc-type-dialogue) !important;
     line-height: 1.5 !important;
     box-sizing: border-box !important;
   }
@@ -85,7 +85,7 @@
   html body #vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question) #vnPredictionChoicePanel button,
   html body #vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result :is(.prediction-continue-btn, #pcContinueToClaudeBtn) {
     min-height: 50px !important;
-    font-size: 16px !important;
+    font-size: var(--pc-type-control) !important;
     line-height: 1.22 !important;
   }
 

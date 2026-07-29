@@ -1,11 +1,37 @@
-# PromptCraft JavaScript modules
+# PromptCraft
 
-The files load synchronously in this order:
+PromptCraft is an interactive visual-novel training experience for educators.
 
-1. `dialogue.js` — dialogue content and expression metadata.
-2. `app.js` — shared state, configuration, data logging, and audio.
-3. `app-scenarios.js` — scenario definitions, main menu, inline coaching, and scenario navigation.
-4. `app-vn.js` — visual-novel engine, responsive layout controllers, scene loading, and initialization.
-5. `app-workbench.js` — scenario loading, the S1 workbench, scoring, completion, reflection, and development tools.
+## Folder map
 
-Do not add `async`, `defer`, or `type="module"` to these script tags without converting the shared globals. The current order preserves the behavior of the original single `app.js` file.
+- `public/` — files deployed to the website
+  - `index.html`, `wall.html`, `favicon.ico`
+  - `assets/` — runtime images and audio
+  - `scripts/` — generated browser JavaScript plus `dialogue.js`
+  - `styles/` — generated production CSS
+- `src/` — editable application source
+  - `src/js/` — dialogue, scenario, VN, and workbench modules
+  - `src/css/` — ordered reusable CSS owner modules
+- `netlify/functions/` — server-side Netlify function code
+- `tools/` — production build script
+- `docs/` — asset trackers, documentation, and archived legacy material
+- `tests/` — developer-only test pages
+
+## Edit and build
+
+Edit files under `src/`, then run:
+
+```bash
+python tools/build-production.py
+```
+
+The browser-ready files are generated in `public/scripts/` and `public/styles/`.
+Do not edit generated bundle files directly.
+
+## Deployment
+
+Netlify is configured to publish the `public/` directory and load serverless
+functions from `netlify/functions/`.
+
+The Git repository's `.git/` directory should remain local. Do not include it in
+manual deployment ZIPs or file handoffs.
