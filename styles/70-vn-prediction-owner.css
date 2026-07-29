@@ -1,0 +1,107 @@
+/* ══════════════════════════════════════════════════════
+   PROMPTCRAFT V265 — PREDICTION DIALOGUE OWNER
+   One phone owner and one intermediate-width owner for prediction questions
+   and logged-result feedback. Wide-screen grid geometry remains with the
+   existing workstation owner until the next refactor stage.
+   ══════════════════════════════════════════════════════ */
+
+/* Phone: question and result use one visual system. */
+@media screen and (max-width: 700px) {
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #claudeTerminalOutput {
+    top: 38% !important;
+    font-size: clamp(1.05rem, 4.4vw, 1.24rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #vnDialogue,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) .vn-dialogue {
+    min-height: 250px !important;
+    padding: 18px 22px 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #vnSpeaker {
+    font-size: 1.15rem !important;
+    line-height: 1.15 !important;
+    margin: 0 0 8px !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #vnText,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result :is(.pc-feedback-copy, .pc-feedback-message) {
+    width: 100% !important;
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+    font-size: 1rem !important;
+    line-height: 1.45 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question) #vnPredictionChoicePanel {
+    margin-top: 14px !important;
+    gap: 10px !important;
+    padding: 4px 0 0 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question) #vnPredictionChoicePanel button,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result :is(.prediction-continue-btn, #pcContinueToClaudeBtn) {
+    min-height: 46px !important;
+    font-size: clamp(.76rem, 2.9vw, .86rem) !important;
+    line-height: 1.2 !important;
+    padding: 11px 16px !important;
+  }
+}
+
+/* Tablet and intermediate laptop: one stable presentation from 701–1510px. */
+@media screen and (min-width: 701px) and (max-width: 1510px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #vnSpeaker {
+    font-size: 22px !important;
+    line-height: 1.18 !important;
+    margin-bottom: 10px !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #vnText,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result :is(.pc-feedback-copy, .pc-feedback-message) {
+    width: 100% !important;
+    max-width: none !important;
+    font-size: 18px !important;
+    line-height: 1.5 !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #vnDialogue {
+    padding: 24px clamp(36px, 5vw, 64px) !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question) #vnPredictionChoicePanel {
+    width: min(760px, calc(100% - 48px)) !important;
+    max-width: 760px !important;
+    margin-top: 16px !important;
+    gap: 12px !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question) #vnPredictionChoicePanel button,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result :is(.prediction-continue-btn, #pcContinueToClaudeBtn) {
+    min-height: 50px !important;
+    font-size: 16px !important;
+    line-height: 1.22 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #claudeTerminalScene {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #claudeTerminalScene .claude-terminal-photo {
+    background-size: 100% 100% !important;
+    background-position: center center !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #claudeTerminalOutput {
+    font-size: 14px !important;
+    line-height: 1.08 !important;
+    white-space: nowrap !important;
+  }
+}

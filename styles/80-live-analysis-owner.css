@@ -1,0 +1,61 @@
+/* ==============================================================
+   PromptCraft v266 — LIVE CLAUDE ANALYSIS OWNER
+   JavaScript owns phone/tablet/desktop geometry. This module keeps only
+   the stable presentation safeguards that remain active after layout.
+   ============================================================== */
+
+/* Claude replaces the classroom portrait while the live analysis runs. */
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode)
+:is(#vnCharacter, .vn-character) {
+  display: none !important;
+}
+
+/* Non-phone modes retain the photographed workstation without legacy motion. */
+html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
+#claudeTerminalScene {
+  overflow: visible !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
+#claudeTerminalScene.thinking .claude-terminal-photo {
+  border-radius: 16px !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
+#claudeTerminalScene.thinking .claude-terminal-screen {
+  border-radius: 14px !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
+#claudeTerminalOutput {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Phone mode intentionally becomes a full-screen CRT instead of a tiny photo. */
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-live-analysis-phone-v256
+#claudeTerminalScene.thinking .claude-terminal-photo {
+  background-image: none !important;
+}
+
+/* Legacy compact tablet mode intentionally used square CRT corners at 701–900px. */
+@media (min-width: 701px) and (max-width: 900px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-live-analysis-tablet-v256
+  #claudeTerminalScene.thinking .claude-terminal-photo,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-live-analysis-tablet-v256
+  #claudeTerminalScene.thinking .claude-terminal-screen {
+    border-radius: 0 !important;
+  }
+}

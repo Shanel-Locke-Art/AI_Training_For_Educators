@@ -12,49 +12,17 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=188">
-<style id="pc-compact-nav-critical">
-/* Critical visibility rules keep the compact controls available even if an
-   older cached responsive block tries to treat them as mobile-only. */
-html body .pc-compact-nav {
-  display: grid !important;
-  visibility: visible !important;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 54px !important;
-  overflow: visible !important;
-}
-html body .pc-compact-nav > .mobile-compact-menu {
-  display: block !important;
-  visibility: visible !important;
-  width: auto !important;
-  height: auto !important;
-  overflow: visible !important;
-}
-@media screen and (max-width: 640px) {
-  html body > .dev-bar,
-  html body > nav.scenario-tabs,
-  html body .dev-bar,
-  html body .scenario-tabs {
-    display: none !important;
-    visibility: hidden !important;
-    width: 0 !important;
-    height: 0 !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    overflow: hidden !important;
-  }
-}
-</style>
+<link rel="stylesheet" href="style.css?v=270">
+<!-- Responsive DEV and Scenario navigation: see style.css [NAVIGATION: COMPACT MOBILE NAV]. -->
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
 <script src="functions/dialogue.js?v=141"></script>
-<script src="functions/app.js?v=188"></script>
+<script src="functions/app.js?v=270"></script>
+<script src="functions/app-scenarios.js?v=270"></script>
+<script src="functions/app-vn.js?v=270"></script>
+<script src="functions/app-workbench.js?v=270"></script>
 
 </head>
 
@@ -444,7 +412,7 @@ html body .pc-compact-nav > .mobile-compact-menu {
 
     <div class="pc-main-menu-footer">
       <span id="mainMenuStatus">Select an option to begin.</span>
-      <span id="mainMenuVersion" data-pc-app-version>Version 188</span>
+      <span id="mainMenuVersion" data-pc-app-version>Version 270</span>
     </div>
   </div>
 </div>
@@ -587,9 +555,7 @@ html body .pc-compact-nav > .mobile-compact-menu {
 
     <!-- PROFESSOR PIXEL PORTRAIT: image fallback included for missing assets -->
     <div class="vn-character" id="vnCharacter" aria-hidden="true">
-      <div class="vn-expression-badge" id="vnExprBadge">neutral</div>
-
-      <svg id="vnPortraitPlaceholder"
+<svg id="vnPortraitPlaceholder"
            viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg"
            aria-hidden="true"
            class="vn-portrait-placeholder-svg">
@@ -624,8 +590,7 @@ html body .pc-compact-nav > .mobile-compact-menu {
 
     <!-- S2 STUDENT PORTRAIT: Jordan appears opposite Pixel during dialogue -->
     <div class="vn-student-character" id="vnStudentCharacter" aria-hidden="true">
-      <div class="vn-expression-badge vn-student-expression-badge" id="vnStudentExprBadge">neutral</div>
-      <img id="vnStudentPortrait"
+<img id="vnStudentPortrait"
            data-pc-image="assets/images/characters/students/jordan/neutral.png" data-pc-fallback="images/characters/students/jordan/neutral.png"
            alt=""
            aria-hidden="true" />
