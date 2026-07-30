@@ -12,16 +12,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=133">
+<link rel="stylesheet" href="styles/promptcraft.bundle.css?v=280">
+<link rel="stylesheet" href="styles/115-level1-intro-polish.css?v=280">
+<!-- Production CSS is generated from the modular owner files by tools/build-production.py. -->
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
-<script src="functions/dialogue.js?v=133"></script>
-<script src="functions/app.js?v=133"></script>
+<script src="functions/dialogue.js?v=141"></script>
+<script src="functions/app.bundle.js?v=278"></script>
 
-<!-- Runtime override bucket: intentionally empty unless app.js injects temporary CSS -->
-<style id="stable-s1-overrides"></style>
 </head>
 
 <body>
@@ -53,7 +53,7 @@
       autocomplete="given-name"
       onkeydown="if(event.key==='Enter'){event.preventDefault();submitName()}" />
     <button class="name-modal-btn" onclick="submitName()">
-      Let's get started →
+      Continue →
     </button>
     <button class="name-modal-skip" onclick="submitName(true)">
       Skip — just call me You
@@ -62,50 +62,107 @@
 </div>
 
 <!-- ══════════════════════════════════════════════════════
-     DEV BAR
-     Purpose: Quick scenario testing controls.
-     Functions used: devTestScenario(), devFillScenario(), devGoScenario(),
-     devGoS5(), devFillS5(), devGoS6(), devFillS6(), devGoS7(),
-     devGoS8(), devFillS8(), devNextScenario(), devSkip()
+     AUDIO SETUP MODAL
+     Purpose: Lets the learner choose automatic voices, music, or silence
+     after the optional name step. The same dialog can be reopened later.
+     Functions used: selectAudioPreference(), submitAudioPreference(),
+     closeAudioSetup()
      ══════════════════════════════════════════════════════ -->
-<div class="dev-bar" id="devBar">
-  <span>DEV</span>
-  <span class="dev-test-label">Test:</span>
-  <button class="dev-btn" onclick="devTestScenario(0)">S1</button>
+<div class="audio-setup-overlay" id="audioSetupOverlay"
+     role="dialog" aria-modal="true"
+     aria-labelledby="audioSetupTitle"
+     aria-describedby="audioSetupHelp"
+     aria-hidden="true" hidden>
+  <div class="audio-setup-modal" role="document">
+    <div class="audio-setup-pixel" aria-hidden="true">
+      <img data-pc-image="assets/images/characters/professor-pixel/encouraging.png" data-pc-fallback="images/pixel-encouraging.png" alt="" />
+    </div>
+
+    <p class="audio-setup-speaker">Professor Pixel</p>
+    <h2 class="audio-setup-title" id="audioSetupTitle">
+      Ready? Choose what you’d like to hear in the Prompt Lab.
+    </h2>
+    <p class="audio-setup-help" id="audioSetupHelp">
+      PromptCraft stays silent until you choose. You can change this later from the audio button in the header.
+    </p>
+
+    <form id="audioSetupForm" onsubmit="submitAudioPreference(event)">
+      <fieldset class="audio-choice-fieldset">
+        <legend class="sr-only">Choose an audio experience</legend>
+
+        <label class="audio-choice-card">
+          <input type="radio" name="audioMode" value="full"
+                 onchange="selectAudioPreference(this.value)" />
+          <span class="audio-choice-copy">
+            <strong>Full audio</strong>
+            <span>Professor Pixel and student voices, plus background music.</span>
+          </span>
+        </label>
+
+        <label class="audio-choice-card">
+          <input type="radio" name="audioMode" value="voices"
+                 onchange="selectAudioPreference(this.value)" />
+          <span class="audio-choice-copy">
+            <strong>Voices only</strong>
+            <span>Recorded dialogue without background music.</span>
+          </span>
+        </label>
+
+        <label class="audio-choice-card">
+          <input type="radio" name="audioMode" value="silent"
+                 onchange="selectAudioPreference(this.value)" />
+          <span class="audio-choice-copy">
+            <strong>Keep it quiet</strong>
+            <span>No automatic audio. Every line remains visible as text.</span>
+          </span>
+        </label>
+      </fieldset>
+
+      <button class="audio-setup-primary" id="audioSetupContinueBtn"
+              type="submit" disabled>
+        Begin the Prompt Lab
+      </button>
+      <button class="audio-setup-cancel" id="audioSetupCancelBtn"
+              type="button" onclick="closeAudioSetup()" hidden>
+        Cancel
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     DEV BAR — clean shell
+     S1 fill resets the playable baseline. S2 opens its playable case; S3–S8 remain development shells.
+══════════════════════════════════════════════════════ -->
+<div class="dev-bar" role="toolbar" aria-label="PromptCraft development shortcuts">
+  <span class="dev-label">DEV</span>
+  <button class="dev-btn" onclick="devGoScenario(0)">S1</button>
   <button class="dev-btn dev-btn-fill" onclick="devFillScenario(0)">S1 ✏️</button>
   <button class="dev-btn" onclick="devGoScenario(1)">S2</button>
-  <button class="dev-btn dev-btn-fill" onclick="devFillScenario(1)">S2 ✏️</button>
-  <button class="dev-btn" onclick="devGoScenario(2)">S3</button>
-  <button class="dev-btn dev-btn-fill" onclick="devFillScenario(2)">S3 ✏️</button>
-  <button class="dev-btn" onclick="devGoScenario(3)">S4</button>
-  <button class="dev-btn dev-btn-sync" onclick="devFillScenario(3)">S4 ✏️</button>
-  <button class="dev-btn" onclick="devGoS5()">S5</button>
-  <button class="dev-btn dev-btn-hallucination" onclick="devFillS5()">S5 ✏️</button>
-  <button class="dev-btn" onclick="devGoS6()">S6</button>
-  <button class="dev-btn dev-btn-predict" onclick="devFillS6()">S6 ✏️</button>
-  <button class="dev-btn dev-btn-overreliance" onclick="devGoS7()">S7</button>
-  <button class="dev-btn" onclick="devGoS8()">S8</button>
-  <button class="dev-btn dev-btn-revise" onclick="devFillS8()">S8 ✏️</button>
-  <button class="dev-btn dev-btn-next" onclick="devNextScenario()">Next ▶</button>
-  <button class="dev-btn dev-btn-wall" onclick="window.open('/wall.html','_blank')">💡 Wall</button>
-  <button class="dev-btn" onclick="devSkip()">Reflection</button>
-  <button class="dev-btn" onclick="document.getElementById('devBar').style.display='none'">Hide</button>
+  <button class="dev-btn" onclick="devGoScenario(2)">S3 shell</button>
+  <button class="dev-btn" onclick="devGoScenario(3)">S4 shell</button>
+  <button class="dev-btn" onclick="devGoScenario(4)">S5 shell</button>
+  <button class="dev-btn" onclick="devGoScenario(5)">S6 shell</button>
+  <button class="dev-btn" onclick="devGoScenario(6)">S7 shell</button>
+  <button class="dev-btn" onclick="devGoScenario(7)">S8 shell</button>
+  <button class="dev-btn" onclick="devNextScenario()">Next →</button>
 </div>
 
 <!-- ══════════════════════════════════════════════════════
      MAIN GAME HEADER
-     Purpose: Persistent title, level, XP, music, and Ideas Wall link.
-     Functions used: toggleMusic()
+     Purpose: Persistent title, level, XP, audio settings, and Ideas Wall link.
+     Functions used: showAudioSetup()
      ══════════════════════════════════════════════════════ -->
-<header role="banner">
+<header role="banner" class="pc-app-header">
   <div class="logo">
     <div class="logo-icon" aria-hidden="true">🌿</div>
-    <div>
+    <div class="logo-copy">
       <div class="logo-name">Prompt<span>Craft</span></div>
       <div class="logo-sub">The Prompt Lab</div>
     </div>
   </div>
-  <div class="header-right">
+
+  <div class="header-status" aria-label="Player progress">
     <div class="level-tag" id="levelTag" aria-label="Current level" aria-live="polite">substitute · novice</div>
     <div class="xp-group" aria-label="Experience points">
       <span class="xp-label" aria-hidden="true">XP</span>
@@ -113,21 +170,74 @@
         <div class="xp-fill" id="xpFill"></div>
       </div>
     </div>
+  </div>
+
+  <div class="header-actions" aria-label="PromptCraft actions">
     <button class="main-menu-toggle" id="mainMenuToggle"
             type="button"
             onclick="openMainMenu('home')"
             aria-label="Open main menu"
             title="Main menu">Menu</button>
     <button class="music-toggle" id="musicToggle"
-            onclick="toggleMusic()"
-            aria-label="Toggle background music"
-            title="Toggle music">🎵</button>
+            type="button"
+            onclick="showAudioSetup({onboarding:false})"
+            aria-label="Open audio settings. Current setting: Keep it quiet"
+            title="Audio settings: Keep it quiet">🔇</button>
     <a class="ideas-wall-btn" href="/wall.html" target="_blank" rel="noopener noreferrer"
        aria-label="Open the Ideas Wall">
-      💡 Ideas Wall
+      <span class="ideas-wall-icon" aria-hidden="true">💡</span>
+      <span class="ideas-wall-text">Ideas Wall</span>
     </a>
   </div>
 </header>
+
+<!-- Compact navigation uses native disclosure controls so opening the menus
+     does not depend on a JavaScript initialization pass. The original hidden
+     controls remain the source of truth for existing scenario and DEV logic. -->
+<nav class="pc-compact-nav" aria-label="PromptCraft navigation">
+  <details class="mobile-compact-menu mobile-dev-menu pc-native-dropdown"
+           name="promptcraft-compact-navigation"
+           ontoggle="if(this.open){document.querySelectorAll('.pc-compact-nav details[open]').forEach((menu)=>{if(menu!==this)menu.removeAttribute('open')})}">
+    <summary class="mobile-dropdown-toggle">
+      <span class="mobile-dropdown-title">DEV TOOLS</span>
+      <span class="mobile-dropdown-caret" aria-hidden="true">▾</span>
+    </summary>
+    <div class="mobile-dropdown-panel" id="mobileDevToolsPanel" role="menu">
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[0]?.click()">S1</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[1]?.click()">S1 ✏️</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[2]?.click()">S2</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[3]?.click()">S3 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[4]?.click()">S4 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[5]?.click()">S5 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[6]?.click()">S6 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[7]?.click()">S7 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[8]?.click()">S8 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[9]?.click()">Next →</button>
+    </div>
+  </details>
+
+  <details class="mobile-compact-menu mobile-scenario-menu pc-native-dropdown"
+           name="promptcraft-compact-navigation"
+           ontoggle="if(this.open){document.querySelectorAll('.pc-compact-nav details[open]').forEach((menu)=>{if(menu!==this)menu.removeAttribute('open')})}">
+    <summary class="mobile-dropdown-toggle">
+      <span class="mobile-dropdown-copy">
+        <span class="mobile-dropdown-eyebrow">SCENARIO MENU</span>
+        <span class="mobile-scenario-current">S1: Engagement</span>
+      </span>
+      <span class="mobile-dropdown-caret" aria-hidden="true">▾</span>
+    </summary>
+    <div class="mobile-dropdown-panel" id="mobileScenarioMenuPanel" role="menu">
+      <button class="mobile-dropdown-option is-active" data-source-index="0" type="button" role="menuitem" aria-current="page" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[0]?.click()">S1: Engagement</button>
+      <button class="mobile-dropdown-option" data-source-index="1" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[1]?.click()">S2: Metacognition</button>
+      <button class="mobile-dropdown-option" data-source-index="2" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[2]?.click()">S3: Assessment</button>
+      <button class="mobile-dropdown-option" data-source-index="3" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[3]?.click()">S4: Sync Bias</button>
+      <button class="mobile-dropdown-option" data-source-index="4" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[4]?.click()">S5: Hallucination</button>
+      <button class="mobile-dropdown-option" data-source-index="5" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[5]?.click()">S6: Prediction</button>
+      <button class="mobile-dropdown-option" data-source-index="6" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[6]?.click()">S7: Overreliance</button>
+      <button class="mobile-dropdown-option" data-source-index="7" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[7]?.click()">S8: Reflect &amp; Revise</button>
+    </div>
+  </details>
+</nav>
 
 <!-- ══════════════════════════════════════════════════════
      MAIN MENU
@@ -300,7 +410,7 @@
 
     <div class="pc-main-menu-footer">
       <span id="mainMenuStatus">Select an option to begin.</span>
-      <span>Version 133</span>
+      <span id="mainMenuVersion" data-pc-app-version>Version 278</span>
     </div>
   </div>
 </div>
@@ -312,14 +422,14 @@
      ══════════════════════════════════════════════════════ -->
 
 <nav class="scenario-tabs" role="tablist" aria-label="Training scenarios">
-  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" onclick="switchScenario(0,this)">📋 S1: Engagement</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(1,this)">📋 S2: Metacognition</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(2,this)">📋 S3: Assessment</button>
-  <button class="tab-btn locked" id="s4Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 S4</button>
-  <button class="tab-btn locked" id="s5Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 S5</button>
-  <button class="tab-btn locked" id="s6Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 S6</button>
-  <button class="tab-btn locked" id="s7Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 S7</button>
-  <button class="tab-btn locked" id="s8Tab" role="tab" aria-selected="false" aria-controls="chat" disabled>🔒 S8</button>
+  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" onclick="switchScenario(0,this)">S1: Engagement</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(1,this)">S2: Metacognition</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(2,this)">S3: Assessment</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(3,this)">S4: Sync Bias</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(4,this)">S5: Hallucination</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(5,this)">S6: Prediction</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(6,this)">S7: Overreliance</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(7,this)">S8: Reflect &amp; Revise</button>
 </nav>
 
 <!-- ══════════════════════════════════════════════════════
@@ -362,7 +472,7 @@
      onkeydown="if(event.key==='Enter'||event.key===' '){pixelBadgeClick()}">
   <!-- Real portrait — shown when images exist -->
   <img class="pixel-badge-portrait" id="pixelBadgeImg"
-       src="images/pixel-neutral.png"
+       data-pc-image="assets/images/characters/professor-pixel/neutral.png" data-pc-fallback="images/pixel-neutral.png"
        alt="Professor Pixel"
        onerror="this.style.display='none';document.getElementById('pixelBadgeFallback').style.display='flex';" />
   <!-- Fallback -->
@@ -373,7 +483,7 @@
 <!-- ── PROFESSOR PIXEL COACH CARD ──────────────────── -->
 <div class="pixel-coach-card" id="pixelCoachCard" role="status" aria-live="polite">
   <img class="pixel-coach-portrait" id="pixelCoachImg"
-       src="images/pixel-neutral.png"
+       data-pc-image="assets/images/characters/professor-pixel/neutral.png" data-pc-fallback="images/pixel-neutral.png"
        alt="Professor Pixel"
        onerror="this.style.display='none';document.getElementById('pixelCoachFallback').style.display='flex';" />
   <div class="pixel-coach-fallback" id="pixelCoachFallback" style="display:none;">🧑‍🏫</div>
@@ -396,7 +506,7 @@
 <div class="vn-overlay" id="vnOverlay"
      role="dialog"
      aria-modal="true"
-     aria-label="Professor Pixel dialogue"
+     aria-label="PromptCraft character dialogue"
      aria-live="polite">
 
   <!-- VN SCENE STAGE: background, smartboard, Pixel, Claude visual systems -->
@@ -443,9 +553,7 @@
 
     <!-- PROFESSOR PIXEL PORTRAIT: image fallback included for missing assets -->
     <div class="vn-character" id="vnCharacter" aria-hidden="true">
-      <div class="vn-expression-badge" id="vnExprBadge">neutral</div>
-
-      <svg id="vnPortraitPlaceholder"
+<svg id="vnPortraitPlaceholder"
            viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg"
            aria-hidden="true"
            class="vn-portrait-placeholder-svg">
@@ -468,12 +576,22 @@
         <text x="100" y="310" text-anchor="middle" font-family="sans-serif" font-size="9" fill="rgba(168,213,181,0.6)">[placeholder — replace with your art]</text>
       </svg>
 
-      <img id="vnPortrait" src="images/pixel-neutral.png"
+      <img id="vnPortrait" data-pc-image="assets/images/characters/professor-pixel/neutral.png" data-pc-fallback="images/pixel-neutral.png"
            alt=""
            aria-hidden="true"
            style="display:none;"
            onerror="this.style.display='none';document.getElementById('vnPortraitPlaceholder').style.display='block';"
            onload="this.style.display='block';document.getElementById('vnPortraitPlaceholder').style.display='none';" />
+    </div>
+
+
+
+    <!-- S2 STUDENT PORTRAIT: Jordan appears opposite Pixel during dialogue -->
+    <div class="vn-student-character" id="vnStudentCharacter" aria-hidden="true">
+<img id="vnStudentPortrait"
+           data-pc-image="assets/images/characters/students/jordan/neutral.png" data-pc-fallback="images/characters/students/jordan/neutral.png"
+           alt=""
+           aria-hidden="true" />
     </div>
 
     <!-- CLAUDE SHELF: legacy/ambient machine visual used by some VN states -->
@@ -547,25 +665,25 @@
       <form name="promptcraft-reflection" method="POST" data-netlify="true" onsubmit="handleReflectionSubmit(event)">
         <input type="hidden" name="form-name" value="promptcraft-reflection" />
         <div class="ref-question">
-          <label class="ref-label"><span>01</span>What surprised you most about how AI responded to your prompts during these scenarios?</label>
-          <textarea class="ref-textarea" name="q1_surprise" placeholder="Write freely — there is no wrong answer."></textarea>
+          <label class="ref-label" for="reflectionQ1"><span>01</span>What surprised you most about how AI responded to your prompts during these scenarios?</label>
+          <textarea id="reflectionQ1" class="ref-textarea" name="q1_surprise" placeholder="Write freely — there is no wrong answer."></textarea>
         </div>
         <div class="ref-question">
-          <label class="ref-label"><span>02</span>What is one thing you noticed about AI that you did not expect — either a strength or a limitation?</label>
-          <textarea class="ref-textarea" name="q2_change" placeholder="Think about the hallucination scenario, the prediction, or any moment that shifted your thinking."></textarea>
+          <label class="ref-label" for="reflectionQ2"><span>02</span>What is one thing you noticed about AI that you did not expect — either a strength or a limitation?</label>
+          <textarea id="reflectionQ2" class="ref-textarea" name="q2_change" placeholder="Think about the hallucination scenario, the prediction, or any moment that shifted your thinking."></textarea>
         </div>
         <div class="ref-question">
-          <label class="ref-label"><span>03</span>How has this experience changed how you plan to use — or not use — AI in your actual teaching or course design work?</label>
-          <textarea class="ref-textarea" name="q3_practice" placeholder="Be as specific as you can — a concrete change in practice, not just a general attitude."></textarea>
+          <label class="ref-label" for="reflectionQ3"><span>03</span>How has this experience changed how you plan to use — or not use — AI in your actual teaching or course design work?</label>
+          <textarea id="reflectionQ3" class="ref-textarea" name="q3_practice" placeholder="Be as specific as you can — a concrete change in practice, not just a general attitude."></textarea>
         </div>
         <div class="ref-question">
-          <label class="ref-label"><span>04</span>Is there anything else you want to share about your experience today?</label>
-          <textarea class="ref-textarea ref-textarea-short" name="q4_other" placeholder="Optional."></textarea>
+          <label class="ref-label" for="reflectionQ4"><span>04</span>Is there anything else you want to share about your experience today?</label>
+          <textarea id="reflectionQ4" class="ref-textarea ref-textarea-short" name="q4_other" placeholder="Optional."></textarea>
         </div>
         <div class="ref-divider">
           <div class="ref-question ref-question-last">
-            <label class="ref-label">Participant ID <span class="ref-label-note">(only if your study protocol asks for it)</span></label>
-            <input class="ref-input" type="text" name="participant_id" placeholder="Leave blank to remain anonymous" />
+            <label class="ref-label" for="reflectionParticipantId">Participant ID <span class="ref-label-note">(only if your study protocol asks for it)</span></label>
+            <input id="reflectionParticipantId" class="ref-input" type="text" name="participant_id" placeholder="Leave blank to remain anonymous" />
           </div>
         </div>
         <button class="ref-submit" type="submit" id="refSubmitBtn">Submit Reflection</button>
@@ -604,5 +722,8 @@
     </div>
   </div>
 </div>
+
+
+
 </body>
 </html>

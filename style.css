@@ -1,0 +1,15 @@
+/* PromptCraft v278 modular stylesheet loader.
+   Shared scenario-system refactor: CSS stays organized by owner, while JavaScript is
+   split into ordered domain files instead of one oversized application file. */
+@import url("styles/00-foundation.css?v=278");
+@import url("styles/10-vn-core.css?v=278");
+@import url("styles/20-terminal-core.css?v=278");
+@import url("styles/30-responsive-legacy.css?v=278");
+@import url("styles/40-components-and-scenarios.css?v=278");
+@import url("styles/50-current-layout-owners.css?v=278");
+@import url("styles/60-vn-intro-owner.css?v=278");
+@import url("styles/70-vn-prediction-owner.css?v=278");
+@import url("styles/80-live-analysis-owner.css?v=278");
+@import url("styles/90-completed-analysis-owner.css?v=278");
+@import url("styles/100-s1-workbench-owner.css?v=278");
+@import url("styles/110-shared-scenario-system.css?v=278");

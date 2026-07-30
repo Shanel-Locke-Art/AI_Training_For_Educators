@@ -518,7 +518,7 @@ function renderScenarioPlaceholder(index) {
       <h2 id="pcShellTitle">${esc(ui.tabLabel)} is being rebuilt</h2>
       <p class="pc-shell-copy">${esc(ui.missionCopy)}</p>
       ${plannedSteps ? `<div class="pc-shell-plan"><h3>Planned game loop</h3>${plannedSteps}</div>` : ''}
-      <p class="pc-shell-note">The previous implementation is preserved in the source project archive, but it is no longer loaded by the game.</p>
+      <p class="pc-shell-note">The previous implementation is preserved in <code>archive/legacy-scenarios-v133/</code>, but it is no longer loaded by the game.</p>
       <div class="pc-shell-actions">
         <button type="button" class="pc-shell-primary" onclick="openMainMenu('scenarios')">Return to Scenario Select</button>
         <button type="button" class="pc-shell-secondary" onclick="launchScenarioFromMenu(0,{skipNameGate:true})">Play Scenario 1</button>

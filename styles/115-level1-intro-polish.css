@@ -1,0 +1,231 @@
+/* ══════════════════════════════════════════════════════
+   V280 — LEVEL 1 INTRO POLISH
+   Final responsive staging pass for the opening Pixel/smartboard scenes.
+   Goal: keep the board readable, reduce oversizing on large screens,
+   center and enlarge Pixel on smaller screens, and boost dialogue legibility.
+   ══════════════════════════════════════════════════════ */
+
+/* Shared polish for single-character intro / guided VN scenes only. */
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap {
+  z-index: 11 !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  border-radius: 10px !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  z-index: 13 !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before {
+  display: block !important;
+  margin-bottom: 10px !important;
+  line-height: 1.22 !important;
+  letter-spacing: 0.16em !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character),
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character) {
+  z-index: 18 !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-dialogue {
+  z-index: 19 !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) #vnText,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-text,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .pc-feedback-copy,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .pc-feedback-message {
+  font-weight: 600 !important;
+}
+
+/* Large desktop / fullscreen: shrink the board, keep it centered, and enlarge Pixel. */
+body[data-pc-viewport-family="desktop"] {
+  --pc-vn-dialogue-pad-inline: clamp(30px, 3vw, 52px);
+  --pc-vn-dialogue-pad-block: clamp(22px, 2.2vh, 30px);
+  --pc-vn-dialogue-min-height: clamp(210px, 21vh, 260px);
+  --pc-vn-dialogue-speaker-size: clamp(26px, 2vw, 31px);
+  --pc-vn-dialogue-copy-size: clamp(20px, 1.55vw, 24px);
+  --pc-vn-dialogue-hint-size: clamp(17px, 1.2vw, 19px);
+
+  --pc-vn-board-wrap-width: min(56vw, 980px);
+  --pc-vn-board-wrap-top: clamp(62px, 6.5vh, 86px);
+  --pc-vn-board-box-top: clamp(78px, 11.5%, 108px);
+  --pc-vn-board-box-inline: 11%;
+  --pc-vn-board-pad-block: clamp(18px, 1.7vw, 24px);
+  --pc-vn-board-pad-inline: clamp(22px, 2vw, 34px);
+  --pc-vn-board-body-size: clamp(1.28rem, 1.45vw, 1.72rem);
+  --pc-vn-board-meta-size: clamp(0.64rem, 0.75vw, 0.8rem);
+  --pc-vn-board-line: 1.26;
+
+  --pc-vn-character-right: clamp(32px, 4vw, 96px);
+  --pc-vn-character-bottom: 10px;
+  --pc-vn-character-height: clamp(360px, 43vh, 540px);
+  --pc-vn-character-max-width: 23vw;
+}
+
+/* Intermediate laptops: board was too large and Pixel was getting trapped behind it. */
+body[data-pc-viewport-family="compact-desktop"] {
+  --pc-vn-dialogue-pad-inline: clamp(24px, 3vw, 40px);
+  --pc-vn-dialogue-pad-block: 20px;
+  --pc-vn-dialogue-min-height: 210px;
+  --pc-vn-dialogue-speaker-size: clamp(24px, 1.95vw, 29px);
+  --pc-vn-dialogue-copy-size: clamp(19px, 1.45vw, 22px);
+  --pc-vn-dialogue-hint-size: clamp(16px, 1.12vw, 18px);
+
+  --pc-vn-board-wrap-width: min(72vw, 780px);
+  --pc-vn-board-wrap-top: clamp(76px, 7.8vh, 98px);
+  --pc-vn-board-box-top: clamp(42px, 7%, 58px);
+  --pc-vn-board-box-inline: 9.8%;
+  --pc-vn-board-pad-block: 14px;
+  --pc-vn-board-pad-inline: 18px;
+  --pc-vn-board-body-size: clamp(1rem, 1.18vw, 1.18rem);
+  --pc-vn-board-meta-size: clamp(0.54rem, 0.7vw, 0.64rem);
+  --pc-vn-board-line: 1.24;
+
+  --pc-vn-character-left: 50%;
+  --pc-vn-character-right: auto;
+  --pc-vn-character-bottom: 92px;
+  --pc-vn-character-height: clamp(270px, 32vh, 350px);
+  --pc-vn-character-max-width: 34vw;
+  --pc-vn-character-transform: translateX(-50%);
+  --pc-vn-character-origin: center bottom;
+  --pc-vn-character-justify: center;
+}
+
+/* Portrait tablets: board needed centering, lower placement, and much stronger dialogue readability. */
+body[data-pc-viewport-family="portrait-tablet"] {
+  --pc-vn-dialogue-pad-inline: clamp(30px, 4.6vw, 52px);
+  --pc-vn-dialogue-pad-block: clamp(22px, 2.5vh, 30px);
+  --pc-vn-dialogue-min-height: clamp(248px, 23vh, 300px);
+  --pc-vn-dialogue-speaker-size: clamp(28px, 3vw, 35px);
+  --pc-vn-dialogue-copy-size: clamp(21px, 2.25vw, 26px);
+  --pc-vn-dialogue-hint-size: clamp(18px, 1.8vw, 21px);
+
+  --pc-vn-board-wrap-width: min(76vw, 760px);
+  --pc-vn-board-wrap-top: clamp(92px, 8vh, 114px);
+  --pc-vn-board-box-top: clamp(34px, 6%, 52px);
+  --pc-vn-board-box-inline: 8.8%;
+  --pc-vn-board-pad-block: clamp(13px, 1.5vw, 18px);
+  --pc-vn-board-pad-inline: clamp(15px, 1.8vw, 22px);
+  --pc-vn-board-body-size: clamp(1.08rem, 1.52vw, 1.32rem);
+  --pc-vn-board-meta-size: clamp(0.6rem, 0.82vw, 0.74rem);
+  --pc-vn-board-line: 1.23;
+
+  --pc-vn-character-left: 50%;
+  --pc-vn-character-right: auto;
+  --pc-vn-character-bottom: clamp(170px, 17dvh, 215px);
+  --pc-vn-character-height: clamp(320px, 38vw, 420px);
+  --pc-vn-character-max-width: 50vw;
+  --pc-vn-character-transform: translateX(-50%);
+  --pc-vn-character-origin: center bottom;
+  --pc-vn-character-justify: center;
+}
+
+/* Short landscape devices and Nest Hub–style layouts: reduce board size and keep Pixel visible. */
+body[data-pc-viewport-family="short-landscape"] {
+  --pc-vn-dialogue-pad-inline: clamp(20px, 2.8vw, 32px);
+  --pc-vn-dialogue-pad-block: 18px;
+  --pc-vn-dialogue-min-height: 188px;
+  --pc-vn-dialogue-speaker-size: clamp(21px, 1.7vw, 25px);
+  --pc-vn-dialogue-copy-size: clamp(17.5px, 1.38vw, 20px);
+  --pc-vn-dialogue-hint-size: clamp(15px, 1.05vw, 17px);
+
+  --pc-vn-board-wrap-width: min(72vw, 720px);
+  --pc-vn-board-wrap-top: 72px;
+  --pc-vn-board-box-top: clamp(36px, 6%, 48px);
+  --pc-vn-board-box-inline: 9.8%;
+  --pc-vn-board-pad-block: 12px;
+  --pc-vn-board-pad-inline: 15px;
+  --pc-vn-board-body-size: clamp(0.96rem, 1vw, 1.08rem);
+  --pc-vn-board-meta-size: clamp(0.48rem, 0.72vw, 0.58rem);
+  --pc-vn-board-line: 1.22;
+
+  --pc-vn-character-left: 50%;
+  --pc-vn-character-right: auto;
+  --pc-vn-character-bottom: 70px;
+  --pc-vn-character-height: clamp(225px, 36vh, 300px);
+  --pc-vn-character-max-width: 34vw;
+  --pc-vn-character-transform: translateX(-50%);
+  --pc-vn-character-origin: center bottom;
+  --pc-vn-character-justify: center;
+}
+
+/* Regular phones: larger board copy, looser line spacing, more bottom readability, and centered Pixel. */
+body[data-pc-viewport-family="standard-phone"] {
+  --pc-vn-dialogue-pad-inline: 22px;
+  --pc-vn-dialogue-pad-block: 18px;
+  --pc-vn-dialogue-min-height: 258px;
+  --pc-vn-dialogue-speaker-size: clamp(21px, 5.2vw, 24px);
+  --pc-vn-dialogue-copy-size: clamp(17px, 4.45vw, 20px);
+  --pc-vn-dialogue-hint-size: clamp(15px, 3.9vw, 17px);
+
+  --pc-vn-board-wrap-width: calc(100vw - 18px);
+  --pc-vn-board-wrap-top: 74px;
+  --pc-vn-board-box-top: 18px;
+  --pc-vn-board-box-inline: 8%;
+  --pc-vn-board-pad-block: 10px;
+  --pc-vn-board-pad-inline: 12px;
+  --pc-vn-board-body-size: clamp(0.98rem, 4.15vw, 1.08rem);
+  --pc-vn-board-meta-size: clamp(0.54rem, 2.1vw, 0.64rem);
+  --pc-vn-board-line: 1.22;
+
+  --pc-vn-character-left: 50%;
+  --pc-vn-character-right: auto;
+  --pc-vn-character-bottom: clamp(182px, 21dvh, 212px);
+  --pc-vn-character-height: clamp(250px, min(34dvh, 60vw), 315px);
+  --pc-vn-character-max-width: 70vw;
+  --pc-vn-character-transform: translateX(-50%);
+  --pc-vn-character-origin: center bottom;
+  --pc-vn-character-justify: center;
+}
+
+/* Compact phones: same treatment, slightly tighter geometry. */
+body[data-pc-viewport-family="compact-phone"] {
+  --pc-vn-dialogue-pad-inline: 18px;
+  --pc-vn-dialogue-pad-block: 16px;
+  --pc-vn-dialogue-min-height: 240px;
+  --pc-vn-dialogue-speaker-size: clamp(19px, 5vw, 22px);
+  --pc-vn-dialogue-copy-size: clamp(16px, 4.2vw, 18.5px);
+  --pc-vn-dialogue-hint-size: clamp(14px, 3.7vw, 16px);
+
+  --pc-vn-board-wrap-width: calc(100vw - 14px);
+  --pc-vn-board-wrap-top: 72px;
+  --pc-vn-board-box-top: 16px;
+  --pc-vn-board-box-inline: 8%;
+  --pc-vn-board-pad-block: 9px;
+  --pc-vn-board-pad-inline: 11px;
+  --pc-vn-board-body-size: clamp(0.94rem, 4vw, 1rem);
+  --pc-vn-board-meta-size: clamp(0.5rem, 2vw, 0.58rem);
+  --pc-vn-board-line: 1.21;
+
+  --pc-vn-character-left: 50%;
+  --pc-vn-character-right: auto;
+  --pc-vn-character-bottom: clamp(174px, 22dvh, 200px);
+  --pc-vn-character-height: clamp(228px, min(34dvh, 61vw), 285px);
+  --pc-vn-character-max-width: 72vw;
+  --pc-vn-character-transform: translateX(-50%);
+  --pc-vn-character-origin: center bottom;
+  --pc-vn-character-justify: center;
+}
+
+/* Family-specific nudges for the challenge card and bottom dialogue readability. */
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-board-text::before,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-board-text::before {
+  margin-bottom: 8px !important;
+}
+
+html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-dialogue,
+html body[data-pc-viewport-family="compact-desktop"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-dialogue,
+html body[data-pc-viewport-family="short-landscape"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-dialogue {
+  padding-bottom: calc(var(--pc-vn-dialogue-pad-block) + 24px) !important;
+}
+
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-dialogue,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-dialogue {
+  padding-bottom: calc(var(--pc-vn-dialogue-pad-block) + 28px) !important;
+}
