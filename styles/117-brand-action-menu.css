@@ -1,0 +1,198 @@
+/* ══════════════════════════════════════════════════════
+   V286 — PROMPTCRAFT BRAND ACTION MENU
+   The wordmark is now the single reusable access point for Main Menu,
+   Audio Settings, and Ideas Wall. The legacy buttons remain in the DOM for
+   existing state updates but are no longer displayed.
+   ══════════════════════════════════════════════════════ */
+
+html body .pc-app-header {
+  overflow: visible !important;
+}
+
+html body .pc-brand-menu {
+  position: relative !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  color: inherit !important;
+}
+
+html body .pc-brand-menu > summary {
+  list-style: none !important;
+}
+
+html body .pc-brand-menu > summary::-webkit-details-marker {
+  display: none !important;
+}
+
+html body .pc-brand-summary {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 48px !important;
+  padding: 6px 10px !important;
+  border: 2px solid transparent !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  user-select: none !important;
+}
+
+html body .pc-brand-summary:hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+html body .pc-brand-summary:focus-visible {
+  outline: 3px solid #f4b400 !important;
+  outline-offset: 3px !important;
+}
+
+html body .pc-brand-menu[open] .pc-brand-summary {
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(189, 231, 204, 0.55) !important;
+}
+
+html body .pc-brand-summary .logo-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  min-width: 0 !important;
+}
+
+html body .pc-brand-summary .logo-name,
+html body .pc-brand-summary .logo-sub {
+  display: block !important;
+}
+
+html body .pc-brand-caret {
+  color: #d4edd9 !important;
+  font-size: 0.9rem !important;
+  line-height: 1 !important;
+  transition: transform 160ms ease !important;
+}
+
+html body .pc-brand-menu[open] .pc-brand-caret {
+  transform: rotate(180deg) !important;
+}
+
+html body .pc-brand-menu-panel {
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+  left: 0 !important;
+  z-index: 5000 !important;
+  display: grid !important;
+  gap: 7px !important;
+  width: min(250px, calc(100vw - 28px)) !important;
+  padding: 10px !important;
+  border: 2px solid #9ed3b4 !important;
+  border-radius: 12px !important;
+  background: #102f25 !important;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.42) !important;
+}
+
+html body .pc-brand-menu:not([open]) .pc-brand-menu-panel {
+  display: none !important;
+}
+
+html body .pc-brand-menu-item {
+  display: grid !important;
+  grid-template-columns: 28px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 9px !important;
+  width: 100% !important;
+  min-height: 44px !important;
+  margin: 0 !important;
+  padding: 9px 12px !important;
+  border: 1px solid rgba(183, 225, 199, 0.48) !important;
+  border-radius: 8px !important;
+  background: #173f32 !important;
+  color: #ffffff !important;
+  font-family: "Nunito", Arial, sans-serif !important;
+  font-size: 0.94rem !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+  text-align: left !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+html body .pc-brand-menu-item:hover,
+html body .pc-brand-menu-item:focus-visible {
+  background: #205542 !important;
+  border-color: #d4edd9 !important;
+  outline: none !important;
+}
+
+html body .pc-brand-menu-ideas {
+  background: #6d5000 !important;
+  border-color: #e1aa21 !important;
+}
+
+html body .pc-brand-menu-ideas:hover,
+html body .pc-brand-menu-ideas:focus-visible {
+  background: #846200 !important;
+  border-color: #ffd76a !important;
+}
+
+/* The logo dropdown replaces these three persistent buttons. They stay in the
+   document so current JavaScript can continue updating the audio control. */
+html body .pc-app-header .header-actions {
+  display: none !important;
+}
+
+/* With actions removed, keep the status block aligned cleanly beside the
+   wordmark rather than reserving an empty second row. */
+@media screen and (min-width: 641px) and (max-width: 1100px) {
+  html body .pc-app-header {
+    grid-template-columns: minmax(230px, 1fr) auto !important;
+    grid-template-areas: "brand status" !important;
+    padding-block: 10px 11px !important;
+  }
+
+  html body .pc-app-header .pc-brand-menu {
+    grid-area: brand !important;
+    justify-self: start !important;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  html body .pc-app-header {
+    grid-template-areas:
+      "brand"
+      "status" !important;
+    gap: 8px !important;
+    padding-bottom: 11px !important;
+  }
+
+  html body .pc-app-header .pc-brand-menu {
+    grid-area: brand !important;
+    justify-self: center !important;
+    width: min(100%, 300px) !important;
+  }
+
+  html body .pc-app-header .pc-brand-summary {
+    width: 100% !important;
+  }
+
+  html body .pc-app-header .pc-brand-menu-panel {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: min(280px, calc(100vw - 28px)) !important;
+  }
+}
+
+@media screen and (min-width: 1101px) {
+  html body .pc-app-header {
+    display: grid !important;
+    grid-template-columns: minmax(260px, 1fr) auto !important;
+    align-items: center !important;
+    gap: 20px !important;
+  }
+
+  html body .pc-app-header .pc-brand-menu {
+    justify-self: start !important;
+  }
+
+  html body .pc-app-header .header-status {
+    justify-self: end !important;
+  }
+}

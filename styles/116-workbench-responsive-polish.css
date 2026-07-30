@@ -1,0 +1,458 @@
+/* ══════════════════════════════════════════════════════
+   V285 — MAIN APP + S1 WORKBENCH RESPONSIVE POLISH
+   Reusable phone/tablet header ownership and readable Scenario 1 typography.
+   This file intentionally loads after the production bundle and the VN intro
+   owner so the workbench can be tuned without disturbing VN scenes.
+   ══════════════════════════════════════════════════════ */
+
+/* Shared header safeguards. */
+html body .pc-app-header,
+html body .pc-app-header * {
+  box-sizing: border-box;
+}
+
+html body .pc-app-header .logo-copy {
+  min-width: 0;
+}
+
+html body .pc-app-header .logo-name {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+html body .pc-app-header .logo-sub {
+  color: #d4edd9;
+  font-weight: 700;
+  opacity: 0.92;
+}
+
+html body .pc-app-header .header-status,
+html body .pc-app-header .header-actions,
+html body .pc-app-header .xp-group {
+  min-width: 0;
+}
+
+/* ── Phones: make the brand read as one coherent header instead of three
+   unrelated rows squeezed into the same dark rectangle. ─────────────── */
+@media screen and (max-width: 640px) {
+  html body .pc-app-header {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "brand"
+      "status"
+      "actions" !important;
+    justify-items: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 12px 14px 13px !important;
+  }
+
+  html body .pc-app-header .logo {
+    grid-area: brand !important;
+    width: auto !important;
+    max-width: 100% !important;
+    flex: 0 0 auto !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    margin: 0 auto !important;
+    padding: 0 4px 3px !important;
+    text-align: left !important;
+  }
+
+  html body .pc-app-header .logo-icon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    font-size: 19px !important;
+    border-radius: 9px !important;
+  }
+
+  html body .pc-app-header .logo-name,
+  html body .pc-app-header .logo-name span {
+    font-size: clamp(1.28rem, 5.7vw, 1.5rem) !important;
+    line-height: 1.02 !important;
+    letter-spacing: 0.01em !important;
+  }
+
+  html body .pc-app-header .logo-sub {
+    margin-top: 1px !important;
+    font-size: clamp(0.68rem, 2.8vw, 0.78rem) !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.065em !important;
+  }
+
+  html body .pc-app-header .header-status {
+    grid-area: status !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, auto) minmax(112px, 1fr) !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: min(100%, 330px) !important;
+    margin: 0 auto !important;
+  }
+
+  html body .pc-app-header .level-tag {
+    min-width: 0 !important;
+    padding: 8px 11px !important;
+    font-size: clamp(0.75rem, 3.2vw, 0.88rem) !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  html body .pc-app-header .xp-group {
+    display: grid !important;
+    grid-template-columns: auto minmax(70px, 1fr) !important;
+    align-items: center !important;
+    gap: 7px !important;
+  }
+
+  html body .pc-app-header .xp-label {
+    font-size: 0.76rem !important;
+    line-height: 1 !important;
+    color: #d4edd9 !important;
+    font-weight: 800 !important;
+  }
+
+  html body .pc-app-header .xp-track {
+    width: 100% !important;
+    min-width: 70px !important;
+    height: 10px !important;
+  }
+
+  html body .pc-app-header .header-actions {
+    grid-area: actions !important;
+    display: grid !important;
+    grid-template-columns: auto 44px minmax(0, 1fr) !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: min(100%, 330px) !important;
+    margin: 0 auto !important;
+  }
+
+  html body .pc-app-header :is(.main-menu-toggle, .music-toggle, .ideas-wall-btn) {
+    min-height: 44px !important;
+    margin: 0 !important;
+    font-size: clamp(0.82rem, 3.4vw, 0.94rem) !important;
+    line-height: 1.1 !important;
+  }
+
+  html body .pc-app-header .main-menu-toggle {
+    padding-inline: 16px !important;
+  }
+
+  html body .pc-app-header .music-toggle {
+    width: 44px !important;
+    min-width: 44px !important;
+    padding: 0 !important;
+  }
+
+  html body .pc-app-header .ideas-wall-btn {
+    justify-content: center !important;
+    padding: 8px 12px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Keep the compact navigation readable beneath the rebuilt header. */
+  html body .pc-compact-nav {
+    height: 58px !important;
+    min-height: 58px !important;
+    max-height: 58px !important;
+    padding: 7px 10px !important;
+  }
+
+  html body .pc-compact-nav > .mobile-compact-menu,
+  html body .pc-compact-nav > .mobile-compact-menu > summary.mobile-dropdown-toggle {
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+  }
+
+  html body .pc-compact-nav > .mobile-compact-menu > summary.mobile-dropdown-toggle {
+    font-size: 0.82rem !important;
+  }
+
+  html body .pc-compact-nav .mobile-dropdown-title,
+  html body .pc-compact-nav .mobile-dropdown-eyebrow {
+    font-size: 0.75rem !important;
+  }
+
+  html body .pc-compact-nav .mobile-scenario-current {
+    font-size: 0.7rem !important;
+  }
+}
+
+/* ── Tablets and foldables: give the brand, status, and actions deliberate
+   rows, then increase the entire S1 interface to a readable scale. ───── */
+@media screen and (min-width: 641px) and (max-width: 1100px) {
+  html body .dev-bar {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 7px 8px !important;
+    padding: 9px 14px !important;
+    min-height: 46px !important;
+  }
+
+  html body .dev-bar .dev-label,
+  html body .dev-bar .dev-btn,
+  html body .dev-bar button,
+  html body .dev-bar span {
+    font-size: clamp(0.78rem, 1.35vw, 0.9rem) !important;
+    line-height: 1.15 !important;
+  }
+
+  html body .dev-bar .dev-btn,
+  html body .dev-bar button {
+    min-height: 32px !important;
+    padding: 5px 10px !important;
+  }
+
+  html body .pc-app-header {
+    display: grid !important;
+    grid-template-columns: minmax(220px, 1fr) auto !important;
+    grid-template-areas:
+      "brand status"
+      "actions actions" !important;
+    align-items: center !important;
+    gap: 11px 18px !important;
+    padding: 13px 18px 14px !important;
+  }
+
+  html body .pc-app-header .logo {
+    grid-area: brand !important;
+    width: auto !important;
+    min-width: 0 !important;
+    justify-self: start !important;
+    gap: 10px !important;
+  }
+
+  html body .pc-app-header .logo-icon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    font-size: 19px !important;
+  }
+
+  html body .pc-app-header .logo-name,
+  html body .pc-app-header .logo-name span {
+    font-size: clamp(1.35rem, 2.55vw, 1.62rem) !important;
+    line-height: 1.02 !important;
+  }
+
+  html body .pc-app-header .logo-sub {
+    margin-top: 1px !important;
+    font-size: clamp(0.72rem, 1.25vw, 0.86rem) !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.06em !important;
+  }
+
+  html body .pc-app-header .header-status {
+    grid-area: status !important;
+    justify-self: end !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 11px !important;
+  }
+
+  html body .pc-app-header .level-tag {
+    padding: 8px 12px !important;
+    font-size: clamp(0.82rem, 1.45vw, 0.96rem) !important;
+    line-height: 1.15 !important;
+  }
+
+  html body .pc-app-header .xp-label {
+    font-size: clamp(0.76rem, 1.25vw, 0.88rem) !important;
+    color: #d4edd9 !important;
+    font-weight: 800 !important;
+  }
+
+  html body .pc-app-header .xp-track {
+    width: clamp(78px, 11vw, 112px) !important;
+    height: 10px !important;
+  }
+
+  html body .pc-app-header .header-actions {
+    grid-area: actions !important;
+    justify-self: start !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+  }
+
+  html body .pc-app-header :is(.main-menu-toggle, .music-toggle, .ideas-wall-btn) {
+    min-height: 42px !important;
+    font-size: clamp(0.82rem, 1.35vw, 0.94rem) !important;
+    line-height: 1.1 !important;
+  }
+
+  html body .pc-app-header .main-menu-toggle,
+  html body .pc-app-header .ideas-wall-btn {
+    padding: 8px 14px !important;
+  }
+
+  html body .pc-app-header .music-toggle {
+    width: 42px !important;
+    min-width: 42px !important;
+    padding: 0 !important;
+  }
+
+  html body .scenario-tabs {
+    min-height: 48px !important;
+    padding-inline: 12px !important;
+    gap: 3px !important;
+  }
+
+  html body .scenario-tabs .tab-btn,
+  html body .scenario-tabs button,
+  html body .scenario-tabs a {
+    min-height: 46px !important;
+    padding: 11px 14px !important;
+    font-size: clamp(0.9rem, 1.45vw, 1.04rem) !important;
+    line-height: 1.18 !important;
+    white-space: nowrap !important;
+  }
+
+  /* Scenario 1 workbench typography. */
+  html body.s1-active:not(.s1-result-active) #inputContainer {
+    font-size: 1.08rem !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-stage {
+    padding: 20px 20px 26px !important;
+    gap: 18px !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-mission {
+    padding: 22px 24px !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-mission .mission-eyebrow,
+  html body.s1-active:not(.s1-result-active) .s1-clean-eyebrow {
+    font-size: clamp(0.82rem, 1.35vw, 0.94rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-mission .mission-title {
+    font-size: clamp(1.85rem, 3.25vw, 2.35rem) !important;
+    line-height: 1.12 !important;
+    margin-bottom: 8px !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-mission .mission-copy {
+    font-size: clamp(1.05rem, 1.75vw, 1.22rem) !important;
+    line-height: 1.62 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-card,
+  html body.s1-active:not(.s1-result-active) .s1-clean-builder {
+    padding: 20px 22px !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-title,
+  html body.s1-active:not(.s1-result-active) .s1-clean-builder-title {
+    font-size: clamp(1.3rem, 2.15vw, 1.58rem) !important;
+    line-height: 1.22 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-prompt {
+    padding: 16px 18px !important;
+    font-size: clamp(1.04rem, 1.7vw, 1.18rem) !important;
+    line-height: 1.72 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-observed div {
+    padding: 11px 13px !important;
+    font-size: clamp(0.98rem, 1.55vw, 1.1rem) !important;
+    line-height: 1.5 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-ingredients {
+    padding: 13px 14px !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-ingredients .ingredient-heading,
+  html body.s1-active:not(.s1-result-active) .ingredient-heading {
+    font-size: clamp(0.82rem, 1.35vw, 0.94rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-ingredients .ingredient-chip,
+  html body.s1-active:not(.s1-result-active) .ingredient-chip {
+    padding: 7px 11px !important;
+    font-size: clamp(0.88rem, 1.4vw, 1rem) !important;
+    line-height: 1.25 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-builder-sub,
+  html body.s1-active:not(.s1-result-active) .s1-clean-nudge {
+    font-size: clamp(0.98rem, 1.55vw, 1.1rem) !important;
+    line-height: 1.55 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-label {
+    font-size: clamp(1rem, 1.55vw, 1.12rem) !important;
+    line-height: 1.35 !important;
+    margin-bottom: 7px !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-num {
+    width: 31px !important;
+    height: 31px !important;
+    font-size: 0.88rem !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-textarea,
+  html body.s1-active:not(.s1-result-active) textarea.s1-clean-textarea,
+  html body.s1-active:not(.s1-result-active) #g-learners,
+  html body.s1-active:not(.s1-result-active) #g-issue,
+  html body.s1-active:not(.s1-result-active) #g-interaction,
+  html body.s1-active:not(.s1-result-active) #g-constraints {
+    min-height: 108px !important;
+    padding: 13px 14px !important;
+    font-size: clamp(1rem, 1.55vw, 1.12rem) !important;
+    line-height: 1.55 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-textarea::placeholder,
+  html body.s1-active:not(.s1-result-active) textarea.s1-clean-textarea::placeholder {
+    font-size: clamp(0.96rem, 1.45vw, 1.06rem) !important;
+    line-height: 1.5 !important;
+  }
+
+  html body.s1-active:not(.s1-result-active) .s1-clean-submit {
+    min-height: 58px !important;
+    padding: 14px 20px !important;
+    font-size: clamp(1.04rem, 1.6vw, 1.16rem) !important;
+  }
+}
+
+/* Narrow tablets and foldables need one clean column in the header so the
+   status badge never crushes the PromptCraft wordmark. */
+@media screen and (min-width: 641px) and (max-width: 899px) {
+  html body .pc-app-header {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "brand"
+      "status"
+      "actions" !important;
+    justify-items: start !important;
+    gap: 10px !important;
+  }
+
+  html body .pc-app-header .logo,
+  html body .pc-app-header .header-status,
+  html body .pc-app-header .header-actions {
+    justify-self: start !important;
+  }
+
+  html body .pc-app-header .header-status {
+    flex-wrap: wrap !important;
+  }
+}

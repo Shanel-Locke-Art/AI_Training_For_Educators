@@ -229,3 +229,341 @@ html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverl
 html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-dialogue {
   padding-bottom: calc(var(--pc-vn-dialogue-pad-block) + 28px) !important;
 }
+
+/* ══════════════════════════════════════════════════════
+   V281 — FINAL LEVEL 1 INTRO TUNING
+   Increases mission leading everywhere and refines the remaining outlier
+   families without creating device-name-specific rules.
+   ══════════════════════════════════════════════════════ */
+
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text *,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text * {
+  line-height: 1.38 !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-board-text::before {
+  margin-bottom: 11px !important;
+  line-height: 1.25 !important;
+}
+
+body[data-pc-viewport-family="desktop"] {
+  --pc-vn-board-wrap-width: min(48vw, 860px);
+  --pc-vn-board-wrap-top: clamp(64px, 6.5vh, 84px);
+  --pc-vn-board-box-top: clamp(70px, 11%, 104px);
+  --pc-vn-board-box-inline: 10%;
+  --pc-vn-board-body-size: clamp(1.22rem, 1.4vw, 1.65rem);
+  --pc-vn-board-meta-size: clamp(0.64rem, 0.72vw, 0.8rem);
+  --pc-vn-board-line: 1.38;
+
+  --pc-vn-character-right: clamp(28px, 3vw, 82px);
+  --pc-vn-character-bottom: 8px;
+  --pc-vn-character-height: clamp(400px, 45vh, 600px);
+  --pc-vn-character-max-width: 26vw;
+}
+
+body[data-pc-viewport-family="compact-desktop"] {
+  --pc-vn-board-wrap-width: min(58vw, 680px);
+  --pc-vn-board-wrap-top: clamp(74px, 7.5vh, 94px);
+  --pc-vn-board-box-top: clamp(38px, 6.5%, 54px);
+  --pc-vn-board-box-inline: 9%;
+  --pc-vn-board-body-size: clamp(1rem, 1.16vw, 1.18rem);
+  --pc-vn-board-meta-size: clamp(0.54rem, 0.68vw, 0.64rem);
+  --pc-vn-board-line: 1.38;
+
+  --pc-vn-dialogue-min-height: 205px;
+  --pc-vn-dialogue-speaker-size: clamp(23px, 1.8vw, 28px);
+  --pc-vn-dialogue-copy-size: clamp(18px, 1.4vw, 21px);
+
+  --pc-vn-character-left: auto;
+  --pc-vn-character-right: clamp(14px, 2vw, 34px);
+  --pc-vn-character-bottom: 188px;
+  --pc-vn-character-height: clamp(320px, 39vh, 410px);
+  --pc-vn-character-max-width: 29vw;
+  --pc-vn-character-transform: none;
+  --pc-vn-character-origin: right bottom;
+  --pc-vn-character-justify: flex-end;
+}
+
+body[data-pc-viewport-family="portrait-tablet"] {
+  --pc-vn-board-wrap-width: min(68vw, 680px);
+  --pc-vn-board-wrap-top: clamp(94px, 8vh, 114px);
+  --pc-vn-board-box-top: clamp(34px, 6%, 50px);
+  --pc-vn-board-box-inline: 8%;
+  --pc-vn-board-body-size: clamp(1.08rem, 1.5vw, 1.32rem);
+  --pc-vn-board-meta-size: clamp(0.6rem, 0.82vw, 0.74rem);
+  --pc-vn-board-line: 1.38;
+
+  --pc-vn-dialogue-min-height: clamp(250px, 23vh, 305px);
+  --pc-vn-dialogue-speaker-size: clamp(30px, 3.2vw, 38px);
+  --pc-vn-dialogue-copy-size: clamp(23px, 2.5vw, 29px);
+  --pc-vn-dialogue-hint-size: clamp(19px, 1.9vw, 22px);
+
+  --pc-vn-character-bottom: clamp(238px, 22dvh, 292px);
+  --pc-vn-character-height: clamp(360px, 43vw, 490px);
+  --pc-vn-character-max-width: 55vw;
+}
+
+body[data-pc-viewport-family="short-landscape"] {
+  --pc-vn-board-wrap-width: min(54vw, 560px);
+  --pc-vn-board-wrap-top: 68px;
+  --pc-vn-board-box-top: clamp(32px, 5.5%, 44px);
+  --pc-vn-board-box-inline: 8.5%;
+  --pc-vn-board-body-size: clamp(0.94rem, 1vw, 1.08rem);
+  --pc-vn-board-meta-size: clamp(0.48rem, 0.7vw, 0.58rem);
+  --pc-vn-board-line: 1.38;
+
+  --pc-vn-dialogue-min-height: 188px;
+  --pc-vn-dialogue-speaker-size: clamp(22px, 1.7vw, 26px);
+  --pc-vn-dialogue-copy-size: clamp(18px, 1.35vw, 21px);
+
+  --pc-vn-character-left: auto;
+  --pc-vn-character-right: clamp(12px, 2vw, 28px);
+  --pc-vn-character-bottom: 180px;
+  --pc-vn-character-height: clamp(245px, 43vh, 300px);
+  --pc-vn-character-max-width: 23vw;
+  --pc-vn-character-transform: none;
+  --pc-vn-character-origin: right bottom;
+  --pc-vn-character-justify: flex-end;
+}
+
+body[data-pc-viewport-family="standard-phone"] {
+  --pc-vn-board-wrap-width: calc(100vw - 18px);
+  --pc-vn-board-wrap-top: 74px;
+  --pc-vn-board-box-top: 16px;
+  --pc-vn-board-box-inline: 6%;
+  --pc-vn-board-pad-block: 9px;
+  --pc-vn-board-pad-inline: 11px;
+  --pc-vn-board-body-size: clamp(0.96rem, 4.1vw, 1.08rem);
+  --pc-vn-board-meta-size: clamp(0.54rem, 2.05vw, 0.64rem);
+  --pc-vn-board-line: 1.36;
+
+  --pc-vn-dialogue-min-height: 258px;
+  --pc-vn-dialogue-speaker-size: clamp(21px, 5.2vw, 24px);
+  --pc-vn-dialogue-copy-size: clamp(17px, 4.45vw, 20px);
+
+  --pc-vn-character-bottom: clamp(210px, 24dvh, 250px);
+  --pc-vn-character-height: clamp(250px, min(34dvh, 61vw), 315px);
+  --pc-vn-character-max-width: 72vw;
+}
+
+body[data-pc-viewport-family="compact-phone"] {
+  --pc-vn-board-wrap-width: calc(100vw - 14px);
+  --pc-vn-board-wrap-top: 72px;
+  --pc-vn-board-box-top: 14px;
+  --pc-vn-board-box-inline: 6%;
+  --pc-vn-board-pad-block: 8px;
+  --pc-vn-board-pad-inline: 10px;
+  --pc-vn-board-body-size: clamp(0.92rem, 3.95vw, 1rem);
+  --pc-vn-board-meta-size: clamp(0.5rem, 1.95vw, 0.58rem);
+  --pc-vn-board-line: 1.35;
+
+  --pc-vn-dialogue-min-height: 242px;
+  --pc-vn-dialogue-speaker-size: clamp(19px, 5vw, 22px);
+  --pc-vn-dialogue-copy-size: clamp(16px, 4.2vw, 18.5px);
+
+  --pc-vn-character-bottom: clamp(170px, 23dvh, 215px);
+  --pc-vn-character-height: clamp(220px, min(34dvh, 62vw), 275px);
+  --pc-vn-character-max-width: 74vw;
+}
+/* ══════════════════════════════════════════════════════
+   V282 — LEVEL 1 INTRO FINAL RESPONSIVE CORRECTIONS
+   Uses the existing viewport families. No device-name-specific selectors.
+   ══════════════════════════════════════════════════════ */
+
+/* Normalize the actual smartboard element so older scale/offset rules cannot
+   make a centered wrapper appear oversized or shifted. */
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap {
+  left: 50% !important;
+  right: auto !important;
+  margin: 0 !important;
+  transform: translateX(-50%) !important;
+  transform-origin: top center !important;
+  box-sizing: border-box !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  transform-origin: center center !important;
+  aspect-ratio: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Full desktop: smaller centered board and a substantially more visible Pixel. */
+body[data-pc-viewport-family="desktop"] {
+  --pc-vn-board-wrap-width: min(46vw, 820px);
+  --pc-vn-board-wrap-top: clamp(62px, 6vh, 82px);
+  --pc-vn-board-box-top: clamp(64px, 10%, 92px);
+  --pc-vn-board-box-inline: 10%;
+  --pc-vn-board-body-size: clamp(1.18rem, 1.28vw, 1.52rem);
+
+  --pc-vn-character-right: clamp(24px, 3.2vw, 72px);
+  --pc-vn-character-bottom: clamp(130px, 16vh, 180px);
+  --pc-vn-character-height: clamp(440px, 52vh, 650px);
+  --pc-vn-character-max-width: 29vw;
+}
+
+/* Portrait tablets and foldable portrait screens: center the board and make
+   the dialogue use the empty panel space instead of rendering as fine print. */
+body[data-pc-viewport-family="portrait-tablet"] {
+  --pc-vn-board-wrap-width: min(66vw, 660px);
+  --pc-vn-board-wrap-top: clamp(96px, 8.2vh, 118px);
+  --pc-vn-board-box-inline: 8%;
+  --pc-vn-board-body-size: clamp(1.06rem, 1.46vw, 1.28rem);
+
+  --pc-vn-dialogue-min-height: clamp(270px, 24vh, 330px);
+  --pc-vn-dialogue-speaker-size: clamp(36px, 3.7vw, 44px);
+  --pc-vn-dialogue-copy-size: clamp(28px, 2.9vw, 34px);
+  --pc-vn-dialogue-hint-size: clamp(20px, 2vw, 24px);
+}
+
+html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) #vnSpeaker,
+html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-speaker {
+  font-size: var(--pc-vn-dialogue-speaker-size) !important;
+  line-height: 1.22 !important;
+  margin-bottom: 14px !important;
+}
+
+html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) #vnText,
+html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-text {
+  font-size: var(--pc-vn-dialogue-copy-size) !important;
+  line-height: 1.55 !important;
+  max-width: 100% !important;
+}
+
+/* Short landscape devices such as Nest Hub: smaller centered board. */
+body[data-pc-viewport-family="short-landscape"] {
+  --pc-vn-board-wrap-width: min(50vw, 520px);
+  --pc-vn-board-wrap-top: 70px;
+  --pc-vn-board-box-inline: 8.5%;
+  --pc-vn-board-body-size: clamp(0.94rem, 0.98vw, 1.06rem);
+}
+
+/* Compact desktop, including 1280 × 800: reduce the board and hold center. */
+body[data-pc-viewport-family="compact-desktop"] {
+  --pc-vn-board-wrap-width: min(52vw, 660px);
+  --pc-vn-board-wrap-top: clamp(74px, 7.4vh, 92px);
+  --pc-vn-board-box-inline: 9%;
+}
+
+/* Phones and narrow foldables: anchor the card above the lower monitor frame.
+   Widening it slightly reduces unnecessary wrapping while retaining the
+   improved line spacing from V281. */
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  top: auto !important;
+  bottom: 22% !important;
+  left: 4.5% !important;
+  right: 4.5% !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+body[data-pc-viewport-family="standard-phone"] {
+  --pc-vn-board-box-inline: 4.5%;
+  --pc-vn-board-body-size: clamp(0.94rem, 4vw, 1.06rem);
+}
+
+body[data-pc-viewport-family="compact-phone"] {
+  --pc-vn-board-box-inline: 4.5%;
+  --pc-vn-board-body-size: clamp(0.9rem, 3.9vw, 0.98rem);
+}
+
+/* ══════════════════════════════════════════════════════
+   V283 — LEVEL 1 INTRO BALANCE PASS
+   Balances the mission card vertically on narrow screens and separates the
+   portrait-tablet typography into small-tablet and large-tablet ranges.
+   ══════════════════════════════════════════════════════ */
+
+/* Phones and narrow foldables: center the mission card inside the usable
+   smartboard area. This restores visible space above and below the card and
+   prevents the eyebrow label from being clipped by the upper frame. */
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translateY(-50%) !important;
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
+  max-height: calc(100% - 34px) !important;
+  overflow: visible !important;
+}
+
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-board-text::before,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-board-text::before {
+  margin-bottom: 7px !important;
+}
+
+body[data-pc-viewport-family="standard-phone"] {
+  --pc-vn-board-line: 1.32;
+}
+
+body[data-pc-viewport-family="compact-phone"] {
+  --pc-vn-board-line: 1.3;
+}
+
+/* iPad Mini and iPad Air-sized portrait tablets: modestly increase the board
+   text while stepping the dialogue back from the oversized V282 settings. */
+@media screen and (min-width: 701px) and (max-width: 849px) and (orientation: portrait) {
+  body[data-pc-viewport-family="portrait-tablet"] {
+    --pc-vn-board-body-size: clamp(1.12rem, 1.72vw, 1.3rem);
+    --pc-vn-board-meta-size: clamp(0.64rem, 0.9vw, 0.76rem);
+    --pc-vn-board-line: 1.36;
+
+    --pc-vn-dialogue-speaker-size: clamp(29px, 3.45vw, 35px);
+    --pc-vn-dialogue-copy-size: clamp(22px, 2.65vw, 27px);
+    --pc-vn-dialogue-hint-size: clamp(18px, 1.9vw, 21px);
+  }
+}
+
+/* Larger portrait tablets and foldables: the smartboard has room for more
+   readable mission typography without enlarging the board itself. */
+@media screen and (min-width: 850px) and (max-width: 1100px) and (orientation: portrait) {
+  body[data-pc-viewport-family="portrait-tablet"] {
+    --pc-vn-board-body-size: clamp(1.22rem, 1.7vw, 1.48rem);
+    --pc-vn-board-meta-size: clamp(0.7rem, 0.92vw, 0.82rem);
+    --pc-vn-board-line: 1.36;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   V284 — FINAL MICRO-TUNING
+   - Give compact-phone foldables more air above and below the mission card.
+   - Boost smartboard readability on iPad Air-sized portrait tablets.
+   ══════════════════════════════════════════════════════ */
+
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  top: 52% !important;
+  padding-top: 11px !important;
+  padding-bottom: 10px !important;
+  max-height: calc(100% - 42px) !important;
+}
+
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-board-text::before {
+  margin-bottom: 8px !important;
+}
+
+@media screen and (min-width: 800px) and (max-width: 849px) and (orientation: portrait) {
+  body[data-pc-viewport-family="portrait-tablet"] {
+    --pc-vn-board-body-size: clamp(1.2rem, 1.95vw, 1.42rem);
+    --pc-vn-board-meta-size: clamp(0.68rem, 0.96vw, 0.78rem);
+    --pc-vn-board-line: 1.38;
+  }
+}
+
