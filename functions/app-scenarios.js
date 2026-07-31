@@ -1043,7 +1043,24 @@ function setClaudeTerminalState(state = 'idle', title = 'CLAUDE TERMINAL', outpu
   if (titleEl) titleEl.textContent = title;
   if (outputEl) {
     outputEl.classList.remove('claude-analysis-layout', 'pc-analyzing-output');
-    outputEl.innerHTML = `${output}<span class="claude-terminal-cursor"></span>`;
+    const outputText = String(output ?? '');
+    if (!outputText.includes('\n') && !outputText.includes('<')) {
+      const statusLine = document.createElement('span');
+      statusLine.className = 'claude-terminal-status-line';
+
+      const statusText = document.createElement('span');
+      statusText.className = 'claude-terminal-status-text';
+      statusText.textContent = outputText;
+
+      const cursor = document.createElement('span');
+      cursor.className = 'claude-terminal-cursor';
+      cursor.setAttribute('aria-hidden', 'true');
+
+      statusLine.append(statusText, cursor);
+      outputEl.replaceChildren(statusLine);
+    } else {
+      outputEl.innerHTML = `${output}<span class="claude-terminal-cursor" aria-hidden="true"></span>`;
+    }
   }
 }
 

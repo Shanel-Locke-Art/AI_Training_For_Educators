@@ -1152,10 +1152,14 @@ function pcClearPredictionPresentationV191(){
   ]);
   pcRemoveInlineStyles(vnText, ['grid-column', 'grid-row', 'align-self']);
   pcRemoveInlineStyles(feedbackCopy, [
-    'padding-left', 'padding-right', 'box-sizing', 'font-size', 'line-height'
+    'display', 'width', 'min-width', 'max-width',
+    'margin-left', 'margin-right', 'padding-left', 'padding-right',
+    'box-sizing', 'align-self', 'font-size', 'line-height'
   ]);
   pcRemoveInlineStyles(feedbackMessage, [
-    'padding-left', 'padding-right', 'box-sizing', 'font-size', 'line-height'
+    'display', 'width', 'min-width', 'max-width',
+    'margin-left', 'margin-right', 'padding-left', 'padding-right',
+    'box-sizing', 'align-self', 'font-size', 'line-height'
   ]);
   pcRemoveInlineStyles(feedbackHeading, [
     'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
@@ -1215,11 +1219,21 @@ function pcFitPredictionDialogueV191(viewportWidth){
   pcRemoveInlineStyles(dialogue, ['height', 'min-height', 'max-height']);
 
   const dialogueStyles = window.getComputedStyle(dialogue);
-  // v231: Phone prediction panels should be measured from their real content,
-  // not from the legacy 35vh minimum that created a hollow black reservation.
+  const viewportHeight = pcPredictionViewportHeightV191();
+  const isLargePortraitPrediction = Boolean(
+    viewportWidth >= 861 &&
+    viewportWidth <= 1100 &&
+    viewportHeight >= 1100
+  );
+  // Phone prediction panels are measured from their real content. Large
+  // portrait tablets need a taller baseline so the enlarged copy and answer
+  // buttons remain comfortable instead of being compressed into a phone-sized
+  // dialogue band.
   const baselineHeight = viewportWidth <= 700
     ? 250
-    : 270;
+    : isLargePortraitPrediction
+      ? 330
+      : 270;
   const paddingTop = Number.parseFloat(dialogueStyles.paddingTop) || 0;
   const paddingBottom = Number.parseFloat(dialogueStyles.paddingBottom) || 0;
   const requiredHeight = Math.ceil(
@@ -1231,7 +1245,6 @@ function pcFitPredictionDialogueV191(viewportWidth){
     2
   );
 
-  const viewportHeight = pcPredictionViewportHeightV191();
   const extraDesktopResultBottomSpace =
     overlay?.classList.contains('pc-prediction-result') && viewportWidth > 1510 ? 40 : 0;
   const compactMobileHeightRatio = viewportWidth <= 340 ? 0.62 : 0.50;
@@ -1281,9 +1294,19 @@ function pcApplyPredictionPresentationV191(){
   const viewportHeight = pcPredictionViewportHeightV191();
   const isPhonePrediction = viewportWidth <= 700;
   const isCompactPrediction = viewportWidth > 700 && viewportWidth <= 1510;
+  const isMediumPortraitPrediction = Boolean(
+    viewportWidth >= 768 &&
+    viewportWidth <= 860 &&
+    viewportHeight >= 900
+  );
+  const isLargePortraitPrediction = Boolean(
+    viewportWidth >= 861 &&
+    viewportWidth <= 1100 &&
+    viewportHeight >= 1100
+  );
 
   // v260: Prediction has only two visual modes. Phones use the simplified
-  // green terminal background; every wider viewport reuses the same approved
+  // transparent status stage; every wider viewport reuses the same approved
   // photographed workstation geometry. This removes the old iPad-only frame
   // that jumped at 1180px and left the CRT overlay behind while resizing.
   if (isPhonePrediction) {
@@ -1297,8 +1320,8 @@ function pcApplyPredictionPresentationV191(){
     );
     if (isCompactPrediction) {
       pcSetImportantStyles(terminal, [
-        ['top', '28.5%'],
-        ['width', 'min(72vw, 920px)']
+        ['top', isLargePortraitPrediction ? '31.5%' : isMediumPortraitPrediction ? '29.5%' : '28.5%'],
+        ['width', isLargePortraitPrediction ? 'min(84vw, 930px)' : isMediumPortraitPrediction ? 'min(92vw, 840px)' : 'min(72vw, 920px)']
       ]);
     }
   }
@@ -1309,7 +1332,7 @@ function pcApplyPredictionPresentationV191(){
     // v243: Use one fixed mobile position for both the question and logged-result
     // beats. Recalculating against a changed containing block made the same
     // AWAITING PREDICTION label jump upward after a choice was recorded.
-    const mobileStatusTop = '29%';
+    const mobileStatusTop = 'clamp(190px, 27dvh, 245px)';
 
     pcSetImportantStyles(output, [
       ['position', 'absolute'],
@@ -1336,7 +1359,7 @@ function pcApplyPredictionPresentationV191(){
       'margin', 'padding', 'transform'
     ]);
     pcSetImportantStyles(output, [
-      ['font-size', '14px'],
+      ['font-size', isLargePortraitPrediction ? '16px' : '14px'],
       ['font-weight', '900'],
       ['line-height', '1.08'],
       ['letter-spacing', '.02em'],
@@ -1364,7 +1387,6 @@ function pcApplyPredictionPresentationV191(){
     ]);
   }
 
-
   // v201: Use the approved intro-scene alignment and typography on iPad.
   // Phones keep their existing scale, while desktop remains untouched.
   if (speaker) {
@@ -1380,9 +1402,9 @@ function pcApplyPredictionPresentationV191(){
       ]);
     } else {
       pcSetImportantStyles(speaker, [
-        ['font-size', '22px'],
-        ['line-height', '1.18'],
-        ['margin-bottom', '10px']
+        ['font-size', isLargePortraitPrediction ? '28px' : '22px'],
+        ['line-height', isLargePortraitPrediction ? '1.12' : '1.18'],
+        ['margin-bottom', isLargePortraitPrediction ? '12px' : '10px']
       ]);
     }
   }
@@ -1393,10 +1415,11 @@ function pcApplyPredictionPresentationV191(){
     pcRemoveInlineStyles(speaker, ['flex-shrink']);
   }
 
-  // v197: Align the white copy on both the prediction question and the
-  // logged-prediction feedback screen. The result message has its own wrapper
-  // so the Continue to Claude button keeps its approved position.
-  const feedbackTextTarget = feedbackMessage || feedbackCopy;
+  // v317: Treat the feedback copy and its nested message as one responsive
+  // reading region. Styling only the nested message left the outer wrapper at
+  // its legacy 50vw cap, which forced early line breaks and an oversized phone
+  // dialogue panel after a prediction was logged.
+  const feedbackTextTargets = [feedbackCopy, feedbackMessage].filter(Boolean);
   if (viewportWidth <= 1510) {
     const compactTextStyles = [
       ['flex-shrink', '0'],
@@ -1406,8 +1429,8 @@ function pcApplyPredictionPresentationV191(){
       ['width', '100%'],
       ['max-width', 'none'],
       ['box-sizing', 'border-box'],
-      ['font-size', isPhonePrediction ? '1rem' : '18px'],
-      ['line-height', isPhonePrediction ? '1.45' : '1.5']
+      ['font-size', isPhonePrediction ? '1rem' : isLargePortraitPrediction ? '22px' : '18px'],
+      ['line-height', isPhonePrediction ? '1.45' : isLargePortraitPrediction ? '1.44' : '1.5']
     );
     pcSetImportantStyles(vnText, compactTextStyles);
   } else {
@@ -1416,17 +1439,23 @@ function pcApplyPredictionPresentationV191(){
     ]);
   }
 
-  if (feedbackTextTarget && viewportWidth <= 700) {
-    pcSetImportantStyles(feedbackTextTarget, [
-      // v231: Match the question copy to Professor Pixel's left edge.
+  if (feedbackTextTargets.length && viewportWidth <= 700) {
+    feedbackTextTargets.forEach((feedbackTextTarget) => pcSetImportantStyles(feedbackTextTarget, [
+      // Match the question copy to Professor Pixel's left edge and use the
+      // dialogue's full available width before measuring its height.
+      ['display', 'block'],
+      ['width', '100%'],
+      ['min-width', '0'],
+      ['max-width', 'none'],
+      ['margin-left', '0'],
+      ['margin-right', '0'],
       ['padding-left', '0'],
       ['padding-right', '0'],
       ['box-sizing', 'border-box'],
-      ['width', '100%'],
-      ['max-width', 'none'],
+      ['align-self', 'stretch'],
       ['font-size', '1rem'],
       ['line-height', '1.45']
-    ]);
+    ]));
     if (feedbackHeading) {
       pcSetImportantStyles(feedbackHeading, [
         ['margin-top', '0'],
@@ -1436,24 +1465,31 @@ function pcApplyPredictionPresentationV191(){
         ['line-height', '1.18']
       ]);
     }
-  } else if (feedbackTextTarget && isCompactPrediction) {
-    pcSetImportantStyles(feedbackTextTarget, [
+  } else if (feedbackTextTargets.length && isCompactPrediction) {
+    feedbackTextTargets.forEach((feedbackTextTarget) => pcSetImportantStyles(feedbackTextTarget, [
+      ['display', 'block'],
+      ['width', '100%'],
+      ['min-width', '0'],
+      ['max-width', 'none'],
+      ['margin-left', '0'],
+      ['margin-right', '0'],
       ['padding-left', '0'],
       ['padding-right', '0'],
       ['box-sizing', 'border-box'],
-      ['width', '100%'],
-      ['max-width', 'none'],
-      ['font-size', '18px'],
-      ['line-height', '1.5']
-    ]);
+      ['align-self', 'stretch'],
+      ['font-size', isLargePortraitPrediction ? '22px' : '18px'],
+      ['line-height', isLargePortraitPrediction ? '1.44' : '1.5']
+    ]));
   } else {
     pcRemoveInlineStyles(feedbackCopy, [
-      'padding-left', 'padding-right', 'box-sizing', 'width', 'max-width',
-      'font-size', 'line-height'
+      'display', 'width', 'min-width', 'max-width',
+      'margin-left', 'margin-right', 'padding-left', 'padding-right',
+      'box-sizing', 'align-self', 'font-size', 'line-height'
     ]);
     pcRemoveInlineStyles(feedbackMessage, [
-      'padding-left', 'padding-right', 'box-sizing', 'width', 'max-width',
-      'font-size', 'line-height'
+      'display', 'width', 'min-width', 'max-width',
+      'margin-left', 'margin-right', 'padding-left', 'padding-right',
+      'box-sizing', 'align-self', 'font-size', 'line-height'
     ]);
     pcRemoveInlineStyles(feedbackHeading, [
       'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
@@ -1463,22 +1499,22 @@ function pcApplyPredictionPresentationV191(){
 
   if (isCompactPrediction) {
     choiceButtons.forEach((button) => pcSetImportantStyles(button, [
-      ['font-size', '16px'],
+      ['font-size', isLargePortraitPrediction ? '18px' : '16px'],
       ['line-height', '1.22'],
-      ['padding-top', '12px'],
-      ['padding-right', '18px'],
-      ['padding-bottom', '12px'],
-      ['padding-left', '18px'],
-      ['min-height', '50px']
+      ['padding-top', isLargePortraitPrediction ? '14px' : '12px'],
+      ['padding-right', isLargePortraitPrediction ? '20px' : '18px'],
+      ['padding-bottom', isLargePortraitPrediction ? '14px' : '12px'],
+      ['padding-left', isLargePortraitPrediction ? '20px' : '18px'],
+      ['min-height', isLargePortraitPrediction ? '56px' : '50px']
     ]));
     pcSetImportantStyles(continueButton, [
-      ['font-size', '16px'],
+      ['font-size', isLargePortraitPrediction ? '18px' : '16px'],
       ['line-height', '1.2'],
-      ['padding-top', '12px'],
-      ['padding-right', '20px'],
-      ['padding-bottom', '12px'],
-      ['padding-left', '20px'],
-      ['min-height', '50px']
+      ['padding-top', isLargePortraitPrediction ? '14px' : '12px'],
+      ['padding-right', isLargePortraitPrediction ? '22px' : '20px'],
+      ['padding-bottom', isLargePortraitPrediction ? '14px' : '12px'],
+      ['padding-left', isLargePortraitPrediction ? '22px' : '20px'],
+      ['min-height', isLargePortraitPrediction ? '56px' : '50px']
     ]);
   } else if (viewportWidth <= 700) {
     choiceButtons.forEach((button) => pcSetImportantStyles(button, [
@@ -1548,10 +1584,10 @@ function pcApplyPredictionPresentationV191(){
   // Pixel's PNG contains transparent space on its left edge. Move the actual
   // portrait left without dragging the dialogue copy toward the brackets.
   if (character) {
-    const characterLeft = viewportWidth <= 480
+    const characterLeft = viewportWidth <= 700
       ? '0px'
-      : viewportWidth <= 700
-        ? '-8px'
+      : isLargePortraitPrediction
+        ? 'clamp(34px, 4.2vw, 52px)'
         : viewportWidth <= 1510
           ? 'clamp(12px, 3vw, 42px)'
           : 'clamp(28px, 3.5vw, 70px)';
@@ -1566,8 +1602,8 @@ function pcApplyPredictionPresentationV191(){
     // widths and pushed the workstation off its expected center.
     if (isCompactPrediction) {
       pcSetImportantStyles(character, [
-        ['height', 'clamp(280px, 34vh, 350px)'],
-        ['max-height', '350px']
+        ['height', isLargePortraitPrediction ? 'clamp(370px, 31vh, 430px)' : 'clamp(280px, 34vh, 350px)'],
+        ['max-height', isLargePortraitPrediction ? '430px' : '350px']
       ]);
     } else {
       pcRemoveInlineStyles(character, ['height', 'max-height']);
@@ -1608,10 +1644,10 @@ function pcApplyPredictionPresentationV191(){
       ['flex-direction', 'column'],
       ['justify-content', 'flex-start'],
       ['align-items', 'stretch'],
-      ['padding-top', viewportWidth <= 700 ? '18px' : '24px'],
-      ['padding-right', viewportWidth <= 700 ? '22px' : 'clamp(36px, 5vw, 64px)'],
-      ['padding-bottom', viewportWidth <= 700 ? '16px' : '24px'],
-      ['padding-left', viewportWidth <= 700 ? '22px' : 'clamp(36px, 5vw, 64px)'],
+      ['padding-top', viewportWidth <= 700 ? '18px' : isLargePortraitPrediction ? '28px' : '24px'],
+      ['padding-right', viewportWidth <= 700 ? '22px' : isLargePortraitPrediction ? 'clamp(46px, 6vw, 72px)' : 'clamp(36px, 5vw, 64px)'],
+      ['padding-bottom', viewportWidth <= 700 ? '16px' : isLargePortraitPrediction ? '28px' : '24px'],
+      ['padding-left', viewportWidth <= 700 ? '22px' : isLargePortraitPrediction ? 'clamp(46px, 6vw, 72px)' : 'clamp(36px, 5vw, 64px)'],
       ['box-sizing', 'border-box'],
       ['overflow', 'visible']
     );
@@ -1629,8 +1665,14 @@ function pcApplyPredictionPresentationV191(){
     if (viewportWidth <= 1510) {
       const panelWidth = viewportWidth <= 700
         ? '100%'
-        : 'min(760px, calc(100% - 48px))';
-      const panelMaxWidth = viewportWidth <= 700 ? 'none' : '760px';
+        : isLargePortraitPrediction
+          ? 'min(820px, calc(100% - 64px))'
+          : 'min(760px, calc(100% - 48px))';
+      const panelMaxWidth = viewportWidth <= 700
+        ? 'none'
+        : isLargePortraitPrediction
+          ? '820px'
+          : '760px';
       const panelGap = viewportWidth <= 480
         ? '14px'
         : viewportWidth <= 700
@@ -1660,7 +1702,7 @@ function pcApplyPredictionPresentationV191(){
         ['display', 'grid'],
         ['grid-template-columns', viewportWidth <= 340 ? '1fr' : 'repeat(2, minmax(0, 1fr))'],
         ['grid-auto-rows', viewportWidth <= 700 ? 'minmax(46px, auto)' : 'auto'],
-        ['gap', viewportWidth <= 700 ? '10px' : '12px'],
+        ['gap', viewportWidth <= 700 ? '10px' : isLargePortraitPrediction ? '14px' : '12px'],
         ['height', 'auto'],
         ['min-height', '0'],
         ['flex-shrink', '0'],
@@ -1896,6 +1938,15 @@ function pcShowPredictionGate(text){
   if (overlay) {
     overlay.classList.remove('claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output','pc-prediction-result');
     overlay.classList.add('active','claude-prediction','pc-clean-prediction','pc-prediction-question');
+  }
+
+  const sceneBackground = document.getElementById('vnSceneBg');
+  if (sceneBackground) {
+    pcSetImageSource(
+      sceneBackground,
+      ASSETS.images.backgrounds.classroom,
+      LEGACY_ASSETS.images.backgrounds.classroom
+    );
   }
 
   const dialogue = document.getElementById('vnDialogue');
