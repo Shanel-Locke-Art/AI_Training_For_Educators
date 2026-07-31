@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════
-   V288 — prediction scene alignment + visibility refinements
+   PREDICTION SCENE RESPONSIVE LAYOUT
    Fixes:
    - Keep the full computer visible on portrait tablets / foldables.
    - Re-center the Awaiting Prediction monitor content on phones.
@@ -272,7 +272,7 @@ body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-predic
 
 
 /* VN overlay PromptCraft dropdown: use the shared component styling from
-   117-brand-action-menu.css and only define scene-specific placement here. */
+   117-brand-menu.css and only define scene-specific placement here. */
 body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-brand-menu {
   position: absolute !important;
   top: clamp(12px, 2.2dvh, 18px) !important;
@@ -712,73 +712,70 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
 }
 
 
-/* V303 — medium portrait prediction scene cleanup
-   Goals:
-   - restore the classroom background instead of the green terminal wash
-   - enlarge the photographed computer on 768–860px portrait tablets/foldables
-   - move the AWAITING PREDICTION readout higher inside the monitor */
-@media screen and (min-width: 768px) and (max-width: 860px) {
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-bg,
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnSceneBg {
-    opacity: 1 !important;
-    visibility: visible !important;
-    display: block !important;
+/* V302 — make the black dialogue panel sit above Pixel and the computer
+   on short-landscape / smart-display style prediction scenes (Nest Hub / Max).
+   This lets the dialogue mask the lower portions cleanly instead of allowing
+   the portrait and workstation to overlap the text area. */
+body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-dialogue,
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-dialogue {
+  position: absolute !important;
+  z-index: 120 !important;
+}
+
+body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
+body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene,
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene {
+  z-index: 24 !important;
+}
+
+body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnCharacter,
+body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-character,
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnCharacter,
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-character {
+  z-index: 36 !important;
+}
+
+
+/* V304 — force the black dialogue panel to sit in front of every prediction-scene
+   element on short landscape / smart display layouts (Nest Hub / Nest Hub Max and
+   similar). This intentionally overpowers character and computer layering. */
+@media screen and (max-height: 820px) and (min-width: 900px) {
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) {
+    isolation: isolate !important;
   }
 
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-scene,
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnScene {
-    background: transparent !important;
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnDialogue,
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-dialogue,
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-dialogue-box,
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-textbox,
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnTextBox {
+    position: absolute !important;
+    z-index: 9999 !important;
+    isolation: isolate !important;
+    transform: translateZ(0) !important;
   }
 
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-scene::before,
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnScene::before {
-    background: linear-gradient(to bottom, rgba(6, 10, 9, 0.18), rgba(6, 10, 9, 0.30)) !important;
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnDialogue::before,
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnDialogue::after,
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-dialogue::before,
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-dialogue::after {
+    z-index: 0 !important;
   }
 
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene {
-    left: 50% !important;
-    right: auto !important;
-    top: clamp(188px, 20.5dvh, 252px) !important;
-    bottom: auto !important;
-    width: min(94vw, 840px) !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: min(46dvh, calc(100dvh - var(--pc-dialogue-h, 250px) - 18px)) !important;
-    transform: translateX(-50%) !important;
-    overflow: visible !important;
-    z-index: 18 !important;
-    background: transparent !important;
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnDialogue > *,
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-dialogue > * {
+    position: relative !important;
+    z-index: 2 !important;
   }
 
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-photo,
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-photo {
-    background-image: var(--pc-app-background) !important;
-    background-size: contain !important;
-    background-position: center center !important;
-    background-repeat: no-repeat !important;
-    background-color: transparent !important;
-    filter: brightness(.92) saturate(1.04) !important;
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene {
+    z-index: 20 !important;
   }
 
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-screen,
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-screen {
-    left: 24.15% !important;
-    top: 22.6% !important;
-    width: 27.25% !important;
-    height: 40.8% !important;
-    padding: clamp(6px, .8vw, 10px) clamp(9px, 1vw, 12px) clamp(8px, .9vw, 10px) clamp(16px, 1.4vw, 21px) !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-  }
-
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalOutput,
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-output {
-    justify-content: flex-start !important;
-    align-items: center !important;
-    padding: clamp(6px, 1.3dvh, 14px) 8px 0 !important;
-    font-size: clamp(.92rem, 1.16vw, 1.06rem) !important;
-    line-height: 1.08 !important;
-    letter-spacing: .04em !important;
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnCharacter,
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-character {
+    z-index: 30 !important;
   }
 }

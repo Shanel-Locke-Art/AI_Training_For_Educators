@@ -1,8 +1,8 @@
-/* PromptCraft v269 S1 workbench owner.
+/* PromptCraft Scenario 1 workbench.
    Stage 7 consolidates the active Scenario 1 repair workspace while keeping
    result-screen, prediction, and Claude-analysis rules in their own owners. */
 
-/* Source cascade: 20-terminal-core.css */
+/* Source cascade: 20-terminal.css */
 body.s1-active:not(.s1-result-active) #inputContainer {
   flex: 1 1 auto;
   max-height: none !important;
@@ -260,7 +260,7 @@ body.s1-active .s1-clean-textarea {
   resize: vertical;
 }
 
-/* Source cascade: 30-responsive-legacy.css */
+/* Source cascade: 30-legacy-responsive.css */
 body.s1-active:not(.s1-result-active) .s1-clean-stage {
   background: var(--pc-a11y-bg) !important;
   padding: 18px 22px 22px !important;
@@ -402,7 +402,7 @@ body.s1-active:not(.s1-result-active) .s1-clean-mission .mission-title {
   }
 }
 
-/* Source cascade: 40-components-and-scenarios.css */
+/* Source cascade: 40-components.css */
 body.s1-active:not(.s1-result-active) #inputContainer {
   font-size: 0.92rem !important;
 }
@@ -448,7 +448,7 @@ body.s1-active:not(.s1-result-active) textarea.s1-clean-textarea::placeholder {
   opacity: 1 !important;
 }
 
-/* Source cascade: 50-current-layout-owners.css */
+/* Source cascade: 50-layout.css */
 @media screen and (min-width: 1101px) {
   body.s1-active:not(.s1-result-active) .s1-clean-builder {
     display: flex !important;

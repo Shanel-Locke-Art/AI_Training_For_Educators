@@ -88,7 +88,7 @@ body .vn-overlay.active.claude-terminal-consult.claude-terminal-textmode #claude
 
 
 /* Completed-analysis responsive declarations now live exclusively in
-   90-completed-analysis-owner.css. */
+   90-completed-analysis.css. */
 
 /* ══════════════════════════════════════════════════════
    [30 SCENARIO 1 WORKBENCH: EQUAL DESKTOP COLUMNS]
@@ -1355,7 +1355,7 @@ body .vn-overlay.active {
 /* ══════════════════════════════════════════════════════
    VERSION 256 — INTERNAL EXPRESSION LABELS
    Expression labels are state metadata and must never be player-facing.
-   Live-analysis presentation now lives in 80-live-analysis-owner.css.
+   Live-analysis presentation now lives in 80-live-analysis.css.
    ══════════════════════════════════════════════════════ */
 .vn-expression-badge,
 .vn-student-expression-badge,

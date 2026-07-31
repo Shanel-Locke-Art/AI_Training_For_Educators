@@ -216,7 +216,7 @@ body.s1-active:not(.s1-result-active) button[type="submit"]{
 }
 
 /* Completed-analysis responsive declarations now live in
-   90-completed-analysis-owner.css. The retired pc-analysis-terminal-v122
+   90-completed-analysis.css. The retired pc-analysis-terminal-v122
    layout was removed because JavaScript no longer assigns that class. */
 
 .scenario-entry,

@@ -2290,6 +2290,17 @@ function pcApplyIpadLayoutV200(){
     !specialDialogueClasses.some(className => overlay.classList.contains(className))
   );
 
+  // The iPhone SE Level 1 intro is the sole phone layout whose smartboard top
+  // must be owned by CSS. The legacy 78px inline declaration prevented its
+  // exact-height media query from moving the complete board upward.
+  const isLevelOneIphoneSEIntro = Boolean(
+    isRegularMobileDialogue &&
+    scenarioIndex === SCENARIO_INDEX.ENGAGEMENT &&
+    viewportWidth >= 370 && viewportWidth <= 380 &&
+    viewportHeight >= 650 && viewportHeight <= 690 &&
+    viewportHeight > viewportWidth
+  );
+
   const isIntermediateIntro = Boolean(
     viewportWidth >= 701 &&
     viewportWidth <= 1510 &&
@@ -2338,11 +2349,17 @@ function pcApplyIpadLayoutV200(){
   }
 
   if (smartboardWrap) {
-    if (isRegularMobileDialogue) {
-      if (window.pcIpadBoardCenterFrameV200) {
-        cancelAnimationFrame(window.pcIpadBoardCenterFrameV200);
-        window.pcIpadBoardCenterFrameV200 = null;
-      }
+    if (window.pcIpadBoardCenterFrameV200) {
+      cancelAnimationFrame(window.pcIpadBoardCenterFrameV200);
+      window.pcIpadBoardCenterFrameV200 = null;
+    }
+
+    if (isLevelOneIphoneSEIntro) {
+      pcRemoveInlineStyles(smartboardWrap, [
+        'left', 'right', 'top', 'margin-left', 'margin-right',
+        'transform', 'transform-origin'
+      ]);
+    } else if (isRegularMobileDialogue) {
       pcSetImportantStyles(smartboardWrap, [
         ['left', 'clamp(8px, 3vw, 18px)'],
         ['right', 'clamp(8px, 3vw, 18px)'],
@@ -2353,10 +2370,6 @@ function pcApplyIpadLayoutV200(){
         ['transform-origin', 'top center']
       ]);
     } else {
-      if (window.pcIpadBoardCenterFrameV200) {
-        cancelAnimationFrame(window.pcIpadBoardCenterFrameV200);
-        window.pcIpadBoardCenterFrameV200 = null;
-      }
       pcRemoveInlineStyles(smartboardWrap, [
         'left', 'right', 'top', 'margin-left', 'margin-right',
         'transform', 'transform-origin'
