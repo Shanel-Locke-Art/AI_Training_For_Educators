@@ -71,6 +71,7 @@ html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v25
 html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
 #claudeTerminalScene .claude-terminal-screen {
   background: transparent !important;
+  background-image: none !important;
   border: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;

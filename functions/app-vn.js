@@ -1039,9 +1039,9 @@ function pcResetAnalyzingReadoutV203(){
   pcRemoveInlineStyles(readout, [
     'position', 'left', 'right', 'top', 'bottom', 'width', 'max-width',
     'height', 'margin', 'padding', 'transform', 'text-align', 'box-sizing',
-    'font-size', 'line-height', 'white-space'
+    'font-family', 'font-size', 'font-weight', 'line-height', 'letter-spacing', 'white-space'
   ]);
-  pcRemoveInlineStyles(titleLine, ['font-size', 'line-height', 'letter-spacing']);
+  pcRemoveInlineStyles(titleLine, ['font-size', 'line-height', 'letter-spacing', 'white-space']);
   gaps.forEach((gap) => pcRemoveInlineStyles(gap, ['height']));
 }
 
@@ -1064,6 +1064,9 @@ function positionClaudeAnalyzingReadoutV161() {
   const mode = pcGetLiveAnalysisModeV256(viewportWidth);
   const isPortraitTablet = mode === 'tablet' && viewportHeight > viewportWidth * 1.08;
   const isCompactDesktop = mode === 'desktop' && viewportWidth <= 1366 && viewportHeight <= 900;
+  const screenPixelWidth = Math.max(1, screen.getBoundingClientRect().width || 320);
+  const readoutFontPx = Math.max(12, Math.min(19.5, screenPixelWidth / 21));
+  const titleFontPx = Math.min(21.5, readoutFontPx * 1.08);
 
   pcSetImportantStyles(outputEl, [
     ['position', 'absolute'],
@@ -1119,7 +1122,7 @@ function positionClaudeAnalyzingReadoutV161() {
     pcSetImportantStyles(readout, [
       ['position', 'absolute'],
       ['left', '8%'],
-      ['top', '49%'],
+      ['top', '50%'],
       ['right', 'auto'],
       ['bottom', 'auto'],
       ['width', '84%'],
@@ -1130,25 +1133,23 @@ function positionClaudeAnalyzingReadoutV161() {
       ['transform', 'translateY(-50%)'],
       ['text-align', 'left'],
       ['box-sizing', 'border-box'],
-      ['white-space', 'normal'],
-      ['font-size', isPortraitTablet
-        ? 'clamp(.82rem, 1.55vw, 1rem)'
-        : mode === 'tablet'
-          ? 'clamp(.72rem, 1.35vw, .94rem)'
-          : isCompactDesktop
-            ? 'clamp(.96rem, 1.2vw, 1.08rem)'
-            : 'clamp(.82rem, .92vw, 1rem)'],
-      ['line-height', isPortraitTablet ? '1.17' : isCompactDesktop ? '1.18' : '1.14']
+      ['white-space', 'nowrap'],
+      ['font-family', '"Source Code Pro", "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'],
+      ['font-size', `${readoutFontPx.toFixed(2)}px`],
+      ['font-weight', '700'],
+      ['line-height', '1.16'],
+      ['letter-spacing', '.015em']
     ]);
     if (titleLine) {
       pcSetImportantStyles(titleLine, [
-        ['font-size', isCompactDesktop ? '1.1em' : '1.08em'],
-        ['line-height', isCompactDesktop ? '1.1' : '1.08'],
-        ['letter-spacing', '.012em']
+        ['font-size', `${titleFontPx.toFixed(2)}px`],
+        ['line-height', '1.08'],
+        ['letter-spacing', '.01em'],
+        ['white-space', 'nowrap']
       ]);
     }
     gaps.forEach((gap) => pcSetImportantStyles(gap, [
-      ['height', isPortraitTablet ? '.34em' : isCompactDesktop ? '.42em' : '.28em']
+      ['height', '.42em']
     ]));
   }
 
@@ -1376,11 +1377,11 @@ function pcApplyLiveComputerFrameV256({
   pcSetImportantStyles(screen, [
     ['position', 'absolute'],
     ['inset', 'auto'],
-    ['left', '14.7%'],
+    ['left', '19.3%'],
     ['right', 'auto'],
-    ['top', '14.5%'],
+    ['top', '14.4%'],
     ['bottom', 'auto'],
-    ['width', '44.5%'],
+    ['width', '37.3%'],
     ['height', '44.8%'],
     ['min-width', '0'],
     ['min-height', '0'],
@@ -1391,6 +1392,11 @@ function pcApplyLiveComputerFrameV256({
     ['padding', '0'],
     ['display', 'block'],
     ['overflow', 'hidden'],
+    ['background', 'transparent'],
+    ['background-image', 'none'],
+    ['border', '0'],
+    ['border-radius', '0'],
+    ['box-shadow', 'none'],
     ['box-sizing', 'border-box'],
     ['transition', 'none']
   ]);

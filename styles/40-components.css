@@ -1405,7 +1405,7 @@ body.pc-main-menu-open .pixel-coach-card {
 
 /* Small-screen Claude thinking screen: remove the unused lower reserve and
    let the green terminal treatment cover the complete dynamic viewport. */
-@media (max-width: 900px) {
+@media (max-width: 700px) {
   html body #vnOverlay.vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) {
     min-height: 100dvh !important;
     height: 100dvh !important;
