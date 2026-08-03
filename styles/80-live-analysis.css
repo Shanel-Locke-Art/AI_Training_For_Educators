@@ -10,27 +10,70 @@ html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult:not(.cl
   display: none !important;
 }
 
-/* Non-phone modes retain the photographed workstation without legacy motion. */
+/* Live analysis uses the classroom photo as the only backdrop behind the
+   photographed workstation. The overlay itself stays opaque so the workbench
+   underneath never shows through the scene. */
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) {
+  background: #050805 !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode)
+:is(#vnScene, .vn-scene) {
+  background: transparent !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode)
+:is(#vnSceneBg, .vn-bg) {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 0.55 !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  filter: brightness(0.5) blur(1px) !important;
+}
+
+/* Non-phone modes retain the photographed workstation without legacy motion.
+   The compact tablet layouts should match the larger tablet/desktop framing,
+   so this owner reasserts the same computer card styling instead of the old
+   square green treatment. */
 html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
 #claudeTerminalScene {
+  background: transparent !important;
   overflow: visible !important;
   transition: none !important;
   animation: none !important;
 }
 
 html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
-#claudeTerminalScene.thinking .claude-terminal-photo {
-  border-radius: 16px !important;
+#claudeTerminalScene .claude-terminal-photo {
+  border: 2px solid rgba(231, 183, 82, 0.22) !important;
+  border-radius: 18px !important;
+  background-color: #020403 !important;
+  background-image: var(--pc-app-background), var(--pc-app-background-legacy) !important;
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
+  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.78),
+              0 0 0 1px rgba(231, 183, 82, 0.16) !important;
+  overflow: hidden !important;
   transition: none !important;
   animation: none !important;
 }
 
 html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
-#claudeTerminalScene.thinking .claude-terminal-screen {
-  border-radius: 14px !important;
+#claudeTerminalScene .claude-terminal-photo::before,
+html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
+#claudeTerminalScene .claude-terminal-photo::after {
+  content: none !important;
+  display: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
+#claudeTerminalScene .claude-terminal-screen {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   transition: none !important;
   animation: none !important;
 }
@@ -46,16 +89,6 @@ html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v25
 
 /* Phone mode intentionally becomes a full-screen CRT instead of a tiny photo. */
 html body #vnOverlay#vnOverlay.vn-overlay.active.pc-live-analysis-phone-v256
-#claudeTerminalScene.thinking .claude-terminal-photo {
+#claudeTerminalScene .claude-terminal-photo {
   background-image: none !important;
-}
-
-/* Legacy compact tablet mode intentionally used square CRT corners at 701–900px. */
-@media (min-width: 701px) and (max-width: 900px) {
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-live-analysis-tablet-v256
-  #claudeTerminalScene.thinking .claude-terminal-photo,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-live-analysis-tablet-v256
-  #claudeTerminalScene.thinking .claude-terminal-screen {
-    border-radius: 0 !important;
-  }
 }

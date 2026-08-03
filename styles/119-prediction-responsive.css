@@ -14,8 +14,21 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
 
 body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-photo,
 body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-photo {
+  background-color: transparent !important;
   background-repeat: no-repeat !important;
   background-position: center center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-photo::before,
+body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-photo::before,
+body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-photo::after,
+body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-photo::after {
+  content: none !important;
+  display: none !important;
 }
 
 body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-screen,
@@ -141,15 +154,15 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
 body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
 body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene {
   left: 50% !important;
-  top: clamp(196px, 26dvh, 300px) !important;
-  width: min(90vw, 820px) !important;
-  max-height: min(46dvh, calc(100dvh - var(--pc-dialogue-h) - 34px)) !important;
+  top: clamp(180px, 23.5dvh, 274px) !important;
+  width: min(116vw, 1120px) !important;
+  max-height: min(60dvh, calc(100dvh - var(--pc-dialogue-h) - 12px)) !important;
   z-index: 28 !important;
 }
 
 body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-photo,
 body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-photo {
-  background-size: contain !important;
+  background-size: cover !important;
   background-position: center center !important;
   filter: brightness(.86) saturate(1.03) !important;
 }
@@ -174,10 +187,10 @@ body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-predic
 body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene,
 body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
 body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene {
-  left: 57.5% !important;
-  top: clamp(160px, 26dvh, 250px) !important;
-  width: min(74vw, 980px) !important;
-  max-height: min(52dvh, calc(100dvh - var(--pc-dialogue-h) - 28px)) !important;
+  left: 55% !important;
+  top: clamp(174px, 27dvh, 238px) !important;
+  width: min(132vw, 1520px) !important;
+  max-height: min(72dvh, calc(100dvh - var(--pc-dialogue-h) - 6px)) !important;
   z-index: 28 !important;
 }
 
@@ -185,7 +198,7 @@ body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-predic
 body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-photo,
 body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-photo,
 body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-photo {
-  background-size: contain !important;
+  background-size: 100% 100% !important;
   background-position: center center !important;
 }
 
@@ -252,8 +265,14 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
 
 /* Keep Professor Pixel behind the dialogue panel so the box cleanly masks the
    lower portion of the portrait and never blocks the dialogue copy. */
-body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-dialogue {
-  z-index: 40 !important;
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnDialogue,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-dialogue {
+  z-index: 80 !important;
+}
+
+body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnCharacter,
+body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-character {
+  z-index: 42 !important;
 }
 
 /* Small tablets / foldables: use the same monitor-only treatment as phones,
@@ -385,19 +404,19 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
     filter: brightness(0.5) blur(1px) !important;
   }
 
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene {
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene {
     left: 50% !important;
     right: auto !important;
-    top: 29.5% !important;
+    top: 27% !important;
     bottom: auto !important;
-    width: min(92vw, 840px) !important;
+    width: min(120vw, 1000px) !important;
     height: auto !important;
     min-width: 0 !important;
     min-height: 0 !important;
     max-width: none !important;
     max-height: none !important;
-    aspect-ratio: 2.08 / 1 !important;
+    aspect-ratio: 2 / 1 !important;
     transform: translate(-50%, -50%) !important;
     overflow: visible !important;
     z-index: 16 !important;
@@ -460,10 +479,10 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
     text-shadow: 0 0 8px rgba(180, 255, 200, 0.42) !important;
   }
 
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnCharacter,
-  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-character {
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnCharacter,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-character {
     bottom: calc(var(--pc-dialogue-h, 250px) - 38px) !important;
-    z-index: 18 !important;
+    z-index: 42 !important;
   }
 }
 
@@ -476,13 +495,13 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
   body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene {
     left: 50% !important;
     right: auto !important;
-    top: 31.5% !important;
+    top: 27.5% !important;
     bottom: auto !important;
-    width: min(84vw, 930px) !important;
+    width: min(122vw, 1320px) !important;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-    aspect-ratio: 2.08 / 1 !important;
+    aspect-ratio: 2 / 1 !important;
     transform: translate(-50%, -50%) !important;
     overflow: visible !important;
     z-index: 16 !important;
@@ -491,7 +510,9 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
 
   body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-photo,
   body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-photo {
-    background-size: contain !important;
+    background-color: transparent !important;
+    background-image: var(--pc-app-background) !important;
+    background-size: 100% 100% !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
     filter: brightness(.89) saturate(1.04) !important;
@@ -510,11 +531,11 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
 
   body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-screen,
   body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-screen {
-    left: 25.2% !important;
-    top: 23.4% !important;
-    width: 27.25% !important;
-    height: 40.8% !important;
-    padding: clamp(11px, 1.15vw, 15px) clamp(10px, 1vw, 14px) clamp(9px, .9vw, 12px) clamp(18px, 1.55vw, 24px) !important;
+    left: 19.8% !important;
+    top: 15.2% !important;
+    width: 38.3% !important;
+    height: 44.5% !important;
+    padding: clamp(12px, 1.3vw, 16px) !important;
     background: transparent !important;
     border: 0 !important;
     border-radius: 0 !important;
@@ -534,7 +555,7 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
     justify-content: center !important;
     align-items: center !important;
     padding: 0 !important;
-    font-size: clamp(.92rem, 1.15vw, 1.08rem) !important;
+    font-size: clamp(.98rem, 1.2vw, 1.14rem) !important;
     line-height: 1.08 !important;
     letter-spacing: .045em !important;
     text-align: center !important;
@@ -559,7 +580,7 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
     height: clamp(370px, 31dvh, 430px) !important;
     max-width: min(32vw, 300px) !important;
     max-height: 430px !important;
-    z-index: 18 !important;
+    z-index: 42 !important;
     opacity: 1 !important;
   }
 
@@ -705,6 +726,205 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
   .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnCharacter,
   .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-character {
     bottom: calc(var(--pc-dialogue-h) - 8px) !important;
-    z-index: 18 !important;
+    z-index: 42 !important;
   }
+}
+
+/* V296 — normalize the photographed monitor glass on compact landscape
+   prediction layouts and enlarge the workstation on large portrait tablets.
+   This prevents the fallback rounded green card from floating inside the
+   monitor (Nest Hub Max) and restores a fuller-width computer on iPad Pro /
+   Surface Pro portrait screens. */
+body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) #claudeTerminalScene .claude-terminal-screen,
+body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) .claude-terminal-screen,
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) #claudeTerminalScene .claude-terminal-screen,
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) .claude-terminal-screen {
+  position: absolute !important;
+  inset: auto !important;
+  left: 19.8% !important;
+  top: 15.2% !important;
+  width: 38.3% !important;
+  height: 44.5% !important;
+  padding: clamp(10px, 1.2vw, 16px) !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) #claudeTerminalOutput,
+body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) .claude-terminal-output,
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) #claudeTerminalOutput,
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) .claude-terminal-output {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+@media screen and (min-width: 861px) and (max-width: 1100px) and (min-height: 1100px) {
+  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene,
+  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-scene {
+    top: 25.2% !important;
+    width: min(148vw, 1500px) !important;
+  }
+
+  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene .claude-terminal-screen,
+  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-screen {
+    left: 19.8% !important;
+    top: 15.2% !important;
+    width: 38.3% !important;
+    height: 44.5% !important;
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #vnCharacter,
+  body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .vn-character {
+    left: clamp(36px, 4.6vw, 58px) !important;
+    bottom: calc(var(--pc-prediction-dialogue-height, 330px) - 84px) !important;
+    height: clamp(390px, 33dvh, 450px) !important;
+    max-width: min(33vw, 310px) !important;
+    max-height: 450px !important;
+  }
+}
+
+/* V297 — finish the remaining large portrait tablet prediction layouts.
+   Surface Pro 7 and iPad Pro still need a much larger workstation that spans
+   across the scene like the approved compact landscape versions. Keep Pixel in
+   front of the computer while scaling the scene up significantly. */
+@media screen and (min-width: 861px) and (max-width: 1100px) and (min-height: 1100px) {
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-scene {
+    left: 50% !important;
+    right: auto !important;
+    top: 24.5% !important;
+    width: min(172vw, 1760px) !important;
+    max-height: min(66dvh, calc(100dvh - var(--pc-prediction-dialogue-height, 330px) - 18px)) !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 24 !important;
+    overflow: visible !important;
+  }
+
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene .claude-terminal-photo,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-photo {
+    background-size: 100% 100% !important;
+    background-position: center center !important;
+  }
+
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene .claude-terminal-screen,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-screen {
+    left: 19.8% !important;
+    top: 15.2% !important;
+    width: 38.3% !important;
+    height: 44.5% !important;
+    padding: clamp(12px, 1.2vw, 18px) !important;
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalOutput,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-output {
+    font-size: clamp(1rem, 1.22vw, 1.18rem) !important;
+    line-height: 1.08 !important;
+    letter-spacing: .04em !important;
+  }
+
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #vnCharacter,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .vn-character {
+    left: clamp(34px, 4.4vw, 60px) !important;
+    right: auto !important;
+    bottom: calc(var(--pc-prediction-dialogue-height, 330px) - 70px) !important;
+    height: clamp(400px, 33dvh, 468px) !important;
+    max-width: min(32vw, 320px) !important;
+    max-height: 468px !important;
+    z-index: 42 !important;
+    opacity: 1 !important;
+  }
+}
+
+/* V298 — final polish for the last prediction layouts.
+   1) Dial back the oversized large-portrait-tablet scene so iPad Pro and
+      Surface Pro stay centered without cropping the workstation.
+   2) For full-screen / compact-desktop, move the workstation down slightly and
+      enlarge the on-monitor "AWAITING PREDICTION_" text. */
+
+/* Large portrait tablets: still bigger than the default tablet layout, but no
+   longer so aggressive that the monitor becomes cropped or visually off-center. */
+@media screen and (min-width: 981px) and (max-width: 1100px) and (min-height: 1100px) {
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-scene {
+    left: 50% !important;
+    top: 25.4% !important;
+    width: min(112vw, 1160px) !important;
+    max-height: min(64dvh, calc(100dvh - var(--pc-prediction-dialogue-height, 330px) - 20px)) !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalOutput,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-output {
+    font-size: clamp(1rem, 1.08vw, 1.1rem) !important;
+  }
+}
+
+@media screen and (min-width: 861px) and (max-width: 980px) and (min-height: 1100px) {
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-scene {
+    left: 50% !important;
+    top: 25.6% !important;
+    width: min(116vw, 1080px) !important;
+    max-height: min(64dvh, calc(100dvh - var(--pc-prediction-dialogue-height, 330px) - 20px)) !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalOutput,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-output {
+    font-size: clamp(1rem, 1.12vw, 1.12rem) !important;
+  }
+}
+
+/* Full-screen desktop / wide layout: lower the workstation a bit and make the
+   CRT message read larger inside the real monitor glass. */
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene,
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-scene {
+  top: clamp(208px, 30dvh, 286px) !important;
+  width: min(136vw, 1600px) !important;
+  max-height: min(70dvh, calc(100dvh - var(--pc-dialogue-h) - 8px)) !important;
+}
+
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalOutput,
+body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-output {
+  font-size: clamp(1.22rem, 1.34vw, 1.65rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.04 !important;
+  letter-spacing: 0.045em !important;
 }

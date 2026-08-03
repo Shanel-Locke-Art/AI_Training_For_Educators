@@ -1294,22 +1294,18 @@ function pcApplyPredictionPresentationV191(){
   const viewportHeight = pcPredictionViewportHeightV191();
   const isPhonePrediction = viewportWidth <= 700;
   const isCompactPrediction = viewportWidth > 700 && viewportWidth <= 1510;
-  const isMediumPortraitPrediction = Boolean(
-    viewportWidth >= 768 &&
-    viewportWidth <= 860 &&
-    viewportHeight >= 900
-  );
   const isLargePortraitPrediction = Boolean(
     viewportWidth >= 861 &&
     viewportWidth <= 1100 &&
     viewportHeight >= 1100
   );
 
-  // v260: Prediction has only two visual modes. Phones use the simplified
-  // transparent status stage; every wider viewport reuses the same approved
-  // photographed workstation geometry. This removes the old iPad-only frame
-  // that jumped at 1180px and left the CRT overlay behind while resizing.
-  if (isPhonePrediction) {
+  // v306: CSS owns every phone, tablet, foldable, and compact-desktop
+  // prediction composition through 1510px. This presentation pass runs again
+  // after the first paint, so applying the old inline workstation geometry here
+  // caused the visible snap back to the previous smaller layout. Only true wide
+  // desktop screens keep the JavaScript-owned workstation frame.
+  if (isPhonePrediction || isCompactPrediction) {
     pcClearPredictionLayoutInlineStylesV186();
   } else {
     pcApplyWidePredictionComputerV207(
@@ -1318,12 +1314,6 @@ function pcApplyPredictionPresentationV191(){
       terminalScreen,
       viewportHeight
     );
-    if (isCompactPrediction) {
-      pcSetImportantStyles(terminal, [
-        ['top', isLargePortraitPrediction ? '31.5%' : isMediumPortraitPrediction ? '29.5%' : '28.5%'],
-        ['width', isLargePortraitPrediction ? 'min(84vw, 930px)' : isMediumPortraitPrediction ? 'min(92vw, 840px)' : 'min(72vw, 920px)']
-      ]);
-    }
   }
 
   // The status must remain readable across phones and tablet/iPad widths.
@@ -1359,18 +1349,25 @@ function pcApplyPredictionPresentationV191(){
       'margin', 'padding', 'transform'
     ]);
     pcSetImportantStyles(output, [
-      ['font-size', isLargePortraitPrediction ? '16px' : '14px'],
+      ['font-size', isLargePortraitPrediction ? '18px' : '14px'],
       ['font-weight', '900'],
       ['line-height', '1.08'],
       ['letter-spacing', '.02em'],
       ['text-align', 'center'],
       ['white-space', 'nowrap']
     ]);
-  } else {
+  } else if (output) {
     pcRemoveInlineStyles(output, [
-      'font-size', 'font-weight', 'line-height', 'letter-spacing', 'text-align',
       'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
       'margin', 'padding', 'transform'
+    ]);
+    pcSetImportantStyles(output, [
+      ['font-size', 'clamp(1.5rem, 1.45vw, 1.9rem)'],
+      ['font-weight', '900'],
+      ['line-height', '1.05'],
+      ['letter-spacing', '.045em'],
+      ['text-align', 'center'],
+      ['white-space', 'nowrap']
     ]);
   }
 
@@ -1383,7 +1380,12 @@ function pcApplyPredictionPresentationV191(){
       ['display', 'flex'],
       ['align-items', 'center'],
       ['justify-content', 'center'],
-      ['overflow', 'hidden']
+      ['overflow', 'hidden'],
+      ['background', 'transparent'],
+      ['background-image', 'none'],
+      ['border', '0'],
+      ['border-radius', '0'],
+      ['box-shadow', 'none']
     ]);
   }
 

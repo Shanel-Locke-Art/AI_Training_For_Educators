@@ -444,7 +444,7 @@
 /* ── CONTROLS ──────────────────────────────────────── */
 /* Anchor controls relative to character */
 :root {
-  --pc-app-background: url("./assets/images/backgrounds/app-background.png");
+  --pc-app-background: url("./assets/images/backgrounds/app-background.png?v=2");
   --pc-app-background-legacy: url("./images/background.png");
   --cream: #faf6f0;
   --parchment: #f2ebe0;

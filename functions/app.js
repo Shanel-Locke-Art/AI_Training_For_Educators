@@ -404,7 +404,7 @@ window.pcSetImageSource = pcSetImageSource;
 const ASSETS = Object.freeze({
   images: Object.freeze({
     backgrounds: Object.freeze({
-      app: pcProjectUrl('assets/images/backgrounds/app-background.png'),
+      app: pcProjectUrl('assets/images/backgrounds/app-background.png?v=2'),
       classroom: pcProjectUrl('assets/images/backgrounds/classroom.png')
     }),
     professorPixel: Object.freeze({

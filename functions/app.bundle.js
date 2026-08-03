@@ -406,7 +406,7 @@ window.pcSetImageSource = pcSetImageSource;
 const ASSETS = Object.freeze({
   images: Object.freeze({
     backgrounds: Object.freeze({
-      app: pcProjectUrl('assets/images/backgrounds/app-background.png'),
+      app: pcProjectUrl('assets/images/backgrounds/app-background.png?v=2'),
       classroom: pcProjectUrl('assets/images/backgrounds/classroom.png')
     }),
     professorPixel: Object.freeze({
@@ -2569,8 +2569,8 @@ function pcApplyWidePredictionComputerV207(terminal, photo, screen, viewportHeig
   if (!terminal || !photo || !screen) return false;
 
   const isShortDesktop = Number.isFinite(viewportHeight) && viewportHeight <= 950;
-  const terminalWidth = isShortDesktop ? 'min(66vw, 920px)' : 'min(68vw, 980px)';
-  const terminalTop = isShortDesktop ? '29%' : '28.8%';
+  const terminalWidth = isShortDesktop ? 'min(66vw, 1320px)' : 'min(72vw, 1500px)';
+  const terminalTop = isShortDesktop ? '35.5%' : '34%';
 
   pcSetImportantStyles(terminal, [
     ['position', 'absolute'],
@@ -2585,7 +2585,7 @@ function pcApplyWidePredictionComputerV207(terminal, photo, screen, viewportHeig
     ['min-height', '0'],
     ['max-width', 'none'],
     ['max-height', 'none'],
-    ['aspect-ratio', '2.08 / 1'],
+    ['aspect-ratio', '2 / 1'],
     ['transform', 'translate(-50%, -50%)'],
     ['margin', '0'],
     ['display', 'block'],
@@ -3038,9 +3038,13 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
     ['padding', '0'],
     ['display', 'block'],
     ['background-image', 'var(--pc-app-background)'],
-    ['background-size', 'cover'],
+    ['background-size', '100% 100%'],
     ['background-position', 'center center'],
     ['background-repeat', 'no-repeat'],
+    ['background-color', 'transparent'],
+    ['border', '0'],
+    ['border-radius', '0'],
+    ['box-shadow', 'none'],
     ['overflow', 'hidden'],
     ['transition', 'none']
   ]);
@@ -3241,7 +3245,7 @@ function pcResetAnalyzingReadoutV203(){
   pcRemoveInlineStyles(readout, [
     'position', 'left', 'right', 'top', 'bottom', 'width', 'max-width',
     'height', 'margin', 'padding', 'transform', 'text-align', 'box-sizing',
-    'font-size', 'line-height'
+    'font-size', 'line-height', 'white-space'
   ]);
   pcRemoveInlineStyles(titleLine, ['font-size', 'line-height', 'letter-spacing']);
   gaps.forEach((gap) => pcRemoveInlineStyles(gap, ['height']));
@@ -3258,7 +3262,14 @@ function positionClaudeAnalyzingReadoutV161() {
   if (!terminal || !outputEl || !screen || !readout) return false;
 
   const viewportWidth = pcAnalysisViewportWidthV122();
+  const viewportHeight = Math.min(
+    window.innerHeight || Number.POSITIVE_INFINITY,
+    document.documentElement?.clientHeight || Number.POSITIVE_INFINITY,
+    window.visualViewport?.height || Number.POSITIVE_INFINITY
+  );
   const mode = pcGetLiveAnalysisModeV256(viewportWidth);
+  const isPortraitTablet = mode === 'tablet' && viewportHeight > viewportWidth * 1.08;
+  const isCompactDesktop = mode === 'desktop' && viewportWidth <= 1366 && viewportHeight <= 900;
 
   pcSetImportantStyles(outputEl, [
     ['position', 'absolute'],
@@ -3325,19 +3336,26 @@ function positionClaudeAnalyzingReadoutV161() {
       ['transform', 'translateY(-50%)'],
       ['text-align', 'left'],
       ['box-sizing', 'border-box'],
-      ['font-size', mode === 'tablet'
-        ? 'clamp(.72rem, 1.35vw, .94rem)'
-        : 'clamp(.82rem, .92vw, 1rem)'],
-      ['line-height', '1.14']
+      ['white-space', 'normal'],
+      ['font-size', isPortraitTablet
+        ? 'clamp(.82rem, 1.55vw, 1rem)'
+        : mode === 'tablet'
+          ? 'clamp(.72rem, 1.35vw, .94rem)'
+          : isCompactDesktop
+            ? 'clamp(.96rem, 1.2vw, 1.08rem)'
+            : 'clamp(.82rem, .92vw, 1rem)'],
+      ['line-height', isPortraitTablet ? '1.17' : isCompactDesktop ? '1.18' : '1.14']
     ]);
     if (titleLine) {
       pcSetImportantStyles(titleLine, [
-        ['font-size', '1.08em'],
-        ['line-height', '1.08'],
+        ['font-size', isCompactDesktop ? '1.1em' : '1.08em'],
+        ['line-height', isCompactDesktop ? '1.1' : '1.08'],
         ['letter-spacing', '.012em']
       ]);
     }
-    gaps.forEach((gap) => pcSetImportantStyles(gap, [['height', '.28em']]));
+    gaps.forEach((gap) => pcSetImportantStyles(gap, [
+      ['height', isPortraitTablet ? '.34em' : isCompactDesktop ? '.42em' : '.28em']
+    ]));
   }
 
   return true;
@@ -3346,15 +3364,28 @@ window.pcPositionClaudeAnalyzingReadout = positionClaudeAnalyzingReadoutV161;
 
 
 function pcClearMobileAnalyzingStageV202(){
+  const overlay = document.getElementById('vnOverlay');
   const scene = document.getElementById('vnScene');
+  const sceneBg = document.getElementById('vnSceneBg');
+  const dialogue = document.getElementById('vnDialogue');
+  const speaker = document.getElementById('vnSpeaker');
+  const text = document.getElementById('vnText');
   const terminal = document.getElementById('claudeTerminalScene');
   const photo = terminal?.querySelector('.claude-terminal-photo');
   const screen = terminal?.querySelector('.claude-terminal-screen');
 
+  pcRemoveInlineStyles(overlay, ['background']);
+  pcRemoveInlineStyles(sceneBg, ['display', 'visibility', 'opacity']);
   pcRemoveInlineStyles(scene, [
     'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
     'min-height', 'padding', 'overflow'
   ]);
+  pcRemoveInlineStyles(dialogue, [
+    'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
+    'min-height', 'max-height'
+  ]);
+  pcRemoveInlineStyles(speaker, ['font-size', 'line-height']);
+  pcRemoveInlineStyles(text, ['font-size', 'line-height']);
   pcRemoveInlineStyles(terminal, [
     'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
     'min-width', 'min-height', 'max-width', 'max-height', 'aspect-ratio',
@@ -3410,36 +3441,89 @@ function pcApplyLiveComputerFrameV256({
   mode,
   viewportWidth
 }) {
+  const sceneBg = document.getElementById('vnSceneBg');
   const overlayRect = overlay.getBoundingClientRect();
   const dialogueRect = dialogue?.getBoundingClientRect();
   const measuredStageHeight = dialogueRect && dialogueRect.top > overlayRect.top
     ? Math.round(dialogueRect.top - overlayRect.top)
     : Math.round(overlayRect.height * 0.72);
-  const stageHeight = Math.max(340, measuredStageHeight);
+  const isPortraitTablet = mode === 'tablet' && overlayRect.height > overlayRect.width * 1.08;
+  const portraitDialogueTop = isPortraitTablet
+    ? Math.round(overlayRect.height * 0.64)
+    : null;
+  const stageHeight = Math.max(340, isPortraitTablet ? portraitDialogueTop : measuredStageHeight);
 
-  // v257: Use one tall workstation crop for every non-phone live-analysis size.
-  // The photograph is cropped with cover rather than stretched, so the tower,
-  // monitor, and keyboard keep their proportions while gaining useful height.
-  const aspect = 1.72;
+  // v305: Portrait tablets use the same compact workstation-to-dialogue rhythm
+  // as the Nest Hub layout. The computer ends immediately above the black panel
+  // instead of floating inside a tall unused stage. Landscape and desktop keep
+  // their existing geometry unchanged.
+  const aspect = 2.0;
   const widthLimit = mode === 'tablet'
-    ? Math.min(viewportWidth * 0.94, 1040)
-    : Math.min(viewportWidth * 0.82, 1460);
-  const heightLimit = Math.max(300, stageHeight * (mode === 'tablet' ? 0.86 : 0.90));
-  const width = Math.max(440, Math.min(widthLimit, heightLimit * aspect));
+    ? (isPortraitTablet
+        ? Math.min(viewportWidth * 1.18, 1040)
+        : Math.min(viewportWidth * 1.02, 1180))
+    : Math.min(viewportWidth * 0.90, 1680);
+  const heightLimit = Math.max(320, stageHeight * (isPortraitTablet ? 0.94 : mode === 'tablet' ? 0.98 : 0.94));
+  const width = Math.max(520, Math.min(widthLimit, heightLimit * aspect));
   const height = width / aspect;
-  const downShift = mode === 'tablet' ? 28 : 20;
+  const downShift = mode === 'tablet' ? (isPortraitTablet ? 10 : 16) : 14;
   const centeredTop = ((stageHeight - height) / 2) + downShift;
-  const top = Math.max(8, Math.min(centeredTop, stageHeight - height - 6));
+  const portraitTop = portraitDialogueTop - height - 2;
+  const top = isPortraitTablet
+    ? Math.max(18, portraitTop)
+    : Math.max(8, Math.min(centeredTop, stageHeight - height - 4));
+  const dialogueTop = isPortraitTablet ? Math.round(top + height + 2) : null;
+
+  pcSetImportantStyles(overlay, [
+    ['background', '#050805']
+  ]);
 
   pcSetImportantStyles(scene, [
     ['position', 'absolute'],
-    ['inset', '0'],
+    ['inset', isPortraitTablet ? 'auto' : '0'],
+    ['left', '0'],
+    ['right', '0'],
+    ['top', '0'],
+    ['bottom', isPortraitTablet ? 'auto' : '0'],
     ['width', '100%'],
-    ['height', '100%'],
+    ['height', isPortraitTablet ? `${dialogueTop}px` : '100%'],
     ['min-height', '0'],
     ['padding', '0'],
-    ['overflow', 'hidden']
+    ['overflow', 'hidden'],
+    ['background', 'transparent']
   ]);
+
+  pcSetImportantStyles(sceneBg, [
+    ['display', 'block'],
+    ['visibility', 'visible'],
+    ['opacity', '.55']
+  ]);
+
+  if (isPortraitTablet && dialogue) {
+    pcSetImportantStyles(dialogue, [
+      ['position', 'absolute'],
+      ['inset', 'auto'],
+      ['left', '0'],
+      ['right', '0'],
+      ['top', `${dialogueTop}px`],
+      ['bottom', '0'],
+      ['width', '100%'],
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['max-height', 'none']
+    ]);
+
+    const speaker = document.getElementById('vnSpeaker');
+    const text = document.getElementById('vnText');
+    pcSetImportantStyles(speaker, [
+      ['font-size', 'clamp(1.75rem, 3vw, 2rem)'],
+      ['line-height', '1.15']
+    ]);
+    pcSetImportantStyles(text, [
+      ['font-size', 'clamp(1.3125rem, 2.35vw, 1.5625rem)'],
+      ['line-height', '1.42']
+    ]);
+  }
 
   pcSetImportantStyles(terminal, [
     ['position', 'absolute'],
@@ -3481,24 +3565,29 @@ function pcApplyLiveComputerFrameV256({
     ['padding', '0'],
     ['display', 'block'],
     ['background-image', 'var(--pc-app-background)'],
-    ['background-size', 'cover'],
+    ['background-size', '100% 100%'],
     ['background-position', 'center center'],
     ['background-repeat', 'no-repeat'],
+    ['background-color', 'transparent'],
+    ['border', '0'],
+    ['border-radius', '0'],
+    ['box-shadow', 'none'],
     ['overflow', 'hidden'],
     ['transition', 'none']
   ]);
 
-  // The 1.72:1 cover crop removes about 8.5% from each side of the original
-  // artwork. These coordinates map the physical CRT back into the cropped box.
+  // The workstation now uses the full 2:1 transparent render with no side crop.
+  // These coordinates match the usable glass inside the CRT bezel, rather than
+  // painting the terminal layer across the monitor frame on portrait tablets.
   pcSetImportantStyles(screen, [
     ['position', 'absolute'],
     ['inset', 'auto'],
-    ['left', '13.5%'],
+    ['left', '14.7%'],
     ['right', 'auto'],
-    ['top', '15.0%'],
+    ['top', '14.5%'],
     ['bottom', 'auto'],
-    ['width', '46.3%'],
-    ['height', '45.5%'],
+    ['width', '44.5%'],
+    ['height', '44.8%'],
     ['min-width', '0'],
     ['min-height', '0'],
     ['max-width', 'none'],
@@ -5843,22 +5932,18 @@ function pcApplyPredictionPresentationV191(){
   const viewportHeight = pcPredictionViewportHeightV191();
   const isPhonePrediction = viewportWidth <= 700;
   const isCompactPrediction = viewportWidth > 700 && viewportWidth <= 1510;
-  const isMediumPortraitPrediction = Boolean(
-    viewportWidth >= 768 &&
-    viewportWidth <= 860 &&
-    viewportHeight >= 900
-  );
   const isLargePortraitPrediction = Boolean(
     viewportWidth >= 861 &&
     viewportWidth <= 1100 &&
     viewportHeight >= 1100
   );
 
-  // v260: Prediction has only two visual modes. Phones use the simplified
-  // transparent status stage; every wider viewport reuses the same approved
-  // photographed workstation geometry. This removes the old iPad-only frame
-  // that jumped at 1180px and left the CRT overlay behind while resizing.
-  if (isPhonePrediction) {
+  // v306: CSS owns every phone, tablet, foldable, and compact-desktop
+  // prediction composition through 1510px. This presentation pass runs again
+  // after the first paint, so applying the old inline workstation geometry here
+  // caused the visible snap back to the previous smaller layout. Only true wide
+  // desktop screens keep the JavaScript-owned workstation frame.
+  if (isPhonePrediction || isCompactPrediction) {
     pcClearPredictionLayoutInlineStylesV186();
   } else {
     pcApplyWidePredictionComputerV207(
@@ -5867,12 +5952,6 @@ function pcApplyPredictionPresentationV191(){
       terminalScreen,
       viewportHeight
     );
-    if (isCompactPrediction) {
-      pcSetImportantStyles(terminal, [
-        ['top', isLargePortraitPrediction ? '31.5%' : isMediumPortraitPrediction ? '29.5%' : '28.5%'],
-        ['width', isLargePortraitPrediction ? 'min(84vw, 930px)' : isMediumPortraitPrediction ? 'min(92vw, 840px)' : 'min(72vw, 920px)']
-      ]);
-    }
   }
 
   // The status must remain readable across phones and tablet/iPad widths.
@@ -5908,18 +5987,25 @@ function pcApplyPredictionPresentationV191(){
       'margin', 'padding', 'transform'
     ]);
     pcSetImportantStyles(output, [
-      ['font-size', isLargePortraitPrediction ? '16px' : '14px'],
+      ['font-size', isLargePortraitPrediction ? '18px' : '14px'],
       ['font-weight', '900'],
       ['line-height', '1.08'],
       ['letter-spacing', '.02em'],
       ['text-align', 'center'],
       ['white-space', 'nowrap']
     ]);
-  } else {
+  } else if (output) {
     pcRemoveInlineStyles(output, [
-      'font-size', 'font-weight', 'line-height', 'letter-spacing', 'text-align',
       'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
       'margin', 'padding', 'transform'
+    ]);
+    pcSetImportantStyles(output, [
+      ['font-size', 'clamp(1.5rem, 1.45vw, 1.9rem)'],
+      ['font-weight', '900'],
+      ['line-height', '1.05'],
+      ['letter-spacing', '.045em'],
+      ['text-align', 'center'],
+      ['white-space', 'nowrap']
     ]);
   }
 
@@ -5932,7 +6018,12 @@ function pcApplyPredictionPresentationV191(){
       ['display', 'flex'],
       ['align-items', 'center'],
       ['justify-content', 'center'],
-      ['overflow', 'hidden']
+      ['overflow', 'hidden'],
+      ['background', 'transparent'],
+      ['background-image', 'none'],
+      ['border', '0'],
+      ['border-radius', '0'],
+      ['box-shadow', 'none']
     ]);
   }
 
