@@ -138,12 +138,6 @@ header {
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
 .level-tag {
   background: rgba(74,124,94,0.25);
   color: #a8d5b5;
@@ -330,77 +324,6 @@ header {
 }
 
 /* ── PROFESSOR PIXEL STICKY NOTE ───────────────────── */
-
-
-/* ── FEEDBACK PANEL ────────────────────────────────── */
-.feedback-panel {
-  margin-top: 10px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: 1px 2px 5px rgba(42,31,20,0.05);
-}
-.fp-header {
-  background: var(--parchment-drk);
-  padding: 7px 13px;
-  font-family: "Source Code Pro", monospace;
-  font-size: 0.63rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-light);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.fp-header::before {
-  content: "📋";
-  font-size: 11px;
-}
-.fp-body {
-  padding: 11px 13px;
-  background: var(--chalk);
-}
-.score-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-bottom: 9px;
-}
-.score-chip {
-  font-size: 0.67rem;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 99px;
-  border: 1.5px solid;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-.score-chip.good {
-  color: var(--good);
-  border-color: var(--forest-mid);
-  background: var(--good-bg);
-}
-.score-chip.needs {
-  color: var(--warn);
-  border-color: var(--amber);
-  background: var(--warn-bg);
-}
-.fp-tips {
-  font-size: 0.77rem;
-  color: var(--ink-light);
-  line-height: 1.7;
-}
-.fp-tips li {
-  margin-left: 15px;
-  margin-bottom: 2px;
-}
-.fp-success {
-  font-size: 0.79rem;
-  color: var(--forest);
-  font-weight: 700;
-}
 
 /* ── TYPING ────────────────────────────────────────── */
 .typing-dots {

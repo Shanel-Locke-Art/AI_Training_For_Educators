@@ -1035,8 +1035,7 @@ body .vn-overlay.active {
   }
 
   html body .vn-overlay.active #vnPredictionChoicePanel button,
-  html body .vn-overlay.active .pc-clean-choice-btn,
-  html body .vn-overlay.active .pc-clean-continue {
+html body .vn-overlay.active .pc-clean-choice-btn {
     font-size: clamp(0.96rem, 1.05vw, 1.08rem) !important;
     line-height: 1.28 !important;
   }
@@ -1095,8 +1094,7 @@ body .vn-overlay.active {
   }
 
   html body .vn-overlay.active.pc-prediction-result .prediction-continue-btn,
-  html body .vn-overlay.active.pc-prediction-result #pcContinueToClaudeBtn,
-  html body .vn-overlay.active.pc-prediction-result .pc-clean-continue {
+html body .vn-overlay.active.pc-prediction-result #pcContinueToClaudeBtn {
     margin-top: 14px !important;
     font-size: 0.92rem !important;
   }
@@ -1257,28 +1255,14 @@ body .vn-overlay.active {
   }
 
   
-
-  
-  body.s1-active:not(.s1-result-active) .s1-result-heading,
-  body.s1-active:not(.s1-result-active) .scenario-nav-card h3 {
-    font-size: 1.72rem !important;
-    line-height: 1.2 !important;
-  }
-
-  
   body.s1-active:not(.s1-result-active) .s1-clean-reference,
-  body.s1-active:not(.s1-result-active) .s1-result-card,
-  body.s1-active:not(.s1-result-active) .scenario-nav-card p,
-  body.s1-active:not(.s1-result-active) .s1-post-analysis-reflection,
-  body.s1-active:not(.s1-result-active) .s1-post-analysis-reflection p {
+body.s1-active:not(.s1-result-active) .s1-result-card {
     font-size: 1.14rem !important;
     line-height: 1.62 !important;
   }
 
   
-  body.s1-active:not(.s1-result-active) .ingredient-chip,
-  body.s1-active:not(.s1-result-active) .s1-result-label,
-  body.s1-active:not(.s1-result-active) .s1-result-badge {
+  body.s1-active:not(.s1-result-active) .ingredient-chip {
     font-size: 1.06rem !important;
     line-height: 1.28 !important;
   }
@@ -1301,9 +1285,7 @@ body .vn-overlay.active {
 
   
   body.s1-active:not(.s1-result-active) .s1-secondary-btn,
-  body.s1-active:not(.s1-result-active) .continue-btn,
-  body.s1-active:not(.s1-result-active) .scenario-nav-btn,
-  body.s1-active:not(.s1-result-active) .consult-claude-btn {
+body.s1-active:not(.s1-result-active) .continue-btn {
     font-size: 1.14rem !important;
     line-height: 1.25 !important;
   }
@@ -1324,10 +1306,9 @@ body .vn-overlay.active {
   }
 
   html body .vn-overlay.active #vnPredictionChoicePanel button,
-  html body .vn-overlay.active .pc-clean-choice-btn,
-  html body .vn-overlay.active .prediction-continue-btn,
-  html body .vn-overlay.active .pc-clean-continue,
-  html body .vn-overlay.active .terminal-return {
+html body .vn-overlay.active .pc-clean-choice-btn,
+html body .vn-overlay.active .prediction-continue-btn,
+html body .vn-overlay.active .terminal-return {
     font-size: clamp(1rem, 1.12vw, 1.1rem) !important;
     line-height: 1.24 !important;
   }
@@ -1357,12 +1338,3 @@ body .vn-overlay.active {
    Expression labels are state metadata and must never be player-facing.
    Live-analysis presentation now lives in 80-live-analysis.css.
    ══════════════════════════════════════════════════════ */
-.vn-expression-badge,
-.vn-student-expression-badge,
-#vnExprBadge,
-#vnStudentExprBadge {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}

@@ -39,13 +39,9 @@ function playScenarioIntroduction(index) {
   const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
   const useSpecialIntroLayout = ui.introLayout === 'special';
   overlay?.classList.toggle('scenario-intro-active', useSpecialIntroLayout);
-  const afterIntroActions = {
-    's2-diagnosis': renderS2DiagnosisActivity
-  };
   const onDone = () => {
     if (useSpecialIntroLayout) overlay?.classList.remove('scenario-intro-active');
-    const action = afterIntroActions[ui.afterIntroAction];
-    if (typeof action === 'function') action();
+    pcRunScenarioAfterIntroAction(ui.afterIntroAction);
   };
 
   if (window.scenarioIntroTimer) clearTimeout(window.scenarioIntroTimer);
@@ -62,50 +58,36 @@ function playScenarioIntroduction(index) {
 }
 
 
-function switchScenario(i, btn) {
-  const index = Number(i);
-  if (!Number.isInteger(index) || !scenarios[index]) return false;
+function pcActivateScenario(index, { explicitButton = null, playIntroduction = true } = {}) {
+  const normalized = pcNormalizeScenarioIndex(index);
+  if (normalized === null) return false;
 
   pcClearVNStateForScenarioSwitch();
-  resetScenarioRunState(index);
-  selectScenarioTab(index, btn);
+  resetScenarioRunState(normalized);
+  selectScenarioTab(normalized, explicitButton);
   window.scenarioIntroEnabled = true;
+
+  const implemented = Boolean(getScenarioUI(normalized).implemented);
   // v216: Mark the introduction before rendering the workbench. This prevents
   // its first textarea from briefly stealing focus and scrolling the page just
   // before Professor Pixel states the challenge.
-  window.pcScenarioIntroPending = Boolean(getScenarioUI(index).implemented);
-  loadScenario(index);
+  window.pcScenarioIntroPending = implemented && playIntroduction;
+  loadScenario(normalized);
 
-  if (getScenarioUI(index).implemented) playScenarioIntroduction(index);
+  if (implemented && playIntroduction) playScenarioIntroduction(normalized);
   else window.pcScenarioIntroPending = false;
   return false;
 }
 
+function switchScenario(i, btn) {
+  return pcActivateScenario(i, { explicitButton: btn });
+}
+
 
 function pcClearVNStateForScenarioSwitch() {
-  const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
-  if (overlay) {
-    overlay.classList.remove(
-      'active',
-      'claude-prediction',
-      'pc-clean-prediction',
-      'claude-terminal-consult',
-      'claude-terminal-textmode',
-      'claude-analysis',
-      'claude-consult',
-      'pc-clean-output',
-      'scenario-intro-active'
-    );
-  }
-
-  document.getElementById('vnDialogue')?.classList.remove('has-choices');
-  document.getElementById('vnCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
-  document.getElementById('vnStudentCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
-  const pixelCharacter = document.getElementById('vnCharacter');
-  const studentCharacter = document.getElementById('vnStudentCharacter');
-  if (pixelCharacter) pixelCharacter.style.removeProperty('display');
-  if (studentCharacter) studentCharacter.style.removeProperty('display');
-  overlay?.classList.remove('pc-dual-character');
+  pcSetVNOverlayState({ active: false });
+  pcResetVNCharacters();
+  pcResetVNDialogueState();
   document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
   if (typeof pcClearPredictionPresentationV191 === 'function') pcClearPredictionPresentationV191();
 
@@ -113,15 +95,15 @@ function pcClearVNStateForScenarioSwitch() {
   window.pendingPromptAfterPrediction = '';
   window.pcWaitingForClaudeContinue = false;
 
-  try { predictionGateActive = false; } catch(e) {}
-  try { vnQueue = []; } catch(e) {}
-  try { vnTyping = false; } catch(e) {}
-  try { vnOnComplete = null; } catch(e) {}
-  try { clearTimeout(vnTypeTimer); } catch(e) {}
-  try { setClaudeShelfState('idle', 'idle'); } catch(e) {}
-  try { setClaudeTerminalTextMode(false); } catch(e) {}
-  try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'AWAITING INPUT...'); } catch(e) {}
-  try { musicEndVN(); } catch(e) {}
+  predictionGateActive = false;
+  vnQueue = [];
+  vnTyping = false;
+  vnOnComplete = null;
+  clearTimeout(vnTypeTimer);
+  setClaudeShelfState('idle', 'idle');
+  setClaudeTerminalTextMode(false);
+  setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'AWAITING INPUT...');
+  musicEndVN();
 }
 
 function pcFillS1DevFields() {
@@ -151,10 +133,7 @@ function pcFillS1DevFields() {
 }
 
 function resetS1Dev() {
-    scenarioIndex = 0;
-    attempts = 0;
-    lastPromptText = '';
-    history = [];
+    resetScenarioRunState(SCENARIO_INDEX.ENGAGEMENT);
 
     if (window.scenarioIntroTimer) {
       clearTimeout(window.scenarioIntroTimer);
@@ -190,13 +169,7 @@ function resetS1Dev() {
     document.body.classList.remove('s1-result-active');
     document.body.classList.add('s1-active');
 
-    document.querySelectorAll('.tab-btn').forEach((b, idx) => {
-      b.classList.toggle('active', idx === 0);
-      b.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
-    });
-
-    const attNum = document.getElementById('attNum');
-    if (attNum) attNum.textContent = '0';
+    selectScenarioTab(SCENARIO_INDEX.ENGAGEMENT);
 
     window.scenarioIntroEnabled = true;
     if (Array.isArray(navCardShown)) navCardShown[SCENARIO_INDEX.ENGAGEMENT] = false;
@@ -208,10 +181,11 @@ function resetS1Dev() {
     }, 120);
   }
 
-window.pcClearVNStateForScenarioSwitch = pcClearVNStateForScenarioSwitch;
-window.pcFillS1DevFields = pcFillS1DevFields;
-window.resetS1Dev = resetS1Dev;
-try { resetS1Dev = window.resetS1Dev; } catch(e) {}
+pcExposeGlobals({
+  pcClearVNStateForScenarioSwitch,
+  pcFillS1DevFields,
+  resetS1Dev
+});
 
 function prepareScenarioShell(index) {
   const scenario = scenarios[index];
@@ -263,19 +237,12 @@ function renderScenarioInput(index) {
 }
 
 
-function runScenarioSetup(index) {
-  // Scenario-specific setup functions will be added back one scenario at a time.
-  return getScenarioUI(index).implemented;
-}
-
-
 function loadScenario(i) {
   const index = Number(i);
   if (!Number.isInteger(index) || !scenarios[index]) return;
   prepareScenarioShell(index);
   requestAnimationFrame(pcApplyIpadLayoutV200);
   renderScenarioInput(index);
-  if (getScenarioUI(index).implemented) runScenarioSetup(index);
 }
 
 
@@ -361,20 +328,11 @@ const playerHistory = {
 // Hint chip definitions for Scenario 2
 
 // Render the correct input mode for the current scenario
-const PC_SCENARIO_RENDERERS = Object.freeze({
-  'guided-builder': ({ container }) => renderGuidedBuilder(container),
-  'metacognition-opening': ({ container }) => renderS2Standby(container),
-  'development-shell': ({ index }) => renderScenarioPlaceholder(index)
-});
-
 function renderInputMode(idx) {
   const container = document.getElementById('inputContainer');
   if (!container) return;
   container.classList.remove('s1-workbench', 's1-clean-workbench', 'pc-scenario-workbench');
-
-  const ui = getScenarioUI(idx);
-  const renderer = PC_SCENARIO_RENDERERS[ui.rendererKey] || PC_SCENARIO_RENDERERS['development-shell'];
-  renderer({ index: idx, container, ui });
+  pcRenderScenarioWorkspace(idx, container);
 }
 
 
@@ -542,6 +500,11 @@ function closeReflection() {
   document.getElementById('reflectionOverlay').classList.remove('visible');
 }
 
+pcRegisterUIActions({
+  'close-reflection': () => closeReflection(),
+  'submit-reflection': (_target, event) => handleReflectionSubmit(event)
+});
+
 async function handleReflectionSubmit(e) {
   e.preventDefault();
   const btn = document.getElementById('refSubmitBtn');
@@ -568,10 +531,10 @@ async function handleReflectionSubmit(e) {
     }
     try {
       const payload = buildSessionPayload(formData);
-      console.log('[PromptCraft] Submitting full session payload:', payload);
+      pcDebug('[PromptCraft] Submitting full session payload:', payload);
 
       await postToSheets(payload, 'full session payload');
-      console.log('[PromptCraft] Sheets submission sent');
+      pcDebug('[PromptCraft] Sheets submission sent');
     } catch(err) {
       console.warn('[PromptCraft] Sheets submission error:', err);
     }
@@ -582,12 +545,12 @@ async function handleReflectionSubmit(e) {
       const netlifyData = new URLSearchParams();
       netlifyData.append('form-name', 'promptcraft-reflection');
       formData.forEach((v, k) => netlifyData.append(k, v));
-      await fetch('/', {
+      await fetch(pcProjectUrl(''), {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: netlifyData.toString()
       });
-      console.log('[PromptCraft] Netlify fallback sent');
+      pcDebug('[PromptCraft] Netlify fallback sent');
     } catch(err) {
       // Netlify fallback is best-effort -- Sheets is the primary
     }
@@ -605,7 +568,7 @@ async function handleReflectionSubmit(e) {
     };
     generateGrowthReport(reflAnswers).then(narrative => {
       const el = document.getElementById('growthNarrative');
-      if (el && narrative) el.innerHTML = narrative.replace(/\n/g, '<br>');
+      if (el && narrative) el.innerHTML = fmt(narrative);
       const g = buildGrowthScores();
       const tableEl = document.getElementById('growthTable');
       if (tableEl) tableEl.innerHTML = buildGrowthTableHTML(g);
@@ -631,7 +594,7 @@ async function handleReflectionSubmit(e) {
 
   // ── NETLIFY FORMS MODE (fallback) ──────────────────
   try {
-    const res = await fetch('/', {
+    const res = await fetch(pcProjectUrl(''), {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams(formData).toString()
@@ -643,7 +606,7 @@ async function handleReflectionSubmit(e) {
       const rfAnswers = { q1: formData.get('q1_surprise')||'', q2: formData.get('q2_change')||'', q3: formData.get('q3_practice')||'', q4: formData.get('q4_other')||'' };
       generateGrowthReport(rfAnswers).then(narrative => {
         const el = document.getElementById('growthNarrative');
-        if (el && narrative) el.innerHTML = narrative.replace(/\n/g, '<br>');
+        if (el && narrative) el.innerHTML = fmt(narrative);
         const g = buildGrowthScores();
         const tableEl = document.getElementById('growthTable');
         if (tableEl) tableEl.innerHTML = buildGrowthTableHTML(g);
@@ -761,24 +724,24 @@ function buildS1RightHTML(){
         <div class="s1-clean-fields">
           <div class="s1-clean-field">
             <label class="s1-clean-label" for="g-learners"><span class="s1-clean-num">1</span>Learners + course</label>
-            <textarea class="s1-clean-textarea" id="g-learners" rows="3" placeholder="Who are these students? What kind of course is this?" oninput="onGuidedInput(this)" aria-label="Describe learners and course"></textarea>
+            <textarea class="s1-clean-textarea" id="g-learners" rows="3" placeholder="Who are these students? What kind of course is this?" data-pc-guided-input="true" aria-label="Describe learners and course"></textarea>
           </div>
           <div class="s1-clean-field">
             <label class="s1-clean-label" for="g-issue"><span class="s1-clean-num">2</span>What is failing?</label>
-            <textarea class="s1-clean-textarea" id="g-issue" rows="3" placeholder="What exactly is going wrong in the discussion?" oninput="onGuidedInput(this)" aria-label="Describe the discussion problem"></textarea>
+            <textarea class="s1-clean-textarea" id="g-issue" rows="3" placeholder="What exactly is going wrong in the discussion?" data-pc-guided-input="true" aria-label="Describe the discussion problem"></textarea>
           </div>
           <div class="s1-clean-field">
             <label class="s1-clean-label" for="g-interaction"><span class="s1-clean-num">3</span>Interaction move</label>
-            <textarea class="s1-clean-textarea" id="g-interaction" rows="3" placeholder="How should students build on, challenge, compare, or extend peer ideas?" oninput="onGuidedInput(this)" aria-label="Describe the interaction move"></textarea>
+            <textarea class="s1-clean-textarea" id="g-interaction" rows="3" placeholder="How should students build on, challenge, compare, or extend peer ideas?" data-pc-guided-input="true" aria-label="Describe the interaction move"></textarea>
           </div>
           <div class="s1-clean-field">
             <label class="s1-clean-label" for="g-constraints"><span class="s1-clean-num">4</span>Constraints + success criteria</label>
-            <textarea class="s1-clean-textarea" id="g-constraints" rows="3" placeholder="What limits matter? What should a strong reply include?" oninput="onGuidedInput(this)" aria-label="Describe constraints and success criteria"></textarea>
+            <textarea class="s1-clean-textarea" id="g-constraints" rows="3" placeholder="What limits matter? What should a strong reply include?" data-pc-guided-input="true" aria-label="Describe constraints and success criteria"></textarea>
           </div>
         </div>
         <div class="s1-clean-actions">
           <div class="s1-clean-nudge" id="s1BuilderNudge"></div>
-          <button class="s1-clean-submit" id="sendBtn" type="button" onclick="sendGuided()">Consult Claude →</button>
+          <button class="s1-clean-submit" id="sendBtn" type="button" data-pc-action="send-guided">Consult Claude →</button>
         </div>
       </section>
     </div>`;
@@ -938,10 +901,10 @@ function showS1ResultControls(scoreTotal, mode = 'postReflection'){
         <div class="s1-result-controls-sub">${reviewMode ? `Claude's draft is shown above. Review the analysis before Pixel explains what changed.` : `Pixel's explanation is complete. Choose the next step.`}</div>
       </div>
       <div class="s1-result-controls-actions">
-        <button class="s1-secondary-btn" type="button" onclick="reviseS1()">Revise S1</button>
+        <button class="s1-secondary-btn" type="button" data-pc-action="revise-s1">Revise S1</button>
         ${reviewMode
-          ? `<button class="continue-btn" type="button" onclick="showS1PostAnalysisReflection(${Number(scoreTotal) || 0})">Continue with Pixel →</button>`
-          : (thresholdMet ? `<button class="continue-btn" type="button" onclick="navigateToNext(1)">Next scenario →</button>` : `<button class="continue-btn" type="button" onclick="reviseS1()">Strengthen and try again</button>`)}
+          ? `<button class="continue-btn" type="button" data-pc-action="show-s1-reflection" data-pc-score="${Number(scoreTotal) || 0}">Continue with Pixel →</button>`
+          : (thresholdMet ? `<button class="continue-btn" type="button" data-pc-action="navigate-next" data-pc-scenario-index="1">Next scenario →</button>` : `<button class="continue-btn" type="button" data-pc-action="revise-s1">Strengthen and try again</button>`)}
       </div>
     </div>`;
 };
@@ -957,27 +920,14 @@ function showS1PostAnalysisReflection(scoreTotal){
     stopClaudeTTS?.();
   } catch(e) {}
 
-  const overlay = document.getElementById('vnOverlay');
+  const overlay = pcSetVNOverlayState({ active: true });
   const dialogue = document.getElementById('vnDialogue');
   const speaker = document.getElementById('vnSpeaker');
   const text = document.getElementById('vnText');
   const hint = document.getElementById('vnAdvanceHint');
   const character = document.getElementById('vnCharacter');
 
-  if (overlay) {
-    overlay.classList.remove(
-      'claude-consult',
-      'claude-terminal-consult',
-      'claude-terminal-textmode',
-      'claude-analysis',
-      'claude-prediction',
-      'pc-clean-prediction',
-      'pc-clean-output',
-      'pc-prediction-result'
-    );
-    overlay.classList.add('active');
-    overlay.removeAttribute('aria-hidden');
-  }
+  if (overlay) overlay.removeAttribute('aria-hidden');
 
   if (dialogue) {
     dialogue.classList.remove('has-choices');
@@ -1028,9 +978,8 @@ function showS1PostAnalysisReflection(scoreTotal){
     } : null);
   });
 }
-window.showS1PostAnalysisReflection = showS1PostAnalysisReflection;
 
-window.reviseS1 = reviseS1 = function reviseS1(){
+function reviseS1(){
   const saved = Object.assign(
     {},
     JSON.parse((() => { try { return localStorage.getItem('promptcraft_s1_clean_draft') || '{}'; } catch(e) { return '{}'; } })()),
@@ -1065,8 +1014,34 @@ window.reviseS1 = reviseS1 = function reviseS1(){
 
     document.getElementById('g-learners')?.focus();
   }, 100);
-};
+}
 
+pcExposeGlobals({
+  showS1PostAnalysisReflection,
+  reviseS1
+});
+
+if (!window.pcGuidedInputDelegationInstalled) {
+  window.pcGuidedInputDelegationInstalled = true;
+  document.addEventListener('input', event => {
+    const field = event.target.closest?.('[data-pc-guided-input="true"]');
+    if (field) onGuidedInput(field);
+  });
+}
+
+pcRegisterUIActions({
+  'send-guided': () => sendGuided(),
+  'revise-s1': () => reviseS1(),
+  'show-s1-reflection': target => showS1PostAnalysisReflection(Number(target.dataset.pcScore) || 0),
+  'switch-scenario': target => {
+    const index = pcNormalizeScenarioIndex(target.dataset.pcScenarioIndex);
+    return index === null ? false : switchScenario(index, target);
+  },
+  'dev-go-scenario': target => window.devGoScenario?.(target.dataset.pcScenarioIndex),
+  'dev-fill-scenario': target => window.devFillScenario?.(target.dataset.pcScenarioIndex),
+  'dev-next-scenario': () => window.devNextScenario?.(),
+  'navigate-next': target => window.navigateToNext?.(target.dataset.pcScenarioIndex)
+});
 
 // ══════════════════════════════════════════════════════
 //  SEND + PREDICTION GATE — final owner
@@ -1354,7 +1329,8 @@ function pcApplyPredictionPresentationV191(){
       ['line-height', '1.08'],
       ['letter-spacing', '.02em'],
       ['text-align', 'center'],
-      ['white-space', 'nowrap']
+      ['white-space', 'nowrap'],
+      ['transform', 'translateX(clamp(14px, 2vw, 26px))']
     ]);
   } else if (output) {
     pcRemoveInlineStyles(output, [
@@ -1367,7 +1343,8 @@ function pcApplyPredictionPresentationV191(){
       ['line-height', '1.05'],
       ['letter-spacing', '.045em'],
       ['text-align', 'center'],
-      ['white-space', 'nowrap']
+      ['white-space', 'nowrap'],
+      ['transform', 'translateX(clamp(14px, 2vw, 26px))']
     ]);
   }
 
@@ -1906,20 +1883,10 @@ function pcEnsurePredictionButtons(){
     panel.setAttribute('role','group');
     panel.setAttribute('aria-label','Prediction choices');
     panel.innerHTML = Object.entries(PC_PREDICTION_LABELS).map(([choice,label]) =>
-      `<button class="pc-clean-choice-btn" type="button" data-choice="${choice}">${label}</button>`
+      `<button class="pc-clean-choice-btn" type="button" data-choice="${choice}" data-pc-action="choose-prediction" data-pc-choice="${choice}" data-pc-stop-propagation="true">${label}</button>`
     ).join('');
     dialogue.appendChild(panel);
   }
-
-  panel.querySelectorAll('button[data-choice]').forEach(btn => {
-    if (btn.dataset.pcBound === '1') return;
-    btn.dataset.pcBound = '1';
-    btn.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      pcChoosePrediction(btn.dataset.choice);
-    });
-  });
 
   pcQueuePredictionPresentationV191();
 }
@@ -1936,11 +1903,10 @@ function pcShowPredictionGate(text){
   pcClearPredictionUI();
   pcStopVN();
 
-  const overlay = document.getElementById('vnOverlay');
-  if (overlay) {
-    overlay.classList.remove('claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output','pc-prediction-result');
-    overlay.classList.add('active','claude-prediction','pc-clean-prediction','pc-prediction-question');
-  }
+  const overlay = pcSetVNOverlayState({
+    active: true,
+    modes: ['claude-prediction', 'pc-clean-prediction', 'pc-prediction-question']
+  });
 
   const sceneBackground = document.getElementById('vnSceneBg');
   if (sceneBackground) {
@@ -2035,13 +2001,8 @@ function pcChoosePrediction(choice){
           <div class="pc-feedback-heading"><strong>Your prediction is logged.</strong></div>
           <div>${reaction}</div>
         </div>
-        <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
+        <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button" data-pc-action="continue-to-claude" data-pc-stop-propagation="true">Continue to Claude →</button>
       </div>`;
-    document.getElementById('pcContinueToClaudeBtn')?.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      pcContinueToClaudeAnalysis();
-    });
   }
   pcQueuePredictionPresentationV191();
 }
@@ -2056,7 +2017,7 @@ function pcContinueToClaudeAnalysis(){
   // stored frame null and giving the analyzing screen nothing useful to reuse.
   const predictionTerminal = document.getElementById('claudeTerminalScene');
   const predictionFrameCaptured = pcCapturePredictionTerminalFrameV159(predictionTerminal);
-  console.info(
+  pcDebug(
     '[PromptCraft] Prediction terminal frame capture:',
     predictionFrameCaptured ? { ...pcPredictionTerminalFrameV159 } : null
   );
@@ -2067,18 +2028,10 @@ function pcContinueToClaudeAnalysis(){
   // IMPORTANT: show Claude's thinking screen immediately BEFORE the network/API call.
   // Previously this overlay did not appear until after Claude returned, which made the
   // game look frozen for 20-30 seconds. Tiny little UX crime scene.
-  const overlay = document.getElementById('vnOverlay');
-  if (overlay) {
-    overlay.classList.remove(
-      'claude-prediction',
-      'pc-clean-prediction',
-      'pc-prediction-question',
-      'pc-prediction-result',
-      'claude-terminal-textmode',
-      'has-choices'
-    );
-    overlay.classList.add('active','claude-terminal-consult');
-  }
+  pcSetVNOverlayState({
+    active: true,
+    modes: ['claude-terminal-consult']
+  });
   const dialogue = document.getElementById('vnDialogue');
   if (dialogue) dialogue.classList.remove('has-choices','prediction-question','prediction-result');
   document.getElementById('vnCharacter')?.classList.remove('visible');
@@ -2124,18 +2077,25 @@ function sendText(text){
   return pcShowPredictionGate(text);
 }
 
-window.pcShowPredictionGate = pcShowPredictionGate;
-window.showPredictionGate = pcShowPredictionGate;
-window.choosePrediction = pcChoosePrediction;
-window.finalChoosePrediction = pcChoosePrediction;
-window.pcContinueToClaudeAnalysis = pcContinueToClaudeAnalysis;
-window.finalContinueToClaude = pcContinueToClaudeAnalysis;
-window.hardShowPredictionGate = pcShowPredictionGate;
-window.hardChoosePrediction = pcChoosePrediction;
-window.hardContinueToClaude = pcContinueToClaudeAnalysis;
-window.hardSendText = sendText;
-window.sendText = sendText;
-window.ensurePredictionButtons = pcEnsurePredictionButtons;
+pcExposeGlobals({
+  pcShowPredictionGate,
+  showPredictionGate: pcShowPredictionGate,
+  choosePrediction: pcChoosePrediction,
+  finalChoosePrediction: pcChoosePrediction,
+  pcContinueToClaudeAnalysis,
+  finalContinueToClaude: pcContinueToClaudeAnalysis,
+  hardShowPredictionGate: pcShowPredictionGate,
+  hardChoosePrediction: pcChoosePrediction,
+  hardContinueToClaude: pcContinueToClaudeAnalysis,
+  hardSendText: sendText,
+  sendText,
+  ensurePredictionButtons: pcEnsurePredictionButtons
+});
+
+pcRegisterUIActions({
+  'choose-prediction': target => pcChoosePrediction(target.dataset.pcChoice),
+  'continue-to-claude': () => pcContinueToClaudeAnalysis()
+});
 
 if (!window.__pcPredictionWatchdogBound) {
   window.__pcPredictionWatchdogBound = true;
@@ -2147,56 +2107,22 @@ if (!window.__pcPredictionWatchdogBound) {
 //  NAVIGATION — final owner
 //  navigateToNext, devGoScenario, devFillScenario,
 //  devNextScenario, devTestScenario.
-//  clearVN() calls pcClearVNStateForScenarioSwitch
-//  (defined in S1 workbench above).
 // ══════════════════════════════════════════════════════
-function clearVN(){
-  if (typeof window.pcClearVNStateForScenarioSwitch === 'function') {
-    window.pcClearVNStateForScenarioSwitch();
-    return;
-  }
-  const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
-  if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction','claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output','scenario-intro-active');
-  document.getElementById('vnDialogue')?.classList.remove('has-choices');
-  document.getElementById('vnCharacter')?.classList.remove('visible');
-  document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
-}
-
-
-
 
 // ══════════════════════════════════════════════════════
 //  DEVELOPMENT TOOLS — CLEAN SHELL
 // ══════════════════════════════════════════════════════
 (function exposePromptCraftDevToolsV3(){
-  function assign(name, fn) {
-    window[name] = fn;
-    try { globalThis[name] = fn; } catch (error) {}
-  }
-
-  function unlockTab(index) {
-    const tab = document.querySelectorAll('.tab-btn')[index] || null;
-    if (tab) {
-      tab.disabled = false;
-      tab.classList.remove('locked');
-      tab.removeAttribute('aria-disabled');
-    }
-    return tab;
-  }
-
   function devGoScenario(index) {
-    const target = Math.max(0, Math.min(SCENARIO_COUNT - 1, Number(index) || 0));
-    const tab = unlockTab(target);
+    const target = pcNormalizeScenarioIndex(index, SCENARIO_INDEX.ENGAGEMENT);
+    const tab = pcUnlockScenarioTab(target);
     pcScenarioHasLaunched = true;
-    switchScenario(target, tab);
-    return false;
+    return switchScenario(target, tab);
   }
 
   function devFillScenario(index) {
-    const target = Number(index) || 0;
-    if (target === SCENARIO_INDEX.ENGAGEMENT && typeof window.resetS1Dev === 'function') {
-      return window.resetS1Dev();
-    }
+    const target = pcNormalizeScenarioIndex(index, SCENARIO_INDEX.ENGAGEMENT);
+    if (target === SCENARIO_INDEX.ENGAGEMENT) return resetS1Dev();
     return devGoScenario(target);
   }
 
@@ -2204,19 +2130,21 @@ function clearVN(){
     return devGoScenario(Math.min(scenarioIndex + 1, SCENARIO_COUNT - 1));
   }
 
-  assign('devGoScenario', devGoScenario);
-  assign('devFillScenario', devFillScenario);
-  assign('devTestScenario', devFillScenario);
-  assign('navigateToNext', devGoScenario);
-  assign('devNextScenario', devNextScenario);
-  assign('devStatus', () => ({
-    activeScenario: scenarioIndex + 1,
-    implemented: SCENARIO_UI.map(item => item.implemented),
-    version: PC_APP_VERSION,
-    build: PC_APP_BUILD_LABEL,
-    schema: PC_APP_SCHEMA_VERSION
-  }));
-})();
+  pcExposeGlobals({
+    devGoScenario,
+    devFillScenario,
+    devTestScenario: devFillScenario,
+    navigateToNext: devGoScenario,
+    devNextScenario,
+    devStatus: () => ({
+      activeScenario: scenarioIndex + 1,
+      implemented: SCENARIO_UI.map(item => item.implemented),
+      version: PC_APP_VERSION,
+      build: PC_APP_BUILD_LABEL,
+      schema: PC_APP_SCHEMA_VERSION
+    })
+  });
+})();;
 
 // Claude Speech Synthesis voice
 let claudeSpeechUtterance = null;
@@ -2259,5 +2187,3 @@ function toggleClaudeTTS() {
     if (btn) btn.textContent = '⏹ Stop Reading';
     window.speechSynthesis.speak(claudeSpeechUtterance);
   }
-
-

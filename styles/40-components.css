@@ -97,10 +97,6 @@ header {
   font-size: 0.55rem !important;
 }
 
-.header-right {
-  gap: 8px !important;
-}
-
 .level-tag {
   font-size: 0.58rem !important;
   padding: 3px 8px !important;
@@ -219,14 +215,6 @@ body.s1-active:not(.s1-result-active) button[type="submit"]{
    90-completed-analysis.css. The retired pc-analysis-terminal-v122
    layout was removed because JavaScript no longer assigns that class. */
 
-.scenario-entry,
-.scenario-nav-wrap {
-  width: min(100%, 1100px);
-  margin: 0 auto 12px;
-  animation: slideUp 0.3s ease forwards;
-  opacity: 0;
-}
-
 .scenario-mission {
   background: linear-gradient(135deg, var(--forest-dark), var(--forest));
   border: 2px solid var(--forest-dark);
@@ -263,11 +251,6 @@ body.s1-active:not(.s1-result-active) button[type="submit"]{
 
 
 @media (max-width: 760px) {
-  .scenario-entry,
-  .scenario-nav-wrap {
-    width: 100%;
-    margin-bottom: 10px;
-  }
 
   .scenario-mission{
     border-radius: 12px;
@@ -834,10 +817,6 @@ body.pc-main-menu-open .pixel-coach-card {
 
   .pc-main-menu-footer {
     padding: 9px 18px;
-  }
-
-  .header-right {
-    gap: 7px;
   }
 
   .main-menu-toggle {
@@ -1977,10 +1956,6 @@ body.pc-main-menu-open .pixel-coach-card {
   object-position: left bottom;
   filter: drop-shadow(0 16px 30px rgba(0,0,0,.46));
   transition: opacity .12s ease;
-}
-.vn-student-expression-badge {
-  left: 8px;
-  right: auto;
 }
 body .vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-smartboard-wrap {
   left: 50% !important;

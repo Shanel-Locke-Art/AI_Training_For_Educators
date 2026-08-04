@@ -156,10 +156,8 @@
 }.s1-secondary-btn,.s1-result-controls .continue-btn{min-height:52px!important;min-width:150px!important;border-radius:12px!important;padding:12px 20px!important;font-family:"Fraunces", serif!important;font-weight:800!important;font-size:.95rem!important;cursor:pointer!important
 }.s1-secondary-btn{border:1.5px solid #b89c76!important;border-radius:var(--radius);background:#fffaf2!important;color:#4a3728!important;font-family:"Nunito", sans-serif;font-weight:700;padding:10px 16px;cursor:pointer
 }.s1-result-controls .continue-btn{background:#1e5a37!important;color:#fff!important;border:2px solid #17462b!important
-}@media (max-width: 900px){.vn-overlay.active.pc-clean-prediction .claude-terminal-scene{width:86vw!important;height:42vh!important;top:34%!important
-  }.pc-clean-choice-grid{grid-template-columns:repeat(2, minmax(130px, 1fr))!important;left:24px!important;right:24px!important;bottom:16px!important
+}@media (max-width: 900px){.pc-clean-choice-grid{grid-template-columns:repeat(2, minmax(130px, 1fr))!important;left:24px!important;right:24px!important;bottom:16px!important
   }.pc-feedback-copy{max-width:90vw!important
-  }.vn-overlay.active.pc-clean-prediction .vn-dialogue{padding-left:24px!important;padding-right:24px!important;max-height:38vh!important
   }.vn-overlay.active.pc-clean-prediction .vn-character{height:32vh!important;bottom:140px!important;left:20px!important;right:auto!important
   }.s1-result-controls{flex-direction:column!important;align-items:stretch!important
   }
@@ -217,8 +215,8 @@
 }body .vn-overlay.active.claude-prediction #vnPredictionChoicePanel,body .vn-overlay.active #vnPredictionChoicePanel.pc-choice-panel-final,body .vn-overlay.active #vnPredictionChoicePanel.pc-clean-choice-grid,body .vn-overlay.active #vnPredictionChoicePanel.vn-prediction-options{display:grid!important;grid-template-columns:repeat(4, minmax(180px, 1fr))!important;gap:14px!important;position:fixed!important;left:max(610px, 35vw)!important;right:3vw!important;bottom:26px!important;width:auto!important;max-width:none!important;min-height:58px!important;z-index:2147483640!important;pointer-events:auto!important;opacity:1!important;visibility:visible!important;transform:none!important;overflow:visible!important
 }body .vn-overlay.active .pc-feedback-copy{max-width:min(800px, 50vw)!important
 }body .vn-overlay.active .prediction-continue-btn{width:auto!important;min-width:245px!important;margin-top:14px!important;background:#10f43a!important;color:#031907!important;border-color:#caffd2!important;text-transform:uppercase!important;letter-spacing:.08em!important;position:relative!important;z-index:2147483641!important
-}body .s1-result-controls .continue-btn,body .s1-result-controls .s1-secondary-btn,body .scenario-nav-card .scenario-nav-btn{appearance:none!important;border:2px solid rgba(26, 91, 55, .55)!important;border-radius:12px!important;padding:14px 24px!important;min-height:52px!important;font-family:"Nunito", sans-serif!important;font-weight:900!important;font-size:1rem!important;text-decoration:none!important;cursor:pointer!important
-}body .s1-result-controls .continue-btn,body .scenario-nav-card .scenario-nav-btn{background:#1f623a!important;color:#fff!important;box-shadow:0 4px 10px rgba(0,0,0,.14)!important
+}body .s1-result-controls .continue-btn,body .s1-result-controls .s1-secondary-btn{appearance:none!important;border:2px solid rgba(26, 91, 55, .55)!important;border-radius:12px!important;padding:14px 24px!important;min-height:52px!important;font-family:"Nunito", sans-serif!important;font-weight:900!important;font-size:1rem!important;text-decoration:none!important;cursor:pointer!important
+}body .s1-result-controls .continue-btn{background:#1f623a!important;color:#fff!important;box-shadow:0 4px 10px rgba(0,0,0,.14)!important
 }body .s1-result-controls .s1-secondary-btn{background:#fffaf2!important;color:#3b2313!important
 }@media (max-width: 1100px){body .vn-overlay.active.claude-prediction .vn-character,body .vn-overlay.active.pc-clean-prediction .vn-character{height:30vh!important;left:16px!important;bottom:160px!important
   }body .vn-overlay.active.claude-prediction .vn-dialogue,body .vn-overlay.active.pc-clean-prediction .vn-dialogue{padding-left:22px!important;padding-bottom:156px!important

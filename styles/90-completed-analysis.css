@@ -689,74 +689,91 @@
    the completed diagnostic shown inside the workstation monitor.
 ================================================== */
 
-/* Wide-screen completed analysis: keep the diagnostic compact enough to live
-   inside the monitor rather than expanding over the entire computer image. */
+/* Wide-screen completed analysis: approved large centered workstation and
+   roomy diagnostic grid inside the physical monitor glass. */
 @media (min-width: 1511px) {
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
   #claudeTerminalOutput.claude-analysis-layout {
-    position: relative !important;
+    position: absolute !important;
+    inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
     min-height: 0 !important;
     max-width: none !important;
     margin: 0 !important;
-    padding: clamp(8px, 0.8vw, 13px) !important;
+    padding: 0 !important;
     display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
     overflow: hidden !important;
     white-space: normal !important;
     box-sizing: border-box !important;
+    font-family: "Source Code Pro", Consolas, monospace !important;
   }
 
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
   #claudeTerminalOutput.claude-analysis-layout .analysis-report {
     width: 100% !important;
-    max-width: none !important;
-    height: auto !important;
+    max-width: 100% !important;
+    height: 100% !important;
     margin: 0 !important;
-    padding: 0 !important;
-    transform: none !important;
-    color: #eaffee !important;
+    color: #f3fff6 !important;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0 1px, transparent 1px 5px),
+      radial-gradient(circle at 50% 12%, rgba(61,255,116,.09), transparent 42%),
+      linear-gradient(180deg, rgba(0,31,16,.99), rgba(0,12,7,.995)) !important;
+    border: 2px solid rgba(64,255,112,.92) !important;
+    border-radius: 13px !important;
+    box-shadow:
+      inset 0 0 0 1px rgba(150,255,183,.14),
+      inset 0 0 28px rgba(35,255,96,.055) !important;
     box-sizing: border-box !important;
   }
 
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
   .analysis-header {
-    margin: 0 0 6px !important;
-    padding: 7px 9px !important;
-    border-width: 1px !important;
+    text-align: center !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
     box-shadow: none !important;
   }
 
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
   .analysis-badge {
-    margin: 0 0 4px !important;
-    padding: 2px 6px !important;
-    font-size: clamp(0.48rem, 0.48vw, 0.64rem) !important;
-    line-height: 1 !important;
+    display: table !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    color: #70ff94 !important;
+    background: rgba(0,24,12,.72) !important;
+    border: 1px solid rgba(76,255,119,.88) !important;
+    border-radius: 6px !important;
+    font-weight: 700 !important;
+    letter-spacing: .055em !important;
+    text-transform: uppercase !important;
   }
 
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
   .analysis-title {
-    margin: 0 0 3px !important;
-    font-size: clamp(1.12rem, 1.35vw, 1.55rem) !important;
-    line-height: 1 !important;
+    color: #f5fff7 !important;
+    font-weight: 800 !important;
+    letter-spacing: .025em !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
   }
 
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
   .analysis-summary {
-    margin: 0 !important;
-    font-size: clamp(0.62rem, 0.68vw, 0.78rem) !important;
-    line-height: 1.18 !important;
+    color: #f1fff4 !important;
+    font-weight: 500 !important;
+    text-align: left !important;
   }
 
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
   .analysis-grid {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-    gap: 6px !important;
-    margin: 0 !important;
+    min-width: 0 !important;
   }
 
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
@@ -766,10 +783,12 @@
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
   .analysis-card.wide {
     margin: 0 !important;
-    padding: 6px 8px !important;
-    min-height: 0 !important;
-    border-width: 1px !important;
-    box-shadow: none !important;
+    min-width: 0 !important;
+    color: #f5fff7 !important;
+    background: linear-gradient(180deg, rgba(0,31,16,.86), rgba(0,18,9,.82)) !important;
+    border: 1px solid rgba(85,255,126,.82) !important;
+    border-radius: 9px !important;
+    box-shadow: inset 0 0 14px rgba(45,255,102,.03) !important;
   }
 
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
@@ -779,24 +798,34 @@
 
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
   .analysis-label {
-    margin: 0 0 2px !important;
-    font-size: clamp(0.46rem, 0.48vw, 0.6rem) !important;
-    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: .48em !important;
+    color: #79ff97 !important;
+    font-weight: 800 !important;
+    letter-spacing: .045em !important;
+    text-transform: uppercase !important;
   }
 
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
   .analysis-value,
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
   .analysis-value.big {
-    font-size: clamp(0.58rem, 0.64vw, 0.75rem) !important;
-    line-height: 1.12 !important;
+    color: #f5fff7 !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .analysis-value.big {
+    font-weight: 800 !important;
+    letter-spacing: .01em !important;
   }
 
   html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
   .analysis-note {
-    margin-top: 2px !important;
-    font-size: clamp(0.5rem, 0.52vw, 0.64rem) !important;
-    line-height: 1.1 !important;
+    color: #d8ffe1 !important;
+    opacity: .9 !important;
   }
 }
 
@@ -805,9 +834,9 @@
    so the border reads centered within the bezel. */
 @media (min-width: 1511px) {
   html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-report {
-    width: 96.5% !important;
-    max-width: 96.5% !important;
-    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
   }
 }
 
@@ -1080,7 +1109,7 @@ html body #vnOverlay.vn-overlay.active.pc-analysis-computer-v255 .claude-termina
 }
 
 html body #vnOverlay.vn-overlay.active.pc-analysis-computer-v255 .claude-terminal-photo {
-  background-size: cover !important;
+  background-size: 100% 100% !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
 }

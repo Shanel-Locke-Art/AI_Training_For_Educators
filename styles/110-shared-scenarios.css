@@ -209,10 +209,6 @@ body.pc-scenario-activity-active #inputContainer {
   transition: border-color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease;
 }
 
-.pc-choice-card--detail {
-  min-height: 132px;
-}
-
 .pc-choice-card:hover {
   border-color: var(--forest-mid);
   transform: translateY(-1px);

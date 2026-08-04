@@ -1,6 +1,6 @@
 /* ======================================================
    PROMPTCRAFT APPLICATION CORE
-   Version 270 modular JavaScript entry point.
+   Version 320 modular JavaScript entry point.
 
    Load order:
      1. dialogue.js          Dialogue content
@@ -53,6 +53,12 @@ let pcMainMenuLastFocused = null;
 let pcNameConfirmed = false;
 let pcPendingScenarioIndex = null;
 
+const PC_RUNTIME_DEBUG = new URLSearchParams(window.location.search).get('debug') === '1';
+
+function pcDebug(...args) {
+  if (PC_RUNTIME_DEBUG) console.debug(...args);
+}
+
 // ── SCREEN READER UTILITY ─────────────────────────────
 (function() {
   const s = document.createElement('style');
@@ -81,6 +87,91 @@ function pcFocusWithoutScroll(element) {
   }
   return true;
 }
+
+// Shared global exposure keeps legacy inline integrations and development tools
+// available without scattering one-off window assignments across every module.
+function pcExposeGlobals(entries = {}) {
+  Object.entries(entries).forEach(([name, value]) => {
+    window[name] = value;
+    try { globalThis[name] = value; } catch (error) {}
+  });
+}
+
+// PromptCraft renders many controls dynamically. A single delegated action
+// registry prevents every render pass from attaching another collection of
+// short-lived click listeners.
+const PC_UI_ACTIONS = new Map();
+
+function pcRegisterUIActions(actions = {}) {
+  Object.entries(actions).forEach(([name, handler]) => {
+    if (typeof handler !== 'function') {
+      throw new TypeError(`[PromptCraft] UI action "${name}" must be a function.`);
+    }
+    PC_UI_ACTIONS.set(name, handler);
+  });
+}
+
+const PC_UI_EVENT_CONFIG = Object.freeze({
+  click:  { attribute: 'data-pc-action',        datasetKey: 'pcAction',       preventDefault: true },
+  submit: { attribute: 'data-pc-submit-action', datasetKey: 'pcSubmitAction', preventDefault: true },
+  change: { attribute: 'data-pc-change-action', datasetKey: 'pcChangeAction', preventDefault: false },
+  keydown:{ attribute: 'data-pc-key-action',    datasetKey: 'pcKeyAction',    preventDefault: true },
+  toggle: { attribute: 'data-pc-toggle-action', datasetKey: 'pcToggleAction', preventDefault: false }
+});
+
+function pcKeyboardActionMatches(target, event) {
+  if (event.type !== 'keydown') return true;
+  const allowed = String(target.dataset.pcKeys || '')
+    .split(/[\s,]+/)
+    .filter(Boolean);
+  if (!allowed.length) return false;
+  const key = event.key === ' ' ? 'Space' : event.key;
+  return allowed.includes(key);
+}
+
+function pcDispatchUIAction(event) {
+  const config = PC_UI_EVENT_CONFIG[event.type];
+  if (!config || !(event.target instanceof Element)) return;
+
+  const target = event.target.closest(`[${config.attribute}]`);
+  if (!target || !pcKeyboardActionMatches(target, event)) return;
+
+  const actionName = target.dataset[config.datasetKey] || '';
+  const handler = PC_UI_ACTIONS.get(actionName);
+  if (!handler) return;
+
+  const shouldPreventDefault = target.dataset.pcPreventDefault === 'false'
+    ? false
+    : config.preventDefault;
+  if (shouldPreventDefault) event.preventDefault();
+  if (target.dataset.pcStopPropagation === 'true') event.stopPropagation();
+  if (target.dataset.pcCloseDetails === 'true') {
+    target.closest('details')?.removeAttribute('open');
+  }
+
+  try {
+    const result = handler(target, event);
+    if (result && typeof result.catch === 'function') {
+      result.catch(error => console.error(`[PromptCraft] UI action "${actionName}" failed:`, error));
+    }
+  } catch (error) {
+    console.error(`[PromptCraft] UI action "${actionName}" failed:`, error);
+  }
+}
+
+Object.keys(PC_UI_EVENT_CONFIG).forEach(eventName => {
+  document.addEventListener(eventName, pcDispatchUIAction, true);
+});
+
+pcRegisterUIActions({
+  'close-details': target => target.closest('details')?.removeAttribute('open'),
+  'close-other-details': target => {
+    if (!target.open) return;
+    document.querySelectorAll('.pc-brand-menu[open], .pc-compact-nav details[open]').forEach(menu => {
+      if (menu !== target) menu.removeAttribute('open');
+    });
+  }
+});
 
 function pcScenarioInputMayReceiveFocusV216() {
   const vnOverlay = document.getElementById('vnOverlay');
@@ -290,6 +381,14 @@ window.addEventListener('keydown', event => {
   }
 });
 
+pcRegisterUIActions({
+  'submit-name': target => submitName(target.dataset.pcSkip === 'true'),
+  'select-audio-preference': target => selectAudioPreference(target.value),
+  'submit-audio-preference': (_target, event) => submitAudioPreference(event),
+  'close-audio-setup': () => closeAudioSetup(),
+  'show-audio-settings': () => showAudioSetup({ onboarding: false })
+});
+
 function updatePixelWelcomeForName() {
   if (playerName !== 'You') {
     // Personalise the welcome dialogue
@@ -336,14 +435,16 @@ const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 
 // ══════════════════════════════════════════════════════
 //  BUILD + DATA SCHEMA VERSIONING
-//  The app version is read from the app.js cache-busting query in index.html.
-//  Update functions/app.js?v=### once and the console build label and main-menu
+//  The app version is read from the active bundle's cache-busting query in index.html.
+//  Update functions/app.bundle.js?v=### once and the console build label and main-menu
 //  version will stay synchronized automatically. Change the schema only when
 //  the saved research-data structure changes.
 // ══════════════════════════════════════════════════════
 const PC_APP_SCRIPT_URL = (() => {
-  const script = [...document.scripts].find(item => /(?:^|\/)functions\/app\.js(?:[?#]|$)/.test(item.src));
-  return script?.src || new URL('functions/app.js', document.baseURI).href;
+  const script = [...document.scripts].find(item =>
+    /(?:^|\/)functions\/(?:app\.bundle|app)\.js(?:[?#]|$)/.test(item.src)
+  );
+  return script?.src || new URL('functions/app.bundle.js', document.baseURI).href;
 })();
 const PC_APP_VERSION = new URL(PC_APP_SCRIPT_URL).searchParams.get('v') || 'DEV';
 const PC_APP_SCHEMA_VERSION = 'V121';
@@ -356,7 +457,7 @@ function pcSyncAppVersionLabels() {
   });
 }
 
-console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
+pcDebug('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 // ══════════════════════════════════════════════════════
 //  ASSET PATHS
@@ -371,10 +472,23 @@ function pcProjectUrl(path = '') {
   return new URL(cleanPath, PC_PROJECT_ROOT_URL).href;
 }
 
+function pcSetImageFallbackVisibility(img, showFallback) {
+  if (!img) return;
+  const fallbackId = img.dataset.pcFallbackElement || '';
+  const fallbackElement = fallbackId ? document.getElementById(fallbackId) : null;
+  const loadedDisplay = img.dataset.pcLoadedDisplay || '';
+
+  img.style.display = showFallback ? 'none' : loadedDisplay;
+  if (fallbackElement) fallbackElement.style.display = showFallback ? (fallbackElement.dataset.pcFallbackDisplay || 'flex') : 'none';
+}
+
 function pcUseImageFallback(img, fallback = '') {
-  if (!img || img.dataset.pcFallbackApplied === 'true') return;
+  if (!img) return;
   const fallbackPath = fallback || img.dataset.pcFallback || '';
-  if (!fallbackPath) return;
+  if (!fallbackPath || img.dataset.pcFallbackApplied === 'true') {
+    pcSetImageFallbackVisibility(img, true);
+    return;
+  }
   img.dataset.pcFallbackApplied = 'true';
   img.src = /^([a-z]+:|data:|blob:)/i.test(fallbackPath)
     ? fallbackPath
@@ -385,6 +499,7 @@ function pcSetImageSource(img, primary, fallback = '') {
   if (!img || !primary) return;
   img.dataset.pcFallback = fallback || '';
   img.dataset.pcFallbackApplied = 'false';
+  img.onload = () => pcSetImageFallbackVisibility(img, false);
   img.onerror = () => pcUseImageFallback(img, fallback);
   img.src = /^([a-z]+:|data:|blob:)/i.test(primary)
     ? primary
@@ -397,9 +512,11 @@ function pcHydrateStaticImages() {
   });
 }
 
-window.pcProjectUrl = pcProjectUrl;
-window.pcUseImageFallback = pcUseImageFallback;
-window.pcSetImageSource = pcSetImageSource;
+pcExposeGlobals({
+  pcProjectUrl,
+  pcUseImageFallback,
+  pcSetImageSource
+});
 
 const ASSETS = Object.freeze({
   images: Object.freeze({
@@ -494,7 +611,7 @@ document.documentElement.style.setProperty('--pc-app-background-legacy', 'none')
 // Robust Google Sheets poster.
 // Uses text/plain so browser no-cors requests are not silently mangled by preflight/CORS rules.
 // Apps Script still receives the JSON string in e.postData.contents.
-const PC_SHEETS_DEBUG = true;
+const PC_SHEETS_DEBUG = PC_RUNTIME_DEBUG;
 
 async function postToSheets(payload, label = 'PromptCraft data') {
   if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
@@ -505,7 +622,7 @@ async function postToSheets(payload, label = 'PromptCraft data') {
   const body = JSON.stringify(payload || {});
 
   try {
-    if (PC_SHEETS_DEBUG) console.log(`[PromptCraft] Sending ${label} to Sheets:`, payload);
+    if (PC_SHEETS_DEBUG) pcDebug(`[PromptCraft] Sending ${label} to Sheets:`, payload);
 
     await fetch(SHEETS_URL, {
       method: 'POST',
@@ -514,7 +631,7 @@ async function postToSheets(payload, label = 'PromptCraft data') {
       body
     });
 
-    if (PC_SHEETS_DEBUG) console.log(`[PromptCraft] Sheets request dispatched: ${label}`);
+    if (PC_SHEETS_DEBUG) pcDebug(`[PromptCraft] Sheets request dispatched: ${label}`);
     return true;
   } catch (err) {
     console.warn(`[PromptCraft] fetch failed for ${label}:`, err);
@@ -525,7 +642,7 @@ async function postToSheets(payload, label = 'PromptCraft data') {
     if (navigator.sendBeacon) {
       const blob = new Blob([body], { type: 'text/plain;charset=utf-8' });
       const ok = navigator.sendBeacon(SHEETS_URL, blob);
-      console.log(`[PromptCraft] sendBeacon fallback ${ok ? 'queued' : 'failed'}: ${label}`);
+      pcDebug(`[PromptCraft] sendBeacon fallback ${ok ? 'queued' : 'failed'}: ${label}`);
       return ok;
     }
   } catch (err) {
@@ -595,7 +712,7 @@ function mockClaudeText(payload, context = 'main') {
 
 
 function mockClaudeResponse(payload, context = 'main') {
-  console.info(`[PromptCraft] Using mock Claude response for ${context}.`);
+  pcDebug(`[PromptCraft] Using mock Claude response for ${context}.`);
   return Promise.resolve({
     content: [{ text: mockClaudeText(payload, context) }],
     mock: true
@@ -637,23 +754,6 @@ async function callClaude(payload, context = 'main') {
     if (timeoutId) clearTimeout(timeoutId);
   }
 }
-
-function showMockClaudeNotice() {
-  if (!USE_MOCK_CLAUDE) return;
-  const bar = document.getElementById('devBar');
-  if (!bar || document.getElementById('mockClaudeNotice')) return;
-  const tag = document.createElement('span');
-  tag.id = 'mockClaudeNotice';
-  tag.textContent = 'MOCK CLAUDE';
-  tag.style.color = '#f6c177';
-  tag.style.border = '1px solid #f6c177';
-  tag.style.borderRadius = '4px';
-  tag.style.padding = '1px 6px';
-  tag.style.marginLeft = '4px';
-  bar.insertBefore(tag, bar.children[1] || null);
-}
-
-document.addEventListener('DOMContentLoaded', showMockClaudeNotice);
 
 // ══════════════════════════════════════════════════════
 //  BEHAVIORAL DATA TRACKING
@@ -963,7 +1063,7 @@ async function saveIncrementalData(scenarioIdx) {
       notes_coding_memo: `${location.pathname} :: ${getPromptCraftScenarioLabel(scenarioIdx)} :: session ${pcSessionId} :: ${PC_APP_BUILD_LABEL}`
     };
 
-    console.log(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
+    pcDebug(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
     await postToSheets(payload, `incremental S${scenarioIdx + 1}`);
   } catch(e) {
     console.warn('[PromptCraft] Incremental save failed:', e.message);

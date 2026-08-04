@@ -124,9 +124,54 @@ if (scenarios.length !== SCENARIO_COUNT || SCENARIO_UI.length !== SCENARIO_COUNT
 
 const PC_SCENARIO_LABELS = SCENARIO_UI.map(ui => ui.dataLabel || ui.tabLabel);
 
-window.SCENARIO_INDEX = SCENARIO_INDEX;
-window.scenarios = scenarios;
-window.SCENARIO_UI = SCENARIO_UI;
+pcExposeGlobals({
+  SCENARIO_INDEX,
+  scenarios,
+  SCENARIO_UI
+});
+
+function pcNormalizeScenarioIndex(value, fallback = null) {
+  const index = Number(value);
+  return Number.isInteger(index) && index >= 0 && index < SCENARIO_COUNT && scenarios[index]
+    ? index
+    : fallback;
+}
+
+function pcGetScenarioTab(index) {
+  const normalized = pcNormalizeScenarioIndex(index);
+  return normalized === null ? null : document.querySelectorAll('.tab-btn')[normalized] || null;
+}
+
+function pcUnlockScenarioTab(index) {
+  const tab = pcGetScenarioTab(index);
+  if (tab) {
+    tab.disabled = false;
+    tab.classList.remove('locked');
+    tab.removeAttribute('aria-disabled');
+  }
+  return tab;
+}
+
+const PC_SCENARIO_RENDERERS = Object.freeze({
+  'guided-builder': ({ container }) => renderGuidedBuilder(container),
+  'metacognition-opening': ({ container }) => renderS2Standby(container),
+  'development-shell': ({ index }) => renderScenarioPlaceholder(index)
+});
+
+const PC_SCENARIO_AFTER_INTRO_ACTIONS = Object.freeze({
+  's2-diagnosis': () => renderS2DiagnosisActivity()
+});
+
+function pcRenderScenarioWorkspace(index, container) {
+  const ui = getScenarioUI(index);
+  const renderer = PC_SCENARIO_RENDERERS[ui.rendererKey] || PC_SCENARIO_RENDERERS['development-shell'];
+  return renderer({ index, container, ui });
+}
+
+function pcRunScenarioAfterIntroAction(actionKey) {
+  const action = PC_SCENARIO_AFTER_INTRO_ACTIONS[actionKey];
+  if (typeof action === 'function') action();
+}
 
 // ══════════════════════════════════════════════════════
 //  MAIN MENU
@@ -151,7 +196,8 @@ function getScenarioMenuStatus(index) {
 
 
 function isScenarioAvailableFromMenu(index) {
-  return Number.isInteger(Number(index)) && !!SCENARIO_UI[Number(index)];
+  const normalized = pcNormalizeScenarioIndex(index);
+  return normalized !== null && Boolean(SCENARIO_UI[normalized]);
 }
 
 
@@ -169,7 +215,8 @@ function renderScenarioMenu() {
     return `
       <button class="pc-menu-scenario-card${stateClass}${shellClass}"
               type="button"
-              onclick="launchScenarioFromMenu(${index})"
+              data-pc-action="launch-scenario"
+              data-pc-scenario-index="${index}"
               aria-label="Open ${esc(ui.tabLabel)}. ${esc(status)}">
         <span class="pc-menu-scenario-number">${String(index + 1).padStart(2, '0')}</span>
         <span class="pc-menu-scenario-content">
@@ -204,12 +251,14 @@ function syncCompactScenarioMenu() {
 }
 
 function initializeCompactScenarioSync() {
-  document.querySelectorAll('.scenario-tabs .tab-btn').forEach(tab => {
-    new MutationObserver(syncCompactScenarioMenu).observe(tab, {
+  const tabs = document.querySelector('.scenario-tabs');
+  if (tabs) {
+    new MutationObserver(syncCompactScenarioMenu).observe(tabs, {
+      subtree: true,
       attributes: true,
       attributeFilter: ['class', 'aria-selected']
     });
-  });
+  }
   syncCompactScenarioMenu();
 }
 
@@ -327,19 +376,13 @@ function closeMainMenu(options = {}) {
 }
 
 function pcUnlockScenarioForMenuPreview(index) {
-  const tab = document.querySelectorAll('.tab-btn')[index] || null;
-  if (tab) {
-    tab.disabled = false;
-    tab.classList.remove('locked');
-    tab.removeAttribute('aria-disabled');
-  }
-  return tab;
+  return pcUnlockScenarioTab(index);
 }
 
 
 function launchScenarioFromMenu(index, options = {}) {
-  index = Number(index);
-  if (!Number.isInteger(index) || !scenarios[index] || !isScenarioAvailableFromMenu(index)) return false;
+  index = pcNormalizeScenarioIndex(index);
+  if (index === null || !isScenarioAvailableFromMenu(index)) return false;
 
   // The main menu is the first screen. Ask for the learner's name only after
   // they choose Start or select a scenario.
@@ -361,7 +404,7 @@ function launchScenarioFromMenu(index, options = {}) {
   pcScenarioHasLaunched = true;
   pcMainMenuInitialOpen = false;
 
-  const tab = pcUnlockScenarioForMenuPreview(index) || document.querySelectorAll('.tab-btn')[index] || null;
+  const tab = pcUnlockScenarioForMenuPreview(index);
   closeMainMenu({ force: true });
 
   // switchScenario owns all scene cleanup, input rendering, and introduction
@@ -409,11 +452,24 @@ window.addEventListener('keydown', event => {
   }
 });
 
-window.openMainMenu = openMainMenu;
-window.closeMainMenu = closeMainMenu;
-window.showMainMenuPanel = showMainMenuPanel;
-window.continueFromMainMenu = continueFromMainMenu;
-window.launchScenarioFromMenu = launchScenarioFromMenu;
+pcExposeGlobals({
+  openMainMenu,
+  closeMainMenu,
+  showMainMenuPanel,
+  continueFromMainMenu,
+  launchScenarioFromMenu
+});
+
+pcRegisterUIActions({
+  'open-main-menu': target => openMainMenu(target.dataset.pcPanel || 'home'),
+  'close-main-menu': () => closeMainMenu(),
+  'show-main-menu-panel': target => showMainMenuPanel(target.dataset.pcPanel || 'home'),
+  'continue-main-menu': () => continueFromMainMenu(),
+  'launch-scenario': target => launchScenarioFromMenu(
+    target.dataset.pcScenarioIndex,
+    { skipNameGate: target.dataset.pcSkipNameGate === 'true' }
+  )
+});
 
 // ══════════════════════════════════════════════════════
 //  PROFESSOR PIXEL — INLINE CHAT DIALOGUE SYSTEM
@@ -452,6 +508,11 @@ function pixelBadgeClick() {
 function pixelCoachDismiss() {
   document.getElementById('pixelCoachCard').classList.remove('visible');
 }
+
+pcRegisterUIActions({
+  'pixel-badge-click': () => pixelBadgeClick(),
+  'pixel-coach-dismiss': () => pixelCoachDismiss()
+});
 
 // ── AI BUBBLE AVATAR ──────────────────────────────────
 function pixelAvatarHTML(expr) {
@@ -520,8 +581,8 @@ function renderScenarioPlaceholder(index) {
       ${plannedSteps ? `<div class="pc-shell-plan"><h3>Planned game loop</h3>${plannedSteps}</div>` : ''}
       <p class="pc-shell-note">The previous implementation is preserved in <code>archive/legacy-scenarios-v133/</code>, but it is no longer loaded by the game.</p>
       <div class="pc-shell-actions">
-        <button type="button" class="pc-shell-primary" onclick="openMainMenu('scenarios')">Return to Scenario Select</button>
-        <button type="button" class="pc-shell-secondary" onclick="launchScenarioFromMenu(0,{skipNameGate:true})">Play Scenario 1</button>
+        <button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="scenarios">Return to Scenario Select</button>
+        <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="0" data-pc-skip-name-gate="true">Play Scenario 1</button>
       </div>
     </section>`;
   area.scrollTop = 0;
@@ -631,8 +692,11 @@ function wireExactSelection({ rootId, inputName, limit, statusId, submitId, onSu
     inputs.forEach(input => input.closest('.pc-choice-card')?.classList.toggle('selected', input.checked));
   };
 
-  inputs.forEach(input => input.addEventListener('change', () => update(input)));
-  submit.addEventListener('click', onSubmit);
+  root.addEventListener('change', event => {
+    const input = event.target.closest?.(`input[name="${inputName}"]`);
+    if (input) update(input);
+  });
+  submit.addEventListener('click', onSubmit, { once: true });
   update(null);
 }
 
@@ -687,6 +751,46 @@ const S2_EVIDENCE_RESPONSES = [
   { id: 'f', tag: 'F', title: 'Transfer', text: 'The examples helped me notice the differences, so I will use that strategy before the next quiz.' },
 ];
 
+const S2_ACTIVITY_CONFIG = Object.freeze({
+  diagnosis: Object.freeze({
+    items: S2_DIAGNOSIS_OPTIONS,
+    inputName: 's2-diagnosis',
+    idPrefix: 's2-diagnosis',
+    titleId: 's2DiagnosisTitle',
+    kicker: 'Decision 1 · Diagnose the learning problem',
+    title: 'Which two instructional needs are most clearly supported by Jordan’s comments?',
+    instruction: 'Select exactly two. Several options sound educationally useful, but only two are the strongest diagnosis of this evidence.',
+    choiceGridId: 's2DiagnosisChoices',
+    statusId: 's2DiagnosisStatus',
+    submitId: 's2DiagnosisSubmit',
+    submitLabel: 'Submit diagnosis',
+    feedbackId: 's2DiagnosisFeedback',
+    activeIndex: 0,
+    focusSelector: 'input[name="s2-diagnosis"]',
+    onSubmit: submitS2Diagnosis,
+    wrapContent: taskHTML => `<div class="pc-activity-layout">${buildS2JordanEvidenceHTML()}${taskHTML}</div>`
+  }),
+  evidence: Object.freeze({
+    items: S2_EVIDENCE_RESPONSES,
+    inputName: 's2-evidence',
+    idPrefix: 's2-evidence',
+    variant: 'detail',
+    marker: item => item.tag,
+    titleId: 's2EvidenceTitle',
+    kicker: 'Decision 2 · Find the metacognitive thinker',
+    title: 'Which two responses show the strongest metacognitive thinking?',
+    instruction: 'Select exactly two. One response is deliberately close because noticing a problem is meaningful, but it is not the entire learning cycle.',
+    choiceGridId: 's2EvidenceChoices',
+    statusId: 's2EvidenceStatus',
+    submitId: 's2EvidenceSubmit',
+    submitLabel: 'Submit evidence',
+    feedbackId: 's2EvidenceFeedback',
+    activeIndex: 1,
+    focusSelector: 'input[name="s2-evidence"]',
+    onSubmit: submitS2Evidence
+  })
+});
+
 function getS2Data() {
   const data = scenarioData[SCENARIO_INDEX.METACOGNITION];
   if (!Array.isArray(data.diagnosisAttempts)) data.diagnosisAttempts = [];
@@ -722,43 +826,58 @@ function renderS2Standby(container) {
   });
 }
 
-function renderS2DiagnosisActivity() {
+function renderS2SelectionActivity(config) {
   const container = document.getElementById('inputContainer');
-  if (!container || scenarioIndex !== SCENARIO_INDEX.METACOGNITION) return;
+  if (!container || scenarioIndex !== SCENARIO_INDEX.METACOGNITION) return false;
+
   const choicesHTML = buildScenarioChoiceCardsHTML({
-    items: S2_DIAGNOSIS_OPTIONS,
-    inputName: 's2-diagnosis',
-    idPrefix: 's2-diagnosis'
+    items: config.items,
+    inputName: config.inputName,
+    idPrefix: config.idPrefix,
+    variant: config.variant,
+    marker: config.marker
   });
   const taskHTML = buildScenarioTaskCardHTML({
-    titleId: 's2DiagnosisTitle',
-    kicker: 'Decision 1 · Diagnose the learning problem',
-    title: 'Which two instructional needs are most clearly supported by Jordan’s comments?',
-    instruction: 'Select exactly two. Several options sound educationally useful, but only two are the strongest diagnosis of this evidence.',
-    choiceGridId: 's2DiagnosisChoices',
+    titleId: config.titleId,
+    kicker: config.kicker,
+    title: config.title,
+    instruction: config.instruction,
+    choiceGridId: config.choiceGridId,
     choicesHTML,
-    statusId: 's2DiagnosisStatus',
-    submitId: 's2DiagnosisSubmit',
-    submitLabel: 'Submit diagnosis',
-    feedbackId: 's2DiagnosisFeedback'
+    statusId: config.statusId,
+    submitId: config.submitId,
+    submitLabel: config.submitLabel,
+    feedbackId: config.feedbackId
   });
+  const contentHTML = typeof config.wrapContent === 'function'
+    ? config.wrapContent(taskHTML)
+    : taskHTML;
 
   mountScenarioActivity({
     container,
     scenarioIndex: SCENARIO_INDEX.METACOGNITION,
-    progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 0, ariaLabel: 'Scenario 2 progress' }),
-    contentHTML: `<div class="pc-activity-layout">${buildS2JordanEvidenceHTML()}${taskHTML}</div>`,
-    focusSelector: 'input[name="s2-diagnosis"]'
+    progressHTML: buildScenarioProgressHTML({
+      steps: S2_PROGRESS_STEPS,
+      activeIndex: config.activeIndex,
+      ariaLabel: 'Scenario 2 progress'
+    }),
+    contentHTML,
+    focusSelector: config.focusSelector
   });
 
   wireExactSelection({
-    rootId: 's2DiagnosisChoices',
-    inputName: 's2-diagnosis',
+    rootId: config.choiceGridId,
+    inputName: config.inputName,
     limit: 2,
-    statusId: 's2DiagnosisStatus',
-    submitId: 's2DiagnosisSubmit',
-    onSubmit: submitS2Diagnosis,
+    statusId: config.statusId,
+    submitId: config.submitId,
+    onSubmit: config.onSubmit
   });
+  return true;
+}
+
+function renderS2DiagnosisActivity() {
+  return renderS2SelectionActivity(S2_ACTIVITY_CONFIG.diagnosis);
 }
 
 function classifyS2Diagnosis(selection) {
@@ -796,53 +915,13 @@ function renderS2DiagnosisFeedback(selection, result) {
     heading: exact ? 'Diagnosis supported by the evidence' : 'A useful diagnosis needs one more pass',
     text,
     actionsHTML: `
-      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryDiagnosis">Revise diagnosis</button>'}
-      <button class="pc-button pc-button--primary" type="button" id="s2ContinueEvidence">Examine student responses →</button>`
-  });
-  document.getElementById('s2RetryDiagnosis')?.addEventListener('click', renderS2DiagnosisActivity);
-  document.getElementById('s2ContinueEvidence')?.addEventListener('click', () => {
-    const data = getS2Data();
-    data.diagnosisFinal = [...selection];
-    renderS2EvidenceActivity();
+      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryDiagnosis" data-pc-action="s2-retry-diagnosis">Revise diagnosis</button>'}
+      <button class="pc-button pc-button--primary" type="button" id="s2ContinueEvidence" data-pc-action="s2-continue-evidence">Examine student responses →</button>`
   });
 }
 
 function renderS2EvidenceActivity() {
-  const choicesHTML = buildScenarioChoiceCardsHTML({
-    items: S2_EVIDENCE_RESPONSES,
-    inputName: 's2-evidence',
-    idPrefix: 's2-evidence',
-    variant: 'detail',
-    marker: item => item.tag
-  });
-  const taskHTML = buildScenarioTaskCardHTML({
-    titleId: 's2EvidenceTitle',
-    kicker: 'Decision 2 · Find the metacognitive thinker',
-    title: 'Which two responses show the strongest metacognitive thinking?',
-    instruction: 'Select exactly two. One response is deliberately close because noticing a problem is meaningful, but it is not the entire learning cycle.',
-    choiceGridId: 's2EvidenceChoices',
-    choicesHTML,
-    statusId: 's2EvidenceStatus',
-    submitId: 's2EvidenceSubmit',
-    submitLabel: 'Submit evidence',
-    feedbackId: 's2EvidenceFeedback'
-  });
-
-  mountScenarioActivity({
-    scenarioIndex: SCENARIO_INDEX.METACOGNITION,
-    progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 1, ariaLabel: 'Scenario 2 progress' }),
-    contentHTML: taskHTML,
-    focusSelector: 'input[name="s2-evidence"]'
-  });
-
-  wireExactSelection({
-    rootId: 's2EvidenceChoices',
-    inputName: 's2-evidence',
-    limit: 2,
-    statusId: 's2EvidenceStatus',
-    submitId: 's2EvidenceSubmit',
-    onSubmit: submitS2Evidence,
-  });
+  return renderS2SelectionActivity(S2_ACTIVITY_CONFIG.evidence);
 }
 
 function submitS2Evidence() {
@@ -877,14 +956,8 @@ function submitS2Evidence() {
     heading,
     text: copy,
     actionsHTML: `
-      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryEvidence">Review the responses</button>'}
-      <button class="pc-button pc-button--primary" type="button" id="s2OpeningCheckpoint">Continue →</button>`
-  });
-  document.getElementById('s2RetryEvidence')?.addEventListener('click', renderS2EvidenceActivity);
-  document.getElementById('s2OpeningCheckpoint')?.addEventListener('click', () => {
-    data.evidenceFinal = [...selection];
-    data.openingCheckpointReached = true;
-    renderS2OpeningCheckpoint();
+      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryEvidence" data-pc-action="s2-retry-evidence">Review the responses</button>'}
+      <button class="pc-button pc-button--primary" type="button" id="s2OpeningCheckpoint" data-pc-action="s2-opening-checkpoint">Continue →</button>`
   });
 }
 
@@ -900,14 +973,39 @@ function renderS2OpeningCheckpoint() {
           <h2 id="s2CheckpointTitle">The case is diagnosed.</h2>
           <p>You identified the gap between completing work and understanding how learning happened. The next build will let the player choose whether Jordan needs to plan, monitor, evaluate, or transfer a strategy before Claude designs the activity.</p>
           <div class="pc-feedback-actions">
-            <button class="pc-button pc-button--secondary" type="button" onclick="switchScenario(1,document.querySelectorAll('.tab-btn')[1])">Replay S2 opening</button>
-            <button class="pc-button pc-button--primary" type="button" onclick="openMainMenu('scenarios')">Return to Scenario Select</button>
+            <button class="pc-button pc-button--secondary" type="button" data-pc-action="replay-scenario" data-pc-scenario-index="1">Replay S2 opening</button>
+            <button class="pc-button pc-button--primary" type="button" data-pc-action="open-main-menu" data-pc-panel="scenarios">Return to Scenario Select</button>
           </div>
         </div>
       </section>`
   });
   document.querySelector('#inputContainer button')?.focus();
 }
+
+function pcGetLatestS2Selection(attemptKey) {
+  const attempts = getS2Data()[attemptKey];
+  const latest = Array.isArray(attempts) ? attempts[attempts.length - 1] : null;
+  return Array.isArray(latest?.selection) ? [...latest.selection] : [];
+}
+
+pcRegisterUIActions({
+  's2-retry-diagnosis': () => renderS2DiagnosisActivity(),
+  's2-continue-evidence': () => {
+    getS2Data().diagnosisFinal = pcGetLatestS2Selection('diagnosisAttempts');
+    renderS2EvidenceActivity();
+  },
+  's2-retry-evidence': () => renderS2EvidenceActivity(),
+  's2-opening-checkpoint': () => {
+    const data = getS2Data();
+    data.evidenceFinal = pcGetLatestS2Selection('evidenceAttempts');
+    data.openingCheckpointReached = true;
+    renderS2OpeningCheckpoint();
+  },
+  'replay-scenario': target => {
+    const index = pcNormalizeScenarioIndex(target.dataset.pcScenarioIndex);
+    return index === null ? false : switchScenario(index, pcGetScenarioTab(index));
+  }
+});
 
 
 // ══════════════════════════════════════════════════════
@@ -926,67 +1024,9 @@ let navCardShown = Array(SCENARIO_COUNT).fill(false);
 
 const SCORE_THRESHOLD = 3; // score out of 5 needed to show nav card
 
-function appendScenarioNavCard({
-  targetIndex,
-  title = 'Ready to move on?',
-  subtitle = '',
-  stayLabel = 'Keep practicing this one first',
-  stayAriaLabel = 'Keep practicing this scenario',
-  container = document.getElementById('chat'),
-} = {}) {
-  const target = Number(targetIndex);
-  const targetUI = getScenarioUI(target);
-  if (!container || !Number.isInteger(target) || !scenarios[target]) return null;
-
-  const wrapper = document.createElement('div');
-  wrapper.className = 'scenario-nav-wrap';
-  const resolvedSubtitle = subtitle || `Your work here is complete. ${targetUI.tabLabel} is waiting.`;
-  wrapper.innerHTML = `
-    <div class="scenario-nav-card">
-      <div class="scenario-nav-text">
-        <div class="scenario-nav-title">${esc(title)}</div>
-        <div class="scenario-nav-sub">${esc(resolvedSubtitle)}</div>
-      </div>
-      <button class="scenario-nav-btn"
-              type="button"
-              onclick="navigateToNext(${target})"
-              aria-label="Move to ${esc(targetUI.tabLabel)}">
-        Next scenario →
-      </button>
-    </div>
-    <button class="scenario-keep-link"
-            type="button"
-            onclick="this.closest('.scenario-nav-wrap').remove()"
-            aria-label="${esc(stayAriaLabel)}">
-      ${esc(stayLabel)}
-    </button>`;
-
-  container.appendChild(wrapper);
-  container.scrollTop = container.scrollHeight;
-  return wrapper;
-}
-
-
-
-
-
-
-
-
+// Navigation rendering is owned by the active completion flow in app-workbench.js.
 // Later-scenario implementations are archived outside the active runtime.
 
-async function autoSaveSession(label) {
-  if (!SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
-  if (SURVEY_MODE !== 'sheets') return;
-  try {
-    const payload = buildSessionPayload(null);
-    payload.type = 'autosave';
-    payload.autosave_trigger = label;
-    await postToSheets(payload, 'Sheets payload');
-  } catch(e) {
-    // silent fail — reflection form send is the primary
-  }
-}
 const EXPRESSIONS = PIXEL_EXPR;
 
 // Queue of dialogue sequences waiting to play

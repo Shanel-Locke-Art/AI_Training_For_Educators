@@ -639,10 +639,7 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
   }
 
   .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnDialogue,
-  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-dialogue,
-  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-dialogue-box,
-  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-textbox,
-  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #vnTextBox {
+  .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .vn-dialogue {
     position: absolute !important;
     z-index: 120 !important;
     isolation: isolate !important;

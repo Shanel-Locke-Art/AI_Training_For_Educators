@@ -12,19 +12,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles/promptcraft.css?v=299">
-<link rel="stylesheet" href="styles/115-intro-responsive.css?v=289">
-<link rel="stylesheet" href="styles/116-workbench-responsive.css?v=289">
-<link rel="stylesheet" href="styles/117-brand-menu.css?v=289">
-<link rel="stylesheet" href="styles/118-large-tablet.css?v=291">
-<link rel="stylesheet" href="styles/119-prediction-responsive.css?v=299">
+<link rel="stylesheet" href="styles/promptcraft.css?v=320">
 <!-- Production CSS is generated from the modular owner files by tools/build-production.py. -->
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
 <script src="functions/dialogue.js?v=141"></script>
-<script src="functions/app.bundle.js?v=307"></script>
+<script src="functions/app.bundle.js?v=320"></script>
 
 </head>
 
@@ -55,11 +50,12 @@
       placeholder="Enter your name"
       aria-label="Your name"
       autocomplete="given-name"
-      onkeydown="if(event.key==='Enter'){event.preventDefault();submitName()}" />
-    <button class="name-modal-btn" onclick="submitName()">
+      data-pc-key-action="submit-name"
+      data-pc-keys="Enter" />
+    <button class="name-modal-btn" data-pc-action="submit-name">
       Continue →
     </button>
-    <button class="name-modal-skip" onclick="submitName(true)">
+    <button class="name-modal-skip" data-pc-action="submit-name" data-pc-skip="true">
       Skip — just call me You
     </button>
   </div>
@@ -90,13 +86,13 @@
       PromptCraft stays silent until you choose. You can change this later from the audio button in the header.
     </p>
 
-    <form id="audioSetupForm" onsubmit="submitAudioPreference(event)">
+    <form id="audioSetupForm" data-pc-submit-action="submit-audio-preference">
       <fieldset class="audio-choice-fieldset">
         <legend class="sr-only">Choose an audio experience</legend>
 
         <label class="audio-choice-card">
           <input type="radio" name="audioMode" value="full"
-                 onchange="selectAudioPreference(this.value)" />
+                 data-pc-change-action="select-audio-preference" />
           <span class="audio-choice-copy">
             <strong>Full audio</strong>
             <span>Professor Pixel and student voices, plus background music.</span>
@@ -105,7 +101,7 @@
 
         <label class="audio-choice-card">
           <input type="radio" name="audioMode" value="voices"
-                 onchange="selectAudioPreference(this.value)" />
+                 data-pc-change-action="select-audio-preference" />
           <span class="audio-choice-copy">
             <strong>Voices only</strong>
             <span>Recorded dialogue without background music.</span>
@@ -114,7 +110,7 @@
 
         <label class="audio-choice-card">
           <input type="radio" name="audioMode" value="silent"
-                 onchange="selectAudioPreference(this.value)" />
+                 data-pc-change-action="select-audio-preference" />
           <span class="audio-choice-copy">
             <strong>Keep it quiet</strong>
             <span>No automatic audio. Every line remains visible as text.</span>
@@ -127,7 +123,7 @@
         Begin the Prompt Lab
       </button>
       <button class="audio-setup-cancel" id="audioSetupCancelBtn"
-              type="button" onclick="closeAudioSetup()" hidden>
+              type="button" data-pc-action="close-audio-setup" hidden>
         Cancel
       </button>
     </form>
@@ -140,16 +136,16 @@
 ══════════════════════════════════════════════════════ -->
 <div class="dev-bar" role="toolbar" aria-label="PromptCraft development shortcuts">
   <span class="dev-label">DEV</span>
-  <button class="dev-btn" onclick="devGoScenario(0)">S1</button>
-  <button class="dev-btn dev-btn-fill" onclick="devFillScenario(0)">S1 ✏️</button>
-  <button class="dev-btn" onclick="devGoScenario(1)">S2</button>
-  <button class="dev-btn" onclick="devGoScenario(2)">S3 shell</button>
-  <button class="dev-btn" onclick="devGoScenario(3)">S4 shell</button>
-  <button class="dev-btn" onclick="devGoScenario(4)">S5 shell</button>
-  <button class="dev-btn" onclick="devGoScenario(5)">S6 shell</button>
-  <button class="dev-btn" onclick="devGoScenario(6)">S7 shell</button>
-  <button class="dev-btn" onclick="devGoScenario(7)">S8 shell</button>
-  <button class="dev-btn" onclick="devNextScenario()">Next →</button>
+  <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="0">S1</button>
+  <button class="dev-btn dev-btn-fill" data-pc-action="dev-fill-scenario" data-pc-scenario-index="0">S1 ✏️</button>
+  <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="1">S2</button>
+  <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="2">S3 shell</button>
+  <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="3">S4 shell</button>
+  <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="4">S5 shell</button>
+  <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="5">S6 shell</button>
+  <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="6">S7 shell</button>
+  <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="7">S8 shell</button>
+  <button class="dev-btn" data-pc-action="dev-next-scenario">Next →</button>
 </div>
 
 <!-- ══════════════════════════════════════════════════════
@@ -160,7 +156,7 @@
 <header role="banner" class="pc-app-header">
   <details class="logo pc-brand-menu"
            name="promptcraft-header-navigation"
-           ontoggle="if(this.open){document.querySelectorAll('.pc-brand-menu[open], .pc-compact-nav details[open]').forEach((menu)=>{if(menu!==this)menu.removeAttribute('open')})}">
+           data-pc-toggle-action="close-other-details">
     <summary class="pc-brand-summary" aria-label="Open PromptCraft menu">
       <span class="logo-icon" aria-hidden="true">🌿</span>
       <span class="logo-copy">
@@ -171,17 +167,17 @@
     </summary>
     <div class="pc-brand-menu-panel" role="menu" aria-label="PromptCraft menu">
       <button class="pc-brand-menu-item" type="button" role="menuitem"
-              onclick="this.closest('details').removeAttribute('open');openMainMenu('home')">
+              data-pc-action="open-main-menu" data-pc-panel="home" data-pc-close-details="true">
         <span aria-hidden="true">☰</span>
         <span>Main Menu</span>
       </button>
       <button class="pc-brand-menu-item" type="button" role="menuitem"
-              onclick="this.closest('details').removeAttribute('open');showAudioSetup({onboarding:false})">
+              data-pc-action="show-audio-settings" data-pc-close-details="true">
         <span aria-hidden="true">🔇</span>
         <span>Audio Settings</span>
       </button>
-      <a class="pc-brand-menu-item pc-brand-menu-ideas" href="/wall.html" target="_blank" rel="noopener noreferrer" role="menuitem"
-         onclick="this.closest('details').removeAttribute('open')">
+      <a class="pc-brand-menu-item pc-brand-menu-ideas" href="wall.html" target="_blank" rel="noopener noreferrer" role="menuitem"
+         data-pc-action="close-details" data-pc-prevent-default="false">
         <span aria-hidden="true">💡</span>
         <span>Ideas Wall</span>
       </a>
@@ -201,15 +197,15 @@
   <div class="header-actions" aria-label="PromptCraft actions">
     <button class="main-menu-toggle" id="mainMenuToggle"
             type="button"
-            onclick="openMainMenu('home')"
+            data-pc-action="open-main-menu" data-pc-panel="home"
             aria-label="Open main menu"
             title="Main menu">Menu</button>
     <button class="music-toggle" id="musicToggle"
             type="button"
-            onclick="showAudioSetup({onboarding:false})"
+            data-pc-action="show-audio-settings"
             aria-label="Open audio settings. Current setting: Keep it quiet"
             title="Audio settings: Keep it quiet">🔇</button>
-    <a class="ideas-wall-btn" href="/wall.html" target="_blank" rel="noopener noreferrer"
+    <a class="ideas-wall-btn" href="wall.html" target="_blank" rel="noopener noreferrer"
        aria-label="Open the Ideas Wall">
       <span class="ideas-wall-icon" aria-hidden="true">💡</span>
       <span class="ideas-wall-text">Ideas Wall</span>
@@ -223,28 +219,28 @@
 <nav class="pc-compact-nav" aria-label="PromptCraft navigation">
   <details class="mobile-compact-menu mobile-dev-menu pc-native-dropdown"
            name="promptcraft-compact-navigation"
-           ontoggle="if(this.open){document.querySelectorAll('.pc-compact-nav details[open]').forEach((menu)=>{if(menu!==this)menu.removeAttribute('open')})}">
+           data-pc-toggle-action="close-other-details">
     <summary class="mobile-dropdown-toggle">
       <span class="mobile-dropdown-title">DEV TOOLS</span>
       <span class="mobile-dropdown-caret" aria-hidden="true">▾</span>
     </summary>
     <div class="mobile-dropdown-panel" id="mobileDevToolsPanel" role="menu">
-      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[0]?.click()">S1</button>
-      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[1]?.click()">S1 ✏️</button>
-      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[2]?.click()">S2</button>
-      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[3]?.click()">S3 shell</button>
-      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[4]?.click()">S4 shell</button>
-      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[5]?.click()">S5 shell</button>
-      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[6]?.click()">S6 shell</button>
-      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[7]?.click()">S7 shell</button>
-      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[8]?.click()">S8 shell</button>
-      <button class="mobile-dropdown-option" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.dev-bar .dev-btn')[9]?.click()">Next →</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="0" data-pc-close-details="true">S1</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-fill-scenario" data-pc-scenario-index="0" data-pc-close-details="true">S1 ✏️</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="1" data-pc-close-details="true">S2</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="2" data-pc-close-details="true">S3 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="3" data-pc-close-details="true">S4 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="4" data-pc-close-details="true">S5 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="5" data-pc-close-details="true">S6 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="6" data-pc-close-details="true">S7 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="7" data-pc-close-details="true">S8 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-next-scenario" data-pc-close-details="true">Next →</button>
     </div>
   </details>
 
   <details class="mobile-compact-menu mobile-scenario-menu pc-native-dropdown"
            name="promptcraft-compact-navigation"
-           ontoggle="if(this.open){document.querySelectorAll('.pc-compact-nav details[open]').forEach((menu)=>{if(menu!==this)menu.removeAttribute('open')})}">
+           data-pc-toggle-action="close-other-details">
     <summary class="mobile-dropdown-toggle">
       <span class="mobile-dropdown-copy">
         <span class="mobile-dropdown-eyebrow">SCENARIO MENU</span>
@@ -253,14 +249,14 @@
       <span class="mobile-dropdown-caret" aria-hidden="true">▾</span>
     </summary>
     <div class="mobile-dropdown-panel" id="mobileScenarioMenuPanel" role="menu">
-      <button class="mobile-dropdown-option is-active" data-source-index="0" type="button" role="menuitem" aria-current="page" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[0]?.click()">S1: Engagement</button>
-      <button class="mobile-dropdown-option" data-source-index="1" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[1]?.click()">S2: Metacognition</button>
-      <button class="mobile-dropdown-option" data-source-index="2" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[2]?.click()">S3: Assessment</button>
-      <button class="mobile-dropdown-option" data-source-index="3" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[3]?.click()">S4: Sync Bias</button>
-      <button class="mobile-dropdown-option" data-source-index="4" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[4]?.click()">S5: Hallucination</button>
-      <button class="mobile-dropdown-option" data-source-index="5" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[5]?.click()">S6: Prediction</button>
-      <button class="mobile-dropdown-option" data-source-index="6" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[6]?.click()">S7: Overreliance</button>
-      <button class="mobile-dropdown-option" data-source-index="7" type="button" role="menuitem" onclick="this.closest('details').removeAttribute('open');document.querySelectorAll('.scenario-tabs .tab-btn')[7]?.click()">S8: Reflect &amp; Revise</button>
+      <button class="mobile-dropdown-option is-active" data-source-index="0" type="button" role="menuitem" aria-current="page" data-pc-action="switch-scenario" data-pc-scenario-index="0" data-pc-close-details="true">S1: Engagement</button>
+      <button class="mobile-dropdown-option" data-source-index="1" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="1" data-pc-close-details="true">S2: Metacognition</button>
+      <button class="mobile-dropdown-option" data-source-index="2" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="2" data-pc-close-details="true">S3: Assessment</button>
+      <button class="mobile-dropdown-option" data-source-index="3" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="3" data-pc-close-details="true">S4: Sync Bias</button>
+      <button class="mobile-dropdown-option" data-source-index="4" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="4" data-pc-close-details="true">S5: Hallucination</button>
+      <button class="mobile-dropdown-option" data-source-index="5" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="5" data-pc-close-details="true">S6: Prediction</button>
+      <button class="mobile-dropdown-option" data-source-index="6" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="6" data-pc-close-details="true">S7: Overreliance</button>
+      <button class="mobile-dropdown-option" data-source-index="7" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="7" data-pc-close-details="true">S8: Reflect &amp; Revise</button>
     </div>
   </details>
 </nav>
@@ -287,7 +283,7 @@
       </div>
       <button class="pc-main-menu-close" id="mainMenuCloseBtn"
               type="button"
-              onclick="closeMainMenu()"
+              data-pc-action="close-main-menu"
               aria-label="Close main menu">×</button>
     </div>
 
@@ -300,30 +296,30 @@
 
       <div class="pc-menu-primary-actions">
         <button class="pc-menu-action pc-menu-action-primary" id="menuContinueBtn"
-                type="button" onclick="continueFromMainMenu()">
+                type="button" data-pc-action="continue-main-menu">
           Start Scenario 1
         </button>
-        <button class="pc-menu-action" type="button" onclick="showMainMenuPanel('scenarios')">
+        <button class="pc-menu-action" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="scenarios">
           Scenario Select
         </button>
       </div>
 
       <div class="pc-menu-secondary-actions" aria-label="Menu information">
-        <button type="button" onclick="showMainMenuPanel('how-to-play')">How to Play</button>
-        <button type="button" onclick="showMainMenuPanel('about')">About PromptCraft</button>
-        <button type="button" onclick="showMainMenuPanel('research')">Research &amp; Privacy</button>
+        <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="how-to-play">How to Play</button>
+        <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="about">About PromptCraft</button>
+        <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="research">Research &amp; Privacy</button>
       </div>
 
       <aside class="pc-menu-data-summary" aria-labelledby="menuDataSummaryTitle">
         <h3 id="menuDataSummaryTitle">Prototype data notice</h3>
         <p>PromptCraft records activity such as prompts, choices, revisions, scores, reflections, timestamps, and completion progress for development and potential research use. Do not enter student names or other confidential information.</p>
-        <button type="button" onclick="showMainMenuPanel('research')">Read the full Research &amp; Privacy notice</button>
+        <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="research">Read the full Research &amp; Privacy notice</button>
       </aside>
     </section>
 
     <section class="pc-menu-panel" id="menuPanelScenarios" data-menu-panel="scenarios" hidden>
       <div class="pc-menu-panel-heading">
-        <button class="pc-menu-back" type="button" onclick="showMainMenuPanel('home')">← Main Menu</button>
+        <button class="pc-menu-back" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home">← Main Menu</button>
         <p class="pc-menu-eyebrow">Scenario Select</p>
         <h2>Choose a training scenario</h2>
         <p>All scenarios are available here for development and review. Completion data is still recorded normally.</p>
@@ -333,7 +329,7 @@
 
     <section class="pc-menu-panel" id="menuPanelHowToPlay" data-menu-panel="how-to-play" hidden>
       <div class="pc-menu-panel-heading">
-        <button class="pc-menu-back" type="button" onclick="showMainMenuPanel('home')">← Main Menu</button>
+        <button class="pc-menu-back" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home">← Main Menu</button>
         <p class="pc-menu-eyebrow">How to Play</p>
         <h2>Observe, predict, test, and revise.</h2>
       </div>
@@ -363,7 +359,7 @@
 
     <section class="pc-menu-panel" id="menuPanelAbout" data-menu-panel="about" hidden>
       <div class="pc-menu-panel-heading">
-        <button class="pc-menu-back" type="button" onclick="showMainMenuPanel('home')">← Main Menu</button>
+        <button class="pc-menu-back" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home">← Main Menu</button>
         <p class="pc-menu-eyebrow">About PromptCraft</p>
         <h2>A visual novel about using AI with intention.</h2>
         <p>PromptCraft combines scenario-based practice, reflective decision-making, and game-informed faculty development.</p>
@@ -400,7 +396,7 @@
 
     <section class="pc-menu-panel" id="menuPanelResearch" data-menu-panel="research" hidden>
       <div class="pc-menu-panel-heading">
-        <button class="pc-menu-back" type="button" onclick="showMainMenuPanel('home')">← Main Menu</button>
+        <button class="pc-menu-back" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home">← Main Menu</button>
         <p class="pc-menu-eyebrow">Research &amp; Privacy</p>
         <h2>Know what the prototype records.</h2>
         <p>This plain-language notice describes the current development build. It is not a substitute for formal informed consent.</p>
@@ -448,14 +444,14 @@
      ══════════════════════════════════════════════════════ -->
 
 <nav class="scenario-tabs" role="tablist" aria-label="Training scenarios">
-  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" onclick="switchScenario(0,this)">S1: Engagement</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(1,this)">S2: Metacognition</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(2,this)">S3: Assessment</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(3,this)">S4: Sync Bias</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(4,this)">S5: Hallucination</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(5,this)">S6: Prediction</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(6,this)">S7: Overreliance</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" onclick="switchScenario(7,this)">S8: Reflect &amp; Revise</button>
+  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="0">S1: Engagement</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="1">S2: Metacognition</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="2">S3: Assessment</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="3">S4: Sync Bias</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="4">S5: Hallucination</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="5">S6: Prediction</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="6">S7: Overreliance</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="7">S8: Reflect &amp; Revise</button>
 </nav>
 
 <!-- ══════════════════════════════════════════════════════
@@ -491,16 +487,17 @@
      Functions used: pixelBadgeClick(), pixelCoachDismiss()
      ══════════════════════════════════════════════════════ -->
 <div class="pixel-badge" id="pixelBadge"
-     onclick="pixelBadgeClick()"
+     data-pc-action="pixel-badge-click"
      role="button"
      tabindex="0"
      aria-label="Professor Pixel — click to see her latest feedback"
-     onkeydown="if(event.key==='Enter'||event.key===' '){pixelBadgeClick()}">
+     data-pc-key-action="pixel-badge-click"
+     data-pc-keys="Enter Space">
   <!-- Real portrait — shown when images exist -->
   <img class="pixel-badge-portrait" id="pixelBadgeImg"
        data-pc-image="assets/images/characters/professor-pixel/neutral.png" data-pc-fallback="images/pixel-neutral.png"
-       alt="Professor Pixel"
-       onerror="this.style.display='none';document.getElementById('pixelBadgeFallback').style.display='flex';" />
+       data-pc-fallback-element="pixelBadgeFallback"
+       alt="Professor Pixel" />
   <!-- Fallback -->
   <div class="pixel-badge-fallback" id="pixelBadgeFallback" style="display:none;">🧑‍🏫</div>
   <div class="pixel-badge-label" id="pixelBadgeLabel">Pixel</div>
@@ -510,8 +507,8 @@
 <div class="pixel-coach-card" id="pixelCoachCard" role="status" aria-live="polite">
   <img class="pixel-coach-portrait" id="pixelCoachImg"
        data-pc-image="assets/images/characters/professor-pixel/neutral.png" data-pc-fallback="images/pixel-neutral.png"
-       alt="Professor Pixel"
-       onerror="this.style.display='none';document.getElementById('pixelCoachFallback').style.display='flex';" />
+       data-pc-fallback-element="pixelCoachFallback"
+       alt="Professor Pixel" />
   <div class="pixel-coach-fallback" id="pixelCoachFallback" style="display:none;">🧑‍🏫</div>
   <div class="pixel-coach-body">
     <div class="pixel-coach-name">Professor Pixel</div>
@@ -519,7 +516,7 @@
   </div>
   <button class="pixel-coach-dismiss"
           aria-label="Dismiss Professor Pixel's feedback"
-          onclick="pixelCoachDismiss()">✕</button>
+          data-pc-action="pixel-coach-dismiss">✕</button>
 </div>
 
 <!-- ══════════════════════════════════════════════════════
@@ -606,8 +603,8 @@
            alt=""
            aria-hidden="true"
            style="display:none;"
-           onerror="this.style.display='none';document.getElementById('vnPortraitPlaceholder').style.display='block';"
-           onload="this.style.display='block';document.getElementById('vnPortraitPlaceholder').style.display='none';" />
+           data-pc-fallback-element="vnPortraitPlaceholder"
+           data-pc-loaded-display="block" />
     </div>
 
 
@@ -656,7 +653,7 @@
   <!-- MAIN MENU ACCESS: remains available while the VN overlay covers the header -->
   <details class="vn-brand-menu pc-brand-menu"
            name="promptcraft-vn-navigation"
-           ontoggle="if(this.open){document.querySelectorAll('.pc-brand-menu[open], .pc-compact-nav details[open]').forEach((menu)=>{if(menu!==this)menu.removeAttribute('open')})}">
+           data-pc-toggle-action="close-other-details">
     <summary class="pc-brand-summary" aria-label="Open PromptCraft menu">
       <span class="logo-icon" aria-hidden="true">🌿</span>
       <span class="logo-copy">
@@ -667,17 +664,17 @@
     </summary>
     <div class="pc-brand-menu-panel" role="menu" aria-label="PromptCraft menu">
       <button class="pc-brand-menu-item" type="button" role="menuitem"
-              onclick="this.closest('details').removeAttribute('open');openMainMenu('home')">
+              data-pc-action="open-main-menu" data-pc-panel="home" data-pc-close-details="true">
         <span aria-hidden="true">☰</span>
         <span>Main Menu</span>
       </button>
       <button class="pc-brand-menu-item" type="button" role="menuitem"
-              onclick="this.closest('details').removeAttribute('open');showAudioSetup({onboarding:false})">
+              data-pc-action="show-audio-settings" data-pc-close-details="true">
         <span aria-hidden="true">🔇</span>
         <span>Audio Settings</span>
       </button>
-      <a class="pc-brand-menu-item pc-brand-menu-ideas" href="/wall.html" target="_blank" rel="noopener noreferrer" role="menuitem"
-         onclick="this.closest('details')?.removeAttribute('open')">
+      <a class="pc-brand-menu-item pc-brand-menu-ideas" href="wall.html" target="_blank" rel="noopener noreferrer" role="menuitem"
+         data-pc-action="close-details" data-pc-prevent-default="false">
         <span aria-hidden="true">💡</span>
         <span>Ideas Wall</span>
       </a>
@@ -689,9 +686,10 @@
        role="button"
        tabindex="0"
        aria-label="Professor Pixel is speaking. Press Space or Enter to continue."
-       onclick="vnAdvance()"
-       onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();vnAdvance();}">
-    <button class="vn-skip" aria-label="Skip to end of dialogue" onclick="event.stopPropagation();vnSkipType()">SKIP</button>
+       data-pc-action="vn-advance"
+       data-pc-key-action="vn-advance"
+       data-pc-keys="Enter Space">
+    <button class="vn-skip" aria-label="Skip to end of dialogue" data-pc-action="vn-skip" data-pc-stop-propagation="true">SKIP</button>
     <div class="vn-speaker" id="vnSpeaker">Professor Pixel</div>
     <div class="vn-text" id="vnText" aria-live="polite"></div>
     <div class="vn-advance" id="vnAdvanceHint" aria-hidden="true">▼ tap to continue</div>
@@ -714,7 +712,7 @@
         Take a few quiet minutes to reflect on your experience.<br>
         There are no right answers here. Your honest responses make this research meaningful.
       </div>
-      <form name="promptcraft-reflection" method="POST" data-netlify="true" onsubmit="handleReflectionSubmit(event)">
+      <form name="promptcraft-reflection" method="POST" data-netlify="true" data-pc-submit-action="submit-reflection">
         <input type="hidden" name="form-name" value="promptcraft-reflection" />
         <div class="ref-question">
           <label class="ref-label" for="reflectionQ1"><span>01</span>What surprised you most about how AI responded to your prompts during these scenarios?</label>
@@ -764,11 +762,11 @@
         </div>
 
         <div class="ref-success-actions">
-          <a href="/wall.html" target="_blank" rel="noopener noreferrer"
+          <a href="wall.html" target="_blank" rel="noopener noreferrer"
              class="ideas-wall-success-btn">
             💡 See the Ideas Wall →
           </a>
-          <button class="ref-close-btn" onclick="closeReflection()">Return to the Prompt Lab</button>
+          <button class="ref-close-btn" data-pc-action="close-reflection">Return to the Prompt Lab</button>
         </div>
       </div>
     </div>

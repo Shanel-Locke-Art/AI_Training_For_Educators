@@ -2,7 +2,7 @@
 /* SOURCE: functions/app.js */
 /* ======================================================
    PROMPTCRAFT APPLICATION CORE
-   Version 270 modular JavaScript entry point.
+   Version 320 modular JavaScript entry point.
 
    Load order:
      1. dialogue.js          Dialogue content
@@ -55,6 +55,12 @@ let pcMainMenuLastFocused = null;
 let pcNameConfirmed = false;
 let pcPendingScenarioIndex = null;
 
+const PC_RUNTIME_DEBUG = new URLSearchParams(window.location.search).get('debug') === '1';
+
+function pcDebug(...args) {
+  if (PC_RUNTIME_DEBUG) console.debug(...args);
+}
+
 // ── SCREEN READER UTILITY ─────────────────────────────
 (function() {
   const s = document.createElement('style');
@@ -83,6 +89,91 @@ function pcFocusWithoutScroll(element) {
   }
   return true;
 }
+
+// Shared global exposure keeps legacy inline integrations and development tools
+// available without scattering one-off window assignments across every module.
+function pcExposeGlobals(entries = {}) {
+  Object.entries(entries).forEach(([name, value]) => {
+    window[name] = value;
+    try { globalThis[name] = value; } catch (error) {}
+  });
+}
+
+// PromptCraft renders many controls dynamically. A single delegated action
+// registry prevents every render pass from attaching another collection of
+// short-lived click listeners.
+const PC_UI_ACTIONS = new Map();
+
+function pcRegisterUIActions(actions = {}) {
+  Object.entries(actions).forEach(([name, handler]) => {
+    if (typeof handler !== 'function') {
+      throw new TypeError(`[PromptCraft] UI action "${name}" must be a function.`);
+    }
+    PC_UI_ACTIONS.set(name, handler);
+  });
+}
+
+const PC_UI_EVENT_CONFIG = Object.freeze({
+  click:  { attribute: 'data-pc-action',        datasetKey: 'pcAction',       preventDefault: true },
+  submit: { attribute: 'data-pc-submit-action', datasetKey: 'pcSubmitAction', preventDefault: true },
+  change: { attribute: 'data-pc-change-action', datasetKey: 'pcChangeAction', preventDefault: false },
+  keydown:{ attribute: 'data-pc-key-action',    datasetKey: 'pcKeyAction',    preventDefault: true },
+  toggle: { attribute: 'data-pc-toggle-action', datasetKey: 'pcToggleAction', preventDefault: false }
+});
+
+function pcKeyboardActionMatches(target, event) {
+  if (event.type !== 'keydown') return true;
+  const allowed = String(target.dataset.pcKeys || '')
+    .split(/[\s,]+/)
+    .filter(Boolean);
+  if (!allowed.length) return false;
+  const key = event.key === ' ' ? 'Space' : event.key;
+  return allowed.includes(key);
+}
+
+function pcDispatchUIAction(event) {
+  const config = PC_UI_EVENT_CONFIG[event.type];
+  if (!config || !(event.target instanceof Element)) return;
+
+  const target = event.target.closest(`[${config.attribute}]`);
+  if (!target || !pcKeyboardActionMatches(target, event)) return;
+
+  const actionName = target.dataset[config.datasetKey] || '';
+  const handler = PC_UI_ACTIONS.get(actionName);
+  if (!handler) return;
+
+  const shouldPreventDefault = target.dataset.pcPreventDefault === 'false'
+    ? false
+    : config.preventDefault;
+  if (shouldPreventDefault) event.preventDefault();
+  if (target.dataset.pcStopPropagation === 'true') event.stopPropagation();
+  if (target.dataset.pcCloseDetails === 'true') {
+    target.closest('details')?.removeAttribute('open');
+  }
+
+  try {
+    const result = handler(target, event);
+    if (result && typeof result.catch === 'function') {
+      result.catch(error => console.error(`[PromptCraft] UI action "${actionName}" failed:`, error));
+    }
+  } catch (error) {
+    console.error(`[PromptCraft] UI action "${actionName}" failed:`, error);
+  }
+}
+
+Object.keys(PC_UI_EVENT_CONFIG).forEach(eventName => {
+  document.addEventListener(eventName, pcDispatchUIAction, true);
+});
+
+pcRegisterUIActions({
+  'close-details': target => target.closest('details')?.removeAttribute('open'),
+  'close-other-details': target => {
+    if (!target.open) return;
+    document.querySelectorAll('.pc-brand-menu[open], .pc-compact-nav details[open]').forEach(menu => {
+      if (menu !== target) menu.removeAttribute('open');
+    });
+  }
+});
 
 function pcScenarioInputMayReceiveFocusV216() {
   const vnOverlay = document.getElementById('vnOverlay');
@@ -292,6 +383,14 @@ window.addEventListener('keydown', event => {
   }
 });
 
+pcRegisterUIActions({
+  'submit-name': target => submitName(target.dataset.pcSkip === 'true'),
+  'select-audio-preference': target => selectAudioPreference(target.value),
+  'submit-audio-preference': (_target, event) => submitAudioPreference(event),
+  'close-audio-setup': () => closeAudioSetup(),
+  'show-audio-settings': () => showAudioSetup({ onboarding: false })
+});
+
 function updatePixelWelcomeForName() {
   if (playerName !== 'You') {
     // Personalise the welcome dialogue
@@ -338,14 +437,16 @@ const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 
 // ══════════════════════════════════════════════════════
 //  BUILD + DATA SCHEMA VERSIONING
-//  The app version is read from the app.js cache-busting query in index.html.
-//  Update functions/app.js?v=### once and the console build label and main-menu
+//  The app version is read from the active bundle's cache-busting query in index.html.
+//  Update functions/app.bundle.js?v=### once and the console build label and main-menu
 //  version will stay synchronized automatically. Change the schema only when
 //  the saved research-data structure changes.
 // ══════════════════════════════════════════════════════
 const PC_APP_SCRIPT_URL = (() => {
-  const script = [...document.scripts].find(item => /(?:^|\/)functions\/app\.js(?:[?#]|$)/.test(item.src));
-  return script?.src || new URL('functions/app.js', document.baseURI).href;
+  const script = [...document.scripts].find(item =>
+    /(?:^|\/)functions\/(?:app\.bundle|app)\.js(?:[?#]|$)/.test(item.src)
+  );
+  return script?.src || new URL('functions/app.bundle.js', document.baseURI).href;
 })();
 const PC_APP_VERSION = new URL(PC_APP_SCRIPT_URL).searchParams.get('v') || 'DEV';
 const PC_APP_SCHEMA_VERSION = 'V121';
@@ -358,7 +459,7 @@ function pcSyncAppVersionLabels() {
   });
 }
 
-console.log('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
+pcDebug('[PromptCraft] Loaded app.js build:', PC_APP_BUILD_LABEL, 'schema:', PC_APP_SCHEMA_VERSION);
 
 // ══════════════════════════════════════════════════════
 //  ASSET PATHS
@@ -373,10 +474,23 @@ function pcProjectUrl(path = '') {
   return new URL(cleanPath, PC_PROJECT_ROOT_URL).href;
 }
 
+function pcSetImageFallbackVisibility(img, showFallback) {
+  if (!img) return;
+  const fallbackId = img.dataset.pcFallbackElement || '';
+  const fallbackElement = fallbackId ? document.getElementById(fallbackId) : null;
+  const loadedDisplay = img.dataset.pcLoadedDisplay || '';
+
+  img.style.display = showFallback ? 'none' : loadedDisplay;
+  if (fallbackElement) fallbackElement.style.display = showFallback ? (fallbackElement.dataset.pcFallbackDisplay || 'flex') : 'none';
+}
+
 function pcUseImageFallback(img, fallback = '') {
-  if (!img || img.dataset.pcFallbackApplied === 'true') return;
+  if (!img) return;
   const fallbackPath = fallback || img.dataset.pcFallback || '';
-  if (!fallbackPath) return;
+  if (!fallbackPath || img.dataset.pcFallbackApplied === 'true') {
+    pcSetImageFallbackVisibility(img, true);
+    return;
+  }
   img.dataset.pcFallbackApplied = 'true';
   img.src = /^([a-z]+:|data:|blob:)/i.test(fallbackPath)
     ? fallbackPath
@@ -387,6 +501,7 @@ function pcSetImageSource(img, primary, fallback = '') {
   if (!img || !primary) return;
   img.dataset.pcFallback = fallback || '';
   img.dataset.pcFallbackApplied = 'false';
+  img.onload = () => pcSetImageFallbackVisibility(img, false);
   img.onerror = () => pcUseImageFallback(img, fallback);
   img.src = /^([a-z]+:|data:|blob:)/i.test(primary)
     ? primary
@@ -399,9 +514,11 @@ function pcHydrateStaticImages() {
   });
 }
 
-window.pcProjectUrl = pcProjectUrl;
-window.pcUseImageFallback = pcUseImageFallback;
-window.pcSetImageSource = pcSetImageSource;
+pcExposeGlobals({
+  pcProjectUrl,
+  pcUseImageFallback,
+  pcSetImageSource
+});
 
 const ASSETS = Object.freeze({
   images: Object.freeze({
@@ -496,7 +613,7 @@ document.documentElement.style.setProperty('--pc-app-background-legacy', 'none')
 // Robust Google Sheets poster.
 // Uses text/plain so browser no-cors requests are not silently mangled by preflight/CORS rules.
 // Apps Script still receives the JSON string in e.postData.contents.
-const PC_SHEETS_DEBUG = true;
+const PC_SHEETS_DEBUG = PC_RUNTIME_DEBUG;
 
 async function postToSheets(payload, label = 'PromptCraft data') {
   if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
@@ -507,7 +624,7 @@ async function postToSheets(payload, label = 'PromptCraft data') {
   const body = JSON.stringify(payload || {});
 
   try {
-    if (PC_SHEETS_DEBUG) console.log(`[PromptCraft] Sending ${label} to Sheets:`, payload);
+    if (PC_SHEETS_DEBUG) pcDebug(`[PromptCraft] Sending ${label} to Sheets:`, payload);
 
     await fetch(SHEETS_URL, {
       method: 'POST',
@@ -516,7 +633,7 @@ async function postToSheets(payload, label = 'PromptCraft data') {
       body
     });
 
-    if (PC_SHEETS_DEBUG) console.log(`[PromptCraft] Sheets request dispatched: ${label}`);
+    if (PC_SHEETS_DEBUG) pcDebug(`[PromptCraft] Sheets request dispatched: ${label}`);
     return true;
   } catch (err) {
     console.warn(`[PromptCraft] fetch failed for ${label}:`, err);
@@ -527,7 +644,7 @@ async function postToSheets(payload, label = 'PromptCraft data') {
     if (navigator.sendBeacon) {
       const blob = new Blob([body], { type: 'text/plain;charset=utf-8' });
       const ok = navigator.sendBeacon(SHEETS_URL, blob);
-      console.log(`[PromptCraft] sendBeacon fallback ${ok ? 'queued' : 'failed'}: ${label}`);
+      pcDebug(`[PromptCraft] sendBeacon fallback ${ok ? 'queued' : 'failed'}: ${label}`);
       return ok;
     }
   } catch (err) {
@@ -597,7 +714,7 @@ function mockClaudeText(payload, context = 'main') {
 
 
 function mockClaudeResponse(payload, context = 'main') {
-  console.info(`[PromptCraft] Using mock Claude response for ${context}.`);
+  pcDebug(`[PromptCraft] Using mock Claude response for ${context}.`);
   return Promise.resolve({
     content: [{ text: mockClaudeText(payload, context) }],
     mock: true
@@ -639,23 +756,6 @@ async function callClaude(payload, context = 'main') {
     if (timeoutId) clearTimeout(timeoutId);
   }
 }
-
-function showMockClaudeNotice() {
-  if (!USE_MOCK_CLAUDE) return;
-  const bar = document.getElementById('devBar');
-  if (!bar || document.getElementById('mockClaudeNotice')) return;
-  const tag = document.createElement('span');
-  tag.id = 'mockClaudeNotice';
-  tag.textContent = 'MOCK CLAUDE';
-  tag.style.color = '#f6c177';
-  tag.style.border = '1px solid #f6c177';
-  tag.style.borderRadius = '4px';
-  tag.style.padding = '1px 6px';
-  tag.style.marginLeft = '4px';
-  bar.insertBefore(tag, bar.children[1] || null);
-}
-
-document.addEventListener('DOMContentLoaded', showMockClaudeNotice);
 
 // ══════════════════════════════════════════════════════
 //  BEHAVIORAL DATA TRACKING
@@ -965,7 +1065,7 @@ async function saveIncrementalData(scenarioIdx) {
       notes_coding_memo: `${location.pathname} :: ${getPromptCraftScenarioLabel(scenarioIdx)} :: session ${pcSessionId} :: ${PC_APP_BUILD_LABEL}`
     };
 
-    console.log(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
+    pcDebug(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);
     await postToSheets(payload, `incremental S${scenarioIdx + 1}`);
   } catch(e) {
     console.warn('[PromptCraft] Incremental save failed:', e.message);
@@ -1246,9 +1346,54 @@ if (scenarios.length !== SCENARIO_COUNT || SCENARIO_UI.length !== SCENARIO_COUNT
 
 const PC_SCENARIO_LABELS = SCENARIO_UI.map(ui => ui.dataLabel || ui.tabLabel);
 
-window.SCENARIO_INDEX = SCENARIO_INDEX;
-window.scenarios = scenarios;
-window.SCENARIO_UI = SCENARIO_UI;
+pcExposeGlobals({
+  SCENARIO_INDEX,
+  scenarios,
+  SCENARIO_UI
+});
+
+function pcNormalizeScenarioIndex(value, fallback = null) {
+  const index = Number(value);
+  return Number.isInteger(index) && index >= 0 && index < SCENARIO_COUNT && scenarios[index]
+    ? index
+    : fallback;
+}
+
+function pcGetScenarioTab(index) {
+  const normalized = pcNormalizeScenarioIndex(index);
+  return normalized === null ? null : document.querySelectorAll('.tab-btn')[normalized] || null;
+}
+
+function pcUnlockScenarioTab(index) {
+  const tab = pcGetScenarioTab(index);
+  if (tab) {
+    tab.disabled = false;
+    tab.classList.remove('locked');
+    tab.removeAttribute('aria-disabled');
+  }
+  return tab;
+}
+
+const PC_SCENARIO_RENDERERS = Object.freeze({
+  'guided-builder': ({ container }) => renderGuidedBuilder(container),
+  'metacognition-opening': ({ container }) => renderS2Standby(container),
+  'development-shell': ({ index }) => renderScenarioPlaceholder(index)
+});
+
+const PC_SCENARIO_AFTER_INTRO_ACTIONS = Object.freeze({
+  's2-diagnosis': () => renderS2DiagnosisActivity()
+});
+
+function pcRenderScenarioWorkspace(index, container) {
+  const ui = getScenarioUI(index);
+  const renderer = PC_SCENARIO_RENDERERS[ui.rendererKey] || PC_SCENARIO_RENDERERS['development-shell'];
+  return renderer({ index, container, ui });
+}
+
+function pcRunScenarioAfterIntroAction(actionKey) {
+  const action = PC_SCENARIO_AFTER_INTRO_ACTIONS[actionKey];
+  if (typeof action === 'function') action();
+}
 
 // ══════════════════════════════════════════════════════
 //  MAIN MENU
@@ -1273,7 +1418,8 @@ function getScenarioMenuStatus(index) {
 
 
 function isScenarioAvailableFromMenu(index) {
-  return Number.isInteger(Number(index)) && !!SCENARIO_UI[Number(index)];
+  const normalized = pcNormalizeScenarioIndex(index);
+  return normalized !== null && Boolean(SCENARIO_UI[normalized]);
 }
 
 
@@ -1291,7 +1437,8 @@ function renderScenarioMenu() {
     return `
       <button class="pc-menu-scenario-card${stateClass}${shellClass}"
               type="button"
-              onclick="launchScenarioFromMenu(${index})"
+              data-pc-action="launch-scenario"
+              data-pc-scenario-index="${index}"
               aria-label="Open ${esc(ui.tabLabel)}. ${esc(status)}">
         <span class="pc-menu-scenario-number">${String(index + 1).padStart(2, '0')}</span>
         <span class="pc-menu-scenario-content">
@@ -1326,12 +1473,14 @@ function syncCompactScenarioMenu() {
 }
 
 function initializeCompactScenarioSync() {
-  document.querySelectorAll('.scenario-tabs .tab-btn').forEach(tab => {
-    new MutationObserver(syncCompactScenarioMenu).observe(tab, {
+  const tabs = document.querySelector('.scenario-tabs');
+  if (tabs) {
+    new MutationObserver(syncCompactScenarioMenu).observe(tabs, {
+      subtree: true,
       attributes: true,
       attributeFilter: ['class', 'aria-selected']
     });
-  });
+  }
   syncCompactScenarioMenu();
 }
 
@@ -1449,19 +1598,13 @@ function closeMainMenu(options = {}) {
 }
 
 function pcUnlockScenarioForMenuPreview(index) {
-  const tab = document.querySelectorAll('.tab-btn')[index] || null;
-  if (tab) {
-    tab.disabled = false;
-    tab.classList.remove('locked');
-    tab.removeAttribute('aria-disabled');
-  }
-  return tab;
+  return pcUnlockScenarioTab(index);
 }
 
 
 function launchScenarioFromMenu(index, options = {}) {
-  index = Number(index);
-  if (!Number.isInteger(index) || !scenarios[index] || !isScenarioAvailableFromMenu(index)) return false;
+  index = pcNormalizeScenarioIndex(index);
+  if (index === null || !isScenarioAvailableFromMenu(index)) return false;
 
   // The main menu is the first screen. Ask for the learner's name only after
   // they choose Start or select a scenario.
@@ -1483,7 +1626,7 @@ function launchScenarioFromMenu(index, options = {}) {
   pcScenarioHasLaunched = true;
   pcMainMenuInitialOpen = false;
 
-  const tab = pcUnlockScenarioForMenuPreview(index) || document.querySelectorAll('.tab-btn')[index] || null;
+  const tab = pcUnlockScenarioForMenuPreview(index);
   closeMainMenu({ force: true });
 
   // switchScenario owns all scene cleanup, input rendering, and introduction
@@ -1531,11 +1674,24 @@ window.addEventListener('keydown', event => {
   }
 });
 
-window.openMainMenu = openMainMenu;
-window.closeMainMenu = closeMainMenu;
-window.showMainMenuPanel = showMainMenuPanel;
-window.continueFromMainMenu = continueFromMainMenu;
-window.launchScenarioFromMenu = launchScenarioFromMenu;
+pcExposeGlobals({
+  openMainMenu,
+  closeMainMenu,
+  showMainMenuPanel,
+  continueFromMainMenu,
+  launchScenarioFromMenu
+});
+
+pcRegisterUIActions({
+  'open-main-menu': target => openMainMenu(target.dataset.pcPanel || 'home'),
+  'close-main-menu': () => closeMainMenu(),
+  'show-main-menu-panel': target => showMainMenuPanel(target.dataset.pcPanel || 'home'),
+  'continue-main-menu': () => continueFromMainMenu(),
+  'launch-scenario': target => launchScenarioFromMenu(
+    target.dataset.pcScenarioIndex,
+    { skipNameGate: target.dataset.pcSkipNameGate === 'true' }
+  )
+});
 
 // ══════════════════════════════════════════════════════
 //  PROFESSOR PIXEL — INLINE CHAT DIALOGUE SYSTEM
@@ -1574,6 +1730,11 @@ function pixelBadgeClick() {
 function pixelCoachDismiss() {
   document.getElementById('pixelCoachCard').classList.remove('visible');
 }
+
+pcRegisterUIActions({
+  'pixel-badge-click': () => pixelBadgeClick(),
+  'pixel-coach-dismiss': () => pixelCoachDismiss()
+});
 
 // ── AI BUBBLE AVATAR ──────────────────────────────────
 function pixelAvatarHTML(expr) {
@@ -1642,8 +1803,8 @@ function renderScenarioPlaceholder(index) {
       ${plannedSteps ? `<div class="pc-shell-plan"><h3>Planned game loop</h3>${plannedSteps}</div>` : ''}
       <p class="pc-shell-note">The previous implementation is preserved in <code>archive/legacy-scenarios-v133/</code>, but it is no longer loaded by the game.</p>
       <div class="pc-shell-actions">
-        <button type="button" class="pc-shell-primary" onclick="openMainMenu('scenarios')">Return to Scenario Select</button>
-        <button type="button" class="pc-shell-secondary" onclick="launchScenarioFromMenu(0,{skipNameGate:true})">Play Scenario 1</button>
+        <button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="scenarios">Return to Scenario Select</button>
+        <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="0" data-pc-skip-name-gate="true">Play Scenario 1</button>
       </div>
     </section>`;
   area.scrollTop = 0;
@@ -1753,8 +1914,11 @@ function wireExactSelection({ rootId, inputName, limit, statusId, submitId, onSu
     inputs.forEach(input => input.closest('.pc-choice-card')?.classList.toggle('selected', input.checked));
   };
 
-  inputs.forEach(input => input.addEventListener('change', () => update(input)));
-  submit.addEventListener('click', onSubmit);
+  root.addEventListener('change', event => {
+    const input = event.target.closest?.(`input[name="${inputName}"]`);
+    if (input) update(input);
+  });
+  submit.addEventListener('click', onSubmit, { once: true });
   update(null);
 }
 
@@ -1809,6 +1973,46 @@ const S2_EVIDENCE_RESPONSES = [
   { id: 'f', tag: 'F', title: 'Transfer', text: 'The examples helped me notice the differences, so I will use that strategy before the next quiz.' },
 ];
 
+const S2_ACTIVITY_CONFIG = Object.freeze({
+  diagnosis: Object.freeze({
+    items: S2_DIAGNOSIS_OPTIONS,
+    inputName: 's2-diagnosis',
+    idPrefix: 's2-diagnosis',
+    titleId: 's2DiagnosisTitle',
+    kicker: 'Decision 1 · Diagnose the learning problem',
+    title: 'Which two instructional needs are most clearly supported by Jordan’s comments?',
+    instruction: 'Select exactly two. Several options sound educationally useful, but only two are the strongest diagnosis of this evidence.',
+    choiceGridId: 's2DiagnosisChoices',
+    statusId: 's2DiagnosisStatus',
+    submitId: 's2DiagnosisSubmit',
+    submitLabel: 'Submit diagnosis',
+    feedbackId: 's2DiagnosisFeedback',
+    activeIndex: 0,
+    focusSelector: 'input[name="s2-diagnosis"]',
+    onSubmit: submitS2Diagnosis,
+    wrapContent: taskHTML => `<div class="pc-activity-layout">${buildS2JordanEvidenceHTML()}${taskHTML}</div>`
+  }),
+  evidence: Object.freeze({
+    items: S2_EVIDENCE_RESPONSES,
+    inputName: 's2-evidence',
+    idPrefix: 's2-evidence',
+    variant: 'detail',
+    marker: item => item.tag,
+    titleId: 's2EvidenceTitle',
+    kicker: 'Decision 2 · Find the metacognitive thinker',
+    title: 'Which two responses show the strongest metacognitive thinking?',
+    instruction: 'Select exactly two. One response is deliberately close because noticing a problem is meaningful, but it is not the entire learning cycle.',
+    choiceGridId: 's2EvidenceChoices',
+    statusId: 's2EvidenceStatus',
+    submitId: 's2EvidenceSubmit',
+    submitLabel: 'Submit evidence',
+    feedbackId: 's2EvidenceFeedback',
+    activeIndex: 1,
+    focusSelector: 'input[name="s2-evidence"]',
+    onSubmit: submitS2Evidence
+  })
+});
+
 function getS2Data() {
   const data = scenarioData[SCENARIO_INDEX.METACOGNITION];
   if (!Array.isArray(data.diagnosisAttempts)) data.diagnosisAttempts = [];
@@ -1844,43 +2048,58 @@ function renderS2Standby(container) {
   });
 }
 
-function renderS2DiagnosisActivity() {
+function renderS2SelectionActivity(config) {
   const container = document.getElementById('inputContainer');
-  if (!container || scenarioIndex !== SCENARIO_INDEX.METACOGNITION) return;
+  if (!container || scenarioIndex !== SCENARIO_INDEX.METACOGNITION) return false;
+
   const choicesHTML = buildScenarioChoiceCardsHTML({
-    items: S2_DIAGNOSIS_OPTIONS,
-    inputName: 's2-diagnosis',
-    idPrefix: 's2-diagnosis'
+    items: config.items,
+    inputName: config.inputName,
+    idPrefix: config.idPrefix,
+    variant: config.variant,
+    marker: config.marker
   });
   const taskHTML = buildScenarioTaskCardHTML({
-    titleId: 's2DiagnosisTitle',
-    kicker: 'Decision 1 · Diagnose the learning problem',
-    title: 'Which two instructional needs are most clearly supported by Jordan’s comments?',
-    instruction: 'Select exactly two. Several options sound educationally useful, but only two are the strongest diagnosis of this evidence.',
-    choiceGridId: 's2DiagnosisChoices',
+    titleId: config.titleId,
+    kicker: config.kicker,
+    title: config.title,
+    instruction: config.instruction,
+    choiceGridId: config.choiceGridId,
     choicesHTML,
-    statusId: 's2DiagnosisStatus',
-    submitId: 's2DiagnosisSubmit',
-    submitLabel: 'Submit diagnosis',
-    feedbackId: 's2DiagnosisFeedback'
+    statusId: config.statusId,
+    submitId: config.submitId,
+    submitLabel: config.submitLabel,
+    feedbackId: config.feedbackId
   });
+  const contentHTML = typeof config.wrapContent === 'function'
+    ? config.wrapContent(taskHTML)
+    : taskHTML;
 
   mountScenarioActivity({
     container,
     scenarioIndex: SCENARIO_INDEX.METACOGNITION,
-    progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 0, ariaLabel: 'Scenario 2 progress' }),
-    contentHTML: `<div class="pc-activity-layout">${buildS2JordanEvidenceHTML()}${taskHTML}</div>`,
-    focusSelector: 'input[name="s2-diagnosis"]'
+    progressHTML: buildScenarioProgressHTML({
+      steps: S2_PROGRESS_STEPS,
+      activeIndex: config.activeIndex,
+      ariaLabel: 'Scenario 2 progress'
+    }),
+    contentHTML,
+    focusSelector: config.focusSelector
   });
 
   wireExactSelection({
-    rootId: 's2DiagnosisChoices',
-    inputName: 's2-diagnosis',
+    rootId: config.choiceGridId,
+    inputName: config.inputName,
     limit: 2,
-    statusId: 's2DiagnosisStatus',
-    submitId: 's2DiagnosisSubmit',
-    onSubmit: submitS2Diagnosis,
+    statusId: config.statusId,
+    submitId: config.submitId,
+    onSubmit: config.onSubmit
   });
+  return true;
+}
+
+function renderS2DiagnosisActivity() {
+  return renderS2SelectionActivity(S2_ACTIVITY_CONFIG.diagnosis);
 }
 
 function classifyS2Diagnosis(selection) {
@@ -1918,53 +2137,13 @@ function renderS2DiagnosisFeedback(selection, result) {
     heading: exact ? 'Diagnosis supported by the evidence' : 'A useful diagnosis needs one more pass',
     text,
     actionsHTML: `
-      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryDiagnosis">Revise diagnosis</button>'}
-      <button class="pc-button pc-button--primary" type="button" id="s2ContinueEvidence">Examine student responses →</button>`
-  });
-  document.getElementById('s2RetryDiagnosis')?.addEventListener('click', renderS2DiagnosisActivity);
-  document.getElementById('s2ContinueEvidence')?.addEventListener('click', () => {
-    const data = getS2Data();
-    data.diagnosisFinal = [...selection];
-    renderS2EvidenceActivity();
+      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryDiagnosis" data-pc-action="s2-retry-diagnosis">Revise diagnosis</button>'}
+      <button class="pc-button pc-button--primary" type="button" id="s2ContinueEvidence" data-pc-action="s2-continue-evidence">Examine student responses →</button>`
   });
 }
 
 function renderS2EvidenceActivity() {
-  const choicesHTML = buildScenarioChoiceCardsHTML({
-    items: S2_EVIDENCE_RESPONSES,
-    inputName: 's2-evidence',
-    idPrefix: 's2-evidence',
-    variant: 'detail',
-    marker: item => item.tag
-  });
-  const taskHTML = buildScenarioTaskCardHTML({
-    titleId: 's2EvidenceTitle',
-    kicker: 'Decision 2 · Find the metacognitive thinker',
-    title: 'Which two responses show the strongest metacognitive thinking?',
-    instruction: 'Select exactly two. One response is deliberately close because noticing a problem is meaningful, but it is not the entire learning cycle.',
-    choiceGridId: 's2EvidenceChoices',
-    choicesHTML,
-    statusId: 's2EvidenceStatus',
-    submitId: 's2EvidenceSubmit',
-    submitLabel: 'Submit evidence',
-    feedbackId: 's2EvidenceFeedback'
-  });
-
-  mountScenarioActivity({
-    scenarioIndex: SCENARIO_INDEX.METACOGNITION,
-    progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 1, ariaLabel: 'Scenario 2 progress' }),
-    contentHTML: taskHTML,
-    focusSelector: 'input[name="s2-evidence"]'
-  });
-
-  wireExactSelection({
-    rootId: 's2EvidenceChoices',
-    inputName: 's2-evidence',
-    limit: 2,
-    statusId: 's2EvidenceStatus',
-    submitId: 's2EvidenceSubmit',
-    onSubmit: submitS2Evidence,
-  });
+  return renderS2SelectionActivity(S2_ACTIVITY_CONFIG.evidence);
 }
 
 function submitS2Evidence() {
@@ -1999,14 +2178,8 @@ function submitS2Evidence() {
     heading,
     text: copy,
     actionsHTML: `
-      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryEvidence">Review the responses</button>'}
-      <button class="pc-button pc-button--primary" type="button" id="s2OpeningCheckpoint">Continue →</button>`
-  });
-  document.getElementById('s2RetryEvidence')?.addEventListener('click', renderS2EvidenceActivity);
-  document.getElementById('s2OpeningCheckpoint')?.addEventListener('click', () => {
-    data.evidenceFinal = [...selection];
-    data.openingCheckpointReached = true;
-    renderS2OpeningCheckpoint();
+      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryEvidence" data-pc-action="s2-retry-evidence">Review the responses</button>'}
+      <button class="pc-button pc-button--primary" type="button" id="s2OpeningCheckpoint" data-pc-action="s2-opening-checkpoint">Continue →</button>`
   });
 }
 
@@ -2022,14 +2195,39 @@ function renderS2OpeningCheckpoint() {
           <h2 id="s2CheckpointTitle">The case is diagnosed.</h2>
           <p>You identified the gap between completing work and understanding how learning happened. The next build will let the player choose whether Jordan needs to plan, monitor, evaluate, or transfer a strategy before Claude designs the activity.</p>
           <div class="pc-feedback-actions">
-            <button class="pc-button pc-button--secondary" type="button" onclick="switchScenario(1,document.querySelectorAll('.tab-btn')[1])">Replay S2 opening</button>
-            <button class="pc-button pc-button--primary" type="button" onclick="openMainMenu('scenarios')">Return to Scenario Select</button>
+            <button class="pc-button pc-button--secondary" type="button" data-pc-action="replay-scenario" data-pc-scenario-index="1">Replay S2 opening</button>
+            <button class="pc-button pc-button--primary" type="button" data-pc-action="open-main-menu" data-pc-panel="scenarios">Return to Scenario Select</button>
           </div>
         </div>
       </section>`
   });
   document.querySelector('#inputContainer button')?.focus();
 }
+
+function pcGetLatestS2Selection(attemptKey) {
+  const attempts = getS2Data()[attemptKey];
+  const latest = Array.isArray(attempts) ? attempts[attempts.length - 1] : null;
+  return Array.isArray(latest?.selection) ? [...latest.selection] : [];
+}
+
+pcRegisterUIActions({
+  's2-retry-diagnosis': () => renderS2DiagnosisActivity(),
+  's2-continue-evidence': () => {
+    getS2Data().diagnosisFinal = pcGetLatestS2Selection('diagnosisAttempts');
+    renderS2EvidenceActivity();
+  },
+  's2-retry-evidence': () => renderS2EvidenceActivity(),
+  's2-opening-checkpoint': () => {
+    const data = getS2Data();
+    data.evidenceFinal = pcGetLatestS2Selection('evidenceAttempts');
+    data.openingCheckpointReached = true;
+    renderS2OpeningCheckpoint();
+  },
+  'replay-scenario': target => {
+    const index = pcNormalizeScenarioIndex(target.dataset.pcScenarioIndex);
+    return index === null ? false : switchScenario(index, pcGetScenarioTab(index));
+  }
+});
 
 
 // ══════════════════════════════════════════════════════
@@ -2048,67 +2246,9 @@ let navCardShown = Array(SCENARIO_COUNT).fill(false);
 
 const SCORE_THRESHOLD = 3; // score out of 5 needed to show nav card
 
-function appendScenarioNavCard({
-  targetIndex,
-  title = 'Ready to move on?',
-  subtitle = '',
-  stayLabel = 'Keep practicing this one first',
-  stayAriaLabel = 'Keep practicing this scenario',
-  container = document.getElementById('chat'),
-} = {}) {
-  const target = Number(targetIndex);
-  const targetUI = getScenarioUI(target);
-  if (!container || !Number.isInteger(target) || !scenarios[target]) return null;
-
-  const wrapper = document.createElement('div');
-  wrapper.className = 'scenario-nav-wrap';
-  const resolvedSubtitle = subtitle || `Your work here is complete. ${targetUI.tabLabel} is waiting.`;
-  wrapper.innerHTML = `
-    <div class="scenario-nav-card">
-      <div class="scenario-nav-text">
-        <div class="scenario-nav-title">${esc(title)}</div>
-        <div class="scenario-nav-sub">${esc(resolvedSubtitle)}</div>
-      </div>
-      <button class="scenario-nav-btn"
-              type="button"
-              onclick="navigateToNext(${target})"
-              aria-label="Move to ${esc(targetUI.tabLabel)}">
-        Next scenario →
-      </button>
-    </div>
-    <button class="scenario-keep-link"
-            type="button"
-            onclick="this.closest('.scenario-nav-wrap').remove()"
-            aria-label="${esc(stayAriaLabel)}">
-      ${esc(stayLabel)}
-    </button>`;
-
-  container.appendChild(wrapper);
-  container.scrollTop = container.scrollHeight;
-  return wrapper;
-}
-
-
-
-
-
-
-
-
+// Navigation rendering is owned by the active completion flow in app-workbench.js.
 // Later-scenario implementations are archived outside the active runtime.
 
-async function autoSaveSession(label) {
-  if (!SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
-  if (SURVEY_MODE !== 'sheets') return;
-  try {
-    const payload = buildSessionPayload(null);
-    payload.type = 'autosave';
-    payload.autosave_trigger = label;
-    await postToSheets(payload, 'Sheets payload');
-  } catch(e) {
-    // silent fail — reflection form send is the primary
-  }
-}
 const EXPRESSIONS = PIXEL_EXPR;
 
 // Queue of dialogue sequences waiting to play
@@ -2271,6 +2411,55 @@ function pcSetImportantStyles(element, declarations) {
 function pcRemoveInlineStyles(element, properties) {
   if (!element) return;
   properties.forEach((property) => element.style.removeProperty(property));
+}
+
+const PC_VN_OVERLAY_MODE_CLASSES = Object.freeze([
+  'claude-prediction',
+  'pc-clean-prediction',
+  'pc-prediction-question',
+  'pc-prediction-result',
+  'claude-terminal-consult',
+  'claude-terminal-textmode',
+  'claude-analysis',
+  'claude-consult',
+  'pc-clean-output',
+  'pc-clean-final',
+  'analysis-complete',
+  'scenario-intro-active'
+]);
+
+function pcSetVNOverlayState({ active = null, modes = [], preserve = [] } = {}) {
+  const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
+  if (!overlay) return null;
+
+  const preserved = new Set(preserve);
+  PC_VN_OVERLAY_MODE_CLASSES.forEach(className => {
+    if (!preserved.has(className)) overlay.classList.remove(className);
+  });
+  if (active === true) overlay.classList.add('active');
+  if (active === false) overlay.classList.remove('active');
+  if (modes.length) overlay.classList.add(...modes);
+  return overlay;
+}
+
+function pcResetVNCharacters() {
+  const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
+  const pixel = document.getElementById('vnCharacter');
+  const student = document.getElementById('vnStudentCharacter');
+
+  pixel?.classList.remove('visible', 'is-active', 'is-inactive');
+  student?.classList.remove('visible', 'is-active', 'is-inactive');
+  pixel?.style.removeProperty('display');
+  student?.style.removeProperty('display');
+  overlay?.classList.remove('pc-dual-character');
+}
+
+function pcResetVNDialogueState() {
+  document.getElementById('vnDialogue')?.classList.remove(
+    'has-choices',
+    'prediction-question',
+    'prediction-result'
+  );
 }
 
 function pcApplyIpadLayoutV200(){
@@ -2558,10 +2747,10 @@ window.pcClearPredictionLayoutInlineStyles = pcClearPredictionLayoutInlineStyles
 // JavaScript because prediction is rebuilt dynamically and later passes can
 // otherwise win the cascade with stale inline values.
 const PC_WIDE_PREDICTION_SCREEN_GEOMETRY_V207 = {
-  left: '19.8%',
-  top: '15.2%',
-  width: '38.3%',
-  height: '44.5%'
+  left: '21.7%',
+  top: '12.7%',
+  width: '39.0%',
+  height: '44.1%'
 };
 
 // [WORKSTATION FRAME: DESKTOP PREDICTION + LIVE ANALYSIS]
@@ -2570,12 +2759,13 @@ function pcApplyWidePredictionComputerV207(terminal, photo, screen, viewportHeig
 
   const isShortDesktop = Number.isFinite(viewportHeight) && viewportHeight <= 950;
   const terminalWidth = isShortDesktop ? 'min(66vw, 1320px)' : 'min(72vw, 1500px)';
-  const terminalTop = isShortDesktop ? '35.5%' : '34%';
+  const terminalLeft = '47.5%';
+  const terminalTop = isShortDesktop ? '37%' : '35.5%';
 
   pcSetImportantStyles(terminal, [
     ['position', 'absolute'],
     ['inset', 'auto'],
-    ['left', '50%'],
+    ['left', terminalLeft],
     ['right', 'auto'],
     ['top', terminalTop],
     ['bottom', 'auto'],
@@ -2650,10 +2840,10 @@ window.pcApplyWidePredictionComputer = () => {
 // needs more room. The action buttons are centered independently of legacy dialogue
 // positioning so they remain centered beneath the workstation at every wide size.
 const PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215 = {
-  left: '19.8%',
-  top: '15.2%',
-  width: '38.3%',
-  height: '44.5%'
+  left: '4%',
+  top: '6%',
+  width: '62.5%',
+  height: '72.5%'
 };
 
 function pcClearWideAnalysisActionsV215() {
@@ -2741,7 +2931,8 @@ function pcClearWideAnalysisReportContentStylesV215() {
   pcRemoveInlineStyles(report, [
     'position', 'width', 'max-width', 'height', 'min-width', 'min-height',
     'margin', 'padding', 'overflow', 'box-sizing', 'transform', 'transform-origin',
-    'display', 'flex-direction', 'gap', 'grid-template-rows', 'align-items', 'justify-content'
+    'display', 'flex-direction', 'gap', 'grid-template-rows', 'align-items', 'justify-content',
+    'border', 'border-radius', 'background', 'box-shadow', 'flex'
   ]);
   pcRemoveInlineStyles(header, [
     'margin', 'padding', 'border-width', 'box-shadow', 'box-sizing'
@@ -2752,13 +2943,14 @@ function pcClearWideAnalysisReportContentStylesV215() {
     'width', 'max-width', 'margin', 'font-size', 'line-height', 'overflow-wrap', 'word-break'
   ]);
   pcRemoveInlineStyles(grid, [
-    'display', 'grid-template-columns', 'grid-template-rows', 'gap', 'width', 'height',
+    'display', 'grid-template-columns', 'grid-template-rows', 'grid-template-areas', 'gap', 'width', 'height',
     'min-height', 'margin', 'box-sizing', 'align-items', 'align-content', 'flex',
     'flex-grow', 'flex-shrink', 'flex-basis'
   ]);
   cards.forEach((card) => pcRemoveInlineStyles(card, [
     'margin', 'padding', 'min-width', 'min-height', 'height', 'border-width',
-    'box-shadow', 'box-sizing', 'display', 'flex-direction', 'justify-content', 'overflow'
+    'box-shadow', 'box-sizing', 'display', 'flex-direction', 'justify-content', 'overflow',
+    'grid-area', 'border-radius'
   ]));
   labels.forEach((label) => pcRemoveInlineStyles(label, [
     'margin', 'font-size', 'line-height'
@@ -2787,27 +2979,37 @@ function pcFitWideAnalysisReportV215(screen) {
   const summary = report.querySelector('.analysis-summary');
   const grid = report.querySelector('.analysis-grid');
   const cards = [...report.querySelectorAll('.analysis-card')];
-  const compactCards = [...report.querySelectorAll('.analysis-card.compact')];
-  const detailCards = [...report.querySelectorAll('.analysis-issue-card, .analysis-repair-card')];
+  const statusCard = report.querySelector('.analysis-status-card');
+  const confidenceCard = report.querySelector('.analysis-confidence-card');
+  const issueCard = report.querySelector('.analysis-issue-card');
+  const repairCard = report.querySelector('.analysis-repair-card');
   const impactCard = report.querySelector('.analysis-impact-card');
   const labels = [...report.querySelectorAll('.analysis-label')];
+  const icons = [...report.querySelectorAll('.analysis-icon')];
   const values = [...report.querySelectorAll('.analysis-value')];
+  const bigValues = [...report.querySelectorAll('.analysis-value.big')];
   const notes = [...report.querySelectorAll('.analysis-note')];
   if (!header || !badge || !title || !summary || !grid) return false;
 
   const screenRect = screen.getBoundingClientRect();
   const clampNumber = (min, value, max) => Math.max(min, Math.min(max, value));
+  const useSingleColumn = screenRect.width < 340;
+  const widthFactor = screenRect.width / 900;
+  const heightFactor = screenRect.height / 520;
+  const fitFactor = clampNumber(0.56, Math.min(widthFactor, heightFactor), 1.15);
   const base = {
-    badge: clampNumber(9, screenRect.width * 0.0112, 12.5),
-    title: clampNumber(27, screenRect.width * 0.0345, 37),
-    summary: clampNumber(14, screenRect.width * 0.0175, 18.5),
-    label: clampNumber(9.5, screenRect.width * 0.0126, 12.5),
-    value: clampNumber(14, screenRect.width * 0.0175, 18.5),
-    note: clampNumber(10.5, screenRect.width * 0.0136, 14),
-    outputPadding: clampNumber(0, screenRect.width * 0.0016, 3),
-    gap: clampNumber(6, screenRect.width * 0.0088, 11),
-    cardPadding: clampNumber(7, screenRect.width * 0.0094, 11),
-    headerPadding: clampNumber(8, screenRect.width * 0.011, 13)
+    badge: clampNumber(7.5, 10.5 * fitFactor, 12),
+    title: clampNumber(19, 32 * fitFactor, 36),
+    summary: clampNumber(10, 15.5 * fitFactor, 17.5),
+    label: clampNumber(8, 11.5 * fitFactor, 12.5),
+    value: clampNumber(10, 15.2 * fitFactor, 17.5),
+    big: clampNumber(11, 17 * fitFactor, 19.5),
+    note: clampNumber(8.5, 12.2 * fitFactor, 13.5),
+    outputPadding: clampNumber(4, 7 * fitFactor, 9),
+    reportPadding: clampNumber(6, 9 * fitFactor, 12),
+    gap: clampNumber(4, 7.5 * fitFactor, 10),
+    cardPadding: clampNumber(5, 9 * fitFactor, 11),
+    headerGap: clampNumber(3, 5.5 * fitFactor, 7)
   };
 
   pcSetImportantStyles(output, [
@@ -2845,7 +3047,7 @@ function pcFitWideAnalysisReportV215(screen) {
     ['min-width', '0'],
     ['min-height', '0'],
     ['margin', '0'],
-    ['padding', '0'],
+    ['padding', `${base.reportPadding}px`],
     ['display', 'flex'],
     ['flex-direction', 'column'],
     ['gap', `${base.gap}px`],
@@ -2853,98 +3055,127 @@ function pcFitWideAnalysisReportV215(screen) {
     ['justify-content', 'flex-start'],
     ['overflow', 'hidden'],
     ['box-sizing', 'border-box'],
+    ['border', '1px solid rgba(72,255,92,.92)'],
+    ['border-radius', `${clampNumber(7, 11 * fitFactor, 14)}px`],
+    ['background', 'linear-gradient(180deg, rgba(0,35,18,.96), rgba(0,14,7,.98))'],
+    ['box-shadow', 'inset 0 0 22px rgba(45,255,94,.08), 0 0 12px rgba(34,255,82,.12)'],
     ['transform', 'none'],
     ['transform-origin', 'center center']
   ]);
 
+  pcSetImportantStyles(header, [
+    ['margin', '0'],
+    ['padding', '0'],
+    ['display', 'grid'],
+    ['gap', `${base.headerGap}px`],
+    ['border', '0'],
+    ['box-shadow', 'none'],
+    ['box-sizing', 'border-box'],
+    ['flex', '0 0 auto']
+  ]);
+
   pcSetImportantStyles(grid, [
     ['display', 'grid'],
-    ['grid-template-columns', 'minmax(0, 1fr) minmax(0, 1fr)'],
-    ['grid-template-rows', 'auto auto auto'],
+    ['grid-template-columns', useSingleColumn ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) minmax(0, 1fr)'],
+    ['grid-template-rows', useSingleColumn ? 'auto auto auto auto auto' : 'minmax(0, .72fr) minmax(0, 1.28fr) minmax(0, .82fr)'],
+    ['grid-template-areas', useSingleColumn
+      ? '"status" "confidence" "issue" "repair" "impact"'
+      : '"status confidence" "issue repair" "impact impact"'],
     ['gap', `${base.gap}px`],
     ['width', '100%'],
     ['height', 'auto'],
     ['min-height', '0'],
     ['margin', '0'],
     ['align-items', 'stretch'],
-    ['align-content', 'start'],
-    ['flex', '0 0 auto'],
+    ['align-content', 'stretch'],
+    ['flex', '1 1 auto'],
     ['box-sizing', 'border-box']
   ]);
 
+  if (statusCard) pcSetImportantStyles(statusCard, [['grid-area', 'status']]);
+  if (confidenceCard) pcSetImportantStyles(confidenceCard, [['grid-area', 'confidence']]);
+  if (issueCard) pcSetImportantStyles(issueCard, [['grid-area', 'issue']]);
+  if (repairCard) pcSetImportantStyles(repairCard, [['grid-area', 'repair']]);
+  if (impactCard) pcSetImportantStyles(impactCard, [['grid-area', 'impact']]);
+
   const applyScale = (scale) => {
     const scaled = (value, floor = 1) => Math.max(floor, value * scale);
+    report.classList.toggle('analysis-report-fitted-compact', scale < 0.78);
+    report.classList.toggle('analysis-report-fitted-tight', scale < 0.64);
 
-    pcSetImportantStyles(report, [['gap', `${scaled(base.gap, 4)}px`]]);
-    pcSetImportantStyles(header, [
-      ['margin', '0'],
-      ['padding', `${scaled(base.headerPadding, 6)}px`],
-      ['border-width', '1px'],
-      ['box-shadow', 'none'],
-      ['box-sizing', 'border-box']
+    pcSetImportantStyles(report, [
+      ['gap', `${scaled(base.gap, 3)}px`],
+      ['padding', `${scaled(base.reportPadding, 4)}px`]
     ]);
+    pcSetImportantStyles(header, [['gap', `${scaled(base.headerGap, 2)}px`]]);
     pcSetImportantStyles(badge, [
-      ['margin', `0 0 ${scaled(4, 2)}px`],
-      ['padding', `${scaled(2, 1)}px ${scaled(6, 4)}px`],
-      ['font-size', `${scaled(base.badge, 7)}px`],
-      ['line-height', '1']
+      ['margin', '0 auto'],
+      ['padding', `${scaled(2, 1)}px ${scaled(8, 4)}px`],
+      ['font-size', `${scaled(base.badge, 6.5)}px`],
+      ['line-height', '1'],
+      ['justify-self', 'center']
     ]);
     pcSetImportantStyles(title, [
-      ['margin', `0 0 ${scaled(5, 3)}px`],
-      ['font-size', `${scaled(base.title, 17)}px`],
-      ['line-height', '1.04']
+      ['margin', '0'],
+      ['font-size', `${scaled(base.title, 15)}px`],
+      ['line-height', '1.02'],
+      ['text-align', 'center']
     ]);
     pcSetImportantStyles(summary, [
-      ['width', '97%'],
+      ['width', '96%'],
       ['max-width', 'none'],
       ['margin', '0 auto'],
-      ['font-size', `${scaled(base.summary, 9.5)}px`],
-      ['line-height', '1.2'],
-      ['overflow-wrap', 'normal'],
+      ['font-size', `${scaled(base.summary, 8.5)}px`],
+      ['line-height', '1.16'],
+      ['text-align', 'center'],
+      ['overflow-wrap', 'break-word'],
       ['word-break', 'normal']
     ]);
-    pcSetImportantStyles(grid, [['gap', `${scaled(base.gap, 4)}px`]]);
+    pcSetImportantStyles(grid, [['gap', `${scaled(base.gap, 3)}px`]]);
 
     cards.forEach((card) => pcSetImportantStyles(card, [
       ['margin', '0'],
-      ['padding', `${scaled(base.cardPadding, 5)}px`],
+      ['padding', `${scaled(base.cardPadding, 4)}px`],
       ['min-width', '0'],
       ['min-height', '0'],
-      ['height', 'auto'],
+      ['height', '100%'],
       ['border-width', '1px'],
-      ['box-shadow', 'none'],
+      ['border-radius', `${scaled(8, 5)}px`],
+      ['box-shadow', 'inset 0 0 12px rgba(42,255,91,.04)'],
       ['box-sizing', 'border-box'],
       ['display', 'flex'],
       ['flex-direction', 'column'],
       ['justify-content', 'flex-start'],
       ['overflow', 'hidden']
     ]));
-    compactCards.forEach((card) => pcSetImportantStyles(card, [
-      ['min-height', `${scaled(70, 56)}px`]
-    ]));
-    detailCards.forEach((card) => pcSetImportantStyles(card, [
-      ['min-height', `${scaled(102, 78)}px`]
-    ]));
-    if (impactCard) {
-      pcSetImportantStyles(impactCard, [
-        ['min-height', `${scaled(74, 58)}px`]
-      ]);
-    }
     labels.forEach((label) => pcSetImportantStyles(label, [
-      ['margin', `0 0 ${scaled(3, 2)}px`],
-      ['font-size', `${scaled(base.label, 7)}px`],
-      ['line-height', '1.02']
+      ['margin', `0 0 ${scaled(3, 1.5)}px`],
+      ['font-size', `${scaled(base.label, 6.5)}px`],
+      ['line-height', '1.04'],
+      ['display', 'flex'],
+      ['align-items', 'center'],
+      ['gap', `${scaled(5, 3)}px`]
+    ]));
+    icons.forEach((icon) => pcSetImportantStyles(icon, [
+      ['width', `${scaled(15, 10)}px`],
+      ['height', `${scaled(15, 10)}px`],
+      ['font-size', `${scaled(base.label, 6.5)}px`],
+      ['line-height', '1']
     ]));
     values.forEach((value) => pcSetImportantStyles(value, [
-      ['font-size', `${scaled(base.value, 9)}px`],
-      ['line-height', '1.18'],
+      ['font-size', `${scaled(base.value, 8)}px`],
+      ['line-height', '1.14'],
       ['overflow-wrap', 'break-word'],
       ['word-break', 'normal']
     ]));
+    bigValues.forEach((value) => pcSetImportantStyles(value, [
+      ['font-size', `${scaled(base.big, 9)}px`],
+      ['line-height', '1.1']
+    ]));
     notes.forEach((note) => pcSetImportantStyles(note, [
-      ['margin-top', `${scaled(3, 2)}px`],
-      ['font-size', `${scaled(base.note, 8)}px`],
-      ['line-height', '1.14']
+      ['margin-top', `${scaled(3, 1.5)}px`],
+      ['font-size', `${scaled(base.note, 7)}px`],
+      ['line-height', '1.12']
     ]));
   };
 
@@ -2958,23 +3189,34 @@ function pcFitWideAnalysisReportV215(screen) {
     return reportFits && cardsFit;
   };
 
-  let scale = 1;
+  let scale = report.classList.contains('analysis-report-very-dense') ? 0.86
+    : report.classList.contains('analysis-report-dense') ? 0.93
+      : 1;
   applyScale(scale);
-  // Generated diagnoses can vary substantially in length. Reduce only as much
-  // as needed, preserving the larger default typography for ordinary responses.
-  for (let pass = 0; pass < 12 && !contentFits(); pass += 1) {
-    scale = Math.max(0.62, scale * 0.94);
+
+  for (let pass = 0; pass < 18 && !contentFits(); pass += 1) {
+    scale = Math.max(0.48, scale * 0.94);
     applyScale(scale);
-    if (scale <= 0.62) break;
+    if (scale <= 0.48) break;
   }
 
-  // A final narrow fallback keeps unusually long generated copy available
-  // without allowing card borders or the monitor frame to overlap.
   if (!contentFits()) {
+    report.classList.add('analysis-report-scrollable');
     pcSetImportantStyles(output, [
       ['overflow-y', 'auto'],
       ['scrollbar-gutter', 'stable both-edges']
     ]);
+    pcSetImportantStyles(report, [
+      ['height', 'auto'],
+      ['min-height', '100%']
+    ]);
+    pcSetImportantStyles(grid, [
+      ['grid-template-rows', 'auto auto auto'],
+      ['height', 'auto']
+    ]);
+    cards.forEach((card) => pcSetImportantStyles(card, [['height', 'auto']]));
+  } else {
+    report.classList.remove('analysis-report-scrollable');
   }
 
   return true;
@@ -2989,13 +3231,13 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
     ? viewportHeight
     : pcViewportHeight();
 
-  // v257: The completed report gets a tall, close workstation crop. The source
-  // photograph is cropped with cover, never stretched. The explicit pixel box
-  // also prevents old aspect-ratio rules from briefly flattening the machine.
+  // v258: Keep the completed diagnostic formatting intact while zooming the
+  // workstation itself. The physical monitor now dominates the wide layout,
+  // and the report remains mapped to the actual monitor glass.
   const aspect = 1.72;
-  const maxHeight = Math.max(560, safeViewportHeight * 0.78);
-  const maxWidth = Math.min(viewportWidth * 0.96, 1840);
-  const width = Math.max(980, Math.min(maxWidth, maxHeight * aspect));
+  const maxHeight = Math.max(740, safeViewportHeight * 0.985);
+  const maxWidth = Math.min(viewportWidth * 0.995, 1980);
+  const width = Math.max(1460, Math.min(maxWidth, maxHeight * aspect));
   const height = width / aspect;
 
   pcSetImportantStyles(terminal, [
@@ -3003,7 +3245,7 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
     ['inset', 'auto'],
     ['left', '50%'],
     ['right', 'auto'],
-    ['top', '42%'],
+    ['top', '49%'],
     ['bottom', 'auto'],
     ['width', `${Math.round(width)}px`],
     ['height', `${Math.round(height)}px`],
@@ -3038,8 +3280,8 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
     ['padding', '0'],
     ['display', 'block'],
     ['background-image', 'var(--pc-app-background)'],
-    ['background-size', '100% 100%'],
-    ['background-position', 'center center'],
+    ['background-size', '165% 165%'],
+    ['background-position', '45% 30%'],
     ['background-repeat', 'no-repeat'],
     ['background-color', 'transparent'],
     ['border', '0'],
@@ -3052,12 +3294,12 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
   pcSetImportantStyles(screen, [
     ['position', 'absolute'],
     ['inset', 'auto'],
-    ['left', '13.5%'],
+    ['left', PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215.left],
     ['right', 'auto'],
-    ['top', '14.7%'],
+    ['top', PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215.top],
     ['bottom', 'auto'],
-    ['width', '46.3%'],
-    ['height', '46.5%'],
+    ['width', PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215.width],
+    ['height', PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215.height],
     ['min-width', '0'],
     ['min-height', '0'],
     ['max-width', 'none'],
@@ -3120,7 +3362,7 @@ function pcAlignModernTerminalScreenV149() {
   // the legacy monitor-alignment pass overwrite the full mobile stage or put
   // the iPad readout back above the photographed monitor.
   if (consultThinking && viewportWidth <= 760) {
-    pcApplyLiveAnalyzingLayoutV202();
+    pcApplyLiveAnalyzingLayoutV256();
     return;
   }
   if (isIpadConsultThinking) {
@@ -3227,8 +3469,10 @@ function pcResetAnalyzingReadoutV203(){
   const screen = document.querySelector('#claudeTerminalScene .claude-terminal-screen');
   const output = document.getElementById('claudeTerminalOutput');
   const readout = output?.querySelector('.pc-analyzing-readout');
+  const panel = output?.querySelector('.pc-analyzing-panel');
   const titleLine = output?.querySelector('.pc-terminal-title-line');
-  const gaps = output?.querySelectorAll('.pc-terminal-gap') || [];
+  const dividers = output?.querySelectorAll('.pc-terminal-divider') || [];
+  const progress = output?.querySelector('.pc-analyzing-progress');
 
   pcRemoveInlineStyles(screen, [
     'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
@@ -3247,8 +3491,13 @@ function pcResetAnalyzingReadoutV203(){
     'height', 'margin', 'padding', 'transform', 'text-align', 'box-sizing',
     'font-family', 'font-size', 'font-weight', 'line-height', 'letter-spacing', 'white-space'
   ]);
+  pcRemoveInlineStyles(panel, [
+    'width', 'max-width', 'margin', 'padding', 'border', 'border-radius',
+    'background', 'box-shadow', 'box-sizing'
+  ]);
   pcRemoveInlineStyles(titleLine, ['font-size', 'line-height', 'letter-spacing', 'white-space']);
-  gaps.forEach((gap) => pcRemoveInlineStyles(gap, ['height']));
+  dividers.forEach((divider) => pcRemoveInlineStyles(divider, ['margin']));
+  pcRemoveInlineStyles(progress, ['gap', 'margin-top']);
 }
 
 // [LIVE ANALYSIS: READOUT POSITION]
@@ -3257,22 +3506,25 @@ function positionClaudeAnalyzingReadoutV161() {
   const outputEl = document.getElementById('claudeTerminalOutput');
   const screen = terminal?.querySelector('.claude-terminal-screen');
   const readout = outputEl?.querySelector('.pc-analyzing-readout');
+  const panel = outputEl?.querySelector('.pc-analyzing-panel');
   const titleLine = outputEl?.querySelector('.pc-terminal-title-line');
-  const gaps = outputEl?.querySelectorAll('.pc-terminal-gap') || [];
-  if (!terminal || !outputEl || !screen || !readout) return false;
+  const dividers = outputEl?.querySelectorAll('.pc-terminal-divider') || [];
+  const progress = outputEl?.querySelector('.pc-analyzing-progress');
+  if (!terminal || !outputEl || !screen || !readout || !panel) return false;
 
   const viewportWidth = pcAnalysisViewportWidthV122();
-  const viewportHeight = Math.min(
-    window.innerHeight || Number.POSITIVE_INFINITY,
-    document.documentElement?.clientHeight || Number.POSITIVE_INFINITY,
-    window.visualViewport?.height || Number.POSITIVE_INFINITY
-  );
   const mode = pcGetLiveAnalysisModeV256(viewportWidth);
-  const isPortraitTablet = mode === 'tablet' && viewportHeight > viewportWidth * 1.08;
-  const isCompactDesktop = mode === 'desktop' && viewportWidth <= 1366 && viewportHeight <= 900;
-  const screenPixelWidth = Math.max(1, screen.getBoundingClientRect().width || 320);
-  const readoutFontPx = Math.max(12, Math.min(19.5, screenPixelWidth / 21));
-  const titleFontPx = Math.min(21.5, readoutFontPx * 1.08);
+  const screenRect = screen.getBoundingClientRect();
+  const screenPixelWidth = Math.max(1, screenRect.width || 320);
+  const screenPixelHeight = Math.max(1, screenRect.height || 220);
+  const clampNumber = (min, value, max) => Math.max(min, Math.min(max, value));
+  const terminalFontPx = clampNumber(
+    mode === 'phone' ? 11 : 10,
+    Math.min(screenPixelWidth / 23, screenPixelHeight / 15.5),
+    mode === 'desktop' ? 22 : 18
+  );
+  const panelPaddingPx = clampNumber(9, Math.min(screenPixelWidth, screenPixelHeight) * 0.055, 22);
+  const readoutInset = mode === 'phone' ? 7 : 6;
 
   pcSetImportantStyles(outputEl, [
     ['position', 'absolute'],
@@ -3295,72 +3547,63 @@ function positionClaudeAnalyzingReadoutV161() {
     ['text-align', 'left']
   ]);
 
-  if (mode === 'phone') {
-    pcSetImportantStyles(readout, [
-      ['position', 'absolute'],
-      ['left', '18%'],
-      ['top', '20%'],
-      ['right', 'auto'],
-      ['bottom', 'auto'],
-      ['width', '64%'],
-      ['max-width', '64%'],
-      ['height', 'auto'],
-      ['margin', '0'],
-      ['padding', '0'],
-      ['transform', 'none'],
-      ['text-align', 'left'],
-      ['box-sizing', 'border-box'],
-      ['font-size', 'clamp(.78rem, 3vw, .92rem)'],
-      ['line-height', '1.24']
-    ]);
-    if (titleLine) {
-      pcSetImportantStyles(titleLine, [
-        ['font-size', '1.16em'],
-        ['line-height', '1.1'],
-        ['letter-spacing', '.015em']
-      ]);
-    }
-    gaps.forEach((gap) => pcSetImportantStyles(gap, [['height', '.55em']]));
-  } else {
-    // v257: Tablet and desktop both position the readout inside the CRT layer
-    // established by pcApplyLiveComputerFrameV256. No height-dependent iPad
-    // branch remains, so intermediate landscape sizes cannot lose lines.
-    pcSetImportantStyles(readout, [
-      ['position', 'absolute'],
-      ['left', '8%'],
-      ['top', '50%'],
-      ['right', 'auto'],
-      ['bottom', 'auto'],
-      ['width', '84%'],
-      ['max-width', '84%'],
-      ['height', 'auto'],
-      ['margin', '0'],
-      ['padding', '0'],
-      ['transform', 'translateY(-50%)'],
-      ['text-align', 'left'],
-      ['box-sizing', 'border-box'],
+  pcSetImportantStyles(readout, [
+    ['position', 'absolute'],
+    ['left', `${readoutInset}%`],
+    ['right', 'auto'],
+    ['top', '50%'],
+    ['bottom', 'auto'],
+    ['width', `${100 - (readoutInset * 2)}%`],
+    ['max-width', `${100 - (readoutInset * 2)}%`],
+    ['height', 'auto'],
+    ['margin', '0'],
+    ['padding', '0'],
+    ['transform', 'translateY(-50%)'],
+    ['text-align', 'left'],
+    ['box-sizing', 'border-box'],
+    ['font-family', '"Source Code Pro", "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'],
+    ['font-size', `${terminalFontPx.toFixed(2)}px`],
+    ['font-weight', '700'],
+    ['line-height', '1.12'],
+    ['letter-spacing', '.018em'],
+    ['white-space', 'normal']
+  ]);
+
+  pcSetImportantStyles(panel, [
+    ['width', '100%'],
+    ['max-width', '100%'],
+    ['margin', '0'],
+    ['padding', `${panelPaddingPx.toFixed(1)}px`],
+    ['border', '1px solid rgba(76,255,103,.88)'],
+    ['border-radius', `${clampNumber(7, screenPixelWidth * 0.022, 15)}px`],
+    ['background', 'linear-gradient(180deg, rgba(0,35,18,.72), rgba(0,15,7,.82))'],
+    ['box-shadow', 'inset 0 0 18px rgba(48,255,96,.06), 0 0 9px rgba(42,255,89,.10)'],
+    ['box-sizing', 'border-box']
+  ]);
+
+  if (titleLine) {
+    pcSetImportantStyles(titleLine, [
+      ['font-size', '1.22em'],
+      ['line-height', '1.04'],
+      ['letter-spacing', '.025em'],
       ['white-space', 'nowrap'],
-      ['font-family', '"Source Code Pro", "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'],
-      ['font-size', `${readoutFontPx.toFixed(2)}px`],
-      ['font-weight', '700'],
-      ['line-height', '1.16'],
-      ['letter-spacing', '.015em']
+      ['text-align', 'center']
     ]);
-    if (titleLine) {
-      pcSetImportantStyles(titleLine, [
-        ['font-size', `${titleFontPx.toFixed(2)}px`],
-        ['line-height', '1.08'],
-        ['letter-spacing', '.01em'],
-        ['white-space', 'nowrap']
-      ]);
-    }
-    gaps.forEach((gap) => pcSetImportantStyles(gap, [
-      ['height', '.42em']
-    ]));
+  }
+  dividers.forEach((divider) => pcSetImportantStyles(divider, [
+    ['margin', `${clampNumber(5, terminalFontPx * 0.52, 11)}px 0`]
+  ]));
+  if (progress) {
+    pcSetImportantStyles(progress, [
+      ['gap', `${clampNumber(2, terminalFontPx * 0.22, 5)}px`],
+      ['margin-top', `${clampNumber(5, terminalFontPx * 0.55, 11)}px`]
+    ]);
   }
 
   return true;
 }
+window.pcPositionClaudeAnalyzingReadout = positionClaudeAnalyzingReadoutV161;
+
 window.pcPositionClaudeAnalyzingReadout = positionClaudeAnalyzingReadoutV161;
 
 
@@ -3577,18 +3820,19 @@ function pcApplyLiveComputerFrameV256({
     ['transition', 'none']
   ]);
 
-  // The workstation now uses the full 2:1 transparent render with no side crop.
-  // These coordinates match the usable glass inside the CRT bezel, rather than
-  // painting the terminal layer across the monitor frame on portrait tablets.
+  // The workstation uses the full 2:1 transparent render with no side crop.
+  // Keep the live terminal inside the monitor's inner glass, not the bezel.
+  // These percentages are measured from the source artwork and therefore stay
+  // aligned at every tablet and desktop workstation size.
   pcSetImportantStyles(screen, [
     ['position', 'absolute'],
     ['inset', 'auto'],
-    ['left', '19.3%'],
+    ['left', '22.45%'],
     ['right', 'auto'],
-    ['top', '14.4%'],
+    ['top', '13.2%'],
     ['bottom', 'auto'],
-    ['width', '37.3%'],
-    ['height', '44.8%'],
+    ['width', '39.75%'],
+    ['height', '45%'],
     ['min-width', '0'],
     ['min-height', '0'],
     ['max-width', 'none'],
@@ -3787,13 +4031,6 @@ if (!window.pcLiveAnalyzingLayoutV256Installed) {
   }, { once: true });
 }
 
-// Backward-compatible names used by existing state transitions.
-function pcApplyLiveAnalyzingLayoutV202() {
-  return pcApplyLiveAnalyzingLayoutV256();
-}
-function pcQueueLiveAnalyzingLayoutV202() {
-  pcScheduleLiveAnalyzingLayoutV256({ immediate: true });
-}
 window.pcApplyLiveAnalyzingLayout = pcApplyLiveAnalyzingLayoutV256;
 
 function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
@@ -3806,13 +4043,22 @@ function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
 
   outputEl.innerHTML = `
     <div class="pc-analyzing-readout" aria-label="Claude terminal analyzing">
-      <div class="pc-terminal-line pc-terminal-title-line">CLAUDE TERMINAL</div>
-      <div class="pc-terminal-gap" aria-hidden="true"></div>
-      <div class="pc-terminal-line">&gt; SECTION</div>
-      <div class="pc-terminal-line pc-terminal-indent">${esc(sectionLabel)}</div>
-      <div class="pc-terminal-gap" aria-hidden="true"></div>
-      <div class="pc-terminal-line">&gt; STATUS</div>
-      <div class="pc-terminal-line pc-terminal-indent pc-analyzing-status">ANALYZING<span class="claude-terminal-cursor" aria-hidden="true"></span></div>
+      <div class="pc-analyzing-panel">
+        <div class="pc-terminal-line pc-terminal-title-line">CLAUDE TERMINAL</div>
+        <div class="pc-terminal-divider" aria-hidden="true"></div>
+        <div class="pc-terminal-section">
+          <div class="pc-terminal-kicker">&gt; SECTION</div>
+          <div class="pc-terminal-value">${esc(sectionLabel)}</div>
+        </div>
+        <div class="pc-terminal-divider" aria-hidden="true"></div>
+        <div class="pc-terminal-section">
+          <div class="pc-terminal-kicker">&gt; STATUS</div>
+          <div class="pc-terminal-value pc-analyzing-status">ANALYZING<span class="claude-terminal-cursor" aria-hidden="true"></span></div>
+          <div class="pc-analyzing-progress" role="progressbar" aria-label="Claude analysis progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span class="pc-analyzing-progress-fill" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 
@@ -3820,9 +4066,55 @@ function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
   requestAnimationFrame(positionClaudeAnalyzingReadoutV161);
   window.setTimeout(positionClaudeAnalyzingReadoutV161, 60);
   window.setTimeout(positionClaudeAnalyzingReadoutV161, 220);
-  pcQueueLiveAnalyzingLayoutV202();
+  pcScheduleLiveAnalyzingLayoutV256({ immediate: true });
 }
 
+const PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS = 15000;
+let pcClaudeAnalysisProgressTimerV309 = 0;
+
+function pcGetClaudeProcessingHoldMsV316() {
+  const configured = Number(window.PC_CLAUDE_PROCESSING_HOLD_MS);
+  if (!Number.isFinite(configured)) {
+    window.PC_CLAUDE_PROCESSING_HOLD_MS = PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS;
+    return PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS;
+  }
+  return Math.max(0, configured || PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS);
+}
+
+function pcStartClaudeAnalysisProgressV309(durationMs = PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS) {
+  const progress = document.querySelector('#claudeTerminalOutput .pc-analyzing-progress');
+  if (!progress) return false;
+
+  const safeDuration = Math.max(0, Number(durationMs) || 0);
+  if (pcClaudeAnalysisProgressTimerV309) {
+    window.clearTimeout(pcClaudeAnalysisProgressTimerV309);
+    pcClaudeAnalysisProgressTimerV309 = 0;
+  }
+
+  progress.classList.remove('is-running', 'is-complete');
+  progress.style.setProperty('--pc-analysis-progress-duration', `${safeDuration}ms`);
+  progress.setAttribute('aria-valuenow', '0');
+
+  // Force one clean animation restart when a new Claude analysis begins.
+  void progress.offsetWidth;
+
+  if (safeDuration === 0) {
+    progress.classList.add('is-complete');
+    progress.setAttribute('aria-valuenow', '100');
+    return true;
+  }
+
+  progress.classList.add('is-running');
+  pcClaudeAnalysisProgressTimerV309 = window.setTimeout(() => {
+    progress.classList.remove('is-running');
+    progress.classList.add('is-complete');
+    progress.setAttribute('aria-valuenow', '100');
+    pcClaudeAnalysisProgressTimerV309 = 0;
+  }, safeDuration);
+
+  return true;
+}
+window.pcStartClaudeAnalysisProgress = pcStartClaudeAnalysisProgressV309;
 
 const PC_ANALYSIS_LAYOUT_CLASSES_V267 = [
   'pc-analysis-report-active-v122',
@@ -3945,13 +4237,15 @@ function pcApplyAnalysisLayoutV122() {
   }
 
   if (layout === 'panel') {
-    // CSS owns the phone/tablet panel completely. There are deliberately no
-    // delayed inline geometry passes in this mode.
+    // CSS owns the outer phone/tablet panel, while the shared auto-fit routine
+    // keeps the dynamic report inside its available monitor area.
     pcSetImportantStyles(menuButton, [
       ['display', 'none'],
       ['visibility', 'hidden'],
       ['pointer-events', 'none']
     ]);
+    const panelScreen = terminal?.querySelector('.claude-terminal-screen');
+    if (panelScreen) pcFitWideAnalysisReportV215(panelScreen);
     return true;
   }
 
@@ -3991,6 +4285,10 @@ function pcScheduleAnalysisLayoutV255({ immediate = false } = {}) {
 }
 
 function pcClearAnalysisLayoutV122() {
+  if (pcClaudeAnalysisProgressTimerV309) {
+    window.clearTimeout(pcClaudeAnalysisProgressTimerV309);
+    pcClaudeAnalysisProgressTimerV309 = 0;
+  }
   pcAnalysisLayoutGenerationV255 += 1;
   if (pcAnalysisLayoutFrameV255) cancelAnimationFrame(pcAnalysisLayoutFrameV255);
   if (pcAnalysisLayoutSettleTimerV255) clearTimeout(pcAnalysisLayoutSettleTimerV255);
@@ -4027,25 +4325,12 @@ function showClaudeConsultOverlay(partLabel) {
   vnFullText = '';
   vnCurrentText = '';
 
-const overlay = document.getElementById('vnOverlay');
-
 pcClearAnalysisLayoutV122();
 
-overlay.classList.remove(
-  'claude-prediction',
-  'pc-clean-prediction',
-  'pc-prediction-question',
-  'claude-terminal-consult',
-  'claude-terminal-textmode',
-  'pc-clean-output',
-  'pc-clean-final',
-  'analysis-complete'
-);
-
-overlay.classList.add('active', 'claude-terminal-consult');
-
-setVNClaudeMode(false);
-setVNClaudeTerminalMode(true);
+const overlay = pcSetVNOverlayState({
+  active: true,
+  modes: ['claude-terminal-consult']
+});
 setClaudeTerminalTextMode(false);
 
 musicStartVN();
@@ -4060,7 +4345,7 @@ setClaudeTerminalState(
 
 renderClaudeAnalyzingReadout(partLabel);
 pcQueueModernTerminalAlignmentV147();
-pcQueueLiveAnalyzingLayoutV202();
+pcScheduleLiveAnalyzingLayoutV256({ immediate: true });
 
   const speaker = document.getElementById('vnSpeaker');
   if (speaker) speaker.textContent = 'Professor Pixel';
@@ -4127,9 +4412,17 @@ function parseClaudeDiagnosticSections(text) {
 function buildClaudeAnalysisHTML(feedback, mock = false) {
   const d = parseClaudeDiagnosticSections(feedback);
   const badge = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
+  const totalCharacters = [d.status, d.issue, d.repair, d.impact, d.confidence]
+    .join(' ')
+    .length;
+  const densityClass = totalCharacters > 920
+    ? 'analysis-report-very-dense'
+    : totalCharacters > 680
+      ? 'analysis-report-dense'
+      : '';
 
   return `
-    <div class="analysis-report" role="document" aria-label="Claude scenario diagnostic report">
+    <div class="analysis-report ${densityClass}" data-analysis-characters="${totalCharacters}" role="document" aria-label="Claude scenario diagnostic report">
       <header class="analysis-header">
         <div class="analysis-badge">${esc(badge)}</div>
         <h2 class="analysis-title">Scenario Diagnostic</h2>
@@ -4140,35 +4433,34 @@ function buildClaudeAnalysisHTML(feedback, mock = false) {
 
       <div class="analysis-grid" aria-label="Diagnostic findings">
         <section class="analysis-card analysis-status-card compact">
-          <span class="analysis-label">Status</span>
-          <div class="analysis-value big">✓ ${esc(d.status)}</div>
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">✓</span><span>Status</span></span>
+          <div class="analysis-value big">${esc(d.status)}</div>
         </section>
 
         <section class="analysis-card analysis-confidence-card compact">
-          <span class="analysis-label">Confidence</span>
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">◎</span><span>Confidence</span></span>
           <div class="analysis-value big">${esc(d.confidence)}</div>
           <div class="analysis-note">Strong evidence pattern detected.</div>
         </section>
 
         <section class="analysis-card analysis-issue-card">
-          <span class="analysis-label">Issue Detected</span>
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">!</span><span>Issue Detected</span></span>
           <div class="analysis-value">${esc(d.issue)}</div>
         </section>
 
         <section class="analysis-card analysis-repair-card">
-          <span class="analysis-label">Recommended Repair</span>
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">↗</span><span>Recommended Repair</span></span>
           <div class="analysis-value">${esc(d.repair)}</div>
         </section>
 
         <section class="analysis-card analysis-impact-card wide">
-          <span class="analysis-label">Expected Impact</span>
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">▥</span><span>Expected Impact</span></span>
           <div class="analysis-value">${esc(d.impact)}</div>
         </section>
       </div>
     </div>
   `;
 }
-
 
 function showClaudeConsultResult(feedback, mock = false, onClose = null) {
   claudeTerminalCloseCallback = typeof onClose === 'function' ? onClose : null;
@@ -4203,8 +4495,8 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
   const vnText = document.getElementById('vnText');
   if (vnText) {
     vnText.innerHTML = `
-      <button id="claudeTTSBtn" class="claude-tts-btn" type="button" onclick="event.stopPropagation();toggleClaudeTTS()">🔊 Read Analysis</button>
-      <button class="vn-return-btn terminal-return" type="button" onclick="event.stopPropagation();closeClaudeConsultOverlay()">Continue</button>
+      <button id="claudeTTSBtn" class="claude-tts-btn" type="button" data-pc-action="toggle-claude-tts" data-pc-stop-propagation="true">🔊 Read Analysis</button>
+      <button class="vn-return-btn terminal-return" type="button" data-pc-action="close-claude-consult" data-pc-stop-propagation="true">Continue</button>
     `;
     setTimeout(() => vnText.querySelector('.vn-return-btn')?.focus(), 100);
     pcScheduleAnalysisLayoutV255();
@@ -4230,17 +4522,11 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
   if (!overlay || !overlay.classList.contains('active')) {
     showClaudeConsultOverlay('Scenario diagnosis');
   }
-  // v156: Keep the Claude analyzing screen visible long enough to inspect.
-  // Change this from DevTools before opening Claude when a longer pause is useful:
-  //   PC_CLAUDE_PROCESSING_HOLD_MS = 60000
-  // The default is 30 seconds.
-  if (!Number.isFinite(Number(window.PC_CLAUDE_PROCESSING_HOLD_MS))) {
-    window.PC_CLAUDE_PROCESSING_HOLD_MS = 30000;
-  }
-  const claudeProcessingHoldMs = Math.max(
-    0,
-    Number(window.PC_CLAUDE_PROCESSING_HOLD_MS) || 30000
-  );
+  // Keep the analyzing screen visible for responsive QA screenshots.
+  // Override PC_CLAUDE_PROCESSING_HOLD_MS in DevTools when another inspection time is useful.
+  const claudeProcessingHoldMs = pcGetClaudeProcessingHoldMsV316();
+
+  pcStartClaudeAnalysisProgressV309(claudeProcessingHoldMs);
 
   setTimeout(() => {
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
@@ -4254,12 +4540,10 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
 function closeClaudeConsultOverlay() {
   const cb = claudeTerminalCloseCallback;
   claudeTerminalCloseCallback = null;
-  const overlay = document.getElementById('vnOverlay');
   pcClearAnalysisLayoutV122();
-  if (overlay) overlay.classList.remove('active', 'claude-consult', 'claude-terminal-consult', 'claude-terminal-textmode', 'claude-prediction');
-  document.getElementById('vnCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
-  document.getElementById('vnStudentCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
-  overlay?.classList.remove('pc-dual-character');
+  pcSetVNOverlayState({ active: false });
+  pcResetVNCharacters();
+  pcResetVNDialogueState();
   setClaudeShelfState('idle', 'idle');
   setClaudeTerminalTextMode(false);
   setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
@@ -4269,14 +4553,12 @@ function closeClaudeConsultOverlay() {
   } else {
     document.getElementById('promptInput')?.focus();
   }
-  function stopClaudeTTS() {
-    if (window.speechSynthesis?.speaking) {
-      window.speechSynthesis.cancel();
-    }
-    const btn = document.getElementById('claudeTTSBtn');
-    if (btn) btn.textContent = '🔊 Read Analysis';
-  }
 }
+
+pcRegisterUIActions({
+  'toggle-claude-tts': () => toggleClaudeTTS(),
+  'close-claude-consult': () => closeClaudeConsultOverlay()
+});
 
 function setClaudeShelfState(state = 'idle', label = '') {
   const shelf = document.getElementById('claudeShelf');
@@ -4297,15 +4579,9 @@ function vnShow(expression, text, onComplete, meta = {}) {
 function vnPlayNext() {
   if (vnQueue.length === 0) {
     setTimeout(() => {
-      const overlay = document.getElementById('vnOverlay');
-      overlay.classList.remove('active', 'claude-consult', 'claude-terminal-consult');
-      document.getElementById('vnCharacter').classList.remove('visible', 'is-active', 'is-inactive');
-      document.getElementById('vnStudentCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
-      const pixelCharacter = document.getElementById('vnCharacter');
-      const studentCharacter = document.getElementById('vnStudentCharacter');
-      if (pixelCharacter) pixelCharacter.style.removeProperty('display');
-      if (studentCharacter) studentCharacter.style.removeProperty('display');
-      overlay.classList.remove('pc-dual-character');
+      pcSetVNOverlayState({ active: false });
+      pcResetVNCharacters();
+      pcResetVNDialogueState();
       document.getElementById('promptInput')?.focus();
       // Fade music down when VN closes
       musicEndVN();
@@ -4319,13 +4595,13 @@ function vnPlayNext() {
   vnOnComplete = onComplete || null;
   vnTyping = true;
 
-  const overlay = document.getElementById('vnOverlay');
-  overlay.classList.add('active');
+  const overlay = pcSetVNOverlayState({
+    active: true,
+    preserve: ['scenario-intro-active']
+  });
 
   // Reset Claude modes, then configure the active VN speaker. Dual-cast scenes keep
   // the secondary character opposite Pixel on wide screens and show one on small screens.
-  setVNClaudeMode(false);
-  setVNClaudeTerminalMode(false);
   setClaudeTerminalTextMode(false);
 
   // Fade music up when VN opens
@@ -4463,6 +4739,11 @@ function vnSkipType() {
   el.innerHTML = vnFullText;
   document.getElementById('vnAdvanceHint').classList.add('show');
 }
+
+pcRegisterUIActions({
+  'vn-advance': () => vnAdvance(),
+  'vn-skip': () => vnSkipType()
+});
 
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');
@@ -4683,13 +4964,9 @@ function playScenarioIntroduction(index) {
   const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
   const useSpecialIntroLayout = ui.introLayout === 'special';
   overlay?.classList.toggle('scenario-intro-active', useSpecialIntroLayout);
-  const afterIntroActions = {
-    's2-diagnosis': renderS2DiagnosisActivity
-  };
   const onDone = () => {
     if (useSpecialIntroLayout) overlay?.classList.remove('scenario-intro-active');
-    const action = afterIntroActions[ui.afterIntroAction];
-    if (typeof action === 'function') action();
+    pcRunScenarioAfterIntroAction(ui.afterIntroAction);
   };
 
   if (window.scenarioIntroTimer) clearTimeout(window.scenarioIntroTimer);
@@ -4706,50 +4983,36 @@ function playScenarioIntroduction(index) {
 }
 
 
-function switchScenario(i, btn) {
-  const index = Number(i);
-  if (!Number.isInteger(index) || !scenarios[index]) return false;
+function pcActivateScenario(index, { explicitButton = null, playIntroduction = true } = {}) {
+  const normalized = pcNormalizeScenarioIndex(index);
+  if (normalized === null) return false;
 
   pcClearVNStateForScenarioSwitch();
-  resetScenarioRunState(index);
-  selectScenarioTab(index, btn);
+  resetScenarioRunState(normalized);
+  selectScenarioTab(normalized, explicitButton);
   window.scenarioIntroEnabled = true;
+
+  const implemented = Boolean(getScenarioUI(normalized).implemented);
   // v216: Mark the introduction before rendering the workbench. This prevents
   // its first textarea from briefly stealing focus and scrolling the page just
   // before Professor Pixel states the challenge.
-  window.pcScenarioIntroPending = Boolean(getScenarioUI(index).implemented);
-  loadScenario(index);
+  window.pcScenarioIntroPending = implemented && playIntroduction;
+  loadScenario(normalized);
 
-  if (getScenarioUI(index).implemented) playScenarioIntroduction(index);
+  if (implemented && playIntroduction) playScenarioIntroduction(normalized);
   else window.pcScenarioIntroPending = false;
   return false;
 }
 
+function switchScenario(i, btn) {
+  return pcActivateScenario(i, { explicitButton: btn });
+}
+
 
 function pcClearVNStateForScenarioSwitch() {
-  const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
-  if (overlay) {
-    overlay.classList.remove(
-      'active',
-      'claude-prediction',
-      'pc-clean-prediction',
-      'claude-terminal-consult',
-      'claude-terminal-textmode',
-      'claude-analysis',
-      'claude-consult',
-      'pc-clean-output',
-      'scenario-intro-active'
-    );
-  }
-
-  document.getElementById('vnDialogue')?.classList.remove('has-choices');
-  document.getElementById('vnCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
-  document.getElementById('vnStudentCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
-  const pixelCharacter = document.getElementById('vnCharacter');
-  const studentCharacter = document.getElementById('vnStudentCharacter');
-  if (pixelCharacter) pixelCharacter.style.removeProperty('display');
-  if (studentCharacter) studentCharacter.style.removeProperty('display');
-  overlay?.classList.remove('pc-dual-character');
+  pcSetVNOverlayState({ active: false });
+  pcResetVNCharacters();
+  pcResetVNDialogueState();
   document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
   if (typeof pcClearPredictionPresentationV191 === 'function') pcClearPredictionPresentationV191();
 
@@ -4757,15 +5020,15 @@ function pcClearVNStateForScenarioSwitch() {
   window.pendingPromptAfterPrediction = '';
   window.pcWaitingForClaudeContinue = false;
 
-  try { predictionGateActive = false; } catch(e) {}
-  try { vnQueue = []; } catch(e) {}
-  try { vnTyping = false; } catch(e) {}
-  try { vnOnComplete = null; } catch(e) {}
-  try { clearTimeout(vnTypeTimer); } catch(e) {}
-  try { setClaudeShelfState('idle', 'idle'); } catch(e) {}
-  try { setClaudeTerminalTextMode(false); } catch(e) {}
-  try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'AWAITING INPUT...'); } catch(e) {}
-  try { musicEndVN(); } catch(e) {}
+  predictionGateActive = false;
+  vnQueue = [];
+  vnTyping = false;
+  vnOnComplete = null;
+  clearTimeout(vnTypeTimer);
+  setClaudeShelfState('idle', 'idle');
+  setClaudeTerminalTextMode(false);
+  setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'AWAITING INPUT...');
+  musicEndVN();
 }
 
 function pcFillS1DevFields() {
@@ -4795,10 +5058,7 @@ function pcFillS1DevFields() {
 }
 
 function resetS1Dev() {
-    scenarioIndex = 0;
-    attempts = 0;
-    lastPromptText = '';
-    history = [];
+    resetScenarioRunState(SCENARIO_INDEX.ENGAGEMENT);
 
     if (window.scenarioIntroTimer) {
       clearTimeout(window.scenarioIntroTimer);
@@ -4834,13 +5094,7 @@ function resetS1Dev() {
     document.body.classList.remove('s1-result-active');
     document.body.classList.add('s1-active');
 
-    document.querySelectorAll('.tab-btn').forEach((b, idx) => {
-      b.classList.toggle('active', idx === 0);
-      b.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
-    });
-
-    const attNum = document.getElementById('attNum');
-    if (attNum) attNum.textContent = '0';
+    selectScenarioTab(SCENARIO_INDEX.ENGAGEMENT);
 
     window.scenarioIntroEnabled = true;
     if (Array.isArray(navCardShown)) navCardShown[SCENARIO_INDEX.ENGAGEMENT] = false;
@@ -4852,10 +5106,11 @@ function resetS1Dev() {
     }, 120);
   }
 
-window.pcClearVNStateForScenarioSwitch = pcClearVNStateForScenarioSwitch;
-window.pcFillS1DevFields = pcFillS1DevFields;
-window.resetS1Dev = resetS1Dev;
-try { resetS1Dev = window.resetS1Dev; } catch(e) {}
+pcExposeGlobals({
+  pcClearVNStateForScenarioSwitch,
+  pcFillS1DevFields,
+  resetS1Dev
+});
 
 function prepareScenarioShell(index) {
   const scenario = scenarios[index];
@@ -4907,19 +5162,12 @@ function renderScenarioInput(index) {
 }
 
 
-function runScenarioSetup(index) {
-  // Scenario-specific setup functions will be added back one scenario at a time.
-  return getScenarioUI(index).implemented;
-}
-
-
 function loadScenario(i) {
   const index = Number(i);
   if (!Number.isInteger(index) || !scenarios[index]) return;
   prepareScenarioShell(index);
   requestAnimationFrame(pcApplyIpadLayoutV200);
   renderScenarioInput(index);
-  if (getScenarioUI(index).implemented) runScenarioSetup(index);
 }
 
 
@@ -5005,20 +5253,11 @@ const playerHistory = {
 // Hint chip definitions for Scenario 2
 
 // Render the correct input mode for the current scenario
-const PC_SCENARIO_RENDERERS = Object.freeze({
-  'guided-builder': ({ container }) => renderGuidedBuilder(container),
-  'metacognition-opening': ({ container }) => renderS2Standby(container),
-  'development-shell': ({ index }) => renderScenarioPlaceholder(index)
-});
-
 function renderInputMode(idx) {
   const container = document.getElementById('inputContainer');
   if (!container) return;
   container.classList.remove('s1-workbench', 's1-clean-workbench', 'pc-scenario-workbench');
-
-  const ui = getScenarioUI(idx);
-  const renderer = PC_SCENARIO_RENDERERS[ui.rendererKey] || PC_SCENARIO_RENDERERS['development-shell'];
-  renderer({ index: idx, container, ui });
+  pcRenderScenarioWorkspace(idx, container);
 }
 
 
@@ -5186,6 +5425,11 @@ function closeReflection() {
   document.getElementById('reflectionOverlay').classList.remove('visible');
 }
 
+pcRegisterUIActions({
+  'close-reflection': () => closeReflection(),
+  'submit-reflection': (_target, event) => handleReflectionSubmit(event)
+});
+
 async function handleReflectionSubmit(e) {
   e.preventDefault();
   const btn = document.getElementById('refSubmitBtn');
@@ -5212,10 +5456,10 @@ async function handleReflectionSubmit(e) {
     }
     try {
       const payload = buildSessionPayload(formData);
-      console.log('[PromptCraft] Submitting full session payload:', payload);
+      pcDebug('[PromptCraft] Submitting full session payload:', payload);
 
       await postToSheets(payload, 'full session payload');
-      console.log('[PromptCraft] Sheets submission sent');
+      pcDebug('[PromptCraft] Sheets submission sent');
     } catch(err) {
       console.warn('[PromptCraft] Sheets submission error:', err);
     }
@@ -5226,12 +5470,12 @@ async function handleReflectionSubmit(e) {
       const netlifyData = new URLSearchParams();
       netlifyData.append('form-name', 'promptcraft-reflection');
       formData.forEach((v, k) => netlifyData.append(k, v));
-      await fetch('/', {
+      await fetch(pcProjectUrl(''), {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: netlifyData.toString()
       });
-      console.log('[PromptCraft] Netlify fallback sent');
+      pcDebug('[PromptCraft] Netlify fallback sent');
     } catch(err) {
       // Netlify fallback is best-effort -- Sheets is the primary
     }
@@ -5249,7 +5493,7 @@ async function handleReflectionSubmit(e) {
     };
     generateGrowthReport(reflAnswers).then(narrative => {
       const el = document.getElementById('growthNarrative');
-      if (el && narrative) el.innerHTML = narrative.replace(/\n/g, '<br>');
+      if (el && narrative) el.innerHTML = fmt(narrative);
       const g = buildGrowthScores();
       const tableEl = document.getElementById('growthTable');
       if (tableEl) tableEl.innerHTML = buildGrowthTableHTML(g);
@@ -5275,7 +5519,7 @@ async function handleReflectionSubmit(e) {
 
   // ── NETLIFY FORMS MODE (fallback) ──────────────────
   try {
-    const res = await fetch('/', {
+    const res = await fetch(pcProjectUrl(''), {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams(formData).toString()
@@ -5287,7 +5531,7 @@ async function handleReflectionSubmit(e) {
       const rfAnswers = { q1: formData.get('q1_surprise')||'', q2: formData.get('q2_change')||'', q3: formData.get('q3_practice')||'', q4: formData.get('q4_other')||'' };
       generateGrowthReport(rfAnswers).then(narrative => {
         const el = document.getElementById('growthNarrative');
-        if (el && narrative) el.innerHTML = narrative.replace(/\n/g, '<br>');
+        if (el && narrative) el.innerHTML = fmt(narrative);
         const g = buildGrowthScores();
         const tableEl = document.getElementById('growthTable');
         if (tableEl) tableEl.innerHTML = buildGrowthTableHTML(g);
@@ -5405,24 +5649,24 @@ function buildS1RightHTML(){
         <div class="s1-clean-fields">
           <div class="s1-clean-field">
             <label class="s1-clean-label" for="g-learners"><span class="s1-clean-num">1</span>Learners + course</label>
-            <textarea class="s1-clean-textarea" id="g-learners" rows="3" placeholder="Who are these students? What kind of course is this?" oninput="onGuidedInput(this)" aria-label="Describe learners and course"></textarea>
+            <textarea class="s1-clean-textarea" id="g-learners" rows="3" placeholder="Who are these students? What kind of course is this?" data-pc-guided-input="true" aria-label="Describe learners and course"></textarea>
           </div>
           <div class="s1-clean-field">
             <label class="s1-clean-label" for="g-issue"><span class="s1-clean-num">2</span>What is failing?</label>
-            <textarea class="s1-clean-textarea" id="g-issue" rows="3" placeholder="What exactly is going wrong in the discussion?" oninput="onGuidedInput(this)" aria-label="Describe the discussion problem"></textarea>
+            <textarea class="s1-clean-textarea" id="g-issue" rows="3" placeholder="What exactly is going wrong in the discussion?" data-pc-guided-input="true" aria-label="Describe the discussion problem"></textarea>
           </div>
           <div class="s1-clean-field">
             <label class="s1-clean-label" for="g-interaction"><span class="s1-clean-num">3</span>Interaction move</label>
-            <textarea class="s1-clean-textarea" id="g-interaction" rows="3" placeholder="How should students build on, challenge, compare, or extend peer ideas?" oninput="onGuidedInput(this)" aria-label="Describe the interaction move"></textarea>
+            <textarea class="s1-clean-textarea" id="g-interaction" rows="3" placeholder="How should students build on, challenge, compare, or extend peer ideas?" data-pc-guided-input="true" aria-label="Describe the interaction move"></textarea>
           </div>
           <div class="s1-clean-field">
             <label class="s1-clean-label" for="g-constraints"><span class="s1-clean-num">4</span>Constraints + success criteria</label>
-            <textarea class="s1-clean-textarea" id="g-constraints" rows="3" placeholder="What limits matter? What should a strong reply include?" oninput="onGuidedInput(this)" aria-label="Describe constraints and success criteria"></textarea>
+            <textarea class="s1-clean-textarea" id="g-constraints" rows="3" placeholder="What limits matter? What should a strong reply include?" data-pc-guided-input="true" aria-label="Describe constraints and success criteria"></textarea>
           </div>
         </div>
         <div class="s1-clean-actions">
           <div class="s1-clean-nudge" id="s1BuilderNudge"></div>
-          <button class="s1-clean-submit" id="sendBtn" type="button" onclick="sendGuided()">Consult Claude →</button>
+          <button class="s1-clean-submit" id="sendBtn" type="button" data-pc-action="send-guided">Consult Claude →</button>
         </div>
       </section>
     </div>`;
@@ -5582,10 +5826,10 @@ function showS1ResultControls(scoreTotal, mode = 'postReflection'){
         <div class="s1-result-controls-sub">${reviewMode ? `Claude's draft is shown above. Review the analysis before Pixel explains what changed.` : `Pixel's explanation is complete. Choose the next step.`}</div>
       </div>
       <div class="s1-result-controls-actions">
-        <button class="s1-secondary-btn" type="button" onclick="reviseS1()">Revise S1</button>
+        <button class="s1-secondary-btn" type="button" data-pc-action="revise-s1">Revise S1</button>
         ${reviewMode
-          ? `<button class="continue-btn" type="button" onclick="showS1PostAnalysisReflection(${Number(scoreTotal) || 0})">Continue with Pixel →</button>`
-          : (thresholdMet ? `<button class="continue-btn" type="button" onclick="navigateToNext(1)">Next scenario →</button>` : `<button class="continue-btn" type="button" onclick="reviseS1()">Strengthen and try again</button>`)}
+          ? `<button class="continue-btn" type="button" data-pc-action="show-s1-reflection" data-pc-score="${Number(scoreTotal) || 0}">Continue with Pixel →</button>`
+          : (thresholdMet ? `<button class="continue-btn" type="button" data-pc-action="navigate-next" data-pc-scenario-index="1">Next scenario →</button>` : `<button class="continue-btn" type="button" data-pc-action="revise-s1">Strengthen and try again</button>`)}
       </div>
     </div>`;
 };
@@ -5601,27 +5845,14 @@ function showS1PostAnalysisReflection(scoreTotal){
     stopClaudeTTS?.();
   } catch(e) {}
 
-  const overlay = document.getElementById('vnOverlay');
+  const overlay = pcSetVNOverlayState({ active: true });
   const dialogue = document.getElementById('vnDialogue');
   const speaker = document.getElementById('vnSpeaker');
   const text = document.getElementById('vnText');
   const hint = document.getElementById('vnAdvanceHint');
   const character = document.getElementById('vnCharacter');
 
-  if (overlay) {
-    overlay.classList.remove(
-      'claude-consult',
-      'claude-terminal-consult',
-      'claude-terminal-textmode',
-      'claude-analysis',
-      'claude-prediction',
-      'pc-clean-prediction',
-      'pc-clean-output',
-      'pc-prediction-result'
-    );
-    overlay.classList.add('active');
-    overlay.removeAttribute('aria-hidden');
-  }
+  if (overlay) overlay.removeAttribute('aria-hidden');
 
   if (dialogue) {
     dialogue.classList.remove('has-choices');
@@ -5672,9 +5903,8 @@ function showS1PostAnalysisReflection(scoreTotal){
     } : null);
   });
 }
-window.showS1PostAnalysisReflection = showS1PostAnalysisReflection;
 
-window.reviseS1 = reviseS1 = function reviseS1(){
+function reviseS1(){
   const saved = Object.assign(
     {},
     JSON.parse((() => { try { return localStorage.getItem('promptcraft_s1_clean_draft') || '{}'; } catch(e) { return '{}'; } })()),
@@ -5709,8 +5939,34 @@ window.reviseS1 = reviseS1 = function reviseS1(){
 
     document.getElementById('g-learners')?.focus();
   }, 100);
-};
+}
 
+pcExposeGlobals({
+  showS1PostAnalysisReflection,
+  reviseS1
+});
+
+if (!window.pcGuidedInputDelegationInstalled) {
+  window.pcGuidedInputDelegationInstalled = true;
+  document.addEventListener('input', event => {
+    const field = event.target.closest?.('[data-pc-guided-input="true"]');
+    if (field) onGuidedInput(field);
+  });
+}
+
+pcRegisterUIActions({
+  'send-guided': () => sendGuided(),
+  'revise-s1': () => reviseS1(),
+  'show-s1-reflection': target => showS1PostAnalysisReflection(Number(target.dataset.pcScore) || 0),
+  'switch-scenario': target => {
+    const index = pcNormalizeScenarioIndex(target.dataset.pcScenarioIndex);
+    return index === null ? false : switchScenario(index, target);
+  },
+  'dev-go-scenario': target => window.devGoScenario?.(target.dataset.pcScenarioIndex),
+  'dev-fill-scenario': target => window.devFillScenario?.(target.dataset.pcScenarioIndex),
+  'dev-next-scenario': () => window.devNextScenario?.(),
+  'navigate-next': target => window.navigateToNext?.(target.dataset.pcScenarioIndex)
+});
 
 // ══════════════════════════════════════════════════════
 //  SEND + PREDICTION GATE — final owner
@@ -5998,7 +6254,8 @@ function pcApplyPredictionPresentationV191(){
       ['line-height', '1.08'],
       ['letter-spacing', '.02em'],
       ['text-align', 'center'],
-      ['white-space', 'nowrap']
+      ['white-space', 'nowrap'],
+      ['transform', 'translateX(clamp(14px, 2vw, 26px))']
     ]);
   } else if (output) {
     pcRemoveInlineStyles(output, [
@@ -6011,7 +6268,8 @@ function pcApplyPredictionPresentationV191(){
       ['line-height', '1.05'],
       ['letter-spacing', '.045em'],
       ['text-align', 'center'],
-      ['white-space', 'nowrap']
+      ['white-space', 'nowrap'],
+      ['transform', 'translateX(clamp(14px, 2vw, 26px))']
     ]);
   }
 
@@ -6550,20 +6808,10 @@ function pcEnsurePredictionButtons(){
     panel.setAttribute('role','group');
     panel.setAttribute('aria-label','Prediction choices');
     panel.innerHTML = Object.entries(PC_PREDICTION_LABELS).map(([choice,label]) =>
-      `<button class="pc-clean-choice-btn" type="button" data-choice="${choice}">${label}</button>`
+      `<button class="pc-clean-choice-btn" type="button" data-choice="${choice}" data-pc-action="choose-prediction" data-pc-choice="${choice}" data-pc-stop-propagation="true">${label}</button>`
     ).join('');
     dialogue.appendChild(panel);
   }
-
-  panel.querySelectorAll('button[data-choice]').forEach(btn => {
-    if (btn.dataset.pcBound === '1') return;
-    btn.dataset.pcBound = '1';
-    btn.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      pcChoosePrediction(btn.dataset.choice);
-    });
-  });
 
   pcQueuePredictionPresentationV191();
 }
@@ -6580,11 +6828,10 @@ function pcShowPredictionGate(text){
   pcClearPredictionUI();
   pcStopVN();
 
-  const overlay = document.getElementById('vnOverlay');
-  if (overlay) {
-    overlay.classList.remove('claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output','pc-prediction-result');
-    overlay.classList.add('active','claude-prediction','pc-clean-prediction','pc-prediction-question');
-  }
+  const overlay = pcSetVNOverlayState({
+    active: true,
+    modes: ['claude-prediction', 'pc-clean-prediction', 'pc-prediction-question']
+  });
 
   const sceneBackground = document.getElementById('vnSceneBg');
   if (sceneBackground) {
@@ -6679,13 +6926,8 @@ function pcChoosePrediction(choice){
           <div class="pc-feedback-heading"><strong>Your prediction is logged.</strong></div>
           <div>${reaction}</div>
         </div>
-        <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button">Continue to Claude →</button>
+        <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button" data-pc-action="continue-to-claude" data-pc-stop-propagation="true">Continue to Claude →</button>
       </div>`;
-    document.getElementById('pcContinueToClaudeBtn')?.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      pcContinueToClaudeAnalysis();
-    });
   }
   pcQueuePredictionPresentationV191();
 }
@@ -6700,7 +6942,7 @@ function pcContinueToClaudeAnalysis(){
   // stored frame null and giving the analyzing screen nothing useful to reuse.
   const predictionTerminal = document.getElementById('claudeTerminalScene');
   const predictionFrameCaptured = pcCapturePredictionTerminalFrameV159(predictionTerminal);
-  console.info(
+  pcDebug(
     '[PromptCraft] Prediction terminal frame capture:',
     predictionFrameCaptured ? { ...pcPredictionTerminalFrameV159 } : null
   );
@@ -6711,18 +6953,10 @@ function pcContinueToClaudeAnalysis(){
   // IMPORTANT: show Claude's thinking screen immediately BEFORE the network/API call.
   // Previously this overlay did not appear until after Claude returned, which made the
   // game look frozen for 20-30 seconds. Tiny little UX crime scene.
-  const overlay = document.getElementById('vnOverlay');
-  if (overlay) {
-    overlay.classList.remove(
-      'claude-prediction',
-      'pc-clean-prediction',
-      'pc-prediction-question',
-      'pc-prediction-result',
-      'claude-terminal-textmode',
-      'has-choices'
-    );
-    overlay.classList.add('active','claude-terminal-consult');
-  }
+  pcSetVNOverlayState({
+    active: true,
+    modes: ['claude-terminal-consult']
+  });
   const dialogue = document.getElementById('vnDialogue');
   if (dialogue) dialogue.classList.remove('has-choices','prediction-question','prediction-result');
   document.getElementById('vnCharacter')?.classList.remove('visible');
@@ -6768,18 +7002,25 @@ function sendText(text){
   return pcShowPredictionGate(text);
 }
 
-window.pcShowPredictionGate = pcShowPredictionGate;
-window.showPredictionGate = pcShowPredictionGate;
-window.choosePrediction = pcChoosePrediction;
-window.finalChoosePrediction = pcChoosePrediction;
-window.pcContinueToClaudeAnalysis = pcContinueToClaudeAnalysis;
-window.finalContinueToClaude = pcContinueToClaudeAnalysis;
-window.hardShowPredictionGate = pcShowPredictionGate;
-window.hardChoosePrediction = pcChoosePrediction;
-window.hardContinueToClaude = pcContinueToClaudeAnalysis;
-window.hardSendText = sendText;
-window.sendText = sendText;
-window.ensurePredictionButtons = pcEnsurePredictionButtons;
+pcExposeGlobals({
+  pcShowPredictionGate,
+  showPredictionGate: pcShowPredictionGate,
+  choosePrediction: pcChoosePrediction,
+  finalChoosePrediction: pcChoosePrediction,
+  pcContinueToClaudeAnalysis,
+  finalContinueToClaude: pcContinueToClaudeAnalysis,
+  hardShowPredictionGate: pcShowPredictionGate,
+  hardChoosePrediction: pcChoosePrediction,
+  hardContinueToClaude: pcContinueToClaudeAnalysis,
+  hardSendText: sendText,
+  sendText,
+  ensurePredictionButtons: pcEnsurePredictionButtons
+});
+
+pcRegisterUIActions({
+  'choose-prediction': target => pcChoosePrediction(target.dataset.pcChoice),
+  'continue-to-claude': () => pcContinueToClaudeAnalysis()
+});
 
 if (!window.__pcPredictionWatchdogBound) {
   window.__pcPredictionWatchdogBound = true;
@@ -6791,56 +7032,22 @@ if (!window.__pcPredictionWatchdogBound) {
 //  NAVIGATION — final owner
 //  navigateToNext, devGoScenario, devFillScenario,
 //  devNextScenario, devTestScenario.
-//  clearVN() calls pcClearVNStateForScenarioSwitch
-//  (defined in S1 workbench above).
 // ══════════════════════════════════════════════════════
-function clearVN(){
-  if (typeof window.pcClearVNStateForScenarioSwitch === 'function') {
-    window.pcClearVNStateForScenarioSwitch();
-    return;
-  }
-  const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
-  if (overlay) overlay.classList.remove('active','claude-prediction','pc-clean-prediction','claude-consult','claude-terminal-consult','claude-terminal-textmode','claude-analysis','pc-clean-output','scenario-intro-active');
-  document.getElementById('vnDialogue')?.classList.remove('has-choices');
-  document.getElementById('vnCharacter')?.classList.remove('visible');
-  document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
-}
-
-
-
 
 // ══════════════════════════════════════════════════════
 //  DEVELOPMENT TOOLS — CLEAN SHELL
 // ══════════════════════════════════════════════════════
 (function exposePromptCraftDevToolsV3(){
-  function assign(name, fn) {
-    window[name] = fn;
-    try { globalThis[name] = fn; } catch (error) {}
-  }
-
-  function unlockTab(index) {
-    const tab = document.querySelectorAll('.tab-btn')[index] || null;
-    if (tab) {
-      tab.disabled = false;
-      tab.classList.remove('locked');
-      tab.removeAttribute('aria-disabled');
-    }
-    return tab;
-  }
-
   function devGoScenario(index) {
-    const target = Math.max(0, Math.min(SCENARIO_COUNT - 1, Number(index) || 0));
-    const tab = unlockTab(target);
+    const target = pcNormalizeScenarioIndex(index, SCENARIO_INDEX.ENGAGEMENT);
+    const tab = pcUnlockScenarioTab(target);
     pcScenarioHasLaunched = true;
-    switchScenario(target, tab);
-    return false;
+    return switchScenario(target, tab);
   }
 
   function devFillScenario(index) {
-    const target = Number(index) || 0;
-    if (target === SCENARIO_INDEX.ENGAGEMENT && typeof window.resetS1Dev === 'function') {
-      return window.resetS1Dev();
-    }
+    const target = pcNormalizeScenarioIndex(index, SCENARIO_INDEX.ENGAGEMENT);
+    if (target === SCENARIO_INDEX.ENGAGEMENT) return resetS1Dev();
     return devGoScenario(target);
   }
 
@@ -6848,19 +7055,21 @@ function clearVN(){
     return devGoScenario(Math.min(scenarioIndex + 1, SCENARIO_COUNT - 1));
   }
 
-  assign('devGoScenario', devGoScenario);
-  assign('devFillScenario', devFillScenario);
-  assign('devTestScenario', devFillScenario);
-  assign('navigateToNext', devGoScenario);
-  assign('devNextScenario', devNextScenario);
-  assign('devStatus', () => ({
-    activeScenario: scenarioIndex + 1,
-    implemented: SCENARIO_UI.map(item => item.implemented),
-    version: PC_APP_VERSION,
-    build: PC_APP_BUILD_LABEL,
-    schema: PC_APP_SCHEMA_VERSION
-  }));
-})();
+  pcExposeGlobals({
+    devGoScenario,
+    devFillScenario,
+    devTestScenario: devFillScenario,
+    navigateToNext: devGoScenario,
+    devNextScenario,
+    devStatus: () => ({
+      activeScenario: scenarioIndex + 1,
+      implemented: SCENARIO_UI.map(item => item.implemented),
+      version: PC_APP_VERSION,
+      build: PC_APP_BUILD_LABEL,
+      schema: PC_APP_SCHEMA_VERSION
+    })
+  });
+})();;
 
 // Claude Speech Synthesis voice
 let claudeSpeechUtterance = null;

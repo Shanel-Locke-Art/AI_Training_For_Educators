@@ -1,7 +1,7 @@
 /* ==============================================================
-   PromptCraft v266 — LIVE CLAUDE ANALYSIS OWNER
-   JavaScript owns phone/tablet/desktop geometry. This module keeps only
-   the stable presentation safeguards that remain active after layout.
+   PromptCraft v309 — CLAUDE TERMINAL PRESENTATION OWNER
+   JavaScript owns workstation geometry. This module owns the stable
+   monitor UI for both the analyzing state and the completed diagnostic.
    ============================================================== */
 
 /* Claude replaces the classroom portrait while the live analysis runs. */
@@ -10,9 +10,6 @@ html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult:not(.cl
   display: none !important;
 }
 
-/* Live analysis uses the classroom photo as the only backdrop behind the
-   photographed workstation. The overlay itself stays opaque so the workbench
-   underneath never shows through the scene. */
 html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult:not(.claude-terminal-textmode) {
   background: #050805 !important;
 }
@@ -32,10 +29,6 @@ html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult:not(.cl
   filter: brightness(0.5) blur(1px) !important;
 }
 
-/* Non-phone modes retain the photographed workstation without legacy motion.
-   The compact tablet layouts should match the larger tablet/desktop framing,
-   so this owner reasserts the same computer card styling instead of the old
-   square green treatment. */
 html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
 #claudeTerminalScene {
   background: transparent !important;
@@ -46,15 +39,14 @@ html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v25
 
 html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
 #claudeTerminalScene .claude-terminal-photo {
-  border: 2px solid rgba(231, 183, 82, 0.22) !important;
-  border-radius: 18px !important;
-  background-color: #020403 !important;
+  background-color: transparent !important;
   background-image: var(--pc-app-background), var(--pc-app-background-legacy) !important;
-  background-size: cover !important;
+  background-size: 100% 100% !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
-  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.78),
-              0 0 0 1px rgba(231, 183, 82, 0.16) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   overflow: hidden !important;
   transition: none !important;
   animation: none !important;
@@ -68,7 +60,7 @@ html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v25
   display: none !important;
 }
 
-html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
 #claudeTerminalScene .claude-terminal-screen {
   background: transparent !important;
   background-image: none !important;
@@ -79,7 +71,7 @@ html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v25
   animation: none !important;
 }
 
-html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v256, .pc-live-analysis-desktop-v256)
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
 #claudeTerminalOutput {
   min-width: 0 !important;
   min-height: 0 !important;
@@ -88,8 +80,230 @@ html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet-v25
   overflow: hidden !important;
 }
 
+/* Shared analyzing screen. The same centered terminal card is used inside the
+   physical monitor on every computer layout. */
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+#claudeTerminalOutput.pc-analyzing-output {
+  color: #bfffd0 !important;
+  text-shadow: 0 0 7px rgba(75, 255, 113, 0.38) !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+.pc-analyzing-readout {
+  color: #bfffd0 !important;
+  text-transform: uppercase !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+.pc-analyzing-panel {
+  color: inherit !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+.pc-terminal-title-line {
+  color: #d9ffe2 !important;
+  font-weight: 900 !important;
+  text-shadow: 0 0 10px rgba(71, 255, 110, 0.42) !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+.pc-terminal-divider {
+  width: 100% !important;
+  height: 1px !important;
+  background: rgba(78, 255, 112, 0.82) !important;
+  box-shadow: 0 0 6px rgba(56, 255, 97, 0.2) !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+.pc-terminal-section {
+  display: grid !important;
+  gap: 0.18em !important;
+  min-width: 0 !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+.pc-terminal-kicker {
+  color: #62ff86 !important;
+  font-weight: 800 !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+.pc-terminal-value {
+  color: #e6ffeb !important;
+  font-size: 1.12em !important;
+  font-weight: 900 !important;
+  line-height: 1.08 !important;
+  overflow-wrap: break-word !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+.pc-analyzing-progress {
+  --pc-analysis-progress-duration: 4000ms;
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: clamp(7px, 0.58em, 11px) !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(90, 255, 117, 0.9) !important;
+  border-radius: 999px !important;
+  background: rgba(0, 18, 8, 0.88) !important;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.72), 0 0 7px rgba(56, 255, 91, 0.13) !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+.pc-analyzing-progress-fill {
+  position: absolute !important;
+  inset: 0 auto 0 0 !important;
+  display: block !important;
+  width: 0 !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+  background: linear-gradient(90deg, rgba(38, 214, 69, 0.82), rgba(118, 255, 143, 1)) !important;
+  box-shadow: 0 0 10px rgba(78, 255, 112, 0.58) !important;
+  transform-origin: left center !important;
+  transition: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+.pc-analyzing-progress.is-running .pc-analyzing-progress-fill {
+  width: 100% !important;
+  transition: width var(--pc-analysis-progress-duration) linear !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+.pc-analyzing-progress.is-complete .pc-analyzing-progress-fill {
+  width: 100% !important;
+  transition: none !important;
+}
+
+/* Completed diagnostic screen. The report has one outer frame, a compact
+   centered header, and a stable 2-column / 3-row grid that can auto-fit longer
+   Claude responses vertically and horizontally. */
+html body .analysis-report {
+  color: #eaffee !important;
+  font-family: "Source Code Pro", "Courier New", ui-monospace, monospace !important;
+}
+
+html body .analysis-header {
+  text-align: center !important;
+}
+
+html body .analysis-badge {
+  color: #77ff94 !important;
+  border: 1px solid rgba(75, 255, 108, 0.92) !important;
+  border-radius: 999px !important;
+  background: rgba(0, 38, 19, 0.72) !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.045em !important;
+  text-transform: uppercase !important;
+}
+
+html body .analysis-title {
+  color: #eaffee !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.035em !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 0 9px rgba(68, 255, 105, 0.32) !important;
+}
+
+html body .analysis-summary {
+  color: #e2fbe8 !important;
+  text-shadow: none !important;
+}
+
+html body .analysis-grid {
+  min-height: 0 !important;
+}
+
+html body .analysis-card,
+html body .analysis-card.compact,
+html body .analysis-card.wide {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  border: 1px solid rgba(72, 255, 101, 0.82) !important;
+  background: linear-gradient(180deg, rgba(0, 32, 16, 0.78), rgba(0, 18, 9, 0.88)) !important;
+}
+
+html body .analysis-label {
+  color: #72ff90 !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.045em !important;
+  text-transform: uppercase !important;
+}
+
+html body .analysis-icon {
+  display: inline-grid !important;
+  place-items: center !important;
+  flex: 0 0 auto !important;
+  color: #72ff90 !important;
+  border: 1px solid currentColor !important;
+  border-radius: 3px !important;
+  font-weight: 900 !important;
+}
+
+html body .analysis-value {
+  color: #effff2 !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 5px rgba(49, 255, 92, 0.2) !important;
+}
+
+html body .analysis-value.big {
+  font-weight: 900 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+}
+
+html body .analysis-note {
+  color: #d8f6df !important;
+  font-family: "Source Code Pro", monospace !important;
+  text-shadow: none !important;
+}
+
+html body .analysis-report-dense .analysis-summary,
+html body .analysis-report-very-dense .analysis-summary {
+  line-height: 1.12 !important;
+}
+
+html body .analysis-report-fitted-tight .analysis-note {
+  margin-top: 1px !important;
+}
+
+html body .analysis-report-scrollable {
+  overflow: visible !important;
+}
+
+@media (max-width: 700px) {
+  html body .analysis-report {
+    height: auto !important;
+    min-height: 100% !important;
+  }
+
+  html body .analysis-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto !important;
+    grid-template-areas:
+      "status"
+      "confidence"
+      "issue"
+      "repair"
+      "impact" !important;
+  }
+}
+
 /* Phone mode intentionally becomes a full-screen CRT instead of a tiny photo. */
 html body #vnOverlay#vnOverlay.vn-overlay.active.pc-live-analysis-phone-v256
 #claudeTerminalScene .claude-terminal-photo {
   background-image: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+  .pc-analyzing-progress-fill {
+    transition: none !important;
+    width: 100% !important;
+  }
 }

@@ -359,7 +359,6 @@
 
 /* ── SIDE MOUNTING RAILS ────────────────────────────── */
 
-
 /* ── MOBILE ─────────────────────────────────────────── */
 @media (max-width: 480px) {
   .vn-smartboard-wrap {
@@ -444,8 +443,8 @@
 /* ── CONTROLS ──────────────────────────────────────── */
 /* Anchor controls relative to character */
 :root {
-  --pc-app-background: url("./assets/images/backgrounds/app-background.png?v=2");
-  --pc-app-background-legacy: url("./images/background.png");
+  --pc-app-background: url("../assets/images/backgrounds/app-background.png?v=2");
+  --pc-app-background-legacy: url("../images/background.png");
   --cream: #faf6f0;
   --parchment: #f2ebe0;
   --parchment-drk: #e8dece;
@@ -701,7 +700,6 @@
 
 /* ── REFLECTION ROOM MOBILE ────────────────────────── */
 
-
 /* ── TOUCH TARGETS ─────────────────────────────────── */
 /* All interactive elements meet 44px minimum */
 .tab-btn {
@@ -782,20 +780,15 @@
 /* ── AI BUBBLE — Pixel as the responder ────────────── */
 /* Replace the plain 🌿 avatar with Pixel's portrait */
 
-
 /* ── PIXEL SIDEBAR POPUP (key moment slide-in) ──────── */
-
 
 
 
 /* Speech bubble tail */
 
-
 /* Folded corner */
 
-
 /* Auto-dismiss fade */
-
 
 
 /* ── MOBILE BADGE ──────────────────────────────────── */
@@ -1026,7 +1019,6 @@
   }
 }
 
-
 /* ── LARGER CHAT AVATARS ON MOBILE ─────────────────── */
 @media (max-width: 480px) {
   .pixel-chat-avatar, .pixel-chat-avatar-fallback {
@@ -1046,22 +1038,16 @@
 /* ── SCENARIO 4 — CRITICAL THINKING UNLOCK ─────────── */
 /* Unlocked tab style — terracotta to signal something different */
 
-
 /* Scenario 4 card gets a warm amber tone */
-
 
 /* ── PIXEL INTERRUPT BUBBLE ─────────────────────────── */
 /* Special inline message when Pixel breaks the fourth wall */
 
-
 /* ── REVEAL PANEL ───────────────────────────────────── */
-
 
 /* ── SELF-REPORT QUESTION ───────────────────────────── */
 
-
 /* ── AI LITERACY TIPS ───────────────────────────────── */
-
 
 /* ══════════════════════════════════════════════════════
    NAME ENTRY MODAL
@@ -1169,23 +1155,17 @@
 
 /* ── SCAFFOLD WRAPPER ───────────────────────────────── */
 
-
 /* ── SCENARIO 1: GUIDED BUILDER ─────────────────────── */
-
 
 /* Live preview of assembled prompt */
 
-
 /* Builder footer row */
-
 
 /* ── SCENARIO 2: HINT CHIPS ──────────────────────────── */
 
 /* ── SCENARIO 3: MEMORY HINT ─────────────────────────── */
 
-
 /* ── SHARED INPUT FOOTER ─────────────────────────────── */
-
 
 /* ══════════════════════════════════════════════════════
    TYPOGRAPHY — COZY ACADEMIC EDITION
@@ -1245,14 +1225,9 @@
   font-family: "Lora", Georgia, serif;
   font-style: italic;
 }
-/* Feedback tips */
-.fp-tips, .fp-success {
-  font-family: "Lora", Georgia, serif;
-}
 /* Memory hint */
 
 /* Guided builder label text */
-
 
 /* ══════════════════════════════════════════════════════
    MUSIC TOGGLE BUTTON
@@ -1332,7 +1307,6 @@
 
 /* Ref room title and submit */
 
-
 /* Pixel coach name in sticky note */
 .pixel-coach-name{
   font-family: "Lora", serif;
@@ -1348,10 +1322,6 @@
   color: var(--ink-muted);
   padding: 0 6px;
 }
-/* Guided builder send button */
-
-/* Reveal panel headers */
-
 
 /* ══════════════════════════════════════════════════════
    MUSIC TOGGLE BUTTON
@@ -1389,92 +1359,6 @@
     font-size: 0.8rem;
   }
 }
-
-/* ══════════════════════════════════════════════════════
-   SCENARIO NAVIGATION BUTTON
-   Appears in chat when player hits score threshold
-   ══════════════════════════════════════════════════════ */
-.scenario-nav-card {
-  background: var(--chalk);
-  border: 1.5px solid var(--forest-mid);
-  border-radius: var(--radius-lg);
-  padding: 14px 18px;
-  margin: 4px 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  animation: slideUp 0.4s ease forwards;
-  opacity: 0;
-  box-shadow: 0 2px 8px rgba(45,90,61,0.12);
-}
-.scenario-nav-text {
-  flex: 1;
-  min-width: 0;
-}
-.scenario-nav-title {
-  font-family: "Fraunces", serif;
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--forest-dark);
-  margin-bottom: 2px;
-}
-.scenario-nav-sub {
-  font-family: "Lora", Georgia, serif;
-  font-size: 0.76rem;
-  color: var(--ink-light);
-  font-style: italic;
-}
-.scenario-nav-btn {
-  padding: 9px 18px;
-  background: var(--forest);
-  border: 2px solid var(--forest-dark);
-  border-radius: var(--radius);
-  color: #d4edd9;
-  font-family: "Fraunces", serif;
-  font-weight: 700;
-  font-size: 0.82rem;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s;
-  min-height: 44px;
-  flex-shrink: 0;
-  box-shadow: 0 2px 4px rgba(30,61,41,0.2);
-}
-.scenario-nav-btn:hover {
-  background: var(--forest-dark);
-  transform: translateX(2px);
-}
-/* "keep practicing" link below the nav card */
-.scenario-keep-link {
-  display: block;
-  text-align: center;
-  font-size: 0.7rem;
-  color: var(--ink-muted);
-  margin-top: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  font-family: "Nunito", sans-serif;
-  padding: 3px;
-}
-.scenario-keep-link:hover {
-  color: var(--ink-light);
-}
-@media (max-width: 480px) {
-  .scenario-nav-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .scenario-nav-btn {
-    width: 100%;
-    text-align: center;
-  }
-}
-
 /* ══════════════════════════════════════════════════════
    IDEAS WALL BUTTON (header)
    ══════════════════════════════════════════════════════ */
@@ -1517,7 +1401,6 @@
    SCENARIO TEST BUTTONS (dev bar)
    ══════════════════════════════════════════════════════ */
 
-
 /* ══════════════════════════════════════════════════════
    S1 SPRINT STYLES — migrated from index.html inline blocks
    All new component CSS for the S1 workbench, Claude shelf,
@@ -1527,7 +1410,6 @@
 /* ── BLOCK 1 ── */
 
 /* ── Claude-as-machine visual layer ─────────────────── */
-
 
 .claude-avatar {
   width: 34px;
@@ -1545,7 +1427,6 @@
   margin-top: 2px;
 }
 
-
 /* ── VN prediction choice overlay ───────────────────── */
 .vn-prediction-note {
   margin-top: 10px;
@@ -1557,7 +1438,6 @@
 }
 
 /* ── Sprint 2A: S1 problem artifact + prompt ingredients ───────── */
-
 
 .ingredient-heading {
   font-family: "Source Code Pro", monospace;
@@ -1587,7 +1467,6 @@
   border-color: var(--forest-dark);
   color: #d4edd9;
 }
-
 
 /* ── S1 cleaned consultation result card ───────────────────── */
 
@@ -1637,7 +1516,6 @@
 
 /* ── BLOCK 2 ── */
 
-
 /* ── BLOCK 3 ── */
 
 /* Sprint 2A rewrite: S1 section-review needs room to breathe. Shocking development. */
@@ -1649,7 +1527,6 @@
   -webkit-overflow-scrolling: touch;
   border-top: 2px solid var(--border);
 }
-
 
 /* ── BLOCK 4 ── */
 /* Sprint 2B: Claude gets a home. Placeholder shelf layout, not final art. */

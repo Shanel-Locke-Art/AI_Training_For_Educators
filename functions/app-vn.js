@@ -80,6 +80,55 @@ function pcRemoveInlineStyles(element, properties) {
   properties.forEach((property) => element.style.removeProperty(property));
 }
 
+const PC_VN_OVERLAY_MODE_CLASSES = Object.freeze([
+  'claude-prediction',
+  'pc-clean-prediction',
+  'pc-prediction-question',
+  'pc-prediction-result',
+  'claude-terminal-consult',
+  'claude-terminal-textmode',
+  'claude-analysis',
+  'claude-consult',
+  'pc-clean-output',
+  'pc-clean-final',
+  'analysis-complete',
+  'scenario-intro-active'
+]);
+
+function pcSetVNOverlayState({ active = null, modes = [], preserve = [] } = {}) {
+  const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
+  if (!overlay) return null;
+
+  const preserved = new Set(preserve);
+  PC_VN_OVERLAY_MODE_CLASSES.forEach(className => {
+    if (!preserved.has(className)) overlay.classList.remove(className);
+  });
+  if (active === true) overlay.classList.add('active');
+  if (active === false) overlay.classList.remove('active');
+  if (modes.length) overlay.classList.add(...modes);
+  return overlay;
+}
+
+function pcResetVNCharacters() {
+  const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
+  const pixel = document.getElementById('vnCharacter');
+  const student = document.getElementById('vnStudentCharacter');
+
+  pixel?.classList.remove('visible', 'is-active', 'is-inactive');
+  student?.classList.remove('visible', 'is-active', 'is-inactive');
+  pixel?.style.removeProperty('display');
+  student?.style.removeProperty('display');
+  overlay?.classList.remove('pc-dual-character');
+}
+
+function pcResetVNDialogueState() {
+  document.getElementById('vnDialogue')?.classList.remove(
+    'has-choices',
+    'prediction-question',
+    'prediction-result'
+  );
+}
+
 function pcApplyIpadLayoutV200(){
   if (typeof pcIsAnalysisReportActiveV122 === 'function' && pcIsAnalysisReportActiveV122()) return;
 
@@ -112,6 +161,17 @@ function pcApplyIpadLayoutV200(){
     viewportWidth <= 700 &&
     overlay?.classList.contains('active') &&
     !specialDialogueClasses.some(className => overlay.classList.contains(className))
+  );
+
+  // The iPhone SE Level 1 intro is the sole phone layout whose smartboard top
+  // must be owned by CSS. The legacy 78px inline declaration prevented its
+  // exact-height media query from moving the complete board upward.
+  const isLevelOneIphoneSEIntro = Boolean(
+    isRegularMobileDialogue &&
+    scenarioIndex === SCENARIO_INDEX.ENGAGEMENT &&
+    viewportWidth >= 370 && viewportWidth <= 380 &&
+    viewportHeight >= 650 && viewportHeight <= 690 &&
+    viewportHeight > viewportWidth
   );
 
   const isIntermediateIntro = Boolean(
@@ -162,11 +222,17 @@ function pcApplyIpadLayoutV200(){
   }
 
   if (smartboardWrap) {
-    if (isRegularMobileDialogue) {
-      if (window.pcIpadBoardCenterFrameV200) {
-        cancelAnimationFrame(window.pcIpadBoardCenterFrameV200);
-        window.pcIpadBoardCenterFrameV200 = null;
-      }
+    if (window.pcIpadBoardCenterFrameV200) {
+      cancelAnimationFrame(window.pcIpadBoardCenterFrameV200);
+      window.pcIpadBoardCenterFrameV200 = null;
+    }
+
+    if (isLevelOneIphoneSEIntro) {
+      pcRemoveInlineStyles(smartboardWrap, [
+        'left', 'right', 'top', 'margin-left', 'margin-right',
+        'transform', 'transform-origin'
+      ]);
+    } else if (isRegularMobileDialogue) {
       pcSetImportantStyles(smartboardWrap, [
         ['left', 'clamp(8px, 3vw, 18px)'],
         ['right', 'clamp(8px, 3vw, 18px)'],
@@ -177,10 +243,6 @@ function pcApplyIpadLayoutV200(){
         ['transform-origin', 'top center']
       ]);
     } else {
-      if (window.pcIpadBoardCenterFrameV200) {
-        cancelAnimationFrame(window.pcIpadBoardCenterFrameV200);
-        window.pcIpadBoardCenterFrameV200 = null;
-      }
       pcRemoveInlineStyles(smartboardWrap, [
         'left', 'right', 'top', 'margin-left', 'margin-right',
         'transform', 'transform-origin'
@@ -352,10 +414,10 @@ window.pcClearPredictionLayoutInlineStyles = pcClearPredictionLayoutInlineStyles
 // JavaScript because prediction is rebuilt dynamically and later passes can
 // otherwise win the cascade with stale inline values.
 const PC_WIDE_PREDICTION_SCREEN_GEOMETRY_V207 = {
-  left: '19.8%',
-  top: '15.2%',
-  width: '38.3%',
-  height: '44.5%'
+  left: '21.7%',
+  top: '12.7%',
+  width: '39.0%',
+  height: '44.1%'
 };
 
 // [WORKSTATION FRAME: DESKTOP PREDICTION + LIVE ANALYSIS]
@@ -364,12 +426,13 @@ function pcApplyWidePredictionComputerV207(terminal, photo, screen, viewportHeig
 
   const isShortDesktop = Number.isFinite(viewportHeight) && viewportHeight <= 950;
   const terminalWidth = isShortDesktop ? 'min(66vw, 1320px)' : 'min(72vw, 1500px)';
-  const terminalTop = isShortDesktop ? '35.5%' : '34%';
+  const terminalLeft = '47.5%';
+  const terminalTop = isShortDesktop ? '37%' : '35.5%';
 
   pcSetImportantStyles(terminal, [
     ['position', 'absolute'],
     ['inset', 'auto'],
-    ['left', '50%'],
+    ['left', terminalLeft],
     ['right', 'auto'],
     ['top', terminalTop],
     ['bottom', 'auto'],
@@ -444,10 +507,10 @@ window.pcApplyWidePredictionComputer = () => {
 // needs more room. The action buttons are centered independently of legacy dialogue
 // positioning so they remain centered beneath the workstation at every wide size.
 const PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215 = {
-  left: '19.8%',
-  top: '15.2%',
-  width: '38.3%',
-  height: '44.5%'
+  left: '4%',
+  top: '6%',
+  width: '62.5%',
+  height: '72.5%'
 };
 
 function pcClearWideAnalysisActionsV215() {
@@ -535,7 +598,8 @@ function pcClearWideAnalysisReportContentStylesV215() {
   pcRemoveInlineStyles(report, [
     'position', 'width', 'max-width', 'height', 'min-width', 'min-height',
     'margin', 'padding', 'overflow', 'box-sizing', 'transform', 'transform-origin',
-    'display', 'flex-direction', 'gap', 'grid-template-rows', 'align-items', 'justify-content'
+    'display', 'flex-direction', 'gap', 'grid-template-rows', 'align-items', 'justify-content',
+    'border', 'border-radius', 'background', 'box-shadow', 'flex'
   ]);
   pcRemoveInlineStyles(header, [
     'margin', 'padding', 'border-width', 'box-shadow', 'box-sizing'
@@ -546,13 +610,14 @@ function pcClearWideAnalysisReportContentStylesV215() {
     'width', 'max-width', 'margin', 'font-size', 'line-height', 'overflow-wrap', 'word-break'
   ]);
   pcRemoveInlineStyles(grid, [
-    'display', 'grid-template-columns', 'grid-template-rows', 'gap', 'width', 'height',
+    'display', 'grid-template-columns', 'grid-template-rows', 'grid-template-areas', 'gap', 'width', 'height',
     'min-height', 'margin', 'box-sizing', 'align-items', 'align-content', 'flex',
     'flex-grow', 'flex-shrink', 'flex-basis'
   ]);
   cards.forEach((card) => pcRemoveInlineStyles(card, [
     'margin', 'padding', 'min-width', 'min-height', 'height', 'border-width',
-    'box-shadow', 'box-sizing', 'display', 'flex-direction', 'justify-content', 'overflow'
+    'box-shadow', 'box-sizing', 'display', 'flex-direction', 'justify-content', 'overflow',
+    'grid-area', 'border-radius'
   ]));
   labels.forEach((label) => pcRemoveInlineStyles(label, [
     'margin', 'font-size', 'line-height'
@@ -581,27 +646,37 @@ function pcFitWideAnalysisReportV215(screen) {
   const summary = report.querySelector('.analysis-summary');
   const grid = report.querySelector('.analysis-grid');
   const cards = [...report.querySelectorAll('.analysis-card')];
-  const compactCards = [...report.querySelectorAll('.analysis-card.compact')];
-  const detailCards = [...report.querySelectorAll('.analysis-issue-card, .analysis-repair-card')];
+  const statusCard = report.querySelector('.analysis-status-card');
+  const confidenceCard = report.querySelector('.analysis-confidence-card');
+  const issueCard = report.querySelector('.analysis-issue-card');
+  const repairCard = report.querySelector('.analysis-repair-card');
   const impactCard = report.querySelector('.analysis-impact-card');
   const labels = [...report.querySelectorAll('.analysis-label')];
+  const icons = [...report.querySelectorAll('.analysis-icon')];
   const values = [...report.querySelectorAll('.analysis-value')];
+  const bigValues = [...report.querySelectorAll('.analysis-value.big')];
   const notes = [...report.querySelectorAll('.analysis-note')];
   if (!header || !badge || !title || !summary || !grid) return false;
 
   const screenRect = screen.getBoundingClientRect();
   const clampNumber = (min, value, max) => Math.max(min, Math.min(max, value));
+  const useSingleColumn = screenRect.width < 340;
+  const widthFactor = screenRect.width / 900;
+  const heightFactor = screenRect.height / 520;
+  const fitFactor = clampNumber(0.56, Math.min(widthFactor, heightFactor), 1.15);
   const base = {
-    badge: clampNumber(9, screenRect.width * 0.0112, 12.5),
-    title: clampNumber(27, screenRect.width * 0.0345, 37),
-    summary: clampNumber(14, screenRect.width * 0.0175, 18.5),
-    label: clampNumber(9.5, screenRect.width * 0.0126, 12.5),
-    value: clampNumber(14, screenRect.width * 0.0175, 18.5),
-    note: clampNumber(10.5, screenRect.width * 0.0136, 14),
-    outputPadding: clampNumber(0, screenRect.width * 0.0016, 3),
-    gap: clampNumber(6, screenRect.width * 0.0088, 11),
-    cardPadding: clampNumber(7, screenRect.width * 0.0094, 11),
-    headerPadding: clampNumber(8, screenRect.width * 0.011, 13)
+    badge: clampNumber(7.5, 10.5 * fitFactor, 12),
+    title: clampNumber(19, 32 * fitFactor, 36),
+    summary: clampNumber(10, 15.5 * fitFactor, 17.5),
+    label: clampNumber(8, 11.5 * fitFactor, 12.5),
+    value: clampNumber(10, 15.2 * fitFactor, 17.5),
+    big: clampNumber(11, 17 * fitFactor, 19.5),
+    note: clampNumber(8.5, 12.2 * fitFactor, 13.5),
+    outputPadding: clampNumber(4, 7 * fitFactor, 9),
+    reportPadding: clampNumber(6, 9 * fitFactor, 12),
+    gap: clampNumber(4, 7.5 * fitFactor, 10),
+    cardPadding: clampNumber(5, 9 * fitFactor, 11),
+    headerGap: clampNumber(3, 5.5 * fitFactor, 7)
   };
 
   pcSetImportantStyles(output, [
@@ -639,7 +714,7 @@ function pcFitWideAnalysisReportV215(screen) {
     ['min-width', '0'],
     ['min-height', '0'],
     ['margin', '0'],
-    ['padding', '0'],
+    ['padding', `${base.reportPadding}px`],
     ['display', 'flex'],
     ['flex-direction', 'column'],
     ['gap', `${base.gap}px`],
@@ -647,98 +722,127 @@ function pcFitWideAnalysisReportV215(screen) {
     ['justify-content', 'flex-start'],
     ['overflow', 'hidden'],
     ['box-sizing', 'border-box'],
+    ['border', '1px solid rgba(72,255,92,.92)'],
+    ['border-radius', `${clampNumber(7, 11 * fitFactor, 14)}px`],
+    ['background', 'linear-gradient(180deg, rgba(0,35,18,.96), rgba(0,14,7,.98))'],
+    ['box-shadow', 'inset 0 0 22px rgba(45,255,94,.08), 0 0 12px rgba(34,255,82,.12)'],
     ['transform', 'none'],
     ['transform-origin', 'center center']
   ]);
 
+  pcSetImportantStyles(header, [
+    ['margin', '0'],
+    ['padding', '0'],
+    ['display', 'grid'],
+    ['gap', `${base.headerGap}px`],
+    ['border', '0'],
+    ['box-shadow', 'none'],
+    ['box-sizing', 'border-box'],
+    ['flex', '0 0 auto']
+  ]);
+
   pcSetImportantStyles(grid, [
     ['display', 'grid'],
-    ['grid-template-columns', 'minmax(0, 1fr) minmax(0, 1fr)'],
-    ['grid-template-rows', 'auto auto auto'],
+    ['grid-template-columns', useSingleColumn ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) minmax(0, 1fr)'],
+    ['grid-template-rows', useSingleColumn ? 'auto auto auto auto auto' : 'minmax(0, .72fr) minmax(0, 1.28fr) minmax(0, .82fr)'],
+    ['grid-template-areas', useSingleColumn
+      ? '"status" "confidence" "issue" "repair" "impact"'
+      : '"status confidence" "issue repair" "impact impact"'],
     ['gap', `${base.gap}px`],
     ['width', '100%'],
     ['height', 'auto'],
     ['min-height', '0'],
     ['margin', '0'],
     ['align-items', 'stretch'],
-    ['align-content', 'start'],
-    ['flex', '0 0 auto'],
+    ['align-content', 'stretch'],
+    ['flex', '1 1 auto'],
     ['box-sizing', 'border-box']
   ]);
 
+  if (statusCard) pcSetImportantStyles(statusCard, [['grid-area', 'status']]);
+  if (confidenceCard) pcSetImportantStyles(confidenceCard, [['grid-area', 'confidence']]);
+  if (issueCard) pcSetImportantStyles(issueCard, [['grid-area', 'issue']]);
+  if (repairCard) pcSetImportantStyles(repairCard, [['grid-area', 'repair']]);
+  if (impactCard) pcSetImportantStyles(impactCard, [['grid-area', 'impact']]);
+
   const applyScale = (scale) => {
     const scaled = (value, floor = 1) => Math.max(floor, value * scale);
+    report.classList.toggle('analysis-report-fitted-compact', scale < 0.78);
+    report.classList.toggle('analysis-report-fitted-tight', scale < 0.64);
 
-    pcSetImportantStyles(report, [['gap', `${scaled(base.gap, 4)}px`]]);
-    pcSetImportantStyles(header, [
-      ['margin', '0'],
-      ['padding', `${scaled(base.headerPadding, 6)}px`],
-      ['border-width', '1px'],
-      ['box-shadow', 'none'],
-      ['box-sizing', 'border-box']
+    pcSetImportantStyles(report, [
+      ['gap', `${scaled(base.gap, 3)}px`],
+      ['padding', `${scaled(base.reportPadding, 4)}px`]
     ]);
+    pcSetImportantStyles(header, [['gap', `${scaled(base.headerGap, 2)}px`]]);
     pcSetImportantStyles(badge, [
-      ['margin', `0 0 ${scaled(4, 2)}px`],
-      ['padding', `${scaled(2, 1)}px ${scaled(6, 4)}px`],
-      ['font-size', `${scaled(base.badge, 7)}px`],
-      ['line-height', '1']
+      ['margin', '0 auto'],
+      ['padding', `${scaled(2, 1)}px ${scaled(8, 4)}px`],
+      ['font-size', `${scaled(base.badge, 6.5)}px`],
+      ['line-height', '1'],
+      ['justify-self', 'center']
     ]);
     pcSetImportantStyles(title, [
-      ['margin', `0 0 ${scaled(5, 3)}px`],
-      ['font-size', `${scaled(base.title, 17)}px`],
-      ['line-height', '1.04']
+      ['margin', '0'],
+      ['font-size', `${scaled(base.title, 15)}px`],
+      ['line-height', '1.02'],
+      ['text-align', 'center']
     ]);
     pcSetImportantStyles(summary, [
-      ['width', '97%'],
+      ['width', '96%'],
       ['max-width', 'none'],
       ['margin', '0 auto'],
-      ['font-size', `${scaled(base.summary, 9.5)}px`],
-      ['line-height', '1.2'],
-      ['overflow-wrap', 'normal'],
+      ['font-size', `${scaled(base.summary, 8.5)}px`],
+      ['line-height', '1.16'],
+      ['text-align', 'center'],
+      ['overflow-wrap', 'break-word'],
       ['word-break', 'normal']
     ]);
-    pcSetImportantStyles(grid, [['gap', `${scaled(base.gap, 4)}px`]]);
+    pcSetImportantStyles(grid, [['gap', `${scaled(base.gap, 3)}px`]]);
 
     cards.forEach((card) => pcSetImportantStyles(card, [
       ['margin', '0'],
-      ['padding', `${scaled(base.cardPadding, 5)}px`],
+      ['padding', `${scaled(base.cardPadding, 4)}px`],
       ['min-width', '0'],
       ['min-height', '0'],
-      ['height', 'auto'],
+      ['height', '100%'],
       ['border-width', '1px'],
-      ['box-shadow', 'none'],
+      ['border-radius', `${scaled(8, 5)}px`],
+      ['box-shadow', 'inset 0 0 12px rgba(42,255,91,.04)'],
       ['box-sizing', 'border-box'],
       ['display', 'flex'],
       ['flex-direction', 'column'],
       ['justify-content', 'flex-start'],
       ['overflow', 'hidden']
     ]));
-    compactCards.forEach((card) => pcSetImportantStyles(card, [
-      ['min-height', `${scaled(70, 56)}px`]
-    ]));
-    detailCards.forEach((card) => pcSetImportantStyles(card, [
-      ['min-height', `${scaled(102, 78)}px`]
-    ]));
-    if (impactCard) {
-      pcSetImportantStyles(impactCard, [
-        ['min-height', `${scaled(74, 58)}px`]
-      ]);
-    }
     labels.forEach((label) => pcSetImportantStyles(label, [
-      ['margin', `0 0 ${scaled(3, 2)}px`],
-      ['font-size', `${scaled(base.label, 7)}px`],
-      ['line-height', '1.02']
+      ['margin', `0 0 ${scaled(3, 1.5)}px`],
+      ['font-size', `${scaled(base.label, 6.5)}px`],
+      ['line-height', '1.04'],
+      ['display', 'flex'],
+      ['align-items', 'center'],
+      ['gap', `${scaled(5, 3)}px`]
+    ]));
+    icons.forEach((icon) => pcSetImportantStyles(icon, [
+      ['width', `${scaled(15, 10)}px`],
+      ['height', `${scaled(15, 10)}px`],
+      ['font-size', `${scaled(base.label, 6.5)}px`],
+      ['line-height', '1']
     ]));
     values.forEach((value) => pcSetImportantStyles(value, [
-      ['font-size', `${scaled(base.value, 9)}px`],
-      ['line-height', '1.18'],
+      ['font-size', `${scaled(base.value, 8)}px`],
+      ['line-height', '1.14'],
       ['overflow-wrap', 'break-word'],
       ['word-break', 'normal']
     ]));
+    bigValues.forEach((value) => pcSetImportantStyles(value, [
+      ['font-size', `${scaled(base.big, 9)}px`],
+      ['line-height', '1.1']
+    ]));
     notes.forEach((note) => pcSetImportantStyles(note, [
-      ['margin-top', `${scaled(3, 2)}px`],
-      ['font-size', `${scaled(base.note, 8)}px`],
-      ['line-height', '1.14']
+      ['margin-top', `${scaled(3, 1.5)}px`],
+      ['font-size', `${scaled(base.note, 7)}px`],
+      ['line-height', '1.12']
     ]));
   };
 
@@ -752,23 +856,34 @@ function pcFitWideAnalysisReportV215(screen) {
     return reportFits && cardsFit;
   };
 
-  let scale = 1;
+  let scale = report.classList.contains('analysis-report-very-dense') ? 0.86
+    : report.classList.contains('analysis-report-dense') ? 0.93
+      : 1;
   applyScale(scale);
-  // Generated diagnoses can vary substantially in length. Reduce only as much
-  // as needed, preserving the larger default typography for ordinary responses.
-  for (let pass = 0; pass < 12 && !contentFits(); pass += 1) {
-    scale = Math.max(0.62, scale * 0.94);
+
+  for (let pass = 0; pass < 18 && !contentFits(); pass += 1) {
+    scale = Math.max(0.48, scale * 0.94);
     applyScale(scale);
-    if (scale <= 0.62) break;
+    if (scale <= 0.48) break;
   }
 
-  // A final narrow fallback keeps unusually long generated copy available
-  // without allowing card borders or the monitor frame to overlap.
   if (!contentFits()) {
+    report.classList.add('analysis-report-scrollable');
     pcSetImportantStyles(output, [
       ['overflow-y', 'auto'],
       ['scrollbar-gutter', 'stable both-edges']
     ]);
+    pcSetImportantStyles(report, [
+      ['height', 'auto'],
+      ['min-height', '100%']
+    ]);
+    pcSetImportantStyles(grid, [
+      ['grid-template-rows', 'auto auto auto'],
+      ['height', 'auto']
+    ]);
+    cards.forEach((card) => pcSetImportantStyles(card, [['height', 'auto']]));
+  } else {
+    report.classList.remove('analysis-report-scrollable');
   }
 
   return true;
@@ -783,13 +898,13 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
     ? viewportHeight
     : pcViewportHeight();
 
-  // v257: The completed report gets a tall, close workstation crop. The source
-  // photograph is cropped with cover, never stretched. The explicit pixel box
-  // also prevents old aspect-ratio rules from briefly flattening the machine.
+  // v258: Keep the completed diagnostic formatting intact while zooming the
+  // workstation itself. The physical monitor now dominates the wide layout,
+  // and the report remains mapped to the actual monitor glass.
   const aspect = 1.72;
-  const maxHeight = Math.max(560, safeViewportHeight * 0.78);
-  const maxWidth = Math.min(viewportWidth * 0.96, 1840);
-  const width = Math.max(980, Math.min(maxWidth, maxHeight * aspect));
+  const maxHeight = Math.max(740, safeViewportHeight * 0.985);
+  const maxWidth = Math.min(viewportWidth * 0.995, 1980);
+  const width = Math.max(1460, Math.min(maxWidth, maxHeight * aspect));
   const height = width / aspect;
 
   pcSetImportantStyles(terminal, [
@@ -797,7 +912,7 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
     ['inset', 'auto'],
     ['left', '50%'],
     ['right', 'auto'],
-    ['top', '42%'],
+    ['top', '49%'],
     ['bottom', 'auto'],
     ['width', `${Math.round(width)}px`],
     ['height', `${Math.round(height)}px`],
@@ -832,8 +947,8 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
     ['padding', '0'],
     ['display', 'block'],
     ['background-image', 'var(--pc-app-background)'],
-    ['background-size', '100% 100%'],
-    ['background-position', 'center center'],
+    ['background-size', '165% 165%'],
+    ['background-position', '45% 30%'],
     ['background-repeat', 'no-repeat'],
     ['background-color', 'transparent'],
     ['border', '0'],
@@ -846,12 +961,12 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
   pcSetImportantStyles(screen, [
     ['position', 'absolute'],
     ['inset', 'auto'],
-    ['left', '13.5%'],
+    ['left', PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215.left],
     ['right', 'auto'],
-    ['top', '14.7%'],
+    ['top', PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215.top],
     ['bottom', 'auto'],
-    ['width', '46.3%'],
-    ['height', '46.5%'],
+    ['width', PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215.width],
+    ['height', PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215.height],
     ['min-width', '0'],
     ['min-height', '0'],
     ['max-width', 'none'],
@@ -914,7 +1029,7 @@ function pcAlignModernTerminalScreenV149() {
   // the legacy monitor-alignment pass overwrite the full mobile stage or put
   // the iPad readout back above the photographed monitor.
   if (consultThinking && viewportWidth <= 760) {
-    pcApplyLiveAnalyzingLayoutV202();
+    pcApplyLiveAnalyzingLayoutV256();
     return;
   }
   if (isIpadConsultThinking) {
@@ -1021,8 +1136,10 @@ function pcResetAnalyzingReadoutV203(){
   const screen = document.querySelector('#claudeTerminalScene .claude-terminal-screen');
   const output = document.getElementById('claudeTerminalOutput');
   const readout = output?.querySelector('.pc-analyzing-readout');
+  const panel = output?.querySelector('.pc-analyzing-panel');
   const titleLine = output?.querySelector('.pc-terminal-title-line');
-  const gaps = output?.querySelectorAll('.pc-terminal-gap') || [];
+  const dividers = output?.querySelectorAll('.pc-terminal-divider') || [];
+  const progress = output?.querySelector('.pc-analyzing-progress');
 
   pcRemoveInlineStyles(screen, [
     'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
@@ -1041,8 +1158,13 @@ function pcResetAnalyzingReadoutV203(){
     'height', 'margin', 'padding', 'transform', 'text-align', 'box-sizing',
     'font-family', 'font-size', 'font-weight', 'line-height', 'letter-spacing', 'white-space'
   ]);
+  pcRemoveInlineStyles(panel, [
+    'width', 'max-width', 'margin', 'padding', 'border', 'border-radius',
+    'background', 'box-shadow', 'box-sizing'
+  ]);
   pcRemoveInlineStyles(titleLine, ['font-size', 'line-height', 'letter-spacing', 'white-space']);
-  gaps.forEach((gap) => pcRemoveInlineStyles(gap, ['height']));
+  dividers.forEach((divider) => pcRemoveInlineStyles(divider, ['margin']));
+  pcRemoveInlineStyles(progress, ['gap', 'margin-top']);
 }
 
 // [LIVE ANALYSIS: READOUT POSITION]
@@ -1051,22 +1173,25 @@ function positionClaudeAnalyzingReadoutV161() {
   const outputEl = document.getElementById('claudeTerminalOutput');
   const screen = terminal?.querySelector('.claude-terminal-screen');
   const readout = outputEl?.querySelector('.pc-analyzing-readout');
+  const panel = outputEl?.querySelector('.pc-analyzing-panel');
   const titleLine = outputEl?.querySelector('.pc-terminal-title-line');
-  const gaps = outputEl?.querySelectorAll('.pc-terminal-gap') || [];
-  if (!terminal || !outputEl || !screen || !readout) return false;
+  const dividers = outputEl?.querySelectorAll('.pc-terminal-divider') || [];
+  const progress = outputEl?.querySelector('.pc-analyzing-progress');
+  if (!terminal || !outputEl || !screen || !readout || !panel) return false;
 
   const viewportWidth = pcAnalysisViewportWidthV122();
-  const viewportHeight = Math.min(
-    window.innerHeight || Number.POSITIVE_INFINITY,
-    document.documentElement?.clientHeight || Number.POSITIVE_INFINITY,
-    window.visualViewport?.height || Number.POSITIVE_INFINITY
-  );
   const mode = pcGetLiveAnalysisModeV256(viewportWidth);
-  const isPortraitTablet = mode === 'tablet' && viewportHeight > viewportWidth * 1.08;
-  const isCompactDesktop = mode === 'desktop' && viewportWidth <= 1366 && viewportHeight <= 900;
-  const screenPixelWidth = Math.max(1, screen.getBoundingClientRect().width || 320);
-  const readoutFontPx = Math.max(12, Math.min(19.5, screenPixelWidth / 21));
-  const titleFontPx = Math.min(21.5, readoutFontPx * 1.08);
+  const screenRect = screen.getBoundingClientRect();
+  const screenPixelWidth = Math.max(1, screenRect.width || 320);
+  const screenPixelHeight = Math.max(1, screenRect.height || 220);
+  const clampNumber = (min, value, max) => Math.max(min, Math.min(max, value));
+  const terminalFontPx = clampNumber(
+    mode === 'phone' ? 11 : 10,
+    Math.min(screenPixelWidth / 23, screenPixelHeight / 15.5),
+    mode === 'desktop' ? 22 : 18
+  );
+  const panelPaddingPx = clampNumber(9, Math.min(screenPixelWidth, screenPixelHeight) * 0.055, 22);
+  const readoutInset = mode === 'phone' ? 7 : 6;
 
   pcSetImportantStyles(outputEl, [
     ['position', 'absolute'],
@@ -1089,72 +1214,63 @@ function positionClaudeAnalyzingReadoutV161() {
     ['text-align', 'left']
   ]);
 
-  if (mode === 'phone') {
-    pcSetImportantStyles(readout, [
-      ['position', 'absolute'],
-      ['left', '18%'],
-      ['top', '20%'],
-      ['right', 'auto'],
-      ['bottom', 'auto'],
-      ['width', '64%'],
-      ['max-width', '64%'],
-      ['height', 'auto'],
-      ['margin', '0'],
-      ['padding', '0'],
-      ['transform', 'none'],
-      ['text-align', 'left'],
-      ['box-sizing', 'border-box'],
-      ['font-size', 'clamp(.78rem, 3vw, .92rem)'],
-      ['line-height', '1.24']
-    ]);
-    if (titleLine) {
-      pcSetImportantStyles(titleLine, [
-        ['font-size', '1.16em'],
-        ['line-height', '1.1'],
-        ['letter-spacing', '.015em']
-      ]);
-    }
-    gaps.forEach((gap) => pcSetImportantStyles(gap, [['height', '.55em']]));
-  } else {
-    // v257: Tablet and desktop both position the readout inside the CRT layer
-    // established by pcApplyLiveComputerFrameV256. No height-dependent iPad
-    // branch remains, so intermediate landscape sizes cannot lose lines.
-    pcSetImportantStyles(readout, [
-      ['position', 'absolute'],
-      ['left', '8%'],
-      ['top', '50%'],
-      ['right', 'auto'],
-      ['bottom', 'auto'],
-      ['width', '84%'],
-      ['max-width', '84%'],
-      ['height', 'auto'],
-      ['margin', '0'],
-      ['padding', '0'],
-      ['transform', 'translateY(-50%)'],
-      ['text-align', 'left'],
-      ['box-sizing', 'border-box'],
+  pcSetImportantStyles(readout, [
+    ['position', 'absolute'],
+    ['left', `${readoutInset}%`],
+    ['right', 'auto'],
+    ['top', '50%'],
+    ['bottom', 'auto'],
+    ['width', `${100 - (readoutInset * 2)}%`],
+    ['max-width', `${100 - (readoutInset * 2)}%`],
+    ['height', 'auto'],
+    ['margin', '0'],
+    ['padding', '0'],
+    ['transform', 'translateY(-50%)'],
+    ['text-align', 'left'],
+    ['box-sizing', 'border-box'],
+    ['font-family', '"Source Code Pro", "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'],
+    ['font-size', `${terminalFontPx.toFixed(2)}px`],
+    ['font-weight', '700'],
+    ['line-height', '1.12'],
+    ['letter-spacing', '.018em'],
+    ['white-space', 'normal']
+  ]);
+
+  pcSetImportantStyles(panel, [
+    ['width', '100%'],
+    ['max-width', '100%'],
+    ['margin', '0'],
+    ['padding', `${panelPaddingPx.toFixed(1)}px`],
+    ['border', '1px solid rgba(76,255,103,.88)'],
+    ['border-radius', `${clampNumber(7, screenPixelWidth * 0.022, 15)}px`],
+    ['background', 'linear-gradient(180deg, rgba(0,35,18,.72), rgba(0,15,7,.82))'],
+    ['box-shadow', 'inset 0 0 18px rgba(48,255,96,.06), 0 0 9px rgba(42,255,89,.10)'],
+    ['box-sizing', 'border-box']
+  ]);
+
+  if (titleLine) {
+    pcSetImportantStyles(titleLine, [
+      ['font-size', '1.22em'],
+      ['line-height', '1.04'],
+      ['letter-spacing', '.025em'],
       ['white-space', 'nowrap'],
-      ['font-family', '"Source Code Pro", "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'],
-      ['font-size', `${readoutFontPx.toFixed(2)}px`],
-      ['font-weight', '700'],
-      ['line-height', '1.16'],
-      ['letter-spacing', '.015em']
+      ['text-align', 'center']
     ]);
-    if (titleLine) {
-      pcSetImportantStyles(titleLine, [
-        ['font-size', `${titleFontPx.toFixed(2)}px`],
-        ['line-height', '1.08'],
-        ['letter-spacing', '.01em'],
-        ['white-space', 'nowrap']
-      ]);
-    }
-    gaps.forEach((gap) => pcSetImportantStyles(gap, [
-      ['height', '.42em']
-    ]));
+  }
+  dividers.forEach((divider) => pcSetImportantStyles(divider, [
+    ['margin', `${clampNumber(5, terminalFontPx * 0.52, 11)}px 0`]
+  ]));
+  if (progress) {
+    pcSetImportantStyles(progress, [
+      ['gap', `${clampNumber(2, terminalFontPx * 0.22, 5)}px`],
+      ['margin-top', `${clampNumber(5, terminalFontPx * 0.55, 11)}px`]
+    ]);
   }
 
   return true;
 }
+window.pcPositionClaudeAnalyzingReadout = positionClaudeAnalyzingReadoutV161;
+
 window.pcPositionClaudeAnalyzingReadout = positionClaudeAnalyzingReadoutV161;
 
 
@@ -1371,18 +1487,19 @@ function pcApplyLiveComputerFrameV256({
     ['transition', 'none']
   ]);
 
-  // The workstation now uses the full 2:1 transparent render with no side crop.
-  // These coordinates match the usable glass inside the CRT bezel, rather than
-  // painting the terminal layer across the monitor frame on portrait tablets.
+  // The workstation uses the full 2:1 transparent render with no side crop.
+  // Keep the live terminal inside the monitor's inner glass, not the bezel.
+  // These percentages are measured from the source artwork and therefore stay
+  // aligned at every tablet and desktop workstation size.
   pcSetImportantStyles(screen, [
     ['position', 'absolute'],
     ['inset', 'auto'],
-    ['left', '19.3%'],
+    ['left', '22.45%'],
     ['right', 'auto'],
-    ['top', '14.4%'],
+    ['top', '13.2%'],
     ['bottom', 'auto'],
-    ['width', '37.3%'],
-    ['height', '44.8%'],
+    ['width', '39.75%'],
+    ['height', '45%'],
     ['min-width', '0'],
     ['min-height', '0'],
     ['max-width', 'none'],
@@ -1581,13 +1698,6 @@ if (!window.pcLiveAnalyzingLayoutV256Installed) {
   }, { once: true });
 }
 
-// Backward-compatible names used by existing state transitions.
-function pcApplyLiveAnalyzingLayoutV202() {
-  return pcApplyLiveAnalyzingLayoutV256();
-}
-function pcQueueLiveAnalyzingLayoutV202() {
-  pcScheduleLiveAnalyzingLayoutV256({ immediate: true });
-}
 window.pcApplyLiveAnalyzingLayout = pcApplyLiveAnalyzingLayoutV256;
 
 function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
@@ -1600,13 +1710,22 @@ function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
 
   outputEl.innerHTML = `
     <div class="pc-analyzing-readout" aria-label="Claude terminal analyzing">
-      <div class="pc-terminal-line pc-terminal-title-line">CLAUDE TERMINAL</div>
-      <div class="pc-terminal-gap" aria-hidden="true"></div>
-      <div class="pc-terminal-line">&gt; SECTION</div>
-      <div class="pc-terminal-line pc-terminal-indent">${esc(sectionLabel)}</div>
-      <div class="pc-terminal-gap" aria-hidden="true"></div>
-      <div class="pc-terminal-line">&gt; STATUS</div>
-      <div class="pc-terminal-line pc-terminal-indent pc-analyzing-status">ANALYZING<span class="claude-terminal-cursor" aria-hidden="true"></span></div>
+      <div class="pc-analyzing-panel">
+        <div class="pc-terminal-line pc-terminal-title-line">CLAUDE TERMINAL</div>
+        <div class="pc-terminal-divider" aria-hidden="true"></div>
+        <div class="pc-terminal-section">
+          <div class="pc-terminal-kicker">&gt; SECTION</div>
+          <div class="pc-terminal-value">${esc(sectionLabel)}</div>
+        </div>
+        <div class="pc-terminal-divider" aria-hidden="true"></div>
+        <div class="pc-terminal-section">
+          <div class="pc-terminal-kicker">&gt; STATUS</div>
+          <div class="pc-terminal-value pc-analyzing-status">ANALYZING<span class="claude-terminal-cursor" aria-hidden="true"></span></div>
+          <div class="pc-analyzing-progress" role="progressbar" aria-label="Claude analysis progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span class="pc-analyzing-progress-fill" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 
@@ -1614,9 +1733,55 @@ function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
   requestAnimationFrame(positionClaudeAnalyzingReadoutV161);
   window.setTimeout(positionClaudeAnalyzingReadoutV161, 60);
   window.setTimeout(positionClaudeAnalyzingReadoutV161, 220);
-  pcQueueLiveAnalyzingLayoutV202();
+  pcScheduleLiveAnalyzingLayoutV256({ immediate: true });
 }
 
+const PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS = 15000;
+let pcClaudeAnalysisProgressTimerV309 = 0;
+
+function pcGetClaudeProcessingHoldMsV316() {
+  const configured = Number(window.PC_CLAUDE_PROCESSING_HOLD_MS);
+  if (!Number.isFinite(configured)) {
+    window.PC_CLAUDE_PROCESSING_HOLD_MS = PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS;
+    return PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS;
+  }
+  return Math.max(0, configured || PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS);
+}
+
+function pcStartClaudeAnalysisProgressV309(durationMs = PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS) {
+  const progress = document.querySelector('#claudeTerminalOutput .pc-analyzing-progress');
+  if (!progress) return false;
+
+  const safeDuration = Math.max(0, Number(durationMs) || 0);
+  if (pcClaudeAnalysisProgressTimerV309) {
+    window.clearTimeout(pcClaudeAnalysisProgressTimerV309);
+    pcClaudeAnalysisProgressTimerV309 = 0;
+  }
+
+  progress.classList.remove('is-running', 'is-complete');
+  progress.style.setProperty('--pc-analysis-progress-duration', `${safeDuration}ms`);
+  progress.setAttribute('aria-valuenow', '0');
+
+  // Force one clean animation restart when a new Claude analysis begins.
+  void progress.offsetWidth;
+
+  if (safeDuration === 0) {
+    progress.classList.add('is-complete');
+    progress.setAttribute('aria-valuenow', '100');
+    return true;
+  }
+
+  progress.classList.add('is-running');
+  pcClaudeAnalysisProgressTimerV309 = window.setTimeout(() => {
+    progress.classList.remove('is-running');
+    progress.classList.add('is-complete');
+    progress.setAttribute('aria-valuenow', '100');
+    pcClaudeAnalysisProgressTimerV309 = 0;
+  }, safeDuration);
+
+  return true;
+}
+window.pcStartClaudeAnalysisProgress = pcStartClaudeAnalysisProgressV309;
 
 const PC_ANALYSIS_LAYOUT_CLASSES_V267 = [
   'pc-analysis-report-active-v122',
@@ -1739,13 +1904,15 @@ function pcApplyAnalysisLayoutV122() {
   }
 
   if (layout === 'panel') {
-    // CSS owns the phone/tablet panel completely. There are deliberately no
-    // delayed inline geometry passes in this mode.
+    // CSS owns the outer phone/tablet panel, while the shared auto-fit routine
+    // keeps the dynamic report inside its available monitor area.
     pcSetImportantStyles(menuButton, [
       ['display', 'none'],
       ['visibility', 'hidden'],
       ['pointer-events', 'none']
     ]);
+    const panelScreen = terminal?.querySelector('.claude-terminal-screen');
+    if (panelScreen) pcFitWideAnalysisReportV215(panelScreen);
     return true;
   }
 
@@ -1785,6 +1952,10 @@ function pcScheduleAnalysisLayoutV255({ immediate = false } = {}) {
 }
 
 function pcClearAnalysisLayoutV122() {
+  if (pcClaudeAnalysisProgressTimerV309) {
+    window.clearTimeout(pcClaudeAnalysisProgressTimerV309);
+    pcClaudeAnalysisProgressTimerV309 = 0;
+  }
   pcAnalysisLayoutGenerationV255 += 1;
   if (pcAnalysisLayoutFrameV255) cancelAnimationFrame(pcAnalysisLayoutFrameV255);
   if (pcAnalysisLayoutSettleTimerV255) clearTimeout(pcAnalysisLayoutSettleTimerV255);
@@ -1821,25 +1992,12 @@ function showClaudeConsultOverlay(partLabel) {
   vnFullText = '';
   vnCurrentText = '';
 
-const overlay = document.getElementById('vnOverlay');
-
 pcClearAnalysisLayoutV122();
 
-overlay.classList.remove(
-  'claude-prediction',
-  'pc-clean-prediction',
-  'pc-prediction-question',
-  'claude-terminal-consult',
-  'claude-terminal-textmode',
-  'pc-clean-output',
-  'pc-clean-final',
-  'analysis-complete'
-);
-
-overlay.classList.add('active', 'claude-terminal-consult');
-
-setVNClaudeMode(false);
-setVNClaudeTerminalMode(true);
+const overlay = pcSetVNOverlayState({
+  active: true,
+  modes: ['claude-terminal-consult']
+});
 setClaudeTerminalTextMode(false);
 
 musicStartVN();
@@ -1854,7 +2012,7 @@ setClaudeTerminalState(
 
 renderClaudeAnalyzingReadout(partLabel);
 pcQueueModernTerminalAlignmentV147();
-pcQueueLiveAnalyzingLayoutV202();
+pcScheduleLiveAnalyzingLayoutV256({ immediate: true });
 
   const speaker = document.getElementById('vnSpeaker');
   if (speaker) speaker.textContent = 'Professor Pixel';
@@ -1921,9 +2079,17 @@ function parseClaudeDiagnosticSections(text) {
 function buildClaudeAnalysisHTML(feedback, mock = false) {
   const d = parseClaudeDiagnosticSections(feedback);
   const badge = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
+  const totalCharacters = [d.status, d.issue, d.repair, d.impact, d.confidence]
+    .join(' ')
+    .length;
+  const densityClass = totalCharacters > 920
+    ? 'analysis-report-very-dense'
+    : totalCharacters > 680
+      ? 'analysis-report-dense'
+      : '';
 
   return `
-    <div class="analysis-report" role="document" aria-label="Claude scenario diagnostic report">
+    <div class="analysis-report ${densityClass}" data-analysis-characters="${totalCharacters}" role="document" aria-label="Claude scenario diagnostic report">
       <header class="analysis-header">
         <div class="analysis-badge">${esc(badge)}</div>
         <h2 class="analysis-title">Scenario Diagnostic</h2>
@@ -1934,35 +2100,34 @@ function buildClaudeAnalysisHTML(feedback, mock = false) {
 
       <div class="analysis-grid" aria-label="Diagnostic findings">
         <section class="analysis-card analysis-status-card compact">
-          <span class="analysis-label">Status</span>
-          <div class="analysis-value big">✓ ${esc(d.status)}</div>
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">✓</span><span>Status</span></span>
+          <div class="analysis-value big">${esc(d.status)}</div>
         </section>
 
         <section class="analysis-card analysis-confidence-card compact">
-          <span class="analysis-label">Confidence</span>
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">◎</span><span>Confidence</span></span>
           <div class="analysis-value big">${esc(d.confidence)}</div>
           <div class="analysis-note">Strong evidence pattern detected.</div>
         </section>
 
         <section class="analysis-card analysis-issue-card">
-          <span class="analysis-label">Issue Detected</span>
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">!</span><span>Issue Detected</span></span>
           <div class="analysis-value">${esc(d.issue)}</div>
         </section>
 
         <section class="analysis-card analysis-repair-card">
-          <span class="analysis-label">Recommended Repair</span>
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">↗</span><span>Recommended Repair</span></span>
           <div class="analysis-value">${esc(d.repair)}</div>
         </section>
 
         <section class="analysis-card analysis-impact-card wide">
-          <span class="analysis-label">Expected Impact</span>
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">▥</span><span>Expected Impact</span></span>
           <div class="analysis-value">${esc(d.impact)}</div>
         </section>
       </div>
     </div>
   `;
 }
-
 
 function showClaudeConsultResult(feedback, mock = false, onClose = null) {
   claudeTerminalCloseCallback = typeof onClose === 'function' ? onClose : null;
@@ -1997,8 +2162,8 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
   const vnText = document.getElementById('vnText');
   if (vnText) {
     vnText.innerHTML = `
-      <button id="claudeTTSBtn" class="claude-tts-btn" type="button" onclick="event.stopPropagation();toggleClaudeTTS()">🔊 Read Analysis</button>
-      <button class="vn-return-btn terminal-return" type="button" onclick="event.stopPropagation();closeClaudeConsultOverlay()">Continue</button>
+      <button id="claudeTTSBtn" class="claude-tts-btn" type="button" data-pc-action="toggle-claude-tts" data-pc-stop-propagation="true">🔊 Read Analysis</button>
+      <button class="vn-return-btn terminal-return" type="button" data-pc-action="close-claude-consult" data-pc-stop-propagation="true">Continue</button>
     `;
     setTimeout(() => vnText.querySelector('.vn-return-btn')?.focus(), 100);
     pcScheduleAnalysisLayoutV255();
@@ -2024,17 +2189,11 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
   if (!overlay || !overlay.classList.contains('active')) {
     showClaudeConsultOverlay('Scenario diagnosis');
   }
-  // v156: Keep the Claude analyzing screen visible long enough to inspect.
-  // Change this from DevTools before opening Claude when a longer pause is useful:
-  //   PC_CLAUDE_PROCESSING_HOLD_MS = 60000
-  // The default is 30 seconds.
-  if (!Number.isFinite(Number(window.PC_CLAUDE_PROCESSING_HOLD_MS))) {
-    window.PC_CLAUDE_PROCESSING_HOLD_MS = 30000;
-  }
-  const claudeProcessingHoldMs = Math.max(
-    0,
-    Number(window.PC_CLAUDE_PROCESSING_HOLD_MS) || 30000
-  );
+  // Keep the analyzing screen visible for responsive QA screenshots.
+  // Override PC_CLAUDE_PROCESSING_HOLD_MS in DevTools when another inspection time is useful.
+  const claudeProcessingHoldMs = pcGetClaudeProcessingHoldMsV316();
+
+  pcStartClaudeAnalysisProgressV309(claudeProcessingHoldMs);
 
   setTimeout(() => {
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
@@ -2048,12 +2207,10 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
 function closeClaudeConsultOverlay() {
   const cb = claudeTerminalCloseCallback;
   claudeTerminalCloseCallback = null;
-  const overlay = document.getElementById('vnOverlay');
   pcClearAnalysisLayoutV122();
-  if (overlay) overlay.classList.remove('active', 'claude-consult', 'claude-terminal-consult', 'claude-terminal-textmode', 'claude-prediction');
-  document.getElementById('vnCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
-  document.getElementById('vnStudentCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
-  overlay?.classList.remove('pc-dual-character');
+  pcSetVNOverlayState({ active: false });
+  pcResetVNCharacters();
+  pcResetVNDialogueState();
   setClaudeShelfState('idle', 'idle');
   setClaudeTerminalTextMode(false);
   setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
@@ -2063,14 +2220,12 @@ function closeClaudeConsultOverlay() {
   } else {
     document.getElementById('promptInput')?.focus();
   }
-  function stopClaudeTTS() {
-    if (window.speechSynthesis?.speaking) {
-      window.speechSynthesis.cancel();
-    }
-    const btn = document.getElementById('claudeTTSBtn');
-    if (btn) btn.textContent = '🔊 Read Analysis';
-  }
 }
+
+pcRegisterUIActions({
+  'toggle-claude-tts': () => toggleClaudeTTS(),
+  'close-claude-consult': () => closeClaudeConsultOverlay()
+});
 
 function setClaudeShelfState(state = 'idle', label = '') {
   const shelf = document.getElementById('claudeShelf');
@@ -2091,15 +2246,9 @@ function vnShow(expression, text, onComplete, meta = {}) {
 function vnPlayNext() {
   if (vnQueue.length === 0) {
     setTimeout(() => {
-      const overlay = document.getElementById('vnOverlay');
-      overlay.classList.remove('active', 'claude-consult', 'claude-terminal-consult');
-      document.getElementById('vnCharacter').classList.remove('visible', 'is-active', 'is-inactive');
-      document.getElementById('vnStudentCharacter')?.classList.remove('visible', 'is-active', 'is-inactive');
-      const pixelCharacter = document.getElementById('vnCharacter');
-      const studentCharacter = document.getElementById('vnStudentCharacter');
-      if (pixelCharacter) pixelCharacter.style.removeProperty('display');
-      if (studentCharacter) studentCharacter.style.removeProperty('display');
-      overlay.classList.remove('pc-dual-character');
+      pcSetVNOverlayState({ active: false });
+      pcResetVNCharacters();
+      pcResetVNDialogueState();
       document.getElementById('promptInput')?.focus();
       // Fade music down when VN closes
       musicEndVN();
@@ -2113,13 +2262,13 @@ function vnPlayNext() {
   vnOnComplete = onComplete || null;
   vnTyping = true;
 
-  const overlay = document.getElementById('vnOverlay');
-  overlay.classList.add('active');
+  const overlay = pcSetVNOverlayState({
+    active: true,
+    preserve: ['scenario-intro-active']
+  });
 
   // Reset Claude modes, then configure the active VN speaker. Dual-cast scenes keep
   // the secondary character opposite Pixel on wide screens and show one on small screens.
-  setVNClaudeMode(false);
-  setVNClaudeTerminalMode(false);
   setClaudeTerminalTextMode(false);
 
   // Fade music up when VN opens
@@ -2257,6 +2406,11 @@ function vnSkipType() {
   el.innerHTML = vnFullText;
   document.getElementById('vnAdvanceHint').classList.add('show');
 }
+
+pcRegisterUIActions({
+  'vn-advance': () => vnAdvance(),
+  'vn-skip': () => vnSkipType()
+});
 
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');

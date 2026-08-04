@@ -1,5 +1,5 @@
 {
-  "version": 138,
+  "version": 139,
   "runtime_images": {
     "background.png": "assets/images/backgrounds/app-background.png",
     "classroom-bg.png": "assets/images/backgrounds/classroom.png",
@@ -22,6 +22,19 @@
     "jordan-thinking.png": "assets/images/characters/students/jordan/thinking.png",
     "jordan-confident.png": "assets/images/characters/students/jordan/confident.png"
   },
+  "planned_runtime_images": {
+    "scene-s7.png": "assets/images/scenes/scenario-07-overreliance/scene.png",
+    "scene-s8.png": "assets/images/scenes/scenario-08-reflect-revise/scene.png"
+  },
+  "development_reference_images": [
+    "assets/images/characters/students/student-cast-concept-sheet.png",
+    "assets/images/characters/students/devon/references/concept-sheet.png",
+    "assets/images/characters/students/eli/references/concept-sheet.png",
+    "assets/images/characters/students/jordan/references/concept-sheet.png",
+    "assets/images/characters/students/lena/references/concept-sheet.png",
+    "assets/images/characters/students/maya/references/concept-sheet.png",
+    "assets/images/characters/students/samira/references/concept-sheet.png"
+  ],
   "runtime_audio": {
     "background.mp3": "assets/audio/music/background.mp3",
     "welcome.mp3": "assets/audio/voice/professor-pixel/system/welcome.mp3",
@@ -33,7 +46,42 @@
     "all-complete.mp3": "assets/audio/voice/professor-pixel/completion/all-complete.mp3",
     "reflection-open.mp3": "assets/audio/voice/professor-pixel/reflection/open.mp3"
   },
-  "legacy_audio_archive": [
+  "planned_audio": [
+    "assets/audio/voice/professor-pixel/scenario-02/p86.mp3",
+    "assets/audio/voice/professor-pixel/scenario-02/p87.mp3",
+    "assets/audio/voice/professor-pixel/scenario-02/p88.mp3",
+    "assets/audio/voice/professor-pixel/scenario-02/p89.mp3",
+    "assets/audio/voice/professor-pixel/scenario-02/p90.mp3",
+    "assets/audio/voice/professor-pixel/scenario-02/p91.mp3",
+    "assets/audio/voice/professor-pixel/scenario-02/p92.mp3",
+    "assets/audio/voice/professor-pixel/scenario-02/p93.mp3",
+    "assets/audio/voice/professor-pixel/scenario-02/p94.mp3",
+    "assets/audio/voice/students/jordan/scenario-02/jordan-s2-01.mp3",
+    "assets/audio/voice/students/jordan/scenario-02/jordan-s2-02.mp3",
+    "assets/audio/voice/students/jordan/scenario-02/jordan-s2-03.mp3"
+  ],
+  "asset_documentation": [
+    "assets/audio/voice/professor-pixel/scenario-02/README.md",
+    "assets/audio/voice/professor-pixel/scenario-03/README.md",
+    "assets/audio/voice/professor-pixel/scenario-04/README.md",
+    "assets/audio/voice/professor-pixel/scenario-05/README.md",
+    "assets/audio/voice/professor-pixel/scenario-06/README.md",
+    "assets/audio/voice/professor-pixel/scenario-07/README.md",
+    "assets/audio/voice/professor-pixel/scenario-08/README.md",
+    "assets/audio/voice/students/devon/scenario-06/README.md",
+    "assets/audio/voice/students/eli/scenario-03/README.md",
+    "assets/audio/voice/students/jordan/scenario-02/README.md",
+    "assets/audio/voice/students/lena/scenario-07/README.md",
+    "assets/audio/voice/students/maya/scenario-04/README.md",
+    "assets/audio/voice/students/samira/scenario-05/README.md",
+    "assets/images/characters/students/devon/README.md",
+    "assets/images/characters/students/eli/README.md",
+    "assets/images/characters/students/jordan/README.md",
+    "assets/images/characters/students/lena/README.md",
+    "assets/images/characters/students/maya/README.md",
+    "assets/images/characters/students/samira/README.md"
+  ],
+  "retired_audio_names": [
     "s4-interrupt.mp3",
     "s4-reveal.mp3",
     "s7-closing.mp3",
@@ -44,9 +92,5 @@
     "scenario-6-intro.mp3",
     "scenario-7-intro.mp3",
     "scenario-8-intro.mp3"
-  ],
-  "planned_audio": {
-    "professor_pixel_s2": "assets/audio/voice/professor-pixel/scenario-02/p86.mp3 through p94.mp3",
-    "jordan_s2": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-01.mp3 through jordan-s2-03.mp3"
-  }
+  ]
 }
