@@ -505,6 +505,8 @@ window.pcApplyWidePredictionComputer = () => {
 // render stays intact so the monitor can scale up without re-cropping the tower
 // or shifting the report outside the physical screen.
 const PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215 = {
+  // v346: Restore the proven monitor-glass geometry. The v345 geometry pushed
+  // the terminal layer outside the photographed inner bezel on several tablets.
   left: '22.2%',
   top: '12.85%',
   width: '40.3%',
@@ -660,15 +662,48 @@ function pcFitWideAnalysisReportV215(screen) {
   const clampNumber = (min, value, max) => Math.max(min, Math.min(max, value));
   const viewportWidth = pcAnalysisViewportWidthV122();
   const viewportHeight = pcViewportHeight();
-  const isWideDesktopMonitor = screenRect.width >= 560 && screenRect.height >= 320;
+  // v329: Short landscape workstation displays (notably Nest Hub Max) have a
+  // physically wide monitor even though the measured glass can land just below
+  // the old 560x320 cutoff. Treat those screens like the full-screen desktop
+  // diagnostic so the complete two-column report auto-fits inside the monitor
+  // instead of switching to the oversized tablet/scrolling typography.
+  // v330: Nest Hub (1024 × 600 class) now uses the photographed workstation
+  // instead of the old floating terminal panel. Its physical monitor is smaller
+  // than the desktop cutoff, so explicitly treat that glass as a wide diagnostic
+  // surface. This preserves the two-column report and avoids the giant clipped
+  // single-column panel that previously occupied the whole display.
+  const isNestHubWorkstation = viewportWidth >= 980 && viewportWidth <= 1100 &&
+    viewportHeight >= 560 && viewportHeight <= 680 &&
+    screenRect.width >= 500 && screenRect.height >= 275;
+  // v332: The 1024x1366 iPad Pro was being misclassified as a wide desktop
+  // simply because its photographed monitor is physically wide. Keep portrait
+  // tablets in the readable tablet layout so the report can use larger text and
+  // scroll inside the monitor instead of shrinking until every card fits.
+  const isPortraitTabletWorkstation = viewportWidth >= 900 && viewportWidth <= 1100 &&
+    viewportHeight >= 1200;
+  const isWideDesktopMonitor = !isPortraitTabletWorkstation && (isNestHubWorkstation ||
+    (screenRect.width >= 560 && screenRect.height >= 320) ||
+    (viewportWidth > 1180 && viewportHeight <= 900 &&
+      screenRect.width >= 500 && screenRect.height >= 270));
   const isShortLandscapePanel = !isWideDesktopMonitor && viewportWidth >= 900 && viewportHeight <= 700;
   const isCompactAnalysisPanel = !isWideDesktopMonitor && (viewportWidth <= 640 || isShortLandscapePanel);
   const isTabletWorkstation = !isWideDesktopMonitor && viewportWidth >= 700 && viewportWidth <= 1366;
   const isMediumAnalysisPanel = !isCompactAnalysisPanel && (viewportWidth > 640 && viewportWidth <= 920 || isTabletWorkstation);
   const isTallPortraitWorkstation = isWideDesktopMonitor && viewportWidth >= 980 && viewportWidth <= 1100 && viewportHeight >= 1280;
   const isLargePortraitWorkstation = isTallPortraitWorkstation && viewportWidth >= 1000 && viewportHeight >= 1320;
+  // v333: Give the 1024x1366 iPad Pro the same *visual* diagnostic treatment
+  // as the iPad Air. Because the Pro's photographed monitor glass is physically
+  // larger, reusing the ordinary tablet scale makes the report look noticeably
+  // smaller even though its CSS font size is technically larger. Increase the
+  // Pro's type scale enough to match the Air's screen-relative proportions; the
+  // report already scrolls inside the monitor when the larger content needs room.
+  const isIPadProReadableProfile = isPortraitTabletWorkstation &&
+    viewportWidth >= 980 && viewportWidth <= 1060 &&
+    viewportHeight >= 1320 && viewportHeight <= 1400;
   const mediumScale = isMediumAnalysisPanel
-    ? clampNumber(1.02, viewportWidth / 860, viewportHeight >= 1100 ? 1.22 : 1.14)
+    ? (isIPadProReadableProfile
+      ? 1.42
+      : clampNumber(1.02, viewportWidth / 860, viewportHeight >= 1100 ? 1.22 : 1.14))
     : 1;
   const useSingleColumn = screenRect.width < 420 || isCompactAnalysisPanel;
   const widthFactor = screenRect.width / 900;
@@ -678,19 +713,24 @@ function pcFitWideAnalysisReportV215(screen) {
     Math.min(widthFactor, heightFactor) * (isLargePortraitWorkstation ? 1.62 : isTallPortraitWorkstation ? 1.30 : 1),
     isLargePortraitWorkstation ? 1.48 : 1.26
   );
+  // v349: Phone/foldable diagnostics use a wider, calmer reading layout.
+  // The old compact profile made the type enormous inside a narrow faux-CRT,
+  // causing excessive wrapping and a tall stack of boxed cards. Keep the type
+  // comfortably readable, but spend the scarce pixels on line length instead.
+  const compactWidthScale = clampNumber(0, (viewportWidth - 344) / 296, 1);
   const base = isCompactAnalysisPanel ? {
-    badge: 11,
-    title: 29,
-    summary: 17,
-    label: 12,
-    value: 17,
-    big: 19,
-    note: 15.5,
-    outputPadding: 5,
-    reportPadding: 9,
-    gap: 11,
-    cardPadding: 10,
-    headerGap: 8
+    badge: 9.5 + (0.8 * compactWidthScale),
+    title: 24 + (3 * compactWidthScale),
+    summary: 14.5 + (1.2 * compactWidthScale),
+    label: 10.5 + (0.7 * compactWidthScale),
+    value: 14.5 + (1.2 * compactWidthScale),
+    big: 16 + (1.2 * compactWidthScale),
+    note: 13.5 + (1 * compactWidthScale),
+    outputPadding: 2,
+    reportPadding: 7,
+    gap: 8,
+    cardPadding: 9,
+    headerGap: 6
   } : isMediumAnalysisPanel ? {
     badge: 11.5 * mediumScale,
     title: 36 * mediumScale,
@@ -731,6 +771,9 @@ function pcFitWideAnalysisReportV215(screen) {
       : clampNumber(3, 4.75 * fitFactor, 6)
   };
 
+  // v345: The terminal output is the monitor glass. Put the green edge on
+  // the glass itself instead of on an inset report card, so the diagnostic
+  // reaches the physical inner bezel on every workstation format.
   pcSetImportantStyles(output, [
     ['position', 'absolute'],
     ['inset', '0'],
@@ -745,7 +788,7 @@ function pcFitWideAnalysisReportV215(screen) {
     ['max-width', 'none'],
     ['max-height', 'none'],
     ['margin', '0'],
-    ['padding', `${base.outputPadding}px`],
+    ['padding', isMediumAnalysisPanel ? '3px' : `${Math.max(2, base.outputPadding)}px`],
     ['display', 'flex'],
     ['align-items', 'stretch'],
     ['justify-content', 'stretch'],
@@ -755,7 +798,11 @@ function pcFitWideAnalysisReportV215(screen) {
     ['white-space', 'normal'],
     ['scrollbar-gutter', 'auto'],
     ['box-sizing', 'border-box'],
-    ['transform', 'none']
+    ['transform', 'none'],
+    ['border', '0'],
+    ['border-radius', '0'],
+    ['background', 'transparent'],
+    ['box-shadow', 'none']
   ]);
 
   pcSetImportantStyles(report, [
@@ -775,9 +822,9 @@ function pcFitWideAnalysisReportV215(screen) {
     ['overflow', 'hidden'],
     ['box-sizing', 'border-box'],
     ['border', '1px solid rgba(72,255,92,.92)'],
-    ['border-radius', `${clampNumber(7, 11 * fitFactor, 14)}px`],
+    ['border-radius', `${isMediumAnalysisPanel ? 4 : clampNumber(7, 11 * fitFactor, 14)}px`],
     ['background', 'linear-gradient(180deg, rgba(0,35,18,.96), rgba(0,14,7,.98))'],
-    ['box-shadow', 'inset 0 0 22px rgba(45,255,94,.08), 0 0 12px rgba(34,255,82,.12)'],
+    ['box-shadow', 'inset 0 0 22px rgba(45,255,94,.08)'],
     ['transform', 'none'],
     ['transform-origin', 'center center']
   ]);
@@ -965,18 +1012,22 @@ function pcFitWideAnalysisReportV215(screen) {
       ['display', 'block'],
       ['overflow-y', 'auto'],
       ['overflow-x', 'hidden'],
+      ['overscroll-behavior', 'contain'],
+      ['touch-action', 'pan-y'],
       ['scrollbar-gutter', 'auto'],
-      ['padding', `0 4px ${Math.max(8, base.outputPadding)}px`],
+      ['padding', '2px'],
       ['box-sizing', 'border-box']
     ]);
     pcSetImportantStyles(report, [
       ['display', 'block'],
-      ['width', 'calc(100% - 4px)'],
-      ['max-width', 'calc(100% - 4px)'],
-      ['margin', '0 auto'],
+      ['width', '100%'],
+      ['max-width', '100%'],
+      ['margin', '0'],
       ['height', 'auto'],
       ['min-height', '0'],
+      ['padding', `${base.reportPadding}px`],
       ['overflow', 'visible'],
+      ['border-radius', '10px'],
       ['box-sizing', 'border-box']
     ]);
     pcSetImportantStyles(grid, [
@@ -1034,11 +1085,15 @@ function pcFitWideAnalysisReportV215(screen) {
       ['padding', `${base.outputPadding}px`],
       ['box-sizing', 'border-box']
     ]);
+    // v333: Use the same side breathing room as iPad Air on the Pro profile.
+    // The monitor bezel already supplies the visual inset, so the extra 20px made
+    // the Pro report feel smaller and more compressed than the Air version.
+    const mediumSideInset = isIPadProReadableProfile ? 10 : (isPortraitTabletWorkstation ? 20 : 10);
     pcSetImportantStyles(report, [
       ['display', 'flex'],
       ['flex-direction', 'column'],
-      ['width', 'calc(100% - 10px)'],
-      ['max-width', 'calc(100% - 10px)'],
+      ['width', `calc(100% - ${mediumSideInset}px)`],
+      ['max-width', `calc(100% - ${mediumSideInset}px)`],
       ['height', 'auto'],
       ['min-height', '0'],
       ['max-height', 'none'],
@@ -1105,25 +1160,42 @@ function pcFitWideAnalysisReportV215(screen) {
       ['word-break', 'normal']
     ]));
 
-    void report.offsetHeight;
-    const reportFitsMediumPanel = report.scrollHeight <= output.clientHeight + 1 &&
-      report.scrollWidth <= output.clientWidth + 1;
-
-    if (!reportFitsMediumPanel) {
-      report.classList.add('analysis-report-scrollable');
-      pcSetImportantStyles(output, [
-        ['display', 'block'],
-        ['overflow-y', 'auto'],
-        ['overflow-x', 'hidden'],
-        ['padding', `${base.outputPadding}px`]
-      ]);
-      pcSetImportantStyles(report, [
-        ['margin', '0 auto'],
-        ['height', 'auto'],
-        ['min-height', '0'],
-        ['overflow', 'visible']
-      ]);
-    }
+    // v346: Keep tablet text readable without letting the DOM screen spill over
+    // the monitor bezel. Scroll only inside the glass, and always reset to the top.
+    const readableScale = viewportWidth <= 790 ? 0.92
+      : viewportWidth <= 930 ? 0.94
+        : 0.96;
+    applyScale(readableScale);
+    report.classList.add('analysis-report-scrollable');
+    pcSetImportantStyles(output, [
+      ['display', 'block'],
+      ['overflow-y', 'auto'],
+      ['overflow-x', 'hidden'],
+      ['overscroll-behavior', 'contain'],
+      ['touch-action', 'pan-y'],
+      ['scrollbar-gutter', 'stable'],
+      ['padding', '3px']
+    ]);
+    pcSetImportantStyles(report, [
+      ['width', '100%'],
+      ['max-width', '100%'],
+      ['margin', '0'],
+      ['height', 'auto'],
+      ['min-height', '100%'],
+      ['overflow', 'visible'],
+      ['border-radius', '4px']
+    ]);
+    pcSetImportantStyles(grid, [
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['grid-template-rows', 'auto auto auto']
+    ]);
+    cards.forEach((card) => pcSetImportantStyles(card, [
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['overflow', 'visible']
+    ]));
+    output.scrollTop = 0;
     return true;
   }
 
@@ -1163,6 +1235,70 @@ function pcFitWideAnalysisReportV215(screen) {
   return true;
 }
 
+
+// v338: Extend the wooden desktop beneath contained completed-analysis workstations.
+// The source workstation artwork ends above the fixed action buttons on tall tablet
+// layouts, which exposed the dark classroom/floor strip. Continue the desk surface
+// through that lower region while keeping the buttons layered in front.
+function pcRemoveAnalysisDeskExtensionV338() {
+  document.getElementById('pcAnalysisDeskExtensionV338')?.remove();
+}
+
+function pcApplyAnalysisDeskExtensionV338(scene, frame, viewportHeight) {
+  if (!scene || !frame?.isContainedWorkstation) {
+    pcRemoveAnalysisDeskExtensionV338();
+    return false;
+  }
+
+  let extension = document.getElementById('pcAnalysisDeskExtensionV338');
+  if (!extension) {
+    extension = document.createElement('div');
+    extension.id = 'pcAnalysisDeskExtensionV338';
+    extension.setAttribute('aria-hidden', 'true');
+    scene.appendChild(extension);
+  }
+
+  const rawTop = Number.parseFloat(frame.top);
+  if (!Number.isFinite(rawTop)) {
+    pcRemoveAnalysisDeskExtensionV338();
+    return false;
+  }
+
+  const centeredVertically = String(frame.transform || '').includes('translate(-50%, -50%)');
+  const terminalTopPx = centeredVertically ? rawTop - (frame.height / 2) : rawTop;
+  const terminalBottomPx = terminalTopPx + frame.height;
+  const safeHeight = Number.isFinite(viewportHeight) && viewportHeight > 0
+    ? viewportHeight
+    : pcViewportHeight();
+  const extensionTop = Math.max(0, Math.min(safeHeight, terminalBottomPx - 2));
+
+  pcSetImportantStyles(extension, [
+    ['position', 'absolute'],
+    ['left', '0'],
+    ['right', '0'],
+    ['top', `${Math.round(extensionTop)}px`],
+    ['bottom', '0'],
+    ['width', '100%'],
+    ['height', 'auto'],
+    ['min-height', '0'],
+    ['margin', '0'],
+    ['padding', '0'],
+    ['display', 'block'],
+    ['background-image', 'url("assets/images/backgrounds/desk-extension.png")'],
+    ['background-size', 'cover'],
+    ['background-position', 'center center'],
+    ['background-repeat', 'no-repeat'],
+    ['background-color', '#7a3f1d'],
+    ['border', '0'],
+    ['box-shadow', 'none'],
+    ['pointer-events', 'none'],
+    ['overflow', 'hidden'],
+    ['z-index', '55']
+  ]);
+
+  return true;
+}
+
 // [COMPLETED ANALYSIS: DESKTOP WORKSTATION]
 function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewportHeight) {
   if (!terminal || !photo || !screen) return false;
@@ -1175,20 +1311,18 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
     ? viewportHeight
     : pcViewportHeight();
 
-  const aspect = 2.0;
-  const isContainedWorkstation = viewportWidth <= 1510;
-  const controlsReserve = isContainedWorkstation ? 114 : 90;
-  const topReserve = isContainedWorkstation ? 28 : 12;
-  const availableHeight = Math.max(320, safeViewportHeight - topReserve - controlsReserve);
+  const frame = pcGetComputerFrameLikeCompletedV327(viewportWidth, safeViewportHeight);
+  const isContainedWorkstation = frame.isContainedWorkstation;
+  const width = frame.width;
+  const height = frame.height;
+  const terminalLeft = frame.left;
+  const terminalTop = frame.top;
+  const terminalTransform = frame.transform;
 
-  let width;
-  let height;
-  let terminalLeft = '50%';
-  let terminalTop;
-  let terminalTransform = 'translateX(-50%)';
-
+  // v344: Completed Scenario Diagnostic must keep the classroom visible.
+  // The dark workstation matte is intentionally limited to prediction/live-analysis states.
   if (overlay && isContainedWorkstation) {
-    pcSetImportantStyles(overlay, [['background', '#050805']]);
+    pcSetImportantStyles(overlay, [['background', 'transparent']]);
   }
   if (scene && isContainedWorkstation) {
     pcSetImportantStyles(scene, [
@@ -1210,43 +1344,11 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
     pcSetImportantStyles(sceneBg, [
       ['display', 'block'],
       ['visibility', 'visible'],
-      ['opacity', '.55']
+      ['opacity', '1']
     ]);
   }
 
-  if (isContainedWorkstation) {
-    const isShortLandscape = safeViewportHeight <= 740;
-    const isTallPortraitTablet = safeViewportHeight >= 980 && viewportWidth >= 700 && viewportWidth <= 1100;
-    const isLargePortraitTablet = isTallPortraitTablet && viewportWidth >= 980 && safeViewportHeight >= 1280;
-    const isMiniPortraitTablet = isTallPortraitTablet && viewportWidth < 800;
-    const desiredWidth = Math.min(
-      viewportWidth * (isLargePortraitTablet ? 2.54 : isMiniPortraitTablet ? 2.24 : isTallPortraitTablet ? 2.34 : isShortLandscape ? 1.56 : 1.90),
-      isLargePortraitTablet ? 2540 : isMiniPortraitTablet ? 2160 : isTallPortraitTablet ? 2300 : isShortLandscape ? 1700 : 1920
-    );
-    const maxWidthByHeight = availableHeight * aspect * (isLargePortraitTablet ? 1.21 : isMiniPortraitTablet ? 1.14 : isTallPortraitTablet ? 1.18 : isShortLandscape ? 1.09 : 1.05);
-    width = Math.max(isLargePortraitTablet ? 1580 : isMiniPortraitTablet ? 1320 : isTallPortraitTablet ? 1440 : isShortLandscape ? 1140 : 1000, Math.min(desiredWidth, maxWidthByHeight));
-    height = width / aspect;
-    terminalLeft = isLargePortraitTablet ? '61.25%' : isMiniPortraitTablet ? '60.0%' : isTallPortraitTablet ? '60.35%' : isShortLandscape ? '58.1%' : '59.2%';
-    const centeredTop = topReserve + Math.max(6, (availableHeight - height) * (isShortLandscape ? 0.04 : isLargePortraitTablet ? 0.08 : isTallPortraitTablet ? 0.10 : 0.18));
-    terminalTop = `${Math.round(Math.max(topReserve, Math.min(centeredTop, safeViewportHeight - controlsReserve - height)))}px`;
-  } else {
-    // Wide desktop keeps the larger workstation composition.
-    const usableStageHeight = Math.max(720, safeViewportHeight - topReserve - controlsReserve);
-    const targetHeight = Math.max(780, usableStageHeight * 1.08);
-    const widthFromHeight = targetHeight * aspect;
-    const widthFromViewport = viewportWidth * 1.24;
-    width = Math.max(1760, Math.min(2280, Math.max(widthFromHeight, widthFromViewport)));
-    height = width / aspect;
-    const minCenterY = topReserve + (height / 2);
-    const maxCenterY = safeViewportHeight - controlsReserve + Math.min(36, safeViewportHeight * 0.03) - (height / 2);
-    const centerY = Math.max(
-      minCenterY,
-      Math.min((safeViewportHeight * 0.48) + 18, maxCenterY)
-    );
-    terminalLeft = viewportWidth >= 2100 ? '57%' : viewportWidth >= 1800 ? '58%' : '59%';
-    terminalTop = `${Math.round(centerY)}px`;
-    terminalTransform = 'translate(-50%, -50%)';
-  }
+  pcApplyAnalysisDeskExtensionV338(scene, frame, safeViewportHeight);
 
   pcSetImportantStyles(terminal, [
     ['position', 'absolute'],
@@ -1645,7 +1747,8 @@ function pcClearMobileAnalyzingStageV202(){
   ]);
   pcRemoveInlineStyles(dialogue, [
     'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
-    'min-height', 'max-height'
+    'min-height', 'max-height', 'display', 'visibility', 'padding', 'overflow',
+    'pointer-events'
   ]);
   pcRemoveInlineStyles(speaker, ['font-size', 'line-height']);
   pcRemoveInlineStyles(text, ['font-size', 'line-height']);
@@ -1694,6 +1797,96 @@ function pcGetLiveAnalysisModeV256(viewportWidth) {
   return 'desktop';
 }
 
+function pcGetComputerFrameLikeCompletedV327(viewportWidth, viewportHeight) {
+  const safeViewportHeight = Number.isFinite(viewportHeight) && viewportHeight > 0
+    ? viewportHeight
+    : pcViewportHeight();
+  const aspect = 2.0;
+  const isContainedWorkstation = viewportWidth <= 1510;
+  const controlsReserve = isContainedWorkstation ? 114 : 90;
+  const topReserve = isContainedWorkstation ? 28 : 12;
+  const availableHeight = Math.max(320, safeViewportHeight - topReserve - controlsReserve);
+
+  let width;
+  let height;
+  let left = '50%';
+  let top;
+  let transform = 'translateX(-50%)';
+
+  if (isContainedWorkstation) {
+    const isShortLandscape = safeViewportHeight <= 740;
+    const isNestHubWorkstation = viewportWidth >= 980 && viewportWidth <= 1100 &&
+      safeViewportHeight >= 560 && safeViewportHeight <= 680;
+    const isNestHubMaxWorkstation = viewportWidth >= 1180 && viewportWidth <= 1366 &&
+      safeViewportHeight >= 720 && safeViewportHeight <= 900;
+    const isTallPortraitTablet = safeViewportHeight >= 980 && viewportWidth >= 700 && viewportWidth <= 1100;
+    const isLargePortraitTablet = isTallPortraitTablet && viewportWidth >= 980 && safeViewportHeight >= 1280;
+    const isMiniPortraitTablet = isTallPortraitTablet && viewportWidth < 800;
+    if (isNestHubWorkstation) {
+      // Deliberately zoom the artwork past the viewport edges. The useful part is
+      // the monitor/keyboard, not the tower's entire right flank. This gives the
+      // 1024 × 600 screen enough physical monitor pixels for readable diagnostic
+      // text while keeping the controls clear at the bottom.
+      width = 1340;
+      height = width / aspect;
+      left = '58.4%';
+      top = '-42px';
+    } else if (isNestHubMaxWorkstation) {
+      // v332: Match the visual weight of the approved full-screen workstation.
+      // The previous height-limited calculation left the 1280x800 Nest Hub Max
+      // monitor too small, wasting the very screen space meant to carry the report.
+      width = 1660;
+      height = width / aspect;
+      left = '50%';
+      top = '-18px';
+    } else {
+      // v334: Keep the iPad Pro's physical monitor fully inside the portrait viewport.
+      // Match the iPad Air's monitor-to-viewport ratio (~94%) instead of letting the
+      // Pro monitor span the full viewport width and clip both bezel edges.
+      const desiredWidth = Math.min(
+        viewportWidth * (isLargePortraitTablet ? 2.34 : isMiniPortraitTablet ? 2.24 : isTallPortraitTablet ? 2.34 : isShortLandscape ? 1.56 : 1.90),
+        isLargePortraitTablet ? 2400 : isMiniPortraitTablet ? 2160 : isTallPortraitTablet ? 2300 : isShortLandscape ? 1700 : 1920
+      );
+      const maxWidthByHeight = availableHeight * aspect * (isLargePortraitTablet ? 1.21 : isMiniPortraitTablet ? 1.14 : isTallPortraitTablet ? 1.18 : isShortLandscape ? 1.09 : 1.05);
+      width = Math.max(isLargePortraitTablet ? 1580 : isMiniPortraitTablet ? 1320 : isTallPortraitTablet ? 1440 : isShortLandscape ? 1140 : 1000, Math.min(desiredWidth, maxWidthByHeight));
+      height = width / aspect;
+      left = isLargePortraitTablet ? '61.25%' : isMiniPortraitTablet ? '60.0%' : isTallPortraitTablet ? '60.35%' : isShortLandscape ? '58.1%' : '59.2%';
+      const centeredTop = topReserve + Math.max(6, (availableHeight - height) * (isShortLandscape ? 0.04 : isLargePortraitTablet ? 0.08 : isTallPortraitTablet ? 0.10 : 0.18));
+      top = `${Math.round(Math.max(topReserve, Math.min(centeredTop, safeViewportHeight - controlsReserve - height)))}px`;
+    }
+  } else {
+    const usableStageHeight = Math.max(720, safeViewportHeight - topReserve - controlsReserve);
+    const targetHeight = Math.max(780, usableStageHeight * 1.08);
+    const widthFromHeight = targetHeight * aspect;
+    const widthFromViewport = viewportWidth * 1.24;
+    width = Math.max(1760, Math.min(2280, Math.max(widthFromHeight, widthFromViewport)));
+    height = width / aspect;
+    const minCenterY = topReserve + (height / 2);
+    const maxCenterY = safeViewportHeight - controlsReserve + Math.min(36, safeViewportHeight * 0.03) - (height / 2);
+    const centerY = Math.max(
+      minCenterY,
+      Math.min((safeViewportHeight * 0.48) + 18, maxCenterY)
+    );
+    left = viewportWidth >= 2100 ? '57%' : viewportWidth >= 1800 ? '58%' : '59%';
+    top = `${Math.round(centerY)}px`;
+    transform = 'translate(-50%, -50%)';
+  }
+
+  // v331: Center the *physical monitor* over the action buttons rather than
+  // centering the full 2:1 workstation artwork. The tower makes the artwork's
+  // midpoint sit well to the right of the monitor, so using the artwork center
+  // causes the monitor to drift left on portrait/tablet layouts. The monitor
+  // glass occupies 22.2%..62.5% of the source render, putting its center at
+  // 42.35% of the artwork width. Anchor that point to the viewport midpoint.
+  if (isContainedWorkstation) {
+    const monitorCenterFraction = (22.2 + (40.3 / 2)) / 100;
+    const artworkAnchorPx = (viewportWidth / 2) + (width * (0.5 - monitorCenterFraction));
+    left = `${Math.round(artworkAnchorPx)}px`;
+  }
+
+  return { width, height, left, top, transform, isContainedWorkstation };
+}
+
 function pcApplyLiveComputerFrameV256({
   overlay,
   scene,
@@ -1706,36 +1899,18 @@ function pcApplyLiveComputerFrameV256({
 }) {
   const sceneBg = document.getElementById('vnSceneBg');
   const overlayRect = overlay.getBoundingClientRect();
-  const dialogueRect = dialogue?.getBoundingClientRect();
-  const measuredStageHeight = dialogueRect && dialogueRect.top > overlayRect.top
-    ? Math.round(dialogueRect.top - overlayRect.top)
-    : Math.round(overlayRect.height * 0.72);
   const isPortraitTablet = mode === 'tablet' && overlayRect.height > overlayRect.width * 1.08;
-  const portraitDialogueTop = isPortraitTablet
-    ? Math.round(overlayRect.height * 0.64)
-    : null;
-  const stageHeight = Math.max(340, isPortraitTablet ? portraitDialogueTop : measuredStageHeight);
 
-  // v305: Portrait tablets use the same compact workstation-to-dialogue rhythm
-  // as the Nest Hub layout. The computer ends immediately above the black panel
-  // instead of floating inside a tall unused stage. Landscape and desktop keep
-  // their existing geometry unchanged.
-  const aspect = 2.0;
-  const widthLimit = mode === 'tablet'
-    ? (isPortraitTablet
-        ? Math.min(viewportWidth * 1.18, 1040)
-        : Math.min(viewportWidth * 1.02, 1180))
-    : Math.min(viewportWidth * 0.90, 1680);
-  const heightLimit = Math.max(320, stageHeight * (isPortraitTablet ? 0.94 : mode === 'tablet' ? 0.98 : 0.94));
-  const width = Math.max(520, Math.min(widthLimit, heightLimit * aspect));
-  const height = width / aspect;
-  const downShift = mode === 'tablet' ? (isPortraitTablet ? 10 : 16) : 14;
-  const centeredTop = ((stageHeight - height) / 2) + downShift;
-  const portraitTop = portraitDialogueTop - height - 2;
-  const top = isPortraitTablet
-    ? Math.max(18, portraitTop)
-    : Math.max(8, Math.min(centeredTop, stageHeight - height - 4));
-  const dialogueTop = isPortraitTablet ? Math.round(top + height + 2) : null;
+  // v327: whenever a photographed computer is visible, the analyzing state now
+  // uses the exact workstation frame calculation as the completed diagnostic.
+  // Only the monitor contents and bottom controls/dialogue differ between states.
+  const frame = pcGetComputerFrameLikeCompletedV327(viewportWidth, pcViewportHeight());
+  const width = frame.width;
+  const height = frame.height;
+  const top = frame.top;
+  // v328: The dialogue is intentionally collapsed for the entire live-analysis
+  // state. The workstation can therefore use the full scene height instead of
+  // reserving a text panel beneath it.
 
   pcSetImportantStyles(overlay, [
     ['background', '#050805']
@@ -1743,13 +1918,13 @@ function pcApplyLiveComputerFrameV256({
 
   pcSetImportantStyles(scene, [
     ['position', 'absolute'],
-    ['inset', isPortraitTablet ? 'auto' : '0'],
+    ['inset', '0'],
     ['left', '0'],
     ['right', '0'],
     ['top', '0'],
-    ['bottom', isPortraitTablet ? 'auto' : '0'],
+    ['bottom', '0'],
     ['width', '100%'],
-    ['height', isPortraitTablet ? `${dialogueTop}px` : '100%'],
+    ['height', '100%'],
     ['min-height', '0'],
     ['padding', '0'],
     ['overflow', 'hidden'],
@@ -1762,38 +1937,30 @@ function pcApplyLiveComputerFrameV256({
     ['opacity', '.55']
   ]);
 
-  if (isPortraitTablet && dialogue) {
-    pcSetImportantStyles(dialogue, [
-      ['position', 'absolute'],
-      ['inset', 'auto'],
-      ['left', '0'],
-      ['right', '0'],
-      ['top', `${dialogueTop}px`],
-      ['bottom', '0'],
-      ['width', '100%'],
-      ['height', 'auto'],
-      ['min-height', '0'],
-      ['max-height', 'none']
-    ]);
+  // v339: Use the same wooden desk continuation during the live analyzing state
+  // as the completed diagnostic. This removes the dark lower strip on contained
+  // tablet/foldable workstation layouts while the dialogue remains collapsed.
+  pcApplyAnalysisDeskExtensionV338(scene, frame, pcViewportHeight());
 
-    const speaker = document.getElementById('vnSpeaker');
-    const text = document.getElementById('vnText');
-    pcSetImportantStyles(speaker, [
-      ['font-size', 'clamp(1.75rem, 3vw, 2rem)'],
-      ['line-height', '1.15']
-    ]);
-    pcSetImportantStyles(text, [
-      ['font-size', 'clamp(1.3125rem, 2.35vw, 1.5625rem)'],
-      ['line-height', '1.42']
+  if (dialogue) {
+    pcSetImportantStyles(dialogue, [
+      ['display', 'none'],
+      ['visibility', 'hidden'],
+      ['height', '0'],
+      ['min-height', '0'],
+      ['max-height', '0'],
+      ['padding', '0'],
+      ['overflow', 'hidden'],
+      ['pointer-events', 'none']
     ]);
   }
 
   pcSetImportantStyles(terminal, [
     ['position', 'absolute'],
     ['inset', 'auto'],
-    ['left', '50%'],
+    ['left', frame.left],
     ['right', 'auto'],
-    ['top', `${Math.round(top)}px`],
+    ['top', frame.top],
     ['bottom', 'auto'],
     ['width', `${Math.round(width)}px`],
     ['height', `${Math.round(height)}px`],
@@ -1802,7 +1969,7 @@ function pcApplyLiveComputerFrameV256({
     ['max-width', 'none'],
     ['max-height', 'none'],
     ['aspect-ratio', 'auto'],
-    ['transform', 'translateX(-50%)'],
+    ['transform', frame.transform],
     ['margin', '0'],
     ['padding', '0'],
     ['display', 'block'],
@@ -1846,12 +2013,12 @@ function pcApplyLiveComputerFrameV256({
   pcSetImportantStyles(screen, [
     ['position', 'absolute'],
     ['inset', 'auto'],
-    ['left', '22.45%'],
+    ['left', PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215.left],
     ['right', 'auto'],
-    ['top', '13.2%'],
+    ['top', PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215.top],
     ['bottom', 'auto'],
-    ['width', '39.75%'],
-    ['height', '45%'],
+    ['width', PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215.width],
+    ['height', PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215.height],
     ['min-width', '0'],
     ['min-height', '0'],
     ['max-width', 'none'],
@@ -1872,11 +2039,20 @@ function pcApplyLiveComputerFrameV256({
 }
 function pcApplyLivePhoneStageV256({ overlay, scene, dialogue, terminal, photo, screen }) {
   const overlayRect = overlay.getBoundingClientRect();
-  const dialogueRect = dialogue?.getBoundingClientRect();
-  const measuredStageHeight = dialogueRect && dialogueRect.top > overlayRect.top
-    ? Math.round(dialogueRect.top - overlayRect.top)
-    : Math.round(overlayRect.height * 0.72);
-  const stageHeight = Math.max(320, measuredStageHeight);
+  const stageHeight = Math.max(320, Math.round(overlayRect.height));
+
+  if (dialogue) {
+    pcSetImportantStyles(dialogue, [
+      ['display', 'none'],
+      ['visibility', 'hidden'],
+      ['height', '0'],
+      ['min-height', '0'],
+      ['max-height', '0'],
+      ['padding', '0'],
+      ['overflow', 'hidden'],
+      ['pointer-events', 'none']
+    ]);
+  }
 
   pcSetImportantStyles(scene, [
     ['position', 'absolute'],
@@ -2188,11 +2364,16 @@ function pcGetAnalysisLayoutV122() {
   // screens graduate to the photographed workstation so the completed
   // diagnostic uses the same classroom-computer composition as the regular
   // analysis view instead of floating inside a large terminal border.
+  // v330: The Nest Hub class is wide enough to show the real workstation even
+  // though it is short. Keeping it in panel mode produced a floating report with
+  // cropped left edges and no relationship to the rest of the computer sequence.
+  if (width >= 900 && height <= 700) return 'computer';
   if (width >= 700 && height >= 760) return 'computer';
   return width <= 1180 ? 'panel' : 'computer';
 }
 
 function pcClearLegacyAnalysisInlineStylesV122() {
+  pcRemoveAnalysisDeskExtensionV338();
   const overlay = document.getElementById('vnOverlay');
   const terminal = document.getElementById('claudeTerminalScene');
   const photo = terminal ? terminal.querySelector('.claude-terminal-photo') : null;

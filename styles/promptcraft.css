@@ -3014,6 +3014,150 @@ textarea::placeholder {
   }body .vn-overlay.active.pc-clean-prediction #vnCharacter,body .vn-overlay.active.claude-prediction #vnCharacter,body .vn-overlay.active.pc-prediction-question #vnCharacter,body .vn-overlay.active.pc-clean-prediction .vn-character,body .vn-overlay.active.claude-prediction .vn-character,body .vn-overlay.active.pc-prediction-question .vn-character{opacity:.55!important
   }
 }
+/* v335: Keep the Scenario 1 final-result tray compact on portrait/tablet widths.
+   The prior flex-basis on the copy block expanded the tray vertically on 768–1024px layouts. */
+@media (min-width: 761px) and (max-width: 1100px) {
+  body.s1-result-active #inputContainer {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  body.s1-result-active .s1-result-controls {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 12px 14px 14px !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    align-items: start !important;
+    justify-content: stretch !important;
+  }
+
+  body.s1-result-active .s1-result-controls > div:first-child {
+    flex: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    text-align: left !important;
+  }
+
+  body.s1-result-active .s1-result-controls-title {
+    font-size: 1.08rem !important;
+    line-height: 1.15 !important;
+  }
+
+  body.s1-result-active .s1-result-controls-sub {
+    margin-top: 3px !important;
+    font-size: .82rem !important;
+    line-height: 1.3 !important;
+  }
+
+  body.s1-result-active .s1-result-controls-actions {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+  }
+
+  body.s1-result-active .s1-result-controls-actions button,
+  body.s1-result-active .s1-result-controls .s1-secondary-btn,
+  body.s1-result-active .s1-result-controls .continue-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+    height: auto !important;
+    padding: 10px 14px !important;
+    font-size: .9rem !important;
+    line-height: 1.15 !important;
+  }
+
+  body.s1-result-active .chat-area,
+  body.s1-result-active #chat {
+    padding-bottom: 170px !important;
+  }
+}
+
+/* v337: Final Scenario 1 result tray must stay content-height on tablet/portrait layouts.
+   #inputContainer.s1-clean-workbench previously retained flex: 1 1 auto from the workbench state,
+   which stretched the fixed result tray through most of the viewport. */
+@media (min-width: 761px) and (max-width: 1100px) {
+  body.s1-active.s1-result-active #inputContainer.s1-clean-workbench {
+    position: fixed !important;
+    inset: auto 0 0 0 !important;
+    top: auto !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    display: block !important;
+    flex: 0 0 auto !important;
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    flex-basis: auto !important;
+    align-self: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  body.s1-active.s1-result-active #inputContainer.s1-clean-workbench .s1-result-controls {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 10px 14px 12px !important;
+    gap: 8px !important;
+  }
+
+  body.s1-active.s1-result-active #inputContainer.s1-clean-workbench .s1-result-controls > div:first-child {
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+  }
+
+  body.s1-active.s1-result-active #inputContainer.s1-clean-workbench .s1-result-controls-title {
+    margin: 0 !important;
+    font-size: 1.04rem !important;
+    line-height: 1.1 !important;
+  }
+
+  body.s1-active.s1-result-active #inputContainer.s1-clean-workbench .s1-result-controls-sub {
+    margin: 2px 0 0 !important;
+    font-size: .8rem !important;
+    line-height: 1.22 !important;
+  }
+
+  body.s1-active.s1-result-active #inputContainer.s1-clean-workbench .s1-result-controls-actions {
+    margin: 0 !important;
+    min-height: 0 !important;
+  }
+
+  body.s1-active.s1-result-active #inputContainer.s1-clean-workbench .s1-result-controls-actions button,
+  body.s1-active.s1-result-active #inputContainer.s1-clean-workbench .s1-secondary-btn,
+  body.s1-active.s1-result-active #inputContainer.s1-clean-workbench .continue-btn {
+    min-height: 42px !important;
+    padding: 8px 12px !important;
+  }
+
+  body.s1-result-active .chat-area,
+  body.s1-result-active #chat {
+    padding-bottom: 150px !important;
+  }
+}
 
 /* SOURCE: styles/30-legacy-responsive.css */
 /*
@@ -17795,20 +17939,34 @@ html body .pc-app-header .header-actions {
    ══════════════════════════════════════════════════════ */
 
 /* Shared helper: limit these refinements to the prediction/question states. */
-body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
-body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene {
+body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene,
+body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-scene {
   overflow: visible !important;
-}
-
-body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-photo,
-body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-photo {
-  background-color: transparent !important;
-  background-repeat: no-repeat !important;
-  background-position: center center !important;
+  background: transparent !important;
   border: 0 !important;
   border-radius: 0 !important;
+  outline: 0 !important;
   box-shadow: none !important;
-  overflow: visible !important;
+}
+
+body[data-pc-viewport-family]:not([data-pc-viewport-family="phone"]) .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #vnSceneBg,
+body[data-pc-viewport-family]:not([data-pc-viewport-family="phone"]) .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .vn-bg {
+  opacity: 0.82 !important;
+  filter: brightness(0.76) saturate(0.96) blur(0.35px) !important;
+}
+
+body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene .claude-terminal-photo,
+body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-photo {
+  background-color: rgba(3, 9, 6, 0.92) !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  border: 2px solid rgba(116, 186, 150, 0.76) !important;
+  border-radius: 8px !important;
+  box-shadow:
+    inset 0 0 0 clamp(9px, 1.15vw, 15px) rgba(3, 10, 7, 0.62),
+    inset 0 0 34px rgba(0, 7, 4, 0.46),
+    0 8px 22px rgba(0, 0, 0, 0.24) !important;
+  overflow: hidden !important;
 }
 
 body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-photo::before,
@@ -17948,10 +18106,33 @@ body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-predic
   z-index: 28 !important;
 }
 
+/* Portrait-tablet prediction workstation: match the wide-format matte treatment.
+   The workstation now sits inside a dark backing panel with the green edge,
+   rather than letting that edge float directly over the classroom image. */
+body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
+body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene {
+  box-sizing: border-box !important;
+  padding: clamp(9px, 1.25vw, 14px) !important;
+  background: rgba(1, 8, 5, 0.94) !important;
+  border: 2px solid rgba(116, 186, 150, 0.76) !important;
+  border-radius: 8px !important;
+  box-shadow:
+    inset 0 0 28px rgba(0, 0, 0, 0.42),
+    0 8px 22px rgba(0, 0, 0, 0.24) !important;
+  overflow: hidden !important;
+}
+
 body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-photo,
 body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-photo {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
   background-size: cover !important;
   background-position: center center !important;
+  border: 0 !important;
+  border-radius: 3px !important;
+  box-shadow: none !important;
   filter: brightness(.86) saturate(1.03) !important;
 }
 
@@ -17971,8 +18152,15 @@ body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-predic
 
 /* Short landscape / compact desktop: keep the computer visible, but let Pixel
    overlap in front of it rather than hiding behind the terminal. */
-body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
-body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene,
+body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene,
+body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-scene {
+  left: 55% !important;
+  top: clamp(194px, 30dvh, 258px) !important;
+  width: min(132vw, 1520px) !important;
+  max-height: min(72dvh, calc(100dvh - var(--pc-dialogue-h) - 6px)) !important;
+  z-index: 28 !important;
+}
+
 body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
 body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene {
   left: 55% !important;
@@ -18186,17 +18374,17 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
     visibility: visible !important;
     width: 100% !important;
     height: 100% !important;
-    opacity: 0.55 !important;
+    opacity: 0.82 !important;
     object-fit: cover !important;
     object-position: center center !important;
-    filter: brightness(0.5) blur(1px) !important;
+    filter: brightness(0.76) saturate(0.96) blur(0.35px) !important;
   }
 
   html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene,
   html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) .claude-terminal-scene {
     left: 50% !important;
     right: auto !important;
-    top: 27% !important;
+    top: calc(27% + clamp(10px, 1.2dvh, 16px)) !important;
     bottom: auto !important;
     width: min(120vw, 1000px) !important;
     height: auto !important;
@@ -18222,9 +18410,12 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
     background-size: 100% 100% !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
+    border: 2px solid rgba(116, 186, 150, 0.76) !important;
+    border-radius: 8px !important;
+    box-shadow:
+      inset 0 0 0 clamp(9px, 1.15vw, 15px) rgba(3, 10, 7, 0.62),
+      inset 0 0 34px rgba(0, 7, 4, 0.46),
+      0 8px 22px rgba(0, 0, 0, 0.24) !important;
     overflow: visible !important;
     filter: brightness(.89) saturate(1.04) !important;
   }
@@ -18304,9 +18495,12 @@ body[data-pc-viewport-family] .vn-overlay.active:is(.pc-prediction-question, .cl
     background-position: center center !important;
     background-repeat: no-repeat !important;
     filter: brightness(.89) saturate(1.04) !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
+    border: 2px solid rgba(116, 186, 150, 0.76) !important;
+    border-radius: 8px !important;
+    box-shadow:
+      inset 0 0 0 clamp(9px, 1.15vw, 15px) rgba(3, 10, 7, 0.62),
+      inset 0 0 34px rgba(0, 7, 4, 0.46),
+      0 8px 22px rgba(0, 0, 0, 0.24) !important;
   }
 
   body[data-pc-viewport-family="portrait-tablet"] .vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction) #claudeTerminalScene .claude-terminal-photo::before,
@@ -18669,7 +18863,7 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
   html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene,
   html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-scene {
     left: 50% !important;
-    top: 25.4% !important;
+    top: calc(25.4% + clamp(18px, 1.8dvh, 26px)) !important;
     width: min(112vw, 1160px) !important;
     max-height: min(64dvh, calc(100dvh - var(--pc-prediction-dialogue-height, 330px) - 20px)) !important;
     transform: translate(-50%, -50%) !important;
@@ -18685,7 +18879,7 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
   html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) #claudeTerminalScene,
   html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result) .claude-terminal-scene {
     left: 50% !important;
-    top: 25.6% !important;
+    top: calc(25.6% + clamp(18px, 1.8dvh, 26px)) !important;
     width: min(116vw, 1080px) !important;
     max-height: min(64dvh, calc(100dvh - var(--pc-prediction-dialogue-height, 330px) - 20px)) !important;
     transform: translate(-50%, -50%) !important;
@@ -18712,4 +18906,269 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
   font-weight: 900 !important;
   line-height: 1.04 !important;
   letter-spacing: 0.045em !important;
+}
+
+/* V343 — softer portrait/foldable workstation backdrop.
+   The approved wide layout does not use a thick frame outside the workstation.
+   Instead, the classroom portion of the workstation image is deliberately
+   darkened behind the computer while the wooden desk remains visible. This
+   makes the existing green edge read as a real framed workstation area. */
+@media screen and (min-width: 701px) and (max-width: 1510px) {
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result)
+  #claudeTerminalScene .claude-terminal-photo,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result)
+  .claude-terminal-photo {
+    background-color: #020403 !important;
+    background-image:
+      linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.46) 0%,
+        rgba(0, 0, 0, 0.46) 60%,
+        rgba(0, 0, 0, 0.26) 68%,
+        rgba(0, 0, 0, 0.05) 77%,
+        rgba(0, 0, 0, 0) 84%
+      ),
+      var(--pc-app-background) !important;
+    background-size: 100% 100%, 100% 100% !important;
+    background-position: center center, center center !important;
+    background-repeat: no-repeat, no-repeat !important;
+    border: 2px solid rgba(116, 186, 150, 0.82) !important;
+    border-radius: 8px !important;
+    box-shadow:
+      inset 0 0 0 1px rgba(205, 238, 218, 0.08),
+      0 8px 22px rgba(0, 0, 0, 0.26) !important;
+    filter: none !important;
+  }
+
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result)
+  #claudeTerminalScene,
+  html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-prediction-question, .claude-prediction, .pc-clean-prediction, .pc-prediction-result)
+  .claude-terminal-scene {
+    overflow: visible !important;
+    background: transparent !important;
+    border: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* V347 — completed Scenario Diagnostic workstation must remain on the classroom.
+   Earlier responsive compatibility rules converted every <=1510px completed report
+   into a black/green terminal panel. That treatment belongs to the prediction/live
+   analysis states, not the final photographed workstation. Scope this reset only to
+   completed reports that JavaScript has assigned to computer mode. */
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 {
+  background: transparent !important;
+  backdrop-filter: none !important;
+}
+
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .vn-scene {
+  background: transparent !important;
+}
+
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .vn-bg {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+}
+
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 #claudeTerminalScene .claude-terminal-photo,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .claude-terminal-photo {
+  background-color: transparent !important;
+  background-image: var(--pc-app-background) !important;
+  background-size: 100% 100% !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* V348 — Surface Pro completed-diagnostic readability.
+   Keep the approved workstation geometry, but stop shrinking the report copy
+   on 912px-class portrait tablets. The monitor itself becomes the scroll area
+   if the larger type needs more vertical room. */
+@media screen and (min-width: 880px) and (max-width: 960px) and (min-height: 1200px) {
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .claude-terminal-screen {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: stable !important;
+    overscroll-behavior: contain !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-report {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-header {
+    padding: 8px 10px 7px !important;
+    margin-bottom: 6px !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-badge {
+    font-size: 0.66rem !important;
+    padding: 2px 6px !important;
+    margin-bottom: 4px !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-title {
+    font-size: 1.45rem !important;
+    line-height: 1.04 !important;
+    margin-bottom: 5px !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-summary {
+    font-size: 0.91rem !important;
+    line-height: 1.18 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-grid {
+    gap: 6px !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-card,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-card.compact,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-card.wide {
+    padding: 8px 9px !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-label {
+    font-size: 0.69rem !important;
+    line-height: 1.06 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-value,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-value.big {
+    font-size: 0.96rem !important;
+    line-height: 1.1 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-note {
+    font-size: 0.84rem !important;
+    line-height: 1.12 !important;
+  }
+}
+
+/* V351 — compact completed-diagnostic frame cleanup + dynamic-content resilience.
+   Applies only to the phone/foldable/Surface-Duo-sized completed diagnostic.
+   The report is content-driven: Claude may return longer or shorter text, so no
+   report section is given a fixed height. The terminal screen owns vertical
+   scrolling while the bottom controls remain available. */
+@media screen and (max-width: 540px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #claudeTerminalScene,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-scene {
+    border-radius: 0 !important;
+  }
+
+  /* Remove the two large nested frames on compact completed reports. */
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-photo {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-screen {
+    inset: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    scrollbar-gutter: auto !important;
+    padding: 12px 10px 22px !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #claudeTerminalOutput,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-output,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-header,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-grid,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-card.compact,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-card.wide,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-status-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-confidence-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-issue-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-repair-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-impact-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-badge,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-title,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-summary,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-label,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-value,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-value.big,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-note {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report p,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report ul,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report ol,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report li,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report a,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report strong,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report em,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report span {
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report img,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
+
+/* V352 — final Scenario 1 contrast normalization.
+   Universal across all viewport sizes so the completion note and result
+   subtitle keep the same readable treatment everywhere. */
+body.s1-result-active .s1-scenario-complete-note {
+  color: #4a3728 !important;
+  font-weight: 800 !important;
+}
+
+body.s1-result-active .s1-result-controls-sub {
+  color: #4a3728 !important;
+  font-weight: 700 !important;
 }

@@ -1121,3 +1121,144 @@ html body #vnOverlay.vn-overlay.active.pc-analysis-computer-v255 #claudeTerminal
   max-height: 100% !important;
   overflow: hidden !important;
 }
+
+/* ══════════════════════════════════════════════════════
+   VERSION 349 — COMPACT DIAGNOSTIC POLISH
+   Phones and narrow foldables keep the terminal identity, but use nearly the
+   full viewport width so the report reads like a designed mobile surface
+   instead of a skinny desktop monitor squeezed into a phone.
+   ══════════════════════════════════════════════════════ */
+@media screen and (max-width: 640px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 {
+    background:
+      radial-gradient(circle at 50% 20%, rgba(18, 76, 42, .18), transparent 42%),
+      #050806 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #claudeTerminalScene,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-scene {
+    top: 8px !important;
+    bottom: 74px !important;
+    width: calc(100vw - 10px) !important;
+    max-width: 620px !important;
+    border-radius: 15px !important;
+    box-shadow: 0 14px 36px rgba(0,0,0,.34) !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-photo {
+    border: 1px solid rgba(74,255,126,.78) !important;
+    border-radius: 15px !important;
+    background:
+      linear-gradient(180deg, rgba(3,24,13,.99), rgba(1,8,4,.995)) !important;
+    box-shadow:
+      inset 0 0 0 1px rgba(135,255,205,.08),
+      inset 0 0 24px rgba(35,255,96,.035) !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-screen {
+    inset: 5px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 11px !important;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 5px),
+      linear-gradient(180deg, rgba(0,27,14,.98), rgba(0,10,5,.995)) !important;
+    scrollbar-gutter: auto !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-header {
+    margin: 0 0 8px !important;
+    padding: 4px 5px 8px !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(83,255,130,.28) !important;
+    text-align: center !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-badge {
+    display: table !important;
+    margin: 0 auto 6px !important;
+    padding: 3px 8px !important;
+    border-radius: 999px !important;
+    background: rgba(5,38,19,.76) !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-title {
+    margin: 0 0 5px !important;
+    letter-spacing: .025em !important;
+    text-align: center !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-summary {
+    max-width: 36ch !important;
+    margin: 0 auto !important;
+    line-height: 1.24 !important;
+    text-align: center !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-card.compact,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-card.wide,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-status-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-confidence-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-issue-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-repair-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-impact-card {
+    margin-bottom: 8px !important;
+    border: 1px solid rgba(75,255,125,.36) !important;
+    border-left: 3px solid rgba(75,255,125,.72) !important;
+    border-radius: 8px !important;
+    background: rgba(1,24,12,.72) !important;
+    box-shadow: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-label {
+    margin-bottom: 3px !important;
+    letter-spacing: .045em !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-value,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-value.big,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-note {
+    line-height: 1.22 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #vnText {
+    bottom: 9px !important;
+    width: calc(100vw - 12px) !important;
+    max-width: 620px !important;
+    gap: 7px !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #vnText button {
+    min-height: 48px !important;
+    padding: 9px 8px !important;
+    border-radius: 10px !important;
+    font-size: clamp(.76rem, 3.3vw, .9rem) !important;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #claudeTerminalScene,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-scene {
+    bottom: 72px !important;
+    width: calc(100vw - 6px) !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #vnText {
+    width: calc(100vw - 8px) !important;
+    gap: 5px !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #vnText button {
+    min-height: 46px !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+}
