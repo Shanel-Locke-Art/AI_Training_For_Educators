@@ -405,7 +405,7 @@ async function sendMain(text) {
     showClaudeFinalResponseInTerminal(reply, !!data.mock, () => {
       addS1ClaudeResultCard(reply);
       showS1PostAnalysisReflection(score.total);
-    }, score.total);
+    }, score.total, data.mockReason || '');
   } catch (error) {
     removeTyping();
     addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`);
@@ -420,14 +420,19 @@ async function sendMain(text) {
 // ══════════════════════════════════════════════════════
 function scorePrompt(text) {
   const value = String(text || '');
-  const t = value.toLowerCase();
-  const hasLearners = /\b(student|learner|online|class|course|first-year|gen ed|general education|college|higher ed|adult|cohort|asynchronous)\b/.test(t);
-  const hasGoal = /\b(one.sentence|surface|shallow|dead|generic|conversation dies|do not build|not build|weak|low.quality|low quality|reply|replies|engagement problem)\b/.test(t);
-  const hasContext = /\b(compare|contrast|respond|reply|peer|build|question|evidence|example|explain|reason|connect|agree|disagree|extend|substantive|follow.up|follow-up)\b/.test(t);
-  const hasConstraint = /\b(asynchronous|online|week|weekly|reply|replies|peer|two|2|word|minute|lms|canvas|no extra|low.tech|format|deadline|by)\b/.test(t) || /\d+/.test(t);
-  const isDetailed = /\b(success|criteria|strong response|strong post|substantive|meaningful|evidence|example|explain|reasoning|rubric|quality|must include|should include)\b/.test(t) || value.length > 220;
-  return { hasLearners, hasGoal, hasContext, hasConstraint, isDetailed,
-    total: [hasLearners, hasGoal, hasContext, hasConstraint, isDetailed].filter(Boolean).length };
+  const values = (window.playerHistory && window.playerHistory.s1) || getS1GuidedValues();
+  const checks = analyzeS1Guided(values);
+  const hasLearners = !!checks.audience;
+  const hasGoal = !!checks.issue;
+  const hasContext = !!checks.interaction;
+  const hasConstraint = !!checks.constraints;
+  const isDetailed = !!checks.success;
+  const penalty = checks.demeaning ? 2 : 0;
+  return {
+    hasLearners, hasGoal, hasContext, hasConstraint, isDetailed,
+    demeaning: !!checks.demeaning,
+    total: Math.max(0, [hasLearners, hasGoal, hasContext, hasConstraint, isDetailed].filter(Boolean).length - penalty)
+  };
 }
 
 
@@ -703,14 +708,22 @@ function restoreS1DraftToFields(){
 };
 
 function analyzeS1Guided(values){
-  const allText = `${values.learners} ${values.issue} ${values.interaction} ${values.constraints}`.toLowerCase();
-  return {
-    audience: values.learners.length > 12 || /student|learner|class|course|online|first-year|adult|faculty|cohort|gen ed|general education|asynchronous/.test(allText),
-    issue: values.issue.length > 12 || /one.sentence|one sentence|surface|shallow|dead|not build|do not build|generic|reply|replies|conversation|dies|stops|weak|required/.test(allText),
-    interaction: values.interaction.length > 12 || /compare|contrast|respond|reply|peer|build|question|evidence|example|explain|reason|connect|disagree|agree|extend|challenge|follow/.test(allText),
-    constraints: values.constraints.length > 8 || /minute|week|reply|peer|two|2|asynchronous|format|word|time|low tech|no extra|lms|canvas|deadline/.test(allText),
-    success: /substantive|meaningful|evidence|example|build|criteria|reason|explain|success|quality|rubric|strong|specific|follow.up|follow-up|extend|challenge/.test(allText)
-  };
+  const learners = String(values.learners || '').toLowerCase();
+  const issue = String(values.issue || '').toLowerCase();
+  const interaction = String(values.interaction || '').toLowerCase();
+  const constraints = String(values.constraints || '').toLowerCase();
+  const allText = `${learners} ${issue} ${interaction} ${constraints}`;
+  const demeaning = /\b(stupid|idiot|idiots|lazy|dumb|moron|morons|hate (?:these|my|the) students|students suck)\b/.test(allText);
+  const audience = /\b(student|learner|class|course|online|first-year|adult|faculty|cohort|gen ed|general education|asynchronous|undergraduate|graduate)\b/.test(learners)
+    && learners.replace(/\b(student|students|learner|learners|class|course|online|asynchronous)\b/g, '').trim().length >= 4;
+  const issueOK = /\b(one[ -]?sentence|surface|shallow|dead|not build|do not build|generic|canned|reply|replies|conversation|dies|stops|weak|required|evidence|reading)\b/.test(issue)
+    && !/^\s*(it sucks|bad|terrible|awful|students suck)\s*[.!]?\s*$/.test(issue);
+  const interactionOK = /\b(compare|contrast|respond|reply|peer|build|question|evidence|example|explain|reason|connect|disagree|agree|extend|challenge|follow[ -]?up|interpret|apply|analy[sz]e|synthesi[sz]e)\b/.test(interaction)
+    && /\b(student|they|peer|classmate|reply|respond|compare|contrast|question|evidence|example|explain|reason|extend|challenge|build)\b/.test(interaction);
+  const constraintsOK = /\b(minute|week|reply|peer|two|2|asynchronous|format|word|time|low tech|no extra|lms|canvas|deadline|due|initial post|reading|rubric|points?)\b/.test(constraints);
+  const success = /\b(substantive|meaningful|evidence|example|build|criteria|reason|explain|success|quality|rubric|specific|follow[ -]?up|extend|challenge|demonstrate|show|apply|support)\b/.test(`${interaction} ${constraints}`)
+    && !/^\s*(do work|work harder|participate|try harder|sound less canned)\s*[.!]?\s*$/.test(interaction);
+  return { audience: audience && !demeaning, issue: issueOK, interaction: interactionOK, constraints: constraintsOK, success, demeaning };
 };
 
 function buildS1MissionHTML(){

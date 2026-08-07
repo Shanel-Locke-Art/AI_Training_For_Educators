@@ -693,7 +693,6 @@ const USE_MOCK_CLAUDE = FORCE_MOCK_CLAUDE || (MOCK_CLAUDE_FOR_LOCAL && IS_LOCAL_
 // NOTE: Mock Claude text is dialogue/content-heavy. Move to dialogue.js in a later pass if desired.
 function mockClaudeText(payload, context = 'main') {
   const system = payload.system || '';
-  const lastUser = payload.messages?.slice().reverse().find(message => message.role === 'user')?.content || '';
 
   if (context === 'pixel' || system.includes('You are Professor Pixel')) {
     return `You gave Claude enough direction to produce a usable response, especially where your prompt named the actual teaching problem. The next improvement is to make the success criteria more visible so Claude knows what a strong student outcome should look like.\n\n*What would you want students to do, say, or produce that would prove the activity worked?*`;
@@ -707,51 +706,42 @@ function mockClaudeText(payload, context = 'main') {
     return `This scenario is currently a clean development shell and does not send prompts to Claude.`;
   }
 
-  return `STATUS
-STRONG REPAIR WITH A CLEAR INTERACTION PURPOSE
+  const values = (window.playerHistory && window.playerHistory.s1) || (typeof getS1GuidedValues === 'function' ? getS1GuidedValues() : {});
+  const checks = typeof analyzeS1Guided === 'function' ? analyzeS1Guided(values) : {};
+  const problems = [];
+  if (checks.demeaning) problems.push('the learner description uses demeaning language instead of usable learner characteristics');
+  if (!checks.audience) problems.push('the learner/course context is not specific enough to guide a redesign');
+  if (!checks.issue) problems.push('the problem statement is too vague to diagnose the instructional failure');
+  if (!checks.interaction) problems.push('the requested interaction does not define an observable peer-to-peer thinking move');
+  if (!checks.constraints) problems.push('the constraints are too thin to shape a realistic activity');
+  if (!checks.success) problems.push('there is no clear criterion for what a successful contribution should demonstrate');
 
-CONFIDENCE
-HIGH
+  if (problems.length) {
+    const summary = problems.slice(0, 3).join('; ') + '.';
+    const worked = [
+      checks.issue ? `You did identify a discussion problem: ${values.issue}.` : '',
+      checks.constraints ? `You supplied at least one practical boundary: ${values.constraints}.` : ''
+    ].filter(Boolean).join(' ') || 'There is not yet enough instructionally useful detail to treat this as a strong repair.';
+    return `STATUS\nNEEDS REVISION BEFORE REDESIGN\n\nCONFIDENCE\nHIGH\n\nFEEDBACK SUMMARY\nThis input should not be treated as a strong repair. ${summary}\n\nWHAT WORKED\n${worked}\n\nISSUE DETECTED\n${problems[0]}. The current notes would force Claude to invent important instructional decisions rather than respond to your actual design.\n\nRECOMMENDED REPAIR\nReplace vague or judgmental wording with observable information: who the learners are, what students are currently doing, what intellectual move peers should make with one another, and what evidence would show the discussion worked.\n\nEXPECTED IMPACT\nA more concrete and respectful description gives Claude evidence it can actually reason from, which should produce a redesign that matches the course instead of a generic discussion template.\n\nREVISED DISCUSSION PROMPT\nChoose one claim or interpretation from this week's reading. Explain it in your initial post and support it with a specific passage, example, or piece of evidence. Respond to two classmates by engaging directly with their reasoning: extend, challenge, compare, or question an idea and explain why. At least one reply should give your classmate a clear reason to respond again.\n\nCOURSE QUALITY CHECK\nClear Objectives: partially addressed. Student Interaction: needs clearer direction. Real-World Context: not established from the notes. Inclusive Design: insufficient information. Measurable Outcomes: needs explicit success criteria.`;
+  }
 
-FEEDBACK SUMMARY
-You identified that one-line replies are happening because students are completing a requirement rather than responding to an intellectual reason to continue. Your request for students to compare interpretations, support claims with a specific example, and ask a follow-up question gives each reply a job beyond agreement.
-
-WHAT WORKED
-You named the learner context as first-year students in an 8-week asynchronous course. You also defined a concrete peer-interaction move: compare interpretations, use evidence or examples, and invite a peer to extend or challenge an idea. Requiring two substantive replies gives the redesign a measurable participation constraint.
-
-ISSUE DETECTED
-The repair defines what students should do in replies, but it does not yet define how the two replies should differ from one another. Students could still repeat the same comparison move twice.
-
-RECOMMENDED REPAIR
-Give the two replies distinct purposes, such as one reply that extends or challenges a peer's interpretation with evidence and a second reply that asks a genuine follow-up question or introduces a contrasting example.
-
-EXPECTED IMPACT
-Distinct reply moves make repetition less likely and create multiple pathways for the conversation to continue, so students have to process a peer's reasoning instead of simply satisfying a reply count.
-
-REVISED DISCUSSION PROMPT
-Choose one interpretation of this week's reading that you find convincing, questionable, or difficult to apply. In your initial post, explain your interpretation and support it with one specific example or piece of evidence from the reading.
-
-Then respond substantively to two classmates. In one reply, extend, challenge, or compare your classmate's interpretation using evidence or a concrete example. In the other, ask a genuine follow-up question or introduce a contrasting example that invites your classmate to continue the discussion.
-
-A substantive reply should explain your reasoning, connect directly to the classmate's idea, and give that person something meaningful to respond to.
-
-COURSE QUALITY CHECK
-Clear Objectives: addressed. Student Interaction: strongly addressed through distinct reply moves. Real-World Context: can be added if relevant to the reading. Inclusive Design: multiple response moves provide flexible ways to participate. Measurable Outcomes: initial evidence plus two substantive replies are observable.`
+  return `STATUS\nSTRONG REPAIR WITH A CLEAR INTERACTION PURPOSE\n\nCONFIDENCE\nHIGH\n\nFEEDBACK SUMMARY\nYour notes identify the learner context, the observed discussion problem, a specific peer-interaction move, and practical constraints. The redesign can therefore respond to your actual course rather than inventing the missing pieces.\n\nWHAT WORKED\nLearners: ${values.learners}. Problem: ${values.issue}. Interaction: ${values.interaction}. Constraints: ${values.constraints}. These details give the redesign concrete instructional boundaries.\n\nISSUE DETECTED\nThe strongest remaining refinement is to make the two required peer replies serve visibly different purposes so students cannot satisfy both with the same generic move.\n\nRECOMMENDED REPAIR\nGive one reply an extend/challenge/compare purpose and the other a genuine follow-up-question or contrasting-example purpose.\n\nEXPECTED IMPACT\nDistinct reply moves reduce repetition and create more than one pathway for a conversation to continue.\n\nREVISED DISCUSSION PROMPT\nChoose one interpretation of this week's reading that you find convincing, questionable, or difficult to apply. Explain your interpretation and support it with one specific example or piece of evidence. Then respond substantively to two classmates. In one reply, extend, challenge, or compare a classmate's interpretation using evidence or a concrete example. In the other, ask a genuine follow-up question or introduce a contrasting example that invites further discussion.\n\nCOURSE QUALITY CHECK\nClear Objectives: addressed. Student Interaction: strongly addressed. Real-World Context: use when relevant to the reading. Inclusive Design: multiple response moves support participation. Measurable Outcomes: the initial evidence and two substantive replies are observable.`;
 }
 
 
-function mockClaudeResponse(payload, context = 'main') {
-  pcDebug(`[PromptCraft] Using mock Claude response for ${context}.`);
+function mockClaudeResponse(payload, context = 'main', reason = 'forced') {
+  pcDebug(`[PromptCraft] Using mock Claude response for ${context} (${reason}).`);
   return Promise.resolve({
     content: [{ text: mockClaudeText(payload, context) }],
-    mock: true
+    mock: true,
+    mockReason: reason
   });
 }
 
 const CLAUDE_REQUEST_TIMEOUT_MS = 25000;
 
 async function callClaude(payload, context = 'main') {
-  if (USE_MOCK_CLAUDE) return mockClaudeResponse(payload, context);
+  if (USE_MOCK_CLAUDE) return mockClaudeResponse(payload, context, FORCE_MOCK_CLAUDE ? 'query-parameter' : 'local-test');
 
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
   const timeoutId = controller
@@ -778,7 +768,7 @@ async function callClaude(payload, context = 'main') {
       Professor Pixel stranded in terminal purgatory.
     */
     console.warn('[PromptCraft] Claude unavailable or timed out; using mock response:', err && err.message ? err.message : err);
-    return mockClaudeResponse(payload, context);
+    return mockClaudeResponse(payload, context, 'backend-unavailable');
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
   }

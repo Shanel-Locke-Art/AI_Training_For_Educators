@@ -695,7 +695,6 @@ const USE_MOCK_CLAUDE = FORCE_MOCK_CLAUDE || (MOCK_CLAUDE_FOR_LOCAL && IS_LOCAL_
 // NOTE: Mock Claude text is dialogue/content-heavy. Move to dialogue.js in a later pass if desired.
 function mockClaudeText(payload, context = 'main') {
   const system = payload.system || '';
-  const lastUser = payload.messages?.slice().reverse().find(message => message.role === 'user')?.content || '';
 
   if (context === 'pixel' || system.includes('You are Professor Pixel')) {
     return `You gave Claude enough direction to produce a usable response, especially where your prompt named the actual teaching problem. The next improvement is to make the success criteria more visible so Claude knows what a strong student outcome should look like.\n\n*What would you want students to do, say, or produce that would prove the activity worked?*`;
@@ -709,51 +708,42 @@ function mockClaudeText(payload, context = 'main') {
     return `This scenario is currently a clean development shell and does not send prompts to Claude.`;
   }
 
-  return `STATUS
-STRONG REPAIR WITH A CLEAR INTERACTION PURPOSE
+  const values = (window.playerHistory && window.playerHistory.s1) || (typeof getS1GuidedValues === 'function' ? getS1GuidedValues() : {});
+  const checks = typeof analyzeS1Guided === 'function' ? analyzeS1Guided(values) : {};
+  const problems = [];
+  if (checks.demeaning) problems.push('the learner description uses demeaning language instead of usable learner characteristics');
+  if (!checks.audience) problems.push('the learner/course context is not specific enough to guide a redesign');
+  if (!checks.issue) problems.push('the problem statement is too vague to diagnose the instructional failure');
+  if (!checks.interaction) problems.push('the requested interaction does not define an observable peer-to-peer thinking move');
+  if (!checks.constraints) problems.push('the constraints are too thin to shape a realistic activity');
+  if (!checks.success) problems.push('there is no clear criterion for what a successful contribution should demonstrate');
 
-CONFIDENCE
-HIGH
+  if (problems.length) {
+    const summary = problems.slice(0, 3).join('; ') + '.';
+    const worked = [
+      checks.issue ? `You did identify a discussion problem: ${values.issue}.` : '',
+      checks.constraints ? `You supplied at least one practical boundary: ${values.constraints}.` : ''
+    ].filter(Boolean).join(' ') || 'There is not yet enough instructionally useful detail to treat this as a strong repair.';
+    return `STATUS\nNEEDS REVISION BEFORE REDESIGN\n\nCONFIDENCE\nHIGH\n\nFEEDBACK SUMMARY\nThis input should not be treated as a strong repair. ${summary}\n\nWHAT WORKED\n${worked}\n\nISSUE DETECTED\n${problems[0]}. The current notes would force Claude to invent important instructional decisions rather than respond to your actual design.\n\nRECOMMENDED REPAIR\nReplace vague or judgmental wording with observable information: who the learners are, what students are currently doing, what intellectual move peers should make with one another, and what evidence would show the discussion worked.\n\nEXPECTED IMPACT\nA more concrete and respectful description gives Claude evidence it can actually reason from, which should produce a redesign that matches the course instead of a generic discussion template.\n\nREVISED DISCUSSION PROMPT\nChoose one claim or interpretation from this week's reading. Explain it in your initial post and support it with a specific passage, example, or piece of evidence. Respond to two classmates by engaging directly with their reasoning: extend, challenge, compare, or question an idea and explain why. At least one reply should give your classmate a clear reason to respond again.\n\nCOURSE QUALITY CHECK\nClear Objectives: partially addressed. Student Interaction: needs clearer direction. Real-World Context: not established from the notes. Inclusive Design: insufficient information. Measurable Outcomes: needs explicit success criteria.`;
+  }
 
-FEEDBACK SUMMARY
-You identified that one-line replies are happening because students are completing a requirement rather than responding to an intellectual reason to continue. Your request for students to compare interpretations, support claims with a specific example, and ask a follow-up question gives each reply a job beyond agreement.
-
-WHAT WORKED
-You named the learner context as first-year students in an 8-week asynchronous course. You also defined a concrete peer-interaction move: compare interpretations, use evidence or examples, and invite a peer to extend or challenge an idea. Requiring two substantive replies gives the redesign a measurable participation constraint.
-
-ISSUE DETECTED
-The repair defines what students should do in replies, but it does not yet define how the two replies should differ from one another. Students could still repeat the same comparison move twice.
-
-RECOMMENDED REPAIR
-Give the two replies distinct purposes, such as one reply that extends or challenges a peer's interpretation with evidence and a second reply that asks a genuine follow-up question or introduces a contrasting example.
-
-EXPECTED IMPACT
-Distinct reply moves make repetition less likely and create multiple pathways for the conversation to continue, so students have to process a peer's reasoning instead of simply satisfying a reply count.
-
-REVISED DISCUSSION PROMPT
-Choose one interpretation of this week's reading that you find convincing, questionable, or difficult to apply. In your initial post, explain your interpretation and support it with one specific example or piece of evidence from the reading.
-
-Then respond substantively to two classmates. In one reply, extend, challenge, or compare your classmate's interpretation using evidence or a concrete example. In the other, ask a genuine follow-up question or introduce a contrasting example that invites your classmate to continue the discussion.
-
-A substantive reply should explain your reasoning, connect directly to the classmate's idea, and give that person something meaningful to respond to.
-
-COURSE QUALITY CHECK
-Clear Objectives: addressed. Student Interaction: strongly addressed through distinct reply moves. Real-World Context: can be added if relevant to the reading. Inclusive Design: multiple response moves provide flexible ways to participate. Measurable Outcomes: initial evidence plus two substantive replies are observable.`
+  return `STATUS\nSTRONG REPAIR WITH A CLEAR INTERACTION PURPOSE\n\nCONFIDENCE\nHIGH\n\nFEEDBACK SUMMARY\nYour notes identify the learner context, the observed discussion problem, a specific peer-interaction move, and practical constraints. The redesign can therefore respond to your actual course rather than inventing the missing pieces.\n\nWHAT WORKED\nLearners: ${values.learners}. Problem: ${values.issue}. Interaction: ${values.interaction}. Constraints: ${values.constraints}. These details give the redesign concrete instructional boundaries.\n\nISSUE DETECTED\nThe strongest remaining refinement is to make the two required peer replies serve visibly different purposes so students cannot satisfy both with the same generic move.\n\nRECOMMENDED REPAIR\nGive one reply an extend/challenge/compare purpose and the other a genuine follow-up-question or contrasting-example purpose.\n\nEXPECTED IMPACT\nDistinct reply moves reduce repetition and create more than one pathway for a conversation to continue.\n\nREVISED DISCUSSION PROMPT\nChoose one interpretation of this week's reading that you find convincing, questionable, or difficult to apply. Explain your interpretation and support it with one specific example or piece of evidence. Then respond substantively to two classmates. In one reply, extend, challenge, or compare a classmate's interpretation using evidence or a concrete example. In the other, ask a genuine follow-up question or introduce a contrasting example that invites further discussion.\n\nCOURSE QUALITY CHECK\nClear Objectives: addressed. Student Interaction: strongly addressed. Real-World Context: use when relevant to the reading. Inclusive Design: multiple response moves support participation. Measurable Outcomes: the initial evidence and two substantive replies are observable.`;
 }
 
 
-function mockClaudeResponse(payload, context = 'main') {
-  pcDebug(`[PromptCraft] Using mock Claude response for ${context}.`);
+function mockClaudeResponse(payload, context = 'main', reason = 'forced') {
+  pcDebug(`[PromptCraft] Using mock Claude response for ${context} (${reason}).`);
   return Promise.resolve({
     content: [{ text: mockClaudeText(payload, context) }],
-    mock: true
+    mock: true,
+    mockReason: reason
   });
 }
 
 const CLAUDE_REQUEST_TIMEOUT_MS = 25000;
 
 async function callClaude(payload, context = 'main') {
-  if (USE_MOCK_CLAUDE) return mockClaudeResponse(payload, context);
+  if (USE_MOCK_CLAUDE) return mockClaudeResponse(payload, context, FORCE_MOCK_CLAUDE ? 'query-parameter' : 'local-test');
 
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
   const timeoutId = controller
@@ -780,7 +770,7 @@ async function callClaude(payload, context = 'main') {
       Professor Pixel stranded in terminal purgatory.
     */
     console.warn('[PromptCraft] Claude unavailable or timed out; using mock response:', err && err.message ? err.message : err);
-    return mockClaudeResponse(payload, context);
+    return mockClaudeResponse(payload, context, 'backend-unavailable');
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
   }
@@ -1269,7 +1259,9 @@ const scenarios = [
 
 Your first job is to evaluate the faculty member's ACTUAL choices in the prompt you receive, not to give generic discussion-board advice. Refer to concrete details they supplied: learner/course context, the problem they diagnosed, the interaction move they requested, constraints, and success criteria. If they invent a completely different repair than the example, evaluate that repair on its own merits. Do not pretend they said something they did not say.
 
-Your second job is to produce a course-ready revised discussion prompt that follows their choices wherever those choices are instructionally sound. If an important weakness remains, improve it in the revised prompt and explain why.
+Be an evaluator, not an agreeable assistant. Explicitly identify input that is vague, irrelevant, contradictory, demeaning toward learners, unserious, or instructionally unusable. Do not reward a field merely because it contains words related to students, readings, deadlines, or replies. If the faculty member gives a ridiculous or hostile answer, say so professionally and specifically, explain why it does not provide usable instructional context, and lower STATUS and CONFIDENCE accordingly. Never sanitize weak input into a strong diagnosis without acknowledging the weakness.
+
+Your second job is to produce a course-ready revised discussion prompt. Follow the faculty member's choices only where those choices are instructionally sound. Do not carry insults, irrelevant details, or nonsensical requirements into the student-facing prompt. When you must replace or reinterpret a weak choice, say exactly what you changed and why in the diagnostic.
 
 Return the response using EXACTLY these headings, each on its own line:
 STATUS
@@ -5047,9 +5039,9 @@ function parseClaudeDiagnosticSections(text) {
   };
 }
 
-function buildClaudeAnalysisHTML(feedback, mock = false) {
+function buildClaudeAnalysisHTML(feedback, mock = false, mockReason = '') {
   const d = parseClaudeDiagnosticSections(feedback);
-  const badge = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
+  const badge = mock ? (mockReason === 'backend-unavailable' ? 'BACKEND FALLBACK ANALYSIS' : 'MOCK ANALYSIS COMPLETE') : 'ANALYSIS COMPLETE';
   const totalCharacters = [d.status, d.confidence, d.summary, d.worked, d.issue, d.repair, d.impact]
     .join(' ')
     .length;
@@ -5103,9 +5095,9 @@ function buildClaudeAnalysisHTML(feedback, mock = false) {
   `;
 }
 
-function showClaudeConsultResult(feedback, mock = false, onClose = null) {
+function showClaudeConsultResult(feedback, mock = false, onClose = null, mockReason = '') {
   claudeTerminalCloseCallback = typeof onClose === 'function' ? onClose : null;
-  const label = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
+  const label = mock ? (mockReason === 'backend-unavailable' ? 'BACKEND FALLBACK ANALYSIS' : 'MOCK ANALYSIS COMPLETE') : 'ANALYSIS COMPLETE';
   const terminalText = `${label}\n\n${terminalizeClaudeText(feedback)}`;
 
   setClaudeTerminalTextMode(true);
@@ -5120,7 +5112,7 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
 
   if (output) {
     output.classList.add('claude-analysis-layout');
-    output.innerHTML = buildClaudeAnalysisHTML(terminalText, mock);
+    output.innerHTML = buildClaudeAnalysisHTML(terminalText, mock, mockReason);
   }
 
   requestAnimationFrame(() => {
@@ -5149,7 +5141,7 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
 
 
 // NOTE: Terminal diagnosis copy is still inline. Candidate for dialogue.js or scenario-data.js.
-function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose = null, scoreTotal = null) {
+function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose = null, scoreTotal = null, mockReason = '') {
   // Scenario-specific result handoff: S2 currently uses the shared terminal flow.
   let effectiveClose = onClose;
   if (scenarioIndex === 1) {
@@ -5173,7 +5165,7 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
       ? buildS1TerminalDiagnosis(scoreTotal, responseText)
       : responseText;
-    showClaudeConsultResult(terminalOutput, mock, effectiveClose);
+    showClaudeConsultResult(terminalOutput, mock, effectiveClose, mockReason);
   }, claudeProcessingHoldMs);
 }
 
@@ -5971,7 +5963,7 @@ async function sendMain(text) {
     showClaudeFinalResponseInTerminal(reply, !!data.mock, () => {
       addS1ClaudeResultCard(reply);
       showS1PostAnalysisReflection(score.total);
-    }, score.total);
+    }, score.total, data.mockReason || '');
   } catch (error) {
     removeTyping();
     addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`);
@@ -5986,14 +5978,19 @@ async function sendMain(text) {
 // ══════════════════════════════════════════════════════
 function scorePrompt(text) {
   const value = String(text || '');
-  const t = value.toLowerCase();
-  const hasLearners = /\b(student|learner|online|class|course|first-year|gen ed|general education|college|higher ed|adult|cohort|asynchronous)\b/.test(t);
-  const hasGoal = /\b(one.sentence|surface|shallow|dead|generic|conversation dies|do not build|not build|weak|low.quality|low quality|reply|replies|engagement problem)\b/.test(t);
-  const hasContext = /\b(compare|contrast|respond|reply|peer|build|question|evidence|example|explain|reason|connect|agree|disagree|extend|substantive|follow.up|follow-up)\b/.test(t);
-  const hasConstraint = /\b(asynchronous|online|week|weekly|reply|replies|peer|two|2|word|minute|lms|canvas|no extra|low.tech|format|deadline|by)\b/.test(t) || /\d+/.test(t);
-  const isDetailed = /\b(success|criteria|strong response|strong post|substantive|meaningful|evidence|example|explain|reasoning|rubric|quality|must include|should include)\b/.test(t) || value.length > 220;
-  return { hasLearners, hasGoal, hasContext, hasConstraint, isDetailed,
-    total: [hasLearners, hasGoal, hasContext, hasConstraint, isDetailed].filter(Boolean).length };
+  const values = (window.playerHistory && window.playerHistory.s1) || getS1GuidedValues();
+  const checks = analyzeS1Guided(values);
+  const hasLearners = !!checks.audience;
+  const hasGoal = !!checks.issue;
+  const hasContext = !!checks.interaction;
+  const hasConstraint = !!checks.constraints;
+  const isDetailed = !!checks.success;
+  const penalty = checks.demeaning ? 2 : 0;
+  return {
+    hasLearners, hasGoal, hasContext, hasConstraint, isDetailed,
+    demeaning: !!checks.demeaning,
+    total: Math.max(0, [hasLearners, hasGoal, hasContext, hasConstraint, isDetailed].filter(Boolean).length - penalty)
+  };
 }
 
 
@@ -6269,14 +6266,22 @@ function restoreS1DraftToFields(){
 };
 
 function analyzeS1Guided(values){
-  const allText = `${values.learners} ${values.issue} ${values.interaction} ${values.constraints}`.toLowerCase();
-  return {
-    audience: values.learners.length > 12 || /student|learner|class|course|online|first-year|adult|faculty|cohort|gen ed|general education|asynchronous/.test(allText),
-    issue: values.issue.length > 12 || /one.sentence|one sentence|surface|shallow|dead|not build|do not build|generic|reply|replies|conversation|dies|stops|weak|required/.test(allText),
-    interaction: values.interaction.length > 12 || /compare|contrast|respond|reply|peer|build|question|evidence|example|explain|reason|connect|disagree|agree|extend|challenge|follow/.test(allText),
-    constraints: values.constraints.length > 8 || /minute|week|reply|peer|two|2|asynchronous|format|word|time|low tech|no extra|lms|canvas|deadline/.test(allText),
-    success: /substantive|meaningful|evidence|example|build|criteria|reason|explain|success|quality|rubric|strong|specific|follow.up|follow-up|extend|challenge/.test(allText)
-  };
+  const learners = String(values.learners || '').toLowerCase();
+  const issue = String(values.issue || '').toLowerCase();
+  const interaction = String(values.interaction || '').toLowerCase();
+  const constraints = String(values.constraints || '').toLowerCase();
+  const allText = `${learners} ${issue} ${interaction} ${constraints}`;
+  const demeaning = /\b(stupid|idiot|idiots|lazy|dumb|moron|morons|hate (?:these|my|the) students|students suck)\b/.test(allText);
+  const audience = /\b(student|learner|class|course|online|first-year|adult|faculty|cohort|gen ed|general education|asynchronous|undergraduate|graduate)\b/.test(learners)
+    && learners.replace(/\b(student|students|learner|learners|class|course|online|asynchronous)\b/g, '').trim().length >= 4;
+  const issueOK = /\b(one[ -]?sentence|surface|shallow|dead|not build|do not build|generic|canned|reply|replies|conversation|dies|stops|weak|required|evidence|reading)\b/.test(issue)
+    && !/^\s*(it sucks|bad|terrible|awful|students suck)\s*[.!]?\s*$/.test(issue);
+  const interactionOK = /\b(compare|contrast|respond|reply|peer|build|question|evidence|example|explain|reason|connect|disagree|agree|extend|challenge|follow[ -]?up|interpret|apply|analy[sz]e|synthesi[sz]e)\b/.test(interaction)
+    && /\b(student|they|peer|classmate|reply|respond|compare|contrast|question|evidence|example|explain|reason|extend|challenge|build)\b/.test(interaction);
+  const constraintsOK = /\b(minute|week|reply|peer|two|2|asynchronous|format|word|time|low tech|no extra|lms|canvas|deadline|due|initial post|reading|rubric|points?)\b/.test(constraints);
+  const success = /\b(substantive|meaningful|evidence|example|build|criteria|reason|explain|success|quality|rubric|specific|follow[ -]?up|extend|challenge|demonstrate|show|apply|support)\b/.test(`${interaction} ${constraints}`)
+    && !/^\s*(do work|work harder|participate|try harder|sound less canned)\s*[.!]?\s*$/.test(interaction);
+  return { audience: audience && !demeaning, issue: issueOK, interaction: interactionOK, constraints: constraintsOK, success, demeaning };
 };
 
 function buildS1MissionHTML(){

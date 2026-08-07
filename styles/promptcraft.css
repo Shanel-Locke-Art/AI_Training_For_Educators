@@ -14578,6 +14578,41 @@ html body #vnOverlay.vn-overlay.active.pc-analysis-computer-v255 #claudeTerminal
   overflow: hidden !important;
 }
 
+/* v355: Completed analysis readability and balanced information hierarchy.
+   The diagnostic header is informational, not another card. Long-form findings
+   span the full monitor width so variable Claude feedback does not leave a
+   stranded half-column or create uneven visual weight. */
+html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-header {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 2px 4px 10px !important;
+  margin-bottom: 6px !important;
+  text-align: center !important;
+}
+
+html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-summary {
+  max-width: 84ch !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+}
+
+html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-worked-card,
+html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-impact-card {
+  grid-column: 1 / -1 !important;
+}
+
+@media (max-width: 760px) {
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-header {
+    padding: 0 2px 8px !important;
+    text-align: center !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-summary {
+    text-align: center !important;
+  }
+}
+
 /* SOURCE: styles/100-scenario-1-workbench.css */
 /* PromptCraft Scenario 1 workbench.
    Stage 7 consolidates the active Scenario 1 repair workspace while keeping

@@ -2654,9 +2654,9 @@ function parseClaudeDiagnosticSections(text) {
   };
 }
 
-function buildClaudeAnalysisHTML(feedback, mock = false) {
+function buildClaudeAnalysisHTML(feedback, mock = false, mockReason = '') {
   const d = parseClaudeDiagnosticSections(feedback);
-  const badge = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
+  const badge = mock ? (mockReason === 'backend-unavailable' ? 'BACKEND FALLBACK ANALYSIS' : 'MOCK ANALYSIS COMPLETE') : 'ANALYSIS COMPLETE';
   const totalCharacters = [d.status, d.confidence, d.summary, d.worked, d.issue, d.repair, d.impact]
     .join(' ')
     .length;
@@ -2710,9 +2710,9 @@ function buildClaudeAnalysisHTML(feedback, mock = false) {
   `;
 }
 
-function showClaudeConsultResult(feedback, mock = false, onClose = null) {
+function showClaudeConsultResult(feedback, mock = false, onClose = null, mockReason = '') {
   claudeTerminalCloseCallback = typeof onClose === 'function' ? onClose : null;
-  const label = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
+  const label = mock ? (mockReason === 'backend-unavailable' ? 'BACKEND FALLBACK ANALYSIS' : 'MOCK ANALYSIS COMPLETE') : 'ANALYSIS COMPLETE';
   const terminalText = `${label}\n\n${terminalizeClaudeText(feedback)}`;
 
   setClaudeTerminalTextMode(true);
@@ -2727,7 +2727,7 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
 
   if (output) {
     output.classList.add('claude-analysis-layout');
-    output.innerHTML = buildClaudeAnalysisHTML(terminalText, mock);
+    output.innerHTML = buildClaudeAnalysisHTML(terminalText, mock, mockReason);
   }
 
   requestAnimationFrame(() => {
@@ -2756,7 +2756,7 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null) {
 
 
 // NOTE: Terminal diagnosis copy is still inline. Candidate for dialogue.js or scenario-data.js.
-function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose = null, scoreTotal = null) {
+function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose = null, scoreTotal = null, mockReason = '') {
   // Scenario-specific result handoff: S2 currently uses the shared terminal flow.
   let effectiveClose = onClose;
   if (scenarioIndex === 1) {
@@ -2780,7 +2780,7 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
       ? buildS1TerminalDiagnosis(scoreTotal, responseText)
       : responseText;
-    showClaudeConsultResult(terminalOutput, mock, effectiveClose);
+    showClaudeConsultResult(terminalOutput, mock, effectiveClose, mockReason);
   }, claudeProcessingHoldMs);
 }
 
