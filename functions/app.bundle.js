@@ -2833,17 +2833,15 @@ window.pcApplyWidePredictionComputer = () => {
 };
 
 
-// v225: The completed desktop diagnostic reuses the approved live workstation crop.
-// The photographed monitor geometry remains unchanged. The report now removes the
-// reserved scrollbar gutter that was shifting it left, starts at a larger readable
-// type scale, and progressively reduces that scale only when a generated response
-// needs more room. The action buttons are centered independently of legacy dialogue
-// positioning so they remain centered beneath the workstation at every wide size.
+// v321: The completed desktop diagnostic now uses the same measured monitor glass
+// as the approved prediction/live-analysis workstation. The full 2:1 computer
+// render stays intact so the monitor can scale up without re-cropping the tower
+// or shifting the report outside the physical screen.
 const PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY_V215 = {
-  left: '4%',
-  top: '6%',
-  width: '62.5%',
-  height: '72.5%'
+  left: '22.2%',
+  top: '12.85%',
+  width: '40.3%',
+  height: '45.45%'
 };
 
 function pcClearWideAnalysisActionsV215() {
@@ -2993,23 +2991,77 @@ function pcFitWideAnalysisReportV215(screen) {
 
   const screenRect = screen.getBoundingClientRect();
   const clampNumber = (min, value, max) => Math.max(min, Math.min(max, value));
-  const useSingleColumn = screenRect.width < 340;
+  const viewportWidth = pcAnalysisViewportWidthV122();
+  const viewportHeight = pcViewportHeight();
+  const isWideDesktopMonitor = screenRect.width >= 560 && screenRect.height >= 320;
+  const isShortLandscapePanel = !isWideDesktopMonitor && viewportWidth >= 900 && viewportHeight <= 700;
+  const isCompactAnalysisPanel = !isWideDesktopMonitor && (viewportWidth <= 640 || isShortLandscapePanel);
+  const isTabletWorkstation = !isWideDesktopMonitor && viewportWidth >= 700 && viewportWidth <= 1366;
+  const isMediumAnalysisPanel = !isCompactAnalysisPanel && (viewportWidth > 640 && viewportWidth <= 920 || isTabletWorkstation);
+  const isTallPortraitWorkstation = isWideDesktopMonitor && viewportWidth >= 980 && viewportWidth <= 1100 && viewportHeight >= 1280;
+  const isLargePortraitWorkstation = isTallPortraitWorkstation && viewportWidth >= 1000 && viewportHeight >= 1320;
+  const mediumScale = isMediumAnalysisPanel
+    ? clampNumber(1.02, viewportWidth / 860, viewportHeight >= 1100 ? 1.22 : 1.14)
+    : 1;
+  const useSingleColumn = screenRect.width < 420 || isCompactAnalysisPanel;
   const widthFactor = screenRect.width / 900;
   const heightFactor = screenRect.height / 520;
-  const fitFactor = clampNumber(0.56, Math.min(widthFactor, heightFactor), 1.15);
-  const base = {
+  const fitFactor = clampNumber(
+    0.56,
+    Math.min(widthFactor, heightFactor) * (isLargePortraitWorkstation ? 1.62 : isTallPortraitWorkstation ? 1.30 : 1),
+    isLargePortraitWorkstation ? 1.48 : 1.26
+  );
+  const base = isCompactAnalysisPanel ? {
+    badge: 11,
+    title: 29,
+    summary: 17,
+    label: 12,
+    value: 17,
+    big: 19,
+    note: 15.5,
+    outputPadding: 5,
+    reportPadding: 9,
+    gap: 11,
+    cardPadding: 10,
+    headerGap: 8
+  } : isMediumAnalysisPanel ? {
+    badge: 11.5 * mediumScale,
+    title: 36 * mediumScale,
+    summary: 18 * mediumScale,
+    label: 12.25 * mediumScale,
+    value: 17.25 * mediumScale,
+    big: 20.5 * mediumScale,
+    note: 15.5 * mediumScale,
+    outputPadding: 10,
+    reportPadding: 15,
+    gap: 13,
+    cardPadding: 13,
+    headerGap: 9
+  } : {
     badge: clampNumber(7.5, 10.5 * fitFactor, 12),
     title: clampNumber(19, 32 * fitFactor, 36),
     summary: clampNumber(10, 15.5 * fitFactor, 17.5),
     label: clampNumber(8, 11.5 * fitFactor, 12.5),
     value: clampNumber(10, 15.2 * fitFactor, 17.5),
     big: clampNumber(11, 17 * fitFactor, 19.5),
-    note: clampNumber(8.5, 12.2 * fitFactor, 13.5),
-    outputPadding: clampNumber(4, 7 * fitFactor, 9),
-    reportPadding: clampNumber(6, 9 * fitFactor, 12),
-    gap: clampNumber(4, 7.5 * fitFactor, 10),
-    cardPadding: clampNumber(5, 9 * fitFactor, 11),
-    headerGap: clampNumber(3, 5.5 * fitFactor, 7)
+    note: isWideDesktopMonitor
+      ? clampNumber(10, 13.8 * fitFactor, 15.5)
+      : clampNumber(8.5, 12.2 * fitFactor, 13.5),
+    outputPadding: isWideDesktopMonitor
+      ? clampNumber(0, 1.1 * fitFactor, 2)
+      : clampNumber(2, 4.5 * fitFactor, 6),
+    reportPadding: isWideDesktopMonitor
+      ? clampNumber(1, 3 * fitFactor, 5)
+      : clampNumber(3.5, 6 * fitFactor, 8),
+    gap: isWideDesktopMonitor
+      ? clampNumber(2, 4.4 * fitFactor, 6)
+      : clampNumber(4, 6.5 * fitFactor, 9),
+    cardPadding: isWideDesktopMonitor
+      ? clampNumber(3, 5.6 * fitFactor, 7)
+      : clampNumber(5, 8 * fitFactor, 10),
+    headerGap: isWideDesktopMonitor
+      ? clampNumber(1.25, 3 * fitFactor, 4.5)
+      : clampNumber(3, 4.75 * fitFactor, 6)
   };
 
   pcSetImportantStyles(output, [
@@ -3122,16 +3174,20 @@ function pcFitWideAnalysisReportV215(screen) {
       ['text-align', 'center']
     ]);
     pcSetImportantStyles(summary, [
-      ['width', '96%'],
+      ['width', isCompactAnalysisPanel || isWideDesktopMonitor ? '100%' : '96%'],
       ['max-width', 'none'],
       ['margin', '0 auto'],
+      ['padding-bottom', isCompactAnalysisPanel || isMediumAnalysisPanel ? `${scaled(4, 2)}px` : '0'],
       ['font-size', `${scaled(base.summary, 8.5)}px`],
-      ['line-height', '1.16'],
+      ['line-height', isCompactAnalysisPanel || isMediumAnalysisPanel ? '1.2' : '1.16'],
       ['text-align', 'center'],
       ['overflow-wrap', 'break-word'],
       ['word-break', 'normal']
     ]);
-    pcSetImportantStyles(grid, [['gap', `${scaled(base.gap, 3)}px`]]);
+    pcSetImportantStyles(grid, [
+      ['gap', `${scaled(base.gap, 3)}px`],
+      ['margin-top', isCompactAnalysisPanel || isMediumAnalysisPanel ? `${scaled(3, 1)}px` : '0']
+    ]);
 
     cards.forEach((card) => pcSetImportantStyles(card, [
       ['margin', '0'],
@@ -3173,9 +3229,15 @@ function pcFitWideAnalysisReportV215(screen) {
       ['line-height', '1.1']
     ]));
     notes.forEach((note) => pcSetImportantStyles(note, [
-      ['margin-top', `${scaled(3, 1.5)}px`],
-      ['font-size', `${scaled(base.note, 7)}px`],
-      ['line-height', '1.12']
+      ['display', 'block'],
+      ['width', '100%'],
+      ['margin-top', `${scaled(4, 2)}px`],
+      ['font-size', `${scaled(base.note, 8.5)}px`],
+      ['font-weight', '700'],
+      ['line-height', '1.18'],
+      ['text-align', 'left'],
+      ['overflow-wrap', 'break-word'],
+      ['word-break', 'normal']
     ]));
   };
 
@@ -3189,15 +3251,227 @@ function pcFitWideAnalysisReportV215(screen) {
     return reportFits && cardsFit;
   };
 
+  const finalizeScrollableReportLayout = () => {
+    cards.forEach((card) => pcSetImportantStyles(card, [
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['overflow', 'visible']
+    ]));
+    pcSetImportantStyles(grid, [
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['overflow', 'visible']
+    ]);
+    pcSetImportantStyles(report, [
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['overflow', 'visible']
+    ]);
+
+    void report.offsetHeight;
+
+    cards.forEach((card) => {
+      const neededHeight = Math.ceil(card.scrollHeight) + 2;
+      pcSetImportantStyles(card, [
+        ['min-height', `${neededHeight}px`],
+        ['height', 'auto']
+      ]);
+    });
+
+    const gridHeight = Math.ceil(grid.scrollHeight) + 2;
+    pcSetImportantStyles(grid, [
+      ['min-height', `${gridHeight}px`],
+      ['height', 'auto']
+    ]);
+
+    const reportHeight = Math.ceil(report.scrollHeight) + 2;
+    pcSetImportantStyles(report, [
+      ['min-height', `${reportHeight}px`],
+      ['height', `${reportHeight}px`]
+    ]);
+  };
+
+  if (isCompactAnalysisPanel) {
+    applyScale(1);
+    report.classList.add('analysis-report-scrollable');
+    pcSetImportantStyles(output, [
+      ['display', 'block'],
+      ['overflow-y', 'auto'],
+      ['overflow-x', 'hidden'],
+      ['scrollbar-gutter', 'auto'],
+      ['padding', `0 4px ${Math.max(8, base.outputPadding)}px`],
+      ['box-sizing', 'border-box']
+    ]);
+    pcSetImportantStyles(report, [
+      ['display', 'block'],
+      ['width', 'calc(100% - 4px)'],
+      ['max-width', 'calc(100% - 4px)'],
+      ['margin', '0 auto'],
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['overflow', 'visible'],
+      ['box-sizing', 'border-box']
+    ]);
+    pcSetImportantStyles(grid, [
+      ['display', 'block'],
+      ['grid-template-columns', 'none'],
+      ['grid-template-rows', 'none'],
+      ['grid-template-areas', 'none'],
+      ['height', 'auto'],
+      ['overflow', 'visible']
+    ]);
+    cards.forEach((card, index) => pcSetImportantStyles(card, [
+      ['display', 'block'],
+      ['width', '100%'],
+      ['max-width', '100%'],
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['overflow', 'visible'],
+      ['margin', `0 0 ${index === cards.length - 1 ? 0 : base.gap}px 0`],
+      ['box-sizing', 'border-box']
+    ]));
+    values.forEach((value) => pcSetImportantStyles(value, [
+      ['display', 'block'],
+      ['position', 'static'],
+      ['white-space', 'normal'],
+      ['overflow-wrap', 'anywhere'],
+      ['word-break', 'break-word']
+    ]));
+    notes.forEach((note) => pcSetImportantStyles(note, [
+      ['display', 'block'],
+      ['position', 'static'],
+      ['white-space', 'normal'],
+      ['overflow-wrap', 'anywhere'],
+      ['word-break', 'break-word']
+    ]));
+    finalizeScrollableReportLayout();
+    return true;
+  }
+
+  if (isMediumAnalysisPanel) {
+    applyScale(1);
+    report.classList.remove('analysis-report-scrollable');
+
+    // Medium portrait screens use a content-height diagnostic instead of
+    // stretching each row across the entire monitor. The complete report is
+    // centered when it fits and becomes a single scrolling surface only when
+    // generated content genuinely needs more vertical room.
+    pcSetImportantStyles(output, [
+      ['display', 'flex'],
+      ['flex-direction', 'column'],
+      ['align-items', 'center'],
+      ['justify-content', 'center'],
+      ['overflow-y', 'hidden'],
+      ['overflow-x', 'hidden'],
+      ['scrollbar-gutter', 'auto'],
+      ['padding', `${base.outputPadding}px`],
+      ['box-sizing', 'border-box']
+    ]);
+    pcSetImportantStyles(report, [
+      ['display', 'flex'],
+      ['flex-direction', 'column'],
+      ['width', 'calc(100% - 10px)'],
+      ['max-width', 'calc(100% - 10px)'],
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['max-height', 'none'],
+      ['margin', '0 auto'],
+      ['padding', `${base.reportPadding}px`],
+      ['gap', `${base.gap}px`],
+      ['overflow', 'visible'],
+      ['border', '1px solid rgba(72,255,92,.92)'],
+      ['border-radius', '12px'],
+      ['box-sizing', 'border-box'],
+      ['flex', '0 0 auto']
+    ]);
+    pcSetImportantStyles(header, [
+      ['display', 'grid'],
+      ['gap', `${base.headerGap}px`],
+      ['flex', '0 0 auto'],
+      ['margin', '0'],
+      ['padding', '0']
+    ]);
+    pcSetImportantStyles(summary, [
+      ['padding-bottom', '6px'],
+      ['line-height', '1.22']
+    ]);
+    pcSetImportantStyles(grid, [
+      ['display', 'grid'],
+      ['grid-template-columns', 'minmax(0, 1fr) minmax(0, 1fr)'],
+      ['grid-template-rows', 'auto auto auto'],
+      ['grid-template-areas', '"status confidence" "issue repair" "impact impact"'],
+      ['width', '100%'],
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['flex', '0 0 auto'],
+      ['align-items', 'start'],
+      ['align-content', 'start'],
+      ['overflow', 'visible'],
+      ['margin-top', '4px'],
+      ['box-sizing', 'border-box']
+    ]);
+    cards.forEach((card) => pcSetImportantStyles(card, [
+      ['display', 'flex'],
+      ['flex-direction', 'column'],
+      ['justify-content', 'flex-start'],
+      ['align-self', 'start'],
+      ['width', '100%'],
+      ['max-width', '100%'],
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['padding', `${base.cardPadding}px`],
+      ['overflow', 'visible'],
+      ['box-sizing', 'border-box']
+    ]));
+    values.forEach((value) => pcSetImportantStyles(value, [
+      ['display', 'block'],
+      ['position', 'static'],
+      ['white-space', 'normal'],
+      ['overflow-wrap', 'break-word'],
+      ['word-break', 'normal']
+    ]));
+    notes.forEach((note) => pcSetImportantStyles(note, [
+      ['display', 'block'],
+      ['position', 'static'],
+      ['white-space', 'normal'],
+      ['overflow-wrap', 'break-word'],
+      ['word-break', 'normal']
+    ]));
+
+    void report.offsetHeight;
+    const reportFitsMediumPanel = report.scrollHeight <= output.clientHeight + 1 &&
+      report.scrollWidth <= output.clientWidth + 1;
+
+    if (!reportFitsMediumPanel) {
+      report.classList.add('analysis-report-scrollable');
+      pcSetImportantStyles(output, [
+        ['display', 'block'],
+        ['overflow-y', 'auto'],
+        ['overflow-x', 'hidden'],
+        ['padding', `${base.outputPadding}px`]
+      ]);
+      pcSetImportantStyles(report, [
+        ['margin', '0 auto'],
+        ['height', 'auto'],
+        ['min-height', '0'],
+        ['overflow', 'visible']
+      ]);
+    }
+    return true;
+  }
+
+  const minScale = 0.48;
+  const scaleStep = 0.94;
+  const maxPasses = 18;
   let scale = report.classList.contains('analysis-report-very-dense') ? 0.86
     : report.classList.contains('analysis-report-dense') ? 0.93
       : 1;
   applyScale(scale);
 
-  for (let pass = 0; pass < 18 && !contentFits(); pass += 1) {
-    scale = Math.max(0.48, scale * 0.94);
+  for (let pass = 0; pass < maxPasses && !contentFits(); pass += 1) {
+    scale = Math.max(minScale, scale * scaleStep);
     applyScale(scale);
-    if (scale <= 0.48) break;
+    if (scale <= minScale) break;
   }
 
   if (!contentFits()) {
@@ -3226,26 +3500,93 @@ function pcFitWideAnalysisReportV215(screen) {
 function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewportHeight) {
   if (!terminal || !photo || !screen) return false;
 
+  const overlay = document.getElementById('vnOverlay');
+  const scene = document.getElementById('vnScene');
+  const sceneBg = document.getElementById('vnSceneBg');
   const viewportWidth = pcAnalysisViewportWidthV122();
   const safeViewportHeight = Number.isFinite(viewportHeight) && viewportHeight > 0
     ? viewportHeight
     : pcViewportHeight();
 
-  // v258: Keep the completed diagnostic formatting intact while zooming the
-  // workstation itself. The physical monitor now dominates the wide layout,
-  // and the report remains mapped to the actual monitor glass.
-  const aspect = 1.72;
-  const maxHeight = Math.max(740, safeViewportHeight * 0.985);
-  const maxWidth = Math.min(viewportWidth * 0.995, 1980);
-  const width = Math.max(1460, Math.min(maxWidth, maxHeight * aspect));
-  const height = width / aspect;
+  const aspect = 2.0;
+  const isContainedWorkstation = viewportWidth <= 1510;
+  const controlsReserve = isContainedWorkstation ? 114 : 90;
+  const topReserve = isContainedWorkstation ? 28 : 12;
+  const availableHeight = Math.max(320, safeViewportHeight - topReserve - controlsReserve);
+
+  let width;
+  let height;
+  let terminalLeft = '50%';
+  let terminalTop;
+  let terminalTransform = 'translateX(-50%)';
+
+  if (overlay && isContainedWorkstation) {
+    pcSetImportantStyles(overlay, [['background', '#050805']]);
+  }
+  if (scene && isContainedWorkstation) {
+    pcSetImportantStyles(scene, [
+      ['position', 'absolute'],
+      ['inset', '0'],
+      ['left', '0'],
+      ['right', '0'],
+      ['top', '0'],
+      ['bottom', '0'],
+      ['width', '100%'],
+      ['height', '100%'],
+      ['min-height', '0'],
+      ['padding', '0'],
+      ['overflow', 'hidden'],
+      ['background', 'transparent']
+    ]);
+  }
+  if (sceneBg && isContainedWorkstation) {
+    pcSetImportantStyles(sceneBg, [
+      ['display', 'block'],
+      ['visibility', 'visible'],
+      ['opacity', '.55']
+    ]);
+  }
+
+  if (isContainedWorkstation) {
+    const isShortLandscape = safeViewportHeight <= 740;
+    const isTallPortraitTablet = safeViewportHeight >= 980 && viewportWidth >= 700 && viewportWidth <= 1100;
+    const isLargePortraitTablet = isTallPortraitTablet && viewportWidth >= 980 && safeViewportHeight >= 1280;
+    const isMiniPortraitTablet = isTallPortraitTablet && viewportWidth < 800;
+    const desiredWidth = Math.min(
+      viewportWidth * (isLargePortraitTablet ? 2.54 : isMiniPortraitTablet ? 2.24 : isTallPortraitTablet ? 2.34 : isShortLandscape ? 1.56 : 1.90),
+      isLargePortraitTablet ? 2540 : isMiniPortraitTablet ? 2160 : isTallPortraitTablet ? 2300 : isShortLandscape ? 1700 : 1920
+    );
+    const maxWidthByHeight = availableHeight * aspect * (isLargePortraitTablet ? 1.21 : isMiniPortraitTablet ? 1.14 : isTallPortraitTablet ? 1.18 : isShortLandscape ? 1.09 : 1.05);
+    width = Math.max(isLargePortraitTablet ? 1580 : isMiniPortraitTablet ? 1320 : isTallPortraitTablet ? 1440 : isShortLandscape ? 1140 : 1000, Math.min(desiredWidth, maxWidthByHeight));
+    height = width / aspect;
+    terminalLeft = isLargePortraitTablet ? '61.25%' : isMiniPortraitTablet ? '60.0%' : isTallPortraitTablet ? '60.35%' : isShortLandscape ? '58.1%' : '59.2%';
+    const centeredTop = topReserve + Math.max(6, (availableHeight - height) * (isShortLandscape ? 0.04 : isLargePortraitTablet ? 0.08 : isTallPortraitTablet ? 0.10 : 0.18));
+    terminalTop = `${Math.round(Math.max(topReserve, Math.min(centeredTop, safeViewportHeight - controlsReserve - height)))}px`;
+  } else {
+    // Wide desktop keeps the larger workstation composition.
+    const usableStageHeight = Math.max(720, safeViewportHeight - topReserve - controlsReserve);
+    const targetHeight = Math.max(780, usableStageHeight * 1.08);
+    const widthFromHeight = targetHeight * aspect;
+    const widthFromViewport = viewportWidth * 1.24;
+    width = Math.max(1760, Math.min(2280, Math.max(widthFromHeight, widthFromViewport)));
+    height = width / aspect;
+    const minCenterY = topReserve + (height / 2);
+    const maxCenterY = safeViewportHeight - controlsReserve + Math.min(36, safeViewportHeight * 0.03) - (height / 2);
+    const centerY = Math.max(
+      minCenterY,
+      Math.min((safeViewportHeight * 0.48) + 18, maxCenterY)
+    );
+    terminalLeft = viewportWidth >= 2100 ? '57%' : viewportWidth >= 1800 ? '58%' : '59%';
+    terminalTop = `${Math.round(centerY)}px`;
+    terminalTransform = 'translate(-50%, -50%)';
+  }
 
   pcSetImportantStyles(terminal, [
     ['position', 'absolute'],
     ['inset', 'auto'],
-    ['left', '50%'],
+    ['left', terminalLeft],
     ['right', 'auto'],
-    ['top', '49%'],
+    ['top', terminalTop],
     ['bottom', 'auto'],
     ['width', `${Math.round(width)}px`],
     ['height', `${Math.round(height)}px`],
@@ -3254,7 +3595,7 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
     ['max-width', 'none'],
     ['max-height', 'none'],
     ['aspect-ratio', 'auto'],
-    ['transform', 'translate(-50%, -50%)'],
+    ['transform', terminalTransform],
     ['margin', '0'],
     ['padding', '0'],
     ['display', 'block'],
@@ -3280,8 +3621,8 @@ function pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, viewport
     ['padding', '0'],
     ['display', 'block'],
     ['background-image', 'var(--pc-app-background)'],
-    ['background-size', '165% 165%'],
-    ['background-position', '45% 30%'],
+    ['background-size', '100% 100%'],
+    ['background-position', 'center center'],
     ['background-repeat', 'no-repeat'],
     ['background-color', 'transparent'],
     ['border', '0'],
@@ -3510,6 +3851,7 @@ function positionClaudeAnalyzingReadoutV161() {
   const titleLine = outputEl?.querySelector('.pc-terminal-title-line');
   const dividers = outputEl?.querySelectorAll('.pc-terminal-divider') || [];
   const progress = outputEl?.querySelector('.pc-analyzing-progress');
+  const cursors = outputEl?.querySelectorAll('.claude-terminal-cursor') || [];
   if (!terminal || !outputEl || !screen || !readout || !panel) return false;
 
   const viewportWidth = pcAnalysisViewportWidthV122();
@@ -3599,6 +3941,16 @@ function positionClaudeAnalyzingReadoutV161() {
       ['margin-top', `${clampNumber(5, terminalFontPx * 0.55, 11)}px`]
     ]);
   }
+  cursors.forEach((cursor) => pcSetImportantStyles(cursor, [
+    ['display', 'inline-block'],
+    ['width', '0.66em'],
+    ['height', '1em'],
+    ['margin-left', '0.34em'],
+    ['background', 'rgba(210,255,225,0.92)'],
+    ['box-shadow', '0 0 5px rgba(200,255,218,0.42), 0 0 12px rgba(22,255,66,0.16)'],
+    ['vertical-align', '-0.14em'],
+    ['animation', 'claudeCursorBlink 0.82s steps(1,end) infinite']
+  ]));
 
   return true;
 }
@@ -4069,8 +4421,9 @@ function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
   pcScheduleLiveAnalyzingLayoutV256({ immediate: true });
 }
 
-const PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS = 15000;
+const PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS = 4000;
 let pcClaudeAnalysisProgressTimerV309 = 0;
+let pcClaudeAnalysisProgressFrameV309 = 0;
 
 function pcGetClaudeProcessingHoldMsV316() {
   const configured = Number(window.PC_CLAUDE_PROCESSING_HOLD_MS);
@@ -4083,32 +4436,55 @@ function pcGetClaudeProcessingHoldMsV316() {
 
 function pcStartClaudeAnalysisProgressV309(durationMs = PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS) {
   const progress = document.querySelector('#claudeTerminalOutput .pc-analyzing-progress');
-  if (!progress) return false;
+  const fill = progress?.querySelector('.pc-analyzing-progress-fill');
+  if (!progress || !fill) return false;
 
   const safeDuration = Math.max(0, Number(durationMs) || 0);
   if (pcClaudeAnalysisProgressTimerV309) {
     window.clearTimeout(pcClaudeAnalysisProgressTimerV309);
     pcClaudeAnalysisProgressTimerV309 = 0;
   }
+  if (pcClaudeAnalysisProgressFrameV309) {
+    window.cancelAnimationFrame(pcClaudeAnalysisProgressFrameV309);
+    pcClaudeAnalysisProgressFrameV309 = 0;
+  }
+  if (pcClaudeAnalysisProgressFrameV309) {
+    window.cancelAnimationFrame(pcClaudeAnalysisProgressFrameV309);
+    pcClaudeAnalysisProgressFrameV309 = 0;
+  }
 
   progress.classList.remove('is-running', 'is-complete');
   progress.style.setProperty('--pc-analysis-progress-duration', `${safeDuration}ms`);
   progress.setAttribute('aria-valuenow', '0');
+  fill.style.transition = 'none';
+  fill.style.width = '0';
 
   // Force one clean animation restart when a new Claude analysis begins.
-  void progress.offsetWidth;
+  void fill.offsetWidth;
 
   if (safeDuration === 0) {
+    fill.style.removeProperty('transition');
+    fill.style.removeProperty('width');
     progress.classList.add('is-complete');
     progress.setAttribute('aria-valuenow', '100');
     return true;
   }
 
-  progress.classList.add('is-running');
+  pcClaudeAnalysisProgressFrameV309 = window.requestAnimationFrame(() => {
+    pcClaudeAnalysisProgressFrameV309 = window.requestAnimationFrame(() => {
+      pcClaudeAnalysisProgressFrameV309 = 0;
+      fill.style.removeProperty('transition');
+      fill.style.removeProperty('width');
+      progress.classList.add('is-running');
+    });
+  });
+
   pcClaudeAnalysisProgressTimerV309 = window.setTimeout(() => {
     progress.classList.remove('is-running');
     progress.classList.add('is-complete');
     progress.setAttribute('aria-valuenow', '100');
+    fill.style.removeProperty('transition');
+    fill.style.removeProperty('width');
     pcClaudeAnalysisProgressTimerV309 = 0;
   }, safeDuration);
 
@@ -4140,10 +4516,12 @@ function pcAnalysisViewportWidthV122() {
 // [COMPLETED ANALYSIS: BREAKPOINT OWNER]
 function pcGetAnalysisLayoutV122() {
   const width = pcAnalysisViewportWidthV122();
-  // v255: Completed analysis has two layouts only. Phones and tablets share
-  // one framed diagnostic panel; wider screens use the photographed computer.
-  // Removing the intermediate terminal mode prevents a third composition from
-  // appearing briefly while the viewport crosses neighboring breakpoints.
+  const height = pcViewportHeight();
+  // v336: Keep phones on the framed panel, but let tablet and fold portrait
+  // screens graduate to the photographed workstation so the completed
+  // diagnostic uses the same classroom-computer composition as the regular
+  // analysis view instead of floating inside a large terminal border.
+  if (width >= 700 && height >= 760) return 'computer';
   return width <= 1180 ? 'panel' : 'computer';
 }
 
@@ -4154,6 +4532,11 @@ function pcClearLegacyAnalysisInlineStylesV122() {
   const screen = terminal ? terminal.querySelector('.claude-terminal-screen') : null;
   const dialogue = overlay ? overlay.querySelector('.vn-dialogue') : null;
   const scene = overlay ? overlay.querySelector('.vn-scene') : null;
+  const sceneBg = document.getElementById('vnSceneBg');
+  const menuButton = document.querySelector('.vn-brand-menu');
+  const appHeader = document.querySelector('.pc-app-header');
+  const compactNav = document.querySelector('.pc-compact-nav');
+  const devBar = document.querySelector('.dev-bar');
 
   pcClearWideAnalysisReportContentStylesV215();
 
@@ -4177,7 +4560,13 @@ function pcClearLegacyAnalysisInlineStylesV122() {
   pcRemoveInlineStyles(dialogue, [
     'height', 'min-height', 'padding', 'overflow', 'background', 'border'
   ]);
-  pcRemoveInlineStyles(scene, ['flex', 'height', 'min-height']);
+  pcRemoveInlineStyles(scene, ['position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height', 'min-height', 'padding', 'overflow', 'background']);
+  pcRemoveInlineStyles(sceneBg, ['display', 'visibility', 'opacity']);
+  pcRemoveInlineStyles(menuButton, ['display', 'visibility', 'pointer-events', 'opacity']);
+  pcRemoveInlineStyles(overlay, ['background']);
+  pcRemoveInlineStyles(appHeader, ['display', 'visibility', 'pointer-events', 'opacity']);
+  pcRemoveInlineStyles(compactNav, ['display', 'visibility', 'pointer-events', 'opacity']);
+  pcRemoveInlineStyles(devBar, ['display', 'visibility', 'pointer-events', 'opacity']);
 }
 
 function pcIsAnalysisReportActiveV122() {
@@ -4198,7 +4587,10 @@ function pcApplyAnalysisLayoutV122() {
   const overlay = document.getElementById('vnOverlay');
   const terminal = document.getElementById('claudeTerminalScene');
   const output = document.getElementById('claudeTerminalOutput');
-  const menuButton = overlay?.querySelector('.vn-main-menu-toggle');
+  const menuButton = overlay?.querySelector('.vn-brand-menu');
+  const appHeader = document.querySelector('.pc-app-header');
+  const compactNav = document.querySelector('.pc-compact-nav');
+  const devBar = document.querySelector('.dev-bar');
   const targets = [overlay, terminal, output].filter(Boolean);
   const isActive = pcIsAnalysisReportActiveV122();
 
@@ -4206,7 +4598,7 @@ function pcApplyAnalysisLayoutV122() {
     if (pcAnalysisLayoutModeV255 !== null) {
       targets.forEach((element) => element.classList.remove(...PC_ANALYSIS_LAYOUT_CLASSES_V267));
       pcClearLegacyAnalysisInlineStylesV122();
-      pcRemoveInlineStyles(menuButton, ['display', 'visibility', 'pointer-events']);
+      pcRemoveInlineStyles(menuButton, ['display', 'visibility', 'pointer-events', 'opacity']);
       pcAnalysisLayoutModeV255 = null;
     }
     return false;
@@ -4214,6 +4606,11 @@ function pcApplyAnalysisLayoutV122() {
 
   const layout = pcGetAnalysisLayoutV122();
   const modeChanged = layout !== pcAnalysisLayoutModeV255;
+  [appHeader, compactNav, devBar].forEach((element) => pcSetImportantStyles(element, [
+    ['display', 'none'],
+    ['visibility', 'hidden'],
+    ['pointer-events', 'none']
+  ]));
 
   if (modeChanged) {
     // Clear once at the breakpoint transition, then assign the new mode in the
@@ -4236,20 +4633,22 @@ function pcApplyAnalysisLayoutV122() {
     });
   }
 
+  if (menuButton && 'open' in menuButton) menuButton.open = false;
+  pcSetImportantStyles(menuButton, [
+    ['display', 'none'],
+    ['visibility', 'hidden'],
+    ['pointer-events', 'none'],
+    ['opacity', '0']
+  ]);
+
   if (layout === 'panel') {
     // CSS owns the outer phone/tablet panel, while the shared auto-fit routine
     // keeps the dynamic report inside its available monitor area.
-    pcSetImportantStyles(menuButton, [
-      ['display', 'none'],
-      ['visibility', 'hidden'],
-      ['pointer-events', 'none']
-    ]);
     const panelScreen = terminal?.querySelector('.claude-terminal-screen');
     if (panelScreen) pcFitWideAnalysisReportV215(panelScreen);
     return true;
   }
 
-  pcRemoveInlineStyles(menuButton, ['display', 'visibility', 'pointer-events']);
   const photo = terminal?.querySelector('.claude-terminal-photo');
   const screen = terminal?.querySelector('.claude-terminal-screen');
   pcApplyWideAnalysisReportComputerV215(terminal, photo, screen, pcViewportHeight());
@@ -4299,7 +4698,7 @@ function pcClearAnalysisLayoutV122() {
   const overlay = document.getElementById('vnOverlay');
   const terminal = document.getElementById('claudeTerminalScene');
   const output = document.getElementById('claudeTerminalOutput');
-  const menuButton = overlay?.querySelector('.vn-main-menu-toggle');
+  const menuButton = overlay?.querySelector('.vn-brand-menu');
 
   [overlay, terminal, output].filter(Boolean).forEach((element) => {
     element.classList.remove(...PC_ANALYSIS_LAYOUT_CLASSES_V267);
