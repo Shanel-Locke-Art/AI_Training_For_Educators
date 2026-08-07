@@ -1506,7 +1506,8 @@
 /* S1 focused result mode */
 .s1-result-controls-sub {
   font-size: 0.78rem;
-  color: var(--ink-light);
+  color: #4a3728;
+  font-weight: 700;
   margin-top: 2px;
 }
 .s1-secondary-btn:hover {

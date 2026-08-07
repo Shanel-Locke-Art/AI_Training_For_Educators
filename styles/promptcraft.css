@@ -1955,7 +1955,8 @@ textarea::placeholder {
 /* S1 focused result mode */
 .s1-result-controls-sub {
   font-size: 0.78rem;
-  color: var(--ink-light);
+  color: #4a3728;
+  font-weight: 700;
   margin-top: 2px;
 }
 .s1-secondary-btn:hover {
@@ -2349,7 +2350,7 @@ textarea::placeholder {
 }.prediction-continue-btn,.vn-return-btn.terminal-return{display:inline-flex!important;align-items:center!important;justify-content:center!important;margin-top:16px!important;background:#10f43a!important;color:#031907!important;border-color:#caffd2!important;min-width:220px!important;text-transform:uppercase!important;letter-spacing:.08em!important
 }.s1-result-controls{background:#f3eadc!important;border-top:1.5px solid #c8b89e!important;padding:18px 22px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:16px!important;flex-wrap:wrap
 }.s1-result-controls-title{font-family:"Fraunces", serif!important;font-weight:800!important;color:#163d28!important;font-size:1.15rem!important
-}.s1-result-controls-sub{font-size:.9rem!important;color:#6f5b46!important
+}.s1-result-controls-sub{font-size:.9rem!important;color:#4a3728!important;font-weight:700!important
 }.s1-result-controls-actions{display:flex!important;gap:12px!important;align-items:center;flex-wrap:wrap!important;justify-content:flex-end!important
 }.s1-secondary-btn,.s1-result-controls .continue-btn{min-height:52px!important;min-width:150px!important;border-radius:12px!important;padding:12px 20px!important;font-family:"Fraunces", serif!important;font-weight:800!important;font-size:.95rem!important;cursor:pointer!important
 }.s1-secondary-btn{border:1.5px solid #b89c76!important;border-radius:var(--radius);background:#fffaf2!important;color:#4a3728!important;font-family:"Nunito", sans-serif;font-weight:700;padding:10px 16px;cursor:pointer
@@ -2622,8 +2623,8 @@ textarea::placeholder {
 }body.s1-result-active .s1-result-controls{width:100%!important;min-height:108px!important;padding:18px clamp(18px, 4vw, 48px)!important;border:0!important;border-top:1.5px solid #c9b99c!important;border-radius:0!important;background:rgba(246, 237, 224, .97)!important;box-shadow:0 -12px 30px rgba(69, 53, 35, .12)!important;display:flex!important;align-items:center!important;gap:22px!important
 }body.s1-result-active .s1-result-controls-title{margin:0!important;color:#12351f!important;font-family:"Fraunces", Georgia, serif!important;font-size:clamp(1.2rem, 1.5vw, 1.55rem)!important;font-weight:800!important;line-height:1.2!important
 }body.s1-result-active .s1-result-controls-title::before{content:"✓ ";color:#1e6b41
-}body.s1-result-active .s1-result-controls-sub{margin-top:6px!important;color:#6a5848!important;font-size:clamp(.95rem, 1.05vw, 1.08rem)!important;line-height:1.45!important
-}body.s1-result-active .s1-result-controls-actions{display:flex!important;justify-content:flex-end!important;align-items:center!important;gap:14px!important;flex-wrap:wrap!important
+}body.s1-result-active .s1-result-controls-sub{margin-top:6px!important;color:#4a3728!important;font-size:clamp(.95rem, 1.05vw, 1.08rem)!important;line-height:1.45!important
+font-weight:700!important;}body.s1-result-active .s1-result-controls-actions{display:flex!important;justify-content:flex-end!important;align-items:center!important;gap:14px!important;flex-wrap:wrap!important
 }body.s1-result-active .s1-result-controls .s1-secondary-btn,body.s1-result-active .s1-result-controls .continue-btn{min-height:58px!important;min-width:168px!important;padding:14px 24px!important;border-radius:14px!important;font-family:"Fraunces", Georgia, serif!important;font-size:1.03rem!important;font-weight:800!important;line-height:1.15!important;cursor:pointer!important
 }body.s1-result-active .s1-result-controls .s1-secondary-btn{background:#fffdf8!important;color:#4a3728!important;border:2px solid #7fa184!important
 }body.s1-result-active .s1-result-controls .continue-btn{background:#1f6b42!important;color:#fff!important;border:2px solid #174b30!important;box-shadow:0 6px 16px rgba(31, 107, 66, .18)!important
@@ -2647,7 +2648,7 @@ textarea::placeholder {
 }html:has(body.s1-result-active),body.s1-result-active{scroll-behavior:auto!important;overflow-y:auto!important
 }body.s1-result-active .chat-area,body.s1-result-active #chat{height:auto!important;overflow:visible!important;align-items:flex-start!important
 }body.s1-result-active .s1-result-card,body.s1-result-active .s1-result-card-focused{margin-top:0!important;scroll-margin-top:130px!important
-}body.s1-result-active .s1-scenario-complete-note{width:min(94vw, 1040px)!important;margin:26px auto 8px!important;padding:0!important;text-align:center!important;color:#8b7a68!important;font-size:.88rem!important;font-weight:700!important;line-height:1.4!important
+}body.s1-result-active .s1-scenario-complete-note{width:min(94vw, 1040px)!important;margin:26px auto 8px!important;padding:0!important;text-align:center!important;color:#4a3728!important;font-size:.88rem!important;font-weight:800!important;line-height:1.4!important
 }body.s1-result-active .s1-scenario-complete-note p{margin:0!important
 }body.s1-result-active .s1-result-controls{justify-content:center!important
 }body.s1-result-active .s1-result-controls > div:first-child{flex:1 1 420px!important;text-align:left!important
@@ -2783,8 +2784,8 @@ textarea::placeholder {
   }body.s1-result-active #inputContainer{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:999!important;width:100%!important;max-width:100%!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;box-shadow:none!important
   }body.s1-result-active .s1-result-controls{width:100%!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:14px 14px 16px!important;display:grid!important;grid-template-columns:1fr!important;gap:12px!important;align-items:start!important;background:#f4eadb!important;border-top:1px solid rgba(122, 97, 58, .28)!important;box-shadow:0 -8px 24px rgba(37, 27, 16, .16)!important
   }body.s1-result-active .s1-result-controls-title{margin:0!important;font-size:1.18rem!important;line-height:1.2!important;color:var(--forest-dark, #173b28)!important
-  }body.s1-result-active .s1-result-controls-sub{margin:4px 0 0!important;font-size:.9rem!important;line-height:1.35!important;color:#5d5148!important
-  }body.s1-result-active .s1-result-controls-actions{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;width:100%!important
+  }body.s1-result-active .s1-result-controls-sub{margin:4px 0 0!important;font-size:.9rem!important;line-height:1.35!important;color:#4a3728!important
+  font-weight:700!important;}body.s1-result-active .s1-result-controls-actions{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;width:100%!important
   }body.s1-result-active .s1-result-controls-actions button,body.s1-result-active .s1-result-controls .s1-secondary-btn,body.s1-result-active .s1-result-controls .continue-btn{width:100%!important;min-height:48px!important;padding:12px 14px!important;display:flex!important;align-items:center!important;justify-content:center!important;border-radius:10px!important;font-size:.95rem!important;line-height:1.2!important;text-align:center!important
   }body.s1-result-active .s1-result-controls .s1-clean-reference{display:none!important
   }body.s1-result-active #pixelBadge,body.s1-result-active .pixel-badge{display:none!important
@@ -13570,6 +13571,7 @@ html body #vnOverlay#vnOverlay.vn-overlay.active.pc-live-analysis-phone-v256
   html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-card.wide,
   html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-status-card,
   html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-confidence-card,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-worked-card,
   html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-issue-card,
   html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-repair-card,
   html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122 .analysis-impact-card {
@@ -14438,6 +14440,92 @@ html body #vnOverlay#vnOverlay.vn-overlay.active.pc-live-analysis-phone-v256
   html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #vnText button {
     min-height: 46px !important;
     font-size: .84rem !important;
+  }
+}
+
+/* Compact completed-analysis cleanup. Phones, foldables, and Surface Duo-sized
+   layouts do not need the two decorative terminal frames. Keep the individual
+   diagnostic cards, let every Claude-generated field establish its natural
+   height, and scroll the terminal surface when the report is taller than the
+   available monitor area. */
+@media screen and (max-width: 540px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #claudeTerminalScene,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-scene {
+    border-radius: 0 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-photo {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-screen {
+    inset: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    scrollbar-gutter: auto !important;
+    padding: 12px 10px 22px !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #claudeTerminalOutput,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-output,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-header,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-grid,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-card.compact,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-card.wide,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-status-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-confidence-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-issue-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-repair-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-impact-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-badge,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-title,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-summary,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-label,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-value,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-value.big,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-note,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report p,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report ul,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report ol,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report li,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report a,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report strong,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report em,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report span {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report img,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report svg {
+    max-width: 100% !important;
+    height: auto !important;
   }
 }
 
@@ -18950,225 +19038,4 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
     padding: 0 !important;
     box-shadow: none !important;
   }
-}
-
-/* V347 — completed Scenario Diagnostic workstation must remain on the classroom.
-   Earlier responsive compatibility rules converted every <=1510px completed report
-   into a black/green terminal panel. That treatment belongs to the prediction/live
-   analysis states, not the final photographed workstation. Scope this reset only to
-   completed reports that JavaScript has assigned to computer mode. */
-html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 {
-  background: transparent !important;
-  backdrop-filter: none !important;
-}
-
-html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .vn-scene {
-  background: transparent !important;
-}
-
-html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .vn-bg {
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: none !important;
-}
-
-html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 #claudeTerminalScene .claude-terminal-photo,
-html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .claude-terminal-photo {
-  background-color: transparent !important;
-  background-image: var(--pc-app-background) !important;
-  background-size: 100% 100% !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  filter: none !important;
-}
-
-/* V348 — Surface Pro completed-diagnostic readability.
-   Keep the approved workstation geometry, but stop shrinking the report copy
-   on 912px-class portrait tablets. The monitor itself becomes the scroll area
-   if the larger type needs more vertical room. */
-@media screen and (min-width: 880px) and (max-width: 960px) and (min-height: 1200px) {
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .claude-terminal-screen {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    scrollbar-gutter: stable !important;
-    overscroll-behavior: contain !important;
-  }
-
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-report {
-    height: auto !important;
-    min-height: 100% !important;
-    overflow: visible !important;
-  }
-
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-header {
-    padding: 8px 10px 7px !important;
-    margin-bottom: 6px !important;
-  }
-
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-badge {
-    font-size: 0.66rem !important;
-    padding: 2px 6px !important;
-    margin-bottom: 4px !important;
-  }
-
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-title {
-    font-size: 1.45rem !important;
-    line-height: 1.04 !important;
-    margin-bottom: 5px !important;
-  }
-
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-summary {
-    font-size: 0.91rem !important;
-    line-height: 1.18 !important;
-  }
-
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-grid {
-    gap: 6px !important;
-  }
-
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-card,
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-card.compact,
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-card.wide {
-    padding: 8px 9px !important;
-  }
-
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-label {
-    font-size: 0.69rem !important;
-    line-height: 1.06 !important;
-  }
-
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-value,
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-value.big {
-    font-size: 0.96rem !important;
-    line-height: 1.1 !important;
-  }
-
-  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122.pc-analysis-computer-v255 .analysis-note {
-    font-size: 0.84rem !important;
-    line-height: 1.12 !important;
-  }
-}
-
-/* V351 — compact completed-diagnostic frame cleanup + dynamic-content resilience.
-   Applies only to the phone/foldable/Surface-Duo-sized completed diagnostic.
-   The report is content-driven: Claude may return longer or shorter text, so no
-   report section is given a fixed height. The terminal screen owns vertical
-   scrolling while the bottom controls remain available. */
-@media screen and (max-width: 540px) {
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #claudeTerminalScene,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-scene {
-    border-radius: 0 !important;
-  }
-
-  /* Remove the two large nested frames on compact completed reports. */
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-photo {
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-screen {
-    inset: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior-y: contain !important;
-    scrollbar-gutter: auto !important;
-    padding: 12px 10px 22px !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 #claudeTerminalOutput,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .claude-terminal-output,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    height: auto !important;
-    min-height: 100% !important;
-    max-height: none !important;
-    overflow: visible !important;
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
-    word-break: normal !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-header,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-grid,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-card,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-card.compact,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-card.wide,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-status-card,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-confidence-card,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-issue-card,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-repair-card,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-impact-card {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
-    word-break: normal !important;
-    box-sizing: border-box !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-badge,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-title,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-summary,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-label,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-value,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-value.big,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-note {
-    max-width: 100% !important;
-    min-width: 0 !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    white-space: normal !important;
-    overflow: visible !important;
-    overflow-wrap: anywhere !important;
-    word-break: normal !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report p,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report ul,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report ol,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report li,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report a,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report strong,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report em,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report span {
-    max-width: 100% !important;
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
-    word-break: normal !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report img,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel-v255 .analysis-report svg {
-    max-width: 100% !important;
-    height: auto !important;
-  }
-}
-
-/* V352 — final Scenario 1 contrast normalization.
-   Universal across all viewport sizes so the completion note and result
-   subtitle keep the same readable treatment everywhere. */
-body.s1-result-active .s1-scenario-complete-note {
-  color: #4a3728 !important;
-  font-weight: 800 !important;
-}
-
-body.s1-result-active .s1-result-controls-sub {
-  color: #4a3728 !important;
-  font-weight: 700 !important;
 }

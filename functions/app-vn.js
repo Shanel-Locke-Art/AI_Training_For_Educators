@@ -713,24 +713,19 @@ function pcFitWideAnalysisReportV215(screen) {
     Math.min(widthFactor, heightFactor) * (isLargePortraitWorkstation ? 1.62 : isTallPortraitWorkstation ? 1.30 : 1),
     isLargePortraitWorkstation ? 1.48 : 1.26
   );
-  // v349: Phone/foldable diagnostics use a wider, calmer reading layout.
-  // The old compact profile made the type enormous inside a narrow faux-CRT,
-  // causing excessive wrapping and a tall stack of boxed cards. Keep the type
-  // comfortably readable, but spend the scarce pixels on line length instead.
-  const compactWidthScale = clampNumber(0, (viewportWidth - 344) / 296, 1);
   const base = isCompactAnalysisPanel ? {
-    badge: 9.5 + (0.8 * compactWidthScale),
-    title: 24 + (3 * compactWidthScale),
-    summary: 14.5 + (1.2 * compactWidthScale),
-    label: 10.5 + (0.7 * compactWidthScale),
-    value: 14.5 + (1.2 * compactWidthScale),
-    big: 16 + (1.2 * compactWidthScale),
-    note: 13.5 + (1 * compactWidthScale),
-    outputPadding: 2,
-    reportPadding: 7,
-    gap: 8,
-    cardPadding: 9,
-    headerGap: 6
+    badge: 11,
+    title: 29,
+    summary: 17,
+    label: 12,
+    value: 17,
+    big: 19,
+    note: 15.5,
+    outputPadding: 5,
+    reportPadding: 9,
+    gap: 11,
+    cardPadding: 10,
+    headerGap: 8
   } : isMediumAnalysisPanel ? {
     badge: 11.5 * mediumScale,
     title: 36 * mediumScale,
@@ -1012,22 +1007,18 @@ function pcFitWideAnalysisReportV215(screen) {
       ['display', 'block'],
       ['overflow-y', 'auto'],
       ['overflow-x', 'hidden'],
-      ['overscroll-behavior', 'contain'],
-      ['touch-action', 'pan-y'],
       ['scrollbar-gutter', 'auto'],
-      ['padding', '2px'],
+      ['padding', `0 4px ${Math.max(8, base.outputPadding)}px`],
       ['box-sizing', 'border-box']
     ]);
     pcSetImportantStyles(report, [
       ['display', 'block'],
-      ['width', '100%'],
-      ['max-width', '100%'],
-      ['margin', '0'],
+      ['width', 'calc(100% - 4px)'],
+      ['max-width', 'calc(100% - 4px)'],
+      ['margin', '0 auto'],
       ['height', 'auto'],
       ['min-height', '0'],
-      ['padding', `${base.reportPadding}px`],
       ['overflow', 'visible'],
-      ['border-radius', '10px'],
       ['box-sizing', 'border-box']
     ]);
     pcSetImportantStyles(grid, [
@@ -2619,9 +2610,11 @@ function parseClaudeDiagnosticSections(text) {
 
   const result = {
     status: '',
+    confidence: '',
+    summary: '',
+    worked: '',
     issue: '',
     repair: '',
-    confidence: '',
     impact: ''
   };
 
@@ -2633,10 +2626,13 @@ function parseClaudeDiagnosticSections(text) {
     if (/^(MOCK )?ANALYSIS COMPLETE$/.test(upper) || upper === 'SCENARIO DIAGNOSTIC') continue;
 
     if (upper === 'STATUS') { current = 'status'; continue; }
+    if (upper === 'CONFIDENCE') { current = 'confidence'; continue; }
+    if (upper === 'FEEDBACK SUMMARY') { current = 'summary'; continue; }
+    if (upper === 'WHAT WORKED') { current = 'worked'; continue; }
     if (upper === 'ISSUE DETECTED') { current = 'issue'; continue; }
     if (upper === 'RECOMMENDED REPAIR') { current = 'repair'; continue; }
     if (upper === 'EXPECTED IMPACT') { current = 'impact'; continue; }
-    if (upper === 'CONFIDENCE') { current = 'confidence'; continue; }
+    if (upper === 'REVISED DISCUSSION PROMPT' || upper === 'COURSE QUALITY CHECK') { current = ''; continue; }
 
     if (current && result[current]) result[current] += ' ' + line;
     else if (current) result[current] = line;
@@ -2649,22 +2645,24 @@ function parseClaudeDiagnosticSections(text) {
 
   return {
     status: result.status || 'High-confidence repair',
+    confidence: result.confidence || 'High',
+    summary: result.summary || 'Claude evaluated the specific repair choices in your prompt and identified the strongest next refinement.',
+    worked: result.worked || 'Your prompt gave Claude enough instructional direction to produce a targeted redesign.',
     issue: result.issue || fallbackIssue || 'The prompt has a discussion design problem that may limit student interaction.',
     repair: result.repair || 'Add a clear reason for students to extend, challenge, compare, or build on a peer’s idea using evidence or reasoning.',
-    impact: result.impact || 'Students will be more likely to extend conversations, challenge ideas, compare perspectives, and engage in deeper discussion.',
-    confidence: result.confidence || 'High'
+    impact: result.impact || 'Students will be more likely to extend conversations, challenge ideas, compare perspectives, and engage in deeper discussion.'
   };
 }
 
 function buildClaudeAnalysisHTML(feedback, mock = false) {
   const d = parseClaudeDiagnosticSections(feedback);
   const badge = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
-  const totalCharacters = [d.status, d.issue, d.repair, d.impact, d.confidence]
+  const totalCharacters = [d.status, d.confidence, d.summary, d.worked, d.issue, d.repair, d.impact]
     .join(' ')
     .length;
-  const densityClass = totalCharacters > 920
+  const densityClass = totalCharacters > 1100
     ? 'analysis-report-very-dense'
-    : totalCharacters > 680
+    : totalCharacters > 820
       ? 'analysis-report-dense'
       : '';
 
@@ -2673,9 +2671,7 @@ function buildClaudeAnalysisHTML(feedback, mock = false) {
       <header class="analysis-header">
         <div class="analysis-badge">${esc(badge)}</div>
         <h2 class="analysis-title">Scenario Diagnostic</h2>
-        <p class="analysis-summary">
-          Claude found the discussion design problem and suggested a repair that gives students a clearer reason to keep the conversation going.
-        </p>
+        <p class="analysis-summary">${esc(d.summary)}</p>
       </header>
 
       <div class="analysis-grid" aria-label="Diagnostic findings">
@@ -2687,7 +2683,12 @@ function buildClaudeAnalysisHTML(feedback, mock = false) {
         <section class="analysis-card analysis-confidence-card compact">
           <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">◎</span><span>Confidence</span></span>
           <div class="analysis-value big">${esc(d.confidence)}</div>
-          <div class="analysis-note">Strong evidence pattern detected.</div>
+          <div class="analysis-note">Claude's confidence in this specific diagnosis.</div>
+        </section>
+
+        <section class="analysis-card analysis-worked-card">
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">+</span><span>What Worked</span></span>
+          <div class="analysis-value">${esc(d.worked)}</div>
         </section>
 
         <section class="analysis-card analysis-issue-card">

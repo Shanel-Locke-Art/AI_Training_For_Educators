@@ -1,8 +1,9 @@
 {
-  "version": 139,
+  "version": 140,
   "runtime_images": {
     "background.png": "assets/images/backgrounds/app-background.png",
     "classroom-bg.png": "assets/images/backgrounds/classroom.png",
+    "desk-extension.png": "assets/images/backgrounds/desk-extension.png",
     "pixel-neutral.png": "assets/images/characters/professor-pixel/neutral.png",
     "pixel-thinking.png": "assets/images/characters/professor-pixel/thinking.png",
     "pixel-excited.png": "assets/images/characters/professor-pixel/excited.png",

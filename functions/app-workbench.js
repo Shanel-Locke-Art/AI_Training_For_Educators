@@ -378,7 +378,7 @@ async function sendMain(text) {
   try {
     const data = await callClaude({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
+      max_tokens: 1600,
       system: scenarios[SCENARIO_INDEX.ENGAGEMENT].system,
       messages: history
     }, 'main');
@@ -434,10 +434,46 @@ function scorePrompt(text) {
 // ══════════════════════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════════════════════
+function parseS1ClaudeStructuredResponse(text) {
+  const raw = String(text || '').replace(/\r/g, '').trim();
+  const headings = [
+    ['status', 'STATUS'],
+    ['confidence', 'CONFIDENCE'],
+    ['summary', 'FEEDBACK SUMMARY'],
+    ['worked', 'WHAT WORKED'],
+    ['issue', 'ISSUE DETECTED'],
+    ['repair', 'RECOMMENDED REPAIR'],
+    ['impact', 'EXPECTED IMPACT'],
+    ['draft', 'REVISED DISCUSSION PROMPT'],
+    ['quality', 'COURSE QUALITY CHECK']
+  ];
+  const result = Object.fromEntries(headings.map(([key]) => [key, '']));
+  let current = '';
+
+  raw.split('\n').forEach(line => {
+    const trimmed = line.trim();
+    const normalized = trimmed
+      .replace(/^#{1,4}\s*/, '')
+      .replace(/^\*{1,2}|\*{1,2}$/g, '')
+      .replace(/:$/, '')
+      .trim()
+      .toUpperCase();
+    const match = headings.find(([, label]) => normalized === label);
+    if (match) { current = match[0]; return; }
+    if (!current) return;
+    result[current] += (result[current] ? '\n' : '') + line;
+  });
+
+  Object.keys(result).forEach(key => { result[key] = result[key].trim(); });
+  return result;
+}
+
 function cleanS1ClaudeDraft(text) {
-  return String(text || '')
-    .replace(/^#{1,3}\s*Revised Discussion Prompt\s*/i, '')
-    .replace(/^Revised Discussion Prompt\s*/i, '')
+  const parsed = parseS1ClaudeStructuredResponse(text);
+  const draft = parsed.draft || String(text || '');
+  return draft
+    .replace(/^#{1,3}\s*Revised Discussion Prompt(?::[^\n]*)?\s*/i, '')
+    .replace(/^Revised Discussion Prompt(?::[^\n]*)?\s*/i, '')
     .replace(/^Here's your redesigned discussion prompt:\s*/i, '')
     .replace(/^\s*---+\s*$/gm, '')
     .replace(/\n{3,}/g, '\n\n')
@@ -839,22 +875,43 @@ function sendGuided(){
 };
 
 function buildS1TerminalDiagnosis(score, responseText){
+  const parsed = parseS1ClaudeStructuredResponse(responseText);
   const values = getS1GuidedValues();
   const checks = analyzeS1Guided(values);
-  const level = score <= 2 ? 'NEEDS MORE CONTEXT' : score <= 3 ? 'PARTIAL REPAIR DETECTED' : score <= 4 ? 'STRONG REPAIR DETECTED' : 'HIGH-CONFIDENCE REPAIR';
   const missing = [];
   if (!checks.audience) missing.push('learner context');
   if (!checks.issue) missing.push('problem diagnosis');
   if (!checks.interaction) missing.push('interaction strategy');
   if (!checks.constraints) missing.push('constraints');
   if (!checks.success) missing.push('success criteria');
-  const issue = 'Students are replying because the prompt requires replies, but the prompt does not create a reason to continue the conversation.';
-  const repair = missing.length
-    ? `Strengthen: ${missing.join(', ')}.`
-    : 'Require students to extend, challenge, compare, or build on a peer\'s idea using evidence or reasoning.';
-  const confidence = score <= 2 ? 'LOW' : score <= 3 ? 'MODERATE' : 'HIGH';
-  return `STATUS\n${level}\n\nISSUE DETECTED\n${issue}\n\nRECOMMENDED REPAIR\n${repair}\n\nCONFIDENCE\n${confidence}`;
-};
+
+  const fallbackStatus = score <= 2 ? 'NEEDS MORE CONTEXT' : score <= 3 ? 'PARTIAL REPAIR DETECTED' : score <= 4 ? 'STRONG REPAIR DETECTED' : 'HIGH-CONFIDENCE REPAIR';
+  const fallbackConfidence = score <= 2 ? 'LOW' : score <= 3 ? 'MODERATE' : 'HIGH';
+  const fallbackSummary = missing.length
+    ? `Your repair has a usable direction, but it still needs more precision around ${missing.join(', ')}.`
+    : 'Your repair identifies the engagement problem, gives peer replies an instructional purpose, and includes enough constraints for a usable redesign.';
+  const fallbackWorked = [
+    values.learners ? `You identified the learner/course context: ${values.learners}.` : '',
+    values.interaction ? `You specified this interaction move: ${values.interaction}.` : ''
+  ].filter(Boolean).join(' ');
+  const fallbackIssue = missing.length
+    ? `The most important remaining gap is ${missing[0]}.`
+    : 'The design is strong enough to use; the next refinement is to make each required peer reply serve a distinct purpose.';
+  const fallbackRepair = missing.length
+    ? `Make the ${missing[0]} explicit and connect it to what students must actually do in the discussion.`
+    : 'Differentiate the required peer replies so students cannot satisfy both with the same generic response move.';
+  const fallbackImpact = 'That refinement should make student replies more purposeful and give classmates a clearer reason to continue the conversation.';
+
+  return [
+    'STATUS', parsed.status || fallbackStatus,
+    '', 'CONFIDENCE', parsed.confidence || fallbackConfidence,
+    '', 'FEEDBACK SUMMARY', parsed.summary || fallbackSummary,
+    '', 'WHAT WORKED', parsed.worked || fallbackWorked || 'You supplied enough information for Claude to identify a concrete instructional direction.',
+    '', 'ISSUE DETECTED', parsed.issue || fallbackIssue,
+    '', 'RECOMMENDED REPAIR', parsed.repair || fallbackRepair,
+    '', 'EXPECTED IMPACT', parsed.impact || fallbackImpact
+  ].join('\n');
+}
 
 function addS1ClaudeResultCard(responseText){
   document.body.classList.add('s1-result-active');

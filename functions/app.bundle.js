@@ -687,7 +687,7 @@ window.testSheetsPing = function testSheetsPing() {
 //  Lets VS Code Live Server progress through scenarios without Netlify.
 //  Add ?mockClaude=1 to force mock mode anywhere.
 // ══════════════════════════════════════════════════════
-const MOCK_CLAUDE_FOR_LOCAL = true;
+const MOCK_CLAUDE_FOR_LOCAL = false;
 const FORCE_MOCK_CLAUDE = new URLSearchParams(window.location.search).get('mockClaude') === '1';
 const IS_LOCAL_TEST = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:';
 const USE_MOCK_CLAUDE = FORCE_MOCK_CLAUDE || (MOCK_CLAUDE_FOR_LOCAL && IS_LOCAL_TEST);
@@ -709,7 +709,36 @@ function mockClaudeText(payload, context = 'main') {
     return `This scenario is currently a clean development shell and does not send prompts to Claude.`;
   }
 
-  return `**Revised Discussion Prompt: From Reaction to Conversation**\n\nChoose one idea from this week's reading that you think is useful, questionable, or difficult to apply. In your initial post, explain your choice, connect it to a specific detail from the reading, and describe how it might show up in a real classroom, workplace, or community situation.\n\nThen reply to two classmates using a different move for each reply:\n1. **Build:** Add an example, resource, or connection that extends their point.\n2. **Probe:** Ask a genuine follow-up question that would help the conversation go deeper.\n\nA strong reply should do more than agree. It should explain reasoning, refer to a specific idea, and help the other person continue thinking.\n\n**Why this addresses the original issue**\nThe original prompt asked students what they thought, but it did not give them a reason to return to the conversation. This version gives students clear interaction moves, defines what quality looks like, and turns peer replies into part of the learning task instead of a checkbox.\n\n**Course Quality Check**\nClear Objectives: addressed\nStudent Interaction: addressed\nReal-World Context: addressed\nInclusive Design: addressed\nMeasurable Outcomes: addressed`;
+  return `STATUS
+STRONG REPAIR WITH A CLEAR INTERACTION PURPOSE
+
+CONFIDENCE
+HIGH
+
+FEEDBACK SUMMARY
+You identified that one-line replies are happening because students are completing a requirement rather than responding to an intellectual reason to continue. Your request for students to compare interpretations, support claims with a specific example, and ask a follow-up question gives each reply a job beyond agreement.
+
+WHAT WORKED
+You named the learner context as first-year students in an 8-week asynchronous course. You also defined a concrete peer-interaction move: compare interpretations, use evidence or examples, and invite a peer to extend or challenge an idea. Requiring two substantive replies gives the redesign a measurable participation constraint.
+
+ISSUE DETECTED
+The repair defines what students should do in replies, but it does not yet define how the two replies should differ from one another. Students could still repeat the same comparison move twice.
+
+RECOMMENDED REPAIR
+Give the two replies distinct purposes, such as one reply that extends or challenges a peer's interpretation with evidence and a second reply that asks a genuine follow-up question or introduces a contrasting example.
+
+EXPECTED IMPACT
+Distinct reply moves make repetition less likely and create multiple pathways for the conversation to continue, so students have to process a peer's reasoning instead of simply satisfying a reply count.
+
+REVISED DISCUSSION PROMPT
+Choose one interpretation of this week's reading that you find convincing, questionable, or difficult to apply. In your initial post, explain your interpretation and support it with one specific example or piece of evidence from the reading.
+
+Then respond substantively to two classmates. In one reply, extend, challenge, or compare your classmate's interpretation using evidence or a concrete example. In the other, ask a genuine follow-up question or introduce a contrasting example that invites your classmate to continue the discussion.
+
+A substantive reply should explain your reasoning, connect directly to the classmate's idea, and give that person something meaningful to respond to.
+
+COURSE QUALITY CHECK
+Clear Objectives: addressed. Student Interaction: strongly addressed through distinct reply moves. Real-World Context: can be added if relevant to the reading. Inclusive Design: multiple response moves provide flexible ways to participate. Measurable Outcomes: initial evidence plus two substantive replies are observable.`
 }
 
 
@@ -721,7 +750,7 @@ function mockClaudeResponse(payload, context = 'main') {
   });
 }
 
-const CLAUDE_REQUEST_TIMEOUT_MS = 15000;
+const CLAUDE_REQUEST_TIMEOUT_MS = 25000;
 
 async function callClaude(payload, context = 'main') {
   if (USE_MOCK_CLAUDE) return mockClaudeResponse(payload, context);
@@ -1236,10 +1265,41 @@ const scenarios = [
       { id:"inc", label:"Inclusive Design" },
       { id:"out", label:"Measurable Outcomes" },
     ],
-    system: `You are a supportive instructional design coach helping an online higher education faculty member improve student engagement in asynchronous discussions.
-When the instructor writes a prompt, respond with a practical, course-ready discussion activity. Be warm and specific.
-After your main response, add a short section called "Course Quality Check" noting which are addressed: Clear Objectives, Student Interaction, Real-World Context, Inclusive Design, Measurable Outcomes.
-Coaching: vague prompts get generic outputs with gentle guidance. Specific prompts with learner context, course level, and format constraints get excellent, usable outputs with explicit praise.`
+    system: `You are the live instructional-design evaluator inside PromptCraft Scenario 1. The faculty member is repairing a weak asynchronous discussion design.
+
+Your first job is to evaluate the faculty member's ACTUAL choices in the prompt you receive, not to give generic discussion-board advice. Refer to concrete details they supplied: learner/course context, the problem they diagnosed, the interaction move they requested, constraints, and success criteria. If they invent a completely different repair than the example, evaluate that repair on its own merits. Do not pretend they said something they did not say.
+
+Your second job is to produce a course-ready revised discussion prompt that follows their choices wherever those choices are instructionally sound. If an important weakness remains, improve it in the revised prompt and explain why.
+
+Return the response using EXACTLY these headings, each on its own line:
+STATUS
+One concise, specific judgment of this repair.
+
+CONFIDENCE
+LOW, MODERATE, or HIGH.
+
+FEEDBACK SUMMARY
+2-3 sentences that directly reference the faculty member's actual choices and explain the overall quality of the repair.
+
+WHAT WORKED
+2-4 specific strengths. Mention exact choices or requirements from the faculty member's prompt rather than generic praise.
+
+ISSUE DETECTED
+The most important remaining weakness or tradeoff. If the repair is already strong, identify the most useful refinement rather than inventing a defect.
+
+RECOMMENDED REPAIR
+A concrete next-step revision tied directly to the issue above.
+
+EXPECTED IMPACT
+Explain how that specific revision is likely to change student thinking or peer interaction.
+
+REVISED DISCUSSION PROMPT
+Provide the complete student-facing activity.
+
+COURSE QUALITY CHECK
+Briefly note how the response addresses Clear Objectives, Student Interaction, Real-World Context, Inclusive Design, and Measurable Outcomes.
+
+Keep the diagnostic specific enough that a different faculty answer would receive meaningfully different feedback. Avoid stock phrases such as "add more context" unless you name exactly what is missing and why it matters.`
   },
   { desc: "Mission: Listen to Jordan, diagnose the missing learning process, and distinguish metacognitive evidence from generic reflection.", oscqr: [], system: "" },
   { desc: "Scenario 3 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
@@ -3046,24 +3106,19 @@ function pcFitWideAnalysisReportV215(screen) {
     Math.min(widthFactor, heightFactor) * (isLargePortraitWorkstation ? 1.62 : isTallPortraitWorkstation ? 1.30 : 1),
     isLargePortraitWorkstation ? 1.48 : 1.26
   );
-  // v349: Phone/foldable diagnostics use a wider, calmer reading layout.
-  // The old compact profile made the type enormous inside a narrow faux-CRT,
-  // causing excessive wrapping and a tall stack of boxed cards. Keep the type
-  // comfortably readable, but spend the scarce pixels on line length instead.
-  const compactWidthScale = clampNumber(0, (viewportWidth - 344) / 296, 1);
   const base = isCompactAnalysisPanel ? {
-    badge: 9.5 + (0.8 * compactWidthScale),
-    title: 24 + (3 * compactWidthScale),
-    summary: 14.5 + (1.2 * compactWidthScale),
-    label: 10.5 + (0.7 * compactWidthScale),
-    value: 14.5 + (1.2 * compactWidthScale),
-    big: 16 + (1.2 * compactWidthScale),
-    note: 13.5 + (1 * compactWidthScale),
-    outputPadding: 2,
-    reportPadding: 7,
-    gap: 8,
-    cardPadding: 9,
-    headerGap: 6
+    badge: 11,
+    title: 29,
+    summary: 17,
+    label: 12,
+    value: 17,
+    big: 19,
+    note: 15.5,
+    outputPadding: 5,
+    reportPadding: 9,
+    gap: 11,
+    cardPadding: 10,
+    headerGap: 8
   } : isMediumAnalysisPanel ? {
     badge: 11.5 * mediumScale,
     title: 36 * mediumScale,
@@ -3345,22 +3400,18 @@ function pcFitWideAnalysisReportV215(screen) {
       ['display', 'block'],
       ['overflow-y', 'auto'],
       ['overflow-x', 'hidden'],
-      ['overscroll-behavior', 'contain'],
-      ['touch-action', 'pan-y'],
       ['scrollbar-gutter', 'auto'],
-      ['padding', '2px'],
+      ['padding', `0 4px ${Math.max(8, base.outputPadding)}px`],
       ['box-sizing', 'border-box']
     ]);
     pcSetImportantStyles(report, [
       ['display', 'block'],
-      ['width', '100%'],
-      ['max-width', '100%'],
-      ['margin', '0'],
+      ['width', 'calc(100% - 4px)'],
+      ['max-width', 'calc(100% - 4px)'],
+      ['margin', '0 auto'],
       ['height', 'auto'],
       ['min-height', '0'],
-      ['padding', `${base.reportPadding}px`],
       ['overflow', 'visible'],
-      ['border-radius', '10px'],
       ['box-sizing', 'border-box']
     ]);
     pcSetImportantStyles(grid, [
@@ -4952,9 +5003,11 @@ function parseClaudeDiagnosticSections(text) {
 
   const result = {
     status: '',
+    confidence: '',
+    summary: '',
+    worked: '',
     issue: '',
     repair: '',
-    confidence: '',
     impact: ''
   };
 
@@ -4966,10 +5019,13 @@ function parseClaudeDiagnosticSections(text) {
     if (/^(MOCK )?ANALYSIS COMPLETE$/.test(upper) || upper === 'SCENARIO DIAGNOSTIC') continue;
 
     if (upper === 'STATUS') { current = 'status'; continue; }
+    if (upper === 'CONFIDENCE') { current = 'confidence'; continue; }
+    if (upper === 'FEEDBACK SUMMARY') { current = 'summary'; continue; }
+    if (upper === 'WHAT WORKED') { current = 'worked'; continue; }
     if (upper === 'ISSUE DETECTED') { current = 'issue'; continue; }
     if (upper === 'RECOMMENDED REPAIR') { current = 'repair'; continue; }
     if (upper === 'EXPECTED IMPACT') { current = 'impact'; continue; }
-    if (upper === 'CONFIDENCE') { current = 'confidence'; continue; }
+    if (upper === 'REVISED DISCUSSION PROMPT' || upper === 'COURSE QUALITY CHECK') { current = ''; continue; }
 
     if (current && result[current]) result[current] += ' ' + line;
     else if (current) result[current] = line;
@@ -4982,22 +5038,24 @@ function parseClaudeDiagnosticSections(text) {
 
   return {
     status: result.status || 'High-confidence repair',
+    confidence: result.confidence || 'High',
+    summary: result.summary || 'Claude evaluated the specific repair choices in your prompt and identified the strongest next refinement.',
+    worked: result.worked || 'Your prompt gave Claude enough instructional direction to produce a targeted redesign.',
     issue: result.issue || fallbackIssue || 'The prompt has a discussion design problem that may limit student interaction.',
     repair: result.repair || 'Add a clear reason for students to extend, challenge, compare, or build on a peer’s idea using evidence or reasoning.',
-    impact: result.impact || 'Students will be more likely to extend conversations, challenge ideas, compare perspectives, and engage in deeper discussion.',
-    confidence: result.confidence || 'High'
+    impact: result.impact || 'Students will be more likely to extend conversations, challenge ideas, compare perspectives, and engage in deeper discussion.'
   };
 }
 
 function buildClaudeAnalysisHTML(feedback, mock = false) {
   const d = parseClaudeDiagnosticSections(feedback);
   const badge = mock ? 'MOCK ANALYSIS COMPLETE' : 'ANALYSIS COMPLETE';
-  const totalCharacters = [d.status, d.issue, d.repair, d.impact, d.confidence]
+  const totalCharacters = [d.status, d.confidence, d.summary, d.worked, d.issue, d.repair, d.impact]
     .join(' ')
     .length;
-  const densityClass = totalCharacters > 920
+  const densityClass = totalCharacters > 1100
     ? 'analysis-report-very-dense'
-    : totalCharacters > 680
+    : totalCharacters > 820
       ? 'analysis-report-dense'
       : '';
 
@@ -5006,9 +5064,7 @@ function buildClaudeAnalysisHTML(feedback, mock = false) {
       <header class="analysis-header">
         <div class="analysis-badge">${esc(badge)}</div>
         <h2 class="analysis-title">Scenario Diagnostic</h2>
-        <p class="analysis-summary">
-          Claude found the discussion design problem and suggested a repair that gives students a clearer reason to keep the conversation going.
-        </p>
+        <p class="analysis-summary">${esc(d.summary)}</p>
       </header>
 
       <div class="analysis-grid" aria-label="Diagnostic findings">
@@ -5020,7 +5076,12 @@ function buildClaudeAnalysisHTML(feedback, mock = false) {
         <section class="analysis-card analysis-confidence-card compact">
           <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">◎</span><span>Confidence</span></span>
           <div class="analysis-value big">${esc(d.confidence)}</div>
-          <div class="analysis-note">Strong evidence pattern detected.</div>
+          <div class="analysis-note">Claude's confidence in this specific diagnosis.</div>
+        </section>
+
+        <section class="analysis-card analysis-worked-card">
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">+</span><span>What Worked</span></span>
+          <div class="analysis-value">${esc(d.worked)}</div>
         </section>
 
         <section class="analysis-card analysis-issue-card">
@@ -5883,7 +5944,7 @@ async function sendMain(text) {
   try {
     const data = await callClaude({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
+      max_tokens: 1600,
       system: scenarios[SCENARIO_INDEX.ENGAGEMENT].system,
       messages: history
     }, 'main');
@@ -5939,10 +6000,46 @@ function scorePrompt(text) {
 // ══════════════════════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════════════════════
+function parseS1ClaudeStructuredResponse(text) {
+  const raw = String(text || '').replace(/\r/g, '').trim();
+  const headings = [
+    ['status', 'STATUS'],
+    ['confidence', 'CONFIDENCE'],
+    ['summary', 'FEEDBACK SUMMARY'],
+    ['worked', 'WHAT WORKED'],
+    ['issue', 'ISSUE DETECTED'],
+    ['repair', 'RECOMMENDED REPAIR'],
+    ['impact', 'EXPECTED IMPACT'],
+    ['draft', 'REVISED DISCUSSION PROMPT'],
+    ['quality', 'COURSE QUALITY CHECK']
+  ];
+  const result = Object.fromEntries(headings.map(([key]) => [key, '']));
+  let current = '';
+
+  raw.split('\n').forEach(line => {
+    const trimmed = line.trim();
+    const normalized = trimmed
+      .replace(/^#{1,4}\s*/, '')
+      .replace(/^\*{1,2}|\*{1,2}$/g, '')
+      .replace(/:$/, '')
+      .trim()
+      .toUpperCase();
+    const match = headings.find(([, label]) => normalized === label);
+    if (match) { current = match[0]; return; }
+    if (!current) return;
+    result[current] += (result[current] ? '\n' : '') + line;
+  });
+
+  Object.keys(result).forEach(key => { result[key] = result[key].trim(); });
+  return result;
+}
+
 function cleanS1ClaudeDraft(text) {
-  return String(text || '')
-    .replace(/^#{1,3}\s*Revised Discussion Prompt\s*/i, '')
-    .replace(/^Revised Discussion Prompt\s*/i, '')
+  const parsed = parseS1ClaudeStructuredResponse(text);
+  const draft = parsed.draft || String(text || '');
+  return draft
+    .replace(/^#{1,3}\s*Revised Discussion Prompt(?::[^\n]*)?\s*/i, '')
+    .replace(/^Revised Discussion Prompt(?::[^\n]*)?\s*/i, '')
     .replace(/^Here's your redesigned discussion prompt:\s*/i, '')
     .replace(/^\s*---+\s*$/gm, '')
     .replace(/\n{3,}/g, '\n\n')
@@ -6344,22 +6441,43 @@ function sendGuided(){
 };
 
 function buildS1TerminalDiagnosis(score, responseText){
+  const parsed = parseS1ClaudeStructuredResponse(responseText);
   const values = getS1GuidedValues();
   const checks = analyzeS1Guided(values);
-  const level = score <= 2 ? 'NEEDS MORE CONTEXT' : score <= 3 ? 'PARTIAL REPAIR DETECTED' : score <= 4 ? 'STRONG REPAIR DETECTED' : 'HIGH-CONFIDENCE REPAIR';
   const missing = [];
   if (!checks.audience) missing.push('learner context');
   if (!checks.issue) missing.push('problem diagnosis');
   if (!checks.interaction) missing.push('interaction strategy');
   if (!checks.constraints) missing.push('constraints');
   if (!checks.success) missing.push('success criteria');
-  const issue = 'Students are replying because the prompt requires replies, but the prompt does not create a reason to continue the conversation.';
-  const repair = missing.length
-    ? `Strengthen: ${missing.join(', ')}.`
-    : 'Require students to extend, challenge, compare, or build on a peer\'s idea using evidence or reasoning.';
-  const confidence = score <= 2 ? 'LOW' : score <= 3 ? 'MODERATE' : 'HIGH';
-  return `STATUS\n${level}\n\nISSUE DETECTED\n${issue}\n\nRECOMMENDED REPAIR\n${repair}\n\nCONFIDENCE\n${confidence}`;
-};
+
+  const fallbackStatus = score <= 2 ? 'NEEDS MORE CONTEXT' : score <= 3 ? 'PARTIAL REPAIR DETECTED' : score <= 4 ? 'STRONG REPAIR DETECTED' : 'HIGH-CONFIDENCE REPAIR';
+  const fallbackConfidence = score <= 2 ? 'LOW' : score <= 3 ? 'MODERATE' : 'HIGH';
+  const fallbackSummary = missing.length
+    ? `Your repair has a usable direction, but it still needs more precision around ${missing.join(', ')}.`
+    : 'Your repair identifies the engagement problem, gives peer replies an instructional purpose, and includes enough constraints for a usable redesign.';
+  const fallbackWorked = [
+    values.learners ? `You identified the learner/course context: ${values.learners}.` : '',
+    values.interaction ? `You specified this interaction move: ${values.interaction}.` : ''
+  ].filter(Boolean).join(' ');
+  const fallbackIssue = missing.length
+    ? `The most important remaining gap is ${missing[0]}.`
+    : 'The design is strong enough to use; the next refinement is to make each required peer reply serve a distinct purpose.';
+  const fallbackRepair = missing.length
+    ? `Make the ${missing[0]} explicit and connect it to what students must actually do in the discussion.`
+    : 'Differentiate the required peer replies so students cannot satisfy both with the same generic response move.';
+  const fallbackImpact = 'That refinement should make student replies more purposeful and give classmates a clearer reason to continue the conversation.';
+
+  return [
+    'STATUS', parsed.status || fallbackStatus,
+    '', 'CONFIDENCE', parsed.confidence || fallbackConfidence,
+    '', 'FEEDBACK SUMMARY', parsed.summary || fallbackSummary,
+    '', 'WHAT WORKED', parsed.worked || fallbackWorked || 'You supplied enough information for Claude to identify a concrete instructional direction.',
+    '', 'ISSUE DETECTED', parsed.issue || fallbackIssue,
+    '', 'RECOMMENDED REPAIR', parsed.repair || fallbackRepair,
+    '', 'EXPECTED IMPACT', parsed.impact || fallbackImpact
+  ].join('\n');
+}
 
 function addS1ClaudeResultCard(responseText){
   document.body.classList.add('s1-result-active');

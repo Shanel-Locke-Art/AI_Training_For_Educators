@@ -685,7 +685,7 @@ window.testSheetsPing = function testSheetsPing() {
 //  Lets VS Code Live Server progress through scenarios without Netlify.
 //  Add ?mockClaude=1 to force mock mode anywhere.
 // ══════════════════════════════════════════════════════
-const MOCK_CLAUDE_FOR_LOCAL = true;
+const MOCK_CLAUDE_FOR_LOCAL = false;
 const FORCE_MOCK_CLAUDE = new URLSearchParams(window.location.search).get('mockClaude') === '1';
 const IS_LOCAL_TEST = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:';
 const USE_MOCK_CLAUDE = FORCE_MOCK_CLAUDE || (MOCK_CLAUDE_FOR_LOCAL && IS_LOCAL_TEST);
@@ -707,7 +707,36 @@ function mockClaudeText(payload, context = 'main') {
     return `This scenario is currently a clean development shell and does not send prompts to Claude.`;
   }
 
-  return `**Revised Discussion Prompt: From Reaction to Conversation**\n\nChoose one idea from this week's reading that you think is useful, questionable, or difficult to apply. In your initial post, explain your choice, connect it to a specific detail from the reading, and describe how it might show up in a real classroom, workplace, or community situation.\n\nThen reply to two classmates using a different move for each reply:\n1. **Build:** Add an example, resource, or connection that extends their point.\n2. **Probe:** Ask a genuine follow-up question that would help the conversation go deeper.\n\nA strong reply should do more than agree. It should explain reasoning, refer to a specific idea, and help the other person continue thinking.\n\n**Why this addresses the original issue**\nThe original prompt asked students what they thought, but it did not give them a reason to return to the conversation. This version gives students clear interaction moves, defines what quality looks like, and turns peer replies into part of the learning task instead of a checkbox.\n\n**Course Quality Check**\nClear Objectives: addressed\nStudent Interaction: addressed\nReal-World Context: addressed\nInclusive Design: addressed\nMeasurable Outcomes: addressed`;
+  return `STATUS
+STRONG REPAIR WITH A CLEAR INTERACTION PURPOSE
+
+CONFIDENCE
+HIGH
+
+FEEDBACK SUMMARY
+You identified that one-line replies are happening because students are completing a requirement rather than responding to an intellectual reason to continue. Your request for students to compare interpretations, support claims with a specific example, and ask a follow-up question gives each reply a job beyond agreement.
+
+WHAT WORKED
+You named the learner context as first-year students in an 8-week asynchronous course. You also defined a concrete peer-interaction move: compare interpretations, use evidence or examples, and invite a peer to extend or challenge an idea. Requiring two substantive replies gives the redesign a measurable participation constraint.
+
+ISSUE DETECTED
+The repair defines what students should do in replies, but it does not yet define how the two replies should differ from one another. Students could still repeat the same comparison move twice.
+
+RECOMMENDED REPAIR
+Give the two replies distinct purposes, such as one reply that extends or challenges a peer's interpretation with evidence and a second reply that asks a genuine follow-up question or introduces a contrasting example.
+
+EXPECTED IMPACT
+Distinct reply moves make repetition less likely and create multiple pathways for the conversation to continue, so students have to process a peer's reasoning instead of simply satisfying a reply count.
+
+REVISED DISCUSSION PROMPT
+Choose one interpretation of this week's reading that you find convincing, questionable, or difficult to apply. In your initial post, explain your interpretation and support it with one specific example or piece of evidence from the reading.
+
+Then respond substantively to two classmates. In one reply, extend, challenge, or compare your classmate's interpretation using evidence or a concrete example. In the other, ask a genuine follow-up question or introduce a contrasting example that invites your classmate to continue the discussion.
+
+A substantive reply should explain your reasoning, connect directly to the classmate's idea, and give that person something meaningful to respond to.
+
+COURSE QUALITY CHECK
+Clear Objectives: addressed. Student Interaction: strongly addressed through distinct reply moves. Real-World Context: can be added if relevant to the reading. Inclusive Design: multiple response moves provide flexible ways to participate. Measurable Outcomes: initial evidence plus two substantive replies are observable.`
 }
 
 
@@ -719,7 +748,7 @@ function mockClaudeResponse(payload, context = 'main') {
   });
 }
 
-const CLAUDE_REQUEST_TIMEOUT_MS = 15000;
+const CLAUDE_REQUEST_TIMEOUT_MS = 25000;
 
 async function callClaude(payload, context = 'main') {
   if (USE_MOCK_CLAUDE) return mockClaudeResponse(payload, context);
