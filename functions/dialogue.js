@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════
-   PromptCraft — dialogue.js (v138 S2 opening vertical slice)
+   PromptCraft — dialogue.js (v356 S1 score-reactive Pixel dialogue + S2 opening vertical slice)
    Active runtime dialogue for shared systems, Scenario 1, and the Scenario 2 opening.
    Legacy Scenario 2–8 dialogue is preserved under archive/legacy-scenarios-v133/.
    ══════════════════════════════════════════════════════ */
@@ -166,64 +166,106 @@ window.pixelDialogue = {
   "s2_diagnosis_evidence": [
     { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "Those concerns might matter in another case, but Jordan did not give us evidence for them. Stay with what he actually said rather than filling in the rest of his story for him.", "id": "p94" }
   ],
-  "scoreReflection_0_1": [
+  "scoreReflection_0": [
     {
       "expr": "skeptical",
-      "text": "Claude had to make a lot of assumptions there.",
-      "id": "p31"
+      "text": "That landed at zero out of five. I am not going to pretend Claude had a usable design brief here. The response either missed the scenario or gave us information we cannot responsibly design from.",
+      "id": "s1-score-0-a"
     },
     {
       "expr": "thinking",
-      "text": "Give it clearer learner context, the specific discussion failure, and what a stronger reply should actually do.",
-      "id": "p32"
+      "text": "A useful repair needs a real learner context, a specific interaction problem, a meaningful interaction move, practical constraints, and some sign of what success should look like.",
+      "id": "s1-score-0-b"
+    },
+    {
+      "expr": "encouraging",
+      "text": "Go back to the repair notes and rebuild the foundation. Give Claude instructional information, not filler, and the next analysis should change substantially.",
+      "id": "s1-score-0-c"
+    }
+  ],
+  "scoreReflection_1": [
+    {
+      "expr": "skeptical",
+      "text": "That scored one out of five. There is one usable signal in the response, but Claude is still being asked to fill in most of the instructional design for you.",
+      "id": "s1-score-1-a"
+    },
+    {
+      "expr": "thinking",
+      "text": "When the design brief is this thin, even a polished AI response can look smarter than the reasoning underneath it. That is exactly the trap this scenario is trying to expose.",
+      "id": "s1-score-1-b"
+    },
+    {
+      "expr": "encouraging",
+      "text": "Strengthen the repair notes before you move on. Make the problem and the interaction you want students to have much more concrete.",
+      "id": "s1-score-1-c"
     }
   ],
   "scoreReflection_2": [
     {
-      "expr": "encouraging",
-      "text": "You are starting to give Claude useful context.",
-      "id": "p33"
+      "expr": "thinking",
+      "text": "Two out of five. Claude has enough to see part of your intent, but too much of the redesign is still guesswork.",
+      "id": "s1-score-2-a"
     },
     {
-      "expr": "thinking",
-      "text": "Now tighten the connection to the original problem: shallow replies and conversations that stop after one exchange.",
-      "id": "p34"
+      "expr": "skeptical",
+      "text": "The important question is not whether the draft sounds better. It is whether your input gives Claude enough evidence to make the right instructional change instead of inventing one.",
+      "id": "s1-score-2-b"
+    },
+    {
+      "expr": "encouraging",
+      "text": "Add the missing design information and try again. You are close to having a brief Claude can actually reason from.",
+      "id": "s1-score-2-c"
     }
   ],
   "scoreReflection_3": [
     {
       "expr": "encouraging",
-      "text": "Much better. Claude is responding to the teaching problem instead of guessing at a generic discussion activity.",
-      "id": "p35"
+      "text": "Three out of five. That is enough structure for Claude to attempt a defensible repair, but I would not call the design brief complete yet.",
+      "id": "s1-score-3-a"
     },
     {
-      "expr": "neutral",
-      "text": "The next improvement is to make the interaction move and success criteria more explicit.",
-      "id": "p36"
+      "expr": "thinking",
+      "text": "The draft may work, but some of its quality still depends on Claude making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify.",
+      "id": "s1-score-3-b"
+    },
+    {
+      "expr": "encouraging",
+      "text": "You can move forward, or revise once more and see whether a more complete brief produces a more precise repair.",
+      "id": "s1-score-3-c"
     }
   ],
   "scoreReflection_4": [
     {
       "expr": "proud",
-      "text": "Nice work. The prompt gives Claude enough context to address the dead-discussion problem directly.",
-      "id": "p37"
+      "text": "Four out of five. This is a strong design brief. Claude had enough context to make a targeted repair instead of simply rewriting the discussion prompt.",
+      "id": "s1-score-4-a"
     },
     {
-      "expr": "encouraging",
-      "text": "Notice how the response changes when the prompt includes learners, constraints, and a clear interaction strategy.",
-      "id": "p38"
+      "expr": "thinking",
+      "text": "There is still one area that could be clearer, which matters because small gaps are where AI starts making quiet assumptions on your behalf.",
+      "id": "s1-score-4-b"
+    },
+    {
+      "expr": "proud",
+      "text": "The important shift is here: you gave the replies an instructional purpose, not just a participation requirement. That is a meaningful redesign.",
+      "id": "s1-score-4-c"
     }
   ],
   "scoreReflection_5": [
     {
-      "expr": "excited",
-      "text": "Claude spotted the core issue. Students were complying with the requirements, but the prompt was not creating meaningful interaction.",
-      "id": "p39"
+      "expr": "proud",
+      "text": "Five out of five. You gave Claude a complete design brief: learner context, the actual problem, the interaction you want, the constraints, and a clear success signal.",
+      "id": "s1-score-5-a"
+    },
+    {
+      "expr": "thinking",
+      "text": "That does not mean Claude is automatically right. It means you gave it enough information that you can judge whether its repair actually follows your instructional intent.",
+      "id": "s1-score-5-b"
     },
     {
       "expr": "proud",
-      "text": "To improve discussion quality, we need prompts that ask learners to extend, challenge, compare, or build on one another's ideas. That is exactly what your repair helped Claude design.",
-      "id": "p40"
+      "text": "That is the habit I want you to carry forward: make the reasoning visible first, then use AI to help execute the design.",
+      "id": "s1-score-5-c"
     }
   ]
 };
@@ -253,16 +295,24 @@ window.pixelAudioByText = {
   "A faculty member brought me this discussion prompt. Nothing is technically wrong with it.": "p14",
   "Students are posting. Students are replying. The assignment is being completed.": "p15",
   "But the conversation dies after a single exchange. Let's figure out why.": "p16",
-  "Claude had to make a lot of assumptions there.": "p31",
-  "Give it clearer learner context, the specific discussion failure, and what a stronger reply should actually do.": "p32",
-  "You are starting to give Claude useful context.": "p33",
-  "Now tighten the connection to the original problem: shallow replies and conversations that stop after one exchange.": "p34",
-  "Much better. Claude is responding to the teaching problem instead of guessing at a generic discussion activity.": "p35",
-  "The next improvement is to make the interaction move and success criteria more explicit.": "p36",
-  "Nice work. The prompt gives Claude enough context to address the dead-discussion problem directly.": "p37",
-  "Notice how the response changes when the prompt includes learners, constraints, and a clear interaction strategy.": "p38",
-  "Claude spotted the core issue. Students were complying with the requirements, but the prompt was not creating meaningful interaction.": "p39",
-  "To improve discussion quality, we need prompts that ask learners to extend, challenge, compare, or build on one another's ideas. That is exactly what your repair helped Claude design.": "p40",
+  "That landed at zero out of five. I am not going to pretend Claude had a usable design brief here. The response either missed the scenario or gave us information we cannot responsibly design from.": "s1-score-0-a",
+  "A useful repair needs a real learner context, a specific interaction problem, a meaningful interaction move, practical constraints, and some sign of what success should look like.": "s1-score-0-b",
+  "Go back to the repair notes and rebuild the foundation. Give Claude instructional information, not filler, and the next analysis should change substantially.": "s1-score-0-c",
+  "That scored one out of five. There is one usable signal in the response, but Claude is still being asked to fill in most of the instructional design for you.": "s1-score-1-a",
+  "When the design brief is this thin, even a polished AI response can look smarter than the reasoning underneath it. That is exactly the trap this scenario is trying to expose.": "s1-score-1-b",
+  "Strengthen the repair notes before you move on. Make the problem and the interaction you want students to have much more concrete.": "s1-score-1-c",
+  "Two out of five. Claude has enough to see part of your intent, but too much of the redesign is still guesswork.": "s1-score-2-a",
+  "The important question is not whether the draft sounds better. It is whether your input gives Claude enough evidence to make the right instructional change instead of inventing one.": "s1-score-2-b",
+  "Add the missing design information and try again. You are close to having a brief Claude can actually reason from.": "s1-score-2-c",
+  "Three out of five. That is enough structure for Claude to attempt a defensible repair, but I would not call the design brief complete yet.": "s1-score-3-a",
+  "The draft may work, but some of its quality still depends on Claude making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify.": "s1-score-3-b",
+  "You can move forward, or revise once more and see whether a more complete brief produces a more precise repair.": "s1-score-3-c",
+  "Four out of five. This is a strong design brief. Claude had enough context to make a targeted repair instead of simply rewriting the discussion prompt.": "s1-score-4-a",
+  "There is still one area that could be clearer, which matters because small gaps are where AI starts making quiet assumptions on your behalf.": "s1-score-4-b",
+  "The important shift is here: you gave the replies an instructional purpose, not just a participation requirement. That is a meaningful redesign.": "s1-score-4-c",
+  "Five out of five. You gave Claude a complete design brief: learner context, the actual problem, the interaction you want, the constraints, and a clear success signal.": "s1-score-5-a",
+  "That does not mean Claude is automatically right. It means you gave it enough information that you can judge whether its repair actually follows your instructional intent.": "s1-score-5-b",
+  "That is the habit I want you to carry forward: make the reasoning visible first, then use AI to help execute the design.": "s1-score-5-c",
   "That prediction makes sense. You gave Claude learner context, the actual discussion failure, and a clear interaction move, so it should have enough to give a targeted repair.": "p47",
   "That could happen. Claude can still drift into polite template language if it treats the issue as make this better instead of fix this exact discussion breakdown.": "p48",
   "Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Claude actually respected them.": "p49",
@@ -380,65 +430,113 @@ window.pixelAudioLabels = {
     "text": "But the conversation dies after a single exchange. Let's figure out why.",
     "notes": ""
   },
-  "p31": {
-    "source": "scoreReflection_0_1",
+  "s1-score-0-a": {
+    "source": "scoreReflection_0",
     "expression": "skeptical",
-    "text": "Claude had to make a lot of assumptions there.",
-    "notes": ""
+    "text": "That landed at zero out of five. I am not going to pretend Claude had a usable design brief here. The response either missed the scenario or gave us information we cannot responsibly design from.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 0/5 branch."
   },
-  "p32": {
-    "source": "scoreReflection_0_1",
+  "s1-score-0-b": {
+    "source": "scoreReflection_0",
     "expression": "thinking",
-    "text": "Give it clearer learner context, the specific discussion failure, and what a stronger reply should actually do.",
-    "notes": ""
+    "text": "A useful repair needs a real learner context, a specific interaction problem, a meaningful interaction move, practical constraints, and some sign of what success should look like.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 0/5 branch."
   },
-  "p33": {
+  "s1-score-0-c": {
+    "source": "scoreReflection_0",
+    "expression": "encouraging",
+    "text": "Go back to the repair notes and rebuild the foundation. Give Claude instructional information, not filler, and the next analysis should change substantially.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 0/5 branch."
+  },
+  "s1-score-1-a": {
+    "source": "scoreReflection_1",
+    "expression": "skeptical",
+    "text": "That scored one out of five. There is one usable signal in the response, but Claude is still being asked to fill in most of the instructional design for you.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 1/5 branch."
+  },
+  "s1-score-1-b": {
+    "source": "scoreReflection_1",
+    "expression": "thinking",
+    "text": "When the design brief is this thin, even a polished AI response can look smarter than the reasoning underneath it. That is exactly the trap this scenario is trying to expose.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 1/5 branch."
+  },
+  "s1-score-1-c": {
+    "source": "scoreReflection_1",
+    "expression": "encouraging",
+    "text": "Strengthen the repair notes before you move on. Make the problem and the interaction you want students to have much more concrete.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 1/5 branch."
+  },
+  "s1-score-2-a": {
+    "source": "scoreReflection_2",
+    "expression": "thinking",
+    "text": "Two out of five. Claude has enough to see part of your intent, but too much of the redesign is still guesswork.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 2/5 branch."
+  },
+  "s1-score-2-b": {
+    "source": "scoreReflection_2",
+    "expression": "skeptical",
+    "text": "The important question is not whether the draft sounds better. It is whether your input gives Claude enough evidence to make the right instructional change instead of inventing one.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 2/5 branch."
+  },
+  "s1-score-2-c": {
     "source": "scoreReflection_2",
     "expression": "encouraging",
-    "text": "You are starting to give Claude useful context.",
-    "notes": ""
+    "text": "Add the missing design information and try again. You are close to having a brief Claude can actually reason from.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 2/5 branch."
   },
-  "p34": {
-    "source": "scoreReflection_2",
+  "s1-score-3-a": {
+    "source": "scoreReflection_3",
+    "expression": "encouraging",
+    "text": "Three out of five. That is enough structure for Claude to attempt a defensible repair, but I would not call the design brief complete yet.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 3/5 branch."
+  },
+  "s1-score-3-b": {
+    "source": "scoreReflection_3",
     "expression": "thinking",
-    "text": "Now tighten the connection to the original problem: shallow replies and conversations that stop after one exchange.",
-    "notes": ""
+    "text": "The draft may work, but some of its quality still depends on Claude making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 3/5 branch."
   },
-  "p35": {
+  "s1-score-3-c": {
     "source": "scoreReflection_3",
     "expression": "encouraging",
-    "text": "Much better. Claude is responding to the teaching problem instead of guessing at a generic discussion activity.",
-    "notes": ""
+    "text": "You can move forward, or revise once more and see whether a more complete brief produces a more precise repair.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 3/5 branch."
   },
-  "p36": {
-    "source": "scoreReflection_3",
-    "expression": "neutral",
-    "text": "The next improvement is to make the interaction move and success criteria more explicit.",
-    "notes": ""
-  },
-  "p37": {
+  "s1-score-4-a": {
     "source": "scoreReflection_4",
     "expression": "proud",
-    "text": "Nice work. The prompt gives Claude enough context to address the dead-discussion problem directly.",
-    "notes": ""
+    "text": "Four out of five. This is a strong design brief. Claude had enough context to make a targeted repair instead of simply rewriting the discussion prompt.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 4/5 branch."
   },
-  "p38": {
+  "s1-score-4-b": {
     "source": "scoreReflection_4",
-    "expression": "encouraging",
-    "text": "Notice how the response changes when the prompt includes learners, constraints, and a clear interaction strategy.",
-    "notes": ""
+    "expression": "thinking",
+    "text": "There is still one area that could be clearer, which matters because small gaps are where AI starts making quiet assumptions on your behalf.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 4/5 branch."
   },
-  "p39": {
-    "source": "scoreReflection_5",
-    "expression": "excited",
-    "text": "Claude spotted the core issue. Students were complying with the requirements, but the prompt was not creating meaningful interaction.",
-    "notes": ""
+  "s1-score-4-c": {
+    "source": "scoreReflection_4",
+    "expression": "proud",
+    "text": "The important shift is here: you gave the replies an instructional purpose, not just a participation requirement. That is a meaningful redesign.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 4/5 branch."
   },
-  "p40": {
+  "s1-score-5-a": {
     "source": "scoreReflection_5",
     "expression": "proud",
-    "text": "To improve discussion quality, we need prompts that ask learners to extend, challenge, compare, or build on one another's ideas. That is exactly what your repair helped Claude design.",
-    "notes": ""
+    "text": "Five out of five. You gave Claude a complete design brief: learner context, the actual problem, the interaction you want, the constraints, and a clear success signal.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 5/5 branch."
+  },
+  "s1-score-5-b": {
+    "source": "scoreReflection_5",
+    "expression": "thinking",
+    "text": "That does not mean Claude is automatically right. It means you gave it enough information that you can judge whether its repair actually follows your instructional intent.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 5/5 branch."
+  },
+  "s1-score-5-c": {
+    "source": "scoreReflection_5",
+    "expression": "proud",
+    "text": "That is the habit I want you to carry forward: make the reasoning visible first, then use AI to help execute the design.",
+    "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 5/5 branch."
   },
   "p47": {
     "source": "predictionReaction_targeted",
@@ -550,6 +648,28 @@ window.pixelAudioLabels = {
   }
 };
 
+
+// S1 v356 score-specific recordings. Stable IDs match app-workbench.js audioKey values.
+window.s1ScoreVoiceover = {
+  "s1-score-0-a": "assets/audio/voice/professor-pixel/scenario-01/s1-score-0-a.mp3",
+  "s1-score-0-b": "assets/audio/voice/professor-pixel/scenario-01/s1-score-0-b.mp3",
+  "s1-score-0-c": "assets/audio/voice/professor-pixel/scenario-01/s1-score-0-c.mp3",
+  "s1-score-1-a": "assets/audio/voice/professor-pixel/scenario-01/s1-score-1-a.mp3",
+  "s1-score-1-b": "assets/audio/voice/professor-pixel/scenario-01/s1-score-1-b.mp3",
+  "s1-score-1-c": "assets/audio/voice/professor-pixel/scenario-01/s1-score-1-c.mp3",
+  "s1-score-2-a": "assets/audio/voice/professor-pixel/scenario-01/s1-score-2-a.mp3",
+  "s1-score-2-b": "assets/audio/voice/professor-pixel/scenario-01/s1-score-2-b.mp3",
+  "s1-score-2-c": "assets/audio/voice/professor-pixel/scenario-01/s1-score-2-c.mp3",
+  "s1-score-3-a": "assets/audio/voice/professor-pixel/scenario-01/s1-score-3-a.mp3",
+  "s1-score-3-b": "assets/audio/voice/professor-pixel/scenario-01/s1-score-3-b.mp3",
+  "s1-score-3-c": "assets/audio/voice/professor-pixel/scenario-01/s1-score-3-c.mp3",
+  "s1-score-4-a": "assets/audio/voice/professor-pixel/scenario-01/s1-score-4-a.mp3",
+  "s1-score-4-b": "assets/audio/voice/professor-pixel/scenario-01/s1-score-4-b.mp3",
+  "s1-score-4-c": "assets/audio/voice/professor-pixel/scenario-01/s1-score-4-c.mp3",
+  "s1-score-5-a": "assets/audio/voice/professor-pixel/scenario-01/s1-score-5-a.mp3",
+  "s1-score-5-b": "assets/audio/voice/professor-pixel/scenario-01/s1-score-5-b.mp3",
+  "s1-score-5-c": "assets/audio/voice/professor-pixel/scenario-01/s1-score-5-c.mp3",
+};
 
 // S2 draft recording metadata. These files are planned but are not loaded until
 // completed recordings are placed at the listed paths.
