@@ -377,7 +377,7 @@ async function sendMain(text) {
 
   try {
     const data = await callClaude({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 1600,
       system: scenarios[SCENARIO_INDEX.ENGAGEMENT].system,
       messages: history
@@ -856,12 +856,12 @@ function buildS1AssembledPrompt(values){
   const parts = [
     `I need help fixing this weak asynchronous discussion prompt: "What did you think about this week's reading? Reply to at least two classmates."`
   ];
-  if (values.learners) parts.push(`Learners and course context: ${values.learners}.`);
-  if (values.issue) parts.push(`The current problem is: ${values.issue}.`);
-  if (values.interaction) parts.push(`Redesign the discussion so students: ${values.interaction}.`);
-  if (values.constraints) parts.push(`Constraints and success criteria: ${values.constraints}.`);
+  if (values.learners) parts.push(`Learners and course context: ${values.learners}`);
+  if (values.issue) parts.push(`The current problem is: ${values.issue}`);
+  if (values.interaction) parts.push(`Redesign the discussion so students: ${values.interaction}`);
+  if (values.constraints) parts.push(`Constraints and success criteria: ${values.constraints}`);
   parts.push('Create a revised student-facing discussion prompt. Keep it practical for an asynchronous online course. Briefly explain how the revision addresses the original problem of surface-level replies.');
-  return parts.join(' ');
+  return parts.join('\n\n');
 };
 
 function sendGuided(){
@@ -904,8 +904,8 @@ function buildS1TerminalDiagnosis(score, responseText){
     ? `Your repair has a usable direction, but it still needs more precision around ${missing.join(', ')}.`
     : 'Your repair identifies the engagement problem, gives peer replies an instructional purpose, and includes enough constraints for a usable redesign.';
   const fallbackWorked = [
-    values.learners ? `You identified the learner/course context: ${values.learners}.` : '',
-    values.interaction ? `You specified this interaction move: ${values.interaction}.` : ''
+    values.learners ? `You identified the learner/course context: ${values.learners}` : '',
+    values.interaction ? `You specified this interaction move: ${values.interaction}` : ''
   ].filter(Boolean).join(' ');
   const fallbackIssue = missing.length
     ? `The most important remaining gap is ${missing[0]}.`

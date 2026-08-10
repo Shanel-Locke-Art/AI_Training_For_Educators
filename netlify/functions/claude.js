@@ -1,3 +1,5 @@
+const DEFAULT_CLAUDE_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6';
+
 const CORS_HEADERS = Object.freeze({
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type',
@@ -49,6 +51,10 @@ exports.handler = async (event = {}) => {
   if (!payload || !Array.isArray(payload.messages) || payload.messages.length === 0) {
     return jsonResponse(400, { error: { message: 'At least one Claude message is required.' } });
   }
+
+  // Keep the active model server-side so retired model IDs do not strand the game.
+  // Set ANTHROPIC_MODEL in Netlify if PromptCraft needs to pin a different supported model.
+  payload.model = DEFAULT_CLAUDE_MODEL;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {

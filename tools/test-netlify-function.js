@@ -45,6 +45,8 @@ async function run() {
       assert.equal(options.method, 'POST');
       assert.equal(options.headers['x-api-key'], 'test-key');
       assert.equal(options.headers['anthropic-version'], '2023-06-01');
+      const outbound = JSON.parse(options.body);
+      assert.equal(outbound.model, 'claude-sonnet-4-6');
       return {
         status: 429,
         text: async () => JSON.stringify({ error: { message: 'Rate limited.' } })
