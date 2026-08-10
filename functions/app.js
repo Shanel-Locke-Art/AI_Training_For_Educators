@@ -430,7 +430,7 @@ function startGame() {
 //  Paste your Google Apps Script Web App URL into SHEETS_URL
 // ══════════════════════════════════════════════════════
 const SURVEY_MODE   = 'sheets';
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbylnSseQkSsPNKSjqoU2ui6yFa62YslQEq-nRyeC8MZFVnlmv-XYoi2EUJPZGvnKU1z/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzgR2zSd3nP_qmWPlqgWa67bONHuUbbgxPovqYL7cxSJocD8ama16XGpCoAJV9N3U0/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 
 // ══════════════════════════════════════════════════════

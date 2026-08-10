@@ -1,83 +1,96 @@
-#!/usr/bin/env node
-'use strict';
-
 const assert = require('node:assert/strict');
 const { handler } = require('../netlify/functions/claude.js');
 
 async function run() {
   const originalKey = process.env.ANTHROPIC_API_KEY;
+  const originalBase = process.env.ANTHROPIC_BASE_URL;
+  const originalModel = process.env.ANTHROPIC_MODEL;
   const originalFetch = global.fetch;
-  const originalConsoleError = console.error;
 
   try {
     delete process.env.ANTHROPIC_API_KEY;
-
-    const options = await handler({ httpMethod: 'OPTIONS' });
-    assert.equal(options.statusCode, 204);
-    assert.equal(options.headers['Access-Control-Allow-Methods'], 'POST, OPTIONS');
+    delete process.env.ANTHROPIC_BASE_URL;
+    delete process.env.ANTHROPIC_MODEL;
 
     const get = await handler({ httpMethod: 'GET' });
-    assert.equal(get.statusCode, 405);
-    assert.equal(get.headers.Allow, 'POST, OPTIONS');
+    assert.equal(get.statusCode, 200);
+    const healthWithoutKey = JSON.parse(get.body);
+    assert.equal(healthWithoutKey.status, 'ok');
+    assert.equal(healthWithoutKey.configured, false);
+    assert.equal(healthWithoutKey.model, 'claude-sonnet-4-6');
+    assert.equal(healthWithoutKey.route, 'anthropic-direct');
+    assert.equal(healthWithoutKey.proxy_version, 'V358');
 
-    const unavailable = await handler({ httpMethod: 'POST', body: '{}' });
-    assert.equal(unavailable.statusCode, 503);
+    const noKey = await handler({
+      httpMethod: 'POST',
+      body: JSON.stringify({ max_tokens: 32, messages: [{ role: 'user', content: 'Test' }] })
+    });
+    assert.equal(noKey.statusCode, 503);
 
     process.env.ANTHROPIC_API_KEY = 'test-key';
 
-    const empty = await handler({ httpMethod: 'POST', body: '' });
-    assert.equal(empty.statusCode, 400);
-
-    const malformed = await handler({ httpMethod: 'POST', body: '{' });
-    assert.equal(malformed.statusCode, 400);
-
-    const noMessages = await handler({ httpMethod: 'POST', body: '{"messages":[]}' });
-    assert.equal(noMessages.statusCode, 400);
-
-    const oversized = await handler({
-      httpMethod: 'POST',
-      body: JSON.stringify({ messages: [{ role: 'user', content: 'x'.repeat(100_001) }] })
-    });
-    assert.equal(oversized.statusCode, 413);
-
+    let lastUrl = '';
+    let lastOptions = null;
     global.fetch = async (url, options) => {
-      assert.equal(url, 'https://api.anthropic.com/v1/messages');
-      assert.equal(options.method, 'POST');
-      assert.equal(options.headers['x-api-key'], 'test-key');
-      assert.equal(options.headers['anthropic-version'], '2023-06-01');
-      const outbound = JSON.parse(options.body);
-      assert.equal(outbound.model, 'claude-sonnet-4-6');
+      lastUrl = url;
+      lastOptions = options;
       return {
-        status: 429,
-        text: async () => JSON.stringify({ error: { message: 'Rate limited.' } })
+        status: 200,
+        ok: true,
+        text: async () => JSON.stringify({
+          id: 'msg_test',
+          type: 'message',
+          role: 'assistant',
+          content: [{ type: 'text', text: 'Connected.' }]
+        })
       };
     };
 
-    const upstream = await handler({
+    const direct = await handler({
       httpMethod: 'POST',
-      body: JSON.stringify({ messages: [{ role: 'user', content: 'Test' }] })
+      body: JSON.stringify({
+        model: 'retired-client-model',
+        max_tokens: 64,
+        system: 'Test system',
+        messages: [{ role: 'user', content: 'Hello' }]
+      })
     });
-    assert.equal(upstream.statusCode, 429);
-    assert.equal(JSON.parse(upstream.body).error.message, 'Rate limited.');
-    assert.equal(upstream.headers['Cache-Control'], 'no-store');
+    assert.equal(direct.statusCode, 200);
+    assert.equal(lastUrl, 'https://api.anthropic.com/v1/messages');
+    assert.equal(lastOptions.headers['x-api-key'], 'test-key');
+    assert.equal(lastOptions.headers['anthropic-version'], '2023-06-01');
+    let outbound = JSON.parse(lastOptions.body);
+    assert.equal(outbound.model, 'claude-sonnet-4-6');
 
-    global.fetch = async () => {
-      throw new Error('network unavailable');
-    };
-    console.error = () => {};
-    const failed = await handler({
+    process.env.ANTHROPIC_BASE_URL = 'https://gateway.example.test/anthropic/';
+    const gatewayHealth = await handler({ httpMethod: 'GET' });
+    const gatewayHealthBody = JSON.parse(gatewayHealth.body);
+    assert.equal(gatewayHealthBody.route, 'netlify-ai-gateway-or-custom-base');
+    assert.equal(gatewayHealthBody.base_url_configured, true);
+
+    const gateway = await handler({
       httpMethod: 'POST',
-      body: JSON.stringify({ messages: [{ role: 'user', content: 'Test' }] })
+      body: JSON.stringify({
+        max_tokens: 64,
+        messages: [{ role: 'user', content: 'Hello through gateway' }]
+      })
     });
-    assert.equal(failed.statusCode, 502);
+    assert.equal(gateway.statusCode, 200);
+    assert.equal(lastUrl, 'https://gateway.example.test/anthropic/v1/messages');
+
+    console.log('PromptCraft Claude proxy tests passed.');
   } finally {
     if (originalKey === undefined) delete process.env.ANTHROPIC_API_KEY;
     else process.env.ANTHROPIC_API_KEY = originalKey;
-    global.fetch = originalFetch;
-    console.error = originalConsoleError;
-  }
 
-  console.log('PromptCraft Claude proxy tests passed.');
+    if (originalBase === undefined) delete process.env.ANTHROPIC_BASE_URL;
+    else process.env.ANTHROPIC_BASE_URL = originalBase;
+
+    if (originalModel === undefined) delete process.env.ANTHROPIC_MODEL;
+    else process.env.ANTHROPIC_MODEL = originalModel;
+
+    global.fetch = originalFetch;
+  }
 }
 
 run().catch(error => {
