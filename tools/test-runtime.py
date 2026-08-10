@@ -173,9 +173,9 @@ def main() -> int:
             )
             photo, screen, output = geometry["photo"], geometry["screen"], geometry["output"]
             if not geometry["analyzing"]:
-                failures.append(f"{viewport_name}: Claude analyzing state did not open.")
+                failures.append(f"{viewport_name}: Babbage analyzing state did not open.")
             if not all((photo, screen, output)):
-                failures.append(f"{viewport_name}: Claude analysis geometry is incomplete.")
+                failures.append(f"{viewport_name}: Babbage analysis geometry is incomplete.")
             else:
                 tolerance = 1.5
                 if (
@@ -243,7 +243,7 @@ def main() -> int:
 
     print(
         "PromptCraft runtime tests passed: 8 scenarios across 3 viewports, "
-        "Claude analysis geometry, onboarding events, and Ideas Wall interactions."
+        "Babbage analysis geometry, onboarding events, and Ideas Wall interactions."
     )
     return 0
 

@@ -1,5 +1,5 @@
 {
-  "version": 140,
+  "version": 141,
   "runtime_images": {
     "background.png": "assets/images/backgrounds/app-background.png",
     "classroom-bg.png": "assets/images/backgrounds/classroom.png",
@@ -21,7 +21,9 @@
     "jordan-uncertain.png": "assets/images/characters/students/jordan/uncertain.png",
     "jordan-frustrated.png": "assets/images/characters/students/jordan/frustrated.png",
     "jordan-thinking.png": "assets/images/characters/students/jordan/thinking.png",
-    "jordan-confident.png": "assets/images/characters/students/jordan/confident.png"
+    "jordan-confident.png": "assets/images/characters/students/jordan/confident.png",
+    "babbage-mark.svg": "assets/images/ui/babbage-mark.svg",
+    "babbage-engine-plate.svg": "assets/images/ui/babbage-engine-plate.svg"
   },
   "planned_runtime_images": {
     "scene-s7.png": "assets/images/scenes/scenario-07-overreliance/scene.png",

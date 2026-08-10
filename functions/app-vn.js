@@ -1484,7 +1484,7 @@ function pcAlignModernTerminalScreenV149() {
   // v207: Full-width prediction is JavaScript-owned because delayed functions
   // and inline cleanup were restoring the oversized CSS frame after the correct
   // geometry had rendered. Apply the approved workstation and monitor bounds in
-  // one pass, then capture that exact box for Claude's analyzing transition.
+  // one pass, then capture that exact box for Babbage's analyzing transition.
   if (predictionOpen) {
     pcClearPredictionLayoutInlineStylesV186();
     pcApplyWidePredictionComputerV207(terminal, photo, screen, viewportHeight);
@@ -2228,9 +2228,9 @@ function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
   outputEl.classList.add('pc-analyzing-output');
 
   outputEl.innerHTML = `
-    <div class="pc-analyzing-readout" aria-label="Claude terminal analyzing">
+    <div class="pc-analyzing-readout" aria-label="Babbage Engine analyzing">
       <div class="pc-analyzing-panel">
-        <div class="pc-terminal-line pc-terminal-title-line">CLAUDE TERMINAL</div>
+        <div class="pc-terminal-line pc-terminal-title-line">BABBAGE ENGINE</div>
         <div class="pc-terminal-divider" aria-hidden="true"></div>
         <div class="pc-terminal-section">
           <div class="pc-terminal-kicker">&gt; SECTION</div>
@@ -2240,7 +2240,7 @@ function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
         <div class="pc-terminal-section">
           <div class="pc-terminal-kicker">&gt; STATUS</div>
           <div class="pc-terminal-value pc-analyzing-status">ANALYZING<span class="claude-terminal-cursor" aria-hidden="true"></span></div>
-          <div class="pc-analyzing-progress" role="progressbar" aria-label="Claude analysis progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="pc-analyzing-progress" role="progressbar" aria-label="Babbage analysis progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <span class="pc-analyzing-progress-fill" aria-hidden="true"></span>
           </div>
           <div class="pc-analyzing-phase" aria-live="polite">PREPARING REQUEST</div>
@@ -2332,7 +2332,7 @@ function pcStartClaudeAnalysisProgressV360(timeoutMs = 60000) {
   // actually know. Between them the bar advances slowly as an elapsed-time
   // estimate, capped at 84% so "almost done" never becomes a lie.
   window.setTimeout(() => pcSetClaudeAnalysisProgressV360(12, 'Sending course context'), 120);
-  window.setTimeout(() => pcSetClaudeAnalysisProgressV360(18, 'Waiting for Claude'), 500);
+  window.setTimeout(() => pcSetClaudeAnalysisProgressV360(18, 'Waiting for Babbage'), 500);
 
   const safeTimeout = Math.max(10000, Number(timeoutMs) || 60000);
   pcClaudeAnalysisProgressTimerV360 = window.setInterval(() => {
@@ -2340,13 +2340,13 @@ function pcStartClaudeAnalysisProgressV360(timeoutMs = 60000) {
     const ratio = Math.min(1, elapsed / safeTimeout);
 
     // Ease toward 84%. Typical 30–40 s responses land around 60–75% rather
-    // than displaying a fake 100% several seconds before Claude returns.
+    // than displaying a fake 100% several seconds before Babbage returns.
     const estimated = 18 + (66 * (1 - Math.exp(-2.2 * ratio)));
     const next = Math.min(84, estimated);
 
-    let phaseLabel = 'Waiting for Claude';
-    if (elapsed >= 30000) phaseLabel = 'Claude is still reasoning';
-    else if (elapsed >= 12000) phaseLabel = 'Claude is evaluating the design';
+    let phaseLabel = 'Waiting for Babbage';
+    if (elapsed >= 30000) phaseLabel = 'Babbage is still reasoning';
+    else if (elapsed >= 12000) phaseLabel = 'Babbage is evaluating the design';
 
     pcSetClaudeAnalysisProgressV360(next, phaseLabel);
   }, 500);
@@ -2610,7 +2610,7 @@ if (!window.pcAnalysisLayoutV122Installed) {
 }
 
 function showClaudeConsultOverlay(partLabel) {
-  // This is an interaction moment: Pixel consults Claude through the terminal close-up.
+  // This is an interaction moment: Pixel consults Babbage through the terminal close-up.
   vnQueue = [];
   clearTimeout(vnTypeTimer);
   vnTyping = true;
@@ -2632,7 +2632,7 @@ setClaudeShelfState('idle', 'idle');
 
 setClaudeTerminalState(
   'thinking',
-  'CLAUDE TERMINAL',
+  'BABBAGE ENGINE',
   `SECTION:\n${esc(partLabel).toUpperCase()}\n\nANALYZING...`
 );
 
@@ -2645,7 +2645,7 @@ pcScheduleLiveAnalyzingLayoutV256({ immediate: true });
 
   const vnText = document.getElementById('vnText');
   if (vnText) {
-    vnText.innerHTML = `<div><strong>Let's ask Claude what it notices.</strong></div><div style="margin-top:8px;">Claude is analyzing the teaching problem now.</div><div class="vn-prediction-note">Terminal active...</div>`;
+    vnText.innerHTML = `<div><strong>Let's ask Babbage what it notices.</strong></div><div style="margin-top:8px;">Babbage is analyzing the teaching problem now.</div><div class="vn-prediction-note">Terminal active...</div>`;
   }
 
   const hint = document.getElementById('vnAdvanceHint');
@@ -2701,8 +2701,8 @@ function parseClaudeDiagnosticSections(text) {
   return {
     status: result.status || 'High-confidence repair',
     confidence: result.confidence || 'High',
-    summary: result.summary || 'Claude evaluated the specific repair choices in your prompt and identified the strongest next refinement.',
-    worked: result.worked || 'Your prompt gave Claude enough instructional direction to produce a targeted redesign.',
+    summary: result.summary || 'Babbage evaluated the specific repair choices in your prompt and identified the strongest next refinement.',
+    worked: result.worked || 'Your prompt gave Babbage enough instructional direction to produce a targeted redesign.',
     issue: result.issue || fallbackIssue || 'The prompt has a discussion design problem that may limit student interaction.',
     repair: result.repair || 'Add a clear reason for students to extend, challenge, compare, or build on a peer’s idea using evidence or reasoning.',
     impact: result.impact || 'Students will be more likely to extend conversations, challenge ideas, compare perspectives, and engage in deeper discussion.'
@@ -2722,7 +2722,7 @@ function buildClaudeAnalysisHTML(feedback, mock = false, mockReason = '') {
       : '';
 
   return `
-    <div class="analysis-report ${densityClass}" data-analysis-characters="${totalCharacters}" role="document" aria-label="Claude scenario diagnostic report">
+    <div class="analysis-report ${densityClass}" data-analysis-characters="${totalCharacters}" role="document" aria-label="Babbage scenario diagnostic report">
       <header class="analysis-header">
         <div class="analysis-badge">${esc(badge)}</div>
         <h2 class="analysis-title">Scenario Diagnostic</h2>
@@ -2738,7 +2738,7 @@ function buildClaudeAnalysisHTML(feedback, mock = false, mockReason = '') {
         <section class="analysis-card analysis-confidence-card compact">
           <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">◎</span><span>Confidence</span></span>
           <div class="analysis-value big">${esc(d.confidence)}</div>
-          <div class="analysis-note">Claude's confidence in this specific diagnosis.</div>
+          <div class="analysis-note">Babbage's confidence in this specific diagnosis.</div>
         </section>
 
         <section class="analysis-card analysis-worked-card">
@@ -2774,7 +2774,7 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null, mockRea
 
   setClaudeTerminalState(
     'responding',
-    mock ? 'MOCK CLAUDE TERMINAL' : 'CLAUDE TERMINAL',
+    mock ? 'MOCK BABBAGE ENGINE' : 'BABBAGE ENGINE',
     esc(terminalText)
   );
 
@@ -2811,7 +2811,7 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null, mockRea
 
 
 // NOTE: Terminal diagnosis copy is still inline. Candidate for dialogue.js or scenario-data.js.
-function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose = null, scoreTotal = null, mockReason = '') {
+function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose = null, scoreTotal = null, mockReason = '', structuredAnalysis = null) {
   // Scenario-specific result handoff: S2 currently uses the shared terminal flow.
   let effectiveClose = onClose;
   if (scenarioIndex === 1) {
@@ -2825,7 +2825,7 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
   if (!overlay || !overlay.classList.contains('active')) {
     showClaudeConsultOverlay('Scenario diagnosis');
   }
-  // V360: the progress bar now follows the real Claude request lifecycle.
+  // V360: the progress bar now follows the real Babbage request lifecycle.
   // By the time this function runs the response has arrived; briefly show the
   // final parsing/rendering stages, then reveal the report.
   pcMarkClaudeResponseParsedV360();
@@ -2834,7 +2834,7 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
   window.setTimeout(() => {
     pcCompleteClaudeAnalysisProgressV360();
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
-      ? buildS1TerminalDiagnosis(scoreTotal, responseText)
+      ? buildS1TerminalDiagnosis(scoreTotal, responseText, structuredAnalysis)
       : responseText;
     window.setTimeout(() => {
       showClaudeConsultResult(terminalOutput, mock, effectiveClose, mockReason);
@@ -2852,7 +2852,7 @@ function closeClaudeConsultOverlay() {
   pcResetVNDialogueState();
   setClaudeShelfState('idle', 'idle');
   setClaudeTerminalTextMode(false);
-  setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'IDLE');
+  setClaudeTerminalState('idle', 'BABBAGE ENGINE', 'IDLE');
   musicEndVN();
   if (cb) {
     setTimeout(cb, 250);
@@ -3054,7 +3054,7 @@ pcRegisterUIActions({
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');
 
-  // HARD STOP: during Claude terminal/thinking screens, clicks on the black
+  // HARD STOP: during Babbage terminal/thinking screens, clicks on the black
   // dialogue panel must NOT advance or clear the VN text. Only the explicit
   // Continue button on the finished analysis screen should close it.
   const terminal = document.getElementById('claudeTerminalScene');
@@ -3071,7 +3071,7 @@ function vnAdvance() {
   }
 
   // HARD STOP: once the prediction has been logged, the black VN box must
-  // not advance the scene. Only the actual "Continue to Claude" button should
+  // not advance the scene. Only the actual "Continue to Babbage" button should
   // move the user into the Claude processing screen. Otherwise a stray click
   // jumps the state machine into the weird empty terminal screen. Charming.
   if (

@@ -179,8 +179,8 @@ def main() -> int:
         errors.append("Registered UI actions with no matching control: " + ", ".join(unused_actions))
 
     vn_source = (ROOT / "functions/app-vn.js").read_text(encoding="utf-8")
-    if "const PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS = 4000;" not in vn_source:
-        errors.append("The Claude analysis hold is not set to the approved 4-second runtime.")
+    if "const PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS = 350;" not in vn_source:
+        errors.append("The Babbage post-response transition is not set to the approved short runtime.")
 
     app_source = (ROOT / "functions/app.js").read_text(encoding="utf-8")
     workbench_source = (ROOT / "functions/app-workbench.js").read_text(encoding="utf-8")

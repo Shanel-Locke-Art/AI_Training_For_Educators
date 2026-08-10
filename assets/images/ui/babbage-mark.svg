@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Babbage Engine mark</title>
+  <desc id="desc">A brass mechanical gear surrounding a green sprout and a small 1837 inscription.</desc>
+  <defs>
+    <linearGradient id="brass" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#f0d28b"/><stop offset=".42" stop-color="#b98b39"/><stop offset="1" stop-color="#6f4d18"/></linearGradient>
+    <linearGradient id="green" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b7e2c6"/><stop offset="1" stop-color="#3e7f58"/></linearGradient>
+  </defs>
+  <g transform="translate(64 58)">
+    <g fill="url(#brass)" stroke="#4c3515" stroke-width="2">
+      <path d="M-9-51h18l3 10a42 42 0 0 1 9 4l10-5 13 13-5 10a42 42 0 0 1 4 9l10 3v18l-10 3a42 42 0 0 1-4 9l5 10-13 13-10-5a42 42 0 0 1-9 4l-3 10H-9l-3-10a42 42 0 0 1-9-4l-10 5-13-13 5-10a42 42 0 0 1-4-9l-10-3V-7l10-3a42 42 0 0 1 4-9l-5-10 13-13 10 5a42 42 0 0 1 9-4z"/>
+      <circle cx="0" cy="0" r="31" fill="#153b2f" stroke="#d1af67" stroke-width="3"/>
+    </g>
+    <g fill="none" stroke="url(#green)" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 19C-1 6 0-5 3-16" stroke-width="6"/>
+      <path d="M1-7C-12-8-20-15-22-25c12 0 22 5 27 14" stroke-width="5"/>
+      <path d="M3-14c8-10 18-14 28-11-3 11-12 18-25 19" stroke-width="5"/>
+    </g>
+    <circle cx="0" cy="0" r="37" fill="none" stroke="#6fb187" stroke-opacity=".35"/>
+  </g>
+  <text x="64" y="118" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="13" letter-spacing="3" fill="#d7bd7e">1837</text>
+</svg>

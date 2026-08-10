@@ -12,7 +12,7 @@ The generated JavaScript bundle is assembled, in order, from:
 
 1. `functions/app.js` for shared state, configuration, research logging, assets, and audio.
 2. `functions/app-scenarios.js` for scenario definitions, menus, reusable activity builders, and scenario navigation state.
-3. `functions/app-vn.js` for the visual-novel engine, Claude terminal flows, and responsive scene controllers.
+3. `functions/app-vn.js` for the visual-novel engine, Babbage terminal flows, and responsive scene controllers.
 4. `functions/app-workbench.js` for scenario workbenches, scoring, completion, reflection, and development tools.
 
 ## Editing JavaScript
@@ -25,7 +25,7 @@ python tools/validate-project.py
 python tools/test-runtime.py
 ```
 
-The build adds defensive semicolon boundaries between JavaScript source files, compiles the complete CSS owner cascade into one runtime stylesheet, and runs `node --check` against every runtime script. Validation checks bundle drift, duplicate HTML IDs, local file references, UI action ownership, CSS structure, retired selectors, exact duplicate CSS rules, asset ownership, the Claude proxy, synchronized cache versions, and the temporary Claude-analysis hold. The runtime test exercises all eight scenarios at desktop, tablet, and phone sizes, plus onboarding, the Claude analyzing geometry, and Ideas Wall interactions. It requires Python Playwright and Chromium.
+The build adds defensive semicolon boundaries between JavaScript source files, compiles the complete CSS owner cascade into one runtime stylesheet, and runs `node --check` against every runtime script. Validation checks bundle drift, duplicate HTML IDs, local file references, UI action ownership, CSS structure, retired selectors, exact duplicate CSS rules, asset ownership, the Babbage/OpenAI proxy, synchronized cache versions, and the temporary Claude-analysis hold. The runtime test exercises all eight scenarios at desktop, tablet, and phone sizes, plus onboarding, the Babbage analyzing geometry, and Ideas Wall interactions. It requires Python Playwright and Chromium.
 
 Do not add `async`, `defer`, or `type="module"` to the runtime script tags without first converting the shared globals.
 
@@ -51,7 +51,7 @@ Modify the existing owner rule whenever possible. Add a new owner file only for 
 
 Phase 4 establishes the clean baseline for future interface work. Application controls now use the delegated action registry for click, submit, change, keyboard, and details-toggle behavior; inline HTML event handlers are prohibited by validation. Image fallbacks retain their error handlers, and research payload logging is disabled unless the page is opened with `?debug=1`.
 
-The Ideas Wall owns its CSS and JavaScript in `styles/wall.css` and `functions/wall.js`. Project links are relative so the site can run from a subfolder or Canvas-hosted package rather than assuming deployment at the domain root. The Claude Netlify proxy validates methods, body size, JSON, and message content, preserves upstream status codes, prevents caching, and has a local test in `tools/test-netlify-function.js`.
+The Ideas Wall owns its CSS and JavaScript in `styles/wall.css` and `functions/wall.js`. Project links are relative so the site can run from a subfolder or Canvas-hosted package rather than assuming deployment at the domain root. The Babbage Netlify proxy validates methods, body size, JSON, and message content, preserves upstream status codes, prevents caching, and has a local test in `tools/test-netlify-function.js`.
 
 `assets/asset-manifest.json` classifies every shipped asset as runtime, planned, development reference, or documentation. `tools/audit-assets.py` rejects missing, unclassified, or unregistered assets. The following obsolete files were removed from the clean baseline:
 
@@ -69,6 +69,6 @@ python tools/test-runtime.py
 
 The browser runtime is intentionally framework-free and uses relative local paths, which keeps the package suitable for ordinary static hosting and Canvas-compatible web delivery. External services still require network access and their configured endpoints.
 
-## Temporary Claude analysis hold
+## Babbage analysis transition
 
-Responsive QA currently uses a 15-second analysis hold. Its single default is `PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS` in `functions/app-vn.js`. Keep that value until the responsive Claude-analysis alignment work is complete.
+Babbage's progress display now follows observable request stages. After a live response arrives, the final parsing/render transition uses the short `PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS` compatibility constant in `functions/app-vn.js`; it should remain brief because the progress bar itself owns the waiting experience.

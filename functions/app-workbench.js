@@ -102,7 +102,7 @@ function pcClearVNStateForScenarioSwitch() {
   clearTimeout(vnTypeTimer);
   setClaudeShelfState('idle', 'idle');
   setClaudeTerminalTextMode(false);
-  setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'AWAITING INPUT...');
+  setClaudeTerminalState('idle', 'BABBAGE ENGINE', 'AWAITING INPUT...');
   musicEndVN();
 }
 
@@ -280,7 +280,7 @@ function addMsg(role, html, pixelExpr) {
       ? `<div class="claude-avatar" aria-hidden="true">⌘</div>`
       : pixelAvatarHTML(pixelExpr || 'neutral');
 
-  const senderLabel = isUser ? playerName : isClaude ? 'Claude' : 'Professor Pixel';
+  const senderLabel = isUser ? playerName : isClaude ? 'Babbage' : 'Professor Pixel';
 
   wrap.innerHTML = `
     ${avatarHTML}
@@ -289,7 +289,7 @@ function addMsg(role, html, pixelExpr) {
       <div class="bubble">${html}</div>
     </div>`;
   area.appendChild(wrap);
-  // Only scroll to bottom for user messages -- AI/Claude messages handled by caller
+  // Only scroll to bottom for user messages -- AI/Babbage messages handled by caller
   if (isUser) area.scrollTop = area.scrollHeight;
   return wrap;
 }
@@ -344,10 +344,10 @@ function renderInputMode(idx) {
 
 // ── UNIFIED SEND ENTRY POINT ──────────────────────────
 // Guard state keeps the VN prediction prompt from reopening or re-submitting
-// while Claude is already processing. Without this, the VN click handler can
+// while Babbage is already processing. Without this, the VN click handler can
 // turn one prompt into a tiny haunted carousel.
 let predictionGateActive = false;
-let isSubmittingToClaude = false;
+let isSubmittingToBabbage = false;
 
 // ══════════════════════════════════════════════════════
 //  SEND
@@ -360,11 +360,20 @@ async function send() {
 }
 
 
+let isSubmittingToClaude = false; // compatibility mirror for older guards
+
+function pcSetBabbageSubmitting(value) {
+  isSubmittingToBabbage = !!value;
+  isSubmittingToClaude = !!value;
+  window.isSubmittingToClaude = !!value;
+  window.isSubmittingToBabbage = !!value;
+}
+
 async function sendMain(text) {
-  if (!text || isSubmittingToClaude) return;
+  if (!text || isSubmittingToBabbage) return;
   if (scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT || !getScenarioUI(scenarioIndex).implemented) return;
 
-  isSubmittingToClaude = true;
+  pcSetBabbageSubmitting(true);
   attempts++;
   lastPromptText = text;
   const attEl = document.getElementById('attNum');
@@ -377,19 +386,19 @@ async function sendMain(text) {
 
   try {
     const data = await callClaude({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1600,
+      max_output_tokens: 5000,
       system: scenarios[SCENARIO_INDEX.ENGAGEMENT].system,
       messages: history
     }, 'main');
     removeTyping();
 
     if (data.error) {
-      addMsg('ai', `<span style="color:var(--red)">Error: ${esc(data.error.message || 'Claude request failed.')}</span>`);
+      addMsg('ai', `<span style="color:var(--red)">Error: ${esc(data.error.message || 'Babbage request failed.')}</span>`);
       return;
     }
 
     const reply = data.content?.[0]?.text || '';
+    const structuredAnalysis = data.structured || null;
     history.push({ role: 'assistant', content: reply });
 
     const score = scorePrompt(text);
@@ -398,19 +407,26 @@ async function sendMain(text) {
     trackPrompt(SCENARIO_INDEX.ENGAGEMENT, text, score.total, reply, active.map(id => {
       const indicator = scenarios[SCENARIO_INDEX.ENGAGEMENT].oscqr.find(item => item.id === id);
       return indicator ? indicator.label : id;
-    }));
+    }), {
+      provider: data.provider || (data.mock ? 'local-fallback' : ''),
+      model: data.model || '',
+      request_id: data.request_id || '',
+      elapsed_ms: data.elapsed_ms,
+      usage: data.usage || null,
+      structured: structuredAnalysis
+    });
 
     gainXP(score.total * 6);
     lastScore = score.total;
     showClaudeFinalResponseInTerminal(reply, !!data.mock, () => {
-      addS1ClaudeResultCard(reply);
+      addS1ClaudeResultCard(reply, structuredAnalysis);
       showS1PostAnalysisReflection(score.total);
-    }, score.total, data.mockReason || '');
+    }, score.total, data.mockReason || '', structuredAnalysis);
   } catch (error) {
     removeTyping();
     addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`);
   } finally {
-    isSubmittingToClaude = false;
+    pcSetBabbageSubmitting(false);
     predictionGateActive = false;
     const btn = document.getElementById('sendBtn');
     if (btn) btn.disabled = false;
@@ -490,7 +506,7 @@ function esc(t) {
 }
 
 // Minimal markdown formatter used by result cards and legacy chat bubbles.
-// Claude's cleanup removed this helper, which made Consult Claude crash after the mock response returned.
+// An earlier cleanup removed this helper, which made Consult Babbage crash after the mock response returned.
 function fmt(text) {
   return esc(String(text ?? ''))
     .replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
@@ -767,7 +783,7 @@ function buildS1RightHTML(){
         <div class="s1-clean-builder-head">
           <div>
             <div class="s1-clean-builder-title">Repair Workspace</div>
-            <div class="s1-clean-builder-sub">Give Claude the information it needs to repair the actual teaching problem, not just make a prettier prompt.</div>
+            <div class="s1-clean-builder-sub">Give Babbage the information it needs to repair the actual teaching problem, not just make a prettier prompt.</div>
           </div>
         </div>
         <div class="s1-clean-fields">
@@ -790,7 +806,7 @@ function buildS1RightHTML(){
         </div>
         <div class="s1-clean-actions">
           <div class="s1-clean-nudge" id="s1BuilderNudge"></div>
-          <button class="s1-clean-submit" id="sendBtn" type="button" data-pc-action="send-guided">Consult Claude →</button>
+          <button class="s1-clean-submit" id="sendBtn" type="button" data-pc-action="send-guided">Consult Babbage →</button>
         </div>
       </section>
     </div>`;
@@ -878,7 +894,7 @@ function sendGuided(){
     const nudge = document.getElementById('s1BuilderNudge');
     if (nudge) {
       nudge.style.display = 'block';
-      nudge.innerHTML = `<strong>Before we ask Claude:</strong> Add more detail for ${missing.join(', ')}.`;
+      nudge.innerHTML = `<strong>Before we ask Babbage:</strong> Add more detail for ${missing.join(', ')}.`;
     }
     const focusMap = { 'audience/course':'g-learners', 'problem diagnosis':'g-issue', 'interaction move':'g-interaction', 'constraints':'g-constraints', 'success criteria':'g-constraints' };
     document.getElementById(focusMap[missing[0]])?.focus();
@@ -887,7 +903,7 @@ function sendGuided(){
   sendText(buildS1AssembledPrompt(values));
 };
 
-function buildS1TerminalDiagnosis(score, responseText){
+function buildS1TerminalDiagnosis(score, responseText, structuredAnalysis = null){
   const parsed = parseS1ClaudeStructuredResponse(responseText);
   const values = getS1GuidedValues();
   const checks = analyzeS1Guided(values);
@@ -915,18 +931,22 @@ function buildS1TerminalDiagnosis(score, responseText){
     : 'Differentiate the required peer replies so students cannot satisfy both with the same generic response move.';
   const fallbackImpact = 'That refinement should make student replies more purposeful and give classmates a clearer reason to continue the conversation.';
 
+  const structuredWorked = Array.isArray(structuredAnalysis?.what_worked)
+    ? structuredAnalysis.what_worked.map(item => `• ${item}`).join('\n')
+    : String(structuredAnalysis?.what_worked || '');
+
   return [
-    'STATUS', parsed.status || fallbackStatus,
-    '', 'CONFIDENCE', parsed.confidence || fallbackConfidence,
-    '', 'FEEDBACK SUMMARY', parsed.summary || fallbackSummary,
-    '', 'WHAT WORKED', parsed.worked || fallbackWorked || 'You supplied enough information for Claude to identify a concrete instructional direction.',
-    '', 'ISSUE DETECTED', parsed.issue || fallbackIssue,
-    '', 'RECOMMENDED REPAIR', parsed.repair || fallbackRepair,
-    '', 'EXPECTED IMPACT', parsed.impact || fallbackImpact
+    'STATUS', structuredAnalysis?.status || parsed.status || fallbackStatus,
+    '', 'CONFIDENCE', structuredAnalysis?.confidence || parsed.confidence || fallbackConfidence,
+    '', 'FEEDBACK SUMMARY', structuredAnalysis?.feedback_summary || parsed.summary || fallbackSummary,
+    '', 'WHAT WORKED', structuredWorked || parsed.worked || fallbackWorked || 'You supplied enough information for Babbage to identify a concrete instructional direction.',
+    '', 'ISSUE DETECTED', structuredAnalysis?.issue_detected || parsed.issue || fallbackIssue,
+    '', 'RECOMMENDED REPAIR', structuredAnalysis?.recommended_repair || parsed.repair || fallbackRepair,
+    '', 'EXPECTED IMPACT', structuredAnalysis?.expected_impact || parsed.impact || fallbackImpact
   ].join('\n');
 }
 
-function addS1ClaudeResultCard(responseText){
+function addS1ClaudeResultCard(responseText, structuredAnalysis = null){
   document.body.classList.add('s1-result-active');
   const area = document.getElementById('chat');
   if (!area) return null;
@@ -935,10 +955,17 @@ function addS1ClaudeResultCard(responseText){
   const card = document.createElement('div');
   card.className = 's1-result-card s1-result-card-focused';
   card.innerHTML = `
-    <div class="s1-result-eyebrow">Claude Draft</div>
+    <div class="s1-result-eyebrow">Babbage Draft</div>
     <div class="s1-result-title">Revised Discussion Prompt</div>
     <div class="s1-result-content-box">
-      <div class="s1-result-body">${fmt(cleanS1ClaudeDraft(responseText))}</div>
+      <div class="s1-result-body">${fmt(structuredAnalysis?.revised_discussion_prompt || cleanS1ClaudeDraft(responseText))}</div>
+      ${structuredAnalysis?.revision_review ? `
+        <section class="s1-babbage-revision-review" aria-label="Babbage review of revised discussion prompt">
+          <div class="s1-clean-reference-title">Babbage's Review of the Revision</div>
+          <div class="s1-babbage-review-item"><strong>Strongest improvement:</strong> ${esc(structuredAnalysis.revision_review.strongest_improvement || '')}</div>
+          <div class="s1-babbage-review-item"><strong>Remaining limitation:</strong> ${esc(structuredAnalysis.revision_review.remaining_limitation || '')}</div>
+          <div class="s1-babbage-review-item"><strong>Why these changes:</strong> ${esc(structuredAnalysis.revision_review.why_these_changes || '')}</div>
+        </section>` : ''}
       <div class="s1-clean-reference">
         <div class="s1-clean-reference-title">Your Repair Notes</div>
         <div><strong>Learners:</strong> ${esc(values.learners || 'Not provided')}</div>
@@ -968,7 +995,7 @@ function showS1ResultControls(scoreTotal, mode = 'postReflection'){
     <div class="s1-result-controls" role="region" aria-label="Scenario 1 result options">
       <div>
         <div class="s1-result-controls-title">Scenario 1 result</div>
-        <div class="s1-result-controls-sub">${reviewMode ? `Claude's draft is shown above. Review the analysis before Pixel explains what changed.` : `Pixel's explanation is complete. Choose the next step.`}</div>
+        <div class="s1-result-controls-sub">${reviewMode ? `Babbage's draft is shown above. Review the analysis before Pixel explains what changed.` : `Pixel's explanation is complete. Choose the next step.`}</div>
       </div>
       <div class="s1-result-controls-actions">
         <button class="s1-secondary-btn" type="button" data-pc-action="revise-s1">Revise S1</button>
@@ -983,33 +1010,33 @@ function getS1PixelScoreReflection(scoreTotal){
   const score = Math.max(0, Math.min(5, Math.round(Number(scoreTotal) || 0)));
   const reactions = {
     0: [
-      { expr: 'skeptical', audioKey: 's1-score-0-a', text: "That landed at zero out of five. I am not going to pretend Claude had a usable design brief here. The response either missed the scenario or gave us information we cannot responsibly design from." },
+      { expr: 'skeptical', audioKey: 's1-score-0-a', text: "That landed at zero out of five. I am not going to pretend Babbage had a usable design brief here. The response either missed the scenario or gave us information we cannot responsibly design from." },
       { expr: 'thinking', audioKey: 's1-score-0-b', text: "A useful repair needs a real learner context, a specific interaction problem, a meaningful interaction move, practical constraints, and some sign of what success should look like." },
-      { expr: 'encouraging', audioKey: 's1-score-0-c', text: "Go back to the repair notes and rebuild the foundation. Give Claude instructional information, not filler, and the next analysis should change substantially." }
+      { expr: 'encouraging', audioKey: 's1-score-0-c', text: "Go back to the repair notes and rebuild the foundation. Give Babbage instructional information, not filler, and the next analysis should change substantially." }
     ],
     1: [
-      { expr: 'skeptical', audioKey: 's1-score-1-a', text: "That scored one out of five. There is one usable signal in the response, but Claude is still being asked to fill in most of the instructional design for you." },
+      { expr: 'skeptical', audioKey: 's1-score-1-a', text: "That scored one out of five. There is one usable signal in the response, but Babbage is still being asked to fill in most of the instructional design for you." },
       { expr: 'thinking', audioKey: 's1-score-1-b', text: "When the design brief is this thin, even a polished AI response can look smarter than the reasoning underneath it. That is exactly the trap this scenario is trying to expose." },
       { expr: 'encouraging', audioKey: 's1-score-1-c', text: "Strengthen the repair notes before you move on. Make the problem and the interaction you want students to have much more concrete." }
     ],
     2: [
-      { expr: 'thinking', audioKey: 's1-score-2-a', text: "Two out of five. Claude has enough to see part of your intent, but too much of the redesign is still guesswork." },
-      { expr: 'skeptical', audioKey: 's1-score-2-b', text: "The important question is not whether the draft sounds better. It is whether your input gives Claude enough evidence to make the right instructional change instead of inventing one." },
-      { expr: 'encouraging', audioKey: 's1-score-2-c', text: "Add the missing design information and try again. You are close to having a brief Claude can actually reason from." }
+      { expr: 'thinking', audioKey: 's1-score-2-a', text: "Two out of five. Babbage has enough to see part of your intent, but too much of the redesign is still guesswork." },
+      { expr: 'skeptical', audioKey: 's1-score-2-b', text: "The important question is not whether the draft sounds better. It is whether your input gives Babbage enough evidence to make the right instructional change instead of inventing one." },
+      { expr: 'encouraging', audioKey: 's1-score-2-c', text: "Add the missing design information and try again. You are close to having a brief Babbage can actually reason from." }
     ],
     3: [
-      { expr: 'encouraging', audioKey: 's1-score-3-a', text: "Three out of five. That is enough structure for Claude to attempt a defensible repair, but I would not call the design brief complete yet." },
-      { expr: 'thinking', audioKey: 's1-score-3-b', text: "The draft may work, but some of its quality still depends on Claude making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify." },
+      { expr: 'encouraging', audioKey: 's1-score-3-a', text: "Three out of five. That is enough structure for Babbage to attempt a defensible repair, but I would not call the design brief complete yet." },
+      { expr: 'thinking', audioKey: 's1-score-3-b', text: "The draft may work, but some of its quality still depends on Babbage making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify." },
       { expr: 'encouraging', audioKey: 's1-score-3-c', text: "You can move forward, or revise once more and see whether a more complete brief produces a more precise repair." }
     ],
     4: [
-      { expr: 'proud', audioKey: 's1-score-4-a', text: "Four out of five. This is a strong design brief. Claude had enough context to make a targeted repair instead of simply rewriting the discussion prompt." },
+      { expr: 'proud', audioKey: 's1-score-4-a', text: "Four out of five. This is a strong design brief. Babbage had enough context to make a targeted repair instead of simply rewriting the discussion prompt." },
       { expr: 'thinking', audioKey: 's1-score-4-b', text: "There is still one area that could be clearer, which matters because small gaps are where AI starts making quiet assumptions on your behalf." },
       { expr: 'proud', audioKey: 's1-score-4-c', text: "The important shift is here: you gave the replies an instructional purpose, not just a participation requirement. That is a meaningful redesign." }
     ],
     5: [
-      { expr: 'proud', audioKey: 's1-score-5-a', text: "Five out of five. You gave Claude a complete design brief: learner context, the actual problem, the interaction you want, the constraints, and a clear success signal." },
-      { expr: 'thinking', audioKey: 's1-score-5-b', text: "That does not mean Claude is automatically right. It means you gave it enough information that you can judge whether its repair actually follows your instructional intent." },
+      { expr: 'proud', audioKey: 's1-score-5-a', text: "Five out of five. You gave Babbage a complete design brief: learner context, the actual problem, the interaction you want, the constraints, and a clear success signal." },
+      { expr: 'thinking', audioKey: 's1-score-5-b', text: "That does not mean Babbage is automatically right. It means you gave it enough information that you can judge whether its repair actually follows your instructional intent." },
       { expr: 'proud', audioKey: 's1-score-5-c', text: "That is the habit I want you to carry forward: make the reasoning visible first, then use AI to help execute the design." }
     ]
   };
@@ -1017,7 +1044,7 @@ function getS1PixelScoreReflection(scoreTotal){
 }
 
 function showS1PostAnalysisReflection(scoreTotal){
-  // Robust S1 handoff: Claude terminal/result page -> Professor Pixel VN review.
+  // Robust S1 handoff: Babbage terminal/result page -> Professor Pixel VN review.
   // Pixel's dialogue is intentionally score-banded rather than generated so each
   // line can later map to a stable recorded-audio cue while still reflecting the
   // player's actual performance.
@@ -1147,7 +1174,7 @@ const PC_PREDICTION_LABELS = {
 };
 
 const PC_PREDICTION_REACTIONS = {
-  targeted: 'Good prediction. Now we will see whether Claude actually had enough context to stay specific.',
+  targeted: 'Good prediction. Now we will see whether Babbage actually had enough context to stay specific.',
   generic: 'That is a reasonable suspicion. Generic input often produces generic output, because apparently machines also enjoy vague assignments.',
   ignores_constraints: 'Exactly the kind of risk worth watching for. Constraints only help when the model actually uses them.',
   not_sure: 'Fair. The whole point is to build that prediction muscle before trusting the output.'
@@ -1806,7 +1833,7 @@ function pcApplyPredictionPresentationV191(){
   // v243: The logged-result beat no longer has an answer panel, so clear the
   // wide question grid instead of leaving the copy trapped in its 500px column.
   // A wider result message prevents needless wrapping and keeps Continue to
-  // Claude inside the visible bottom panel.
+  // Babbage inside the visible bottom panel.
   if (viewportWidth > 1510 && isPredictionResult && dialogue && speaker && vnText) {
     pcSetImportantStyles(dialogue, [
       ['display', 'flex'],
@@ -2018,7 +2045,7 @@ function pcShowPredictionGate(text){
   try { setVNClaudeTerminalMode(false); } catch(e) {}
   try { setClaudeTerminalTextMode(false); } catch(e) {}
   try { setClaudeShelfState('idle', 'awaiting prediction'); } catch(e) {}
-  try { setClaudeTerminalState('idle', 'CLAUDE TERMINAL', 'AWAITING PREDICTION'); } catch(e) {}
+  try { setClaudeTerminalState('idle', 'BABBAGE ENGINE', 'AWAITING PREDICTION'); } catch(e) {}
   try { pcClearPredictionLayoutInlineStylesV186(); } catch(e) {}
   pcQueueModernTerminalAlignmentV147();
   try { vnSetExpression('thinking'); } catch(e) {}
@@ -2037,8 +2064,8 @@ function pcShowPredictionGate(text){
   if (vnText) {
     vnText.innerHTML = `
       <div class="pc-feedback-copy">
-        <div><strong>Before we consult Claude...</strong></div>
-        <div>Based on the context you gave, what do you predict Claude will do?</div>
+        <div><strong>Before we consult Babbage...</strong></div>
+        <div>Based on the context you gave, what do you predict Babbage will do?</div>
       </div>`;
   }
 
@@ -2092,7 +2119,7 @@ function pcChoosePrediction(choice){
           <div class="pc-feedback-heading"><strong>Your prediction is logged.</strong></div>
           <div>${reaction}</div>
         </div>
-        <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button" data-pc-action="continue-to-claude" data-pc-stop-propagation="true">Continue to Claude →</button>
+        <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button" data-pc-action="continue-to-claude" data-pc-stop-propagation="true">Continue to Babbage →</button>
       </div>`;
   }
   pcQueuePredictionPresentationV191();
@@ -2116,8 +2143,8 @@ function pcContinueToClaudeAnalysis(){
   window.pendingPromptAfterPrediction = '';
   window.pcWaitingForClaudeContinue = false;
 
-  // IMPORTANT: show Claude's thinking screen immediately BEFORE the network/API call.
-  // Previously this overlay did not appear until after Claude returned, which made the
+  // IMPORTANT: show Babbage's thinking screen immediately BEFORE the network/API call.
+  // Previously this overlay did not appear until after Babbage returned, which made the
   // game look frozen for 20-30 seconds. Tiny little UX crime scene.
   pcSetVNOverlayState({
     active: true,
@@ -2138,7 +2165,7 @@ function pcContinueToClaudeAnalysis(){
       setVNClaudeTerminalMode(true);
       setClaudeTerminalTextMode(false);
       setClaudeShelfState('thinking','analyzing');
-      setClaudeTerminalState('thinking','CLAUDE TERMINAL','ANALYZING...');
+      setClaudeTerminalState('thinking','BABBAGE ENGINE','ANALYZING...');
       renderClaudeAnalyzingReadout('Scenario diagnosis');
       musicStartVN();
     } catch(_) {}
@@ -2237,7 +2264,7 @@ if (!window.__pcPredictionWatchdogBound) {
   });
 })();;
 
-// Claude Speech Synthesis voice
+// Babbage Speech Synthesis voice
 let claudeSpeechUtterance = null;
 
   function cleanClaudeSpeechText(text) {

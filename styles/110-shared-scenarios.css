@@ -1003,3 +1003,844 @@ html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:is(.claude-predi
    composition as the dual-character system. Pixel scales independently from
    the board and dialogue, while the dual-character layouts keep their own
    dedicated staging rules. */
+
+
+/* ══════════════════════════════════════════════════════
+   V365 — SCENARIO 2 FULL METACOGNITION LOOP
+   ══════════════════════════════════════════════════════ */
+
+html body .pc-s2-engine-progress {
+  width: min(680px, 100%) !important;
+  height: 12px !important;
+  margin: 18px auto 10px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(32,255,0,.7) !important;
+  background: rgba(2,19,8,.9) !important;
+}
+
+html body .pc-s2-engine-progress > span {
+  display: block !important;
+  width: 72% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, rgba(32,255,0,.32), rgba(32,255,0,.9)) !important;
+  animation: pcS2EnginePulse 1.4s ease-in-out infinite alternate !important;
+}
+
+@keyframes pcS2EnginePulse {
+  from { transform: translateX(-35%); opacity: .55; }
+  to { transform: translateX(38%); opacity: 1; }
+}
+
+html body .pc-s2-engine-note {
+  font-size: .88rem !important;
+  opacity: .78 !important;
+}
+
+html body .pc-s2-audit-layout,
+html body .pc-s2-repair-layout {
+  display: grid !important;
+  grid-template-columns: minmax(280px, .88fr) minmax(0, 1.12fr) !important;
+  gap: clamp(16px, 2.4vw, 28px) !important;
+  align-items: start !important;
+}
+
+html body .pc-s2-babbage-draft,
+html body .pc-s2-original-draft {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border: 1px solid rgba(194,156,82,.58) !important;
+  border-radius: 16px !important;
+  background:
+    linear-gradient(180deg, rgba(23,57,46,.98), rgba(8,27,21,.98)) !important;
+  color: #eef9f1 !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,.16) !important;
+}
+
+html body .pc-s2-babbage-draft h2,
+html body .pc-s2-original-draft h3 {
+  color: #f4e5ba !important;
+}
+
+html body .pc-s2-draft-prompt {
+  margin: 14px 0 !important;
+  padding: 14px 16px !important;
+  border-left: 4px solid #d0ae65 !important;
+  background: rgba(255,255,255,.055) !important;
+  font-size: 1.02rem !important;
+  line-height: 1.55 !important;
+}
+
+html body .pc-s2-babbage-draft details {
+  margin-top: 14px !important;
+  padding-top: 10px !important;
+  border-top: 1px solid rgba(255,255,255,.14) !important;
+}
+
+html body .pc-s2-repair-label {
+  display: block !important;
+  margin: 16px 0 7px !important;
+  font-weight: 800 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s2-repair-textarea {
+  width: 100% !important;
+  min-height: 190px !important;
+  resize: vertical !important;
+  box-sizing: border-box !important;
+  padding: 14px 16px !important;
+  border: 2px solid #8cb29a !important;
+  border-radius: 12px !important;
+  background: #fffefb !important;
+  color: #1e2d23 !important;
+  font: inherit !important;
+  line-height: 1.55 !important;
+}
+
+html body .pc-s2-repair-textarea:focus {
+  outline: 3px solid rgba(63,120,83,.22) !important;
+  border-color: #3f7853 !important;
+}
+
+html body .pc-s2-final {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+
+html body .pc-s2-final-header {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border-radius: 16px !important;
+  background: #173f32 !important;
+  color: #f5fbf7 !important;
+}
+
+html body .pc-s2-final-header h2 {
+  color: #f4e5ba !important;
+  margin: 4px 0 8px !important;
+}
+
+html body .pc-s2-before-after {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+html body .pc-s2-comparison-card {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border: 1px solid #c9d4cc !important;
+  border-radius: 16px !important;
+  background: #f8f7f2 !important;
+}
+
+html body .pc-s2-comparison-card.is-after {
+  border-color: #78a587 !important;
+  background: #eef7f0 !important;
+}
+
+html body .pc-s2-comparison-card > span {
+  display: inline-block !important;
+  margin-bottom: 8px !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+  color: #466350 !important;
+}
+
+html body .pc-s2-comparison-card blockquote {
+  margin: 14px 0 0 !important;
+  padding: 12px 14px !important;
+  border-left: 4px solid #6f9c7c !important;
+  background: rgba(255,255,255,.65) !important;
+}
+
+html body .pc-s2-review-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+html body .pc-s2-review-grid article {
+  padding: 16px !important;
+  border: 1px solid #cad7cd !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+}
+
+html body .pc-s2-review-grid h3 {
+  margin-top: 0 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s2-final-actions {
+  justify-content: flex-end !important;
+}
+
+@media screen and (max-width: 900px) {
+  html body .pc-s2-audit-layout,
+  html body .pc-s2-repair-layout,
+  html body .pc-s2-before-after,
+  html body .pc-s2-review-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   V366 — SCENARIO 3 AUTHENTIC ASSESSMENT
+   ══════════════════════════════════════════════════════ */
+
+html body .pc-s3-case-grid,
+html body .pc-s3-audit-layout,
+html body .pc-s3-repair-layout {
+  display: grid !important;
+  grid-template-columns: minmax(280px, .86fr) minmax(0, 1.14fr) !important;
+  gap: clamp(16px, 2.4vw, 28px) !important;
+  align-items: start !important;
+}
+
+html body .pc-s3-case-card,
+html body .pc-s3-assessment-draft {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border: 1px solid rgba(92, 126, 101, .42) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, #f7f4ea, #ece7d8) !important;
+  color: #253329 !important;
+  box-shadow: 0 16px 38px rgba(0,0,0,.10) !important;
+}
+
+html body .pc-s3-case-card h2,
+html body .pc-s3-assessment-draft h2,
+html body .pc-s3-assessment-draft h3 {
+  color: #173d27 !important;
+}
+
+html body .pc-s3-evidence-list {
+  display: grid !important;
+  gap: 10px !important;
+  margin-top: 14px !important;
+}
+
+html body .pc-s3-evidence-list p {
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  border-left: 4px solid #6d9678 !important;
+  background: rgba(255,255,255,.62) !important;
+}
+
+html body .pc-s3-draft-details {
+  display: grid !important;
+  gap: 10px !important;
+  margin: 14px 0 18px !important;
+}
+
+html body .pc-s3-draft-details > div {
+  display: grid !important;
+  grid-template-columns: 112px minmax(0, 1fr) !important;
+  gap: 10px !important;
+  padding: 9px 0 !important;
+  border-bottom: 1px solid rgba(45,74,55,.14) !important;
+}
+
+html body .pc-s3-draft-details dt {
+  font-weight: 900 !important;
+  color: #486451 !important;
+}
+
+html body .pc-s3-draft-details dd {
+  margin: 0 !important;
+}
+
+html body .pc-s3-assessment-draft.is-compact {
+  background: linear-gradient(180deg, rgba(23,57,46,.98), rgba(8,27,21,.98)) !important;
+  color: #eef9f1 !important;
+  border-color: rgba(197,165,94,.52) !important;
+}
+
+html body .pc-s3-assessment-draft.is-compact h3 {
+  color: #f3e1ae !important;
+}
+
+html body .pc-s3-repair-label {
+  display: block !important;
+  margin: 16px 0 7px !important;
+  font-weight: 900 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s3-repair-textarea {
+  width: 100% !important;
+  min-height: 170px !important;
+  padding: 14px 16px !important;
+  box-sizing: border-box !important;
+  resize: vertical !important;
+  border: 2px solid #8eae96 !important;
+  border-radius: 12px !important;
+  background: #fffefb !important;
+  color: #1d2c22 !important;
+  font: inherit !important;
+  line-height: 1.55 !important;
+}
+
+html body .pc-s3-repair-textarea.is-short {
+  min-height: 112px !important;
+}
+
+html body .pc-s3-repair-textarea:focus {
+  outline: 3px solid rgba(68, 126, 87, .22) !important;
+  border-color: #447e57 !important;
+}
+
+html body .pc-s3-final {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+
+html body .pc-s3-final-header {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border-radius: 16px !important;
+  background: #173f32 !important;
+  color: #f5fbf7 !important;
+}
+
+html body .pc-s3-final-header h2 {
+  margin: 4px 0 8px !important;
+  color: #f3dfaa !important;
+}
+
+html body .pc-s3-before-after {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+html body .pc-s3-comparison-card {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border: 1px solid #c7d1c9 !important;
+  border-radius: 16px !important;
+  background: #f7f5ef !important;
+}
+
+html body .pc-s3-comparison-card.is-after {
+  border-color: #75a182 !important;
+  background: #eef7f0 !important;
+}
+
+html body .pc-s3-comparison-card > span {
+  display: inline-block !important;
+  margin-bottom: 8px !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+  color: #4f6a57 !important;
+}
+
+html body .pc-s3-consequence {
+  margin-top: 16px !important;
+  padding: 10px 12px !important;
+  border-left: 4px solid #b1843a !important;
+  background: #fff7e3 !important;
+}
+
+html body .pc-s3-evidence-callout {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border: 2px solid #6f9d7e !important;
+  border-radius: 16px !important;
+  background: #f4fbf6 !important;
+}
+
+html body .pc-s3-evidence-callout p {
+  margin: 7px 0 0 !important;
+  font-size: 1.04rem !important;
+  line-height: 1.58 !important;
+}
+
+html body .pc-s3-review-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+html body .pc-s3-review-grid article {
+  padding: 16px !important;
+  border: 1px solid #cad7cd !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+}
+
+html body .pc-s3-review-grid h3 {
+  margin-top: 0 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s3-final-actions {
+  justify-content: flex-end !important;
+}
+
+@media screen and (max-width: 900px) {
+  html body .pc-s3-case-grid,
+  html body .pc-s3-audit-layout,
+  html body .pc-s3-repair-layout,
+  html body .pc-s3-before-after,
+  html body .pc-s3-review-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  html body .pc-s3-draft-details > div {
+    grid-template-columns: 1fr !important;
+    gap: 2px !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   V367 — SCENARIO 4 SYNCHRONOUS BIAS
+   ══════════════════════════════════════════════════════ */
+
+html body .pc-s4-case-grid,
+html body .pc-s4-audit-layout,
+html body .pc-s4-repair-layout {
+  display: grid !important;
+  grid-template-columns: minmax(280px, .88fr) minmax(0, 1.12fr) !important;
+  gap: clamp(16px, 2.4vw, 28px) !important;
+  align-items: start !important;
+}
+
+html body .pc-s4-case-card,
+html body .pc-s4-plan-card {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border: 1px solid rgba(92, 126, 101, .42) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, #f4f6ef, #e6ece4) !important;
+  color: #253329 !important;
+  box-shadow: 0 16px 38px rgba(0,0,0,.10) !important;
+}
+
+html body .pc-s4-case-card h2,
+html body .pc-s4-plan-card h2,
+html body .pc-s4-plan-card h3 {
+  color: #173d27 !important;
+}
+
+html body .pc-s4-student-notes {
+  display: grid !important;
+  gap: 10px !important;
+  margin-top: 14px !important;
+}
+
+html body .pc-s4-student-notes p {
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  border-left: 4px solid #6a9476 !important;
+  background: rgba(255,255,255,.68) !important;
+}
+
+html body .pc-s4-path-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  margin: 16px 0 !important;
+}
+
+html body .pc-s4-path-grid section {
+  padding: 14px !important;
+  border: 1px solid rgba(70,102,79,.24) !important;
+  border-radius: 12px !important;
+  background: rgba(255,255,255,.68) !important;
+}
+
+html body .pc-s4-path-grid span {
+  display: inline-block !important;
+  margin-bottom: 6px !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .08em !important;
+  color: #4a6652 !important;
+}
+
+html body .pc-s4-plan-card.is-compact {
+  background: linear-gradient(180deg, rgba(23,57,46,.98), rgba(8,27,21,.98)) !important;
+  color: #eef9f1 !important;
+  border-color: rgba(197,165,94,.52) !important;
+}
+
+html body .pc-s4-risk-note,
+html body .pc-s4-consequence {
+  margin-top: 14px !important;
+  padding: 11px 13px !important;
+  border-left: 4px solid #b7893d !important;
+  background: #fff6df !important;
+  color: #4b3820 !important;
+}
+
+html body .pc-s4-repair-label {
+  display: block !important;
+  margin: 16px 0 7px !important;
+  font-weight: 900 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s4-repair-textarea {
+  width: 100% !important;
+  min-height: 170px !important;
+  padding: 14px 16px !important;
+  box-sizing: border-box !important;
+  resize: vertical !important;
+  border: 2px solid #8eae96 !important;
+  border-radius: 12px !important;
+  background: #fffefb !important;
+  color: #1d2c22 !important;
+  font: inherit !important;
+  line-height: 1.55 !important;
+}
+
+html body .pc-s4-repair-textarea.is-short {
+  min-height: 112px !important;
+}
+
+html body .pc-s4-repair-textarea:focus {
+  outline: 3px solid rgba(68,126,87,.22) !important;
+  border-color: #447e57 !important;
+}
+
+html body .pc-s4-final {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+
+html body .pc-s4-final-header {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border-radius: 16px !important;
+  background: #173f32 !important;
+  color: #f5fbf7 !important;
+}
+
+html body .pc-s4-final-header h2 {
+  margin: 4px 0 8px !important;
+  color: #f3dfaa !important;
+}
+
+html body .pc-s4-before-after {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+html body .pc-s4-comparison-card {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border: 1px solid #c7d1c9 !important;
+  border-radius: 16px !important;
+  background: #f7f5ef !important;
+}
+
+html body .pc-s4-comparison-card.is-after {
+  border-color: #75a182 !important;
+  background: #eef7f0 !important;
+}
+
+html body .pc-s4-comparison-card > span {
+  display: inline-block !important;
+  margin-bottom: 8px !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+  color: #4f6a57 !important;
+}
+
+html body .pc-s4-evidence-callout {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border: 2px solid #6f9d7e !important;
+  border-radius: 16px !important;
+  background: #f4fbf6 !important;
+}
+
+html body .pc-s4-evidence-callout p {
+  margin: 7px 0 0 !important;
+  font-size: 1.04rem !important;
+  line-height: 1.58 !important;
+}
+
+html body .pc-s4-review-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+html body .pc-s4-review-grid article {
+  padding: 16px !important;
+  border: 1px solid #cad7cd !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+}
+
+html body .pc-s4-review-grid h3 {
+  margin-top: 0 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s4-final-actions {
+  justify-content: flex-end !important;
+}
+
+@media screen and (max-width: 900px) {
+  html body .pc-s4-case-grid,
+  html body .pc-s4-audit-layout,
+  html body .pc-s4-repair-layout,
+  html body .pc-s4-before-after,
+  html body .pc-s4-review-grid,
+  html body .pc-s4-path-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   V368 — SCENARIO 5 HALLUCINATION HUNT
+   ══════════════════════════════════════════════════════ */
+
+html body .pc-s5-evidence-stage,
+html body .pc-s5-final {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+
+html body .pc-s5-evidence-header,
+html body .pc-s5-final-header {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border-radius: 16px !important;
+  background: #173f32 !important;
+  color: #f5fbf7 !important;
+}
+
+html body .pc-s5-evidence-header h2,
+html body .pc-s5-final-header h2 {
+  margin: 4px 0 8px !important;
+  color: #f3dfaa !important;
+}
+
+html body .pc-s5-source-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+html body .pc-s5-source-grid.is-compact {
+  margin-top: 14px !important;
+}
+
+html body .pc-s5-source-card {
+  padding: 16px !important;
+  border: 1px solid #c9d4cc !important;
+  border-radius: 14px !important;
+  background: #fffdf7 !important;
+  color: #253329 !important;
+}
+
+html body .pc-s5-source-card h3 {
+  margin: 5px 0 6px !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s5-source-id {
+  display: inline-block !important;
+  padding: 4px 8px !important;
+  border-radius: 999px !important;
+  background: #173f32 !important;
+  color: #f3dfaa !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .08em !important;
+}
+
+html body .pc-s5-source-type {
+  margin: 0 0 9px !important;
+  font-size: .82rem !important;
+  font-weight: 800 !important;
+  color: #607164 !important;
+}
+
+html body .pc-s5-audit-layout,
+html body .pc-s5-correction-layout {
+  display: grid !important;
+  grid-template-columns: minmax(300px, .95fr) minmax(0, 1.05fr) !important;
+  gap: clamp(16px, 2.4vw, 28px) !important;
+  align-items: start !important;
+}
+
+html body .pc-s5-brief-card,
+html body .pc-s5-unsafe-card {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border: 1px solid rgba(196,164,94,.55) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, rgba(23,57,46,.98), rgba(8,27,21,.98)) !important;
+  color: #eef9f1 !important;
+}
+
+html body .pc-s5-brief-card h2,
+html body .pc-s5-unsafe-card h3 {
+  color: #f3dfaa !important;
+}
+
+html body .pc-s5-claim-stack {
+  display: grid !important;
+  gap: 10px !important;
+  margin-top: 16px !important;
+}
+
+html body .pc-s5-claim-stack article {
+  padding: 12px 14px !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  border-radius: 12px !important;
+  background: rgba(255,255,255,.055) !important;
+}
+
+html body .pc-s5-claim-stack article > span {
+  display: inline-block !important;
+  margin-bottom: 5px !important;
+  color: #d9bc75 !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+}
+
+html body .pc-s5-claim-stack p {
+  margin: 0 0 6px !important;
+}
+
+html body .pc-s5-claim-stack small {
+  color: #b8cdbc !important;
+}
+
+html body .pc-s5-evidence-drawer {
+  margin-bottom: 14px !important;
+  padding: 12px 14px !important;
+  border: 1px solid #b8c9bd !important;
+  border-radius: 12px !important;
+  background: #f5f8f3 !important;
+}
+
+html body .pc-s5-evidence-drawer summary {
+  cursor: pointer !important;
+  font-weight: 900 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s5-issue-note {
+  margin-top: 14px !important;
+  padding: 11px 13px !important;
+  border-left: 4px solid #d29a3e !important;
+  background: #fff3d4 !important;
+  color: #4b3820 !important;
+}
+
+html body .pc-s5-correction-label {
+  display: block !important;
+  margin: 16px 0 7px !important;
+  font-weight: 900 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s5-correction-textarea {
+  width: 100% !important;
+  min-height: 150px !important;
+  padding: 14px 16px !important;
+  box-sizing: border-box !important;
+  resize: vertical !important;
+  border: 2px solid #8eae96 !important;
+  border-radius: 12px !important;
+  background: #fffefb !important;
+  color: #1d2c22 !important;
+  font: inherit !important;
+  line-height: 1.55 !important;
+}
+
+html body .pc-s5-correction-textarea.is-short {
+  min-height: 108px !important;
+}
+
+html body .pc-s5-correction-textarea:focus {
+  outline: 3px solid rgba(68,126,87,.22) !important;
+  border-color: #447e57 !important;
+}
+
+html body .pc-s5-before-after {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+html body .pc-s5-comparison-card {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border-radius: 16px !important;
+}
+
+html body .pc-s5-comparison-card.is-unsafe {
+  border: 1px solid #c38a7f !important;
+  background: #fff2ee !important;
+}
+
+html body .pc-s5-comparison-card.is-safe {
+  border: 1px solid #78a587 !important;
+  background: #eef7f0 !important;
+}
+
+html body .pc-s5-comparison-card > span {
+  display: inline-block !important;
+  margin-bottom: 8px !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+  color: #4f6a57 !important;
+}
+
+html body .pc-s5-verification-callout {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border: 2px solid #6f9d7e !important;
+  border-radius: 16px !important;
+  background: #f4fbf6 !important;
+}
+
+html body .pc-s5-verification-callout p {
+  margin: 7px 0 0 !important;
+  line-height: 1.58 !important;
+}
+
+html body .pc-s5-review-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+html body .pc-s5-review-grid article {
+  padding: 16px !important;
+  border: 1px solid #cad7cd !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+}
+
+html body .pc-s5-review-grid h3 {
+  margin-top: 0 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s5-final-actions {
+  justify-content: flex-end !important;
+}
+
+@media screen and (max-width: 900px) {
+  html body .pc-s5-audit-layout,
+  html body .pc-s5-correction-layout,
+  html body .pc-s5-before-after,
+  html body .pc-s5-review-grid,
+  html body .pc-s5-source-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

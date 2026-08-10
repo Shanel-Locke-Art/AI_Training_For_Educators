@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 190" role="img" aria-labelledby="title desc">
+  <title id="title">Babbage Engine nameplate</title>
+  <desc id="desc">A dark green and brass retro-computing nameplate reading Babbage Engine, analysis system, 1837 lineage.</desc>
+  <defs>
+    <linearGradient id="plate" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#17392e"/><stop offset="1" stop-color="#081b15"/></linearGradient>
+    <linearGradient id="brass" x1="0" x2="1"><stop offset="0" stop-color="#72521f"/><stop offset=".5" stop-color="#d4b56b"/><stop offset="1" stop-color="#72521f"/></linearGradient>
+  </defs>
+  <rect x="4" y="4" width="752" height="182" rx="18" fill="url(#plate)" stroke="#d4b56b" stroke-width="4"/>
+  <rect x="18" y="18" width="724" height="154" rx="12" fill="none" stroke="#5d845f" stroke-width="2" stroke-dasharray="8 8"/>
+  <g transform="translate(92 95)">
+    <circle r="53" fill="#0f2d23" stroke="#b48a3b" stroke-width="8"/>
+    <circle r="35" fill="none" stroke="#6aa17d" stroke-width="4"/>
+    <path d="M0 28C-1 9 0-7 4-24M2-10C-17-11-27-21-29-35c17 0 30 7 36 20M4-21c11-13 24-18 39-14-5 16-17 25-35 26" fill="none" stroke="#9ed3b4" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="175" y="76" font-family="Georgia,serif" font-size="45" font-weight="700" fill="#f5e8c4" letter-spacing="3">BABBAGE ENGINE</text>
+  <text x="178" y="111" font-family="Consolas,monospace" font-size="20" font-weight="700" fill="#9ed3b4" letter-spacing="4">PROMPTCRAFT ANALYSIS SYSTEM</text>
+  <line x1="178" y1="126" x2="708" y2="126" stroke="url(#brass)" stroke-width="2"/>
+  <text x="178" y="151" font-family="Consolas,monospace" font-size="16" fill="#d7bd7e" letter-spacing="3">1837 LINEAGE  •  HUMAN JUDGMENT REQUIRED</text>
+</svg>

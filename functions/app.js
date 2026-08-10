@@ -669,6 +669,9 @@ window.testSheetsPing = function testSheetsPing() {
     score_delta: '',
     prompt_text: 'Browser-to-Apps-Script test ping',
     claude_response: 'If this row appears, the deployed site can write to Sheets.',
+    babbage_response: 'If this row appears, the deployed site can write to Sheets.',
+    ai_provider: 'receiver-test',
+    ai_model: 'receiver-test',
     quality_indicators_lit: '',
     self_report_prediction: '',
     time_since_last_attempt_sec: '',
@@ -681,21 +684,23 @@ window.testSheetsPing = function testSheetsPing() {
 
 
 // ══════════════════════════════════════════════════════
-//  LOCAL TESTING / MOCK CLAUDE FALLBACK
+//  LOCAL TESTING / BABBAGE FALLBACK
 //  Lets VS Code Live Server progress through scenarios without Netlify.
-//  Add ?mockClaude=1 to force mock mode anywhere.
+//  Add ?mockBabbage=1 to force fallback mode anywhere.
+//  Legacy ?mockClaude=1 remains supported for old QA links.
 // ══════════════════════════════════════════════════════
-const MOCK_CLAUDE_FOR_LOCAL = false;
-const FORCE_MOCK_CLAUDE = new URLSearchParams(window.location.search).get('mockClaude') === '1';
+const MOCK_BABBAGE_FOR_LOCAL = false;
+const pcQueryParams = new URLSearchParams(window.location.search);
+const FORCE_MOCK_BABBAGE = pcQueryParams.get('mockBabbage') === '1' || pcQueryParams.get('mockClaude') === '1';
 const IS_LOCAL_TEST = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:';
-const USE_MOCK_CLAUDE = FORCE_MOCK_CLAUDE || (MOCK_CLAUDE_FOR_LOCAL && IS_LOCAL_TEST);
+const USE_MOCK_BABBAGE = FORCE_MOCK_BABBAGE || (MOCK_BABBAGE_FOR_LOCAL && IS_LOCAL_TEST);
 
-// NOTE: Mock Claude text is dialogue/content-heavy. Move to dialogue.js in a later pass if desired.
-function mockClaudeText(payload, context = 'main') {
+// NOTE: Local Babbage fallback text is dialogue/content-heavy. Move to dialogue.js in a later pass if desired.
+function mockBabbageText(payload, context = 'main') {
   const system = payload.system || '';
 
   if (context === 'pixel' || system.includes('You are Professor Pixel')) {
-    return `You gave Claude enough direction to produce a usable response, especially where your prompt named the actual teaching problem. The next improvement is to make the success criteria more visible so Claude knows what a strong student outcome should look like.\n\n*What would you want students to do, say, or produce that would prove the activity worked?*`;
+    return `You gave Babbage enough direction to produce a usable response, especially where your prompt named the actual teaching problem. The next improvement is to make the success criteria more visible so Babbage knows what a strong student outcome should look like.\n\n*What would you want students to do, say, or produce that would prove the activity worked?*`;
   }
 
   if (context === 'growth' || system.includes('personalized growth summary')) {
@@ -703,7 +708,7 @@ function mockClaudeText(payload, context = 'main') {
   }
 
   if (scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT) {
-    return `This scenario is currently a clean development shell and does not send prompts to Claude.`;
+    return `This scenario is currently a clean development shell and does not send prompts to Babbage.`;
   }
 
   const values = (window.playerHistory && window.playerHistory.s1) || (typeof getS1GuidedValues === 'function' ? getS1GuidedValues() : {});
@@ -722,88 +727,102 @@ function mockClaudeText(payload, context = 'main') {
       checks.issue ? `You did identify a discussion problem: ${values.issue}` : '',
       checks.constraints ? `You supplied at least one practical boundary: ${values.constraints}` : ''
     ].filter(Boolean).join(' ') || 'There is not yet enough instructionally useful detail to treat this as a strong repair.';
-    return `STATUS\nNEEDS REVISION BEFORE REDESIGN\n\nCONFIDENCE\nHIGH\n\nFEEDBACK SUMMARY\nThis input should not be treated as a strong repair. ${summary}\n\nWHAT WORKED\n${worked}\n\nISSUE DETECTED\n${problems[0]}. The current notes would force Claude to invent important instructional decisions rather than respond to your actual design.\n\nRECOMMENDED REPAIR\nReplace vague or judgmental wording with observable information: who the learners are, what students are currently doing, what intellectual move peers should make with one another, and what evidence would show the discussion worked.\n\nEXPECTED IMPACT\nA more concrete and respectful description gives Claude evidence it can actually reason from, which should produce a redesign that matches the course instead of a generic discussion template.\n\nREVISED DISCUSSION PROMPT\nChoose one claim or interpretation from this week's reading. Explain it in your initial post and support it with a specific passage, example, or piece of evidence. Respond to two classmates by engaging directly with their reasoning: extend, challenge, compare, or question an idea and explain why. At least one reply should give your classmate a clear reason to respond again.\n\nCOURSE QUALITY CHECK\nClear Objectives: partially addressed. Student Interaction: needs clearer direction. Real-World Context: not established from the notes. Inclusive Design: insufficient information. Measurable Outcomes: needs explicit success criteria.`;
+    return `STATUS\nNEEDS REVISION BEFORE REDESIGN\n\nCONFIDENCE\nHIGH\n\nFEEDBACK SUMMARY\nThis input should not be treated as a strong repair. ${summary}\n\nWHAT WORKED\n${worked}\n\nISSUE DETECTED\n${problems[0]}. The current notes would force Babbage to invent important instructional decisions rather than respond to your actual design.\n\nRECOMMENDED REPAIR\nReplace vague or judgmental wording with observable information: who the learners are, what students are currently doing, what intellectual move peers should make with one another, and what evidence would show the discussion worked.\n\nEXPECTED IMPACT\nA more concrete and respectful description gives Babbage evidence it can actually reason from, which should produce a redesign that matches the course instead of a generic discussion template.\n\nREVISED DISCUSSION PROMPT\nChoose one claim or interpretation from this week's reading. Explain it in your initial post and support it with a specific passage, example, or piece of evidence. Respond to two classmates by engaging directly with their reasoning: extend, challenge, compare, or question an idea and explain why. At least one reply should give your classmate a clear reason to respond again.\n\nCOURSE QUALITY CHECK\nClear Objectives: partially addressed. Student Interaction: needs clearer direction. Real-World Context: not established from the notes. Inclusive Design: insufficient information. Measurable Outcomes: needs explicit success criteria.`;
   }
 
   return `STATUS\nSTRONG REPAIR WITH A CLEAR INTERACTION PURPOSE\n\nCONFIDENCE\nHIGH\n\nFEEDBACK SUMMARY\nYour notes identify the learner context, the observed discussion problem, a specific peer-interaction move, and practical constraints. The redesign can therefore respond to your actual course rather than inventing the missing pieces.\n\nWHAT WORKED\nLearners: ${values.learners}\nProblem: ${values.issue}\nInteraction: ${values.interaction}\nConstraints: ${values.constraints}\nThese details give the redesign concrete instructional boundaries.\n\nISSUE DETECTED\nThe strongest remaining refinement is to make the two required peer replies serve visibly different purposes so students cannot satisfy both with the same generic move.\n\nRECOMMENDED REPAIR\nGive one reply an extend/challenge/compare purpose and the other a genuine follow-up-question or contrasting-example purpose.\n\nEXPECTED IMPACT\nDistinct reply moves reduce repetition and create more than one pathway for a conversation to continue.\n\nREVISED DISCUSSION PROMPT\nChoose one interpretation of this week's reading that you find convincing, questionable, or difficult to apply. Explain your interpretation and support it with one specific example or piece of evidence. Then respond substantively to two classmates. In one reply, extend, challenge, or compare a classmate's interpretation using evidence or a concrete example. In the other, ask a genuine follow-up question or introduce a contrasting example that invites further discussion.\n\nCOURSE QUALITY CHECK\nClear Objectives: addressed. Student Interaction: strongly addressed. Real-World Context: use when relevant to the reading. Inclusive Design: multiple response moves support participation. Measurable Outcomes: the initial evidence and two substantive replies are observable.`;
 }
 
 
-function mockClaudeResponse(payload, context = 'main', reason = 'forced') {
-  pcDebug(`[PromptCraft] Using mock Claude response for ${context} (${reason}).`);
+function mockBabbageResponse(payload, context = 'main', reason = 'forced') {
+  pcDebug(`[PromptCraft] Using mock Babbage response for ${context} (${reason}).`);
+  const legacyText = mockBabbageText(payload, context);
   return Promise.resolve({
-    content: [{ text: mockClaudeText(payload, context) }],
+    content: [{ text: legacyText }],
     mock: true,
-    mockReason: reason
+    mockReason: reason,
+    provider: 'local-fallback',
+    model: 'promptcraft-local-fallback'
   });
 }
 
-const CLAUDE_REQUEST_TIMEOUT_MS = 90000;
+// Compatibility alias retained for older scenario modules while the internal
+// DOM/class vocabulary is migrated gradually.
+const mockClaudeResponse = mockBabbageResponse;
 
-async function callClaude(payload, context = 'main') {
-  if (USE_MOCK_CLAUDE) return mockClaudeResponse(payload, context, FORCE_MOCK_CLAUDE ? 'query-parameter' : 'local-test');
+const BABBAGE_REQUEST_TIMEOUT_MS = 90000;
 
-  const tracksVisibleAnalysis = context === 'main' &&
-    !!document.querySelector('#claudeTerminalOutput .pc-analyzing-progress');
-  if (tracksVisibleAnalysis && typeof window.pcStartClaudeAnalysisProgress === 'function') {
-    window.pcStartClaudeAnalysisProgress(CLAUDE_REQUEST_TIMEOUT_MS);
-  }
+async function requestBabbageAnalysis(payload, context = 'main') {
+  if (USE_MOCK_BABBAGE) return mockBabbageResponse(payload, context, FORCE_MOCK_BABBAGE ? 'query-parameter' : 'local-test');
+
+  const tracksVisibleAnalysis = context === 'main' && !!document.querySelector('#claudeTerminalOutput .pc-analyzing-progress');
+  if (tracksVisibleAnalysis && typeof window.pcStartClaudeAnalysisProgress === 'function') window.pcStartClaudeAnalysisProgress(BABBAGE_REQUEST_TIMEOUT_MS);
 
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-  const timeoutId = controller
-    ? setTimeout(() => controller.abort(), CLAUDE_REQUEST_TIMEOUT_MS)
-    : null;
+  const timeoutId = controller ? setTimeout(() => controller.abort(), BABBAGE_REQUEST_TIMEOUT_MS) : null;
 
   try {
-    const res = await fetch('/.netlify/functions/claude', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: controller ? controller.signal : undefined
+    const res = await fetch('/.netlify/functions/babbage', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: controller ? controller.signal : undefined
     });
 
-    if (tracksVisibleAnalysis && typeof window.pcMarkClaudeResponseReceived === 'function') {
-      window.pcMarkClaudeResponseReceived();
-    }
+    if (tracksVisibleAnalysis && typeof window.pcMarkClaudeResponseReceived === 'function') window.pcMarkClaudeResponseReceived();
 
     const responseText = await res.text();
     let data = {};
-    try {
-      data = responseText ? JSON.parse(responseText) : {};
-    } catch (_error) {
-      data = {};
-    }
+    try { data = responseText ? JSON.parse(responseText) : {}; } catch (_error) { data = {}; }
 
     if (!res.ok) {
-      const providerMessage =
-        data?.error?.message ||
-        data?.message ||
-        responseText ||
-        `HTTP ${res.status}`;
-      throw new Error(`Claude function returned ${res.status}: ${providerMessage}`);
+      const providerMessage = data?.error?.message || data?.message || responseText || `HTTP ${res.status}`;
+      throw new Error(`Babbage function returned ${res.status}: ${providerMessage}`);
     }
+    if (data.error) throw new Error(data.error?.message || 'Babbage returned an error');
 
-    if (data.error) {
-      throw new Error(data.error?.message || 'Claude returned an error');
+    // The UI keeps one normalized contract regardless of provider. This prevents
+    // provider response shapes from leaking throughout the game.
+    if (data.analysis && typeof data.analysis === 'object') {
+      return {
+        ...data,
+        structured: data.analysis,
+        content: [{ text: formatBabbageAnalysisAsLegacyText(data.analysis) }],
+        mock: false,
+        mockReason: ''
+      };
     }
-
     return data;
   } catch (err) {
-    /*
-      Live-site protection:
-      If the Netlify function stalls, fails, or returns HTML instead of JSON,
-      keep the game moving with the local mock response instead of leaving
-      Professor Pixel stranded in terminal purgatory.
-    */
-    console.warn('[PromptCraft] Claude unavailable or timed out; using mock response:', err && err.message ? err.message : err);
-    if (tracksVisibleAnalysis && typeof window.pcFailClaudeAnalysisProgress === 'function') {
-      window.pcFailClaudeAnalysisProgress();
-    }
-    return mockClaudeResponse(payload, context, 'backend-unavailable');
+    console.warn('[PromptCraft] Babbage unavailable or timed out; using local fallback:', err && err.message ? err.message : err);
+    if (tracksVisibleAnalysis && typeof window.pcFailClaudeAnalysisProgress === 'function') window.pcFailClaudeAnalysisProgress();
+    return mockBabbageResponse(payload, context, 'backend-unavailable');
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
   }
 }
+
+function formatBabbageAnalysisAsLegacyText(a = {}) {
+  const worked = Array.isArray(a.what_worked) ? a.what_worked.map(item => `• ${item}`).join('\n') : String(a.what_worked || '');
+  const quality = a.course_quality_check || {};
+  return [
+    'STATUS', a.status || '', '',
+    'CONFIDENCE', a.confidence || '', '',
+    'FEEDBACK SUMMARY', a.feedback_summary || '', '',
+    'WHAT WORKED', worked, '',
+    'ISSUE DETECTED', a.issue_detected || '', '',
+    'RECOMMENDED REPAIR', a.recommended_repair || '', '',
+    'EXPECTED IMPACT', a.expected_impact || '', '',
+    'REVISED DISCUSSION PROMPT', a.revised_discussion_prompt || '', '',
+    'COURSE QUALITY CHECK', [
+      `Clear Objectives: ${quality.clear_objectives || ''}`,
+      `Student Interaction: ${quality.student_interaction || ''}`,
+      `Real-World Context: ${quality.real_world_context || ''}`,
+      `Inclusive Design: ${quality.inclusive_design || ''}`,
+      `Measurable Outcomes: ${quality.measurable_outcomes || ''}`
+    ].join('\n')
+  ].join('\n');
+}
+
+// Compatibility alias until the final cleanup pass.
+const callClaude = requestBabbageAnalysis;
 
 // ══════════════════════════════════════════════════════
 //  BEHAVIORAL DATA TRACKING
@@ -821,6 +840,12 @@ const scenarioData = Array.from({ length: SCENARIO_COUNT }, (_, index) => {
     bestScore: 0,
     finalResponse: '',
     oscqrLit: '',
+    aiProvider: '',
+    aiModel: '',
+    aiRequestId: '',
+    aiElapsedMs: '',
+    aiUsage: null,
+    structuredAnalysis: null,
   };
 
   if (index === SCENARIO_INDEX.METACOGNITION) {
@@ -830,6 +855,13 @@ const scenarioData = Array.from({ length: SCENARIO_COUNT }, (_, index) => {
       diagnosisFinal: [],
       evidenceAttempts: [],
       evidenceFinal: [],
+      thinkingMoveAttempts: [],
+      auditAttempts: [],
+      repairAttempts: [],
+      thinkingMove: '',
+      babbageDraft: null,
+      babbageReview: null,
+      repairText: '',
       openingCheckpointReached: false,
     };
   }
@@ -910,7 +942,7 @@ function getPromptCraftViewportWidth() {
 }
 
 
-function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
+function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive, aiMeta = null) {
   const s = scenarioData[scenarioIdx];
   if (!s) return;
 
@@ -927,8 +959,18 @@ function trackPrompt(scenarioIdx, promptText, score, aiResponse, oscqrActive) {
   s.attempts++;
   s.prompts.push(promptText);
   if (s.currentScore > s.bestScore) s.bestScore = s.currentScore;
-  s.finalResponse = String(aiResponse || '').replace(/<[^>]+>/g, '').substring(0, 1200);
+  // Preserve enough of Babbage's structured analysis for later research review.
+  s.finalResponse = String(aiResponse || '').replace(/<[^>]+>/g, '').substring(0, 24000);
   s.oscqrLit = Array.isArray(oscqrActive) ? oscqrActive.join(', ') : String(oscqrActive || '');
+
+  if (aiMeta && typeof aiMeta === 'object') {
+    s.aiProvider = String(aiMeta.provider || '');
+    s.aiModel = String(aiMeta.model || '');
+    s.aiRequestId = String(aiMeta.request_id || aiMeta.requestId || '');
+    s.aiElapsedMs = Number.isFinite(Number(aiMeta.elapsed_ms)) ? Number(aiMeta.elapsed_ms) : '';
+    s.aiUsage = aiMeta.usage || null;
+    s.structuredAnalysis = aiMeta.structured || aiMeta.analysis || null;
+  }
 }
 
 
@@ -1100,8 +1142,37 @@ async function saveIncrementalData(scenarioIdx) {
       score_delta: scoreDelta,
       prompt_text: lastPrompt || prompts.join(' | '),
       prompts: prompts.join(' | '),
+      // Keep the legacy column key for the current Apps Script schema, while
+      // also logging provider-neutral Babbage metadata in the raw/audit payload.
       claude_response: s.finalResponse || '',
+      babbage_response: s.finalResponse || '',
       final_response: s.finalResponse || '',
+      ai_provider: s.aiProvider || '',
+      ai_model: s.aiModel || '',
+      ai_request_id: s.aiRequestId || '',
+      ai_elapsed_ms: s.aiElapsedMs || '',
+      ai_usage_json: s.aiUsage ? JSON.stringify(s.aiUsage) : '',
+      babbage_analysis_json: s.structuredAnalysis ? JSON.stringify(s.structuredAnalysis) : '',
+      s2_diagnosis_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.diagnosisAttempts || []) : '',
+      s2_evidence_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.evidenceAttempts || []) : '',
+      s2_thinking_move: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? (s.thinkingMove || '') : '',
+      s2_audit_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.auditAttempts || []) : '',
+      s2_repair_text: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? (s.repairText || '') : '',
+      s3_diagnosis_json: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? JSON.stringify(s.diagnosisAttempts || []) : '',
+      s3_evidence_json: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? JSON.stringify(s.evidenceAttempts || []) : '',
+      s3_audit_json: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? JSON.stringify(s.auditAttempts || []) : '',
+      s3_repair_text: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? (s.repairText || '') : '',
+      s3_evidence_statement: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? (s.evidenceStatement || '') : '',
+      s4_diagnosis_json: scenarioIdx === SCENARIO_INDEX.SYNC ? JSON.stringify(s.diagnosisAttempts || []) : '',
+      s4_function_json: scenarioIdx === SCENARIO_INDEX.SYNC ? JSON.stringify(s.functionAttempts || []) : '',
+      s4_audit_json: scenarioIdx === SCENARIO_INDEX.SYNC ? JSON.stringify(s.auditAttempts || []) : '',
+      s4_async_repair: scenarioIdx === SCENARIO_INDEX.SYNC ? (s.asyncRepair || '') : '',
+      s4_evidence_statement: scenarioIdx === SCENARIO_INDEX.SYNC ? (s.evidenceStatement || '') : '',
+      s5_check_json: scenarioIdx === SCENARIO_INDEX.HALLUCINATION ? JSON.stringify(s.checkAttempts || []) : '',
+      s5_audit_json: scenarioIdx === SCENARIO_INDEX.HALLUCINATION ? JSON.stringify(s.auditAttempts || []) : '',
+      s5_flagged_claim: scenarioIdx === SCENARIO_INDEX.HALLUCINATION ? (s.flaggedClaim || '') : '',
+      s5_corrected_claim: scenarioIdx === SCENARIO_INDEX.HALLUCINATION ? (s.correctedClaim || '') : '',
+      s5_verification_note: scenarioIdx === SCENARIO_INDEX.HALLUCINATION ? (s.verificationNote || '') : '',
       quality_indicators_lit: s.oscqrLit || '',
       oscqr_lit: s.oscqrLit || '',
       self_report_prediction: selfReportPrediction,
@@ -1110,7 +1181,16 @@ async function saveIncrementalData(scenarioIdx) {
       time_since_last_attempt_sec: timeSinceLastAttemptSec,
       screen_width: getPromptCraftViewportWidth(),
       event_type: 'scenario_complete',
-      notes_coding_memo: `${location.pathname} :: ${getPromptCraftScenarioLabel(scenarioIdx)} :: session ${pcSessionId} :: ${PC_APP_BUILD_LABEL}`
+      notes_coding_memo: [
+        location.pathname,
+        getPromptCraftScenarioLabel(scenarioIdx),
+        `session ${pcSessionId}`,
+        PC_APP_BUILD_LABEL,
+        s.aiProvider ? `ai_provider=${s.aiProvider}` : '',
+        s.aiModel ? `ai_model=${s.aiModel}` : '',
+        s.aiRequestId ? `ai_request_id=${s.aiRequestId}` : '',
+        s.aiElapsedMs !== '' ? `ai_elapsed_ms=${s.aiElapsedMs}` : ''
+      ].filter(Boolean).join(' :: ')
     };
 
     pcDebug(`[PromptCraft] Incremental save S${scenarioIdx + 1}:`, payload);

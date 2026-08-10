@@ -169,7 +169,7 @@ window.pixelDialogue = {
   "scoreReflection_0": [
     {
       "expr": "skeptical",
-      "text": "That landed at zero out of five. I am not going to pretend Claude had a usable design brief here. The response either missed the scenario or gave us information we cannot responsibly design from.",
+      "text": "That landed at zero out of five. I am not going to pretend Babbage had a usable design brief here. The response either missed the scenario or gave us information we cannot responsibly design from.",
       "id": "s1-score-0-a"
     },
     {
@@ -179,14 +179,14 @@ window.pixelDialogue = {
     },
     {
       "expr": "encouraging",
-      "text": "Go back to the repair notes and rebuild the foundation. Give Claude instructional information, not filler, and the next analysis should change substantially.",
+      "text": "Go back to the repair notes and rebuild the foundation. Give Babbage instructional information, not filler, and the next analysis should change substantially.",
       "id": "s1-score-0-c"
     }
   ],
   "scoreReflection_1": [
     {
       "expr": "skeptical",
-      "text": "That scored one out of five. There is one usable signal in the response, but Claude is still being asked to fill in most of the instructional design for you.",
+      "text": "That scored one out of five. There is one usable signal in the response, but Babbage is still being asked to fill in most of the instructional design for you.",
       "id": "s1-score-1-a"
     },
     {
@@ -203,29 +203,29 @@ window.pixelDialogue = {
   "scoreReflection_2": [
     {
       "expr": "thinking",
-      "text": "Two out of five. Claude has enough to see part of your intent, but too much of the redesign is still guesswork.",
+      "text": "Two out of five. Babbage has enough to see part of your intent, but too much of the redesign is still guesswork.",
       "id": "s1-score-2-a"
     },
     {
       "expr": "skeptical",
-      "text": "The important question is not whether the draft sounds better. It is whether your input gives Claude enough evidence to make the right instructional change instead of inventing one.",
+      "text": "The important question is not whether the draft sounds better. It is whether your input gives Babbage enough evidence to make the right instructional change instead of inventing one.",
       "id": "s1-score-2-b"
     },
     {
       "expr": "encouraging",
-      "text": "Add the missing design information and try again. You are close to having a brief Claude can actually reason from.",
+      "text": "Add the missing design information and try again. You are close to having a brief Babbage can actually reason from.",
       "id": "s1-score-2-c"
     }
   ],
   "scoreReflection_3": [
     {
       "expr": "encouraging",
-      "text": "Three out of five. That is enough structure for Claude to attempt a defensible repair, but I would not call the design brief complete yet.",
+      "text": "Three out of five. That is enough structure for Babbage to attempt a defensible repair, but I would not call the design brief complete yet.",
       "id": "s1-score-3-a"
     },
     {
       "expr": "thinking",
-      "text": "The draft may work, but some of its quality still depends on Claude making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify.",
+      "text": "The draft may work, but some of its quality still depends on Babbage making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify.",
       "id": "s1-score-3-b"
     },
     {
@@ -237,7 +237,7 @@ window.pixelDialogue = {
   "scoreReflection_4": [
     {
       "expr": "proud",
-      "text": "Four out of five. This is a strong design brief. Claude had enough context to make a targeted repair instead of simply rewriting the discussion prompt.",
+      "text": "Four out of five. This is a strong design brief. Babbage had enough context to make a targeted repair instead of simply rewriting the discussion prompt.",
       "id": "s1-score-4-a"
     },
     {
@@ -254,12 +254,12 @@ window.pixelDialogue = {
   "scoreReflection_5": [
     {
       "expr": "proud",
-      "text": "Five out of five. You gave Claude a complete design brief: learner context, the actual problem, the interaction you want, the constraints, and a clear success signal.",
+      "text": "Five out of five. You gave Babbage a complete design brief: learner context, the actual problem, the interaction you want, the constraints, and a clear success signal.",
       "id": "s1-score-5-a"
     },
     {
       "expr": "thinking",
-      "text": "That does not mean Claude is automatically right. It means you gave it enough information that you can judge whether its repair actually follows your instructional intent.",
+      "text": "That does not mean Babbage is automatically right. It means you gave it enough information that you can judge whether its repair actually follows your instructional intent.",
       "id": "s1-score-5-b"
     },
     {
@@ -271,10 +271,10 @@ window.pixelDialogue = {
 };
 
 window.predictionReactions = {
-  "targeted": "That prediction makes sense. You gave Claude learner context, the actual discussion failure, and a clear interaction move, so it should have enough to give a targeted repair.",
-  "generic": "That could happen. Claude can still drift into polite template language if it treats the issue as make this better instead of fix this exact discussion breakdown.",
-  "ignores_constraints": "Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Claude actually respected them.",
-  "not_sure": "That is a useful answer too. Predicting before you look helps you notice what Claude changes, misses, or invents instead of just accepting the shiny paragraph."
+  "targeted": "That prediction makes sense. You gave Babbage learner context, the actual discussion failure, and a clear interaction move, so it should have enough to give a targeted repair.",
+  "generic": "That could happen. Babbage can still drift into polite template language if it treats the issue as make this better instead of fix this exact discussion breakdown.",
+  "ignores_constraints": "Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Babbage actually respected them.",
+  "not_sure": "That is a useful answer too. Predicting before you look helps you notice what Babbage changes, misses, or invents instead of just accepting the shiny paragraph."
 };
 
 // Exact-text fallback map for active S1/shared recordings.
@@ -295,38 +295,38 @@ window.pixelAudioByText = {
   "A faculty member brought me this discussion prompt. Nothing is technically wrong with it.": "p14",
   "Students are posting. Students are replying. The assignment is being completed.": "p15",
   "But the conversation dies after a single exchange. Let's figure out why.": "p16",
-  "That landed at zero out of five. I am not going to pretend Claude had a usable design brief here. The response either missed the scenario or gave us information we cannot responsibly design from.": "s1-score-0-a",
+  "That landed at zero out of five. I am not going to pretend Babbage had a usable design brief here. The response either missed the scenario or gave us information we cannot responsibly design from.": "s1-score-0-a",
   "A useful repair needs a real learner context, a specific interaction problem, a meaningful interaction move, practical constraints, and some sign of what success should look like.": "s1-score-0-b",
-  "Go back to the repair notes and rebuild the foundation. Give Claude instructional information, not filler, and the next analysis should change substantially.": "s1-score-0-c",
-  "That scored one out of five. There is one usable signal in the response, but Claude is still being asked to fill in most of the instructional design for you.": "s1-score-1-a",
+  "Go back to the repair notes and rebuild the foundation. Give Babbage instructional information, not filler, and the next analysis should change substantially.": "s1-score-0-c",
+  "That scored one out of five. There is one usable signal in the response, but Babbage is still being asked to fill in most of the instructional design for you.": "s1-score-1-a",
   "When the design brief is this thin, even a polished AI response can look smarter than the reasoning underneath it. That is exactly the trap this scenario is trying to expose.": "s1-score-1-b",
   "Strengthen the repair notes before you move on. Make the problem and the interaction you want students to have much more concrete.": "s1-score-1-c",
-  "Two out of five. Claude has enough to see part of your intent, but too much of the redesign is still guesswork.": "s1-score-2-a",
-  "The important question is not whether the draft sounds better. It is whether your input gives Claude enough evidence to make the right instructional change instead of inventing one.": "s1-score-2-b",
-  "Add the missing design information and try again. You are close to having a brief Claude can actually reason from.": "s1-score-2-c",
-  "Three out of five. That is enough structure for Claude to attempt a defensible repair, but I would not call the design brief complete yet.": "s1-score-3-a",
-  "The draft may work, but some of its quality still depends on Claude making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify.": "s1-score-3-b",
+  "Two out of five. Babbage has enough to see part of your intent, but too much of the redesign is still guesswork.": "s1-score-2-a",
+  "The important question is not whether the draft sounds better. It is whether your input gives Babbage enough evidence to make the right instructional change instead of inventing one.": "s1-score-2-b",
+  "Add the missing design information and try again. You are close to having a brief Babbage can actually reason from.": "s1-score-2-c",
+  "Three out of five. That is enough structure for Babbage to attempt a defensible repair, but I would not call the design brief complete yet.": "s1-score-3-a",
+  "The draft may work, but some of its quality still depends on Babbage making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify.": "s1-score-3-b",
   "You can move forward, or revise once more and see whether a more complete brief produces a more precise repair.": "s1-score-3-c",
-  "Four out of five. This is a strong design brief. Claude had enough context to make a targeted repair instead of simply rewriting the discussion prompt.": "s1-score-4-a",
+  "Four out of five. This is a strong design brief. Babbage had enough context to make a targeted repair instead of simply rewriting the discussion prompt.": "s1-score-4-a",
   "There is still one area that could be clearer, which matters because small gaps are where AI starts making quiet assumptions on your behalf.": "s1-score-4-b",
   "The important shift is here: you gave the replies an instructional purpose, not just a participation requirement. That is a meaningful redesign.": "s1-score-4-c",
-  "Five out of five. You gave Claude a complete design brief: learner context, the actual problem, the interaction you want, the constraints, and a clear success signal.": "s1-score-5-a",
-  "That does not mean Claude is automatically right. It means you gave it enough information that you can judge whether its repair actually follows your instructional intent.": "s1-score-5-b",
+  "Five out of five. You gave Babbage a complete design brief: learner context, the actual problem, the interaction you want, the constraints, and a clear success signal.": "s1-score-5-a",
+  "That does not mean Babbage is automatically right. It means you gave it enough information that you can judge whether its repair actually follows your instructional intent.": "s1-score-5-b",
   "That is the habit I want you to carry forward: make the reasoning visible first, then use AI to help execute the design.": "s1-score-5-c",
-  "That prediction makes sense. You gave Claude learner context, the actual discussion failure, and a clear interaction move, so it should have enough to give a targeted repair.": "p47",
-  "That could happen. Claude can still drift into polite template language if it treats the issue as make this better instead of fix this exact discussion breakdown.": "p48",
-  "Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Claude actually respected them.": "p49",
-  "That is a useful answer too. Predicting before you look helps you notice what Claude changes, misses, or invents instead of just accepting the shiny paragraph.": "p50",
+  "That prediction makes sense. You gave Babbage learner context, the actual discussion failure, and a clear interaction move, so it should have enough to give a targeted repair.": "p47",
+  "That could happen. Babbage can still drift into polite template language if it treats the issue as make this better instead of fix this exact discussion breakdown.": "p48",
+  "Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Babbage actually respected them.": "p49",
+  "That is a useful answer too. Predicting before you look helps you notice what Babbage changes, misses, or invents instead of just accepting the shiny paragraph.": "p50",
   "Welcome to the Prompt Lab, [player name]! I am Professor Pixel, your AI coaching companion.": "p51",
   "Professor Pixel is thinking.": "p52",
   "Professor Pixel has thoughts — tap to hear them.": "p53",
   "Hmm, I lost my train of thought — take a look at the Prompt Analysis panel and try another attempt.": "p54",
-  "Let's ask Claude what it notices.": "p58",
-  "Claude is analyzing the teaching problem now.": "p59",
-  "Before we consult Claude...": "p60",
-  "Based on the context you gave, what do you predict Claude will do?": "p61",
+  "Let's ask Babbage what it notices.": "p58",
+  "Babbage is analyzing the teaching problem now.": "p59",
+  "Before we consult Babbage...": "p60",
+  "Based on the context you gave, what do you predict Babbage will do?": "p61",
   "Your prediction is logged.": "p62",
-  "Now we have something useful. Claude found that the original prompt was not broken because students ignored it. It was broken because students were doing exactly what it asked.": "p63",
+  "Now we have something useful. Babbage found that the original prompt was not broken because students ignored it. It was broken because students were doing exactly what it asked.": "p63",
   "That is the design problem: compliance is not the same thing as interaction. A reply requirement can create activity without creating a reason to continue the conversation.": "p64",
   "Your revision gives students a clearer interaction move, a purpose for replying, and criteria for what a stronger response should include. That is a real repair, not just prettier wording.": "p65",
   "Your revision is moving in the right direction. Before moving on, strengthen the prompt so students know how to extend, challenge, compare, or build on a peer's idea.": "p66",
@@ -433,7 +433,7 @@ window.pixelAudioLabels = {
   "s1-score-0-a": {
     "source": "scoreReflection_0",
     "expression": "skeptical",
-    "text": "That landed at zero out of five. I am not going to pretend Claude had a usable design brief here. The response either missed the scenario or gave us information we cannot responsibly design from.",
+    "text": "That landed at zero out of five. I am not going to pretend Babbage had a usable design brief here. The response either missed the scenario or gave us information we cannot responsibly design from.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 0/5 branch."
   },
   "s1-score-0-b": {
@@ -445,13 +445,13 @@ window.pixelAudioLabels = {
   "s1-score-0-c": {
     "source": "scoreReflection_0",
     "expression": "encouraging",
-    "text": "Go back to the repair notes and rebuild the foundation. Give Claude instructional information, not filler, and the next analysis should change substantially.",
+    "text": "Go back to the repair notes and rebuild the foundation. Give Babbage instructional information, not filler, and the next analysis should change substantially.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 0/5 branch."
   },
   "s1-score-1-a": {
     "source": "scoreReflection_1",
     "expression": "skeptical",
-    "text": "That scored one out of five. There is one usable signal in the response, but Claude is still being asked to fill in most of the instructional design for you.",
+    "text": "That scored one out of five. There is one usable signal in the response, but Babbage is still being asked to fill in most of the instructional design for you.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 1/5 branch."
   },
   "s1-score-1-b": {
@@ -469,31 +469,31 @@ window.pixelAudioLabels = {
   "s1-score-2-a": {
     "source": "scoreReflection_2",
     "expression": "thinking",
-    "text": "Two out of five. Claude has enough to see part of your intent, but too much of the redesign is still guesswork.",
+    "text": "Two out of five. Babbage has enough to see part of your intent, but too much of the redesign is still guesswork.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 2/5 branch."
   },
   "s1-score-2-b": {
     "source": "scoreReflection_2",
     "expression": "skeptical",
-    "text": "The important question is not whether the draft sounds better. It is whether your input gives Claude enough evidence to make the right instructional change instead of inventing one.",
+    "text": "The important question is not whether the draft sounds better. It is whether your input gives Babbage enough evidence to make the right instructional change instead of inventing one.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 2/5 branch."
   },
   "s1-score-2-c": {
     "source": "scoreReflection_2",
     "expression": "encouraging",
-    "text": "Add the missing design information and try again. You are close to having a brief Claude can actually reason from.",
+    "text": "Add the missing design information and try again. You are close to having a brief Babbage can actually reason from.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 2/5 branch."
   },
   "s1-score-3-a": {
     "source": "scoreReflection_3",
     "expression": "encouraging",
-    "text": "Three out of five. That is enough structure for Claude to attempt a defensible repair, but I would not call the design brief complete yet.",
+    "text": "Three out of five. That is enough structure for Babbage to attempt a defensible repair, but I would not call the design brief complete yet.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 3/5 branch."
   },
   "s1-score-3-b": {
     "source": "scoreReflection_3",
     "expression": "thinking",
-    "text": "The draft may work, but some of its quality still depends on Claude making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify.",
+    "text": "The draft may work, but some of its quality still depends on Babbage making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 3/5 branch."
   },
   "s1-score-3-c": {
@@ -505,7 +505,7 @@ window.pixelAudioLabels = {
   "s1-score-4-a": {
     "source": "scoreReflection_4",
     "expression": "proud",
-    "text": "Four out of five. This is a strong design brief. Claude had enough context to make a targeted repair instead of simply rewriting the discussion prompt.",
+    "text": "Four out of five. This is a strong design brief. Babbage had enough context to make a targeted repair instead of simply rewriting the discussion prompt.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 4/5 branch."
   },
   "s1-score-4-b": {
@@ -523,13 +523,13 @@ window.pixelAudioLabels = {
   "s1-score-5-a": {
     "source": "scoreReflection_5",
     "expression": "proud",
-    "text": "Five out of five. You gave Claude a complete design brief: learner context, the actual problem, the interaction you want, the constraints, and a clear success signal.",
+    "text": "Five out of five. You gave Babbage a complete design brief: learner context, the actual problem, the interaction you want, the constraints, and a clear success signal.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 5/5 branch."
   },
   "s1-score-5-b": {
     "source": "scoreReflection_5",
     "expression": "thinking",
-    "text": "That does not mean Claude is automatically right. It means you gave it enough information that you can judge whether its repair actually follows your instructional intent.",
+    "text": "That does not mean Babbage is automatically right. It means you gave it enough information that you can judge whether its repair actually follows your instructional intent.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 5/5 branch."
   },
   "s1-score-5-c": {
@@ -541,25 +541,25 @@ window.pixelAudioLabels = {
   "p47": {
     "source": "predictionReaction_targeted",
     "expression": "",
-    "text": "That prediction makes sense. You gave Claude learner context, the actual discussion failure, and a clear interaction move, so it should have enough to give a targeted repair.",
+    "text": "That prediction makes sense. You gave Babbage learner context, the actual discussion failure, and a clear interaction move, so it should have enough to give a targeted repair.",
     "notes": "Displayed after learner chooses a prediction."
   },
   "p48": {
     "source": "predictionReaction_generic",
     "expression": "",
-    "text": "That could happen. Claude can still drift into polite template language if it treats the issue as make this better instead of fix this exact discussion breakdown.",
+    "text": "That could happen. Babbage can still drift into polite template language if it treats the issue as make this better instead of fix this exact discussion breakdown.",
     "notes": "Displayed after learner chooses a prediction."
   },
   "p49": {
     "source": "predictionReaction_ignores_constraints",
     "expression": "",
-    "text": "Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Claude actually respected them.",
+    "text": "Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Babbage actually respected them.",
     "notes": "Displayed after learner chooses a prediction."
   },
   "p50": {
     "source": "predictionReaction_not_sure",
     "expression": "",
-    "text": "That is a useful answer too. Predicting before you look helps you notice what Claude changes, misses, or invents instead of just accepting the shiny paragraph.",
+    "text": "That is a useful answer too. Predicting before you look helps you notice what Babbage changes, misses, or invents instead of just accepting the shiny paragraph.",
     "notes": "Displayed after learner chooses a prediction."
   },
   "p51": {
@@ -589,25 +589,25 @@ window.pixelAudioLabels = {
   "p58": {
     "source": "claude_analyzing_bridge_1",
     "expression": "",
-    "text": "Let's ask Claude what it notices.",
-    "notes": "VN dialogue during Claude analysis."
+    "text": "Let's ask Babbage what it notices.",
+    "notes": "VN dialogue during Babbage analysis."
   },
   "p59": {
     "source": "claude_analyzing_bridge_2",
     "expression": "",
-    "text": "Claude is analyzing the teaching problem now.",
-    "notes": "VN dialogue during Claude analysis."
+    "text": "Babbage is analyzing the teaching problem now.",
+    "notes": "VN dialogue during Babbage analysis."
   },
   "p60": {
     "source": "prediction_gate_intro_1",
     "expression": "thinking",
-    "text": "Before we consult Claude...",
+    "text": "Before we consult Babbage...",
     "notes": "VN prediction screen."
   },
   "p61": {
     "source": "prediction_gate_intro_2",
     "expression": "thinking",
-    "text": "Based on the context you gave, what do you predict Claude will do?",
+    "text": "Based on the context you gave, what do you predict Babbage will do?",
     "notes": "VN prediction screen."
   },
   "p62": {
@@ -619,14 +619,14 @@ window.pixelAudioLabels = {
   "p63": {
     "source": "s1_post_analysis_1",
     "expression": "encouraging",
-    "text": "Now we have something useful. Claude found that the original prompt was not broken because students ignored it. It was broken because students were doing exactly what it asked.",
-    "notes": "S1 post-Claude Pixel reflection."
+    "text": "Now we have something useful. Babbage found that the original prompt was not broken because students ignored it. It was broken because students were doing exactly what it asked.",
+    "notes": "S1 post-Babbage Pixel reflection."
   },
   "p64": {
     "source": "s1_post_analysis_2",
     "expression": "thinking",
     "text": "That is the design problem: compliance is not the same thing as interaction. A reply requirement can create activity without creating a reason to continue the conversation.",
-    "notes": "S1 post-Claude Pixel reflection."
+    "notes": "S1 post-Babbage Pixel reflection."
   },
   "p65": {
     "source": "s1_post_analysis_success",
