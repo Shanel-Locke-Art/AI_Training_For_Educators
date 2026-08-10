@@ -740,7 +740,7 @@ function mockClaudeResponse(payload, context = 'main', reason = 'forced') {
   });
 }
 
-const CLAUDE_REQUEST_TIMEOUT_MS = 60000;
+const CLAUDE_REQUEST_TIMEOUT_MS = 90000;
 
 async function callClaude(payload, context = 'main') {
   if (USE_MOCK_CLAUDE) return mockClaudeResponse(payload, context, FORCE_MOCK_CLAUDE ? 'query-parameter' : 'local-test');
