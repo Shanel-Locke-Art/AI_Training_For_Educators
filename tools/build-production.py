@@ -22,7 +22,10 @@ CSS_BUNDLE_PATH = ROOT / "styles" / "promptcraft.css"
 
 JS_SOURCES = (
     Path("functions/app.js"),
+    Path("functions/app-babbage.js"),
+    Path("functions/app-scenario-shared.js"),
     Path("functions/app-scenarios.js"),
+    Path("functions/app-scenario-prototypes.js"),
     Path("functions/app-vn.js"),
     Path("functions/app-workbench.js"),
 )
@@ -94,7 +97,7 @@ def run_node_checks() -> list[str]:
             ROOT / "functions/dialogue.js",
             ROOT / "functions/wall.js",
             JS_BUNDLE_PATH,
-            ROOT / "netlify/functions/claude.js",
+            ROOT / "netlify/functions/babbage.js",
             ROOT / "tools/test-netlify-function.js",
         ]
     )

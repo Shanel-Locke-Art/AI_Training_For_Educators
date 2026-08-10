@@ -12,7 +12,8 @@ async function run() {
     assert.equal(health.statusCode, 200);
     const healthBody = JSON.parse(health.body);
     assert.equal(healthBody.provider, 'openai');
-    assert.equal(healthBody.proxy_version, 'V368');
+    assert.equal(healthBody.proxy_version, 'V369');
+    assert.ok(healthBody.supported_contracts.includes('s5_review'));
 
     const fixtures = {
       promptcraft_s1_babbage_analysis: {
@@ -118,7 +119,7 @@ async function run() {
       assert.equal(result.statusCode, 200);
       const body = JSON.parse(result.body);
       assert.equal(body.analysis_schema, expectedSchema);
-      assert.equal(body.proxy_version, 'V368');
+      assert.equal(body.proxy_version, 'V369');
       assert.equal(lastPayload.text.format.name, expectedName);
       assert.equal(lastPayload.text.format.strict, true);
       assert.equal(lastPayload.model, 'gpt-5.6-terra');

@@ -1,6 +1,6 @@
 const DEFAULT_OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5.6-terra';
 const OPENAI_BASE_URL = String(process.env.OPENAI_BASE_URL || 'https://api.openai.com').replace(/\/+$/, '');
-const PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V368';
+const PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V369';
 
 const CORS_HEADERS = Object.freeze({
   'Access-Control-Allow-Origin': '*',
@@ -348,8 +348,19 @@ exports.handler = async (event = {}) => {
 
   if (event.httpMethod === 'GET') {
     return jsonResponse(200, {
-      status: 'ok', service: 'PromptCraft Babbage proxy', proxy_version: PROMPTCRAFT_BABBAGE_PROXY_VERSION,
-      provider: 'openai', configured: Boolean(process.env.OPENAI_API_KEY), model: DEFAULT_OPENAI_MODEL,
+      status: 'ok',
+      service: 'PromptCraft Babbage proxy',
+      proxy_version: PROMPTCRAFT_BABBAGE_PROXY_VERSION,
+      provider: 'openai',
+      configured: Boolean(process.env.OPENAI_API_KEY),
+      model: DEFAULT_OPENAI_MODEL,
+      supported_contracts: [
+        'scenario1',
+        's2_draft', 's2_review',
+        's3_draft', 's3_review',
+        's4_draft', 's4_review',
+        's5_brief', 's5_review'
+      ],
       message: process.env.OPENAI_API_KEY ? 'Babbage is configured for OpenAI Responses API.' : 'Babbage proxy is reachable, but OPENAI_API_KEY is unavailable.'
     });
   }

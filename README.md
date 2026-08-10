@@ -72,3 +72,9 @@ The browser runtime is intentionally framework-free and uses relative local path
 ## Babbage analysis transition
 
 Babbage's progress display now follows observable request stages. After a live response arrives, the final parsing/render transition uses the short `PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS` compatibility constant in `functions/app-vn.js`; it should remain brief because the progress bar itself owns the waiting experience.
+
+## V369 refactor baseline
+
+Scenario 1 is the regression reference for visual and interaction behavior. The browser application is now split into a provider-neutral Babbage client (`functions/app-babbage.js`), shared scenario framework (`functions/app-scenario-shared.js`), core scenario/menu runtime (`functions/app-scenarios.js`), and current S2-S5 development prototypes (`functions/app-scenario-prototypes.js`). Prototype scenarios are preserved for design reference but are not considered approved final implementations.
+
+The deployed Babbage GET health response reports the proxy version, OpenAI configuration state, model, and supported structured contracts. `node tools/test-babbage-live.js <site-url>` performs a free GET-only deployment check. Add `--contracts` only when intentionally testing every live structured contract because it makes model API calls.

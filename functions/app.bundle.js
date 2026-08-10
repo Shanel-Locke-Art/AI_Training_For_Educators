@@ -684,148 +684,6 @@ window.testSheetsPing = function testSheetsPing() {
   }, 'browser test ping');
 };
 
-
-// ══════════════════════════════════════════════════════
-//  LOCAL TESTING / BABBAGE FALLBACK
-//  Lets VS Code Live Server progress through scenarios without Netlify.
-//  Add ?mockBabbage=1 to force fallback mode anywhere.
-//  Legacy ?mockClaude=1 remains supported for old QA links.
-// ══════════════════════════════════════════════════════
-const MOCK_BABBAGE_FOR_LOCAL = false;
-const pcQueryParams = new URLSearchParams(window.location.search);
-const FORCE_MOCK_BABBAGE = pcQueryParams.get('mockBabbage') === '1' || pcQueryParams.get('mockClaude') === '1';
-const IS_LOCAL_TEST = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:';
-const USE_MOCK_BABBAGE = FORCE_MOCK_BABBAGE || (MOCK_BABBAGE_FOR_LOCAL && IS_LOCAL_TEST);
-
-// NOTE: Local Babbage fallback text is dialogue/content-heavy. Move to dialogue.js in a later pass if desired.
-function mockBabbageText(payload, context = 'main') {
-  const system = payload.system || '';
-
-  if (context === 'pixel' || system.includes('You are Professor Pixel')) {
-    return `You gave Babbage enough direction to produce a usable response, especially where your prompt named the actual teaching problem. The next improvement is to make the success criteria more visible so Babbage knows what a strong student outcome should look like.\n\n*What would you want students to do, say, or produce that would prove the activity worked?*`;
-  }
-
-  if (context === 'growth' || system.includes('personalized growth summary')) {
-    return `Scenario 1 shows how learner context, constraints, and explicit interaction moves can turn a vague AI request into a more useful instructional design draft. Additional growth reporting will be added as the remaining scenarios are rebuilt.`;
-  }
-
-  if (scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT) {
-    return `This scenario is currently a clean development shell and does not send prompts to Babbage.`;
-  }
-
-  const values = (window.playerHistory && window.playerHistory.s1) || (typeof getS1GuidedValues === 'function' ? getS1GuidedValues() : {});
-  const checks = typeof analyzeS1Guided === 'function' ? analyzeS1Guided(values) : {};
-  const problems = [];
-  if (checks.demeaning) problems.push('the learner description uses demeaning language instead of usable learner characteristics');
-  if (!checks.audience) problems.push('the learner/course context is not specific enough to guide a redesign');
-  if (!checks.issue) problems.push('the problem statement is too vague to diagnose the instructional failure');
-  if (!checks.interaction) problems.push('the requested interaction does not define an observable peer-to-peer thinking move');
-  if (!checks.constraints) problems.push('the constraints are too thin to shape a realistic activity');
-  if (!checks.success) problems.push('there is no clear criterion for what a successful contribution should demonstrate');
-
-  if (problems.length) {
-    const summary = problems.slice(0, 3).join('; ') + '.';
-    const worked = [
-      checks.issue ? `You did identify a discussion problem: ${values.issue}` : '',
-      checks.constraints ? `You supplied at least one practical boundary: ${values.constraints}` : ''
-    ].filter(Boolean).join(' ') || 'There is not yet enough instructionally useful detail to treat this as a strong repair.';
-    return `STATUS\nNEEDS REVISION BEFORE REDESIGN\n\nCONFIDENCE\nHIGH\n\nFEEDBACK SUMMARY\nThis input should not be treated as a strong repair. ${summary}\n\nWHAT WORKED\n${worked}\n\nISSUE DETECTED\n${problems[0]}. The current notes would force Babbage to invent important instructional decisions rather than respond to your actual design.\n\nRECOMMENDED REPAIR\nReplace vague or judgmental wording with observable information: who the learners are, what students are currently doing, what intellectual move peers should make with one another, and what evidence would show the discussion worked.\n\nEXPECTED IMPACT\nA more concrete and respectful description gives Babbage evidence it can actually reason from, which should produce a redesign that matches the course instead of a generic discussion template.\n\nREVISED DISCUSSION PROMPT\nChoose one claim or interpretation from this week's reading. Explain it in your initial post and support it with a specific passage, example, or piece of evidence. Respond to two classmates by engaging directly with their reasoning: extend, challenge, compare, or question an idea and explain why. At least one reply should give your classmate a clear reason to respond again.\n\nCOURSE QUALITY CHECK\nClear Objectives: partially addressed. Student Interaction: needs clearer direction. Real-World Context: not established from the notes. Inclusive Design: insufficient information. Measurable Outcomes: needs explicit success criteria.`;
-  }
-
-  return `STATUS\nSTRONG REPAIR WITH A CLEAR INTERACTION PURPOSE\n\nCONFIDENCE\nHIGH\n\nFEEDBACK SUMMARY\nYour notes identify the learner context, the observed discussion problem, a specific peer-interaction move, and practical constraints. The redesign can therefore respond to your actual course rather than inventing the missing pieces.\n\nWHAT WORKED\nLearners: ${values.learners}\nProblem: ${values.issue}\nInteraction: ${values.interaction}\nConstraints: ${values.constraints}\nThese details give the redesign concrete instructional boundaries.\n\nISSUE DETECTED\nThe strongest remaining refinement is to make the two required peer replies serve visibly different purposes so students cannot satisfy both with the same generic move.\n\nRECOMMENDED REPAIR\nGive one reply an extend/challenge/compare purpose and the other a genuine follow-up-question or contrasting-example purpose.\n\nEXPECTED IMPACT\nDistinct reply moves reduce repetition and create more than one pathway for a conversation to continue.\n\nREVISED DISCUSSION PROMPT\nChoose one interpretation of this week's reading that you find convincing, questionable, or difficult to apply. Explain your interpretation and support it with one specific example or piece of evidence. Then respond substantively to two classmates. In one reply, extend, challenge, or compare a classmate's interpretation using evidence or a concrete example. In the other, ask a genuine follow-up question or introduce a contrasting example that invites further discussion.\n\nCOURSE QUALITY CHECK\nClear Objectives: addressed. Student Interaction: strongly addressed. Real-World Context: use when relevant to the reading. Inclusive Design: multiple response moves support participation. Measurable Outcomes: the initial evidence and two substantive replies are observable.`;
-}
-
-
-function mockBabbageResponse(payload, context = 'main', reason = 'forced') {
-  pcDebug(`[PromptCraft] Using mock Babbage response for ${context} (${reason}).`);
-  const legacyText = mockBabbageText(payload, context);
-  return Promise.resolve({
-    content: [{ text: legacyText }],
-    mock: true,
-    mockReason: reason,
-    provider: 'local-fallback',
-    model: 'promptcraft-local-fallback'
-  });
-}
-
-// Compatibility alias retained for older scenario modules while the internal
-// DOM/class vocabulary is migrated gradually.
-const mockClaudeResponse = mockBabbageResponse;
-
-const BABBAGE_REQUEST_TIMEOUT_MS = 90000;
-
-async function requestBabbageAnalysis(payload, context = 'main') {
-  if (USE_MOCK_BABBAGE) return mockBabbageResponse(payload, context, FORCE_MOCK_BABBAGE ? 'query-parameter' : 'local-test');
-
-  const tracksVisibleAnalysis = context === 'main' && !!document.querySelector('#claudeTerminalOutput .pc-analyzing-progress');
-  if (tracksVisibleAnalysis && typeof window.pcStartClaudeAnalysisProgress === 'function') window.pcStartClaudeAnalysisProgress(BABBAGE_REQUEST_TIMEOUT_MS);
-
-  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-  const timeoutId = controller ? setTimeout(() => controller.abort(), BABBAGE_REQUEST_TIMEOUT_MS) : null;
-
-  try {
-    const res = await fetch('/.netlify/functions/babbage', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: controller ? controller.signal : undefined
-    });
-
-    if (tracksVisibleAnalysis && typeof window.pcMarkClaudeResponseReceived === 'function') window.pcMarkClaudeResponseReceived();
-
-    const responseText = await res.text();
-    let data = {};
-    try { data = responseText ? JSON.parse(responseText) : {}; } catch (_error) { data = {}; }
-
-    if (!res.ok) {
-      const providerMessage = data?.error?.message || data?.message || responseText || `HTTP ${res.status}`;
-      throw new Error(`Babbage function returned ${res.status}: ${providerMessage}`);
-    }
-    if (data.error) throw new Error(data.error?.message || 'Babbage returned an error');
-
-    // The UI keeps one normalized contract regardless of provider. This prevents
-    // provider response shapes from leaking throughout the game.
-    if (data.analysis && typeof data.analysis === 'object') {
-      return {
-        ...data,
-        structured: data.analysis,
-        content: [{ text: formatBabbageAnalysisAsLegacyText(data.analysis) }],
-        mock: false,
-        mockReason: ''
-      };
-    }
-    return data;
-  } catch (err) {
-    console.warn('[PromptCraft] Babbage unavailable or timed out; using local fallback:', err && err.message ? err.message : err);
-    if (tracksVisibleAnalysis && typeof window.pcFailClaudeAnalysisProgress === 'function') window.pcFailClaudeAnalysisProgress();
-    return mockBabbageResponse(payload, context, 'backend-unavailable');
-  } finally {
-    if (timeoutId) clearTimeout(timeoutId);
-  }
-}
-
-function formatBabbageAnalysisAsLegacyText(a = {}) {
-  const worked = Array.isArray(a.what_worked) ? a.what_worked.map(item => `• ${item}`).join('\n') : String(a.what_worked || '');
-  const quality = a.course_quality_check || {};
-  return [
-    'STATUS', a.status || '', '',
-    'CONFIDENCE', a.confidence || '', '',
-    'FEEDBACK SUMMARY', a.feedback_summary || '', '',
-    'WHAT WORKED', worked, '',
-    'ISSUE DETECTED', a.issue_detected || '', '',
-    'RECOMMENDED REPAIR', a.recommended_repair || '', '',
-    'EXPECTED IMPACT', a.expected_impact || '', '',
-    'REVISED DISCUSSION PROMPT', a.revised_discussion_prompt || '', '',
-    'COURSE QUALITY CHECK', [
-      `Clear Objectives: ${quality.clear_objectives || ''}`,
-      `Student Interaction: ${quality.student_interaction || ''}`,
-      `Real-World Context: ${quality.real_world_context || ''}`,
-      `Inclusive Design: ${quality.inclusive_design || ''}`,
-      `Measurable Outcomes: ${quality.measurable_outcomes || ''}`
-    ].join('\n')
-  ].join('\n');
-}
-
-// Compatibility alias until the final cleanup pass.
-const callClaude = requestBabbageAnalysis;
-
 // ══════════════════════════════════════════════════════
 //  BEHAVIORAL DATA TRACKING
 //  Records rich session data for dissertation analysis
@@ -1348,6 +1206,356 @@ function applyAudioMode(mode) {
 
 
 // ══════════════════════════════════════════════════════
+;
+/* SOURCE: functions/app-babbage.js */
+/* PROMPTCRAFT BABBAGE CLIENT LAYER
+   Provider-neutral browser request, fallback, and response normalization.
+   Extracted during the V369 architecture refactor. */
+
+// ══════════════════════════════════════════════════════
+//  LOCAL TESTING / BABBAGE FALLBACK
+//  Lets VS Code Live Server progress through scenarios without Netlify.
+//  Add ?mockBabbage=1 to force fallback mode anywhere.
+//  Legacy ?mockClaude=1 remains supported for old QA links.
+// ══════════════════════════════════════════════════════
+const MOCK_BABBAGE_FOR_LOCAL = false;
+const pcQueryParams = new URLSearchParams(window.location.search);
+const FORCE_MOCK_BABBAGE = pcQueryParams.get('mockBabbage') === '1' || pcQueryParams.get('mockClaude') === '1';
+const IS_LOCAL_TEST = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:';
+const USE_MOCK_BABBAGE = FORCE_MOCK_BABBAGE || (MOCK_BABBAGE_FOR_LOCAL && IS_LOCAL_TEST);
+
+// NOTE: Local Babbage fallback text is dialogue/content-heavy. Move to dialogue.js in a later pass if desired.
+function mockBabbageText(payload, context = 'main') {
+  const system = payload.system || '';
+
+  if (context === 'pixel' || system.includes('You are Professor Pixel')) {
+    return `You gave Babbage enough direction to produce a usable response, especially where your prompt named the actual teaching problem. The next improvement is to make the success criteria more visible so Babbage knows what a strong student outcome should look like.\n\n*What would you want students to do, say, or produce that would prove the activity worked?*`;
+  }
+
+  if (context === 'growth' || system.includes('personalized growth summary')) {
+    return `Scenario 1 shows how learner context, constraints, and explicit interaction moves can turn a vague AI request into a more useful instructional design draft. Additional growth reporting will be added as the remaining scenarios are rebuilt.`;
+  }
+
+  if (scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT) {
+    return `This scenario is currently a clean development shell and does not send prompts to Babbage.`;
+  }
+
+  const values = (window.playerHistory && window.playerHistory.s1) || (typeof getS1GuidedValues === 'function' ? getS1GuidedValues() : {});
+  const checks = typeof analyzeS1Guided === 'function' ? analyzeS1Guided(values) : {};
+  const problems = [];
+  if (checks.demeaning) problems.push('the learner description uses demeaning language instead of usable learner characteristics');
+  if (!checks.audience) problems.push('the learner/course context is not specific enough to guide a redesign');
+  if (!checks.issue) problems.push('the problem statement is too vague to diagnose the instructional failure');
+  if (!checks.interaction) problems.push('the requested interaction does not define an observable peer-to-peer thinking move');
+  if (!checks.constraints) problems.push('the constraints are too thin to shape a realistic activity');
+  if (!checks.success) problems.push('there is no clear criterion for what a successful contribution should demonstrate');
+
+  if (problems.length) {
+    const summary = problems.slice(0, 3).join('; ') + '.';
+    const worked = [
+      checks.issue ? `You did identify a discussion problem: ${values.issue}` : '',
+      checks.constraints ? `You supplied at least one practical boundary: ${values.constraints}` : ''
+    ].filter(Boolean).join(' ') || 'There is not yet enough instructionally useful detail to treat this as a strong repair.';
+    return `STATUS\nNEEDS REVISION BEFORE REDESIGN\n\nCONFIDENCE\nHIGH\n\nFEEDBACK SUMMARY\nThis input should not be treated as a strong repair. ${summary}\n\nWHAT WORKED\n${worked}\n\nISSUE DETECTED\n${problems[0]}. The current notes would force Babbage to invent important instructional decisions rather than respond to your actual design.\n\nRECOMMENDED REPAIR\nReplace vague or judgmental wording with observable information: who the learners are, what students are currently doing, what intellectual move peers should make with one another, and what evidence would show the discussion worked.\n\nEXPECTED IMPACT\nA more concrete and respectful description gives Babbage evidence it can actually reason from, which should produce a redesign that matches the course instead of a generic discussion template.\n\nREVISED DISCUSSION PROMPT\nChoose one claim or interpretation from this week's reading. Explain it in your initial post and support it with a specific passage, example, or piece of evidence. Respond to two classmates by engaging directly with their reasoning: extend, challenge, compare, or question an idea and explain why. At least one reply should give your classmate a clear reason to respond again.\n\nCOURSE QUALITY CHECK\nClear Objectives: partially addressed. Student Interaction: needs clearer direction. Real-World Context: not established from the notes. Inclusive Design: insufficient information. Measurable Outcomes: needs explicit success criteria.`;
+  }
+
+  return `STATUS\nSTRONG REPAIR WITH A CLEAR INTERACTION PURPOSE\n\nCONFIDENCE\nHIGH\n\nFEEDBACK SUMMARY\nYour notes identify the learner context, the observed discussion problem, a specific peer-interaction move, and practical constraints. The redesign can therefore respond to your actual course rather than inventing the missing pieces.\n\nWHAT WORKED\nLearners: ${values.learners}\nProblem: ${values.issue}\nInteraction: ${values.interaction}\nConstraints: ${values.constraints}\nThese details give the redesign concrete instructional boundaries.\n\nISSUE DETECTED\nThe strongest remaining refinement is to make the two required peer replies serve visibly different purposes so students cannot satisfy both with the same generic move.\n\nRECOMMENDED REPAIR\nGive one reply an extend/challenge/compare purpose and the other a genuine follow-up-question or contrasting-example purpose.\n\nEXPECTED IMPACT\nDistinct reply moves reduce repetition and create more than one pathway for a conversation to continue.\n\nREVISED DISCUSSION PROMPT\nChoose one interpretation of this week's reading that you find convincing, questionable, or difficult to apply. Explain your interpretation and support it with one specific example or piece of evidence. Then respond substantively to two classmates. In one reply, extend, challenge, or compare a classmate's interpretation using evidence or a concrete example. In the other, ask a genuine follow-up question or introduce a contrasting example that invites further discussion.\n\nCOURSE QUALITY CHECK\nClear Objectives: addressed. Student Interaction: strongly addressed. Real-World Context: use when relevant to the reading. Inclusive Design: multiple response moves support participation. Measurable Outcomes: the initial evidence and two substantive replies are observable.`;
+}
+
+
+function mockBabbageResponse(payload, context = 'main', reason = 'forced') {
+  pcDebug(`[PromptCraft] Using mock Babbage response for ${context} (${reason}).`);
+  const legacyText = mockBabbageText(payload, context);
+  return Promise.resolve({
+    content: [{ text: legacyText }],
+    mock: true,
+    mockReason: reason,
+    provider: 'local-fallback',
+    model: 'promptcraft-local-fallback'
+  });
+}
+
+// Compatibility alias retained for older scenario modules while the internal
+// DOM/class vocabulary is migrated gradually.
+const mockClaudeResponse = mockBabbageResponse;
+
+const BABBAGE_REQUEST_TIMEOUT_MS = 90000;
+
+async function requestBabbageAnalysis(payload, context = 'main') {
+  if (USE_MOCK_BABBAGE) return mockBabbageResponse(payload, context, FORCE_MOCK_BABBAGE ? 'query-parameter' : 'local-test');
+
+  const tracksVisibleAnalysis = context === 'main' && !!document.querySelector('#claudeTerminalOutput .pc-analyzing-progress');
+  if (tracksVisibleAnalysis && typeof window.pcStartClaudeAnalysisProgress === 'function') window.pcStartClaudeAnalysisProgress(BABBAGE_REQUEST_TIMEOUT_MS);
+
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timeoutId = controller ? setTimeout(() => controller.abort(), BABBAGE_REQUEST_TIMEOUT_MS) : null;
+
+  try {
+    const res = await fetch('/.netlify/functions/babbage', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: controller ? controller.signal : undefined
+    });
+
+    if (tracksVisibleAnalysis && typeof window.pcMarkClaudeResponseReceived === 'function') window.pcMarkClaudeResponseReceived();
+
+    const responseText = await res.text();
+    let data = {};
+    try { data = responseText ? JSON.parse(responseText) : {}; } catch (_error) { data = {}; }
+
+    if (!res.ok) {
+      const providerMessage = data?.error?.message || data?.message || responseText || `HTTP ${res.status}`;
+      throw new Error(`Babbage function returned ${res.status}: ${providerMessage}`);
+    }
+    if (data.error) throw new Error(data.error?.message || 'Babbage returned an error');
+
+    // The UI keeps one normalized contract regardless of provider. This prevents
+    // provider response shapes from leaking throughout the game.
+    if (data.analysis && typeof data.analysis === 'object') {
+      return {
+        ...data,
+        structured: data.analysis,
+        content: [{ text: formatBabbageAnalysisAsLegacyText(data.analysis) }],
+        mock: false,
+        mockReason: ''
+      };
+    }
+    return data;
+  } catch (err) {
+    console.warn('[PromptCraft] Babbage unavailable or timed out; using local fallback:', err && err.message ? err.message : err);
+    if (tracksVisibleAnalysis && typeof window.pcFailClaudeAnalysisProgress === 'function') window.pcFailClaudeAnalysisProgress();
+    return mockBabbageResponse(payload, context, 'backend-unavailable');
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+}
+
+function formatBabbageAnalysisAsLegacyText(a = {}) {
+  const worked = Array.isArray(a.what_worked) ? a.what_worked.map(item => `• ${item}`).join('\n') : String(a.what_worked || '');
+  const quality = a.course_quality_check || {};
+  return [
+    'STATUS', a.status || '', '',
+    'CONFIDENCE', a.confidence || '', '',
+    'FEEDBACK SUMMARY', a.feedback_summary || '', '',
+    'WHAT WORKED', worked, '',
+    'ISSUE DETECTED', a.issue_detected || '', '',
+    'RECOMMENDED REPAIR', a.recommended_repair || '', '',
+    'EXPECTED IMPACT', a.expected_impact || '', '',
+    'REVISED DISCUSSION PROMPT', a.revised_discussion_prompt || '', '',
+    'COURSE QUALITY CHECK', [
+      `Clear Objectives: ${quality.clear_objectives || ''}`,
+      `Student Interaction: ${quality.student_interaction || ''}`,
+      `Real-World Context: ${quality.real_world_context || ''}`,
+      `Inclusive Design: ${quality.inclusive_design || ''}`,
+      `Measurable Outcomes: ${quality.measurable_outcomes || ''}`
+    ].join('\n')
+  ].join('\n');
+}
+
+// Compatibility alias until the final cleanup pass.
+const callClaude = requestBabbageAnalysis;
+;
+/* SOURCE: functions/app-scenario-shared.js */
+/* PROMPTCRAFT SHARED SCENARIO FRAMEWORK
+   Reusable mission, progress, choice, feedback, and activity-shell helpers.
+   Scenario 1 remains the visual/behavioral regression reference. */
+
+// ── SHARED SCENARIO STRUCTURE ─────────────────────────
+// Scenario 1 established the clean mission-briefing pattern. The remaining
+// scenarios now use the same anatomy rather than each inventing another card.
+function getScenarioUI(index = scenarioIndex) {
+  return SCENARIO_UI[index] || SCENARIO_UI[SCENARIO_INDEX.ENGAGEMENT];
+}
+
+function buildScenarioMissionHTML(index, options = {}) {
+  const ui = getScenarioUI(index);
+  const eyebrow = options.eyebrow || 'Mission Briefing';
+  const title = options.title || ui.missionTitle;
+  const copy = options.copy || ui.missionCopy;
+  const extraClass = options.className ? ` ${options.className}` : '';
+  const extraHTML = options.extraHTML || '';
+
+  return `
+    <section class="scenario-mission${extraClass}" role="region" aria-label="${esc(eyebrow)}">
+      <div class="mission-eyebrow">${esc(eyebrow)}</div>
+      <div class="mission-title">${esc(title)}</div>
+      <div class="mission-copy">${esc(copy)}</div>
+      ${extraHTML}
+    </section>`;
+}
+
+function setScenarioInputVisible(visible, { focus = false } = {}) {
+  const container = document.getElementById('inputContainer');
+  if (!container) return;
+  container.style.display = visible ? '' : 'none';
+  if (visible && focus) {
+    setTimeout(() => document.getElementById('promptInput')?.focus(), 100);
+  }
+}
+
+function renderScenarioPlaceholder(index) {
+  const ui = getScenarioUI(index);
+  const area = document.getElementById('chat');
+  const container = document.getElementById('inputContainer');
+  if (!area) return;
+
+  if (container) {
+    container.className = 'pc-scenario-placeholder-host';
+    container.innerHTML = '';
+    container.style.display = 'none';
+  }
+
+  const plannedSteps = Array.isArray(ui.plannedLoop) && ui.plannedLoop.length
+    ? `<ol class="pc-shell-loop">${ui.plannedLoop.map(step => `<li>${esc(step)}</li>`).join('')}</ol>`
+    : '';
+
+  area.innerHTML = `
+    <section class="pc-scenario-shell" role="region" aria-labelledby="pcShellTitle">
+      <div class="pc-shell-status">Clean development shell</div>
+      <h2 id="pcShellTitle">${esc(ui.tabLabel)} is being rebuilt</h2>
+      <p class="pc-shell-copy">${esc(ui.missionCopy)}</p>
+      ${plannedSteps ? `<div class="pc-shell-plan"><h3>Planned game loop</h3>${plannedSteps}</div>` : ''}
+      <p class="pc-shell-note">The previous implementation is preserved in <code>archive/legacy-scenarios-v133/</code>, but it is no longer loaded by the game.</p>
+      <div class="pc-shell-actions">
+        <button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="scenarios">Return to Scenario Select</button>
+        <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="0" data-pc-skip-name-gate="true">Play Scenario 1</button>
+      </div>
+    </section>`;
+  area.scrollTop = 0;
+}
+
+
+// ══════════════════════════════════════════════════════
+//  SHARED SCENARIO ACTIVITY COMPONENTS
+//  These builders are scenario-neutral. S2 is the first user, and S3–S8 can
+//  reuse the same mission, progress, evidence, choice, feedback, and action
+//  anatomy without cloning another screen system.
+// ══════════════════════════════════════════════════════
+function buildScenarioProgressHTML({ steps = [], activeIndex = 0, ariaLabel = 'Scenario progress' } = {}) {
+  if (!steps.length) return '';
+  return `
+    <div class="pc-scenario-progress" aria-label="${esc(ariaLabel)}">
+      ${steps.map((step, index) => `<span${index === activeIndex ? ' class="active" aria-current="step"' : ''}>${esc(step)}</span>`).join('')}
+    </div>`;
+}
+
+function buildScenarioChoiceCardsHTML({
+  items = [],
+  inputName,
+  idPrefix,
+  variant = 'compact',
+  marker = (_, index) => String(index + 1).padStart(2, '0')
+} = {}) {
+  return items.map((item, index) => {
+    const inputId = `${idPrefix}-${item.id}`;
+    const markerText = typeof marker === 'function' ? marker(item, index) : item[marker] || '';
+    const body = variant === 'detail'
+      ? `<span class="pc-choice-body"><strong>${esc(item.title)}</strong><span>“${esc(item.text)}”</span></span>`
+      : `<span class="pc-choice-copy">${esc(item.label)}</span>`;
+    return `
+      <label class="pc-choice-card pc-choice-card--${esc(variant)}" for="${esc(inputId)}">
+        <input type="checkbox" id="${esc(inputId)}" name="${esc(inputName)}" value="${esc(item.id)}" />
+        <span class="pc-choice-marker">${esc(markerText)}</span>
+        ${body}
+      </label>`;
+  }).join('');
+}
+
+function buildScenarioTaskCardHTML({
+  titleId,
+  kicker,
+  title,
+  instruction,
+  choiceGridId,
+  choicesHTML,
+  statusId,
+  submitId,
+  submitLabel,
+  feedbackId,
+  gridClass = ''
+} = {}) {
+  return `
+    <section class="pc-activity-card pc-activity-task" aria-labelledby="${esc(titleId)}">
+      <div class="pc-activity-kicker">${esc(kicker)}</div>
+      <h2 id="${esc(titleId)}">${esc(title)}</h2>
+      <p class="pc-activity-instruction">${esc(instruction)}</p>
+      <div class="pc-choice-grid${gridClass ? ` ${esc(gridClass)}` : ''}" id="${esc(choiceGridId)}">${choicesHTML}</div>
+      <div class="pc-selection-bar">
+        <span id="${esc(statusId)}" role="status" aria-live="polite">0 selected</span>
+        <button class="pc-button pc-button--primary" id="${esc(submitId)}" type="button" disabled>${esc(submitLabel)}</button>
+      </div>
+      <div id="${esc(feedbackId)}" aria-live="polite"></div>
+    </section>`;
+}
+
+function mountScenarioActivity({
+  container = document.getElementById('inputContainer'),
+  scenarioIndex: index = scenarioIndex,
+  progressHTML = '',
+  contentHTML = '',
+  focusSelector = ''
+} = {}) {
+  if (!container) return false;
+  container.className = 'pc-scenario-workbench';
+  container.style.display = 'flex';
+  container.innerHTML = `
+    <div class="pc-scenario-stage">
+      ${buildScenarioMissionHTML(index, { extraHTML: progressHTML })}
+      ${contentHTML}
+    </div>`;
+  container.scrollTop = 0;
+  if (focusSelector) setTimeout(() => container.querySelector(focusSelector)?.focus(), 80);
+  return true;
+}
+
+function wireExactSelection({ rootId, inputName, limit, statusId, submitId, onSubmit }) {
+  const root = document.getElementById(rootId);
+  const status = document.getElementById(statusId);
+  const submit = document.getElementById(submitId);
+  if (!root || !status || !submit) return;
+  const inputs = [...root.querySelectorAll(`input[name="${inputName}"]`)];
+
+  const update = changed => {
+    let selected = inputs.filter(input => input.checked);
+    if (selected.length > limit && changed) {
+      changed.checked = false;
+      selected = inputs.filter(input => input.checked);
+      status.textContent = `Choose only ${limit}. ${selected.length} of ${limit} selected.`;
+    } else {
+      status.textContent = `${selected.length} of ${limit} selected`;
+    }
+    submit.disabled = selected.length !== limit;
+    inputs.forEach(input => input.closest('.pc-choice-card')?.classList.toggle('selected', input.checked));
+  };
+
+  root.addEventListener('change', event => {
+    const input = event.target.closest?.(`input[name="${inputName}"]`);
+    if (input) update(input);
+  });
+  submit.addEventListener('click', onSubmit, { once: true });
+  update(null);
+}
+
+function getCheckedValues(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(input => input.value);
+}
+
+function disableScenarioChoices(name, submitId) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(input => { input.disabled = true; });
+  const submit = document.getElementById(submitId);
+  if (submit) submit.disabled = true;
+}
+
+function renderScenarioFeedback({ panelId, tone = 'developing', heading, text, actionsHTML = '' } = {}) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return null;
+  panel.innerHTML = `
+    <div class="pc-feedback-card is-${esc(tone)}">
+      <div class="pc-feedback-heading">${esc(heading)}</div>
+      <p>${esc(text)}</p>
+      <div class="pc-feedback-actions">${actionsHTML}</div>
+    </div>`;
+  panel.querySelector('button')?.focus();
+  return panel;
+}
 ;
 /* SOURCE: functions/app-scenarios.js */
 /* PROMPTCRAFT SCENARIOS, MENU, AND INLINE COACHING
@@ -1919,204 +2127,110 @@ function pixelAvatarHTML(expr) {
          onerror="this.outerHTML='<div class=\\'pixel-chat-avatar-fallback\\'>🧑‍🏫</div>'" />`;
 }
 
-// ── SHARED SCENARIO STRUCTURE ─────────────────────────
-// Scenario 1 established the clean mission-briefing pattern. The remaining
-// scenarios now use the same anatomy rather than each inventing another card.
-function getScenarioUI(index = scenarioIndex) {
-  return SCENARIO_UI[index] || SCENARIO_UI[SCENARIO_INDEX.ENGAGEMENT];
-}
-
-function buildScenarioMissionHTML(index, options = {}) {
-  const ui = getScenarioUI(index);
-  const eyebrow = options.eyebrow || 'Mission Briefing';
-  const title = options.title || ui.missionTitle;
-  const copy = options.copy || ui.missionCopy;
-  const extraClass = options.className ? ` ${options.className}` : '';
-  const extraHTML = options.extraHTML || '';
-
-  return `
-    <section class="scenario-mission${extraClass}" role="region" aria-label="${esc(eyebrow)}">
-      <div class="mission-eyebrow">${esc(eyebrow)}</div>
-      <div class="mission-title">${esc(title)}</div>
-      <div class="mission-copy">${esc(copy)}</div>
-      ${extraHTML}
-    </section>`;
-}
-
-function setScenarioInputVisible(visible, { focus = false } = {}) {
-  const container = document.getElementById('inputContainer');
-  if (!container) return;
-  container.style.display = visible ? '' : 'none';
-  if (visible && focus) {
-    setTimeout(() => document.getElementById('promptInput')?.focus(), 100);
-  }
-}
-
-function renderScenarioPlaceholder(index) {
-  const ui = getScenarioUI(index);
-  const area = document.getElementById('chat');
-  const container = document.getElementById('inputContainer');
-  if (!area) return;
-
-  if (container) {
-    container.className = 'pc-scenario-placeholder-host';
-    container.innerHTML = '';
-    container.style.display = 'none';
-  }
-
-  const plannedSteps = Array.isArray(ui.plannedLoop) && ui.plannedLoop.length
-    ? `<ol class="pc-shell-loop">${ui.plannedLoop.map(step => `<li>${esc(step)}</li>`).join('')}</ol>`
-    : '';
-
-  area.innerHTML = `
-    <section class="pc-scenario-shell" role="region" aria-labelledby="pcShellTitle">
-      <div class="pc-shell-status">Clean development shell</div>
-      <h2 id="pcShellTitle">${esc(ui.tabLabel)} is being rebuilt</h2>
-      <p class="pc-shell-copy">${esc(ui.missionCopy)}</p>
-      ${plannedSteps ? `<div class="pc-shell-plan"><h3>Planned game loop</h3>${plannedSteps}</div>` : ''}
-      <p class="pc-shell-note">The previous implementation is preserved in <code>archive/legacy-scenarios-v133/</code>, but it is no longer loaded by the game.</p>
-      <div class="pc-shell-actions">
-        <button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="scenarios">Return to Scenario Select</button>
-        <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="0" data-pc-skip-name-gate="true">Play Scenario 1</button>
-      </div>
-    </section>`;
-  area.scrollTop = 0;
-}
-
+// ══════════════════════════════════════════════════════
+//  HALLUCINATION HUNT CRITICAL-THINKING HELPERS
+// ══════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════════
-//  SHARED SCENARIO ACTIVITY COMPONENTS
-//  These builders are scenario-neutral. S2 is the first user, and S3–S8 can
-//  reuse the same mission, progress, evidence, choice, feedback, and action
-//  anatomy without cloning another screen system.
+//  SCENARIO NAVIGATION
+//  A "Move to next scenario" card appears in the chat
+//  once the player hits a score of 3+ on any attempt.
+//  They can keep practicing or move forward.
 // ══════════════════════════════════════════════════════
-function buildScenarioProgressHTML({ steps = [], activeIndex = 0, ariaLabel = 'Scenario progress' } = {}) {
-  if (!steps.length) return '';
-  return `
-    <div class="pc-scenario-progress" aria-label="${esc(ariaLabel)}">
-      ${steps.map((step, index) => `<span${index === activeIndex ? ' class="active" aria-current="step"' : ''}>${esc(step)}</span>`).join('')}
-    </div>`;
+
+// Track whether nav card has been shown for current scenario
+let navCardShown = Array(SCENARIO_COUNT).fill(false);
+
+const SCORE_THRESHOLD = 3; // score out of 5 needed to show nav card
+
+// Navigation rendering is owned by the active completion flow in app-workbench.js.
+// Later-scenario implementations are archived outside the active runtime.
+
+const EXPRESSIONS = PIXEL_EXPR;
+
+// Queue of dialogue sequences waiting to play
+let vnQueue = [];
+let claudeTerminalCloseCallback = null;
+let vnTyping = false;
+let vnTypeTimer = null;
+let vnCurrentText = '';
+let vnFullText = '';
+let vnOnComplete = null;
+
+
+// ── CLAUDE SHELF STATE SYSTEM ────────────────────────
+
+function setVNClaudeMode(enabled = false) {
+  const overlay = document.getElementById('vnOverlay');
+  if (!overlay) return;
+  overlay.classList.toggle('claude-consult', !!enabled);
 }
 
-function buildScenarioChoiceCardsHTML({
-  items = [],
-  inputName,
-  idPrefix,
-  variant = 'compact',
-  marker = (_, index) => String(index + 1).padStart(2, '0')
-} = {}) {
-  return items.map((item, index) => {
-    const inputId = `${idPrefix}-${item.id}`;
-    const markerText = typeof marker === 'function' ? marker(item, index) : item[marker] || '';
-    const body = variant === 'detail'
-      ? `<span class="pc-choice-body"><strong>${esc(item.title)}</strong><span>“${esc(item.text)}”</span></span>`
-      : `<span class="pc-choice-copy">${esc(item.label)}</span>`;
-    return `
-      <label class="pc-choice-card pc-choice-card--${esc(variant)}" for="${esc(inputId)}">
-        <input type="checkbox" id="${esc(inputId)}" name="${esc(inputName)}" value="${esc(item.id)}" />
-        <span class="pc-choice-marker">${esc(markerText)}</span>
-        ${body}
-      </label>`;
-  }).join('');
+function setVNClaudeTerminalMode(enabled = false) {
+  const overlay = document.getElementById('vnOverlay');
+  if (!overlay) return;
+  overlay.classList.toggle('claude-terminal-consult', !!enabled);
 }
 
-function buildScenarioTaskCardHTML({
-  titleId,
-  kicker,
-  title,
-  instruction,
-  choiceGridId,
-  choicesHTML,
-  statusId,
-  submitId,
-  submitLabel,
-  feedbackId,
-  gridClass = ''
-} = {}) {
-  return `
-    <section class="pc-activity-card pc-activity-task" aria-labelledby="${esc(titleId)}">
-      <div class="pc-activity-kicker">${esc(kicker)}</div>
-      <h2 id="${esc(titleId)}">${esc(title)}</h2>
-      <p class="pc-activity-instruction">${esc(instruction)}</p>
-      <div class="pc-choice-grid${gridClass ? ` ${esc(gridClass)}` : ''}" id="${esc(choiceGridId)}">${choicesHTML}</div>
-      <div class="pc-selection-bar">
-        <span id="${esc(statusId)}" role="status" aria-live="polite">0 selected</span>
-        <button class="pc-button pc-button--primary" id="${esc(submitId)}" type="button" disabled>${esc(submitLabel)}</button>
-      </div>
-      <div id="${esc(feedbackId)}" aria-live="polite"></div>
-    </section>`;
+function setClaudeTerminalTextMode(enabled = false) {
+  const terminal = document.getElementById('claudeTerminalScene');
+  const overlay = document.getElementById('vnOverlay');
+  if (terminal) terminal.classList.toggle('textmode', !!enabled);
+  if (overlay) overlay.classList.toggle('claude-terminal-textmode', !!enabled);
 }
 
-function mountScenarioActivity({
-  container = document.getElementById('inputContainer'),
-  scenarioIndex: index = scenarioIndex,
-  progressHTML = '',
-  contentHTML = '',
-  focusSelector = ''
-} = {}) {
-  if (!container) return false;
-  container.className = 'pc-scenario-workbench';
-  container.style.display = 'flex';
-  container.innerHTML = `
-    <div class="pc-scenario-stage">
-      ${buildScenarioMissionHTML(index, { extraHTML: progressHTML })}
-      ${contentHTML}
-    </div>`;
-  container.scrollTop = 0;
-  if (focusSelector) setTimeout(() => container.querySelector(focusSelector)?.focus(), 80);
-  return true;
+function terminalizeClaudeText(text) {
+  return String(text || '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/#{1,6}\s*/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
-function wireExactSelection({ rootId, inputName, limit, statusId, submitId, onSubmit }) {
-  const root = document.getElementById(rootId);
-  const status = document.getElementById(statusId);
-  const submit = document.getElementById(submitId);
-  if (!root || !status || !submit) return;
-  const inputs = [...root.querySelectorAll(`input[name="${inputName}"]`)];
+function setClaudeTerminalState(state = 'idle', title = 'BABBAGE ENGINE', output = 'IDLE') {
+  if (state !== 'thinking' && typeof pcClearMobileAnalyzingStageV202 === 'function') {
+    pcClearMobileAnalyzingStageV202();
+  }
+  const terminal = document.getElementById('claudeTerminalScene');
+  const titleEl = document.getElementById('claudeTerminalTitle');
+  const outputEl = document.getElementById('claudeTerminalOutput');
+  if (terminal) {
+    terminal.classList.remove('idle', 'thinking', 'responding');
+    terminal.classList.add(state);
+  }
+  if (titleEl) titleEl.textContent = title;
+  if (outputEl) {
+    outputEl.classList.remove('claude-analysis-layout', 'pc-analyzing-output');
+    const outputText = String(output ?? '');
+    if (!outputText.includes('\n') && !outputText.includes('<')) {
+      const statusLine = document.createElement('span');
+      statusLine.className = 'claude-terminal-status-line';
 
-  const update = changed => {
-    let selected = inputs.filter(input => input.checked);
-    if (selected.length > limit && changed) {
-      changed.checked = false;
-      selected = inputs.filter(input => input.checked);
-      status.textContent = `Choose only ${limit}. ${selected.length} of ${limit} selected.`;
+      const statusText = document.createElement('span');
+      statusText.className = 'claude-terminal-status-text';
+      statusText.textContent = outputText;
+
+      const cursor = document.createElement('span');
+      cursor.className = 'claude-terminal-cursor';
+      cursor.setAttribute('aria-hidden', 'true');
+
+      statusLine.append(statusText, cursor);
+      outputEl.replaceChildren(statusLine);
     } else {
-      status.textContent = `${selected.length} of ${limit} selected`;
+      outputEl.innerHTML = `${output}<span class="claude-terminal-cursor" aria-hidden="true"></span>`;
     }
-    submit.disabled = selected.length !== limit;
-    inputs.forEach(input => input.closest('.pc-choice-card')?.classList.toggle('selected', input.checked));
-  };
-
-  root.addEventListener('change', event => {
-    const input = event.target.closest?.(`input[name="${inputName}"]`);
-    if (input) update(input);
-  });
-  submit.addEventListener('click', onSubmit, { once: true });
-  update(null);
+  }
 }
 
-function getCheckedValues(name) {
-  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(input => input.value);
-}
 
-function disableScenarioChoices(name, submitId) {
-  document.querySelectorAll(`input[name="${name}"]`).forEach(input => { input.disabled = true; });
-  const submit = document.getElementById(submitId);
-  if (submit) submit.disabled = true;
-}
 
-function renderScenarioFeedback({ panelId, tone = 'developing', heading, text, actionsHTML = '' } = {}) {
-  const panel = document.getElementById(panelId);
-  if (!panel) return null;
-  panel.innerHTML = `
-    <div class="pc-feedback-card is-${esc(tone)}">
-      <div class="pc-feedback-heading">${esc(heading)}</div>
-      <p>${esc(text)}</p>
-      <div class="pc-feedback-actions">${actionsHTML}</div>
-    </div>`;
-  panel.querySelector('button')?.focus();
-  return panel;
-}
+// ══════════════════════════════════════════════════════
+;
+/* SOURCE: functions/app-scenario-prototypes.js */
+/* PROMPTCRAFT DEVELOPMENT SCENARIOS
+   Current S2-S5 prototypes. These are preserved as development material,
+   not treated as approved final scenario designs. */
 
 // ══════════════════════════════════════════════════════
 //  SCENARIO 2 — METACOGNITION DETECTIVE OPENING
@@ -4690,107 +4804,6 @@ function renderS5FinalReport() {
 
   document.querySelector('#inputContainer button')?.focus();
 }
-
-
-// ══════════════════════════════════════════════════════
-//  HALLUCINATION HUNT CRITICAL-THINKING HELPERS
-// ══════════════════════════════════════════════════════
-
-// ══════════════════════════════════════════════════════
-//  SCENARIO NAVIGATION
-//  A "Move to next scenario" card appears in the chat
-//  once the player hits a score of 3+ on any attempt.
-//  They can keep practicing or move forward.
-// ══════════════════════════════════════════════════════
-
-// Track whether nav card has been shown for current scenario
-let navCardShown = Array(SCENARIO_COUNT).fill(false);
-
-const SCORE_THRESHOLD = 3; // score out of 5 needed to show nav card
-
-// Navigation rendering is owned by the active completion flow in app-workbench.js.
-// Later-scenario implementations are archived outside the active runtime.
-
-const EXPRESSIONS = PIXEL_EXPR;
-
-// Queue of dialogue sequences waiting to play
-let vnQueue = [];
-let claudeTerminalCloseCallback = null;
-let vnTyping = false;
-let vnTypeTimer = null;
-let vnCurrentText = '';
-let vnFullText = '';
-let vnOnComplete = null;
-
-
-// ── CLAUDE SHELF STATE SYSTEM ────────────────────────
-
-function setVNClaudeMode(enabled = false) {
-  const overlay = document.getElementById('vnOverlay');
-  if (!overlay) return;
-  overlay.classList.toggle('claude-consult', !!enabled);
-}
-
-function setVNClaudeTerminalMode(enabled = false) {
-  const overlay = document.getElementById('vnOverlay');
-  if (!overlay) return;
-  overlay.classList.toggle('claude-terminal-consult', !!enabled);
-}
-
-function setClaudeTerminalTextMode(enabled = false) {
-  const terminal = document.getElementById('claudeTerminalScene');
-  const overlay = document.getElementById('vnOverlay');
-  if (terminal) terminal.classList.toggle('textmode', !!enabled);
-  if (overlay) overlay.classList.toggle('claude-terminal-textmode', !!enabled);
-}
-
-function terminalizeClaudeText(text) {
-  return String(text || '')
-    .replace(/<[^>]*>/g, '')
-    .replace(/\*\*/g, '')
-    .replace(/#{1,6}\s*/g, '')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-}
-
-function setClaudeTerminalState(state = 'idle', title = 'BABBAGE ENGINE', output = 'IDLE') {
-  if (state !== 'thinking' && typeof pcClearMobileAnalyzingStageV202 === 'function') {
-    pcClearMobileAnalyzingStageV202();
-  }
-  const terminal = document.getElementById('claudeTerminalScene');
-  const titleEl = document.getElementById('claudeTerminalTitle');
-  const outputEl = document.getElementById('claudeTerminalOutput');
-  if (terminal) {
-    terminal.classList.remove('idle', 'thinking', 'responding');
-    terminal.classList.add(state);
-  }
-  if (titleEl) titleEl.textContent = title;
-  if (outputEl) {
-    outputEl.classList.remove('claude-analysis-layout', 'pc-analyzing-output');
-    const outputText = String(output ?? '');
-    if (!outputText.includes('\n') && !outputText.includes('<')) {
-      const statusLine = document.createElement('span');
-      statusLine.className = 'claude-terminal-status-line';
-
-      const statusText = document.createElement('span');
-      statusText.className = 'claude-terminal-status-text';
-      statusText.textContent = outputText;
-
-      const cursor = document.createElement('span');
-      cursor.className = 'claude-terminal-cursor';
-      cursor.setAttribute('aria-hidden', 'true');
-
-      statusLine.append(statusText, cursor);
-      outputEl.replaceChildren(statusLine);
-    } else {
-      outputEl.innerHTML = `${output}<span class="claude-terminal-cursor" aria-hidden="true"></span>`;
-    }
-  }
-}
-
-
-
-// ══════════════════════════════════════════════════════
 ;
 /* SOURCE: functions/app-vn.js */
 /* PROMPTCRAFT VISUAL NOVEL AND RESPONSIVE LAYOUT ENGINE
