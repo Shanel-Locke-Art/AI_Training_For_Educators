@@ -13196,7 +13196,7 @@ html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
 
 html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
 .pc-analyzing-progress {
-  --pc-analysis-progress-duration: 4000ms;
+  --pc-analysis-progress-duration: 220ms;
   position: relative !important;
   display: block !important;
   width: 100% !important;
@@ -13219,19 +13219,25 @@ html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
   background: linear-gradient(90deg, rgba(38, 214, 69, 0.82), rgba(118, 255, 143, 1)) !important;
   box-shadow: 0 0 10px rgba(78, 255, 112, 0.58) !important;
   transform-origin: left center !important;
-  transition: none !important;
-}
-
-html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
-.pc-analyzing-progress.is-running .pc-analyzing-progress-fill {
-  width: 100% !important;
-  transition: width var(--pc-analysis-progress-duration) linear !important;
+  transition: width var(--pc-analysis-progress-duration) ease-out !important;
 }
 
 html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
 .pc-analyzing-progress.is-complete .pc-analyzing-progress-fill {
   width: 100% !important;
-  transition: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.claude-terminal-consult
+.pc-analyzing-phase {
+  margin-top: clamp(4px, .34em, 7px) !important;
+  color: rgba(211, 255, 221, .84) !important;
+  font-family: "Source Code Pro", ui-monospace, SFMono-Regular, Consolas, monospace !important;
+  font-size: clamp(.48rem, .48vw, .68rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+  letter-spacing: .055em !important;
+  text-transform: uppercase !important;
+  overflow-wrap: anywhere !important;
 }
 
 /* Completed diagnostic screen. The report has one outer frame, a compact

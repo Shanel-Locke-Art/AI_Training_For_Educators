@@ -738,10 +738,16 @@ function mockClaudeResponse(payload, context = 'main', reason = 'forced') {
   });
 }
 
-const CLAUDE_REQUEST_TIMEOUT_MS = 25000;
+const CLAUDE_REQUEST_TIMEOUT_MS = 60000;
 
 async function callClaude(payload, context = 'main') {
   if (USE_MOCK_CLAUDE) return mockClaudeResponse(payload, context, FORCE_MOCK_CLAUDE ? 'query-parameter' : 'local-test');
+
+  const tracksVisibleAnalysis = context === 'main' &&
+    !!document.querySelector('#claudeTerminalOutput .pc-analyzing-progress');
+  if (tracksVisibleAnalysis && typeof window.pcStartClaudeAnalysisProgress === 'function') {
+    window.pcStartClaudeAnalysisProgress(CLAUDE_REQUEST_TIMEOUT_MS);
+  }
 
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
   const timeoutId = controller
@@ -756,9 +762,31 @@ async function callClaude(payload, context = 'main') {
       signal: controller ? controller.signal : undefined
     });
 
-    if (!res.ok) throw new Error(`Claude function returned ${res.status}`);
-    const data = await res.json();
-    if (data.error) throw new Error(data.error?.message || 'Claude returned an error');
+    if (tracksVisibleAnalysis && typeof window.pcMarkClaudeResponseReceived === 'function') {
+      window.pcMarkClaudeResponseReceived();
+    }
+
+    const responseText = await res.text();
+    let data = {};
+    try {
+      data = responseText ? JSON.parse(responseText) : {};
+    } catch (_error) {
+      data = {};
+    }
+
+    if (!res.ok) {
+      const providerMessage =
+        data?.error?.message ||
+        data?.message ||
+        responseText ||
+        `HTTP ${res.status}`;
+      throw new Error(`Claude function returned ${res.status}: ${providerMessage}`);
+    }
+
+    if (data.error) {
+      throw new Error(data.error?.message || 'Claude returned an error');
+    }
+
     return data;
   } catch (err) {
     /*
@@ -768,6 +796,9 @@ async function callClaude(payload, context = 'main') {
       Professor Pixel stranded in terminal purgatory.
     */
     console.warn('[PromptCraft] Claude unavailable or timed out; using mock response:', err && err.message ? err.message : err);
+    if (tracksVisibleAnalysis && typeof window.pcFailClaudeAnalysisProgress === 'function') {
+      window.pcFailClaudeAnalysisProgress();
+    }
     return mockClaudeResponse(payload, context, 'backend-unavailable');
   } finally {
     if (timeoutId) clearTimeout(timeoutId);

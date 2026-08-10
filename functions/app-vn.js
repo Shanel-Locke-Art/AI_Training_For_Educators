@@ -2243,6 +2243,7 @@ function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
           <div class="pc-analyzing-progress" role="progressbar" aria-label="Claude analysis progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <span class="pc-analyzing-progress-fill" aria-hidden="true"></span>
           </div>
+          <div class="pc-analyzing-phase" aria-live="polite">PREPARING REQUEST</div>
         </div>
       </div>
     </div>
@@ -2255,76 +2256,133 @@ function renderClaudeAnalyzingReadout(partLabel = 'Scenario diagnosis') {
   pcScheduleLiveAnalyzingLayoutV256({ immediate: true });
 }
 
-const PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS = 4000;
-let pcClaudeAnalysisProgressTimerV309 = 0;
-let pcClaudeAnalysisProgressFrameV309 = 0;
+const PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS = 350;
+let pcClaudeAnalysisProgressTimerV360 = 0;
+let pcClaudeAnalysisProgressFrameV360 = 0;
+let pcClaudeAnalysisProgressValueV360 = 0;
+let pcClaudeAnalysisProgressStartedAtV360 = 0;
 
+/*
+  V360 progress model:
+  Anthropic's non-streaming Messages API does not expose a true percentage
+  complete. PromptCraft therefore reports real lifecycle stages and uses a
+  conservative elapsed-time estimate only while the network request is
+  outstanding. It never reaches 100% until an actual response has arrived and
+  the diagnostic is ready to render.
+*/
 function pcGetClaudeProcessingHoldMsV316() {
   const configured = Number(window.PC_CLAUDE_PROCESSING_HOLD_MS);
   if (!Number.isFinite(configured)) {
     window.PC_CLAUDE_PROCESSING_HOLD_MS = PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS;
     return PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS;
   }
-  return Math.max(0, configured || PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS);
+  return Math.max(0, configured);
 }
 
-function pcStartClaudeAnalysisProgressV309(durationMs = PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS) {
+function pcGetClaudeProgressElementsV360() {
   const progress = document.querySelector('#claudeTerminalOutput .pc-analyzing-progress');
-  const fill = progress?.querySelector('.pc-analyzing-progress-fill');
+  return {
+    progress,
+    fill: progress?.querySelector('.pc-analyzing-progress-fill') || null,
+    phase: document.querySelector('#claudeTerminalOutput .pc-analyzing-phase'),
+    status: document.querySelector('#claudeTerminalOutput .pc-analyzing-status')
+  };
+}
+
+function pcSetClaudeAnalysisProgressV360(value, phaseLabel = '', { complete = false } = {}) {
+  const { progress, fill, phase, status } = pcGetClaudeProgressElementsV360();
   if (!progress || !fill) return false;
 
-  const safeDuration = Math.max(0, Number(durationMs) || 0);
-  if (pcClaudeAnalysisProgressTimerV309) {
-    window.clearTimeout(pcClaudeAnalysisProgressTimerV309);
-    pcClaudeAnalysisProgressTimerV309 = 0;
+  const safeValue = complete
+    ? 100
+    : Math.max(pcClaudeAnalysisProgressValueV360, Math.min(98, Number(value) || 0));
+
+  pcClaudeAnalysisProgressValueV360 = safeValue;
+  progress.classList.toggle('is-complete', complete);
+  progress.classList.remove('is-running');
+  progress.setAttribute('aria-valuenow', String(Math.round(safeValue)));
+  fill.style.setProperty('width', `${safeValue}%`, 'important');
+
+  if (phase && phaseLabel) phase.textContent = terminalizeClaudeText(phaseLabel).toUpperCase();
+  if (status) {
+    status.firstChild.textContent = complete ? 'ANALYSIS READY' : 'ANALYZING';
   }
-  if (pcClaudeAnalysisProgressFrameV309) {
-    window.cancelAnimationFrame(pcClaudeAnalysisProgressFrameV309);
-    pcClaudeAnalysisProgressFrameV309 = 0;
+  return true;
+}
+
+function pcStopClaudeAnalysisProgressV360() {
+  if (pcClaudeAnalysisProgressTimerV360) {
+    window.clearInterval(pcClaudeAnalysisProgressTimerV360);
+    pcClaudeAnalysisProgressTimerV360 = 0;
   }
-  if (pcClaudeAnalysisProgressFrameV309) {
-    window.cancelAnimationFrame(pcClaudeAnalysisProgressFrameV309);
-    pcClaudeAnalysisProgressFrameV309 = 0;
+  if (pcClaudeAnalysisProgressFrameV360) {
+    window.cancelAnimationFrame(pcClaudeAnalysisProgressFrameV360);
+    pcClaudeAnalysisProgressFrameV360 = 0;
   }
+}
 
-  progress.classList.remove('is-running', 'is-complete');
-  progress.style.setProperty('--pc-analysis-progress-duration', `${safeDuration}ms`);
-  progress.setAttribute('aria-valuenow', '0');
-  fill.style.transition = 'none';
-  fill.style.width = '0';
+function pcStartClaudeAnalysisProgressV360(timeoutMs = 60000) {
+  pcStopClaudeAnalysisProgressV360();
+  pcClaudeAnalysisProgressStartedAtV360 = performance.now();
+  pcClaudeAnalysisProgressValueV360 = 0;
 
-  // Force one clean animation restart when a new Claude analysis begins.
-  void fill.offsetWidth;
+  if (!pcSetClaudeAnalysisProgressV360(6, 'Preparing request')) return false;
 
-  if (safeDuration === 0) {
-    fill.style.removeProperty('transition');
-    fill.style.removeProperty('width');
-    progress.classList.add('is-complete');
-    progress.setAttribute('aria-valuenow', '100');
-    return true;
-  }
+  // The request has left the browser. These milestones describe things we can
+  // actually know. Between them the bar advances slowly as an elapsed-time
+  // estimate, capped at 84% so "almost done" never becomes a lie.
+  window.setTimeout(() => pcSetClaudeAnalysisProgressV360(12, 'Sending course context'), 120);
+  window.setTimeout(() => pcSetClaudeAnalysisProgressV360(18, 'Waiting for Claude'), 500);
 
-  pcClaudeAnalysisProgressFrameV309 = window.requestAnimationFrame(() => {
-    pcClaudeAnalysisProgressFrameV309 = window.requestAnimationFrame(() => {
-      pcClaudeAnalysisProgressFrameV309 = 0;
-      fill.style.removeProperty('transition');
-      fill.style.removeProperty('width');
-      progress.classList.add('is-running');
-    });
-  });
+  const safeTimeout = Math.max(10000, Number(timeoutMs) || 60000);
+  pcClaudeAnalysisProgressTimerV360 = window.setInterval(() => {
+    const elapsed = performance.now() - pcClaudeAnalysisProgressStartedAtV360;
+    const ratio = Math.min(1, elapsed / safeTimeout);
 
-  pcClaudeAnalysisProgressTimerV309 = window.setTimeout(() => {
-    progress.classList.remove('is-running');
-    progress.classList.add('is-complete');
-    progress.setAttribute('aria-valuenow', '100');
-    fill.style.removeProperty('transition');
-    fill.style.removeProperty('width');
-    pcClaudeAnalysisProgressTimerV309 = 0;
-  }, safeDuration);
+    // Ease toward 84%. Typical 30–40 s responses land around 60–75% rather
+    // than displaying a fake 100% several seconds before Claude returns.
+    const estimated = 18 + (66 * (1 - Math.exp(-2.2 * ratio)));
+    const next = Math.min(84, estimated);
+
+    let phaseLabel = 'Waiting for Claude';
+    if (elapsed >= 30000) phaseLabel = 'Claude is still reasoning';
+    else if (elapsed >= 12000) phaseLabel = 'Claude is evaluating the design';
+
+    pcSetClaudeAnalysisProgressV360(next, phaseLabel);
+  }, 500);
 
   return true;
 }
-window.pcStartClaudeAnalysisProgress = pcStartClaudeAnalysisProgressV309;
+
+function pcMarkClaudeResponseReceivedV360() {
+  pcStopClaudeAnalysisProgressV360();
+  return pcSetClaudeAnalysisProgressV360(90, 'Response received');
+}
+
+function pcMarkClaudeResponseParsedV360() {
+  return pcSetClaudeAnalysisProgressV360(96, 'Building diagnostic');
+}
+
+function pcCompleteClaudeAnalysisProgressV360() {
+  pcStopClaudeAnalysisProgressV360();
+  return pcSetClaudeAnalysisProgressV360(100, 'Analysis complete', { complete: true });
+}
+
+function pcFailClaudeAnalysisProgressV360() {
+  pcStopClaudeAnalysisProgressV360();
+  return pcSetClaudeAnalysisProgressV360(
+    Math.max(24, pcClaudeAnalysisProgressValueV360),
+    'Live analysis unavailable — loading fallback'
+  );
+}
+
+// Compatibility names retained because older scenario shells call these globals.
+window.pcStartClaudeAnalysisProgress = pcStartClaudeAnalysisProgressV360;
+window.pcSetClaudeAnalysisProgress = pcSetClaudeAnalysisProgressV360;
+window.pcMarkClaudeResponseReceived = pcMarkClaudeResponseReceivedV360;
+window.pcMarkClaudeResponseParsed = pcMarkClaudeResponseParsedV360;
+window.pcCompleteClaudeAnalysisProgress = pcCompleteClaudeAnalysisProgressV360;
+window.pcFailClaudeAnalysisProgress = pcFailClaudeAnalysisProgressV360;
 
 const PC_ANALYSIS_LAYOUT_CLASSES_V267 = [
   'pc-analysis-report-active-v122',
@@ -2523,10 +2581,7 @@ function pcScheduleAnalysisLayoutV255({ immediate = false } = {}) {
 }
 
 function pcClearAnalysisLayoutV122() {
-  if (pcClaudeAnalysisProgressTimerV309) {
-    window.clearTimeout(pcClaudeAnalysisProgressTimerV309);
-    pcClaudeAnalysisProgressTimerV309 = 0;
-  }
+  pcStopClaudeAnalysisProgressV360();
   pcAnalysisLayoutGenerationV255 += 1;
   if (pcAnalysisLayoutFrameV255) cancelAnimationFrame(pcAnalysisLayoutFrameV255);
   if (pcAnalysisLayoutSettleTimerV255) clearTimeout(pcAnalysisLayoutSettleTimerV255);
@@ -2770,18 +2825,21 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
   if (!overlay || !overlay.classList.contains('active')) {
     showClaudeConsultOverlay('Scenario diagnosis');
   }
-  // Keep the analyzing screen visible for responsive QA screenshots.
-  // Override PC_CLAUDE_PROCESSING_HOLD_MS in DevTools when another inspection time is useful.
+  // V360: the progress bar now follows the real Claude request lifecycle.
+  // By the time this function runs the response has arrived; briefly show the
+  // final parsing/rendering stages, then reveal the report.
+  pcMarkClaudeResponseParsedV360();
   const claudeProcessingHoldMs = pcGetClaudeProcessingHoldMsV316();
 
-  pcStartClaudeAnalysisProgressV309(claudeProcessingHoldMs);
-
-  setTimeout(() => {
+  window.setTimeout(() => {
+    pcCompleteClaudeAnalysisProgressV360();
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
       ? buildS1TerminalDiagnosis(scoreTotal, responseText)
       : responseText;
-    showClaudeConsultResult(terminalOutput, mock, effectiveClose, mockReason);
-  }, claudeProcessingHoldMs);
+    window.setTimeout(() => {
+      showClaudeConsultResult(terminalOutput, mock, effectiveClose, mockReason);
+    }, Math.min(180, claudeProcessingHoldMs));
+  }, Math.min(180, claudeProcessingHoldMs));
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
