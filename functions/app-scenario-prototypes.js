@@ -6,30 +6,21 @@
 //  SCENARIO 2 — METACOGNITION DETECTIVE OPENING
 //  Vertical slice implemented with the shared activity component system.
 // ══════════════════════════════════════════════════════
-const S2_PROGRESS_STEPS = ['1 Diagnose', '2 Examine evidence', '3 Choose a thinking move', '4 Audit Babbage', '5 Repair & compare'];
+const S2_PROGRESS_STEPS = ['1 Diagnose', '2 Intervene', '3 Observe', '4 Audit Babbage', '5 Repair & compare'];
 
 const S2_DIAGNOSIS_OPTIONS = [
-  { id: 'motivation', label: 'Jordan needs stronger motivation to complete assignments.' },
-  { id: 'content', label: 'Jordan needs a clearer explanation of the course content.' },
-  { id: 'identify_strategy', label: 'Jordan needs to identify which learning strategy he used.' },
-  { id: 'evaluate_strategy', label: 'Jordan needs to evaluate whether that strategy actually helped.' },
-  { id: 'grading', label: 'Jordan needs more detailed information about the grading criteria.' },
-  { id: 'comparison', label: 'Jordan needs to compare his performance with classmates.' },
-  { id: 'transfer', label: 'Jordan needs to decide when an effective strategy should be used again.' },
-  { id: 'encouragement', label: 'Jordan needs more encouragement from the instructor.' },
-  { id: 'time', label: 'Jordan needs additional time to complete the assignment.' },
-  { id: 'difficulty', label: 'Jordan needs a more difficult assignment.' },
+  { id: 'performance', tag: 'RESULT', title: 'Performance problem', text: 'Jordan’s grade shows he has not mastered the material well enough.' },
+  { id: 'strategy', tag: 'STRATEGY', title: 'Strategy problem', text: 'Jordan needs to replace rereading with a better study strategy.' },
+  { id: 'metacognitive', tag: 'PROCESS', title: 'Metacognitive problem', text: 'Jordan cannot connect a learning strategy to evidence that it helped, then use that evidence to decide what to do next.' },
+  { id: 'motivation', tag: 'EFFORT', title: 'Motivation problem', text: 'Jordan needs stronger incentives or encouragement to engage with the material.' }
 ];
 
 const S2_EVIDENCE_RESPONSES = [
-  { id: 'a', tag: 'A', title: 'Emotional reaction', text: 'The assignment was frustrating, but I was relieved when I finished.' },
-  { id: 'b', tag: 'B', title: 'Performance awareness', text: 'I earned a higher score than I did on the previous assignment.' },
-  { id: 'c', tag: 'C', title: 'Strategy identification', text: 'I made a comparison chart before answering the questions.' },
-  { id: 'd', tag: 'D', title: 'Monitoring', text: 'Halfway through, I noticed I could define each concept but still could not explain the difference between them.' },
-  { id: 'e', tag: 'E', title: 'Evaluation and adjustment', text: 'Rereading was not helping me compare the concepts, so I switched to creating examples and checking whether each example fit.' },
-  { id: 'f', tag: 'F', title: 'Transfer', text: 'The examples helped me notice the differences, so I will use that strategy before the next quiz.' },
+  { id: 'confidence', tag: 'CONFIDENCE', title: 'Ask for a confidence rating', text: 'After studying, Jordan rates how confident he feels about the material from 1–5.' },
+  { id: 'strategy_name', tag: 'REFLECT', title: 'Ask what strategy he used', text: 'After studying, Jordan names the study strategy he used and briefly describes it.' },
+  { id: 'grade_compare', tag: 'RESULT', title: 'Compare the new grade', text: 'Jordan compares this assignment score with his previous score to decide whether the strategy worked.' },
+  { id: 'evidence_check', tag: 'TEST', title: 'Make the strategy produce evidence', text: 'Jordan tries to explain the concepts without notes, identifies where understanding breaks down, and decides whether to keep or change his strategy.' }
 ];
-
 
 const S2_THINKING_MOVES = [
   { id: 'plan', tag: 'PLAN', title: 'Plan a strategy', text: 'Choose a learning approach before beginning and explain why it fits the task.' },
@@ -70,9 +61,12 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     inputName: 's2-diagnosis',
     idPrefix: 's2-diagnosis',
     titleId: 's2DiagnosisTitle',
-    kicker: 'Decision 1 · Diagnose the learning problem',
-    title: 'Which two instructional needs are most clearly supported by Jordan’s comments?',
-    instruction: 'Select exactly two. Several options sound educationally useful, but only two are the strongest diagnosis of this evidence.',
+    kicker: 'Decision 1 · Diagnose the case',
+    title: 'What is the instructional problem?',
+    instruction: 'Choose the diagnosis that best explains the gap between Jordan’s improved result and what he actually knows about his learning process.',
+    variant: 'detail',
+    marker: item => item.tag,
+    limit: 1,
     choiceGridId: 's2DiagnosisChoices',
     statusId: 's2DiagnosisStatus',
     submitId: 's2DiagnosisSubmit',
@@ -90,13 +84,14 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     variant: 'detail',
     marker: item => item.tag,
     titleId: 's2EvidenceTitle',
-    kicker: 'Decision 2 · Find the metacognitive thinker',
-    title: 'Which two responses show the strongest metacognitive thinking?',
-    instruction: 'Select exactly two. One response is deliberately close because noticing a problem is meaningful, but it is not the entire learning cycle.',
+    kicker: 'Decision 2 · Intervene',
+    title: 'What would you add to Jordan’s next learning attempt?',
+    instruction: 'Choose one intervention. Each option creates a different kind of evidence, and Jordan’s response will show you what your design actually made possible.',
     choiceGridId: 's2EvidenceChoices',
     statusId: 's2EvidenceStatus',
     submitId: 's2EvidenceSubmit',
-    submitLabel: 'Submit evidence',
+    submitLabel: 'Try this intervention',
+    limit: 1,
     feedbackId: 's2EvidenceFeedback',
     activeIndex: 1,
     focusSelector: 'input[name="s2-evidence"]',
@@ -186,7 +181,7 @@ function renderS2SelectionActivity(config) {
   wireExactSelection({
     rootId: config.choiceGridId,
     inputName: config.inputName,
-    limit: 2,
+    limit: config.limit || 1,
     statusId: config.statusId,
     submitId: config.submitId,
     onSubmit: config.onSubmit
@@ -199,25 +194,22 @@ function renderS2DiagnosisActivity() {
 }
 
 function classifyS2Diagnosis(selection) {
-  const selected = new Set(selection);
-  const correct = selected.has('identify_strategy') && selected.has('evaluate_strategy');
-  const correctCount = ['identify_strategy', 'evaluate_strategy'].filter(id => selected.has(id)).length;
-  if (correct) return { key: 's2_diagnosis_correct', level: 'strong', correctCount };
-  if (selected.has('transfer') && correctCount) return { key: 's2_diagnosis_transfer', level: 'partial', correctCount };
-  if (selected.has('motivation') || selected.has('encouragement')) return { key: 's2_diagnosis_motivation', level: 'reconsider', correctCount };
-  if (selected.has('grading') || selected.has('comparison')) return { key: 's2_diagnosis_grade', level: 'reconsider', correctCount };
-  return { key: 's2_diagnosis_evidence', level: correctCount ? 'partial' : 'reconsider', correctCount };
+  const selected = selection[0] || '';
+  if (selected === 'metacognitive') return { key: 's2_diagnosis_correct', level: 'strong' };
+  if (selected === 'strategy') return { key: 's2_diagnosis_strategy', level: 'partial' };
+  if (selected === 'motivation') return { key: 's2_diagnosis_motivation', level: 'reconsider' };
+  return { key: 's2_diagnosis_performance', level: 'reconsider' };
 }
 
 function submitS2Diagnosis() {
   const selection = getCheckedValues('s2-diagnosis');
-  if (selection.length !== 2) return;
+  if (selection.length !== 1) return;
   const result = classifyS2Diagnosis(selection);
   const data = getS2Data();
-  const labels = selection.map(id => S2_DIAGNOSIS_OPTIONS.find(option => option.id === id)?.label || id);
+  const option = S2_DIAGNOSIS_OPTIONS.find(item => item.id === selection[0]);
   data.attempts += 1;
   data.diagnosisAttempts.push({ selection: [...selection], result: result.level, timestamp: new Date().toISOString() });
-  data.prompts.push(`S2 diagnosis: ${labels.join(' | ')}`);
+  data.prompts.push(`S2 diagnosis: ${option?.title || selection[0]}`);
   data.finalResponse = pixelDialogue[result.key]?.[0]?.text || '';
 
   disableScenarioChoices('s2-diagnosis', 's2DiagnosisSubmit');
@@ -230,11 +222,11 @@ function renderS2DiagnosisFeedback(selection, result) {
   renderScenarioFeedback({
     panelId: 's2DiagnosisFeedback',
     tone: exact ? 'strong' : 'developing',
-    heading: exact ? 'Diagnosis supported by the evidence' : 'A useful diagnosis needs one more pass',
+    heading: exact ? 'You found the hidden problem.' : 'That explains part of the case, not the whole thing.',
     text,
     actionsHTML: `
       ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryDiagnosis" data-pc-action="s2-retry-diagnosis">Revise diagnosis</button>'}
-      <button class="pc-button pc-button--primary" type="button" id="s2ContinueEvidence" data-pc-action="s2-continue-evidence">Examine student responses →</button>`
+      <button class="pc-button pc-button--primary" type="button" id="s2ContinueEvidence" data-pc-action="s2-continue-evidence">Choose an intervention →</button>`
   });
 }
 
@@ -244,38 +236,29 @@ function renderS2EvidenceActivity() {
 
 function submitS2Evidence() {
   const selection = getCheckedValues('s2-evidence');
-  if (selection.length !== 2) return;
-  const selected = new Set(selection);
-  const exact = selected.has('e') && selected.has('f');
-  const includesMonitoring = selected.has('d');
-  const strongestCount = ['e', 'f'].filter(id => selected.has(id)).length;
+  if (selection.length !== 1) return;
+  const choice = selection[0];
   const data = getS2Data();
-  const labels = selection.map(id => S2_EVIDENCE_RESPONSES.find(response => response.id === id)?.title || id);
+  const option = S2_EVIDENCE_RESPONSES.find(item => item.id === choice);
+  const consequences = {
+    confidence: { tone: 'developing', heading: 'Jordan feels informed, but still cannot test the strategy.', quote: 'I’d say I’m a four out of five. I feel better about it this time.', copy: 'Confidence is useful information, but Jordan can still answer without showing what he understands or whether rereading caused the improvement.' },
+    strategy_name: { tone: 'developing', heading: 'The strategy is visible. Its effectiveness is not.', quote: 'I reread the chapter three times and highlighted the parts that seemed important.', copy: 'Jordan can now name what he did, but he still has no evidence for deciding whether it helped.' },
+    grade_compare: { tone: 'developing', heading: 'Outcome bias just got stronger.', quote: 'I got an 84 instead of a 76, so rereading must have worked.', copy: 'The intervention encourages Jordan to treat the grade as proof of the strategy. The result changed, but the learning process is still invisible.' },
+    evidence_check: { tone: 'strong', heading: 'Now Jordan has evidence he can act on.', quote: 'I could define both concepts, but without my notes I still couldn’t explain the difference. Rereading helped me recognize them, but it didn’t help me compare them. I need to try examples next.', copy: 'Jordan is no longer guessing from a feeling or grade. He monitored understanding, connected evidence to the strategy, and made a decision.' }
+  };
+  const result = consequences[choice] || consequences.strategy_name;
   data.attempts += 1;
-  data.evidenceAttempts.push({ selection: [...selection], exact, timestamp: new Date().toISOString() });
-  data.prompts.push(`S2 evidence: ${labels.join(' | ')}`);
-
+  data.evidenceAttempts.push({ selection: [...selection], exact: choice === 'evidence_check', consequence: result.heading, timestamp: new Date().toISOString() });
+  data.prompts.push(`S2 intervention: ${option?.title || choice}`);
+  data.finalResponse = result.copy;
   disableScenarioChoices('s2-evidence', 's2EvidenceSubmit');
-
-  let heading = 'Keep distinguishing awareness from action.';
-  let copy = 'Some responses describe feelings, grades, or a strategy without evaluating what happened. Metacognition becomes stronger when the learner judges the strategy and makes a future decision.';
-  if (exact) {
-    heading = 'You found the strongest evidence.';
-    copy = 'Response E evaluates a strategy and changes course. Response F transfers the successful approach to a future task. Together they show a learner using evidence about learning to make a decision.';
-  } else if (includesMonitoring && strongestCount) {
-    heading = 'Monitoring is meaningful, but it is not the full cycle.';
-    copy = 'Response D shows Jordan noticing where understanding broke down. Responses E and F go further by evaluating a strategy, adjusting it, and deciding when to use the successful approach again.';
-  }
-  data.finalResponse = copy;
 
   renderScenarioFeedback({
     panelId: 's2EvidenceFeedback',
-    tone: exact ? 'strong' : 'developing',
-    heading,
-    text: copy,
-    actionsHTML: `
-      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryEvidence" data-pc-action="s2-retry-evidence">Review the responses</button>'}
-      <button class="pc-button pc-button--primary" type="button" id="s2OpeningCheckpoint" data-pc-action="s2-opening-checkpoint">Continue →</button>`
+    tone: result.tone,
+    heading: result.heading,
+    text: `Jordan: “${result.quote}” ${result.copy}`,
+    actionsHTML: `<button class="pc-button pc-button--primary" type="button" id="s2OpeningCheckpoint" data-pc-action="s2-opening-checkpoint">Give the case to Babbage →</button>`
   });
 }
 
@@ -700,7 +683,8 @@ pcRegisterUIActions({
     const data = getS2Data();
     data.evidenceFinal = pcGetLatestS2Selection('evidenceAttempts');
     data.openingCheckpointReached = true;
-    renderS2ThinkingMoveActivity();
+    data.thinkingMove = 'evaluate';
+    generateS2BabbageDraft();
   },
   's2-generate-draft': () => generateS2BabbageDraft(),
   's2-repair-draft': () => renderS2RepairActivity(),

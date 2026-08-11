@@ -1409,14 +1409,14 @@ function renderScenarioPlaceholder(index) {
 
   area.innerHTML = `
     <section class="pc-scenario-shell" role="region" aria-labelledby="pcShellTitle">
-      <div class="pc-shell-status">Clean development shell</div>
-      <h2 id="pcShellTitle">${esc(ui.tabLabel)} is being rebuilt</h2>
+      <div class="pc-shell-status">Locked · In development</div>
+      <h2 id="pcShellTitle">${esc(ui.tabLabel)} is not yet available</h2>
       <p class="pc-shell-copy">${esc(ui.missionCopy)}</p>
       ${plannedSteps ? `<div class="pc-shell-plan"><h3>Planned game loop</h3>${plannedSteps}</div>` : ''}
-      <p class="pc-shell-note">The previous implementation is preserved in <code>archive/legacy-scenarios-v133/</code>, but it is no longer loaded by the game.</p>
+      <p class="pc-shell-note">This scenario is intentionally locked while its gameplay and instructional design are rebuilt. Scenario 1 and Scenario 2 are currently available.</p>
       <div class="pc-shell-actions">
         <button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="scenarios">Return to Scenario Select</button>
-        <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="0" data-pc-skip-name-gate="true">Play Scenario 1</button>
+        <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="1" data-pc-skip-name-gate="true">Play Scenario 2</button>
       </div>
     </section>`;
   area.scrollTop = 0;
@@ -1587,12 +1587,12 @@ The revised prompt itself must also be evaluated. Identify its strongest improve
 Be specific enough that materially different faculty input produces materially different feedback. Avoid generic praise and stock advice.`
   },
   { desc: "Mission: Listen to Jordan, diagnose the missing learning process, and distinguish metacognitive evidence from generic reflection.", oscqr: [], system: "" },
-  { desc: "Mission: Convert a recall-heavy assessment into authentic practice, audit Babbage\'s redesign, and make the evidence of learning defensible.", oscqr: [], system: "" },
-  { desc: "Mission: Separate the learning value of live interaction from the assumption that everyone must be present at the same time.", oscqr: [], system: "" },
-  { desc: "Mission: Verify a polished AI research brief against a controlled evidence packet before deciding what is safe to use.", oscqr: [], system: "" },
-  { desc: "Scenario 6 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
-  { desc: "Scenario 7 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
-  { desc: "Scenario 8 is being rebuilt from a clean development shell.", oscqr: [], system: "" }
+  { desc: "Scenario 3 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
+  { desc: "Scenario 4 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
+  { desc: "Scenario 5 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
+  { desc: "Scenario 6 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
+  { desc: "Scenario 7 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
+  { desc: "Scenario 8 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" }
 ];
 
 // ══════════════════════════════════════════════════════
@@ -1623,17 +1623,17 @@ const SCENARIO_UI = [
     key: 'metacognition',
     dataLabel: 'S2: Metacognition',
     tabLabel: 'S2: Metacognition',
-    missionTitle: 'Find the metacognitive thinker.',
-    missionCopy: 'Listen to a student, identify the missing thinking move, audit Babbage\'s reflection activity, repair it, and hear how the student\'s thinking changes.',
-    boardText: 'Jordan is completing the work, but he cannot explain what helped, what failed, or what he should try next.',
+    missionTitle: 'Solve the confident student problem.',
+    missionCopy: 'Jordan earned a better grade, but he cannot tell what actually helped him learn. Diagnose the hidden problem, intervene, watch the consequence, then audit and repair Babbage\'s design.',
+    boardText: null,
     rendererKey: 'metacognition-opening',
     workspaceMode: 'activity',
-    introLayout: 'special',
-    introCast: 'dual',
+    introLayout: 'standard',
+    introCast: 'single',
     afterIntroAction: 's2-diagnosis',
     inputMode: 'scenario-2', inputVisible: true, supportsPrompt: false,
     implemented: true, developmentStatus: 'Playable',
-    plannedLoop: ['Listen to the student', 'Identify the missing thinking move', 'Audit Babbage\'s activity', 'Repair one weak element', 'Hear the changed student response']
+    plannedLoop: ['Observe the learner', 'Diagnose the hidden problem', 'Intervene and observe the consequence', 'Audit Babbage\'s activity', 'Repair the design', 'Test transfer']
   },
   {
     key: 'assessment',
@@ -1642,16 +1642,16 @@ const SCENARIO_UI = [
     missionTitle: 'Replace recall with authentic practice.',
     missionCopy: 'Students can pass the quiz but struggle to use the same knowledge in practice. Diagnose what the current assessment really measures, build a more authentic task with Babbage, audit the redesign, and defend the evidence of learning.',
     boardText: 'The quiz scores look fine. Performance outside the quiz does not.',
-    rendererKey: 'authentic-assessment',
-    workspaceMode: 'activity',
-    introLayout: 'special',
+    rendererKey: 'development-shell',
+    workspaceMode: 'development',
+    introLayout: 'none',
     introCast: 'single',
-    afterIntroAction: 's3-diagnosis',
-    inputMode: 'scenario-3',
-    inputVisible: true,
+    afterIntroAction: null,
+    inputMode: 'placeholder',
+    inputVisible: false,
     supportsPrompt: false,
-    implemented: true,
-    developmentStatus: 'Playable',
+    implemented: false,
+    developmentStatus: 'Locked · In development',
     plannedLoop: ['Diagnose the mismatch', 'Choose authentic evidence', 'Build with Babbage', 'Audit the design', 'Repair and defend the evidence']
   },
   {
@@ -1661,16 +1661,16 @@ const SCENARIO_UI = [
     missionTitle: 'Separate live interaction from synchronous attendance.',
     missionCopy: 'A required live session seems engaging, but several students cannot participate on equal terms. Diagnose the bias, identify the learning function that actually matters, audit Babbage’s participation plan, and create an equivalent path.',
     boardText: 'The goal is interaction. The requirement is attendance. Those are not the same thing.',
-    rendererKey: 'sync-bias',
-    workspaceMode: 'activity',
-    introLayout: 'special',
+    rendererKey: 'development-shell',
+    workspaceMode: 'development',
+    introLayout: 'none',
     introCast: 'single',
-    afterIntroAction: 's4-diagnosis',
-    inputMode: 'scenario-4',
-    inputVisible: true,
+    afterIntroAction: null,
+    inputMode: 'placeholder',
+    inputVisible: false,
     supportsPrompt: false,
-    implemented: true,
-    developmentStatus: 'Playable',
+    implemented: false,
+    developmentStatus: 'Locked · In development',
     plannedLoop: ['Diagnose the bias', 'Name the learning function', 'Build with Babbage', 'Audit equivalence', 'Repair the participation plan']
   },
   {
@@ -1680,16 +1680,16 @@ const SCENARIO_UI = [
     missionTitle: 'Verify before you trust.',
     missionCopy: 'Babbage produces a polished research brief from a controlled evidence packet. One claim is unsafe. Inspect the sources, find the failure, correct it, and decide what can actually be used.',
     boardText: 'Polished language is not evidence. Trace the claim.',
-    rendererKey: 'hallucination-hunt',
-    workspaceMode: 'activity',
-    introLayout: 'special',
+    rendererKey: 'development-shell',
+    workspaceMode: 'development',
+    introLayout: 'none',
     introCast: 'single',
-    afterIntroAction: 's5-evidence',
-    inputMode: 'scenario-5',
-    inputVisible: true,
+    afterIntroAction: null,
+    inputMode: 'placeholder',
+    inputVisible: false,
     supportsPrompt: false,
-    implemented: true,
-    developmentStatus: 'Playable',
+    implemented: false,
+    developmentStatus: 'Locked · In development',
     plannedLoop: ['Inspect the evidence', 'Choose a verification habit', 'Audit Babbage', 'Correct the unsafe claim', 'Decide what is safe']
   },
   {
@@ -1698,7 +1698,7 @@ const SCENARIO_UI = [
     missionCopy: 'This scenario will be rebuilt around forecasting AI behavior, testing the prediction, and revising the request.',
     boardText: 'Scenario 6 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Forecast', 'Test', 'Compare', 'Revise']
+    implemented: false, developmentStatus: 'Locked · In development', plannedLoop: ['Forecast', 'Test', 'Compare', 'Revise']
   },
   {
     key: 'overreliance', dataLabel: 'S7: Overreliance', tabLabel: 'S7: Overreliance',
@@ -1706,7 +1706,7 @@ const SCENARIO_UI = [
     missionCopy: 'This scenario will be rebuilt around classifying AI output and defending where instructor judgment is irreplaceable.',
     boardText: 'Scenario 7 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Classify', 'Justify', 'Revise the boundary']
+    implemented: false, developmentStatus: 'Locked · In development', plannedLoop: ['Classify', 'Justify', 'Revise the boundary']
   },
   {
     key: 'reflect-revise', dataLabel: 'S8: Reflect & Revise', tabLabel: 'S8: Reflect and Revise',
@@ -1714,7 +1714,7 @@ const SCENARIO_UI = [
     missionCopy: 'The final scenario will synthesize the game by asking learners to examine their own choices and improve a prompt deliberately.',
     boardText: 'Scenario 8 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Build', 'Explain your choice', 'Evaluate the output', 'Revise']
+    implemented: false, developmentStatus: 'Locked · In development', plannedLoop: ['Build', 'Explain your choice', 'Evaluate the output', 'Revise']
   }
 ];
 
@@ -2236,30 +2236,21 @@ function setClaudeTerminalState(state = 'idle', title = 'BABBAGE ENGINE', output
 //  SCENARIO 2 — METACOGNITION DETECTIVE OPENING
 //  Vertical slice implemented with the shared activity component system.
 // ══════════════════════════════════════════════════════
-const S2_PROGRESS_STEPS = ['1 Diagnose', '2 Examine evidence', '3 Choose a thinking move', '4 Audit Babbage', '5 Repair & compare'];
+const S2_PROGRESS_STEPS = ['1 Diagnose', '2 Intervene', '3 Observe', '4 Audit Babbage', '5 Repair & compare'];
 
 const S2_DIAGNOSIS_OPTIONS = [
-  { id: 'motivation', label: 'Jordan needs stronger motivation to complete assignments.' },
-  { id: 'content', label: 'Jordan needs a clearer explanation of the course content.' },
-  { id: 'identify_strategy', label: 'Jordan needs to identify which learning strategy he used.' },
-  { id: 'evaluate_strategy', label: 'Jordan needs to evaluate whether that strategy actually helped.' },
-  { id: 'grading', label: 'Jordan needs more detailed information about the grading criteria.' },
-  { id: 'comparison', label: 'Jordan needs to compare his performance with classmates.' },
-  { id: 'transfer', label: 'Jordan needs to decide when an effective strategy should be used again.' },
-  { id: 'encouragement', label: 'Jordan needs more encouragement from the instructor.' },
-  { id: 'time', label: 'Jordan needs additional time to complete the assignment.' },
-  { id: 'difficulty', label: 'Jordan needs a more difficult assignment.' },
+  { id: 'performance', tag: 'RESULT', title: 'Performance problem', text: 'Jordan’s grade shows he has not mastered the material well enough.' },
+  { id: 'strategy', tag: 'STRATEGY', title: 'Strategy problem', text: 'Jordan needs to replace rereading with a better study strategy.' },
+  { id: 'metacognitive', tag: 'PROCESS', title: 'Metacognitive problem', text: 'Jordan cannot connect a learning strategy to evidence that it helped, then use that evidence to decide what to do next.' },
+  { id: 'motivation', tag: 'EFFORT', title: 'Motivation problem', text: 'Jordan needs stronger incentives or encouragement to engage with the material.' }
 ];
 
 const S2_EVIDENCE_RESPONSES = [
-  { id: 'a', tag: 'A', title: 'Emotional reaction', text: 'The assignment was frustrating, but I was relieved when I finished.' },
-  { id: 'b', tag: 'B', title: 'Performance awareness', text: 'I earned a higher score than I did on the previous assignment.' },
-  { id: 'c', tag: 'C', title: 'Strategy identification', text: 'I made a comparison chart before answering the questions.' },
-  { id: 'd', tag: 'D', title: 'Monitoring', text: 'Halfway through, I noticed I could define each concept but still could not explain the difference between them.' },
-  { id: 'e', tag: 'E', title: 'Evaluation and adjustment', text: 'Rereading was not helping me compare the concepts, so I switched to creating examples and checking whether each example fit.' },
-  { id: 'f', tag: 'F', title: 'Transfer', text: 'The examples helped me notice the differences, so I will use that strategy before the next quiz.' },
+  { id: 'confidence', tag: 'CONFIDENCE', title: 'Ask for a confidence rating', text: 'After studying, Jordan rates how confident he feels about the material from 1–5.' },
+  { id: 'strategy_name', tag: 'REFLECT', title: 'Ask what strategy he used', text: 'After studying, Jordan names the study strategy he used and briefly describes it.' },
+  { id: 'grade_compare', tag: 'RESULT', title: 'Compare the new grade', text: 'Jordan compares this assignment score with his previous score to decide whether the strategy worked.' },
+  { id: 'evidence_check', tag: 'TEST', title: 'Make the strategy produce evidence', text: 'Jordan tries to explain the concepts without notes, identifies where understanding breaks down, and decides whether to keep or change his strategy.' }
 ];
-
 
 const S2_THINKING_MOVES = [
   { id: 'plan', tag: 'PLAN', title: 'Plan a strategy', text: 'Choose a learning approach before beginning and explain why it fits the task.' },
@@ -2300,9 +2291,12 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     inputName: 's2-diagnosis',
     idPrefix: 's2-diagnosis',
     titleId: 's2DiagnosisTitle',
-    kicker: 'Decision 1 · Diagnose the learning problem',
-    title: 'Which two instructional needs are most clearly supported by Jordan’s comments?',
-    instruction: 'Select exactly two. Several options sound educationally useful, but only two are the strongest diagnosis of this evidence.',
+    kicker: 'Decision 1 · Diagnose the case',
+    title: 'What is the instructional problem?',
+    instruction: 'Choose the diagnosis that best explains the gap between Jordan’s improved result and what he actually knows about his learning process.',
+    variant: 'detail',
+    marker: item => item.tag,
+    limit: 1,
     choiceGridId: 's2DiagnosisChoices',
     statusId: 's2DiagnosisStatus',
     submitId: 's2DiagnosisSubmit',
@@ -2320,13 +2314,14 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     variant: 'detail',
     marker: item => item.tag,
     titleId: 's2EvidenceTitle',
-    kicker: 'Decision 2 · Find the metacognitive thinker',
-    title: 'Which two responses show the strongest metacognitive thinking?',
-    instruction: 'Select exactly two. One response is deliberately close because noticing a problem is meaningful, but it is not the entire learning cycle.',
+    kicker: 'Decision 2 · Intervene',
+    title: 'What would you add to Jordan’s next learning attempt?',
+    instruction: 'Choose one intervention. Each option creates a different kind of evidence, and Jordan’s response will show you what your design actually made possible.',
     choiceGridId: 's2EvidenceChoices',
     statusId: 's2EvidenceStatus',
     submitId: 's2EvidenceSubmit',
-    submitLabel: 'Submit evidence',
+    submitLabel: 'Try this intervention',
+    limit: 1,
     feedbackId: 's2EvidenceFeedback',
     activeIndex: 1,
     focusSelector: 'input[name="s2-evidence"]',
@@ -2416,7 +2411,7 @@ function renderS2SelectionActivity(config) {
   wireExactSelection({
     rootId: config.choiceGridId,
     inputName: config.inputName,
-    limit: 2,
+    limit: config.limit || 1,
     statusId: config.statusId,
     submitId: config.submitId,
     onSubmit: config.onSubmit
@@ -2429,25 +2424,22 @@ function renderS2DiagnosisActivity() {
 }
 
 function classifyS2Diagnosis(selection) {
-  const selected = new Set(selection);
-  const correct = selected.has('identify_strategy') && selected.has('evaluate_strategy');
-  const correctCount = ['identify_strategy', 'evaluate_strategy'].filter(id => selected.has(id)).length;
-  if (correct) return { key: 's2_diagnosis_correct', level: 'strong', correctCount };
-  if (selected.has('transfer') && correctCount) return { key: 's2_diagnosis_transfer', level: 'partial', correctCount };
-  if (selected.has('motivation') || selected.has('encouragement')) return { key: 's2_diagnosis_motivation', level: 'reconsider', correctCount };
-  if (selected.has('grading') || selected.has('comparison')) return { key: 's2_diagnosis_grade', level: 'reconsider', correctCount };
-  return { key: 's2_diagnosis_evidence', level: correctCount ? 'partial' : 'reconsider', correctCount };
+  const selected = selection[0] || '';
+  if (selected === 'metacognitive') return { key: 's2_diagnosis_correct', level: 'strong' };
+  if (selected === 'strategy') return { key: 's2_diagnosis_strategy', level: 'partial' };
+  if (selected === 'motivation') return { key: 's2_diagnosis_motivation', level: 'reconsider' };
+  return { key: 's2_diagnosis_performance', level: 'reconsider' };
 }
 
 function submitS2Diagnosis() {
   const selection = getCheckedValues('s2-diagnosis');
-  if (selection.length !== 2) return;
+  if (selection.length !== 1) return;
   const result = classifyS2Diagnosis(selection);
   const data = getS2Data();
-  const labels = selection.map(id => S2_DIAGNOSIS_OPTIONS.find(option => option.id === id)?.label || id);
+  const option = S2_DIAGNOSIS_OPTIONS.find(item => item.id === selection[0]);
   data.attempts += 1;
   data.diagnosisAttempts.push({ selection: [...selection], result: result.level, timestamp: new Date().toISOString() });
-  data.prompts.push(`S2 diagnosis: ${labels.join(' | ')}`);
+  data.prompts.push(`S2 diagnosis: ${option?.title || selection[0]}`);
   data.finalResponse = pixelDialogue[result.key]?.[0]?.text || '';
 
   disableScenarioChoices('s2-diagnosis', 's2DiagnosisSubmit');
@@ -2460,11 +2452,11 @@ function renderS2DiagnosisFeedback(selection, result) {
   renderScenarioFeedback({
     panelId: 's2DiagnosisFeedback',
     tone: exact ? 'strong' : 'developing',
-    heading: exact ? 'Diagnosis supported by the evidence' : 'A useful diagnosis needs one more pass',
+    heading: exact ? 'You found the hidden problem.' : 'That explains part of the case, not the whole thing.',
     text,
     actionsHTML: `
       ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryDiagnosis" data-pc-action="s2-retry-diagnosis">Revise diagnosis</button>'}
-      <button class="pc-button pc-button--primary" type="button" id="s2ContinueEvidence" data-pc-action="s2-continue-evidence">Examine student responses →</button>`
+      <button class="pc-button pc-button--primary" type="button" id="s2ContinueEvidence" data-pc-action="s2-continue-evidence">Choose an intervention →</button>`
   });
 }
 
@@ -2474,38 +2466,29 @@ function renderS2EvidenceActivity() {
 
 function submitS2Evidence() {
   const selection = getCheckedValues('s2-evidence');
-  if (selection.length !== 2) return;
-  const selected = new Set(selection);
-  const exact = selected.has('e') && selected.has('f');
-  const includesMonitoring = selected.has('d');
-  const strongestCount = ['e', 'f'].filter(id => selected.has(id)).length;
+  if (selection.length !== 1) return;
+  const choice = selection[0];
   const data = getS2Data();
-  const labels = selection.map(id => S2_EVIDENCE_RESPONSES.find(response => response.id === id)?.title || id);
+  const option = S2_EVIDENCE_RESPONSES.find(item => item.id === choice);
+  const consequences = {
+    confidence: { tone: 'developing', heading: 'Jordan feels informed, but still cannot test the strategy.', quote: 'I’d say I’m a four out of five. I feel better about it this time.', copy: 'Confidence is useful information, but Jordan can still answer without showing what he understands or whether rereading caused the improvement.' },
+    strategy_name: { tone: 'developing', heading: 'The strategy is visible. Its effectiveness is not.', quote: 'I reread the chapter three times and highlighted the parts that seemed important.', copy: 'Jordan can now name what he did, but he still has no evidence for deciding whether it helped.' },
+    grade_compare: { tone: 'developing', heading: 'Outcome bias just got stronger.', quote: 'I got an 84 instead of a 76, so rereading must have worked.', copy: 'The intervention encourages Jordan to treat the grade as proof of the strategy. The result changed, but the learning process is still invisible.' },
+    evidence_check: { tone: 'strong', heading: 'Now Jordan has evidence he can act on.', quote: 'I could define both concepts, but without my notes I still couldn’t explain the difference. Rereading helped me recognize them, but it didn’t help me compare them. I need to try examples next.', copy: 'Jordan is no longer guessing from a feeling or grade. He monitored understanding, connected evidence to the strategy, and made a decision.' }
+  };
+  const result = consequences[choice] || consequences.strategy_name;
   data.attempts += 1;
-  data.evidenceAttempts.push({ selection: [...selection], exact, timestamp: new Date().toISOString() });
-  data.prompts.push(`S2 evidence: ${labels.join(' | ')}`);
-
+  data.evidenceAttempts.push({ selection: [...selection], exact: choice === 'evidence_check', consequence: result.heading, timestamp: new Date().toISOString() });
+  data.prompts.push(`S2 intervention: ${option?.title || choice}`);
+  data.finalResponse = result.copy;
   disableScenarioChoices('s2-evidence', 's2EvidenceSubmit');
-
-  let heading = 'Keep distinguishing awareness from action.';
-  let copy = 'Some responses describe feelings, grades, or a strategy without evaluating what happened. Metacognition becomes stronger when the learner judges the strategy and makes a future decision.';
-  if (exact) {
-    heading = 'You found the strongest evidence.';
-    copy = 'Response E evaluates a strategy and changes course. Response F transfers the successful approach to a future task. Together they show a learner using evidence about learning to make a decision.';
-  } else if (includesMonitoring && strongestCount) {
-    heading = 'Monitoring is meaningful, but it is not the full cycle.';
-    copy = 'Response D shows Jordan noticing where understanding broke down. Responses E and F go further by evaluating a strategy, adjusting it, and deciding when to use the successful approach again.';
-  }
-  data.finalResponse = copy;
 
   renderScenarioFeedback({
     panelId: 's2EvidenceFeedback',
-    tone: exact ? 'strong' : 'developing',
-    heading,
-    text: copy,
-    actionsHTML: `
-      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryEvidence" data-pc-action="s2-retry-evidence">Review the responses</button>'}
-      <button class="pc-button pc-button--primary" type="button" id="s2OpeningCheckpoint" data-pc-action="s2-opening-checkpoint">Continue →</button>`
+    tone: result.tone,
+    heading: result.heading,
+    text: `Jordan: “${result.quote}” ${result.copy}`,
+    actionsHTML: `<button class="pc-button pc-button--primary" type="button" id="s2OpeningCheckpoint" data-pc-action="s2-opening-checkpoint">Give the case to Babbage →</button>`
   });
 }
 
@@ -2930,7 +2913,8 @@ pcRegisterUIActions({
     const data = getS2Data();
     data.evidenceFinal = pcGetLatestS2Selection('evidenceAttempts');
     data.openingCheckpointReached = true;
-    renderS2ThinkingMoveActivity();
+    data.thinkingMove = 'evaluate';
+    generateS2BabbageDraft();
   },
   's2-generate-draft': () => generateS2BabbageDraft(),
   's2-repair-draft': () => renderS2RepairActivity(),
@@ -7845,18 +7829,40 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
   const dialogue = document.getElementById('vnDialogue');
   const isJordan = character === 'jordan';
   const useDualCast = getScenarioUI(scenarioIndex).introCast === 'dual' && (isJordan || character === 'pixel');
+  // S2 keeps Scenario 1's board and dialogue geometry. On tablet/landscape-size
+  // viewports only, stage Jordan on the left and Pixel on the right without
+  // enabling the legacy dual-cast layout (which also rewrites the dialogue).
+  const useS2TwoCharacterStage = scenarioIndex === SCENARIO_INDEX.METACOGNITION &&
+    Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0) >= 701;
 
   if (speaker) speaker.textContent = speakerName || (isJordan ? 'Jordan' : 'Professor Pixel');
   if (dialogue) dialogue.setAttribute('aria-label', `${speaker?.textContent || speakerName} is speaking. Press Space or Enter to continue.`);
   overlay?.classList.toggle('pc-dual-character', useDualCast);
+  overlay?.classList.toggle('pc-s2-two-character', useS2TwoCharacterStage);
 
-  if (useDualCast) {
+  if (useS2TwoCharacterStage) {
     pixel?.classList.add('visible');
     student?.classList.add('visible');
     pixel?.classList.toggle('is-active', !isJordan);
     pixel?.classList.toggle('is-inactive', isJordan);
     student?.classList.toggle('is-active', isJordan);
     student?.classList.toggle('is-inactive', !isJordan);
+    vnSetStudentExpression(isJordan ? expression : 'neutral');
+    if (!isJordan) vnSetExpression(expression);
+  } else if (useDualCast) {
+    pixel?.classList.add('visible');
+    student?.classList.add('visible');
+    pixel?.classList.toggle('is-active', !isJordan);
+    pixel?.classList.toggle('is-inactive', isJordan);
+    student?.classList.toggle('is-active', isJordan);
+    student?.classList.toggle('is-inactive', !isJordan);
+  } else if (isJordan) {
+    // Standard single-cast intros reuse Scenario 1 geometry exactly. The
+    // active student's portrait is rendered inside Pixel's established
+    // character container rather than creating parallel positioning rules.
+    pixel?.classList.add('visible', 'is-active');
+    pixel?.classList.remove('is-inactive');
+    student?.classList.remove('visible', 'is-active', 'is-inactive');
   } else {
     pixel?.classList.add('visible', 'is-active');
     pixel?.classList.remove('is-inactive');
@@ -7864,7 +7870,21 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
   }
 
   pcApplyDualCastResponsive();
-  if (isJordan) vnSetStudentExpression(expression);
+  if (useS2TwoCharacterStage) {
+    // Both portraits were assigned above. Do not replace Pixel's portrait with
+    // Jordan's image in the shared single-character container.
+  } else if (isJordan && !useDualCast) {
+    const portrait = document.getElementById('vnPortrait');
+    const expressions = ASSETS.images.students.jordan;
+    const src = expressions[expression] || expressions.neutral;
+    if (portrait) {
+      portrait.style.opacity = '0';
+      setTimeout(() => {
+        pcSetImageSource(portrait, src, LEGACY_ASSETS.images.students.jordan[expression] || LEGACY_ASSETS.images.students.jordan.neutral);
+        portrait.style.opacity = '1';
+      }, 120);
+    }
+  } else if (isJordan) vnSetStudentExpression(expression);
   else vnSetExpression(expression);
 }
 
@@ -7873,9 +7893,14 @@ function pcApplyDualCastResponsive() {
   const pixel = document.getElementById('vnCharacter');
   const student = document.getElementById('vnStudentCharacter');
   const compact = window.matchMedia?.('(max-width: 620px), (max-height: 650px)').matches;
+  const useS2TwoCharacterStage = scenarioIndex === SCENARIO_INDEX.METACOGNITION &&
+    Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0) >= 701 &&
+    overlay?.classList.contains('scenario-intro-active');
+  overlay?.classList.toggle('pc-s2-two-character', useS2TwoCharacterStage);
   if (!overlay?.classList.contains('pc-dual-character')) {
     if (pixel) pixel.style.display = '';
     if (student) student.style.display = '';
+    if (!useS2TwoCharacterStage && student) student.classList.remove('visible', 'is-active', 'is-inactive');
     return;
   }
   if (pixel) {

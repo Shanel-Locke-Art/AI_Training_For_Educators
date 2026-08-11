@@ -27,12 +27,12 @@ The revised prompt itself must also be evaluated. Identify its strongest improve
 Be specific enough that materially different faculty input produces materially different feedback. Avoid generic praise and stock advice.`
   },
   { desc: "Mission: Listen to Jordan, diagnose the missing learning process, and distinguish metacognitive evidence from generic reflection.", oscqr: [], system: "" },
-  { desc: "Mission: Convert a recall-heavy assessment into authentic practice, audit Babbage\'s redesign, and make the evidence of learning defensible.", oscqr: [], system: "" },
-  { desc: "Mission: Separate the learning value of live interaction from the assumption that everyone must be present at the same time.", oscqr: [], system: "" },
-  { desc: "Mission: Verify a polished AI research brief against a controlled evidence packet before deciding what is safe to use.", oscqr: [], system: "" },
-  { desc: "Scenario 6 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
-  { desc: "Scenario 7 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
-  { desc: "Scenario 8 is being rebuilt from a clean development shell.", oscqr: [], system: "" }
+  { desc: "Scenario 3 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
+  { desc: "Scenario 4 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
+  { desc: "Scenario 5 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
+  { desc: "Scenario 6 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
+  { desc: "Scenario 7 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
+  { desc: "Scenario 8 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" }
 ];
 
 // ══════════════════════════════════════════════════════
@@ -63,17 +63,17 @@ const SCENARIO_UI = [
     key: 'metacognition',
     dataLabel: 'S2: Metacognition',
     tabLabel: 'S2: Metacognition',
-    missionTitle: 'Find the metacognitive thinker.',
-    missionCopy: 'Listen to a student, identify the missing thinking move, audit Babbage\'s reflection activity, repair it, and hear how the student\'s thinking changes.',
-    boardText: 'Jordan is completing the work, but he cannot explain what helped, what failed, or what he should try next.',
+    missionTitle: 'Solve the confident student problem.',
+    missionCopy: 'Jordan earned a better grade, but he cannot tell what actually helped him learn. Diagnose the hidden problem, intervene, watch the consequence, then audit and repair Babbage\'s design.',
+    boardText: null,
     rendererKey: 'metacognition-opening',
     workspaceMode: 'activity',
-    introLayout: 'special',
-    introCast: 'dual',
+    introLayout: 'standard',
+    introCast: 'single',
     afterIntroAction: 's2-diagnosis',
     inputMode: 'scenario-2', inputVisible: true, supportsPrompt: false,
     implemented: true, developmentStatus: 'Playable',
-    plannedLoop: ['Listen to the student', 'Identify the missing thinking move', 'Audit Babbage\'s activity', 'Repair one weak element', 'Hear the changed student response']
+    plannedLoop: ['Observe the learner', 'Diagnose the hidden problem', 'Intervene and observe the consequence', 'Audit Babbage\'s activity', 'Repair the design', 'Test transfer']
   },
   {
     key: 'assessment',
@@ -82,16 +82,16 @@ const SCENARIO_UI = [
     missionTitle: 'Replace recall with authentic practice.',
     missionCopy: 'Students can pass the quiz but struggle to use the same knowledge in practice. Diagnose what the current assessment really measures, build a more authentic task with Babbage, audit the redesign, and defend the evidence of learning.',
     boardText: 'The quiz scores look fine. Performance outside the quiz does not.',
-    rendererKey: 'authentic-assessment',
-    workspaceMode: 'activity',
-    introLayout: 'special',
+    rendererKey: 'development-shell',
+    workspaceMode: 'development',
+    introLayout: 'none',
     introCast: 'single',
-    afterIntroAction: 's3-diagnosis',
-    inputMode: 'scenario-3',
-    inputVisible: true,
+    afterIntroAction: null,
+    inputMode: 'placeholder',
+    inputVisible: false,
     supportsPrompt: false,
-    implemented: true,
-    developmentStatus: 'Playable',
+    implemented: false,
+    developmentStatus: 'Locked · In development',
     plannedLoop: ['Diagnose the mismatch', 'Choose authentic evidence', 'Build with Babbage', 'Audit the design', 'Repair and defend the evidence']
   },
   {
@@ -101,16 +101,16 @@ const SCENARIO_UI = [
     missionTitle: 'Separate live interaction from synchronous attendance.',
     missionCopy: 'A required live session seems engaging, but several students cannot participate on equal terms. Diagnose the bias, identify the learning function that actually matters, audit Babbage’s participation plan, and create an equivalent path.',
     boardText: 'The goal is interaction. The requirement is attendance. Those are not the same thing.',
-    rendererKey: 'sync-bias',
-    workspaceMode: 'activity',
-    introLayout: 'special',
+    rendererKey: 'development-shell',
+    workspaceMode: 'development',
+    introLayout: 'none',
     introCast: 'single',
-    afterIntroAction: 's4-diagnosis',
-    inputMode: 'scenario-4',
-    inputVisible: true,
+    afterIntroAction: null,
+    inputMode: 'placeholder',
+    inputVisible: false,
     supportsPrompt: false,
-    implemented: true,
-    developmentStatus: 'Playable',
+    implemented: false,
+    developmentStatus: 'Locked · In development',
     plannedLoop: ['Diagnose the bias', 'Name the learning function', 'Build with Babbage', 'Audit equivalence', 'Repair the participation plan']
   },
   {
@@ -120,16 +120,16 @@ const SCENARIO_UI = [
     missionTitle: 'Verify before you trust.',
     missionCopy: 'Babbage produces a polished research brief from a controlled evidence packet. One claim is unsafe. Inspect the sources, find the failure, correct it, and decide what can actually be used.',
     boardText: 'Polished language is not evidence. Trace the claim.',
-    rendererKey: 'hallucination-hunt',
-    workspaceMode: 'activity',
-    introLayout: 'special',
+    rendererKey: 'development-shell',
+    workspaceMode: 'development',
+    introLayout: 'none',
     introCast: 'single',
-    afterIntroAction: 's5-evidence',
-    inputMode: 'scenario-5',
-    inputVisible: true,
+    afterIntroAction: null,
+    inputMode: 'placeholder',
+    inputVisible: false,
     supportsPrompt: false,
-    implemented: true,
-    developmentStatus: 'Playable',
+    implemented: false,
+    developmentStatus: 'Locked · In development',
     plannedLoop: ['Inspect the evidence', 'Choose a verification habit', 'Audit Babbage', 'Correct the unsafe claim', 'Decide what is safe']
   },
   {
@@ -138,7 +138,7 @@ const SCENARIO_UI = [
     missionCopy: 'This scenario will be rebuilt around forecasting AI behavior, testing the prediction, and revising the request.',
     boardText: 'Scenario 6 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Forecast', 'Test', 'Compare', 'Revise']
+    implemented: false, developmentStatus: 'Locked · In development', plannedLoop: ['Forecast', 'Test', 'Compare', 'Revise']
   },
   {
     key: 'overreliance', dataLabel: 'S7: Overreliance', tabLabel: 'S7: Overreliance',
@@ -146,7 +146,7 @@ const SCENARIO_UI = [
     missionCopy: 'This scenario will be rebuilt around classifying AI output and defending where instructor judgment is irreplaceable.',
     boardText: 'Scenario 7 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Classify', 'Justify', 'Revise the boundary']
+    implemented: false, developmentStatus: 'Locked · In development', plannedLoop: ['Classify', 'Justify', 'Revise the boundary']
   },
   {
     key: 'reflect-revise', dataLabel: 'S8: Reflect & Revise', tabLabel: 'S8: Reflect and Revise',
@@ -154,7 +154,7 @@ const SCENARIO_UI = [
     missionCopy: 'The final scenario will synthesize the game by asking learners to examine their own choices and improve a prompt deliberately.',
     boardText: 'Scenario 8 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Build', 'Explain your choice', 'Evaluate the output', 'Revise']
+    implemented: false, developmentStatus: 'Locked · In development', plannedLoop: ['Build', 'Explain your choice', 'Evaluate the output', 'Revise']
   }
 ];
 

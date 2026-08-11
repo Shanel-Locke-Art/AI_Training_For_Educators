@@ -2471,3 +2471,33 @@ body #musicToggle.full-audio {
 }
 
 
+
+
+/* Locked scenario tabs remain clickable so reviewers can see the development
+   shell, but they are visibly distinct from playable scenarios. */
+.scenario-tabs .tab-btn.is-locked {
+  position: relative;
+  opacity: 0.72;
+  padding-right: 42px;
+}
+
+.scenario-tabs .tab-btn.is-locked::after {
+  content: "LOCK";
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.5rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  color: #6f5a25;
+  background: #f4e6b5;
+  border: 1px solid #b89535;
+  border-radius: 999px;
+  padding: 3px 5px;
+}
+
+.scenario-tabs .tab-btn.is-locked.active {
+  opacity: 1;
+}

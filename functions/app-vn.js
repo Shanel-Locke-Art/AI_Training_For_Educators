@@ -3049,6 +3049,13 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
     pixel?.classList.toggle('is-inactive', isJordan);
     student?.classList.toggle('is-active', isJordan);
     student?.classList.toggle('is-inactive', !isJordan);
+  } else if (isJordan) {
+    // Standard single-cast intros reuse Scenario 1 geometry exactly. The
+    // active student's portrait is rendered inside Pixel's established
+    // character container rather than creating parallel positioning rules.
+    pixel?.classList.add('visible', 'is-active');
+    pixel?.classList.remove('is-inactive');
+    student?.classList.remove('visible', 'is-active', 'is-inactive');
   } else {
     pixel?.classList.add('visible', 'is-active');
     pixel?.classList.remove('is-inactive');
@@ -3056,7 +3063,18 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
   }
 
   pcApplyDualCastResponsive();
-  if (isJordan) vnSetStudentExpression(expression);
+  if (isJordan && !useDualCast) {
+    const portrait = document.getElementById('vnPortrait');
+    const expressions = ASSETS.images.students.jordan;
+    const src = expressions[expression] || expressions.neutral;
+    if (portrait) {
+      portrait.style.opacity = '0';
+      setTimeout(() => {
+        pcSetImageSource(portrait, src, LEGACY_ASSETS.images.students.jordan[expression] || LEGACY_ASSETS.images.students.jordan.neutral);
+        portrait.style.opacity = '1';
+      }, 120);
+    }
+  } else if (isJordan) vnSetStudentExpression(expression);
   else vnSetExpression(expression);
 }
 

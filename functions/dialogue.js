@@ -101,70 +101,24 @@ window.pixelDialogue = {
   ],
 
   "scenarioStart_metacognition": [
-    {
-      "speaker": "Professor Pixel",
-      "character": "pixel",
-      "expr": "neutral",
-      "text": "Meet Jordan. He submits every assignment on time, earns passing grades, and appears to be keeping up with the course.",
-      "id": "p86"
-    },
-    {
-      "speaker": "Jordan",
-      "character": "jordan",
-      "expr": "neutral",
-      "text": "I got an 84 on this assignment. That’s better than last time, so I guess something worked.",
-      "id": "jordan-s2-01"
-    },
-    {
-      "speaker": "Professor Pixel",
-      "character": "pixel",
-      "expr": "thinking",
-      "text": "A better result sounds promising. But it does not necessarily mean Jordan understands what produced it.",
-      "id": "p87"
-    },
-    {
-      "speaker": "Jordan",
-      "character": "jordan",
-      "expr": "uncertain",
-      "text": "I reread the chapter a few times. Some parts finally made more sense, but I couldn’t tell you what actually helped.",
-      "id": "jordan-s2-02"
-    },
-    {
-      "speaker": "Jordan",
-      "character": "jordan",
-      "expr": "frustrated",
-      "text": "When the next assignment starts, I’ll probably reread everything again and hope it works. That is more or less my entire academic strategy.",
-      "id": "jordan-s2-03"
-    },
-    {
-      "speaker": "Professor Pixel",
-      "character": "pixel",
-      "expr": "skeptical",
-      "text": "Jordan completed the work, so do not assume this is simply a motivation problem. Because his grade improved, the real problem is easy to overlook.",
-      "id": "p88"
-    },
-    {
-      "speaker": "Professor Pixel",
-      "character": "pixel",
-      "expr": "encouraging",
-      "text": "Listen to the evidence Jordan gave you. Choose the two instructional needs most clearly supported by his comments.",
-      "id": "p89"
-    }
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "Meet Jordan. He completes his assignments, earns passing grades, and seems to be doing fine.", "id": "p86" },
+    { "speaker": "Jordan", "character": "jordan", "expr": "neutral", "text": "I got an 84 on this assignment. That's better than last time, so I guess something worked.", "id": "jordan-s2-01" },
+    { "speaker": "Jordan", "character": "jordan", "expr": "uncertain", "text": "I reread the chapter a few times. Some parts eventually made more sense, but I couldn't tell you what actually helped.", "id": "jordan-s2-02" },
+    { "speaker": "Jordan", "character": "jordan", "expr": "frustrated", "text": "Next time I'll probably reread everything again and hope it works.", "id": "jordan-s2-03" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "His performance improved. His strategy might have worked. But listen carefully to what Jordan actually knows about his learning.", "id": "p88" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Let's figure out what's missing.", "id": "p89" }
   ],
   "s2_diagnosis_correct": [
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "Exactly. Jordan used a strategy, but he cannot name it clearly or judge whether it helped. Before he can improve the process, he needs to make that process visible.", "id": "p90" }
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "That's the hidden problem. Jordan has an outcome and a strategy, but no evidence connecting the two. He cannot judge what helped or use that judgment to make his next decision.", "id": "p90" }
   ],
-  "s2_diagnosis_transfer": [
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "You found an important part of the problem. Transfer matters, but Jordan first needs to identify and evaluate what happened during this task. Otherwise, his next plan is still a guess.", "id": "p91" }
+  "s2_diagnosis_strategy": [
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "Rereading may not be his best strategy, but replacing it does not solve the deeper problem. Jordan still needs a way to tell why a strategy worked or failed.", "id": "p91" }
   ],
   "s2_diagnosis_motivation": [
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "skeptical", "text": "Jordan completed the assignment and is actively trying to understand the result. His uncertainty is not evidence that he lacks motivation.", "id": "p92" }
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "skeptical", "text": "Jordan completed the work and is trying to understand the result. The evidence points somewhere other than motivation.", "id": "p92" }
   ],
-  "s2_diagnosis_grade": [
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "Jordan already knows the outcome. What he cannot explain is the learning process that produced it.", "id": "p93" }
-  ],
-  "s2_diagnosis_evidence": [
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "Those concerns might matter in another case, but Jordan did not give us evidence for them. Stay with what he actually said rather than filling in the rest of his story for him.", "id": "p94" }
+  "s2_diagnosis_performance": [
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "The grade tells us how Jordan performed. It does not tell Jordan what produced the learning or what he should do next.", "id": "p93" }
   ],
   "scoreReflection_0": [
     {

@@ -1082,9 +1082,24 @@
   animation: pinDrop 0.45s ease;
 }
 .name-modal-icon {
-  font-size: 2.4rem;
-  margin-bottom: 12px;
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #113428;
+  border: 2px solid #caa85d;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.16);
+}
+
+.name-modal-icon img {
   display: block;
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
 }
 .name-modal-sub {
   font-size: 0.8rem;

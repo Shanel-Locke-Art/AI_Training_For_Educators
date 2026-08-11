@@ -53,14 +53,14 @@ function renderScenarioPlaceholder(index) {
 
   area.innerHTML = `
     <section class="pc-scenario-shell" role="region" aria-labelledby="pcShellTitle">
-      <div class="pc-shell-status">Clean development shell</div>
-      <h2 id="pcShellTitle">${esc(ui.tabLabel)} is being rebuilt</h2>
+      <div class="pc-shell-status">Locked · In development</div>
+      <h2 id="pcShellTitle">${esc(ui.tabLabel)} is not yet available</h2>
       <p class="pc-shell-copy">${esc(ui.missionCopy)}</p>
       ${plannedSteps ? `<div class="pc-shell-plan"><h3>Planned game loop</h3>${plannedSteps}</div>` : ''}
-      <p class="pc-shell-note">The previous implementation is preserved in <code>archive/legacy-scenarios-v133/</code>, but it is no longer loaded by the game.</p>
+      <p class="pc-shell-note">This scenario is intentionally locked while its gameplay and instructional design are rebuilt. Scenario 1 and Scenario 2 are currently available.</p>
       <div class="pc-shell-actions">
         <button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="scenarios">Return to Scenario Select</button>
-        <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="0" data-pc-skip-name-gate="true">Play Scenario 1</button>
+        <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="1" data-pc-skip-name-gate="true">Play Scenario 2</button>
       </div>
     </section>`;
   area.scrollTop = 0;
