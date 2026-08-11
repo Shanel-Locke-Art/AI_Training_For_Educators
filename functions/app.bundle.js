@@ -5667,6 +5667,29 @@ function pcFitWideAnalysisReportV215(screen) {
   if (repairCard) pcSetImportantStyles(repairCard, [['grid-area', 'repair']]);
   if (impactCard) pcSetImportantStyles(impactCard, [['grid-area', 'impact']]);
 
+  // v370: Completed analysis is allowed to scroll before typography becomes
+  // uncomfortably small. Babbage responses are variable-length, so fitting the
+  // entire report at once is no longer more important than readability.
+  // The higher floors apply only to photographed workstation layouts; compact
+  // and medium panel modes already use their own readable scrolling profiles.
+  const readableFloor = isWideDesktopMonitor ? {
+    badge: 8,
+    title: 20,
+    summary: 12.5,
+    label: 9,
+    value: 13,
+    big: 14,
+    note: 12.5
+  } : {
+    badge: 6.5,
+    title: 15,
+    summary: 8.5,
+    label: 6.5,
+    value: 8,
+    big: 9,
+    note: 8.5
+  };
+
   const applyScale = (scale) => {
     const scaled = (value, floor = 1) => Math.max(floor, value * scale);
     report.classList.toggle('analysis-report-fitted-compact', scale < 0.78);
@@ -5680,13 +5703,13 @@ function pcFitWideAnalysisReportV215(screen) {
     pcSetImportantStyles(badge, [
       ['margin', '0 auto'],
       ['padding', `${scaled(2, 1)}px ${scaled(8, 4)}px`],
-      ['font-size', `${scaled(base.badge, 6.5)}px`],
+      ['font-size', `${scaled(base.badge, readableFloor.badge)}px`],
       ['line-height', '1'],
       ['justify-self', 'center']
     ]);
     pcSetImportantStyles(title, [
       ['margin', '0'],
-      ['font-size', `${scaled(base.title, 15)}px`],
+      ['font-size', `${scaled(base.title, readableFloor.title)}px`],
       ['line-height', '1.02'],
       ['text-align', 'center']
     ]);
@@ -5695,7 +5718,7 @@ function pcFitWideAnalysisReportV215(screen) {
       ['max-width', 'none'],
       ['margin', '0 auto'],
       ['padding-bottom', isCompactAnalysisPanel || isMediumAnalysisPanel ? `${scaled(4, 2)}px` : '0'],
-      ['font-size', `${scaled(base.summary, 8.5)}px`],
+      ['font-size', `${scaled(base.summary, readableFloor.summary)}px`],
       ['line-height', isCompactAnalysisPanel || isMediumAnalysisPanel ? '1.2' : '1.16'],
       ['text-align', 'center'],
       ['overflow-wrap', 'break-word'],
@@ -5723,7 +5746,7 @@ function pcFitWideAnalysisReportV215(screen) {
     ]));
     labels.forEach((label) => pcSetImportantStyles(label, [
       ['margin', `0 0 ${scaled(3, 1.5)}px`],
-      ['font-size', `${scaled(base.label, 6.5)}px`],
+      ['font-size', `${scaled(base.label, readableFloor.label)}px`],
       ['line-height', '1.04'],
       ['display', 'flex'],
       ['align-items', 'center'],
@@ -5736,20 +5759,20 @@ function pcFitWideAnalysisReportV215(screen) {
       ['line-height', '1']
     ]));
     values.forEach((value) => pcSetImportantStyles(value, [
-      ['font-size', `${scaled(base.value, 8)}px`],
+      ['font-size', `${scaled(base.value, readableFloor.value)}px`],
       ['line-height', '1.14'],
       ['overflow-wrap', 'break-word'],
       ['word-break', 'normal']
     ]));
     bigValues.forEach((value) => pcSetImportantStyles(value, [
-      ['font-size', `${scaled(base.big, 9)}px`],
+      ['font-size', `${scaled(base.big, readableFloor.big)}px`],
       ['line-height', '1.1']
     ]));
     notes.forEach((note) => pcSetImportantStyles(note, [
       ['display', 'block'],
       ['width', '100%'],
       ['margin-top', `${scaled(4, 2)}px`],
-      ['font-size', `${scaled(base.note, 8.5)}px`],
+      ['font-size', `${scaled(base.note, readableFloor.note)}px`],
       ['font-weight', '700'],
       ['line-height', '1.18'],
       ['text-align', 'left'],
@@ -6015,18 +6038,33 @@ function pcFitWideAnalysisReportV215(screen) {
   if (!contentFits()) {
     report.classList.add('analysis-report-scrollable');
     pcSetImportantStyles(output, [
+      ['display', 'block'],
       ['overflow-y', 'auto'],
-      ['scrollbar-gutter', 'stable both-edges']
+      ['overflow-x', 'hidden'],
+      ['overscroll-behavior-y', 'contain'],
+      ['touch-action', 'pan-y'],
+      ['scrollbar-gutter', 'stable'],
+      ['box-sizing', 'border-box']
     ]);
     pcSetImportantStyles(report, [
       ['height', 'auto'],
-      ['min-height', '100%']
+      ['min-height', '100%'],
+      ['overflow', 'visible']
     ]);
     pcSetImportantStyles(grid, [
       ['grid-template-rows', 'auto auto auto'],
-      ['height', 'auto']
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['align-content', 'start'],
+      ['overflow', 'visible'],
+      ['flex', '0 0 auto']
     ]);
-    cards.forEach((card) => pcSetImportantStyles(card, [['height', 'auto']]));
+    cards.forEach((card) => pcSetImportantStyles(card, [
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['overflow', 'visible']
+    ]));
+    output.scrollTop = 0;
   } else {
     report.classList.remove('analysis-report-scrollable');
   }
