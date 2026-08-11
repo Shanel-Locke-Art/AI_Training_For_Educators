@@ -701,10 +701,19 @@ function pcFitWideAnalysisReportV215(screen) {
   const isIPadProReadableProfile = isPortraitTabletWorkstation &&
     viewportWidth >= 980 && viewportWidth <= 1060 &&
     viewportHeight >= 1320 && viewportHeight <= 1400;
+  // v372: Surface Pro and similar tall 900px-class portrait workstations have
+  // plenty of monitor width, but previous auto-fit logic treated that width as
+  // permission to shrink the report aggressively. Use a larger medium profile
+  // and let the monitor scroll instead.
+  const isTallMediumPortraitReadableProfile = isMediumAnalysisPanel &&
+    viewportWidth >= 820 && viewportWidth <= 960 &&
+    viewportHeight >= 1200;
   const mediumScale = isMediumAnalysisPanel
     ? (isIPadProReadableProfile
       ? 1.42
-      : clampNumber(1.02, viewportWidth / 860, viewportHeight >= 1100 ? 1.22 : 1.14))
+      : isTallMediumPortraitReadableProfile
+        ? 1.34
+        : clampNumber(1.02, viewportWidth / 860, viewportHeight >= 1100 ? 1.22 : 1.14))
     : 1;
   const useSingleColumn = screenRect.width < 420 || isCompactAnalysisPanel;
   const widthFactor = screenRect.width / 900;
@@ -876,6 +885,14 @@ function pcFitWideAnalysisReportV215(screen) {
     value: 13,
     big: 14,
     note: 12.5
+  } : isMediumAnalysisPanel ? {
+    badge: isTallMediumPortraitReadableProfile ? 11 : 9.5,
+    title: isTallMediumPortraitReadableProfile ? 30 : 26,
+    summary: isTallMediumPortraitReadableProfile ? 16 : 14,
+    label: isTallMediumPortraitReadableProfile ? 11.5 : 10.5,
+    value: isTallMediumPortraitReadableProfile ? 16 : 14.5,
+    big: isTallMediumPortraitReadableProfile ? 18 : 16.5,
+    note: isTallMediumPortraitReadableProfile ? 15 : 13.5
   } : {
     badge: 6.5,
     title: 15,

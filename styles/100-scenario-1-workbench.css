@@ -530,5 +530,13 @@ body.s1-result-active .s1-babbage-revision-review .s1-clean-reference-title {
   margin-bottom: 10px !important;
   color: #173d27 !important;
 }
-body.s1-result-active .s1-babbage-review-item + .s1-babbage-review-item { margin-top: 9px !important; }
+body.s1-result-active .s1-babbage-review-item + .s1-babbage-review-item { margin-top: 12px !important; }
+body.s1-result-active .s1-babbage-review-item {
+  font-size: clamp(16px, calc(15px + 0.22vw), 18px) !important;
+  line-height: 1.58 !important;
+}
+body.s1-result-active .s1-babbage-revision-review .s1-clean-reference-title {
+  font-size: clamp(14px, calc(13px + 0.20vw), 16px) !important;
+  line-height: 1.25 !important;
+}
 body.s1-result-active .s1-babbage-review-item strong { color: #173d27 !important; }
