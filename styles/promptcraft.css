@@ -13372,6 +13372,23 @@ html body #vnOverlay#vnOverlay.vn-overlay.active.pc-live-analysis-phone-v256
   }
 }
 
+
+/* v371: Variable-length Babbage diagnostics must remain inside their cards.
+   Grid placement is owned by app-vn.js; these are content-safety rules only. */
+html body .analysis-card .analysis-value,
+html body .analysis-card .analysis-note {
+  max-width: 100% !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+
+html body .analysis-report-scrollable .analysis-card {
+  height: auto !important;
+  min-height: max-content !important;
+  overflow: hidden !important;
+}
+
 /* SOURCE: styles/90-completed-analysis.css */
 /* PromptCraft v268 completed-analysis owner.
    Stage 6 finishes the migration: every active completed-report responsive

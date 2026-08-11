@@ -5456,6 +5456,7 @@ function pcFitWideAnalysisReportV215(screen) {
   const cards = [...report.querySelectorAll('.analysis-card')];
   const statusCard = report.querySelector('.analysis-status-card');
   const confidenceCard = report.querySelector('.analysis-confidence-card');
+  const workedCard = report.querySelector('.analysis-worked-card');
   const issueCard = report.querySelector('.analysis-issue-card');
   const repairCard = report.querySelector('.analysis-repair-card');
   const impactCard = report.querySelector('.analysis-impact-card');
@@ -5646,10 +5647,12 @@ function pcFitWideAnalysisReportV215(screen) {
   pcSetImportantStyles(grid, [
     ['display', 'grid'],
     ['grid-template-columns', useSingleColumn ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) minmax(0, 1fr)'],
-    ['grid-template-rows', useSingleColumn ? 'auto auto auto auto auto' : 'minmax(0, .72fr) minmax(0, 1.28fr) minmax(0, .82fr)'],
+    ['grid-template-rows', useSingleColumn
+      ? 'auto auto auto auto auto auto'
+      : 'minmax(0, .62fr) minmax(0, 1.18fr) minmax(0, .78fr) minmax(0, 1.02fr)'],
     ['grid-template-areas', useSingleColumn
-      ? '"status" "confidence" "issue" "repair" "impact"'
-      : '"status confidence" "issue repair" "impact impact"'],
+      ? '"status" "confidence" "issue" "repair" "impact" "worked"'
+      : '"status confidence" "issue repair" "impact impact" "worked worked"'],
     ['gap', `${base.gap}px`],
     ['width', '100%'],
     ['height', 'auto'],
@@ -5663,6 +5666,7 @@ function pcFitWideAnalysisReportV215(screen) {
 
   if (statusCard) pcSetImportantStyles(statusCard, [['grid-area', 'status']]);
   if (confidenceCard) pcSetImportantStyles(confidenceCard, [['grid-area', 'confidence']]);
+  if (workedCard) pcSetImportantStyles(workedCard, [['grid-area', 'worked']]);
   if (issueCard) pcSetImportantStyles(issueCard, [['grid-area', 'issue']]);
   if (repairCard) pcSetImportantStyles(repairCard, [['grid-area', 'repair']]);
   if (impactCard) pcSetImportantStyles(impactCard, [['grid-area', 'impact']]);
@@ -5942,8 +5946,8 @@ function pcFitWideAnalysisReportV215(screen) {
     pcSetImportantStyles(grid, [
       ['display', 'grid'],
       ['grid-template-columns', 'minmax(0, 1fr) minmax(0, 1fr)'],
-      ['grid-template-rows', 'auto auto auto'],
-      ['grid-template-areas', '"status confidence" "issue repair" "impact impact"'],
+      ['grid-template-rows', 'auto auto auto auto'],
+      ['grid-template-areas', '"status confidence" "issue repair" "impact impact" "worked worked"'],
       ['width', '100%'],
       ['height', 'auto'],
       ['min-height', '0'],
@@ -6010,12 +6014,16 @@ function pcFitWideAnalysisReportV215(screen) {
     pcSetImportantStyles(grid, [
       ['height', 'auto'],
       ['min-height', '0'],
-      ['grid-template-rows', 'auto auto auto']
+      ['grid-template-rows', 'auto auto auto auto'],
+      ['align-items', 'start'],
+      ['align-content', 'start']
     ]);
     cards.forEach((card) => pcSetImportantStyles(card, [
       ['height', 'auto'],
-      ['min-height', '0'],
-      ['overflow', 'visible']
+      ['min-height', 'max-content'],
+      ['align-self', 'start'],
+      ['overflow', 'hidden'],
+      ['overflow-wrap', 'anywhere']
     ]));
     output.scrollTop = 0;
     return true;
@@ -6052,17 +6060,23 @@ function pcFitWideAnalysisReportV215(screen) {
       ['overflow', 'visible']
     ]);
     pcSetImportantStyles(grid, [
-      ['grid-template-rows', 'auto auto auto'],
+      ['grid-template-rows', useSingleColumn
+        ? 'auto auto auto auto auto auto'
+        : 'auto auto auto auto'],
       ['height', 'auto'],
       ['min-height', '0'],
+      ['align-items', 'start'],
       ['align-content', 'start'],
       ['overflow', 'visible'],
       ['flex', '0 0 auto']
     ]);
     cards.forEach((card) => pcSetImportantStyles(card, [
       ['height', 'auto'],
-      ['min-height', '0'],
-      ['overflow', 'visible']
+      ['min-height', 'max-content'],
+      ['align-self', 'start'],
+      ['overflow', 'hidden'],
+      ['overflow-wrap', 'anywhere'],
+      ['word-break', 'normal']
     ]));
     output.scrollTop = 0;
   } else {
