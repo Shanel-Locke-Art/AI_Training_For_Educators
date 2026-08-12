@@ -118,7 +118,7 @@ function pcResetVNCharacters() {
   student?.classList.remove('visible', 'is-active', 'is-inactive');
   pixel?.style.removeProperty('display');
   student?.style.removeProperty('display');
-  overlay?.classList.remove('pc-dual-character');
+  overlay?.classList.remove('pc-dual-character', 'pc-s2-two-character');
 }
 
 function pcResetVNDialogueState() {
@@ -2984,7 +2984,17 @@ function vnPlayNext() {
   setClaudeShelfState('idle', 'idle');
 
   vnSetDialogueCharacter(character, expression, speaker);
-  requestAnimationFrame(pcApplyIpadLayoutV200);
+  requestAnimationFrame(() => {
+    pcApplyIpadLayoutV200();
+
+    // S2 narrow layouts use Jordan's dedicated portrait container, staged in
+    // the exact geometry already computed for S1's single-character portrait.
+    // Re-apply after responsive layout work so no later S1 refresh can swap the
+    // visible speaker back to Pixel.
+    const normalizedSpeaker = String(speaker || '').trim().toLowerCase();
+    const isJordanSpeaker = character === 'jordan' || normalizedSpeaker === 'jordan';
+    pcApplyS2NarrowSpeakerStage(isJordanSpeaker, expression);
+  });
 
   setTimeout(() => {
     pcFocusWithoutScroll(document.getElementById('vnDialogue'));
@@ -3003,14 +3013,23 @@ function vnSetExpression(expr) {
   const src = EXPRESSIONS[expr] || EXPRESSIONS.neutral;
   if (!img) return;
 
+  // A previous Pixel line may still have a delayed portrait swap queued when
+  // the next speaker starts. Cancel it so a narrow-screen Jordan portrait is
+  // not overwritten by Pixel 150ms later.
+  if (img._pcExpressionTimer) {
+    clearTimeout(img._pcExpressionTimer);
+    img._pcExpressionTimer = null;
+  }
+
   // Expression names are implementation state, not visible interface copy.
   // Only swap the portrait image; never write labels such as "neutral" or
   // "thinking" into the scene.
   if (img.style.display !== 'none') {
     img.style.opacity = '0';
-    setTimeout(() => {
+    img._pcExpressionTimer = setTimeout(() => {
       pcSetImageSource(img, src, LEGACY_ASSETS.images.professorPixel[expr] || LEGACY_ASSETS.images.professorPixel.neutral);
       img.style.opacity = '1';
+      img._pcExpressionTimer = null;
     }, 150);
   } else {
     pcSetImageSource(img, src, LEGACY_ASSETS.images.professorPixel[expr] || LEGACY_ASSETS.images.professorPixel.neutral);
@@ -3029,20 +3048,145 @@ function vnSetStudentExpression(expr) {
   }, 120);
 }
 
+function pcApplyS2NarrowSpeakerStage(isJordan, expression = 'neutral') {
+  const viewportWidth = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0);
+  if (scenarioIndex !== SCENARIO_INDEX.METACOGNITION || viewportWidth > 700) return false;
+
+  const pixel = document.getElementById('vnCharacter');
+  const student = document.getElementById('vnStudentCharacter');
+  const jordanPortrait = document.getElementById('vnStudentPortrait');
+  if (!pixel || !student || !jordanPortrait) return false;
+
+  const overlay = document.getElementById('vnOverlay');
+
+  if (!isJordan) {
+    // Narrow S2 speaker handoff: make the active portrait state explicit.
+    // The Jordan stage uses !important CSS, so clearing normal inline display
+    // values is not enough when the next line returns to Pixel. Remove the
+    // Jordan state first, then explicitly restore Pixel and suppress Jordan.
+    overlay?.classList.remove('pc-s2-narrow-jordan');
+    student.classList.remove('visible', 'is-active', 'is-inactive');
+    student.style.setProperty('display', 'none', 'important');
+    pixel.style.setProperty('display', 'block', 'important');
+    pixel.classList.add('visible', 'is-active');
+    pixel.classList.remove('is-inactive');
+    vnSetExpression(expression);
+    return true;
+  }
+
+  overlay?.classList.add('pc-s2-narrow-jordan');
+  // Undo any explicit Pixel-line visibility state before measuring the S1
+  // geometry used to stage Jordan.
+  pixel.style.removeProperty('display');
+  student.style.removeProperty('display');
+
+  // Measure Pixel BEFORE hiding it. This copies S1's resolved responsive
+  // geometry rather than recreating it for Scenario 2.
+  pixel.style.display = '';
+  const pixelStyle = window.getComputedStyle(pixel);
+  const pixelPortrait = document.getElementById('vnPortrait');
+  const pixelPortraitStyle = pixelPortrait ? window.getComputedStyle(pixelPortrait) : null;
+
+  const geometryProps = [
+    'position', 'left', 'right', 'top', 'bottom', 'width', 'height',
+    'minWidth', 'maxWidth', 'minHeight', 'maxHeight', 'alignItems',
+    'justifyContent', 'transform', 'transformOrigin', 'zIndex'
+  ];
+  geometryProps.forEach(prop => {
+    student.style[prop] = pixelStyle[prop];
+  });
+
+  student.style.display = 'flex';
+  student.style.visibility = 'visible';
+  student.style.opacity = '1';
+  student.style.filter = 'none';
+  student.classList.add('visible', 'is-active');
+  student.classList.remove('is-inactive');
+
+  if (pixelPortraitStyle) {
+    jordanPortrait.style.height = pixelPortraitStyle.height;
+    jordanPortrait.style.width = pixelPortraitStyle.width;
+    jordanPortrait.style.maxWidth = pixelPortraitStyle.maxWidth;
+    jordanPortrait.style.maxHeight = pixelPortraitStyle.maxHeight;
+    jordanPortrait.style.objectFit = pixelPortraitStyle.objectFit;
+    jordanPortrait.style.objectPosition = pixelPortraitStyle.objectPosition;
+  }
+
+  const expressions = ASSETS.images.students.jordan;
+  const src = expressions[expression] || expressions.neutral;
+  pcSetImageSource(
+    jordanPortrait,
+    src,
+    LEGACY_ASSETS.images.students.jordan[expression] || LEGACY_ASSETS.images.students.jordan.neutral
+  );
+  jordanPortrait.style.opacity = '1';
+
+  // Pixel remains the geometry template but is not visible while Jordan speaks.
+  pixel.style.display = 'none';
+  return true;
+}
+
 function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', speakerName = 'Professor Pixel') {
   const overlay = document.getElementById('vnOverlay');
   const pixel = document.getElementById('vnCharacter');
   const student = document.getElementById('vnStudentCharacter');
   const speaker = document.getElementById('vnSpeaker');
   const dialogue = document.getElementById('vnDialogue');
-  const isJordan = character === 'jordan';
-  const useDualCast = getScenarioUI(scenarioIndex).introCast === 'dual' && (isJordan || character === 'pixel');
+  const normalizedSpeakerName = String(speakerName || '').trim().toLowerCase();
+  const isJordan = character === 'jordan' || normalizedSpeakerName === 'jordan';
+  const useDualCast = scenarioIndex !== SCENARIO_INDEX.METACOGNITION && getScenarioUI(scenarioIndex).introCast === 'dual' && (isJordan || character === 'pixel');
+  // S2 keeps Scenario 1's board and dialogue geometry. On tablet/landscape-size
+  // viewports only, stage Jordan on the left and Pixel on the right without
+  // enabling the legacy dual-cast layout (which also rewrites the dialogue).
+  const useS2TwoCharacterStage = scenarioIndex === SCENARIO_INDEX.METACOGNITION &&
+    Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0) >= 701;
 
   if (speaker) speaker.textContent = speakerName || (isJordan ? 'Jordan' : 'Professor Pixel');
   if (dialogue) dialogue.setAttribute('aria-label', `${speaker?.textContent || speakerName} is speaking. Press Space or Enter to continue.`);
   overlay?.classList.toggle('pc-dual-character', useDualCast);
+  overlay?.classList.toggle('pc-s2-two-character', useS2TwoCharacterStage);
 
-  if (useDualCast) {
+  if (useS2TwoCharacterStage) {
+    // Clear any narrow-screen speaker handoff display overrides before the
+    // two-character layout takes ownership.
+    pixel?.style.removeProperty('display');
+    student?.style.removeProperty('display');
+    overlay?.classList.remove('pc-s2-narrow-jordan');
+    // S2 wide/tablet intro: always render BOTH people. Explicitly assign both
+    // image sources here so the secondary character cannot disappear because
+    // of a previous single-character line, resize, or delayed portrait swap.
+    pixel?.classList.add('visible');
+    student?.classList.add('visible');
+    pixel?.classList.toggle('is-active', !isJordan);
+    pixel?.classList.toggle('is-inactive', isJordan);
+    student?.classList.toggle('is-active', isJordan);
+    student?.classList.toggle('is-inactive', !isJordan);
+
+    const pixelPortrait = document.getElementById('vnPortrait');
+    const jordanPortrait = document.getElementById('vnStudentPortrait');
+    const pixelExpr = isJordan ? 'neutral' : expression;
+    const jordanExpr = isJordan ? expression : 'neutral';
+    const pixelSrc = EXPRESSIONS[pixelExpr] || EXPRESSIONS.neutral;
+    const jordanExpressions = ASSETS.images.students.jordan;
+    const jordanSrc = jordanExpressions[jordanExpr] || jordanExpressions.neutral;
+
+    if (pixelPortrait) {
+      pixelPortrait.style.opacity = '1';
+      pcSetImageSource(
+        pixelPortrait,
+        pixelSrc,
+        LEGACY_ASSETS.images.professorPixel[pixelExpr] || LEGACY_ASSETS.images.professorPixel.neutral
+      );
+    }
+    if (jordanPortrait) {
+      jordanPortrait.style.opacity = '1';
+      pcSetImageSource(
+        jordanPortrait,
+        jordanSrc,
+        LEGACY_ASSETS.images.students.jordan[jordanExpr] || LEGACY_ASSETS.images.students.jordan.neutral
+      );
+    }
+  } else if (useDualCast) {
     pixel?.classList.add('visible');
     student?.classList.add('visible');
     pixel?.classList.toggle('is-active', !isJordan);
@@ -3063,17 +3207,14 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
   }
 
   pcApplyDualCastResponsive();
-  if (isJordan && !useDualCast) {
-    const portrait = document.getElementById('vnPortrait');
-    const expressions = ASSETS.images.students.jordan;
-    const src = expressions[expression] || expressions.neutral;
-    if (portrait) {
-      portrait.style.opacity = '0';
-      setTimeout(() => {
-        pcSetImageSource(portrait, src, LEGACY_ASSETS.images.students.jordan[expression] || LEGACY_ASSETS.images.students.jordan.neutral);
-        portrait.style.opacity = '1';
-      }, 120);
-    }
+  if (useS2TwoCharacterStage) {
+    // Both portraits were assigned above. Do not replace Pixel's portrait with
+    // Jordan's image in the shared single-character container.
+  } else if (scenarioIndex === SCENARIO_INDEX.METACOGNITION && !useDualCast) {
+    // Narrow S2 uses the dedicated Jordan container in S1's resolved portrait
+    // geometry. Keeping separate image elements prevents Pixel's expression
+    // timers or responsive refreshes from overwriting Jordan mid-line.
+    pcApplyS2NarrowSpeakerStage(isJordan, expression);
   } else if (isJordan) vnSetStudentExpression(expression);
   else vnSetExpression(expression);
 }
@@ -3083,9 +3224,39 @@ function pcApplyDualCastResponsive() {
   const pixel = document.getElementById('vnCharacter');
   const student = document.getElementById('vnStudentCharacter');
   const compact = window.matchMedia?.('(max-width: 620px), (max-height: 650px)').matches;
+  const useS2TwoCharacterStage = scenarioIndex === SCENARIO_INDEX.METACOGNITION &&
+    Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0) >= 701;
+  overlay?.classList.toggle('pc-s2-two-character', useS2TwoCharacterStage);
+
+  // When a narrow S2 layout is resized into a two-character layout while
+  // Jordan is speaking, #vnPortrait may still contain Jordan because phones
+  // reuse Pixel's S1 portrait container for the active speaker. Restore Pixel
+  // before showing the dedicated Jordan portrait so the wide scene never
+  // renders Jordan twice.
+  if (useS2TwoCharacterStage) {
+    const pixelPortrait = document.getElementById('vnPortrait');
+    if (pixelPortrait) {
+      if (pixelPortrait._pcExpressionTimer) {
+        clearTimeout(pixelPortrait._pcExpressionTimer);
+        pixelPortrait._pcExpressionTimer = null;
+      }
+      pcSetImageSource(
+        pixelPortrait,
+        EXPRESSIONS.neutral,
+        LEGACY_ASSETS.images.professorPixel.neutral
+      );
+      pixelPortrait.style.opacity = '1';
+    }
+  }
+
   if (!overlay?.classList.contains('pc-dual-character')) {
-    if (pixel) pixel.style.display = '';
-    if (student) student.style.display = '';
+    const viewportWidth = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0);
+    const isS2Narrow = scenarioIndex === SCENARIO_INDEX.METACOGNITION && viewportWidth <= 700;
+    if (!isS2Narrow) {
+      if (pixel) pixel.style.display = '';
+      if (student) student.style.display = '';
+      if (!useS2TwoCharacterStage && student) student.classList.remove('visible', 'is-active', 'is-inactive');
+    }
     return;
   }
   if (pixel) {

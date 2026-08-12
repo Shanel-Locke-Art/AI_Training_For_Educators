@@ -1409,14 +1409,14 @@ function renderScenarioPlaceholder(index) {
 
   area.innerHTML = `
     <section class="pc-scenario-shell" role="region" aria-labelledby="pcShellTitle">
-      <div class="pc-shell-status">Locked · In development</div>
-      <h2 id="pcShellTitle">${esc(ui.tabLabel)} is not yet available</h2>
+      <div class="pc-shell-status">Clean development shell</div>
+      <h2 id="pcShellTitle">${esc(ui.tabLabel)} is being rebuilt</h2>
       <p class="pc-shell-copy">${esc(ui.missionCopy)}</p>
       ${plannedSteps ? `<div class="pc-shell-plan"><h3>Planned game loop</h3>${plannedSteps}</div>` : ''}
-      <p class="pc-shell-note">This scenario is intentionally locked while its gameplay and instructional design are rebuilt. Scenario 1 and Scenario 2 are currently available.</p>
+      <p class="pc-shell-note">The previous implementation is preserved in <code>archive/legacy-scenarios-v133/</code>, but it is no longer loaded by the game.</p>
       <div class="pc-shell-actions">
         <button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="scenarios">Return to Scenario Select</button>
-        <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="1" data-pc-skip-name-gate="true">Play Scenario 2</button>
+        <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="0" data-pc-skip-name-gate="true">Play Scenario 1</button>
       </div>
     </section>`;
   area.scrollTop = 0;
@@ -1586,13 +1586,13 @@ The revised prompt itself must also be evaluated. Identify its strongest improve
 
 Be specific enough that materially different faculty input produces materially different feedback. Avoid generic praise and stock advice.`
   },
-  { desc: "Mission: Listen to Jordan, diagnose the missing learning process, and distinguish metacognitive evidence from generic reflection.", oscqr: [], system: "" },
-  { desc: "Scenario 3 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
-  { desc: "Scenario 4 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
-  { desc: "Scenario 5 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
-  { desc: "Scenario 6 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
-  { desc: "Scenario 7 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" },
-  { desc: "Scenario 8 is locked while its gameplay and instructional design are rebuilt.", oscqr: [], system: "" }
+  { desc: "Mission: Listen to Jordan and diagnose what is missing from his learning process.", oscqr: [], system: "" },
+  { desc: "Mission: Convert a recall-heavy assessment into authentic practice, audit Babbage\'s redesign, and make the evidence of learning defensible.", oscqr: [], system: "" },
+  { desc: "Mission: Separate the learning value of live interaction from the assumption that everyone must be present at the same time.", oscqr: [], system: "" },
+  { desc: "Mission: Verify a polished AI research brief against a controlled evidence packet before deciding what is safe to use.", oscqr: [], system: "" },
+  { desc: "Scenario 6 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
+  { desc: "Scenario 7 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
+  { desc: "Scenario 8 is being rebuilt from a clean development shell.", oscqr: [], system: "" }
 ];
 
 // ══════════════════════════════════════════════════════
@@ -1623,9 +1623,9 @@ const SCENARIO_UI = [
     key: 'metacognition',
     dataLabel: 'S2: Metacognition',
     tabLabel: 'S2: Metacognition',
-    missionTitle: 'Solve the confident student problem.',
-    missionCopy: 'Jordan earned a better grade, but he cannot tell what actually helped him learn. Diagnose the hidden problem, intervene, watch the consequence, then audit and repair Babbage\'s design.',
-    boardText: null,
+    missionTitle: 'Find the metacognitive thinker.',
+    missionCopy: 'Listen to a student, identify the missing thinking move, audit Babbage\'s reflection activity, repair it, and hear how the student\'s thinking changes.',
+    boardText: 'Jordan is completing the work, but he cannot explain what helped, what failed, or what he should try next.',
     rendererKey: 'metacognition-opening',
     workspaceMode: 'activity',
     introLayout: 'standard',
@@ -1633,64 +1633,52 @@ const SCENARIO_UI = [
     afterIntroAction: 's2-diagnosis',
     inputMode: 'scenario-2', inputVisible: true, supportsPrompt: false,
     implemented: true, developmentStatus: 'Playable',
-    plannedLoop: ['Observe the learner', 'Diagnose the hidden problem', 'Intervene and observe the consequence', 'Audit Babbage\'s activity', 'Repair the design', 'Test transfer']
+    plannedLoop: ['Listen to the student', 'Identify the missing thinking move', 'Audit Babbage\'s activity', 'Repair one weak element', 'Hear the changed student response']
   },
   {
     key: 'assessment',
     dataLabel: 'S3: Authentic Assessment',
     tabLabel: 'S3: Assessment',
-    missionTitle: 'Replace recall with authentic practice.',
-    missionCopy: 'Students can pass the quiz but struggle to use the same knowledge in practice. Diagnose what the current assessment really measures, build a more authentic task with Babbage, audit the redesign, and defend the evidence of learning.',
-    boardText: 'The quiz scores look fine. Performance outside the quiz does not.',
+    missionTitle: 'Authentic Assessment is being rebuilt.',
+    missionCopy: 'This scenario is intentionally unavailable while its gameplay and instructional design are rebuilt from the ground up.',
+    boardText: 'Scenario 3 is in development.',
     rendererKey: 'development-shell',
     workspaceMode: 'development',
     introLayout: 'none',
     introCast: 'single',
-    afterIntroAction: null,
-    inputMode: 'placeholder',
-    inputVisible: false,
-    supportsPrompt: false,
-    implemented: false,
-    developmentStatus: 'Locked · In development',
-    plannedLoop: ['Diagnose the mismatch', 'Choose authentic evidence', 'Build with Babbage', 'Audit the design', 'Repair and defend the evidence']
+    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    implemented: false, developmentStatus: 'Locked · In development',
+    plannedLoop: ['Diagnose', 'Design', 'Test', 'Revise']
   },
   {
     key: 'sync-bias',
     dataLabel: 'S4: Sync Bias',
     tabLabel: 'S4: Sync Bias',
-    missionTitle: 'Separate live interaction from synchronous attendance.',
-    missionCopy: 'A required live session seems engaging, but several students cannot participate on equal terms. Diagnose the bias, identify the learning function that actually matters, audit Babbage’s participation plan, and create an equivalent path.',
-    boardText: 'The goal is interaction. The requirement is attendance. Those are not the same thing.',
+    missionTitle: 'Sync Bias is being rebuilt.',
+    missionCopy: 'This scenario is intentionally unavailable while its gameplay and instructional design are rebuilt from the ground up.',
+    boardText: 'Scenario 4 is in development.',
     rendererKey: 'development-shell',
     workspaceMode: 'development',
     introLayout: 'none',
     introCast: 'single',
-    afterIntroAction: null,
-    inputMode: 'placeholder',
-    inputVisible: false,
-    supportsPrompt: false,
-    implemented: false,
-    developmentStatus: 'Locked · In development',
-    plannedLoop: ['Diagnose the bias', 'Name the learning function', 'Build with Babbage', 'Audit equivalence', 'Repair the participation plan']
+    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    implemented: false, developmentStatus: 'Locked · In development',
+    plannedLoop: ['Diagnose', 'Compare', 'Design', 'Revise']
   },
   {
     key: 'hallucination',
     dataLabel: 'S5: Hallucination Hunt',
     tabLabel: 'S5: Hallucination Hunt',
-    missionTitle: 'Verify before you trust.',
-    missionCopy: 'Babbage produces a polished research brief from a controlled evidence packet. One claim is unsafe. Inspect the sources, find the failure, correct it, and decide what can actually be used.',
-    boardText: 'Polished language is not evidence. Trace the claim.',
+    missionTitle: 'Hallucination Hunt is being rebuilt.',
+    missionCopy: 'This scenario is intentionally unavailable while its gameplay and instructional design are rebuilt from the ground up.',
+    boardText: 'Scenario 5 is in development.',
     rendererKey: 'development-shell',
     workspaceMode: 'development',
     introLayout: 'none',
     introCast: 'single',
-    afterIntroAction: null,
-    inputMode: 'placeholder',
-    inputVisible: false,
-    supportsPrompt: false,
-    implemented: false,
-    developmentStatus: 'Locked · In development',
-    plannedLoop: ['Inspect the evidence', 'Choose a verification habit', 'Audit Babbage', 'Correct the unsafe claim', 'Decide what is safe']
+    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    implemented: false, developmentStatus: 'Locked · In development',
+    plannedLoop: ['Inspect', 'Verify', 'Correct', 'Decide']
   },
   {
     key: 'prediction', dataLabel: 'S6: Predict the Output', tabLabel: 'S6: Predict the Output',
@@ -1698,7 +1686,7 @@ const SCENARIO_UI = [
     missionCopy: 'This scenario will be rebuilt around forecasting AI behavior, testing the prediction, and revising the request.',
     boardText: 'Scenario 6 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Locked · In development', plannedLoop: ['Forecast', 'Test', 'Compare', 'Revise']
+    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Forecast', 'Test', 'Compare', 'Revise']
   },
   {
     key: 'overreliance', dataLabel: 'S7: Overreliance', tabLabel: 'S7: Overreliance',
@@ -1706,7 +1694,7 @@ const SCENARIO_UI = [
     missionCopy: 'This scenario will be rebuilt around classifying AI output and defending where instructor judgment is irreplaceable.',
     boardText: 'Scenario 7 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Locked · In development', plannedLoop: ['Classify', 'Justify', 'Revise the boundary']
+    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Classify', 'Justify', 'Revise the boundary']
   },
   {
     key: 'reflect-revise', dataLabel: 'S8: Reflect & Revise', tabLabel: 'S8: Reflect and Revise',
@@ -1714,7 +1702,7 @@ const SCENARIO_UI = [
     missionCopy: 'The final scenario will synthesize the game by asking learners to examine their own choices and improve a prompt deliberately.',
     boardText: 'Scenario 8 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Locked · In development', plannedLoop: ['Build', 'Explain your choice', 'Evaluate the output', 'Revise']
+    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Build', 'Explain your choice', 'Evaluate the output', 'Revise']
   }
 ];
 
@@ -2293,7 +2281,7 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     titleId: 's2DiagnosisTitle',
     kicker: 'Decision 1 · Diagnose the case',
     title: 'What is the instructional problem?',
-    instruction: 'Choose the diagnosis that best explains the gap between Jordan’s improved result and what he actually knows about his learning process.',
+    instruction: 'Review Jordan’s result, strategy, and next move. What problem would you address first?',
     variant: 'detail',
     marker: item => item.tag,
     limit: 1,
@@ -2305,7 +2293,7 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     activeIndex: 0,
     focusSelector: 'input[name="s2-diagnosis"]',
     onSubmit: submitS2Diagnosis,
-    wrapContent: taskHTML => `<div class="pc-activity-layout">${buildS2JordanEvidenceHTML()}${taskHTML}</div>`
+    wrapContent: taskHTML => `<section class="s2-case-file" aria-labelledby="s2CaseFileTitle"><header class="s2-case-file-header"><div class="pc-activity-kicker">Case File 02 · Jordan</div><h1 id="s2CaseFileTitle">The Confident Student Problem</h1><p>Review the evidence from Jordan’s learning process, then decide what you would address first.</p></header><div class="pc-activity-layout">${buildS2JordanEvidenceHTML()}${taskHTML}</div></section>`
   }),
   evidence: Object.freeze({
     items: S2_EVIDENCE_RESPONSES,
@@ -2345,13 +2333,19 @@ function getS2Data() {
 
 function buildS2JordanEvidenceHTML() {
   return `
-    <aside class="pc-evidence-card" aria-label="Evidence from Jordan">
-      <img src="${ASSETS.images.students.jordan.uncertain}" alt="Jordan, an adult online learner, looking uncertain" />
+    <aside class="pc-evidence-card s2-case-evidence" aria-label="Evidence from Jordan">
+      <div class="s2-evidence-portrait">
+        <img src="${ASSETS.images.students.jordan.uncertain}" alt="Jordan, an adult online learner, looking uncertain" />
+        <div class="s2-evidence-name"><span>Student</span><strong>Jordan</strong></div>
+      </div>
       <div class="pc-evidence-card-copy">
         <div class="pc-activity-kicker">Student evidence</div>
-        <h3>What Jordan told us</h3>
-        <blockquote>“I reread the chapter a few times. Some parts finally made more sense, but I couldn’t tell you what actually helped.”</blockquote>
-        <p>He completed the assignment and earned a better grade, but he cannot explain the learning process that produced it.</p>
+        <h3>What do the clues tell you?</h3>
+        <dl class="s2-evidence-list">
+          <div class="s2-evidence-item"><dt>Result</dt><dd><strong>84%</strong><span>Improved from the previous assignment</span></dd></div>
+          <div class="s2-evidence-item"><dt>Strategy</dt><dd>“I reread the chapter a few times.”</dd></div>
+          <div class="s2-evidence-item"><dt>Next move</dt><dd>“I’ll probably reread everything again and hope it works.”</dd></div>
+        </dl>
       </div>
     </aside>`;
 }
@@ -4910,7 +4904,7 @@ function pcResetVNCharacters() {
   student?.classList.remove('visible', 'is-active', 'is-inactive');
   pixel?.style.removeProperty('display');
   student?.style.removeProperty('display');
-  overlay?.classList.remove('pc-dual-character');
+  overlay?.classList.remove('pc-dual-character', 'pc-s2-two-character');
 }
 
 function pcResetVNDialogueState() {
@@ -7776,7 +7770,17 @@ function vnPlayNext() {
   setClaudeShelfState('idle', 'idle');
 
   vnSetDialogueCharacter(character, expression, speaker);
-  requestAnimationFrame(pcApplyIpadLayoutV200);
+  requestAnimationFrame(() => {
+    pcApplyIpadLayoutV200();
+
+    // S2 narrow layouts use Jordan's dedicated portrait container, staged in
+    // the exact geometry already computed for S1's single-character portrait.
+    // Re-apply after responsive layout work so no later S1 refresh can swap the
+    // visible speaker back to Pixel.
+    const normalizedSpeaker = String(speaker || '').trim().toLowerCase();
+    const isJordanSpeaker = character === 'jordan' || normalizedSpeaker === 'jordan';
+    pcApplyS2NarrowSpeakerStage(isJordanSpeaker, expression);
+  });
 
   setTimeout(() => {
     pcFocusWithoutScroll(document.getElementById('vnDialogue'));
@@ -7795,14 +7799,23 @@ function vnSetExpression(expr) {
   const src = EXPRESSIONS[expr] || EXPRESSIONS.neutral;
   if (!img) return;
 
+  // A previous Pixel line may still have a delayed portrait swap queued when
+  // the next speaker starts. Cancel it so a narrow-screen Jordan portrait is
+  // not overwritten by Pixel 150ms later.
+  if (img._pcExpressionTimer) {
+    clearTimeout(img._pcExpressionTimer);
+    img._pcExpressionTimer = null;
+  }
+
   // Expression names are implementation state, not visible interface copy.
   // Only swap the portrait image; never write labels such as "neutral" or
   // "thinking" into the scene.
   if (img.style.display !== 'none') {
     img.style.opacity = '0';
-    setTimeout(() => {
+    img._pcExpressionTimer = setTimeout(() => {
       pcSetImageSource(img, src, LEGACY_ASSETS.images.professorPixel[expr] || LEGACY_ASSETS.images.professorPixel.neutral);
       img.style.opacity = '1';
+      img._pcExpressionTimer = null;
     }, 150);
   } else {
     pcSetImageSource(img, src, LEGACY_ASSETS.images.professorPixel[expr] || LEGACY_ASSETS.images.professorPixel.neutral);
@@ -7821,14 +7834,93 @@ function vnSetStudentExpression(expr) {
   }, 120);
 }
 
+function pcApplyS2NarrowSpeakerStage(isJordan, expression = 'neutral') {
+  const viewportWidth = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0);
+  if (scenarioIndex !== SCENARIO_INDEX.METACOGNITION || viewportWidth > 700) return false;
+
+  const pixel = document.getElementById('vnCharacter');
+  const student = document.getElementById('vnStudentCharacter');
+  const jordanPortrait = document.getElementById('vnStudentPortrait');
+  if (!pixel || !student || !jordanPortrait) return false;
+
+  const overlay = document.getElementById('vnOverlay');
+
+  if (!isJordan) {
+    // Narrow S2 speaker handoff: make the active portrait state explicit.
+    // The Jordan stage uses !important CSS, so clearing normal inline display
+    // values is not enough when the next line returns to Pixel. Remove the
+    // Jordan state first, then explicitly restore Pixel and suppress Jordan.
+    overlay?.classList.remove('pc-s2-narrow-jordan');
+    student.classList.remove('visible', 'is-active', 'is-inactive');
+    student.style.setProperty('display', 'none', 'important');
+    pixel.style.setProperty('display', 'block', 'important');
+    pixel.classList.add('visible', 'is-active');
+    pixel.classList.remove('is-inactive');
+    vnSetExpression(expression);
+    return true;
+  }
+
+  overlay?.classList.add('pc-s2-narrow-jordan');
+  // Undo any explicit Pixel-line visibility state before measuring the S1
+  // geometry used to stage Jordan.
+  pixel.style.removeProperty('display');
+  student.style.removeProperty('display');
+
+  // Measure Pixel BEFORE hiding it. This copies S1's resolved responsive
+  // geometry rather than recreating it for Scenario 2.
+  pixel.style.display = '';
+  const pixelStyle = window.getComputedStyle(pixel);
+  const pixelPortrait = document.getElementById('vnPortrait');
+  const pixelPortraitStyle = pixelPortrait ? window.getComputedStyle(pixelPortrait) : null;
+
+  const geometryProps = [
+    'position', 'left', 'right', 'top', 'bottom', 'width', 'height',
+    'minWidth', 'maxWidth', 'minHeight', 'maxHeight', 'alignItems',
+    'justifyContent', 'transform', 'transformOrigin', 'zIndex'
+  ];
+  geometryProps.forEach(prop => {
+    student.style[prop] = pixelStyle[prop];
+  });
+
+  student.style.display = 'flex';
+  student.style.visibility = 'visible';
+  student.style.opacity = '1';
+  student.style.filter = 'none';
+  student.classList.add('visible', 'is-active');
+  student.classList.remove('is-inactive');
+
+  if (pixelPortraitStyle) {
+    jordanPortrait.style.height = pixelPortraitStyle.height;
+    jordanPortrait.style.width = pixelPortraitStyle.width;
+    jordanPortrait.style.maxWidth = pixelPortraitStyle.maxWidth;
+    jordanPortrait.style.maxHeight = pixelPortraitStyle.maxHeight;
+    jordanPortrait.style.objectFit = pixelPortraitStyle.objectFit;
+    jordanPortrait.style.objectPosition = pixelPortraitStyle.objectPosition;
+  }
+
+  const expressions = ASSETS.images.students.jordan;
+  const src = expressions[expression] || expressions.neutral;
+  pcSetImageSource(
+    jordanPortrait,
+    src,
+    LEGACY_ASSETS.images.students.jordan[expression] || LEGACY_ASSETS.images.students.jordan.neutral
+  );
+  jordanPortrait.style.opacity = '1';
+
+  // Pixel remains the geometry template but is not visible while Jordan speaks.
+  pixel.style.display = 'none';
+  return true;
+}
+
 function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', speakerName = 'Professor Pixel') {
   const overlay = document.getElementById('vnOverlay');
   const pixel = document.getElementById('vnCharacter');
   const student = document.getElementById('vnStudentCharacter');
   const speaker = document.getElementById('vnSpeaker');
   const dialogue = document.getElementById('vnDialogue');
-  const isJordan = character === 'jordan';
-  const useDualCast = getScenarioUI(scenarioIndex).introCast === 'dual' && (isJordan || character === 'pixel');
+  const normalizedSpeakerName = String(speakerName || '').trim().toLowerCase();
+  const isJordan = character === 'jordan' || normalizedSpeakerName === 'jordan';
+  const useDualCast = scenarioIndex !== SCENARIO_INDEX.METACOGNITION && getScenarioUI(scenarioIndex).introCast === 'dual' && (isJordan || character === 'pixel');
   // S2 keeps Scenario 1's board and dialogue geometry. On tablet/landscape-size
   // viewports only, stage Jordan on the left and Pixel on the right without
   // enabling the legacy dual-cast layout (which also rewrites the dialogue).
@@ -7841,14 +7933,45 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
   overlay?.classList.toggle('pc-s2-two-character', useS2TwoCharacterStage);
 
   if (useS2TwoCharacterStage) {
+    // Clear any narrow-screen speaker handoff display overrides before the
+    // two-character layout takes ownership.
+    pixel?.style.removeProperty('display');
+    student?.style.removeProperty('display');
+    overlay?.classList.remove('pc-s2-narrow-jordan');
+    // S2 wide/tablet intro: always render BOTH people. Explicitly assign both
+    // image sources here so the secondary character cannot disappear because
+    // of a previous single-character line, resize, or delayed portrait swap.
     pixel?.classList.add('visible');
     student?.classList.add('visible');
     pixel?.classList.toggle('is-active', !isJordan);
     pixel?.classList.toggle('is-inactive', isJordan);
     student?.classList.toggle('is-active', isJordan);
     student?.classList.toggle('is-inactive', !isJordan);
-    vnSetStudentExpression(isJordan ? expression : 'neutral');
-    if (!isJordan) vnSetExpression(expression);
+
+    const pixelPortrait = document.getElementById('vnPortrait');
+    const jordanPortrait = document.getElementById('vnStudentPortrait');
+    const pixelExpr = isJordan ? 'neutral' : expression;
+    const jordanExpr = isJordan ? expression : 'neutral';
+    const pixelSrc = EXPRESSIONS[pixelExpr] || EXPRESSIONS.neutral;
+    const jordanExpressions = ASSETS.images.students.jordan;
+    const jordanSrc = jordanExpressions[jordanExpr] || jordanExpressions.neutral;
+
+    if (pixelPortrait) {
+      pixelPortrait.style.opacity = '1';
+      pcSetImageSource(
+        pixelPortrait,
+        pixelSrc,
+        LEGACY_ASSETS.images.professorPixel[pixelExpr] || LEGACY_ASSETS.images.professorPixel.neutral
+      );
+    }
+    if (jordanPortrait) {
+      jordanPortrait.style.opacity = '1';
+      pcSetImageSource(
+        jordanPortrait,
+        jordanSrc,
+        LEGACY_ASSETS.images.students.jordan[jordanExpr] || LEGACY_ASSETS.images.students.jordan.neutral
+      );
+    }
   } else if (useDualCast) {
     pixel?.classList.add('visible');
     student?.classList.add('visible');
@@ -7873,17 +7996,11 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
   if (useS2TwoCharacterStage) {
     // Both portraits were assigned above. Do not replace Pixel's portrait with
     // Jordan's image in the shared single-character container.
-  } else if (isJordan && !useDualCast) {
-    const portrait = document.getElementById('vnPortrait');
-    const expressions = ASSETS.images.students.jordan;
-    const src = expressions[expression] || expressions.neutral;
-    if (portrait) {
-      portrait.style.opacity = '0';
-      setTimeout(() => {
-        pcSetImageSource(portrait, src, LEGACY_ASSETS.images.students.jordan[expression] || LEGACY_ASSETS.images.students.jordan.neutral);
-        portrait.style.opacity = '1';
-      }, 120);
-    }
+  } else if (scenarioIndex === SCENARIO_INDEX.METACOGNITION && !useDualCast) {
+    // Narrow S2 uses the dedicated Jordan container in S1's resolved portrait
+    // geometry. Keeping separate image elements prevents Pixel's expression
+    // timers or responsive refreshes from overwriting Jordan mid-line.
+    pcApplyS2NarrowSpeakerStage(isJordan, expression);
   } else if (isJordan) vnSetStudentExpression(expression);
   else vnSetExpression(expression);
 }
@@ -7894,13 +8011,38 @@ function pcApplyDualCastResponsive() {
   const student = document.getElementById('vnStudentCharacter');
   const compact = window.matchMedia?.('(max-width: 620px), (max-height: 650px)').matches;
   const useS2TwoCharacterStage = scenarioIndex === SCENARIO_INDEX.METACOGNITION &&
-    Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0) >= 701 &&
-    overlay?.classList.contains('scenario-intro-active');
+    Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0) >= 701;
   overlay?.classList.toggle('pc-s2-two-character', useS2TwoCharacterStage);
+
+  // When a narrow S2 layout is resized into a two-character layout while
+  // Jordan is speaking, #vnPortrait may still contain Jordan because phones
+  // reuse Pixel's S1 portrait container for the active speaker. Restore Pixel
+  // before showing the dedicated Jordan portrait so the wide scene never
+  // renders Jordan twice.
+  if (useS2TwoCharacterStage) {
+    const pixelPortrait = document.getElementById('vnPortrait');
+    if (pixelPortrait) {
+      if (pixelPortrait._pcExpressionTimer) {
+        clearTimeout(pixelPortrait._pcExpressionTimer);
+        pixelPortrait._pcExpressionTimer = null;
+      }
+      pcSetImageSource(
+        pixelPortrait,
+        EXPRESSIONS.neutral,
+        LEGACY_ASSETS.images.professorPixel.neutral
+      );
+      pixelPortrait.style.opacity = '1';
+    }
+  }
+
   if (!overlay?.classList.contains('pc-dual-character')) {
-    if (pixel) pixel.style.display = '';
-    if (student) student.style.display = '';
-    if (!useS2TwoCharacterStage && student) student.classList.remove('visible', 'is-active', 'is-inactive');
+    const viewportWidth = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0);
+    const isS2Narrow = scenarioIndex === SCENARIO_INDEX.METACOGNITION && viewportWidth <= 700;
+    if (!isS2Narrow) {
+      if (pixel) pixel.style.display = '';
+      if (student) student.style.display = '';
+      if (!useS2TwoCharacterStage && student) student.classList.remove('visible', 'is-active', 'is-inactive');
+    }
     return;
   }
   if (pixel) {
@@ -8174,6 +8316,10 @@ function playScenarioIntroduction(index) {
   overlay?.classList.toggle('scenario-intro-active', useSpecialIntroLayout);
   const onDone = () => {
     if (useSpecialIntroLayout) overlay?.classList.remove('scenario-intro-active');
+    // S2 keeps the exact S1 VN geometry through the final visible frame.
+    // Character-stage cleanup happens in pcResetVNCharacters() after the VN
+    // overlay is inactive, preventing Jordan from briefly inheriting legacy
+    // sizing without touching Pixel or the smartboard during the intro.
     pcRunScenarioAfterIntroAction(ui.afterIntroAction);
   };
 

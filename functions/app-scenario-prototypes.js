@@ -63,7 +63,7 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     titleId: 's2DiagnosisTitle',
     kicker: 'Decision 1 · Diagnose the case',
     title: 'What is the instructional problem?',
-    instruction: 'Choose the diagnosis that best explains the gap between Jordan’s improved result and what he actually knows about his learning process.',
+    instruction: 'Review Jordan’s result, strategy, and next move. What problem would you address first?',
     variant: 'detail',
     marker: item => item.tag,
     limit: 1,
@@ -75,7 +75,7 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     activeIndex: 0,
     focusSelector: 'input[name="s2-diagnosis"]',
     onSubmit: submitS2Diagnosis,
-    wrapContent: taskHTML => `<div class="pc-activity-layout">${buildS2JordanEvidenceHTML()}${taskHTML}</div>`
+    wrapContent: taskHTML => `<section class="s2-case-file" aria-labelledby="s2CaseFileTitle"><header class="s2-case-file-header"><div class="pc-activity-kicker">Case File 02 · Jordan</div><h1 id="s2CaseFileTitle">The Confident Student Problem</h1><p>Review the evidence from Jordan’s learning process, then decide what you would address first.</p></header><div class="pc-activity-layout">${buildS2JordanEvidenceHTML()}${taskHTML}</div></section>`
   }),
   evidence: Object.freeze({
     items: S2_EVIDENCE_RESPONSES,
@@ -115,13 +115,19 @@ function getS2Data() {
 
 function buildS2JordanEvidenceHTML() {
   return `
-    <aside class="pc-evidence-card" aria-label="Evidence from Jordan">
-      <img src="${ASSETS.images.students.jordan.uncertain}" alt="Jordan, an adult online learner, looking uncertain" />
+    <aside class="pc-evidence-card s2-case-evidence" aria-label="Evidence from Jordan">
+      <div class="s2-evidence-portrait">
+        <img src="${ASSETS.images.students.jordan.uncertain}" alt="Jordan, an adult online learner, looking uncertain" />
+        <div class="s2-evidence-name"><span>Student</span><strong>Jordan</strong></div>
+      </div>
       <div class="pc-evidence-card-copy">
         <div class="pc-activity-kicker">Student evidence</div>
-        <h3>What Jordan told us</h3>
-        <blockquote>“I reread the chapter a few times. Some parts finally made more sense, but I couldn’t tell you what actually helped.”</blockquote>
-        <p>He completed the assignment and earned a better grade, but he cannot explain the learning process that produced it.</p>
+        <h3>What do the clues tell you?</h3>
+        <dl class="s2-evidence-list">
+          <div class="s2-evidence-item"><dt>Result</dt><dd><strong>84%</strong><span>Improved from the previous assignment</span></dd></div>
+          <div class="s2-evidence-item"><dt>Strategy</dt><dd>“I reread the chapter a few times.”</dd></div>
+          <div class="s2-evidence-item"><dt>Next move</dt><dd>“I’ll probably reread everything again and hope it works.”</dd></div>
+        </dl>
       </div>
     </aside>`;
 }

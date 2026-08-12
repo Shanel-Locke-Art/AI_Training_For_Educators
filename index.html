@@ -12,14 +12,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles/promptcraft.css?v=376">
+<link rel="stylesheet" href="styles/promptcraft.css?v=388">
 <!-- Production CSS is generated from the modular owner files by tools/build-production.py. -->
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
 <script src="functions/dialogue.js?v=141"></script>
-<script src="functions/app.bundle.js?v=376"></script>
+<script src="functions/app.bundle.js?v=387"></script>
 
 </head>
 
@@ -37,7 +37,7 @@
      ══════════════════════════════════════════════════════ -->
 <div class="name-modal-overlay" id="nameModalOverlay" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle" aria-hidden="true" hidden>
   <div class="name-modal">
-    <span class="name-modal-icon" aria-hidden="true"><img src="assets/images/ui/babbage-mark.svg" alt=""></span>
+    <span class="name-modal-icon">🌿</span>
     <div class="name-modal-title" id="nameModalTitle">Welcome to the Prompt Lab</div>
     <div class="name-modal-sub">
       What should Professor Pixel call you?
@@ -256,12 +256,12 @@
     <div class="mobile-dropdown-panel" id="mobileScenarioMenuPanel" role="menu">
       <button class="mobile-dropdown-option is-active" data-source-index="0" type="button" role="menuitem" aria-current="page" data-pc-action="switch-scenario" data-pc-scenario-index="0" data-pc-close-details="true">S1: Engagement</button>
       <button class="mobile-dropdown-option" data-source-index="1" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="1" data-pc-close-details="true">S2: Metacognition</button>
-      <button class="mobile-dropdown-option" data-source-index="2" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="2" data-pc-close-details="true" data-pc-locked="true">S3: Assessment · Locked</button>
-      <button class="mobile-dropdown-option" data-source-index="3" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="3" data-pc-close-details="true" data-pc-locked="true">S4: Sync Bias · Locked</button>
-      <button class="mobile-dropdown-option" data-source-index="4" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="4" data-pc-close-details="true" data-pc-locked="true">S5: Hallucination · Locked</button>
-      <button class="mobile-dropdown-option" data-source-index="5" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="5" data-pc-close-details="true" data-pc-locked="true">S6: Prediction · Locked</button>
-      <button class="mobile-dropdown-option" data-source-index="6" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="6" data-pc-close-details="true" data-pc-locked="true">S7: Overreliance · Locked</button>
-      <button class="mobile-dropdown-option" data-source-index="7" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="7" data-pc-close-details="true" data-pc-locked="true">S8: Reflect &amp; Revise · Locked</button>
+      <button class="mobile-dropdown-option" data-source-index="2" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="2" data-pc-close-details="true">S3: Assessment</button>
+      <button class="mobile-dropdown-option" data-source-index="3" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="3" data-pc-close-details="true">S4: Sync Bias</button>
+      <button class="mobile-dropdown-option" data-source-index="4" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="4" data-pc-close-details="true">S5: Hallucination</button>
+      <button class="mobile-dropdown-option" data-source-index="5" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="5" data-pc-close-details="true">S6: Prediction</button>
+      <button class="mobile-dropdown-option" data-source-index="6" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="6" data-pc-close-details="true">S7: Overreliance</button>
+      <button class="mobile-dropdown-option" data-source-index="7" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="7" data-pc-close-details="true">S8: Reflect &amp; Revise</button>
     </div>
   </details>
 </nav>
@@ -481,12 +481,12 @@
 <nav class="scenario-tabs" role="tablist" aria-label="Training scenarios">
   <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="0">S1: Engagement</button>
   <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="1">S2: Metacognition</button>
-  <button class="tab-btn is-locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="2" data-pc-locked="true" aria-label="S3: Assessment. Locked, in development.">S3: Assessment</button>
-  <button class="tab-btn is-locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="3" data-pc-locked="true" aria-label="S4: Sync Bias. Locked, in development.">S4: Sync Bias</button>
-  <button class="tab-btn is-locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="4" data-pc-locked="true" aria-label="S5: Hallucination. Locked, in development.">S5: Hallucination</button>
-  <button class="tab-btn is-locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="5" data-pc-locked="true" aria-label="S6: Prediction. Locked, in development.">S6: Prediction</button>
-  <button class="tab-btn is-locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="6" data-pc-locked="true" aria-label="S7: Overreliance. Locked, in development.">S7: Overreliance</button>
-  <button class="tab-btn is-locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="7" data-pc-locked="true" aria-label="S8: Reflect and Revise. Locked, in development.">S8: Reflect &amp; Revise</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="2">S3: Assessment</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="3">S4: Sync Bias</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="4">S5: Hallucination</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="5">S6: Prediction</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="6">S7: Overreliance</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="7">S8: Reflect &amp; Revise</button>
 </nav>
 
 <!-- ══════════════════════════════════════════════════════

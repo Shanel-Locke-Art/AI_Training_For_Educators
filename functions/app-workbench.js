@@ -41,6 +41,20 @@ function playScenarioIntroduction(index) {
   overlay?.classList.toggle('scenario-intro-active', useSpecialIntroLayout);
   const onDone = () => {
     if (useSpecialIntroLayout) overlay?.classList.remove('scenario-intro-active');
+    if (index === SCENARIO_INDEX.METACOGNITION) {
+      // Final S2 intro handoff: hide BOTH portrait containers before the
+      // two-character stage class is removed. Either container may currently
+      // hold Jordan on responsive speaker swaps, so hiding only the dedicated
+      // student container can expose one frame of legacy sizing and make Jordan
+      // appear to suddenly grow before the mission briefing.
+      const pixel = document.getElementById('vnCharacter');
+      const student = document.getElementById('vnStudentCharacter');
+      [pixel, student].forEach(character => {
+        character?.classList.remove('visible', 'is-active', 'is-inactive');
+        character?.style.setProperty('display', 'none', 'important');
+      });
+      overlay?.classList.remove('pc-s2-two-character');
+    }
     pcRunScenarioAfterIntroAction(ui.afterIntroAction);
   };
 

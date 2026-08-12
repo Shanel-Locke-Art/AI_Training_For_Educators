@@ -1110,6 +1110,80 @@ textarea::placeholder {
 
 /* ── VN MOBILE LAYOUT FIXES ────────────────────────── */
 
+/* Short landscape displays such as Nest Hub need the audio setup to fit
+   inside the viewport without clipping the Cancel action or Pixel portrait. */
+@media screen and (min-width: 761px) and (max-height: 650px) {
+  .audio-setup-overlay {
+    align-items: flex-start;
+    padding: 8px 16px 10px;
+  }
+
+  .audio-setup-modal {
+    width: min(94vw, 650px);
+    padding: 16px 30px 14px;
+  }
+
+  .audio-setup-pixel {
+    top: 0;
+    right: 24px;
+    width: 92px;
+    height: 84px;
+  }
+
+  .audio-setup-pixel img {
+    width: 92px;
+  }
+
+  .audio-setup-speaker {
+    margin-right: 100px;
+    margin-bottom: 3px;
+  }
+
+  .audio-setup-title {
+    margin-right: 88px;
+    margin-bottom: 6px;
+    font-size: 1.42rem;
+    line-height: 1.18;
+  }
+
+  .audio-setup-help {
+    margin-bottom: 10px;
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+
+  .audio-choice-fieldset {
+    gap: 8px;
+  }
+
+  .audio-choice-card {
+    min-height: 0;
+    padding: 9px 14px;
+  }
+
+  .audio-choice-copy strong {
+    font-size: 0.92rem;
+  }
+
+  .audio-choice-copy span {
+    font-size: 0.82rem;
+    line-height: 1.3;
+  }
+
+  .audio-setup-primary {
+    min-height: 44px;
+    margin-top: 10px;
+    padding: 9px 16px;
+    font-size: 0.94rem;
+  }
+
+  .audio-setup-cancel {
+    margin-top: 3px;
+    padding: 5px 10px;
+    font-size: 0.86rem;
+  }
+}
+
 @media (max-width: 420px) {
   .vn-text {
     max-width: 100% !important;
@@ -2638,7 +2712,7 @@ textarea::placeholder {
 }body.s1-result-active .s1-result-controls{width:100%!important;min-height:108px!important;padding:18px clamp(18px, 4vw, 48px)!important;border:0!important;border-top:1.5px solid #c9b99c!important;border-radius:0!important;background:rgba(246, 237, 224, .97)!important;box-shadow:0 -12px 30px rgba(69, 53, 35, .12)!important;display:flex!important;align-items:center!important;gap:22px!important
 }body.s1-result-active .s1-result-controls-title{margin:0!important;color:#12351f!important;font-family:"Fraunces", Georgia, serif!important;font-size:clamp(1.2rem, 1.5vw, 1.55rem)!important;font-weight:800!important;line-height:1.2!important
 }body.s1-result-active .s1-result-controls-title::before{content:"✓ ";color:#1e6b41
-}body.s1-result-active .s1-result-controls-sub{margin-top:6px!important;color:#4a3728!important;font-size:clamp(.95rem, 1.05vw, 1.08rem)!important;line-height:1.45!important
+}body.s1-result-active .s1-result-controls-sub{margin-top:6px!important;color:#4a3728!important;font-size:clamp(.95rem, 1.05vw, 1.08rem)!important;line-height:1.45!important;
 font-weight:700!important;}body.s1-result-active .s1-result-controls-actions{display:flex!important;justify-content:flex-end!important;align-items:center!important;gap:14px!important;flex-wrap:wrap!important
 }body.s1-result-active .s1-result-controls .s1-secondary-btn,body.s1-result-active .s1-result-controls .continue-btn{min-height:58px!important;min-width:168px!important;padding:14px 24px!important;border-radius:14px!important;font-family:"Fraunces", Georgia, serif!important;font-size:1.03rem!important;font-weight:800!important;line-height:1.15!important;cursor:pointer!important
 }body.s1-result-active .s1-result-controls .s1-secondary-btn{background:#fffdf8!important;color:#4a3728!important;border:2px solid #7fa184!important
@@ -2799,7 +2873,7 @@ font-weight:700!important;}body.s1-result-active .s1-result-controls-actions{dis
   }body.s1-result-active #inputContainer{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:999!important;width:100%!important;max-width:100%!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;box-shadow:none!important
   }body.s1-result-active .s1-result-controls{width:100%!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:14px 14px 16px!important;display:grid!important;grid-template-columns:1fr!important;gap:12px!important;align-items:start!important;background:#f4eadb!important;border-top:1px solid rgba(122, 97, 58, .28)!important;box-shadow:0 -8px 24px rgba(37, 27, 16, .16)!important
   }body.s1-result-active .s1-result-controls-title{margin:0!important;font-size:1.18rem!important;line-height:1.2!important;color:var(--forest-dark, #173b28)!important
-  }body.s1-result-active .s1-result-controls-sub{margin:4px 0 0!important;font-size:.9rem!important;line-height:1.35!important;color:#4a3728!important
+  }body.s1-result-active .s1-result-controls-sub{margin:4px 0 0!important;font-size:.9rem!important;line-height:1.35!important;color:#4a3728!important;
   font-weight:700!important;}body.s1-result-active .s1-result-controls-actions{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;width:100%!important
   }body.s1-result-active .s1-result-controls-actions button,body.s1-result-active .s1-result-controls .s1-secondary-btn,body.s1-result-active .s1-result-controls .continue-btn{width:100%!important;min-height:48px!important;padding:12px 14px!important;display:flex!important;align-items:center!important;justify-content:center!important;border-radius:10px!important;font-size:.95rem!important;line-height:1.2!important;text-align:center!important
   }body.s1-result-active .s1-result-controls .s1-clean-reference{display:none!important
@@ -18187,198 +18261,190 @@ body[data-pc-viewport-family="portrait-tablet"] {
 }
 
 /* ══════════════════════════════════════════════════════
-   S2 — MOBILE INTRO COMPOSITION
-   Scenario 2 reuses the approved single-character Scenario 1 VN language, but
-   its longer mission copy needs more visible smartboard image around the card.
-   On phones, keep the board clear of the active portrait and make the dialogue
-   a fully enclosed panel instead of a bottom-cropped slab.
-   Scoped to Metacognition so Scenario 1 remains visually unchanged.
+   S2 — S1 INTRO + JORDAN COMPANION
+   Scenario 2 keeps Scenario 1's smartboard/dialogue system. These rules only:
+   1) give the longer S2 mission enough internal card padding,
+   2) place Jordan opposite Pixel on 701px+ screens,
+   3) keep both portraits the same stage size and dim the inactive speaker with
+      brightness rather than transparency, and
+   4) reuse the two proven Level 1 phone compositions with S2-sized mission copy.
    ══════════════════════════════════════════════════════ */
-@media screen and (max-width: 700px) and (orientation: portrait) {
-  body[data-pc-scenario="metacognition"] {
-    --pc-vn-board-wrap-width: calc(100vw - 38px);
-    --pc-vn-board-wrap-top: 18px;
-    --pc-vn-board-box-inline: 9%;
-    --pc-vn-board-body-size: clamp(0.76rem, 3.35vw, 0.86rem);
-    --pc-vn-board-meta-size: clamp(0.45rem, 1.8vw, 0.52rem);
-    --pc-vn-board-line: 1.18;
-    --pc-vn-character-height: clamp(205px, min(31dvh, 57vw), 270px);
-    --pc-vn-character-max-width: 68vw;
-  }
 
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap {
-    width: var(--pc-vn-board-wrap-width) !important;
-    top: var(--pc-vn-board-wrap-top) !important;
-  }
-
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
-    left: var(--pc-vn-board-box-inline) !important;
-    right: var(--pc-vn-board-box-inline) !important;
-    top: 50% !important;
-    bottom: auto !important;
-    max-height: calc(100% - 54px) !important;
-    padding: 9px 11px 12px !important;
-    overflow: visible !important;
-    transform: translateY(-50%) !important;
-  }
-
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before {
-    margin-bottom: 6px !important;
-  }
-
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character) {
-    left: 50% !important;
-    right: auto !important;
-    height: var(--pc-vn-character-height) !important;
-    max-width: var(--pc-vn-character-max-width) !important;
-    transform: translateX(-50%) !important;
-    transform-origin: center bottom !important;
-    justify-content: center !important;
-    z-index: 18 !important;
-  }
-
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) #vnPortrait {
-    object-position: center bottom !important;
-  }
-
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-dialogue {
-    left: 12px !important;
-    right: 12px !important;
-    bottom: 12px !important;
-    width: auto !important;
-    min-height: 252px !important;
-    max-height: 43dvh !important;
-    padding: 18px 18px 44px !important;
-    border: 1px solid rgba(138, 221, 185, 0.82) !important;
-    border-radius: 14px !important;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.34) !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-    z-index: 30 !important;
-  }
-
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.claude-terminal-textmode) #vnAdvanceHint,
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.claude-terminal-textmode) .vn-advance {
-    bottom: 17px !important;
-    right: 18px !important;
-  }
+/* The S2 mission is longer than S1's. Keep the black challenge card fully
+   around the copy without changing the smartboard itself or the dialogue. */
+body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) .vn-board-text {
+  box-sizing: border-box !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding-top: max(10px, var(--pc-vn-board-pad-block)) !important;
+  padding-right: max(14px, var(--pc-vn-board-pad-inline)) !important;
+  padding-bottom: max(12px, var(--pc-vn-board-pad-block)) !important;
+  padding-left: max(14px, var(--pc-vn-board-pad-inline)) !important;
+  overflow: visible !important;
 }
 
-/* iPhone SE class: keep Pixel fully below the smartboard while preserving a
-   complete dialogue frame inside the short viewport. */
-@media screen and (min-width: 370px) and (max-width: 390px) and (max-height: 700px) and (orientation: portrait) {
-  body[data-pc-scenario="metacognition"] {
-    --pc-vn-board-wrap-width: calc(100vw - 42px);
-    --pc-vn-board-wrap-top: 14px;
-    --pc-vn-board-box-inline: 9.5%;
-    --pc-vn-board-body-size: 0.76rem;
-    --pc-vn-board-meta-size: 0.45rem;
-    --pc-vn-board-line: 1.16;
-    --pc-vn-character-height: 205px;
-    --pc-vn-character-bottom: 205px;
-  }
-
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-dialogue {
-    min-height: 246px !important;
-    max-height: 246px !important;
-    padding: 16px 16px 42px !important;
-  }
-}
-
-/* Galaxy Z Fold 5 class: use the extra height for breathing room rather than
-   letting the dialogue run off the bottom edge. */
-@media screen and (min-width: 330px) and (max-width: 360px) and (min-height: 820px) and (orientation: portrait) {
-  body[data-pc-scenario="metacognition"] {
-    --pc-vn-board-wrap-width: calc(100vw - 40px);
-    --pc-vn-board-wrap-top: 20px;
-    --pc-vn-board-box-inline: 10%;
-    --pc-vn-board-body-size: 0.74rem;
-    --pc-vn-board-meta-size: 0.44rem;
-    --pc-vn-board-line: 1.16;
-    --pc-vn-character-height: 245px;
-    --pc-vn-character-bottom: 246px;
-  }
-
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-dialogue {
-    min-height: 260px !important;
-    max-height: 260px !important;
-    padding: 18px 17px 44px !important;
-  }
-}
-
-/* ══════════════════════════════════════════════════════
-   S2 — WIDE INTRO TWO-CHARACTER STAGING
-   Keep the approved S1 board and dialogue untouched. At 701px and wider,
-   Jordan occupies the left side of the classroom while Pixel remains on the
-   right. Narrow phones continue to show only the current speaker.
-   ══════════════════════════════════════════════════════ */
+/* Wide/tablet S2 staging. Pixel keeps Scenario 1's responsive SIZE and
+   vertical placement. Jordan mirrors those exact S1 variables on the left.
+   Only the horizontal staging is new. */
 @media screen and (min-width: 701px) {
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay.vn-overlay.active.scenario-intro-active.pc-s2-two-character #vnStudentCharacter,
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay.vn-overlay.active.scenario-intro-active.pc-s2-two-character .vn-student-character {
+  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.active.pc-s2-two-character {
+    --pc-s2-cast-side: clamp(10px, 2.2vw, 42px);
+  }
+
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnCharacter,
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnStudentCharacter {
     display: flex !important;
     visibility: visible !important;
+    position: absolute !important;
+    top: auto !important;
+    bottom: var(--pc-vn-character-bottom) !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: var(--pc-vn-character-height) !important;
+    min-height: 0 !important;
+    max-width: var(--pc-vn-character-max-width) !important;
+    max-height: none !important;
+    transform: none !important;
+    align-items: flex-end !important;
+    z-index: 17 !important;
+    pointer-events: none !important;
     opacity: 1 !important;
-    left: clamp(18px, 3vw, 56px) !important;
+    transition: filter 160ms ease !important;
+  }
+
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnStudentCharacter {
+    left: var(--pc-s2-cast-side) !important;
     right: auto !important;
-    bottom: var(--pc-vn-character-bottom) !important;
-    width: auto !important;
-    height: var(--pc-vn-character-height) !important;
-    max-height: min(62dvh, 620px) !important;
-    transform: none !important;
-    transform-origin: left bottom !important;
     justify-content: flex-start !important;
-    align-items: flex-end !important;
-    z-index: 18 !important;
+    transform-origin: left bottom !important;
   }
 
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay.vn-overlay.active.scenario-intro-active.pc-s2-two-character #vnCharacter,
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay.vn-overlay.active.scenario-intro-active.pc-s2-two-character .vn-character {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnCharacter {
     left: auto !important;
-    right: var(--pc-vn-character-right) !important;
-    bottom: var(--pc-vn-character-bottom) !important;
-    height: var(--pc-vn-character-height) !important;
-    max-height: min(62dvh, 620px) !important;
-    transform: none !important;
-    transform-origin: right bottom !important;
+    right: var(--pc-s2-cast-side) !important;
     justify-content: flex-end !important;
-    align-items: flex-end !important;
-    z-index: 18 !important;
+    transform-origin: right bottom !important;
   }
 
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay.vn-overlay.active.scenario-intro-active.pc-s2-two-character #vnStudentPortrait {
+  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.active.pc-s2-two-character #vnPortrait,
+  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.active.pc-s2-two-character #vnStudentPortrait {
     display: block !important;
     width: auto !important;
     height: 100% !important;
-    max-width: min(28vw, 440px) !important;
+    min-height: 0 !important;
+    max-width: 100% !important;
     max-height: 100% !important;
     object-fit: contain !important;
-    object-position: left bottom !important;
   }
 
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay.vn-overlay.active.scenario-intro-active.pc-s2-two-character #vnPortrait {
-    display: block !important;
-    width: auto !important;
-    height: 100% !important;
-    max-width: min(28vw, 440px) !important;
-    max-height: 100% !important;
-    object-fit: contain !important;
+  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.active.pc-s2-two-character #vnPortrait {
     object-position: right bottom !important;
   }
 
-  /* The non-speaking character stays present but visually recedes. */
-  html body[data-pc-scenario="metacognition"] #vnOverlay.pc-s2-two-character :is(#vnCharacter, #vnStudentCharacter).is-inactive {
-    display: flex !important;
-    opacity: .72 !important;
-    filter: saturate(.78) brightness(.82) !important;
+  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.active.pc-s2-two-character #vnStudentPortrait {
+    object-position: left bottom !important;
   }
 
-  html body[data-pc-scenario="metacognition"] #vnOverlay.pc-s2-two-character :is(#vnCharacter, #vnStudentCharacter).is-active {
-    display: flex !important;
+  /* Inactive means visually quiet, not translucent. This is symmetrical for
+     both speakers, fixing Jordan fading while Pixel remained fully opaque. */
+  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnCharacter.is-inactive,
+  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnStudentCharacter.is-inactive {
+    opacity: 1 !important;
+    filter: saturate(.68) brightness(.62) !important;
+  }
+
+  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnCharacter.is-active,
+  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnStudentCharacter.is-active {
     opacity: 1 !important;
     filter: none !important;
+  }
+}
+
+/* Narrow phones retain S1's one-speaker composition. Jordan uses his own
+   portrait element, staged into Pixel's already-resolved S1 geometry by JS. */
+@media screen and (max-width: 700px) {
+  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay #vnStudentCharacter {
+    display: none !important;
+  }
+
+  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.pc-s2-narrow-jordan #vnStudentCharacter {
+    display: flex !important;
+  }
+
+  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.pc-s2-narrow-jordan #vnCharacter {
+    display: none !important;
+  }
+}
+
+/* iPhone SE: reuse S1's proven lifted-board composition. The only S2-specific
+   change is slightly smaller mission copy because this mission is longer. */
+@media screen and (min-width: 370px) and (max-width: 380px) and (min-height: 650px) and (max-height: 690px) and (orientation: portrait) {
+  body[data-pc-scenario="metacognition"] {
+    --pc-vn-board-wrap-top: 10px;
+    --pc-vn-board-wrap-width: calc(100vw - 14px);
+    --pc-vn-board-box-inline: 5%;
+    --pc-vn-board-body-size: 0.78rem;
+    --pc-vn-board-meta-size: 0.48rem;
+    --pc-vn-board-line: 1.16;
+    --pc-vn-character-bottom: 170px;
+    --pc-vn-character-height: 190px;
+    --pc-vn-character-max-width: 58vw;
+  }
+
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+    left: var(--pc-vn-board-box-inline) !important;
+    right: var(--pc-vn-board-box-inline) !important;
+    top: 8px !important;
+    bottom: auto !important;
+    max-height: none !important;
+    padding: 9px 11px 11px !important;
+    overflow: visible !important;
+    transform: none !important;
+  }
+
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-board-text::before {
+    margin-bottom: 6px !important;
+  }
+}
+
+/* Galaxy Z Fold 5: preserve the tall S1 composition while ensuring the longer
+   S2 challenge remains inside its black card with a visible inner image border. */
+@media screen and (min-width: 330px) and (max-width: 350px) and (min-height: 840px) and (max-height: 920px) and (orientation: portrait) {
+  body[data-pc-scenario="metacognition"] {
+    --pc-vn-board-box-inline: 5%;
+    --pc-vn-board-body-size: 0.76rem;
+    --pc-vn-board-meta-size: 0.47rem;
+    --pc-vn-board-line: 1.12;
+  }
+
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+    left: var(--pc-vn-board-box-inline) !important;
+    right: var(--pc-vn-board-box-inline) !important;
+    top: 4px !important;
+    bottom: auto !important;
+    max-height: none !important;
+    padding: 8px 11px 9px !important;
+    overflow: visible !important;
+    transform: none !important;
+  }
+
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-board-text::before {
+    margin-bottom: 5px !important;
+  }
+}
+
+/* S2 portrait-tablet/compact layouts inherit S1's centered Pixel transform with
+   unusually high selector specificity. Override only that horizontal transform
+   while the two-character stage is active, leaving S1 untouched everywhere else. */
+@media screen and (min-width: 701px) {
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family][data-pc-viewport-family]
+  #vnOverlay#vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character
+  #vnCharacter#vnCharacter {
+    left: auto !important;
+    right: var(--pc-s2-cast-side) !important;
+    transform: none !important;
+    transform-origin: right bottom !important;
   }
 }
 
@@ -20225,5 +20291,303 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
     border: 0 !important;
     padding: 0 !important;
     box-shadow: none !important;
+  }
+}
+
+/* S2 Case File 02 — diagnosis workspace refinement. Scoped to S2 only. */
+body[data-pc-scenario="metacognition"] .scenario-card,
+body[data-pc-scenario="metacognition"] .oscqr-row {
+  display: none !important;
+}
+
+.pc-scenario-stage:has(.s2-case-file) > .scenario-mission {
+  display: none !important;
+}
+
+.s2-case-file {
+  width: min(100%, 1380px);
+  margin: 0 auto;
+  background: #fffdf9;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(45,34,20,.09);
+  overflow: hidden;
+}
+
+.s2-case-file-header {
+  padding: clamp(18px, 2.4vw, 30px) clamp(20px, 3vw, 38px) clamp(16px, 2vw, 24px);
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #fffdf9 0%, #fbf5eb 100%);
+}
+.s2-case-file-header h1 {
+  margin: 5px 0 6px;
+  font-family: "Lora", Georgia, serif;
+  color: var(--forest-dark);
+  font-size: clamp(24px, calc(20px + .9vw), 36px);
+  line-height: 1.16;
+}
+.s2-case-file-header p { margin: 0; color: var(--ink-light); line-height: 1.5; }
+
+.s2-case-file .pc-activity-layout {
+  margin-top: 0;
+  gap: 0;
+  grid-template-columns: minmax(280px, .72fr) minmax(0, 1.7fr);
+  align-items: stretch;
+}
+.s2-case-file .pc-evidence-card,
+.s2-case-file .pc-activity-card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.s2-case-file .pc-evidence-card {
+  position: relative;
+  top: auto;
+  border-right: 1px solid var(--border);
+  background: #fbf5eb;
+}
+.s2-evidence-portrait { position: relative; background: linear-gradient(145deg, #241a29, #5e4766); }
+.s2-case-file .pc-evidence-card img {
+  height: clamp(260px, 35vh, 410px);
+  object-fit: contain;
+  object-position: center bottom;
+}
+.s2-evidence-name {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  padding: 7px 10px;
+  background: rgba(17,50,36,.9);
+  color: #fff;
+  border-radius: 8px;
+}
+.s2-evidence-name span { font: 700 10px/1.1 "Source Code Pro", monospace; letter-spacing: .12em; text-transform: uppercase; opacity: .75; }
+.s2-evidence-name strong { font: 700 18px/1.2 "Lora", Georgia, serif; }
+.s2-case-file .pc-evidence-card-copy { padding: clamp(18px, 2vw, 26px); }
+.s2-evidence-list { display: grid; gap: 10px; margin: 14px 0 0; }
+.s2-evidence-item {
+  display: grid;
+  grid-template-columns: 88px minmax(0,1fr);
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(90,72,52,.16);
+}
+.s2-evidence-item dt {
+  font: 800 var(--pc-type-xs)/1.3 "Source Code Pro", monospace;
+  color: var(--terracotta);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.s2-evidence-item dd { margin: 0; color: var(--ink-mid); line-height: 1.45; }
+.s2-evidence-item dd strong { display: block; color: var(--forest-dark); font-size: 1.35em; line-height: 1; margin-bottom: 4px; }
+.s2-evidence-item dd span { display: block; font-size: .9em; color: var(--ink-light); }
+
+.s2-case-file .pc-activity-task { padding: clamp(22px, 3vw, 40px); background: #fffdf9; }
+.s2-case-file .pc-choice-card--detail {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  padding: clamp(15px, 1.7vw, 19px);
+}
+.s2-case-file .pc-choice-marker {
+  position: static;
+  width: fit-content;
+  min-width: 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f2eadb;
+  color: var(--forest-dark);
+  font: 800 11px/1 "Source Code Pro", monospace;
+  letter-spacing: .08em;
+}
+.s2-case-file .pc-choice-body { display: grid; gap: 6px; }
+.s2-case-file .pc-choice-body strong { color: var(--forest-dark); font-size: 1.05em; line-height: 1.25; }
+.s2-case-file .pc-choice-body > span { color: var(--ink-mid); line-height: 1.48; }
+
+@media (max-width: 800px) {
+  .s2-case-file { border-radius: 12px; }
+  .s2-case-file .pc-activity-layout { grid-template-columns: 1fr; }
+  .s2-case-file .pc-evidence-card { border-right: 0; border-bottom: 1px solid var(--border); }
+  .s2-case-file .pc-evidence-card img { height: clamp(220px, 31vh, 330px); }
+}
+@media (max-width: 520px) {
+  .s2-case-file-header { padding: 16px; }
+  .s2-case-file .pc-activity-task,
+  .s2-case-file .pc-evidence-card-copy { padding: 16px; }
+  .s2-evidence-item { grid-template-columns: 76px minmax(0,1fr); gap: 9px; }
+  .s2-case-file .pc-choice-grid { grid-template-columns: 1fr; }
+}
+
+/* SOURCE: styles/115-intro-responsive.css — S2 portrait-tablet opposite-side cast fix */
+@media screen and (min-width: 701px) and (max-width: 1100px) {
+  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"] #vnOverlay.vn-overlay.active.pc-s2-two-character {
+    --pc-s2-cast-side: 0px;
+  }
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnStudentCharacter,
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnCharacter {
+    width: min(34vw, 290px) !important;
+    max-width: min(34vw, 290px) !important;
+    transform: none !important;
+  }
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnStudentCharacter {
+    left: 0 !important;
+    right: auto !important;
+    justify-content: flex-start !important;
+  }
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnCharacter {
+    left: auto !important;
+    right: 0 !important;
+    justify-content: flex-end !important;
+  }
+  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"] #vnOverlay.vn-overlay.active.pc-s2-two-character #vnStudentPortrait {
+    object-position: left bottom !important;
+    transform: scale(1.02) !important;
+    transform-origin: left bottom !important;
+  }
+  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"] #vnOverlay.vn-overlay.active.pc-s2-two-character #vnPortrait {
+    object-position: right bottom !important;
+  }
+}
+@media screen and (min-width: 900px) and (max-width: 959px) {
+  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"] #vnOverlay.vn-overlay.active.pc-s2-two-character #vnStudentPortrait {
+    transform: scale(1.08) !important;
+  }
+}
+@media screen and (min-width: 960px) and (max-width: 1100px) {
+  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"] #vnOverlay.vn-overlay.active.pc-s2-two-character #vnStudentPortrait {
+    transform: scale(1.28) !important;
+  }
+}
+
+/* SOURCE: styles/115-intro-responsive.css — S2 narrow-phone Jordan alignment */
+@media screen and (max-width: 700px) {
+  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-s2-narrow-jordan #vnStudentCharacter {
+    left: 50% !important;
+    right: auto !important;
+    bottom: calc(var(--pc-vn-character-bottom) + clamp(18px, 2.6dvh, 28px)) !important;
+    transform: translateX(-50%) !important;
+    transform-origin: center bottom !important;
+    justify-content: center !important;
+  }
+  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.active.pc-s2-narrow-jordan #vnStudentPortrait {
+    object-position: center bottom !important;
+  }
+}
+@media screen and (min-width: 481px) and (max-width: 700px) {
+  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-s2-narrow-jordan #vnStudentCharacter {
+    /* Surface Duo-style compact screens need the same baseline relationship as
+       the phones, but Jordan's source artwork fills more of its canvas. Keep
+       him attached to the dialogue edge without letting him reach the board. */
+    bottom: calc(var(--pc-vn-character-bottom) + 6px) !important;
+    height: clamp(185px, 28dvh, 205px) !important;
+    max-height: clamp(185px, 28dvh, 205px) !important;
+  }
+}
+@media screen and (max-width: 700px) and (max-height: 700px) {
+  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-s2-narrow-jordan #vnStudentCharacter {
+    height: 30% !important;
+    max-height: 30% !important;
+  }
+}
+
+/* V388 — short-landscape audio setup fit.
+   Nest Hub-class 1024x600 viewports need the onboarding modal to fit fully
+   inside the visible app area. This compacts only the audio setup modal; no
+   PromptCraft scenario/VN geometry is affected. */
+@media screen and (min-width: 800px) and (max-height: 650px) {
+  .audio-setup-overlay {
+    align-items: center;
+    padding: 8px 12px;
+  }
+
+  .audio-setup-modal {
+    width: min(92vw, 650px);
+    max-height: calc(100dvh - 16px);
+    padding: 18px 26px 14px;
+    overflow-y: auto;
+    border-radius: 14px;
+  }
+
+  .audio-setup-pixel {
+    top: 0;
+    right: 18px;
+    width: 104px;
+    height: 96px;
+  }
+
+  .audio-setup-pixel img {
+    width: 104px;
+  }
+
+  .audio-setup-speaker {
+    margin: 0 116px 3px 0;
+    font-size: 0.72rem;
+  }
+
+  .audio-setup-title {
+    margin: 0 104px 6px 0;
+    font-size: 1.35rem;
+    line-height: 1.18;
+  }
+
+  .audio-setup-help {
+    margin-bottom: 10px;
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+
+  .audio-choice-fieldset {
+    gap: 7px;
+  }
+
+  .audio-choice-card {
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 10px;
+    min-height: 0;
+    padding: 9px 12px;
+  }
+
+  .audio-choice-card input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+  }
+
+  .audio-choice-copy {
+    gap: 1px;
+  }
+
+  .audio-choice-copy strong {
+    font-size: 0.92rem;
+    line-height: 1.2;
+  }
+
+  .audio-choice-copy span {
+    font-size: 0.82rem;
+    line-height: 1.25;
+  }
+
+  .audio-setup-primary {
+    min-height: 44px;
+    margin-top: 10px;
+    padding: 9px 16px;
+    font-size: 0.94rem;
+  }
+
+  .audio-setup-cancel {
+    margin-top: 4px;
+    padding: 5px 10px;
+    font-size: 0.86rem;
+  }
+}
+
+/* S2 iPad Mini visual-size correction mirrored from the responsive source. */
+@media screen and (min-width: 740px) and (max-width: 799px) and (orientation: portrait) {
+  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"]
+  #vnOverlay.vn-overlay.active.pc-s2-two-character #vnStudentPortrait {
+    transform: scale(1.08) !important;
+    transform-origin: left bottom !important;
   }
 }
