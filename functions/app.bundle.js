@@ -2227,10 +2227,10 @@ function setClaudeTerminalState(state = 'idle', title = 'BABBAGE ENGINE', output
 const S2_PROGRESS_STEPS = ['1 Diagnose', '2 Intervene', '3 Observe', '4 Audit Babbage', '5 Repair & compare'];
 
 const S2_DIAGNOSIS_OPTIONS = [
-  { id: 'performance', tag: 'RESULT', title: 'Performance problem', text: 'Jordan’s grade shows he has not mastered the material well enough.' },
-  { id: 'strategy', tag: 'STRATEGY', title: 'Strategy problem', text: 'Jordan needs to replace rereading with a better study strategy.' },
-  { id: 'metacognitive', tag: 'PROCESS', title: 'Metacognitive problem', text: 'Jordan cannot connect a learning strategy to evidence that it helped, then use that evidence to decide what to do next.' },
-  { id: 'motivation', tag: 'EFFORT', title: 'Motivation problem', text: 'Jordan needs stronger incentives or encouragement to engage with the material.' }
+  { id: 'evidence', tag: 'MISSING LINK', title: 'Evidence of what the strategy actually did', text: 'Connect Jordan’s study approach to specific signs of what he understood, where understanding broke down, and what changed.' },
+  { id: 'strategy', tag: 'SWAP', title: 'A better study strategy', text: 'Replace rereading with a more effective study method before Jordan evaluates the learning process.' },
+  { id: 'performance', tag: 'RESULT', title: 'A higher grade', text: 'Improve Jordan’s performance first, then decide whether the study strategy worked.' },
+  { id: 'motivation', tag: 'EFFORT', title: 'More motivation', text: 'Increase Jordan’s effort or persistence so he engages more strongly with the material.' }
 ];
 
 const S2_EVIDENCE_RESPONSES = [
@@ -2279,21 +2279,21 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     inputName: 's2-diagnosis',
     idPrefix: 's2-diagnosis',
     titleId: 's2DiagnosisTitle',
-    kicker: 'Decision 1 · Diagnose the case',
-    title: 'What is the instructional problem?',
-    instruction: 'Review Jordan’s result, strategy, and next move. What problem would you address first?',
+    kicker: 'Decision 1 · Find the missing link',
+    title: 'What does Jordan need before he can make an informed next move?',
+    instruction: 'Jordan knows what he did and knows the result. Choose what belongs between his strategy and his next decision.',
     variant: 'detail',
     marker: item => item.tag,
     limit: 1,
     choiceGridId: 's2DiagnosisChoices',
     statusId: 's2DiagnosisStatus',
     submitId: 's2DiagnosisSubmit',
-    submitLabel: 'Submit diagnosis',
+    submitLabel: 'Place the missing link',
     feedbackId: 's2DiagnosisFeedback',
     activeIndex: 0,
     focusSelector: 'input[name="s2-diagnosis"]',
     onSubmit: submitS2Diagnosis,
-    wrapContent: taskHTML => `<section class="s2-case-file" aria-labelledby="s2CaseFileTitle"><header class="s2-case-file-header"><div class="pc-activity-kicker">Case File 02 · Jordan</div><h1 id="s2CaseFileTitle">The Confident Student Problem</h1><p>Review the evidence from Jordan’s learning process, then decide what you would address first.</p></header><div class="pc-activity-layout">${buildS2JordanEvidenceHTML()}${taskHTML}</div></section>`
+    wrapContent: taskHTML => `<section class="s2-loop-puzzle" aria-labelledby="s2CaseFileTitle"><header class="s2-loop-header"><div class="s2-loop-title"><div class="pc-activity-kicker">Case File 02 · Jordan</div><h1 id="s2CaseFileTitle">The Confident Student Problem</h1></div><section class="s2-evidence-panel" aria-labelledby="s2EvidencePanelTitle"><h2 id="s2EvidencePanelTitle" class="s2-evidence-title">Student Evidence</h2><div class="s2-evidence-portrait"><img src="${ASSETS.images.students.jordan.uncertain}" alt="Jordan, an adult online learner, looking uncertain" /></div><blockquote class="s2-jordan-quote"><span class="s2-quote-mark" aria-hidden="true">“</span><span class="s2-quote-copy">I guess something<br />worked.</span><span class="s2-quote-mark" aria-hidden="true">”</span></blockquote><div class="s2-loop-result"><span>Result</span><strong>84% ↑</strong><small>Improved from last time</small></div></section></header>${buildS2JordanEvidenceHTML()}${taskHTML}</section>`
   }),
   evidence: Object.freeze({
     items: S2_EVIDENCE_RESPONSES,
@@ -2333,21 +2333,16 @@ function getS2Data() {
 
 function buildS2JordanEvidenceHTML() {
   return `
-    <aside class="pc-evidence-card s2-case-evidence" aria-label="Evidence from Jordan">
-      <div class="s2-evidence-portrait">
-        <img src="${ASSETS.images.students.jordan.uncertain}" alt="Jordan, an adult online learner, looking uncertain" />
-        <div class="s2-evidence-name"><span>Student</span><strong>Jordan</strong></div>
+    <section class="s2-learning-gap" aria-labelledby="s2CluesTitle">
+      <h2 id="s2CluesTitle">What is missing from Jordan’s learning process?</h2>
+      <div class="s2-gap-flow" aria-label="Jordan's incomplete learning process">
+        <div class="s2-flow-node"><span>Strategy</span><strong>Reread ×3</strong><small>What Jordan did</small></div>
+        <div class="s2-flow-arrow" aria-hidden="true">→</div>
+        <div class="s2-flow-node s2-flow-node--missing"><span>Missing</span><strong>?</strong><small>What belongs here?</small></div>
+        <div class="s2-flow-arrow" aria-hidden="true">→</div>
+        <div class="s2-flow-node"><span>Next move</span><strong>Reread again</strong><small>Repeat and hope</small></div>
       </div>
-      <div class="pc-evidence-card-copy">
-        <div class="pc-activity-kicker">Student evidence</div>
-        <h3>What do the clues tell you?</h3>
-        <dl class="s2-evidence-list">
-          <div class="s2-evidence-item"><dt>Result</dt><dd><strong>84%</strong><span>Improved from the previous assignment</span></dd></div>
-          <div class="s2-evidence-item"><dt>Strategy</dt><dd>“I reread the chapter a few times.”</dd></div>
-          <div class="s2-evidence-item"><dt>Next move</dt><dd>“I’ll probably reread everything again and hope it works.”</dd></div>
-        </dl>
-      </div>
-    </aside>`;
+    </section>`;
 }
 
 function renderS2Standby(container) {
@@ -2419,7 +2414,7 @@ function renderS2DiagnosisActivity() {
 
 function classifyS2Diagnosis(selection) {
   const selected = selection[0] || '';
-  if (selected === 'metacognitive') return { key: 's2_diagnosis_correct', level: 'strong' };
+  if (selected === 'evidence') return { key: 's2_diagnosis_correct', level: 'strong' };
   if (selected === 'strategy') return { key: 's2_diagnosis_strategy', level: 'partial' };
   if (selected === 'motivation') return { key: 's2_diagnosis_motivation', level: 'reconsider' };
   return { key: 's2_diagnosis_performance', level: 'reconsider' };
@@ -2442,14 +2437,18 @@ function submitS2Diagnosis() {
 
 function renderS2DiagnosisFeedback(selection, result) {
   const exact = result.key === 's2_diagnosis_correct';
+  if (exact) {
+    const missing = document.querySelector('.s2-flow-node--missing');
+    if (missing) { missing.classList.add('is-solved'); missing.querySelector('strong').textContent = 'Evidence'; missing.querySelector('small').textContent = 'Connect strategy to learning'; }
+  }
   const text = pixelDialogue[result.key]?.[0]?.text || '';
   renderScenarioFeedback({
     panelId: 's2DiagnosisFeedback',
     tone: exact ? 'strong' : 'developing',
-    heading: exact ? 'You found the hidden problem.' : 'That explains part of the case, not the whole thing.',
+    heading: exact ? 'That is the missing link.' : 'That changes the case, but it does not fill the gap.',
     text,
     actionsHTML: `
-      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryDiagnosis" data-pc-action="s2-retry-diagnosis">Revise diagnosis</button>'}
+      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryDiagnosis" data-pc-action="s2-retry-diagnosis">Try another link</button>'}
       <button class="pc-button pc-button--primary" type="button" id="s2ContinueEvidence" data-pc-action="s2-continue-evidence">Choose an intervention →</button>`
   });
 }
@@ -7846,25 +7845,15 @@ function pcApplyS2NarrowSpeakerStage(isJordan, expression = 'neutral') {
   const overlay = document.getElementById('vnOverlay');
 
   if (!isJordan) {
-    // Narrow S2 speaker handoff: make the active portrait state explicit.
-    // The Jordan stage uses !important CSS, so clearing normal inline display
-    // values is not enough when the next line returns to Pixel. Remove the
-    // Jordan state first, then explicitly restore Pixel and suppress Jordan.
     overlay?.classList.remove('pc-s2-narrow-jordan');
+    pixel.style.display = '';
+    student.style.display = 'none';
     student.classList.remove('visible', 'is-active', 'is-inactive');
-    student.style.setProperty('display', 'none', 'important');
-    pixel.style.setProperty('display', 'block', 'important');
-    pixel.classList.add('visible', 'is-active');
-    pixel.classList.remove('is-inactive');
     vnSetExpression(expression);
     return true;
   }
 
   overlay?.classList.add('pc-s2-narrow-jordan');
-  // Undo any explicit Pixel-line visibility state before measuring the S1
-  // geometry used to stage Jordan.
-  pixel.style.removeProperty('display');
-  student.style.removeProperty('display');
 
   // Measure Pixel BEFORE hiding it. This copies S1's resolved responsive
   // geometry rather than recreating it for Scenario 2.
@@ -7933,11 +7922,6 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
   overlay?.classList.toggle('pc-s2-two-character', useS2TwoCharacterStage);
 
   if (useS2TwoCharacterStage) {
-    // Clear any narrow-screen speaker handoff display overrides before the
-    // two-character layout takes ownership.
-    pixel?.style.removeProperty('display');
-    student?.style.removeProperty('display');
-    overlay?.classList.remove('pc-s2-narrow-jordan');
     // S2 wide/tablet intro: always render BOTH people. Explicitly assign both
     // image sources here so the secondary character cannot disappear because
     // of a previous single-character line, resize, or delayed portrait swap.

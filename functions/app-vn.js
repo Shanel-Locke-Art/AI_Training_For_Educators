@@ -3060,25 +3060,15 @@ function pcApplyS2NarrowSpeakerStage(isJordan, expression = 'neutral') {
   const overlay = document.getElementById('vnOverlay');
 
   if (!isJordan) {
-    // Narrow S2 speaker handoff: make the active portrait state explicit.
-    // The Jordan stage uses !important CSS, so clearing normal inline display
-    // values is not enough when the next line returns to Pixel. Remove the
-    // Jordan state first, then explicitly restore Pixel and suppress Jordan.
     overlay?.classList.remove('pc-s2-narrow-jordan');
+    pixel.style.display = '';
+    student.style.display = 'none';
     student.classList.remove('visible', 'is-active', 'is-inactive');
-    student.style.setProperty('display', 'none', 'important');
-    pixel.style.setProperty('display', 'block', 'important');
-    pixel.classList.add('visible', 'is-active');
-    pixel.classList.remove('is-inactive');
     vnSetExpression(expression);
     return true;
   }
 
   overlay?.classList.add('pc-s2-narrow-jordan');
-  // Undo any explicit Pixel-line visibility state before measuring the S1
-  // geometry used to stage Jordan.
-  pixel.style.removeProperty('display');
-  student.style.removeProperty('display');
 
   // Measure Pixel BEFORE hiding it. This copies S1's resolved responsive
   // geometry rather than recreating it for Scenario 2.
@@ -3147,11 +3137,6 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
   overlay?.classList.toggle('pc-s2-two-character', useS2TwoCharacterStage);
 
   if (useS2TwoCharacterStage) {
-    // Clear any narrow-screen speaker handoff display overrides before the
-    // two-character layout takes ownership.
-    pixel?.style.removeProperty('display');
-    student?.style.removeProperty('display');
-    overlay?.classList.remove('pc-s2-narrow-jordan');
     // S2 wide/tablet intro: always render BOTH people. Explicitly assign both
     // image sources here so the secondary character cannot disappear because
     // of a previous single-character line, resize, or delayed portrait swap.
