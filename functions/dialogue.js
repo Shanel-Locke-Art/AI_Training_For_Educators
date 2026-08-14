@@ -639,5 +639,32 @@ window.s2VoiceoverDrafts = {
   p94: "assets/audio/voice/professor-pixel/scenario-02/p94.mp3",
   "jordan-s2-01": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-01.mp3",
   "jordan-s2-02": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-02.mp3",
-  "jordan-s2-03": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-03.mp3"
+  "jordan-s2-03": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-03.mp3",
+  "jordan-s2-intervention-confidence": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-confidence.mp3",
+  "jordan-s2-intervention-strategy": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-strategy.mp3",
+  "jordan-s2-intervention-grade": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-grade.mp3",
+  "jordan-s2-intervention-evidence": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-evidence.mp3"
+};
+
+window.s2JordanInterventionDialogue = {
+  confidence: {
+    voiceId: "jordan-s2-intervention-confidence",
+    expression: "confident",
+    text: "I’d say I’m a four out of five. I feel better about it this time."
+  },
+  strategy_name: {
+    voiceId: "jordan-s2-intervention-strategy",
+    expression: "thinking",
+    text: "I reread the chapter three times and highlighted the parts that seemed important."
+  },
+  grade_compare: {
+    voiceId: "jordan-s2-intervention-grade",
+    expression: "confident",
+    text: "I got an 84 instead of a 76, so rereading must have worked."
+  },
+  evidence_check: {
+    voiceId: "jordan-s2-intervention-evidence",
+    expression: "thinking",
+    text: "I could define both concepts, but without my notes I still couldn’t explain the difference. Rereading helped me recognize them, but it didn’t help me compare them. I need to try examples next."
+  }
 };

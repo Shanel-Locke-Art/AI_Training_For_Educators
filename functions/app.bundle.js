@@ -1409,14 +1409,14 @@ function renderScenarioPlaceholder(index) {
 
   area.innerHTML = `
     <section class="pc-scenario-shell" role="region" aria-labelledby="pcShellTitle">
-      <div class="pc-shell-status">Clean development shell</div>
-      <h2 id="pcShellTitle">${esc(ui.tabLabel)} is being rebuilt</h2>
+      <div class="pc-shell-status">Locked · In development</div>
+      <h2 id="pcShellTitle">${esc(ui.tabLabel)} is not yet available</h2>
       <p class="pc-shell-copy">${esc(ui.missionCopy)}</p>
       ${plannedSteps ? `<div class="pc-shell-plan"><h3>Planned game loop</h3>${plannedSteps}</div>` : ''}
-      <p class="pc-shell-note">The previous implementation is preserved in <code>archive/legacy-scenarios-v133/</code>, but it is no longer loaded by the game.</p>
+      <p class="pc-shell-note">This scenario is intentionally locked while its gameplay and instructional design are rebuilt. Scenario 1 and Scenario 2 are currently available.</p>
       <div class="pc-shell-actions">
         <button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="scenarios">Return to Scenario Select</button>
-        <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="0" data-pc-skip-name-gate="true">Play Scenario 1</button>
+        <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="1" data-pc-skip-name-gate="true">Play Scenario 2</button>
       </div>
     </section>`;
   area.scrollTop = 0;
@@ -2331,6 +2331,24 @@ function getS2Data() {
   return data;
 }
 
+
+function buildS2CaseContextHTML() {
+  return `
+    <section class="pc-s2-case-context" aria-labelledby="s2CaseContextTitle">
+      <div class="pc-s2-case-context__title">
+        <div class="pc-activity-kicker">Case File 02 · Jordan</div>
+        <h2 id="s2CaseContextTitle">The Confident Student Problem</h2>
+      </div>
+      <div class="pc-s2-context-flow" aria-label="Jordan's learning process after diagnosis">
+        <div class="pc-s2-context-node"><span>Strategy</span><strong>Reread ×3</strong><small>What Jordan did</small></div>
+        <div class="pc-s2-context-arrow" aria-hidden="true">→</div>
+        <div class="pc-s2-context-node pc-s2-context-node--evidence"><span>Evidence</span><strong>Test understanding</strong><small>The missing link</small></div>
+        <div class="pc-s2-context-arrow" aria-hidden="true">→</div>
+        <div class="pc-s2-context-node"><span>Next move</span><strong>Choose from evidence</strong><small>Not from the grade alone</small></div>
+      </div>
+    </section>`;
+}
+
 function buildS2JordanEvidenceHTML() {
   return `
     <section class="s2-learning-gap" aria-labelledby="s2CluesTitle">
@@ -2383,7 +2401,7 @@ function renderS2SelectionActivity(config) {
   });
   const contentHTML = typeof config.wrapContent === 'function'
     ? config.wrapContent(taskHTML)
-    : taskHTML;
+    : `<div class="pc-s2-step-shell">${buildS2CaseContextHTML()}${taskHTML}</div>`;
 
   mountScenarioActivity({
     container,
@@ -2396,6 +2414,20 @@ function renderS2SelectionActivity(config) {
     contentHTML,
     focusSelector: config.focusSelector
   });
+
+  // S2 Decision 1 is a single-choice decision rendered with the shared
+  // checkbox card component. Replace the previous choice when the learner
+  // selects a different missing link, rather than rejecting the new choice.
+  if (config.inputName === 's2-diagnosis') {
+    const choiceRoot = document.getElementById(config.choiceGridId);
+    choiceRoot?.addEventListener('change', event => {
+      const changed = event.target.closest?.(`input[name="${config.inputName}"]`);
+      if (!changed || !changed.checked) return;
+      choiceRoot.querySelectorAll(`input[name="${config.inputName}"]`).forEach(input => {
+        if (input !== changed) input.checked = false;
+      });
+    });
+  }
 
   wireExactSelection({
     rootId: config.choiceGridId,
@@ -2431,12 +2463,45 @@ function submitS2Diagnosis() {
   data.prompts.push(`S2 diagnosis: ${option?.title || selection[0]}`);
   data.finalResponse = pixelDialogue[result.key]?.[0]?.text || '';
 
-  disableScenarioChoices('s2-diagnosis', 's2DiagnosisSubmit');
-  playPixelSequence(result.key, () => renderS2DiagnosisFeedback(selection, result));
+  if (result.key === 's2_diagnosis_correct') {
+    disableScenarioChoices('s2-diagnosis', 's2DiagnosisSubmit');
+  }
+
+  // Diagnosis feedback belongs to Professor Pixel. If a previous intervention
+  // recording was open during testing/replay, fully clear that presentation
+  // before starting Pixel's normal S1 VN sequence.
+  if (document.getElementById('vnOverlay')?.classList.contains('pc-s2-jordan-recording')) {
+    pcCloseS2JordanRecordedDialogue();
+  }
+  playPixelSequence(result.key, () => {
+    // A correct diagnosis should move directly into Intervention after
+    // Professor Pixel finishes the feedback sequence. Do not stop on an
+    // intermediate confirmation card that asks the learner to continue again.
+    if (result.key === 's2_diagnosis_correct') {
+      data.diagnosisFinal = [...selection];
+      renderS2EvidenceActivity();
+      return;
+    }
+    renderS2DiagnosisFeedback(selection, result);
+  });
 }
 
 function renderS2DiagnosisFeedback(selection, result) {
   const exact = result.key === 's2_diagnosis_correct';
+  const submittedValue = selection[0] || '';
+  const choiceRoot = document.getElementById('s2DiagnosisChoices');
+
+  // Professor Pixel's sequence is asynchronous. By the time it finishes, the
+  // learner may already have moved the radio selection, so style the value that
+  // was submitted rather than whichever input happens to be :checked now.
+  choiceRoot?.querySelectorAll('.pc-choice-card').forEach(card => {
+    card.classList.remove('is-incorrect', 'is-correct');
+  });
+  const submittedInput = [...document.querySelectorAll('input[name="s2-diagnosis"]')]
+    .find(input => input.value === submittedValue);
+  const submittedCard = submittedInput?.closest('.pc-choice-card');
+  if (submittedCard) submittedCard.classList.add(exact ? 'is-correct' : 'is-incorrect');
+
   if (exact) {
     const missing = document.querySelector('.s2-flow-node--missing');
     if (missing) { missing.classList.add('is-solved'); missing.querySelector('strong').textContent = 'Evidence'; missing.querySelector('small').textContent = 'Connect strategy to learning'; }
@@ -2447,14 +2512,332 @@ function renderS2DiagnosisFeedback(selection, result) {
     tone: exact ? 'strong' : 'developing',
     heading: exact ? 'That is the missing link.' : 'That changes the case, but it does not fill the gap.',
     text,
-    actionsHTML: `
-      ${exact ? '' : '<button class="pc-button pc-button--secondary" type="button" id="s2RetryDiagnosis" data-pc-action="s2-retry-diagnosis">Try another link</button>'}
-      <button class="pc-button pc-button--primary" type="button" id="s2ContinueEvidence" data-pc-action="s2-continue-evidence">Choose an intervention →</button>`
+    actionsHTML: exact
+      ? '<button class="pc-button pc-button--primary" type="button" id="s2ContinueEvidence" data-pc-action="s2-continue-evidence">Choose an intervention →</button>'
+      : ''
   });
+
+  if (!exact) {
+    const submit = document.getElementById('s2DiagnosisSubmit');
+    if (submit) {
+      // The first submit listener is intentionally one-shot. Re-arm it after
+      // incorrect feedback, but require the learner to choose a different option
+      // before submitting again. This keeps the page in place instead of
+      // rebuilding the entire Diagnose step.
+      submit.disabled = true;
+      submit.addEventListener('click', submitS2Diagnosis, { once: true });
+    }
+
+    const choices = document.getElementById('s2DiagnosisChoices');
+    const currentValue = selection[0];
+    const moveFocusToNewChoice = event => {
+      const nextInput = event.target.closest?.('input[name="s2-diagnosis"]');
+      if (!nextInput || nextInput.value === currentValue) return;
+
+      // A new choice starts a genuinely new attempt: remove the previous red
+      // state and Pixel feedback immediately, then let the standard selection
+      // wiring enable Submit for the newly checked answer. Keep this listener
+      // active so a learner can miss more than once without stale feedback.
+      choices.querySelectorAll('.pc-choice-card').forEach(card => {
+        card.classList.remove('is-incorrect', 'is-correct');
+      });
+      const feedback = document.getElementById('s2DiagnosisFeedback');
+      if (feedback) feedback.innerHTML = '';
+    };
+    choices?.addEventListener('change', moveFocusToNewChoice, { once: true });
+  }
 }
 
 function renderS2EvidenceActivity() {
   return renderS2SelectionActivity(S2_ACTIVITY_CONFIG.evidence);
+}
+
+function pcGetS2JordanInterventionDialogue(choice) {
+  const fallback = {
+    confidence: {
+      voiceId: 'jordan-s2-intervention-confidence',
+      expression: 'confident',
+      quote: 'I’d say I’m a four out of five. I feel better about it this time.'
+    },
+    strategy_name: {
+      voiceId: 'jordan-s2-intervention-strategy',
+      expression: 'thinking',
+      quote: 'I reread the chapter three times and highlighted the parts that seemed important.'
+    },
+    grade_compare: {
+      voiceId: 'jordan-s2-intervention-grade',
+      expression: 'confident',
+      quote: 'I got an 84 instead of a 76, so rereading must have worked.'
+    },
+    evidence_check: {
+      voiceId: 'jordan-s2-intervention-evidence',
+      expression: 'thinking',
+      quote: 'I could define both concepts, but without my notes I still couldn’t explain the difference. Rereading helped me recognize them, but it didn’t help me compare them. I need to try examples next.'
+    }
+  };
+  const registered = window.s2JordanInterventionDialogue?.[choice];
+  if (registered) return { ...registered, quote: registered.quote || registered.text || '' };
+  return fallback[choice] || fallback.strategy_name;
+}
+
+const pcS2JordanVoiceCache = new Map();
+function pcPlayS2JordanInterventionVoice(choice, options = {}) {
+  const dialogue = pcGetS2JordanInterventionDialogue(choice);
+  const status = document.getElementById('s2JordanVoiceStatus');
+  const source = window.s2VoiceoverDrafts?.[dialogue.voiceId];
+  const userInitiated = options.userInitiated === true;
+
+  if (!source || typeof Howl === 'undefined') {
+    if (status) status.textContent = 'Jordan recording is not available yet.';
+    return false;
+  }
+  if (typeof audioPreferences !== 'undefined' && !audioPreferences.voicesEnabled && !userInitiated) {
+    return false;
+  }
+  if (typeof audioPreferences !== 'undefined' && !audioPreferences.voicesEnabled && userInitiated) {
+    if (status) status.textContent = 'Voice playback is off in audio settings.';
+    return false;
+  }
+
+  let sound = pcS2JordanVoiceCache.get(dialogue.voiceId);
+  if (!sound) {
+    sound = new Howl({
+      src: [source],
+      volume: 0.92,
+      html5: true,
+      onplay: () => { if (status) status.textContent = 'Jordan recording playing…'; },
+      onend: () => { if (status) status.textContent = 'Jordan recording complete.'; },
+      onloaderror: () => { if (status) status.textContent = 'Jordan recording is not available yet.'; },
+      onplayerror: () => { if (status) status.textContent = 'Jordan recording could not be played.'; }
+    });
+    pcS2JordanVoiceCache.set(dialogue.voiceId, sound);
+  }
+
+  pcS2JordanVoiceCache.forEach(other => {
+    if (other !== sound) {
+      try { other.stop(); } catch (e) {}
+    }
+  });
+  try {
+    sound.stop();
+    sound.play();
+    return true;
+  } catch (e) {
+    if (status) status.textContent = 'Jordan recording could not be played.';
+    return false;
+  }
+}
+
+function pcCloseS2JordanRecordedDialogue() {
+  const overlay = document.getElementById('vnOverlay');
+  overlay?.classList.remove('pc-s2-jordan-recording');
+  document.getElementById('s2JordanVNControls')?.remove();
+  const dialogue = document.getElementById('vnDialogue');
+  dialogue?.classList.remove('pc-s2-recorded-dialogue', 'prediction-question', 'prediction-result');
+  dialogue?.querySelector('.vn-skip')?.removeAttribute('hidden');
+  try { pcClearPredictionPresentationV191(); } catch (e) {}
+  try { pcClearPredictionLayoutInlineStylesV186(); } catch (e) {}
+  try { pcClearPredictionUI(); } catch (e) {}
+  try { setClaudeTerminalState('idle', 'BABBAGE ENGINE', 'IDLE'); } catch (e) {}
+  try { setClaudeShelfState('idle', 'idle'); } catch (e) {}
+  pcSetVNOverlayState({ active: false });
+
+  const student = document.getElementById('vnStudentCharacter');
+  const studentPortrait = document.getElementById('vnStudentPortrait');
+  const pixel = document.getElementById('vnCharacter');
+  const pixelPortrait = document.getElementById('vnPortrait');
+  if (student) {
+    student.classList.remove('visible', 'is-active', 'is-inactive');
+    ['display','visibility','opacity','filter','left','right','top','bottom','height','width','min-width','max-width','min-height','max-height','transform','transform-origin','z-index','align-items','justify-content','position'].forEach(p => student.style.removeProperty(p));
+  }
+  if (studentPortrait) {
+    ['display','height','width','max-width','max-height','object-fit','object-position','opacity','transform','z-index'].forEach(p => studentPortrait.style.removeProperty(p));
+  }
+  if (pixel) {
+    pixel.style.removeProperty('display');
+    pixel.style.removeProperty('visibility');
+    pixel.style.removeProperty('opacity');
+  }
+  if (pixelPortrait) {
+    pcSetImageSource(
+      pixelPortrait,
+      EXPRESSIONS.neutral,
+      LEGACY_ASSETS.images.professorPixel.neutral
+    );
+    pixelPortrait.style.opacity = '1';
+  }
+  const speaker = document.getElementById('vnSpeaker');
+  if (speaker) speaker.textContent = 'Professor Pixel';
+}
+
+
+function pcApplyS2RecordedWideMonitorGeometry() {
+  // Keep S1's authoritative photographed-workstation placement, then adjust
+  // only the S2 recorded-dialogue screen layer to the slightly larger visible
+  // monitor glass in this composition. This helper is called again by the
+  // shared prediction resize lifecycle, so the inset survives viewport changes.
+  try {
+    if (typeof window.pcApplyWidePredictionComputer === 'function') {
+      window.pcApplyWidePredictionComputer();
+    }
+
+    const terminal = document.getElementById('claudeTerminalScene');
+    const screen = terminal?.querySelector('.claude-terminal-screen');
+    if (!screen) return false;
+
+    const recordedGeometry = [
+      ['position', 'absolute'],
+      ['inset', 'auto'],
+      ['left', '22.4%'],
+      ['right', 'auto'],
+      ['top', '13.3%'],
+      ['bottom', 'auto'],
+      ['width', '42.7%'],
+      ['height', '46.8%'],
+      ['box-sizing', 'border-box'],
+      ['transform', 'none'],
+      ['overflow', 'hidden']
+    ];
+
+    if (typeof pcSetImportantStyles === 'function') {
+      pcSetImportantStyles(screen, recordedGeometry);
+    } else {
+      recordedGeometry.forEach(([prop, value]) => screen.style.setProperty(prop, value, 'important'));
+    }
+    return true;
+  } catch (e) {}
+  return false;
+}
+
+function pcShowS2JordanRecordedDialogue(choice, result) {
+  const recorded = pcGetS2JordanInterventionDialogue(choice);
+
+  try { pcClearPredictionUI(); } catch (e) {}
+  try { pcStopVN(); } catch (e) {}
+  const overlay = pcSetVNOverlayState({
+    active: true,
+    modes: ['claude-prediction', 'pc-clean-prediction', 'pc-prediction-question']
+  });
+  if (!overlay) return false;
+
+  overlay.classList.add('pc-s2-jordan-recording');
+  overlay.removeAttribute('aria-hidden');
+
+  const sceneBackground = document.getElementById('vnSceneBg');
+  if (sceneBackground) {
+    pcSetImageSource(
+      sceneBackground,
+      ASSETS.images.backgrounds.classroom,
+      LEGACY_ASSETS.images.backgrounds.classroom
+    );
+  }
+
+  try { setVNClaudeMode(false); } catch (e) {}
+  try { setVNClaudeTerminalMode(false); } catch (e) {}
+  try { setClaudeTerminalTextMode(false); } catch (e) {}
+  try { setClaudeShelfState('idle', 'student response'); } catch (e) {}
+  try { setClaudeTerminalState('idle', 'BABBAGE ENGINE', 'RECORDED DIALOGUE'); } catch (e) {}
+  try { pcClearPredictionLayoutInlineStylesV186(); } catch (e) {}
+
+  // Keep Jordan in his own S2 portrait container. Do not copy Pixel's computed
+  // dimensions: Jordan's source artwork has different transparent-canvas proportions.
+  // The recorded-dialogue CSS reuses S2's established Jordan baselines instead.
+  const pixel = document.getElementById('vnCharacter');
+  const pixelPortrait = document.getElementById('vnPortrait');
+  const student = document.getElementById('vnStudentCharacter');
+  const studentPortrait = document.getElementById('vnStudentPortrait');
+  const jordanExpressions = ASSETS.images.students.jordan;
+  const expression = recorded.expression || 'neutral';
+  const jordanSrc = jordanExpressions[expression] || jordanExpressions.neutral;
+
+  overlay.classList.remove('pc-s2-two-character', 'pc-dual-character', 'pc-s2-narrow-jordan');
+
+  if (pixel) {
+    pixel.classList.remove('visible', 'is-active', 'is-inactive');
+    pixel.style.setProperty('display', 'none', 'important');
+    pixel.style.setProperty('visibility', 'hidden', 'important');
+    pixel.style.setProperty('opacity', '0', 'important');
+  }
+
+  if (student) {
+    ['position','left','right','top','bottom','width','height','min-width','max-width',
+     'min-height','max-height','align-items','justify-content','transform','transform-origin']
+      .forEach(prop => student.style.removeProperty(prop));
+    student.style.setProperty('display', 'flex', 'important');
+    student.style.setProperty('visibility', 'visible', 'important');
+    student.style.setProperty('opacity', '1', 'important');
+    student.style.setProperty('filter', 'none', 'important');
+    student.style.setProperty('z-index', '70', 'important');
+    student.classList.add('visible', 'is-active');
+    student.classList.remove('is-inactive');
+  }
+
+  if (studentPortrait) {
+    pcSetImageSource(
+      studentPortrait,
+      jordanSrc,
+      LEGACY_ASSETS.images.students.jordan[expression] || LEGACY_ASSETS.images.students.jordan.neutral
+    );
+    ['height','width','max-width','max-height','object-fit','object-position','transform']
+      .forEach(prop => studentPortrait.style.removeProperty(prop));
+    studentPortrait.style.setProperty('display', 'block', 'important');
+    studentPortrait.style.setProperty('opacity', '1', 'important');
+    studentPortrait.style.setProperty('z-index', '71', 'important');
+  }
+
+  const speaker = document.getElementById('vnSpeaker');
+  if (speaker) speaker.textContent = 'Jordan';
+
+  overlay.classList.remove('pc-prediction-question');
+  overlay.classList.add('pc-prediction-result');
+
+  const vnDialogue = document.getElementById('vnDialogue');
+  if (vnDialogue) {
+    vnDialogue.classList.remove('has-choices', 'prediction-question', 'pc-s2-recorded-dialogue');
+    vnDialogue.classList.add('prediction-result');
+    vnDialogue.setAttribute('aria-label', 'Jordan recorded response. Continue when ready.');
+    vnDialogue.style.removeProperty('display');
+  }
+
+  // Use S1's result markup exactly: feedback copy, then the continue button.
+  const vnText = document.getElementById('vnText');
+  if (vnText) {
+    vnText.innerHTML = `
+      <div class="pc-feedback-copy">
+        <div class="pc-feedback-message">
+          <div class="pc-feedback-heading"><strong>Recorded student dialogue.</strong></div>
+          <div>“${esc(recorded.quote)}”</div>
+        </div>
+        <button class="prediction-continue-btn" type="button"
+          data-pc-action="s2-opening-checkpoint" data-pc-stop-propagation="true">Continue →</button>
+        <div id="s2JordanVoiceStatus" class="sr-only" role="status" aria-live="polite"></div>
+      </div>`;
+  }
+
+  document.getElementById('s2JordanVNControls')?.remove();
+  const hint = document.getElementById('vnAdvanceHint');
+  if (hint) hint.classList.remove('show');
+  vnDialogue?.querySelector('.vn-skip')?.setAttribute('hidden', '');
+
+  // This is a static recorded-response result, not a live S1 prediction question.
+  // Do not queue the generic prediction/VN presentation after writing vnText: those
+  // delayed passes can replace this dialogue and can also resurrect Pixel. The shared
+  // prediction resize lifecycle now reapplies the S2 recorded monitor correction on
+  // wide desktop, so this function no longer owns a one-time geometry call.
+
+  try { musicStartVN(); } catch (e) {}
+  window.setTimeout(() => pcPlayS2JordanInterventionVoice(choice), 140);
+  window.setTimeout(() => vnText?.querySelector('[data-pc-action="s2-opening-checkpoint"]')?.focus(), 100);
+  return true;
+}
+
+function renderS2JordanInterventionFeedback(choice, result) {
+  const panel = document.getElementById('s2EvidenceFeedback');
+  if (panel) {
+    panel.innerHTML = `<div class="sr-only" role="status">${esc(result.heading)} ${esc(result.copy)}</div>`;
+  }
+  pcShowS2JordanRecordedDialogue(choice, result);
+  return panel;
 }
 
 function submitS2Evidence() {
@@ -2464,25 +2847,19 @@ function submitS2Evidence() {
   const data = getS2Data();
   const option = S2_EVIDENCE_RESPONSES.find(item => item.id === choice);
   const consequences = {
-    confidence: { tone: 'developing', heading: 'Jordan feels informed, but still cannot test the strategy.', quote: 'I’d say I’m a four out of five. I feel better about it this time.', copy: 'Confidence is useful information, but Jordan can still answer without showing what he understands or whether rereading caused the improvement.' },
-    strategy_name: { tone: 'developing', heading: 'The strategy is visible. Its effectiveness is not.', quote: 'I reread the chapter three times and highlighted the parts that seemed important.', copy: 'Jordan can now name what he did, but he still has no evidence for deciding whether it helped.' },
-    grade_compare: { tone: 'developing', heading: 'Outcome bias just got stronger.', quote: 'I got an 84 instead of a 76, so rereading must have worked.', copy: 'The intervention encourages Jordan to treat the grade as proof of the strategy. The result changed, but the learning process is still invisible.' },
-    evidence_check: { tone: 'strong', heading: 'Now Jordan has evidence he can act on.', quote: 'I could define both concepts, but without my notes I still couldn’t explain the difference. Rereading helped me recognize them, but it didn’t help me compare them. I need to try examples next.', copy: 'Jordan is no longer guessing from a feeling or grade. He monitored understanding, connected evidence to the strategy, and made a decision.' }
+    confidence: { tone: 'developing', heading: 'Jordan feels informed, but still cannot test the strategy.', copy: 'Confidence is useful information, but Jordan can still answer without showing what he understands or whether rereading caused the improvement.' },
+    strategy_name: { tone: 'developing', heading: 'The strategy is visible. Its effectiveness is not.', copy: 'Jordan can now name what he did, but he still has no evidence for deciding whether it helped.' },
+    grade_compare: { tone: 'developing', heading: 'Outcome bias just got stronger.', copy: 'The intervention encourages Jordan to treat the grade as proof of the strategy. The result changed, but the learning process is still invisible.' },
+    evidence_check: { tone: 'strong', heading: 'Now Jordan has evidence he can act on.', copy: 'Jordan is no longer guessing from a feeling or grade. He monitored understanding, connected evidence to the strategy, and made a decision.' }
   };
   const result = consequences[choice] || consequences.strategy_name;
   data.attempts += 1;
   data.evidenceAttempts.push({ selection: [...selection], exact: choice === 'evidence_check', consequence: result.heading, timestamp: new Date().toISOString() });
   data.prompts.push(`S2 intervention: ${option?.title || choice}`);
   data.finalResponse = result.copy;
+  data.lastEvidenceFeedback = { heading: result.heading, copy: result.copy, tone: result.tone, choice };
   disableScenarioChoices('s2-evidence', 's2EvidenceSubmit');
-
-  renderScenarioFeedback({
-    panelId: 's2EvidenceFeedback',
-    tone: result.tone,
-    heading: result.heading,
-    text: `Jordan: “${result.quote}” ${result.copy}`,
-    actionsHTML: `<button class="pc-button pc-button--primary" type="button" id="s2OpeningCheckpoint" data-pc-action="s2-opening-checkpoint">Give the case to Babbage →</button>`
-  });
+  renderS2JordanInterventionFeedback(choice, result);
 }
 
 
@@ -2498,7 +2875,7 @@ function renderS2ThinkingMoveActivity() {
   mountScenarioActivity({
     scenarioIndex: SCENARIO_INDEX.METACOGNITION,
     progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 2, ariaLabel: 'Scenario 2 progress' }),
-    contentHTML: buildScenarioTaskCardHTML({
+    contentHTML: `<div class="pc-s2-step-shell">${buildS2CaseContextHTML()}${buildScenarioTaskCardHTML({
       titleId: 's2ThinkingTitle',
       kicker: 'Decision 3 · Choose the thinking move',
       title: 'What should Jordan practice first?',
@@ -2509,7 +2886,7 @@ function renderS2ThinkingMoveActivity() {
       submitId: 's2ThinkingSubmit',
       submitLabel: 'Build the activity',
       feedbackId: 's2ThinkingFeedback'
-    }),
+    })}</div>`,
     focusSelector: 'input[name="s2-thinking-move"]'
   });
 
@@ -2633,16 +3010,27 @@ function renderS2AuditActivity() {
     scenarioIndex: SCENARIO_INDEX.METACOGNITION,
     progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 3, ariaLabel: 'Scenario 2 progress' }),
     contentHTML: `
-      <div class="pc-s2-audit-layout">
+      <div class="pc-s2-step-shell">
+        ${buildS2CaseContextHTML()}
+        <div class="pc-s2-audit-layout">
         <aside class="pc-s2-babbage-draft" aria-label="Babbage reflection activity draft">
           <div class="pc-activity-kicker">Babbage draft</div>
           <h2>${esc(draft.activity_title)}</h2>
           <div class="pc-s2-draft-prompt">${esc(draft.activity_prompt)}</div>
+          <section class="pc-s2-audit-jordan-evidence" aria-label="Likely Jordan response">
+            <div class="pc-s2-audit-jordan-portrait">
+              <img src="${ASSETS.images.students.jordan.uncertain}" alt="Jordan, an adult online learner, considering his study results" />
+            </div>
+            <div class="pc-s2-audit-jordan-response">
+              <div class="pc-s2-audit-jordan-label">Jordan's likely response</div>
+              <blockquote class="pc-s2-audit-jordan-quote">
+                <span class="pc-s2-audit-jordan-quote-mark" aria-hidden="true">“</span>
+                <span class="pc-s2-audit-jordan-quote-copy">${esc(draft.likely_student_response)}</span>
+                <span class="pc-s2-audit-jordan-quote-mark" aria-hidden="true">”</span>
+              </blockquote>
+            </div>
+          </section>
           <p><strong>Babbage's rationale:</strong> ${esc(draft.design_rationale)}</p>
-          <details>
-            <summary>Likely Jordan response</summary>
-            <p>${esc(draft.likely_student_response)}</p>
-          </details>
         </aside>
         ${buildScenarioTaskCardHTML({
           titleId: 's2AuditTitle',
@@ -2656,6 +3044,7 @@ function renderS2AuditActivity() {
           submitLabel: 'Audit the draft',
           feedbackId: 's2AuditFeedback'
         })}
+        </div>
       </div>`,
     focusSelector: 'input[name="s2-audit"]'
   });
@@ -2705,7 +3094,9 @@ function renderS2RepairActivity() {
     scenarioIndex: SCENARIO_INDEX.METACOGNITION,
     progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 4, ariaLabel: 'Scenario 2 progress' }),
     contentHTML: `
-      <div class="pc-s2-repair-layout">
+      <div class="pc-s2-step-shell">
+        ${buildS2CaseContextHTML()}
+        <div class="pc-s2-repair-layout">
         <aside class="pc-s2-original-draft">
           <div class="pc-activity-kicker">Original Babbage draft</div>
           <h3>${esc(draft.activity_title)}</h3>
@@ -2723,6 +3114,7 @@ function renderS2RepairActivity() {
           </div>
           <div id="s2RepairFeedback" aria-live="polite"></div>
         </section>
+        </div>
       </div>`,
     focusSelector: '#s2RepairText'
   });
@@ -2902,12 +3294,25 @@ pcRegisterUIActions({
     renderS2EvidenceActivity();
   },
   's2-retry-evidence': () => renderS2EvidenceActivity(),
+  's2-replay-jordan-voice': target => pcPlayS2JordanInterventionVoice(target.dataset.s2Choice, { userInitiated: true }),
   's2-opening-checkpoint': () => {
+    pcCloseS2JordanRecordedDialogue();
     const data = getS2Data();
     data.evidenceFinal = pcGetLatestS2Selection('evidenceAttempts');
     data.openingCheckpointReached = true;
-    data.thinkingMove = 'evaluate';
-    generateS2BabbageDraft();
+
+    const feedback = data.lastEvidenceFeedback || {};
+    const pixelText = [feedback.heading, feedback.copy].filter(Boolean).join(' ')
+      || 'Jordan’s response is the evidence. The useful intervention is the one that makes his learning process visible enough to evaluate and act on.';
+
+    // This is a solo Pixel beat: Jordan has left after the recording. The
+    // recorded workstation has already been cleared, so the normal S2
+    // smartboard is the only presentation surface behind Pixel.
+    window.pcS2PixelSolo = true;
+    vnShow(feedback.tone === 'strong' ? 'proud' : 'thinking', pixelText, () => {
+      window.pcS2PixelSolo = false;
+      renderS2ThinkingMoveActivity();
+    }, { speaker: 'Professor Pixel', character: 'pixel', id: 's2-post-recording-pixel' });
   },
   's2-generate-draft': () => generateS2BabbageDraft(),
   's2-repair-draft': () => renderS2RepairActivity(),
@@ -4782,6 +5187,7 @@ function renderS5FinalReport() {
   document.querySelector('#inputContainer button')?.focus();
 }
 ;
+
 /* SOURCE: functions/app-vn.js */
 /* PROMPTCRAFT VISUAL NOVEL AND RESPONSIVE LAYOUT ENGINE
    Extracted from app.js in Version 270. Load after the preceding PromptCraft scripts. */
@@ -7914,6 +8320,7 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
   // viewports only, stage Jordan on the left and Pixel on the right without
   // enabling the legacy dual-cast layout (which also rewrites the dialogue).
   const useS2TwoCharacterStage = scenarioIndex === SCENARIO_INDEX.METACOGNITION &&
+    !window.pcS2PixelSolo &&
     Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0) >= 701;
 
   if (speaker) speaker.textContent = speakerName || (isJordan ? 'Jordan' : 'Professor Pixel');
@@ -7995,6 +8402,7 @@ function pcApplyDualCastResponsive() {
   const student = document.getElementById('vnStudentCharacter');
   const compact = window.matchMedia?.('(max-width: 620px), (max-height: 650px)').matches;
   const useS2TwoCharacterStage = scenarioIndex === SCENARIO_INDEX.METACOGNITION &&
+    !window.pcS2PixelSolo &&
     Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0) >= 701;
   overlay?.classList.toggle('pc-s2-two-character', useS2TwoCharacterStage);
 
@@ -8300,10 +8708,20 @@ function playScenarioIntroduction(index) {
   overlay?.classList.toggle('scenario-intro-active', useSpecialIntroLayout);
   const onDone = () => {
     if (useSpecialIntroLayout) overlay?.classList.remove('scenario-intro-active');
-    // S2 keeps the exact S1 VN geometry through the final visible frame.
-    // Character-stage cleanup happens in pcResetVNCharacters() after the VN
-    // overlay is inactive, preventing Jordan from briefly inheriting legacy
-    // sizing without touching Pixel or the smartboard during the intro.
+    if (index === SCENARIO_INDEX.METACOGNITION) {
+      // Final S2 intro handoff: hide BOTH portrait containers before the
+      // two-character stage class is removed. Either container may currently
+      // hold Jordan on responsive speaker swaps, so hiding only the dedicated
+      // student container can expose one frame of legacy sizing and make Jordan
+      // appear to suddenly grow before the mission briefing.
+      const pixel = document.getElementById('vnCharacter');
+      const student = document.getElementById('vnStudentCharacter');
+      [pixel, student].forEach(character => {
+        character?.classList.remove('visible', 'is-active', 'is-inactive');
+        character?.style.setProperty('display', 'none', 'important');
+      });
+      overlay?.classList.remove('pc-s2-two-character');
+    }
     pcRunScenarioAfterIntroAction(ui.afterIntroAction);
   };
 
@@ -8348,6 +8766,27 @@ function switchScenario(i, btn) {
 
 
 function pcClearVNStateForScenarioSwitch() {
+  // Clear any S2-only recorded-dialogue residue before the shared VN reset.
+  // The recording scene temporarily owns character visibility and dialogue
+  // state, so those values must not survive a menu-driven scenario switch.
+  const overlay = document.getElementById('vnOverlay');
+  const dialogue = document.getElementById('vnDialogue');
+  const pixel = document.getElementById('vnCharacter');
+  const student = document.getElementById('vnStudentCharacter');
+  const studentPortrait = document.getElementById('vnStudentPortrait');
+  overlay?.classList.remove('pc-s2-jordan-recording', 'pc-s2-two-character', 'pc-s2-narrow-jordan');
+  dialogue?.classList.remove('pc-s2-recorded-dialogue', 'prediction-question', 'prediction-result');
+  document.getElementById('s2JordanVNControls')?.remove();
+  [pixel, student].forEach(character => {
+    if (!character) return;
+    character.classList.remove('visible', 'is-active', 'is-inactive');
+    ['display','visibility','opacity','filter','left','right','top','bottom','height','width','min-width','max-width','min-height','max-height','transform','transform-origin','z-index','align-items','justify-content','position'].forEach(prop => character.style.removeProperty(prop));
+  });
+  if (studentPortrait) {
+    ['display','height','width','max-width','max-height','object-fit','object-position','opacity','transform','z-index'].forEach(prop => studentPortrait.style.removeProperty(prop));
+  }
+  window.pcS2PixelSolo = false;
+
   pcSetVNOverlayState({ active: false });
   pcResetVNCharacters();
   pcResetVNDialogueState();
@@ -9670,6 +10109,15 @@ function pcApplyPredictionPresentationV191(){
       terminalScreen,
       viewportHeight
     );
+
+    // S2 recorded dialogue shares the S1 prediction resize lifecycle, but its monitor
+    // glass needs a slightly different measured inset. Reapply that correction after
+    // every wide-desktop prediction layout pass so resizing cannot restore S1's screen
+    // coordinates over the S2 recording. Compact layouts remain CSS-owned.
+    if (overlay?.classList.contains('pc-s2-jordan-recording') &&
+        typeof pcApplyS2RecordedWideMonitorGeometry === 'function') {
+      pcApplyS2RecordedWideMonitorGeometry();
+    }
   }
 
   // The status must remain readable across phones and tablet/iPad widths.

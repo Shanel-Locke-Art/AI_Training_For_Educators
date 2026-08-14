@@ -20057,9 +20057,7 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
    monitor (Nest Hub Max) and restores a fuller-width computer on iPad Pro /
    Surface Pro portrait screens. */
 body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) #claudeTerminalScene .claude-terminal-screen,
-body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) .claude-terminal-screen,
-body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) #claudeTerminalScene .claude-terminal-screen,
-body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) .claude-terminal-screen {
+body[data-pc-viewport-family="short-landscape"] .vn-overlay.active:is(.pc-prediction-question, .pc-clean-prediction, .pc-prediction-result, .claude-prediction) .claude-terminal-screen {
   position: absolute !important;
   inset: auto !important;
   left: 19.8% !important;
@@ -20294,131 +20292,113 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
   }
 }
 
-/* S2 Case File 02 — diagnosis workspace refinement. Scoped to S2 only. */
-body[data-pc-scenario="metacognition"] .scenario-card,
-body[data-pc-scenario="metacognition"] .oscqr-row {
+/* S2 recorded student response: Jordan stays in his dedicated S2 portrait
+   container. Pixel remains suppressed for the entire recorded beat. Jordan's
+   geometry is based on the established S2 character baselines, never copied
+   from Pixel's differently cropped source artwork. */
+html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay.vn-overlay.active.pc-s2-jordan-recording #vnCharacter {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay.vn-overlay.active.pc-s2-jordan-recording #vnStudentCharacter {
+  position: absolute !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  filter: none !important;
+  z-index: 70 !important;
+  pointer-events: none !important;
+  top: auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  align-items: flex-end !important;
+}
+body[data-pc-scenario="metacognition"] .vn-overlay.active.pc-s2-jordan-recording #vnStudentPortrait {
+  display: block !important;
+  width: auto !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  opacity: 1 !important;
+  z-index: 71 !important;
 }
 
-.pc-scenario-stage:has(.s2-case-file) > .scenario-mission {
-  display: none !important;
+/* Desktop/tablet/foldable: reuse the S2 cast variables already proven for
+   Jordan, but keep only Jordan visible. */
+@media screen and (min-width: 701px) {
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay.vn-overlay.active.pc-s2-jordan-recording #vnStudentCharacter {
+    left: clamp(10px, 2.2vw, 42px) !important;
+    right: auto !important;
+    bottom: var(--pc-vn-character-bottom) !important;
+    height: var(--pc-vn-character-height) !important;
+    min-height: 0 !important;
+    max-width: var(--pc-vn-character-max-width) !important;
+    max-height: none !important;
+    transform: none !important;
+    transform-origin: left bottom !important;
+    justify-content: flex-start !important;
+  }
+  body[data-pc-scenario="metacognition"] .vn-overlay.active.pc-s2-jordan-recording #vnStudentPortrait {
+    max-width: 100% !important;
+    object-position: left bottom !important;
+  }
 }
 
-.s2-case-file {
-  width: min(100%, 1380px);
-  margin: 0 auto;
-  background: #fffdf9;
-  border: 1.5px solid var(--border-strong);
-  border-radius: 18px;
-  box-shadow: 0 16px 40px rgba(45,34,20,.09);
-  overflow: hidden;
+/* Narrow screens use S2's established centered Jordan treatment. */
+@media screen and (max-width: 700px) {
+  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay.vn-overlay.active.pc-s2-jordan-recording #vnStudentCharacter {
+    left: 50% !important;
+    right: auto !important;
+    bottom: calc(var(--pc-vn-character-bottom) + clamp(18px, 2.6dvh, 28px)) !important;
+    height: var(--pc-vn-character-height) !important;
+    min-height: 0 !important;
+    max-width: var(--pc-vn-character-max-width) !important;
+    max-height: none !important;
+    transform: translateX(-50%) !important;
+    transform-origin: center bottom !important;
+    justify-content: center !important;
+  }
+  body[data-pc-scenario="metacognition"] .vn-overlay.active.pc-s2-jordan-recording #vnStudentPortrait {
+    max-width: 72vw !important;
+    object-position: center bottom !important;
+  }
 }
 
-.s2-case-file-header {
-  padding: clamp(18px, 2.4vw, 30px) clamp(20px, 3vw, 38px) clamp(16px, 2vw, 24px);
-  border-bottom: 1px solid var(--border);
-  background: linear-gradient(180deg, #fffdf9 0%, #fbf5eb 100%);
+/* Surface Duo-class compact screens need the smaller S2 Jordan crop rather
+   than the generic phone character height. */
+@media screen and (min-width: 481px) and (max-width: 700px) {
+  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay.vn-overlay.active.pc-s2-jordan-recording #vnStudentCharacter {
+    bottom: calc(var(--pc-vn-character-bottom) + 6px) !important;
+    height: clamp(240px, 37dvh, 270px) !important;
+    max-height: clamp(240px, 37dvh, 270px) !important;
+  }
 }
-.s2-case-file-header h1 {
-  margin: 5px 0 6px;
-  font-family: "Lora", Georgia, serif;
-  color: var(--forest-dark);
-  font-size: clamp(24px, calc(20px + .9vw), 36px);
-  line-height: 1.16;
-}
-.s2-case-file-header p { margin: 0; color: var(--ink-light); line-height: 1.5; }
 
-.s2-case-file .pc-activity-layout {
-  margin-top: 0;
-  gap: 0;
-  grid-template-columns: minmax(280px, .72fr) minmax(0, 1.7fr);
-  align-items: stretch;
-}
-.s2-case-file .pc-evidence-card,
-.s2-case-file .pc-activity-card {
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-}
-.s2-case-file .pc-evidence-card {
-  position: relative;
-  top: auto;
-  border-right: 1px solid var(--border);
-  background: #fbf5eb;
-}
-.s2-evidence-portrait { position: relative; background: linear-gradient(145deg, #241a29, #5e4766); }
-.s2-case-file .pc-evidence-card img {
-  height: clamp(260px, 35vh, 410px);
-  object-fit: contain;
-  object-position: center bottom;
-}
-.s2-evidence-name {
-  position: absolute;
-  left: 16px;
-  bottom: 14px;
-  display: flex;
-  flex-direction: column;
-  padding: 7px 10px;
-  background: rgba(17,50,36,.9);
-  color: #fff;
-  border-radius: 8px;
-}
-.s2-evidence-name span { font: 700 10px/1.1 "Source Code Pro", monospace; letter-spacing: .12em; text-transform: uppercase; opacity: .75; }
-.s2-evidence-name strong { font: 700 18px/1.2 "Lora", Georgia, serif; }
-.s2-case-file .pc-evidence-card-copy { padding: clamp(18px, 2vw, 26px); }
-.s2-evidence-list { display: grid; gap: 10px; margin: 14px 0 0; }
-.s2-evidence-item {
-  display: grid;
-  grid-template-columns: 88px minmax(0,1fr);
-  gap: 12px;
-  padding: 12px 0;
-  border-top: 1px solid rgba(90,72,52,.16);
-}
-.s2-evidence-item dt {
-  font: 800 var(--pc-type-xs)/1.3 "Source Code Pro", monospace;
-  color: var(--terracotta);
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-.s2-evidence-item dd { margin: 0; color: var(--ink-mid); line-height: 1.45; }
-.s2-evidence-item dd strong { display: block; color: var(--forest-dark); font-size: 1.35em; line-height: 1; margin-bottom: 4px; }
-.s2-evidence-item dd span { display: block; font-size: .9em; color: var(--ink-light); }
+/* Nest Hub-class 1024x600: the recorded response needs a shorter result panel
+   than the generic prediction layout. Keep the sizing local to this S2 beat so
+   Nest Hub Max and the already-approved tablet/foldable layouts remain unchanged. */
+@media screen and (min-width: 800px) and (max-width: 1100px) and (max-height: 650px) {
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family="short-landscape"] #vnOverlay#vnOverlay.vn-overlay.active.pc-s2-jordan-recording {
+    --pc-dialogue-h: 210px !important;
+    --pc-prediction-dialogue-height: 210px !important;
+  }
 
-.s2-case-file .pc-activity-task { padding: clamp(22px, 3vw, 40px); background: #fffdf9; }
-.s2-case-file .pc-choice-card--detail {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  padding: clamp(15px, 1.7vw, 19px);
-}
-.s2-case-file .pc-choice-marker {
-  position: static;
-  width: fit-content;
-  min-width: 0;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: #f2eadb;
-  color: var(--forest-dark);
-  font: 800 11px/1 "Source Code Pro", monospace;
-  letter-spacing: .08em;
-}
-.s2-case-file .pc-choice-body { display: grid; gap: 6px; }
-.s2-case-file .pc-choice-body strong { color: var(--forest-dark); font-size: 1.05em; line-height: 1.25; }
-.s2-case-file .pc-choice-body > span { color: var(--ink-mid); line-height: 1.48; }
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family="short-landscape"] #vnOverlay#vnOverlay.vn-overlay.active.pc-s2-jordan-recording #vnDialogue,
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family="short-landscape"] #vnOverlay#vnOverlay.vn-overlay.active.pc-s2-jordan-recording .vn-dialogue {
+    min-height: 210px !important;
+    height: 210px !important;
+    max-height: 210px !important;
+  }
 
-@media (max-width: 800px) {
-  .s2-case-file { border-radius: 12px; }
-  .s2-case-file .pc-activity-layout { grid-template-columns: 1fr; }
-  .s2-case-file .pc-evidence-card { border-right: 0; border-bottom: 1px solid var(--border); }
-  .s2-case-file .pc-evidence-card img { height: clamp(220px, 31vh, 330px); }
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family="short-landscape"] #vnOverlay#vnOverlay.vn-overlay.active.pc-s2-jordan-recording #vnStudentCharacter {
+    left: clamp(28px, 5vw, 54px) !important;
+    bottom: calc(var(--pc-dialogue-h) + 168px) !important;
+    height: clamp(205px, 39dvh, 235px) !important;
+    max-height: clamp(205px, 39dvh, 235px) !important;
+  }
 }
-@media (max-width: 520px) {
-  .s2-case-file-header { padding: 16px; }
-  .s2-case-file .pc-activity-task,
-  .s2-case-file .pc-evidence-card-copy { padding: 16px; }
-  .s2-evidence-item { grid-template-columns: 76px minmax(0,1fr); gap: 9px; }
-  .s2-case-file .pc-choice-grid { grid-template-columns: 1fr; }
-}
+
 
 /* SOURCE: styles/115-intro-responsive.css — S2 portrait-tablet opposite-side cast fix */
 @media screen and (min-width: 701px) and (max-width: 1100px) {
@@ -20481,8 +20461,8 @@ body[data-pc-scenario="metacognition"] .oscqr-row {
        the phones, but Jordan's source artwork fills more of its canvas. Keep
        him attached to the dialogue edge without letting him reach the board. */
     bottom: calc(var(--pc-vn-character-bottom) + 6px) !important;
-    height: clamp(185px, 28dvh, 205px) !important;
-    max-height: clamp(185px, 28dvh, 205px) !important;
+    height: clamp(240px, 37dvh, 270px) !important;
+    max-height: clamp(240px, 37dvh, 270px) !important;
   }
 }
 @media screen and (max-width: 700px) and (max-height: 700px) {
@@ -24918,5 +24898,410 @@ body[data-pc-scenario="metacognition"] .s2-evidence-portrait img {
   body[data-pc-scenario="metacognition"] .s2-evidence-portrait img {
     max-width: 94% !important;
     margin-bottom: -1px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   V417 — S2 STEPS 2–5 RESPONSIVE ACTIVITY SYSTEM
+   Reuses the Diagnose visual language while keeping later decisions compact,
+   readable, and predictable across desktop, tablet, foldable, and phone widths.
+   ══════════════════════════════════════════════════════ */
+body[data-pc-scenario="metacognition"] .pc-s2-step-shell {
+  display: grid !important;
+  gap: clamp(14px, 1.8vw, 22px) !important;
+  min-width: 0 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-case-context {
+  display: grid !important;
+  grid-template-columns: minmax(220px, .72fr) minmax(0, 1.28fr) !important;
+  align-items: center !important;
+  gap: clamp(16px, 2vw, 28px) !important;
+  padding: clamp(18px, 2vw, 26px) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+  background: var(--paper, #fffdfa) !important;
+  box-shadow: 0 8px 24px rgba(30, 54, 39, .05) !important;
+  min-width: 0 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-case-context__title {
+  min-width: 0 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-case-context__title h2 {
+  margin: 4px 0 0 !important;
+  color: var(--forest-dark) !important;
+  font-size: clamp(1.35rem, 2vw, 2rem) !important;
+  line-height: 1.08 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-context-flow {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.08fr) auto minmax(0, 1.15fr) !important;
+  align-items: stretch !important;
+  gap: clamp(7px, .9vw, 12px) !important;
+  min-width: 0 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-context-node {
+  display: grid !important;
+  align-content: center !important;
+  justify-items: center !important;
+  gap: 4px !important;
+  min-width: 0 !important;
+  min-height: 88px !important;
+  padding: 12px 10px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  text-align: center !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-context-node--evidence {
+  border: 2px dashed #d05a24 !important;
+  background: #fffaf2 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-context-node > span {
+  color: #c95728 !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-context-node > strong {
+  color: var(--forest-dark) !important;
+  font-size: clamp(1rem, 1.4vw, 1.25rem) !important;
+  line-height: 1.15 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-context-node > small {
+  color: var(--ink-light) !important;
+  font-size: .82rem !important;
+  line-height: 1.3 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-context-arrow {
+  align-self: center !important;
+  color: var(--forest-mid) !important;
+  font-size: 1.4rem !important;
+  line-height: 1 !important;
+}
+
+/* Later S2 decisions now use the same two-column choice rhythm as Diagnose. */
+body[data-pc-scenario="metacognition"] .pc-s2-step-shell > .pc-activity-task,
+body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task,
+body[data-pc-scenario="metacognition"] .pc-s2-repair-layout > .pc-activity-card {
+  min-width: 0 !important;
+  padding: clamp(20px, 2vw, 28px) !important;
+  border-radius: 16px !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-activity-task h2 {
+  max-width: 880px !important;
+  margin-bottom: 8px !important;
+  font-size: clamp(1.45rem, 2.1vw, 2.05rem) !important;
+  line-height: 1.12 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-activity-instruction {
+  max-width: 980px !important;
+  margin-bottom: clamp(14px, 1.8vw, 20px) !important;
+  font-size: clamp(.96rem, 1.15vw, 1.08rem) !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(10px, 1.25vw, 14px) !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-card--detail {
+  display: grid !important;
+  grid-template-columns: 38px minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  min-height: 118px !important;
+  padding: 16px !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-card--detail .pc-choice-marker {
+  width: 30px !important;
+  height: 30px !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  color: transparent !important;
+  font-size: 0 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-card--detail .pc-choice-marker::after {
+  content: "" !important;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-card--detail:has(input:checked) .pc-choice-marker::after {
+  background: var(--forest) !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-body {
+  display: grid !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-body strong {
+  color: var(--forest-dark) !important;
+  font-size: clamp(1rem, 1.2vw, 1.12rem) !important;
+  line-height: 1.25 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-body > span {
+  color: var(--ink-mid) !important;
+  font-size: clamp(.9rem, 1vw, 1rem) !important;
+  line-height: 1.45 !important;
+}
+
+/* Audit gets a readable draft/task split without squeezing the choices. */
+body[data-pc-scenario="metacognition"] .pc-s2-audit-layout,
+body[data-pc-scenario="metacognition"] .pc-s2-repair-layout {
+  display: grid !important;
+  grid-template-columns: minmax(260px, .78fr) minmax(0, 1.22fr) !important;
+  gap: clamp(14px, 1.8vw, 22px) !important;
+  min-width: 0 !important;
+  align-items: start !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-grid {
+  grid-template-columns: 1fr !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-card {
+  min-width: 0 !important;
+  min-height: 76px !important;
+  padding: 14px 15px !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft,
+body[data-pc-scenario="metacognition"] .pc-s2-original-draft {
+  min-width: 0 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft h2,
+body[data-pc-scenario="metacognition"] .pc-s2-original-draft h3 {
+  overflow-wrap: anywhere !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-repair-textarea {
+  min-height: clamp(180px, 26vh, 280px) !important;
+}
+
+/* Mid-size tablets/foldables: retain two choice columns but stack case context. */
+@media (max-width: 1050px) {
+  body[data-pc-scenario="metacognition"] .pc-s2-case-context {
+    grid-template-columns: 1fr !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-case-context__title {
+    padding-bottom: 2px !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-audit-layout,
+  body[data-pc-scenario="metacognition"] .pc-s2-repair-layout {
+    grid-template-columns: 1fr !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Narrow tablets and phones: one clean vertical reading order. */
+@media (max-width: 720px) {
+  body[data-pc-scenario="metacognition"] .pc-s2-case-context {
+    padding: 16px !important;
+    gap: 14px !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-context-flow {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-context-arrow {
+    justify-self: center !important;
+    transform: rotate(90deg) !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-context-node {
+    min-height: 72px !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-grid,
+  body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-grid {
+    grid-template-columns: 1fr !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-card--detail {
+    min-height: 0 !important;
+    padding: 14px !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-step-shell > .pc-activity-task,
+  body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task,
+  body[data-pc-scenario="metacognition"] .pc-s2-repair-layout > .pc-activity-card {
+    padding: 18px 16px !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-selection-bar {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-selection-bar .pc-button {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 420px) {
+  body[data-pc-scenario="metacognition"] .pc-s2-case-context__title h2 {
+    font-size: 1.28rem !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-card--detail {
+    grid-template-columns: 30px minmax(0, 1fr) !important;
+    gap: 9px !important;
+  }
+  body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-card--detail .pc-choice-marker {
+    width: 26px !important;
+    height: 26px !important;
+  }
+}
+
+/* S2 Diagnose feedback state: an incorrect submitted choice is visibly wrong,
+   not merely selected, and cannot advance to Intervene. */
+body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-card.is-incorrect,
+body[data-pc-scenario="metacognition"] .s2-case-file .pc-choice-card.is-incorrect {
+  background: #fbe9e7 !important;
+  border-color: #b85a52 !important;
+  box-shadow: inset 0 0 0 1px rgba(184, 90, 82, .16) !important;
+}
+body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-card.is-incorrect .pc-choice-marker,
+body[data-pc-scenario="metacognition"] .s2-case-file .pc-choice-card.is-incorrect .pc-choice-marker {
+  border-color: #a94f48 !important;
+  background: #fff7f6 !important;
+}
+body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-card.is-incorrect .pc-choice-marker::after,
+body[data-pc-scenario="metacognition"] .s2-case-file .pc-choice-card.is-incorrect .pc-choice-marker::after {
+  background: #a94f48 !important;
+}
+body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-card.is-correct,
+body[data-pc-scenario="metacognition"] .s2-case-file .pc-choice-card.is-correct {
+  background: var(--mint-soft, #e7f1eb) !important;
+  border-color: var(--forest, #1f5a43) !important;
+}
+
+/* S2 Decision 4 — compact evidence card that carries Jordan forward from Diagnose
+   without inheriting Decision 1's narrow quote-copy geometry. */
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-evidence {
+  display: grid !important;
+  grid-template-columns: clamp(116px, 18%, 148px) minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: clamp(14px, 1.6vw, 22px) !important;
+  margin: 16px 0 !important;
+  padding: clamp(12px, 1.2vw, 16px) !important;
+  border: 1px solid rgba(168,213,181,.34) !important;
+  border-radius: 12px !important;
+  background: rgba(255,255,255,.055) !important;
+  overflow: hidden !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-portrait {
+  min-width: 0 !important;
+  display: flex !important;
+  align-self: stretch !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-portrait img {
+  display: block !important;
+  width: min(100%, 138px) !important;
+  height: 164px !important;
+  max-width: 138px !important;
+  margin: 0 !important;
+  padding: 0 0 6px !important;
+  box-sizing: border-box !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  border: 1.5px solid rgba(168,213,181,.68) !important;
+  border-radius: 10px !important;
+  background: #fffdf9 !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-response {
+  min-width: 0 !important;
+  align-self: center !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-label {
+  margin: 0 0 7px !important;
+  color: #f4e5ba !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-size: .72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-quote {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  align-items: start !important;
+  gap: .28em !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #eef9f1 !important;
+  font: 700 clamp(.98rem, 1.15vw, 1.12rem)/1.45 "Lora", Georgia, serif !important;
+  text-align: left !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-quote-copy {
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: inherit !important;
+  white-space: normal !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-quote-mark {
+  color: #f4e5ba !important;
+  font: 700 2.1em/.8 "Lora", Georgia, serif !important;
+  opacity: .42 !important;
+}
+
+@media (max-width: 700px) {
+  body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-evidence {
+    grid-template-columns: 92px minmax(0, 1fr) !important;
+    gap: 12px !important;
+    padding: 12px !important;
+  }
+
+  body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-portrait img {
+    width: 88px !important;
+    height: 116px !important;
+  }
+
+  body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-label {
+    font-size: .66rem !important;
+  }
+
+  body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-quote {
+    font-size: .94rem !important;
+    line-height: 1.4 !important;
   }
 }

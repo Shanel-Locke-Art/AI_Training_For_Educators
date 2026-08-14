@@ -1421,6 +1421,15 @@ function pcApplyPredictionPresentationV191(){
       terminalScreen,
       viewportHeight
     );
+
+    // S2 recorded dialogue shares the S1 prediction resize lifecycle, but its monitor
+    // glass needs a slightly different measured inset. Reapply that correction after
+    // every wide-desktop prediction layout pass so resizing cannot restore S1's screen
+    // coordinates over the S2 recording. Compact layouts remain CSS-owned.
+    if (overlay?.classList.contains('pc-s2-jordan-recording') &&
+        typeof pcApplyS2RecordedWideMonitorGeometry === 'function') {
+      pcApplyS2RecordedWideMonitorGeometry();
+    }
   }
 
   // The status must remain readable across phones and tablet/iPad widths.

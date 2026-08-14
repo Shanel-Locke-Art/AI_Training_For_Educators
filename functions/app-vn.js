@@ -3129,6 +3129,7 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
   // viewports only, stage Jordan on the left and Pixel on the right without
   // enabling the legacy dual-cast layout (which also rewrites the dialogue).
   const useS2TwoCharacterStage = scenarioIndex === SCENARIO_INDEX.METACOGNITION &&
+    !window.pcS2PixelSolo &&
     Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0) >= 701;
 
   if (speaker) speaker.textContent = speakerName || (isJordan ? 'Jordan' : 'Professor Pixel');
@@ -3210,6 +3211,7 @@ function pcApplyDualCastResponsive() {
   const student = document.getElementById('vnStudentCharacter');
   const compact = window.matchMedia?.('(max-width: 620px), (max-height: 650px)').matches;
   const useS2TwoCharacterStage = scenarioIndex === SCENARIO_INDEX.METACOGNITION &&
+    !window.pcS2PixelSolo &&
     Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0) >= 701;
   overlay?.classList.toggle('pc-s2-two-character', useS2TwoCharacterStage);
 
