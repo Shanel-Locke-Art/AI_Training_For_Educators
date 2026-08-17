@@ -368,11 +368,8 @@ body .vn-overlay.active #claudeTerminalScene .claude-terminal-screen {
 :root {
   --pc-a11y-ink: #1f160f;
   --pc-a11y-ink-mid: #332417;
-  --pc-a11y-ink-muted: #5f4937;
   --pc-a11y-forest: #143d2a;
   --pc-a11y-forest-dark: #092719;
-  --pc-a11y-gold: #7a5200;
-  --pc-a11y-terra: #7f3514;
   --pc-a11y-border: #9f8e74;
   --pc-a11y-panel: #fffdf8;
   --pc-a11y-bg: #f8f2e8;

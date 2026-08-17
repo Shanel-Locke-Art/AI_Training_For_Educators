@@ -88,6 +88,7 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     title: 'What would you add to Jordan’s next learning attempt?',
     instruction: 'Choose one intervention. Each option creates a different kind of evidence, and Jordan’s response will show you what your design actually made possible.',
     choiceGridId: 's2EvidenceChoices',
+    gridClass: 'pc-choice-grid--tagged-detail',
     statusId: 's2EvidenceStatus',
     submitId: 's2EvidenceSubmit',
     submitLabel: 'Try this intervention',
@@ -96,6 +97,27 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     activeIndex: 1,
     focusSelector: 'input[name="s2-evidence"]',
     onSubmit: submitS2Evidence
+  }),
+  thinkingMove: Object.freeze({
+    items: S2_THINKING_MOVES,
+    inputName: 's2-thinking-move',
+    idPrefix: 's2-thinking',
+    variant: 'detail',
+    marker: item => item.tag,
+    titleId: 's2ThinkingTitle',
+    kicker: 'Decision 3 · Choose the thinking move',
+    title: 'What should Jordan practice first?',
+    instruction: 'Choose the move that most directly addresses the problem you diagnosed. Strong metacognition eventually uses all four, but this case needs a useful starting point.',
+    choiceGridId: 's2ThinkingChoices',
+    gridClass: 'pc-choice-grid--tagged-detail',
+    statusId: 's2ThinkingStatus',
+    submitId: 's2ThinkingSubmit',
+    submitLabel: 'Build the activity',
+    limit: 1,
+    feedbackId: 's2ThinkingFeedback',
+    activeIndex: 2,
+    focusSelector: 'input[name="s2-thinking-move"]',
+    onSubmit: submitS2ThinkingMove
   })
 });
 
@@ -179,7 +201,8 @@ function renderS2SelectionActivity(config) {
     statusId: config.statusId,
     submitId: config.submitId,
     submitLabel: config.submitLabel,
-    feedbackId: config.feedbackId
+    feedbackId: config.feedbackId,
+    gridClass: config.gridClass || ''
   });
   const contentHTML = typeof config.wrapContent === 'function'
     ? config.wrapContent(taskHTML)
@@ -410,6 +433,12 @@ function pcPlayS2JordanInterventionVoice(choice, options = {}) {
   }
 }
 
+function pcStopS2JordanInterventionVoice() {
+  pcS2JordanVoiceCache.forEach(sound => {
+    try { sound.stop(); } catch (e) {}
+  });
+}
+
 function pcCloseS2JordanRecordedDialogue() {
   const overlay = document.getElementById('vnOverlay');
   overlay?.classList.remove('pc-s2-jordan-recording');
@@ -422,196 +451,68 @@ function pcCloseS2JordanRecordedDialogue() {
   try { pcClearPredictionUI(); } catch (e) {}
   try { setClaudeTerminalState('idle', 'BABBAGE ENGINE', 'IDLE'); } catch (e) {}
   try { setClaudeShelfState('idle', 'idle'); } catch (e) {}
+  try { pcResetVNCharacters(); } catch (e) {}
   pcSetVNOverlayState({ active: false });
 
-  const student = document.getElementById('vnStudentCharacter');
-  const studentPortrait = document.getElementById('vnStudentPortrait');
-  const pixel = document.getElementById('vnCharacter');
-  const pixelPortrait = document.getElementById('vnPortrait');
-  if (student) {
-    student.classList.remove('visible', 'is-active', 'is-inactive');
-    ['display','visibility','opacity','filter','left','right','top','bottom','height','width','min-width','max-width','min-height','max-height','transform','transform-origin','z-index','align-items','justify-content','position'].forEach(p => student.style.removeProperty(p));
-  }
-  if (studentPortrait) {
-    ['display','height','width','max-width','max-height','object-fit','object-position','opacity','transform','z-index'].forEach(p => studentPortrait.style.removeProperty(p));
-  }
-  if (pixel) {
-    pixel.style.removeProperty('display');
-    pixel.style.removeProperty('visibility');
-    pixel.style.removeProperty('opacity');
-  }
-  if (pixelPortrait) {
-    pcSetImageSource(
-      pixelPortrait,
-      EXPRESSIONS.neutral,
-      LEGACY_ASSETS.images.professorPixel.neutral
-    );
-    pixelPortrait.style.opacity = '1';
-  }
   const speaker = document.getElementById('vnSpeaker');
   if (speaker) speaker.textContent = 'Professor Pixel';
 }
 
 
-function pcApplyS2RecordedWideMonitorGeometry() {
-  // Keep S1's authoritative photographed-workstation placement, then adjust
-  // only the S2 recorded-dialogue screen layer to the slightly larger visible
-  // monitor glass in this composition. This helper is called again by the
-  // shared prediction resize lifecycle, so the inset survives viewport changes.
-  try {
-    if (typeof window.pcApplyWidePredictionComputer === 'function') {
-      window.pcApplyWidePredictionComputer();
-    }
+function pcHandleS2OpeningCheckpoint() {
+  pcCloseS2JordanRecordedDialogue();
+  const data = getS2Data();
+  data.evidenceFinal = pcGetLatestS2Selection('evidenceAttempts');
+  data.openingCheckpointReached = true;
 
-    const terminal = document.getElementById('claudeTerminalScene');
-    const screen = terminal?.querySelector('.claude-terminal-screen');
-    if (!screen) return false;
+  const feedback = data.lastEvidenceFeedback || {};
+  const pixelText = [feedback.heading, feedback.copy].filter(Boolean).join(' ')
+    || 'Jordan’s response is the evidence. The useful intervention is the one that makes his learning process visible enough to evaluate and act on.';
 
-    const recordedGeometry = [
-      ['position', 'absolute'],
-      ['inset', 'auto'],
-      ['left', '22.4%'],
-      ['right', 'auto'],
-      ['top', '13.3%'],
-      ['bottom', 'auto'],
-      ['width', '42.7%'],
-      ['height', '46.8%'],
-      ['box-sizing', 'border-box'],
-      ['transform', 'none'],
-      ['overflow', 'hidden']
-    ];
-
-    if (typeof pcSetImportantStyles === 'function') {
-      pcSetImportantStyles(screen, recordedGeometry);
-    } else {
-      recordedGeometry.forEach(([prop, value]) => screen.style.setProperty(prop, value, 'important'));
-    }
-    return true;
-  } catch (e) {}
-  return false;
+  // This is a normal single-character VN beat. The shared cast renderer
+  // handles Jordan leaving and Pixel returning; S2 does not own positioning.
+  vnShow(feedback.tone === 'strong' ? 'proud' : 'thinking', pixelText, () => {
+    renderS2ThinkingMoveActivity();
+  }, { speaker: 'Professor Pixel', character: 'pixel', id: 's2-post-recording-pixel' });
 }
 
 function pcShowS2JordanRecordedDialogue(choice, result) {
   const recorded = pcGetS2JordanInterventionDialogue(choice);
-
-  try { pcClearPredictionUI(); } catch (e) {}
-  try { pcStopVN(); } catch (e) {}
-  const overlay = pcSetVNOverlayState({
-    active: true,
-    modes: ['claude-prediction', 'pc-clean-prediction', 'pc-prediction-question']
-  });
-  if (!overlay) return false;
-
-  overlay.classList.add('pc-s2-jordan-recording');
-  overlay.removeAttribute('aria-hidden');
-
-  const sceneBackground = document.getElementById('vnSceneBg');
-  if (sceneBackground) {
-    pcSetImageSource(
-      sceneBackground,
-      ASSETS.images.backgrounds.classroom,
-      LEGACY_ASSETS.images.backgrounds.classroom
-    );
-  }
-
-  try { setVNClaudeMode(false); } catch (e) {}
-  try { setVNClaudeTerminalMode(false); } catch (e) {}
-  try { setClaudeTerminalTextMode(false); } catch (e) {}
-  try { setClaudeShelfState('idle', 'student response'); } catch (e) {}
-  try { setClaudeTerminalState('idle', 'BABBAGE ENGINE', 'RECORDED DIALOGUE'); } catch (e) {}
-  try { pcClearPredictionLayoutInlineStylesV186(); } catch (e) {}
-
-  // Keep Jordan in his own S2 portrait container. Do not copy Pixel's computed
-  // dimensions: Jordan's source artwork has different transparent-canvas proportions.
-  // The recorded-dialogue CSS reuses S2's established Jordan baselines instead.
-  const pixel = document.getElementById('vnCharacter');
-  const pixelPortrait = document.getElementById('vnPortrait');
-  const student = document.getElementById('vnStudentCharacter');
-  const studentPortrait = document.getElementById('vnStudentPortrait');
-  const jordanExpressions = ASSETS.images.students.jordan;
   const expression = recorded.expression || 'neutral';
-  const jordanSrc = jordanExpressions[expression] || jordanExpressions.neutral;
 
-  overlay.classList.remove('pc-s2-two-character', 'pc-dual-character', 'pc-s2-narrow-jordan');
+  const presentation = pcShowSharedWorkstationResult({
+    terminalText: 'RECORDED DIALOGUE',
+    speakerName: 'Jordan',
+    character: 'jordan',
+    expression,
+    heading: 'Recorded student dialogue.',
+    bodyHTML: `“${esc(recorded.quote)}”`,
+    button: {
+      onActivate: pcHandleS2OpeningCheckpoint,
+      label: 'Continue →'
+    },
+    ariaLabel: 'Jordan recorded response. Continue when ready.',
+    // State marker only. It intentionally owns no geometry or visual styling.
+    overlayClasses: ['pc-s2-jordan-recording']
+  });
+  if (!presentation) return false;
 
-  if (pixel) {
-    pixel.classList.remove('visible', 'is-active', 'is-inactive');
-    pixel.style.setProperty('display', 'none', 'important');
-    pixel.style.setProperty('visibility', 'hidden', 'important');
-    pixel.style.setProperty('opacity', '0', 'important');
-  }
-
-  if (student) {
-    ['position','left','right','top','bottom','width','height','min-width','max-width',
-     'min-height','max-height','align-items','justify-content','transform','transform-origin']
-      .forEach(prop => student.style.removeProperty(prop));
-    student.style.setProperty('display', 'flex', 'important');
-    student.style.setProperty('visibility', 'visible', 'important');
-    student.style.setProperty('opacity', '1', 'important');
-    student.style.setProperty('filter', 'none', 'important');
-    student.style.setProperty('z-index', '70', 'important');
-    student.classList.add('visible', 'is-active');
-    student.classList.remove('is-inactive');
-  }
-
-  if (studentPortrait) {
-    pcSetImageSource(
-      studentPortrait,
-      jordanSrc,
-      LEGACY_ASSETS.images.students.jordan[expression] || LEGACY_ASSETS.images.students.jordan.neutral
-    );
-    ['height','width','max-width','max-height','object-fit','object-position','transform']
-      .forEach(prop => studentPortrait.style.removeProperty(prop));
-    studentPortrait.style.setProperty('display', 'block', 'important');
-    studentPortrait.style.setProperty('opacity', '1', 'important');
-    studentPortrait.style.setProperty('z-index', '71', 'important');
-  }
-
-  const speaker = document.getElementById('vnSpeaker');
-  if (speaker) speaker.textContent = 'Jordan';
-
-  overlay.classList.remove('pc-prediction-question');
-  overlay.classList.add('pc-prediction-result');
-
-  const vnDialogue = document.getElementById('vnDialogue');
-  if (vnDialogue) {
-    vnDialogue.classList.remove('has-choices', 'prediction-question', 'pc-s2-recorded-dialogue');
-    vnDialogue.classList.add('prediction-result');
-    vnDialogue.setAttribute('aria-label', 'Jordan recorded response. Continue when ready.');
-    vnDialogue.style.removeProperty('display');
-  }
-
-  // Use S1's result markup exactly: feedback copy, then the continue button.
-  const vnText = document.getElementById('vnText');
-  if (vnText) {
-    vnText.innerHTML = `
-      <div class="pc-feedback-copy">
-        <div class="pc-feedback-message">
-          <div class="pc-feedback-heading"><strong>Recorded student dialogue.</strong></div>
-          <div>“${esc(recorded.quote)}”</div>
-        </div>
-        <button class="prediction-continue-btn" type="button"
-          data-pc-action="s2-opening-checkpoint" data-pc-stop-propagation="true">Continue →</button>
-        <div id="s2JordanVoiceStatus" class="sr-only" role="status" aria-live="polite"></div>
-      </div>`;
-  }
-
-  document.getElementById('s2JordanVNControls')?.remove();
-  const hint = document.getElementById('vnAdvanceHint');
-  if (hint) hint.classList.remove('show');
-  vnDialogue?.querySelector('.vn-skip')?.setAttribute('hidden', '');
-
-  // This is a static recorded-response result, not a live S1 prediction question.
-  // Do not queue the generic prediction/VN presentation after writing vnText: those
-  // delayed passes can replace this dialogue and can also resurrect Pixel. The shared
-  // prediction resize lifecycle now reapplies the S2 recorded monitor correction on
-  // wide desktop, so this function no longer owns a one-time geometry call.
+  const status = document.createElement('div');
+  status.id = 's2JordanVoiceStatus';
+  status.className = 'sr-only';
+  status.setAttribute('role', 'status');
+  status.setAttribute('aria-live', 'polite');
+  presentation.vnText?.querySelector('.pc-feedback-copy')?.appendChild(status);
 
   try { musicStartVN(); } catch (e) {}
-  window.setTimeout(() => pcPlayS2JordanInterventionVoice(choice), 140);
-  window.setTimeout(() => vnText?.querySelector('[data-pc-action="s2-opening-checkpoint"]')?.focus(), 100);
+  pcScheduleScenarioTask(() => pcPlayS2JordanInterventionVoice(choice), 140, SCENARIO_INDEX.METACOGNITION);
+  pcScheduleScenarioTask(() => {
+    const button = presentation.vnText?.querySelector('.prediction-continue-btn');
+    pcFocusWithoutScroll(button);
+  }, 100, SCENARIO_INDEX.METACOGNITION);
   return true;
 }
+
 
 function renderS2JordanInterventionFeedback(choice, result) {
   const panel = document.getElementById('s2EvidenceFeedback');
@@ -646,40 +547,7 @@ function submitS2Evidence() {
 
 
 function renderS2ThinkingMoveActivity() {
-  const choicesHTML = buildScenarioChoiceCardsHTML({
-    items: S2_THINKING_MOVES,
-    inputName: 's2-thinking-move',
-    idPrefix: 's2-thinking',
-    variant: 'detail',
-    marker: item => item.tag
-  });
-
-  mountScenarioActivity({
-    scenarioIndex: SCENARIO_INDEX.METACOGNITION,
-    progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 2, ariaLabel: 'Scenario 2 progress' }),
-    contentHTML: `<div class="pc-s2-step-shell">${buildS2CaseContextHTML()}${buildScenarioTaskCardHTML({
-      titleId: 's2ThinkingTitle',
-      kicker: 'Decision 3 · Choose the thinking move',
-      title: 'What should Jordan practice first?',
-      instruction: 'Choose the move that most directly addresses the problem you diagnosed. Strong metacognition eventually uses all four, but this case needs a useful starting point.',
-      choiceGridId: 's2ThinkingChoices',
-      choicesHTML,
-      statusId: 's2ThinkingStatus',
-      submitId: 's2ThinkingSubmit',
-      submitLabel: 'Build the activity',
-      feedbackId: 's2ThinkingFeedback'
-    })}</div>`,
-    focusSelector: 'input[name="s2-thinking-move"]'
-  });
-
-  wireExactSelection({
-    rootId: 's2ThinkingChoices',
-    inputName: 's2-thinking-move',
-    limit: 1,
-    statusId: 's2ThinkingStatus',
-    submitId: 's2ThinkingSubmit',
-    onSubmit: submitS2ThinkingMove
-  });
+  return renderS2SelectionActivity(S2_ACTIVITY_CONFIG.thinkingMove);
 }
 
 function pcS2BuildDraftSystemPrompt(move) {
@@ -743,6 +611,7 @@ function renderS2BabbageLoading(message = 'Babbage is building a reflection acti
 }
 
 async function generateS2BabbageDraft() {
+  const runToken = pcCaptureScenarioRun(SCENARIO_INDEX.METACOGNITION);
   renderS2BabbageLoading();
   const data = getS2Data();
   const move = data.thinkingMove || 'evaluate';
@@ -758,6 +627,7 @@ async function generateS2BabbageDraft() {
         content: `Case evidence: Jordan says rereading sometimes made the material feel clearer, but he cannot tell what actually helped. He plans to repeat the same strategy next time and hope it works. Build the draft now.`
       }]
     }, 's2-draft');
+    if (!pcIsScenarioRunCurrent(runToken)) return false;
 
     result = response?.analysis || null;
     if (!result || !result.activity_prompt || !result.deliberate_weakness) throw new Error('Incomplete structured draft.');
@@ -767,6 +637,7 @@ async function generateS2BabbageDraft() {
     data.aiElapsedMs = response.elapsed_ms ?? '';
     data.aiUsage = response.usage || null;
   } catch (error) {
+    if (!pcIsScenarioRunCurrent(runToken)) return false;
     console.warn('[PromptCraft] S2 Babbage draft unavailable; using local fallback.', error);
     result = { ...S2_LOCAL_DRAFT_FALLBACK };
     data.aiProvider = 'local-fallback';
@@ -947,6 +818,7 @@ The Jordan response should demonstrate metacognition, not merely a better grade 
 }
 
 async function submitS2Repair() {
+  const runToken = pcCaptureScenarioRun(SCENARIO_INDEX.METACOGNITION);
   const text = document.getElementById('s2RepairText');
   const repair = text?.value.trim() || '';
   if (repair.length < 35) return;
@@ -975,6 +847,7 @@ async function submitS2Repair() {
       system: pcS2BuildReviewSystemPrompt(data, repair),
       messages: [{ role: 'user', content: 'Review the faculty repair now.' }]
     }, 's2-review');
+    if (!pcIsScenarioRunCurrent(runToken)) return false;
 
     review = response?.analysis || null;
     if (!review || !review.revised_activity || !review.student_response_after) throw new Error('Incomplete structured review.');
@@ -984,6 +857,7 @@ async function submitS2Repair() {
     data.aiElapsedMs = response.elapsed_ms ?? data.aiElapsedMs;
     data.aiUsage = response.usage || data.aiUsage || null;
   } catch (error) {
+    if (!pcIsScenarioRunCurrent(runToken)) return false;
     console.warn('[PromptCraft] S2 Babbage review unavailable; using local fallback.', error);
     review = { ...S2_LOCAL_REVIEW_FALLBACK };
     data.aiProvider = 'local-fallback';
@@ -1005,6 +879,7 @@ async function submitS2Repair() {
 }
 
 function renderS2FinalComparison() {
+  if (scenarioIndex !== SCENARIO_INDEX.METACOGNITION) return false;
   const data = getS2Data();
   const draft = data.babbageDraft || S2_LOCAL_DRAFT_FALLBACK;
   const review = data.babbageReview || S2_LOCAL_REVIEW_FALLBACK;
@@ -1077,25 +952,6 @@ pcRegisterUIActions({
   },
   's2-retry-evidence': () => renderS2EvidenceActivity(),
   's2-replay-jordan-voice': target => pcPlayS2JordanInterventionVoice(target.dataset.s2Choice, { userInitiated: true }),
-  's2-opening-checkpoint': () => {
-    pcCloseS2JordanRecordedDialogue();
-    const data = getS2Data();
-    data.evidenceFinal = pcGetLatestS2Selection('evidenceAttempts');
-    data.openingCheckpointReached = true;
-
-    const feedback = data.lastEvidenceFeedback || {};
-    const pixelText = [feedback.heading, feedback.copy].filter(Boolean).join(' ')
-      || 'Jordan’s response is the evidence. The useful intervention is the one that makes his learning process visible enough to evaluate and act on.';
-
-    // This is a solo Pixel beat: Jordan has left after the recording. The
-    // recorded workstation has already been cleared, so the normal S2
-    // smartboard is the only presentation surface behind Pixel.
-    window.pcS2PixelSolo = true;
-    vnShow(feedback.tone === 'strong' ? 'proud' : 'thinking', pixelText, () => {
-      window.pcS2PixelSolo = false;
-      renderS2ThinkingMoveActivity();
-    }, { speaker: 'Professor Pixel', character: 'pixel', id: 's2-post-recording-pixel' });
-  },
   's2-generate-draft': () => generateS2BabbageDraft(),
   's2-repair-draft': () => renderS2RepairActivity(),
   's3-diagnosis': () => renderS3DiagnosisActivity(),
@@ -2968,4 +2824,3 @@ function renderS5FinalReport() {
 
   document.querySelector('#inputContainer button')?.focus();
 }
-;

@@ -6,29 +6,29 @@
    ══════════════════════════════════════════════════════ */
 
 /* Shared polish for single-character intro / guided VN scenes only. */
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap,
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap {
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap {
   z-index: 11 !important;
 }
 
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
   border-radius: 10px !important;
   max-width: none !important;
   min-height: 0 !important;
   z-index: 13 !important;
 }
 
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before,
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before {
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before {
   display: block !important;
   margin-bottom: 10px !important;
   line-height: 1.22 !important;
   letter-spacing: 0.16em !important;
 }
 
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character),
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character) {
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character),
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character) {
   z-index: 18 !important;
 }
 
@@ -236,10 +236,10 @@ html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverla
    families without creating device-name-specific rules.
    ══════════════════════════════════════════════════════ */
 
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text *,
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text * {
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text *,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text * {
   line-height: 1.38 !important;
 }
 
@@ -374,8 +374,8 @@ body[data-pc-viewport-family="compact-phone"] {
 
 /* Normalize the actual smartboard element so older scale/offset rules cannot
    make a centered wrapper appear oversized or shifted. */
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap,
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap {
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap {
   left: 50% !important;
   right: auto !important;
   margin: 0 !important;
@@ -384,8 +384,8 @@ html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.act
   box-sizing: border-box !important;
 }
 
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard,
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard {
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
@@ -459,10 +459,10 @@ body[data-pc-viewport-family="compact-desktop"] {
 /* Phones and narrow foldables: anchor the card above the lower monitor frame.
    Widening it slightly reduces unnecessary wrapping while retaining the
    improved line spacing from V281. */
-html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
   top: auto !important;
   bottom: 22% !important;
   left: 4.5% !important;
@@ -490,10 +490,10 @@ body[data-pc-viewport-family="compact-phone"] {
 /* Phones and narrow foldables: center the mission card inside the usable
    smartboard area. This restores visible space above and below the card and
    prevents the eyebrow label from being clipped by the upper frame. */
-html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
   top: 50% !important;
   bottom: auto !important;
   transform: translateY(-50%) !important;
@@ -547,8 +547,8 @@ body[data-pc-viewport-family="compact-phone"] {
    - Boost smartboard readability on iPad Air-sized portrait tablets.
    ══════════════════════════════════════════════════════ */
 
-html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
   top: 52% !important;
   padding-top: 11px !important;
   padding-bottom: 10px !important;
@@ -649,15 +649,15 @@ html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverla
 }
 
 /* Keep the narrow-screen mission card clear of the bottom smartboard frame. */
-html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
   top: 49% !important;
   padding-top: 8px !important;
   padding-bottom: 8px !important;
 }
 
-html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
   top: 48% !important;
   padding-top: 8px !important;
   padding-bottom: 8px !important;
@@ -665,9 +665,9 @@ html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverla
 }
 
 /* Explicit stacking: dialogue in front, portrait behind it. */
-html body[data-pc-viewport-family="short-landscape"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character),
-html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character),
-html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character) {
+html body[data-pc-viewport-family="short-landscape"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character),
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character),
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character) {
   z-index: 18 !important;
 }
 
@@ -713,17 +713,17 @@ body[data-pc-viewport-family="compact-phone"] {
 }
 
 /* Add a little more space under the mission copy on the smartboard. */
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-consult, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-consult, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
   padding-bottom: 14px !important;
 }
 
-html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="short-landscape"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-html body[data-pc-viewport-family="short-landscape"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="short-landscape"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family="short-landscape"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
   padding-bottom: 16px !important;
 }
 
@@ -757,8 +757,8 @@ body[data-pc-viewport-family="compact-phone"] {
 /* Add more breathing room underneath the mission copy for the Galaxy Z Fold 5
    and Galaxy S8+ style layouts that still felt tight at the bottom. */
 @media screen and (max-width: 360px) and (orientation: portrait) {
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
     padding-bottom: 22px !important;
   }
 }
@@ -795,8 +795,8 @@ body[data-pc-viewport-family="compact-phone"] {
     --pc-vn-board-line: 1.16;
   }
 
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
     top: 46.5% !important;
     padding-top: 10px !important;
     padding-bottom: 28px !important;
@@ -852,8 +852,8 @@ body[data-pc-viewport-family="portrait-tablet"] {
     --pc-vn-board-line: 1.16;
   }
 
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
     left: 3.8% !important;
     right: 3.8% !important;
     top: 44.5% !important;
@@ -880,8 +880,8 @@ body[data-pc-viewport-family="portrait-tablet"] {
     --pc-vn-board-line: 1.18;
   }
 
-  html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-  html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+  html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
     left: 4.8% !important;
     right: 4.8% !important;
     top: 45.5% !important;
@@ -935,8 +935,8 @@ body[data-pc-viewport-family="portrait-tablet"] {
     --pc-vn-board-line: 1.17;
   }
 
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
     top: 43.5% !important;
     max-height: calc(100% - 20px) !important;
     padding-top: 10px !important;
@@ -957,8 +957,8 @@ body[data-pc-viewport-family="portrait-tablet"] {
     --pc-vn-board-line: 1.17;
   }
 
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
     left: 5.4% !important;
     right: 5.4% !important;
     top: 43.5% !important;
@@ -1003,8 +1003,8 @@ body[data-pc-viewport-family="portrait-tablet"] {
     --pc-vn-board-line: 1.15;
   }
 
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
     left: 4.8% !important;
     right: 4.8% !important;
     top: 42.25% !important;
@@ -1028,8 +1028,8 @@ body[data-pc-viewport-family="portrait-tablet"] {
     --pc-vn-board-line: 1.14;
   }
 
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+  html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
     left: 4.2% !important;
     right: 4.2% !important;
     top: 42.25% !important;
@@ -1062,8 +1062,8 @@ body[data-pc-viewport-family="portrait-tablet"] {
     --pc-vn-board-line: 1.16;
   }
 
-  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
     left: var(--pc-vn-board-box-inline) !important;
     right: var(--pc-vn-board-box-inline) !important;
     top: 10px !important;
@@ -1074,8 +1074,8 @@ body[data-pc-viewport-family="portrait-tablet"] {
     transform: none !important;
   }
 
-  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before,
-  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before {
+  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before,
+  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before {
     margin-bottom: 6px !important;
   }
 }
@@ -1090,8 +1090,8 @@ body[data-pc-viewport-family="portrait-tablet"] {
     --pc-vn-board-line: 1.1;
   }
 
-  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
-  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
     left: var(--pc-vn-board-box-inline) !important;
     right: var(--pc-vn-board-box-inline) !important;
     top: 2px !important;
@@ -1102,56 +1102,53 @@ body[data-pc-viewport-family="portrait-tablet"] {
     transform: none !important;
   }
 
-  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before,
-  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before {
+  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before,
+  html body[data-pc-scenario="engagement"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before {
     margin-bottom: 5px !important;
   }
 }
 
 /* ══════════════════════════════════════════════════════
    S2 — S1 INTRO + JORDAN COMPANION
-   IMPORTANT: Scenario 2 inherits Scenario 1's smartboard, Pixel, dialogue,
-   spacing, and responsive geometry without modification. These rules add only
-   the secondary Jordan portrait on larger screens and make room inside the
-   mission text card for S2's longer copy.
+   Scenario 2 keeps Scenario 1's smartboard/dialogue system. These rules only:
+   1) give the longer S2 mission enough internal card padding,
+   2) place Jordan opposite Pixel on 701px+ screens,
+   3) keep both portraits the same stage size and dim the inactive speaker with
+      brightness rather than transparency, and
+   4) reuse the two proven Level 1 phone compositions with S2-sized mission copy.
    ══════════════════════════════════════════════════════ */
 
-/* Smartboard geometry and mission-card styling intentionally inherit Scenario 1 exactly. */
+/* The S2 mission is longer than S1's. Keep the black challenge card fully
+   around the copy without changing the smartboard itself or the dialogue. */
+body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) .vn-board-text {
+  box-sizing: border-box !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding-top: max(10px, var(--pc-vn-board-pad-block)) !important;
+  padding-right: max(14px, var(--pc-vn-board-pad-inline)) !important;
+  padding-bottom: max(12px, var(--pc-vn-board-pad-block)) !important;
+  padding-left: max(14px, var(--pc-vn-board-pad-inline)) !important;
+  overflow: visible !important;
+}
 
-/* On 701px+ screens Jordan is an additional left-side visual-novel portrait.
-   Pixel is intentionally NOT targeted here, so every Pixel rule continues to
-   come directly from Scenario 1's established responsive system. */
+/* Shared two-character VN staging. The dialogue and smartboard remain the
+   ordinary S1 components. Dual-cast mode owns only two reusable character
+   slots, and both slots use the same S1-resolved vertical geometry. */
 @media screen and (min-width: 701px) {
-  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.active.pc-s2-two-character {
-    --pc-s2-jordan-left: clamp(10px, 2.2vw, 42px);
+  #vnOverlay.vn-overlay.active.pc-dual-character {
+    --pc-vn-cast-side: clamp(10px, 2.2vw, 42px);
   }
 
-  /* Portrait tablet / foldable layouts have enough horizontal room for a more
-     visual-novel-like two-character composition. Move only Jordan farther left;
-     Pixel, the smartboard, and all S1 geometry remain untouched. */
-  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"]
-  #vnOverlay.vn-overlay.active.pc-s2-two-character {
-    --pc-s2-jordan-left: -2.5vw;
-  }
-
-
-
-  /* S2 two-character staging only: keep the S1 smartboard/dialogue geometry,
-     but place the two portraits on opposite sides like the full-screen VN. */
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family]
-  #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnCharacter {
-    left: auto !important;
-    right: clamp(10px, 2.2vw, 42px) !important;
-    transform-origin: right bottom !important;
-    justify-content: flex-end !important;
-  }
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family]
-  #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnStudentCharacter {
+  /* High specificity here is intentional: older S1 rules target #vnCharacter
+     directly. A dual-cast scene must give both reusable slots one geometry
+     owner instead of letting the original primary slot drift independently. */
+  html body[data-pc-viewport-family][data-pc-viewport-family]
+  #vnOverlay#vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter) {
     display: flex !important;
     visibility: visible !important;
     position: absolute !important;
-    left: var(--pc-s2-jordan-left) !important;
-    right: auto !important;
     top: auto !important;
     bottom: var(--pc-vn-character-bottom) !important;
     width: auto !important;
@@ -1161,16 +1158,33 @@ body[data-pc-viewport-family="portrait-tablet"] {
     max-width: var(--pc-vn-character-max-width) !important;
     max-height: none !important;
     transform: none !important;
-    transform-origin: left bottom !important;
     align-items: flex-end !important;
-    justify-content: flex-start !important;
     z-index: 17 !important;
     pointer-events: none !important;
     opacity: 1 !important;
     transition: filter 160ms ease !important;
   }
 
-  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.active.pc-s2-two-character #vnStudentPortrait {
+  html body[data-pc-viewport-family][data-pc-viewport-family]
+  #vnOverlay#vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter)[data-pc-cast-side="left"] {
+    left: var(--pc-vn-cast-side) !important;
+    right: auto !important;
+    justify-content: flex-start !important;
+    transform-origin: left bottom !important;
+  }
+
+  html body[data-pc-viewport-family][data-pc-viewport-family]
+  #vnOverlay#vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter)[data-pc-cast-side="right"] {
+    left: auto !important;
+    right: var(--pc-vn-cast-side) !important;
+    justify-content: flex-end !important;
+    transform-origin: right bottom !important;
+  }
+
+  #vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter, #vnStudentCharacter) > :is(#vnPortrait, #vnStudentPortrait) {
     display: block !important;
     width: auto !important;
     height: 100% !important;
@@ -1178,159 +1192,131 @@ body[data-pc-viewport-family="portrait-tablet"] {
     max-width: 100% !important;
     max-height: 100% !important;
     object-fit: contain !important;
-    object-position: left bottom !important;
   }
 
-  /* Speaker emphasis changes brightness only. Geometry and opacity remain the
-     same, so neither portrait jumps or becomes ghost-like. */
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnStudentCharacter.is-inactive,
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnCharacter.is-inactive {
+  #vnOverlay.vn-overlay.active.pc-dual-character [data-pc-cast-side="left"] > img {
+    object-position: left bottom !important;
+  }
+  #vnOverlay.vn-overlay.active.pc-dual-character [data-pc-cast-side="right"] > img {
+    object-position: right bottom !important;
+  }
+
+  #vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter, #vnStudentCharacter).is-inactive {
     opacity: 1 !important;
     filter: saturate(.68) brightness(.62) !important;
   }
-
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnStudentCharacter.is-active,
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnCharacter.is-active {
+  #vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter, #vnStudentCharacter).is-active {
     opacity: 1 !important;
     filter: none !important;
   }
 }
 
-/* Narrow phones keep Scenario 1's exact single-character composition. Jordan
-   uses his dedicated portrait element staged into Pixel's resolved S1 geometry. */
+/* Phones retain S1's proven one-speaker composition. Whichever cast member is
+   speaking is rendered into the same resolved position; the listener remains
+   in state but is not drawn. No phone model needs its own character rule. */
 @media screen and (max-width: 700px) {
-  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay #vnStudentCharacter {
-    display: none !important;
-  }
-
-  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.pc-s2-narrow-jordan #vnStudentCharacter {
-    display: flex !important;
-  }
-
-  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.pc-s2-narrow-jordan #vnCharacter {
-    display: none !important;
-  }
-}
-
-/* S2 portrait-tablet cast spacing: keep S1 smartboard/dialogue geometry untouched.
-   Only pin the two character containers to opposite scene edges. */
-@media screen and (min-width: 701px) and (max-width: 1100px) {
-  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"]
-  #vnOverlay.vn-overlay.active.pc-s2-two-character {
-    --pc-s2-cast-side: 0px;
-  }
-
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"]
-  #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnStudentCharacter,
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"]
-  #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnCharacter {
-    width: min(34vw, 290px) !important;
-    max-width: min(34vw, 290px) !important;
-    transform: none !important;
-  }
-
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"]
-  #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnStudentCharacter {
-    left: 0 !important;
-    right: auto !important;
-    justify-content: flex-start !important;
-  }
-
-  html body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"]
-  #vnOverlay#vnOverlay#vnOverlay.active.pc-s2-two-character #vnCharacter {
-    left: auto !important;
-    right: 0 !important;
-    justify-content: flex-end !important;
-  }
-
-  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"]
-  #vnOverlay.vn-overlay.active.pc-s2-two-character #vnStudentPortrait {
-    object-position: left bottom !important;
-    /* Jordan's source art has more transparent canvas around the figure than
-       Pixel's portraits. Scale only Jordan's image so the two characters read
-       at the same visual size without touching S1/Pixel geometry. */
-    transform: scale(1.02) !important;
-    transform-origin: left bottom !important;
-  }
-
-  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"]
-  #vnOverlay.vn-overlay.active.pc-s2-two-character #vnPortrait {
-    object-position: right bottom !important;
-  }
-}
-
-/* Larger portrait tablets give Pixel more visual presence because of the
-   different transparent padding in the source art. Increase only Jordan here
-   so both characters read at roughly the same on-screen scale. */
-@media screen and (min-width: 900px) and (max-width: 959px) {
-  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"]
-  #vnOverlay.vn-overlay.active.pc-s2-two-character #vnStudentPortrait {
-    transform: scale(1.08) !important;
-  }
-}
-
-/* iPad Pro-class portrait tablets use a larger Pixel portrait box than the
-   smaller tablet family. Compensate only Jordan's source-art padding here so
-   the two characters read at the same visual scale. */
-@media screen and (min-width: 960px) and (max-width: 1100px) {
-  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"]
-  #vnOverlay.vn-overlay.active.pc-s2-two-character #vnStudentPortrait {
-    transform: scale(1.28) !important;
-  }
-}
-
-/* S2 narrow-phone Jordan alignment: keep the dedicated Jordan portrait centered
-   in the same single-speaker stage instead of inheriting Pixel's right offset. */
-@media screen and (max-width: 700px) {
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-s2-narrow-jordan #vnStudentCharacter {
+  html body[data-pc-viewport-family][data-pc-viewport-family]
+  #vnOverlay#vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter) {
+    position: absolute !important;
     left: 50% !important;
     right: auto !important;
-    bottom: calc(var(--pc-vn-character-bottom) + clamp(18px, 2.6dvh, 28px)) !important;
+    top: auto !important;
+    bottom: var(--pc-vn-character-bottom) !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: var(--pc-vn-character-height) !important;
+    min-height: 0 !important;
+    max-width: var(--pc-vn-character-max-width) !important;
+    max-height: none !important;
     transform: translateX(-50%) !important;
     transform-origin: center bottom !important;
+    align-items: flex-end !important;
     justify-content: center !important;
+    z-index: 18 !important;
   }
 
-  body[data-pc-scenario="metacognition"] #vnOverlay.vn-overlay.active.pc-s2-narrow-jordan #vnStudentPortrait {
+  html body[data-pc-viewport-family][data-pc-viewport-family]
+  #vnOverlay#vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter).is-inactive {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  html body[data-pc-viewport-family][data-pc-viewport-family]
+  #vnOverlay#vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter).is-active {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+  #vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter, #vnStudentCharacter) > :is(#vnPortrait, #vnStudentPortrait) {
+    display: block !important;
+    height: 100% !important;
+    width: auto !important;
+    max-width: 72vw !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
     object-position: center bottom !important;
   }
 }
 
-/* Compact 481–700px layouts such as Surface Duo need the single Jordan portrait
-   slightly higher so his visual baseline relates to the dialogue panel the same
-   way it does on the narrower phone layouts. */
-@media screen and (min-width: 481px) and (max-width: 700px) {
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-s2-narrow-jordan #vnStudentCharacter {
-    /* Surface Duo-style compact screens need the same baseline relationship as
-       the phones, but Jordan's source artwork fills more of its canvas. Keep
-       him attached to the dialogue edge without letting him reach the board. */
-    bottom: calc(var(--pc-vn-character-bottom) + 6px) !important;
-    height: clamp(185px, 28dvh, 205px) !important;
-    max-height: clamp(185px, 28dvh, 205px) !important;
+/* iPhone SE: reuse S1's proven lifted-board composition. The only S2-specific
+   change is slightly smaller mission copy because this mission is longer. */
+@media screen and (min-width: 370px) and (max-width: 380px) and (min-height: 650px) and (max-height: 690px) and (orientation: portrait) {
+  body[data-pc-scenario="metacognition"] {
+    --pc-vn-board-wrap-top: 10px;
+    --pc-vn-board-wrap-width: calc(100vw - 14px);
+    --pc-vn-board-box-inline: 5%;
+    --pc-vn-board-body-size: 0.78rem;
+    --pc-vn-board-meta-size: 0.48rem;
+    --pc-vn-board-line: 1.16;
+    --pc-vn-character-bottom: 170px;
+    --pc-vn-character-height: 190px;
+    --pc-vn-character-max-width: 58vw;
+  }
+
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+    left: var(--pc-vn-board-box-inline) !important;
+    right: var(--pc-vn-board-box-inline) !important;
+    top: 8px !important;
+    bottom: auto !important;
+    max-height: none !important;
+    padding: 9px 11px 11px !important;
+    overflow: visible !important;
+    transform: none !important;
+  }
+
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-board-text::before {
+    margin-bottom: 6px !important;
   }
 }
 
-/* The very short iPhone SE viewport inherits a taller S1 portrait box than
-   Jordan needs. Reduce only Jordan on short phone screens; all other phones
-   keep the normal S1-derived character height. */
-@media screen and (max-width: 700px) and (max-height: 700px) {
-  html body[data-pc-scenario="metacognition"] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-s2-narrow-jordan #vnStudentCharacter {
-    /* Jordan's artwork fills more of its image canvas than Pixel's. Match the
-       established S1 visual size on short phones instead of letting Jordan
-       appear substantially larger than Pixel. */
-    height: 30% !important;
-    max-height: 30% !important;
+/* Galaxy Z Fold 5: preserve the tall S1 composition while ensuring the longer
+   S2 challenge remains inside its black card with a visible inner image border. */
+@media screen and (min-width: 330px) and (max-width: 350px) and (min-height: 840px) and (max-height: 920px) and (orientation: portrait) {
+  body[data-pc-scenario="metacognition"] {
+    --pc-vn-board-box-inline: 5%;
+    --pc-vn-board-body-size: 0.76rem;
+    --pc-vn-board-meta-size: 0.47rem;
+    --pc-vn-board-line: 1.12;
   }
-}
 
-/* S2 iPad Mini visual-size correction: Jordan's source art contains more
-   transparent canvas than Pixel's. Keep the existing opposite-side staging,
-   but slightly increase Jordan only on the 768px portrait-tablet class so the
-   two characters read at the same apparent size. */
-@media screen and (min-width: 740px) and (max-width: 799px) and (orientation: portrait) {
-  body[data-pc-scenario="metacognition"][data-pc-viewport-family="portrait-tablet"]
-  #vnOverlay.vn-overlay.active.pc-s2-two-character #vnStudentPortrait {
-    transform: scale(1.08) !important;
-    transform-origin: left bottom !important;
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+    left: var(--pc-vn-board-box-inline) !important;
+    right: var(--pc-vn-board-box-inline) !important;
+    top: 4px !important;
+    bottom: auto !important;
+    max-height: none !important;
+    padding: 8px 11px 9px !important;
+    overflow: visible !important;
+    transform: none !important;
+  }
+
+  html body[data-pc-scenario="metacognition"][data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active:not(.claude-terminal-textmode) .vn-board-text::before {
+    margin-bottom: 5px !important;
   }
 }

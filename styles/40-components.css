@@ -1927,111 +1927,41 @@ body.pc-main-menu-open .pixel-coach-card {
 
 
 /* ══════════════════════════════════════════════════════
-   V138 — S2 METACOGNITION OPENING + DUAL CHARACTER VN
+   SHARED VN SECONDARY CHARACTER SLOT
+   Character identity is supplied by JavaScript. This slot is reusable for
+   Jordan and future students; it does not own dialogue or scene geometry.
    ══════════════════════════════════════════════════════ */
 .vn-student-character {
   position: absolute;
-  left: 1.5%;
-  bottom: 8px;
-  height: min(70vh, 740px);
-  max-height: 740px;
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
   z-index: 6;
   opacity: 0;
-  transform: translateX(-18px);
-  transition: opacity .3s ease, transform .3s ease, filter .3s ease;
   pointer-events: none;
+  transition: opacity .2s ease, filter .2s ease;
 }
 .vn-student-character.visible {
   opacity: 1;
-  transform: translateX(0);
 }
 #vnStudentPortrait {
   height: 100%;
   width: auto;
-  max-width: min(38vw, 520px);
   object-fit: contain;
   object-position: left bottom;
   filter: drop-shadow(0 16px 30px rgba(0,0,0,.46));
   transition: opacity .12s ease;
 }
-body .vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-smartboard-wrap {
-  left: 50% !important;
-  top: 3% !important;
-  width: min(47vw, 710px) !important;
-  transform: translateX(-50%) !important;
-  z-index: 3 !important;
-}
-body .vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character {
-  right: 1.5% !important;
-  bottom: 8px !important;
-  height: min(70vh, 740px) !important;
-  z-index: 6 !important;
-}
-.vn-overlay.pc-dual-character .vn-character.is-active,
-.vn-overlay.pc-dual-character .vn-student-character.is-active {
-  opacity: 1 !important;
-  filter: none;
-  transform: translateX(0) scale(1) !important;
-}
-.vn-overlay.pc-dual-character .vn-character.is-inactive,
-.vn-overlay.pc-dual-character .vn-student-character.is-inactive {
-  opacity: .48 !important;
-  filter: saturate(.55) brightness(.72);
-  transform: scale(.96) !important;
-}
-body .vn-overlay.active.pc-dual-character:not(.claude-terminal-textmode) .vn-dialogue {
-  left: 13% !important;
-  right: 13% !important;
-  padding: 22px 76px 20px 30px !important;
-  min-height: 142px !important;
-}
+
+/* Workstation/analysis scenes are single-character by design. A scenario that
+   needs a different speaker places that character in the primary S1 slot. */
 .vn-overlay.claude-terminal-consult .vn-student-character,
 .vn-overlay.claude-terminal-textmode .vn-student-character,
-.vn-overlay.claude-prediction .vn-student-character {
+.vn-overlay.claude-prediction .vn-student-character,
+.vn-overlay.pc-clean-prediction .vn-student-character,
+.vn-overlay.pc-prediction-result .vn-student-character {
   display: none !important;
 }
-
-@media (max-width: 900px), (max-height: 720px) {
-  body .vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-smartboard-wrap {
-    width: min(92vw, 650px) !important;
-  }
-  .vn-overlay.pc-dual-character .vn-character.is-inactive,
-  .vn-overlay.pc-dual-character .vn-student-character.is-inactive {
-    display: none !important;
-  }
-  body .vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character,
-  body .vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
-    left: 50% !important;
-    right: auto !important;
-    bottom: 120px !important;
-    height: min(40vh, 370px) !important;
-    transform: translateX(-50%) !important;
-  }
-  .vn-overlay.pc-dual-character .vn-character.is-active,
-  .vn-overlay.pc-dual-character .vn-student-character.is-active {
-    transform: translateX(-50%) scale(1) !important;
-  }
-  body .vn-overlay.active.pc-dual-character:not(.claude-terminal-textmode) .vn-dialogue {
-    left: 0 !important;
-    right: 0 !important;
-    padding: 20px 64px 18px 20px !important;
-  }
-}
-
-/* Shared compact dual-cast intro: override the legacy scenario-intro rule that forces Pixel
-   to display even when Jordan is the active speaker. */
-@media (max-width: 900px), (max-height: 720px) {
-  body .vn-overlay.active.scenario-intro-active.pc-dual-character #vnCharacter.is-inactive,
-  body .vn-overlay.active.scenario-intro-active.pc-dual-character .vn-character.is-inactive,
-  body .vn-overlay.active.pc-dual-character #vnStudentCharacter.is-inactive,
-  body .vn-overlay.active.pc-dual-character .vn-student-character.is-inactive {
-    display: none !important;
-  }
-}
-
 
 /* ══════════════════════════════════════════════════════
    V139 — SILENT START + AUDIO PREFERENCE ONBOARDING
@@ -2327,150 +2257,6 @@ body #musicToggle.full-audio {
     transition: none;
   }
 }
-
-
-/* ══════════════════════════════════════════════════════
-   V144 — S2 RESPONSIVE CAST STAGING
-   Tablet keeps both speakers; phones show the active speaker at a readable size.
-   These overrides intentionally come last because the VN stylesheet has accumulated
-   enough historical opinions to qualify as a small legislature.
-   ══════════════════════════════════════════════════════ */
-
-/* Medium screens: keep Jordan and Pixel on opposite sides and use the open space
-   between the smartboard and dialogue instead of shrinking them into tiny busts. */
-@media (min-width: 621px) and (max-width: 900px) and (min-height: 651px) {
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnStudentCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
-    display: flex !important;
-    visibility: visible !important;
-    bottom: clamp(198px, 23dvh, 220px) !important;
-    width: auto !important;
-    height: clamp(275px, 35dvh, 335px) !important;
-    max-height: 38dvh !important;
-    transform: none !important;
-    z-index: 22 !important;
-    align-items: flex-end !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnStudentCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
-    left: clamp(16px, 3.5vw, 42px) !important;
-    right: auto !important;
-    justify-content: flex-start !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character {
-    left: auto !important;
-    right: clamp(14px, 3vw, 38px) !important;
-    justify-content: flex-end !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnCharacter.is-active,
-  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnStudentCharacter.is-active {
-    display: flex !important;
-    opacity: 1 !important;
-    filter: none !important;
-    transform: none !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnCharacter.is-inactive,
-  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnStudentCharacter.is-inactive {
-    display: flex !important;
-    opacity: .48 !important;
-    filter: saturate(.55) brightness(.72) !important;
-    transform: scale(.94) !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character #vnStudentPortrait {
-    display: block !important;
-    width: auto !important;
-    height: 100% !important;
-    max-width: 34vw !important;
-    max-height: 100% !important;
-    object-fit: contain !important;
-    object-position: left bottom !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character #vnPortrait {
-    display: block !important;
-    width: auto !important;
-    height: 100% !important;
-    max-width: 32vw !important;
-    max-height: 100% !important;
-    object-fit: contain !important;
-    object-position: right bottom !important;
-  }
-}
-
-/* Phones: show only the current speaker, centered and large enough to read as a
-   character rather than a decorative head peeking over the dialogue panel. */
-@media (max-width: 620px), (max-height: 650px) {
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnStudentCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
-    left: 50% !important;
-    right: auto !important;
-    bottom: clamp(210px, 26dvh, 238px) !important;
-    width: auto !important;
-    height: clamp(270px, 35dvh, 325px) !important;
-    max-height: 37dvh !important;
-    transform: translateX(-50%) !important;
-    transform-origin: center bottom !important;
-    justify-content: center !important;
-    align-items: flex-end !important;
-    z-index: 22 !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnCharacter.is-inactive,
-  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnStudentCharacter.is-inactive {
-    display: none !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnCharacter.is-active,
-  html body #vnOverlay#vnOverlay.vn-overlay.pc-dual-character #vnStudentCharacter.is-active {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    filter: none !important;
-    transform: translateX(-50%) !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character #vnStudentPortrait {
-    display: block !important;
-    width: auto !important;
-    height: 100% !important;
-    max-width: 72vw !important;
-    max-height: 100% !important;
-    object-fit: contain !important;
-    object-position: center bottom !important;
-  }
-
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character #vnPortrait {
-    display: block !important;
-    width: auto !important;
-    height: 100% !important;
-    max-width: 66vw !important;
-    max-height: 100% !important;
-    object-fit: contain !important;
-    object-position: center bottom !important;
-  }
-}
-
-@media (max-width: 430px) and (min-height: 651px) {
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-character,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) #vnStudentCharacter,
-  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character:not(.claude-terminal-consult):not(.claude-terminal-textmode) .vn-student-character {
-    bottom: clamp(205px, 25dvh, 225px) !important;
-    height: clamp(255px, 33dvh, 300px) !important;
-  }
-}
-
-
 
 
 /* Locked scenario tabs remain clickable so reviewers can see the development

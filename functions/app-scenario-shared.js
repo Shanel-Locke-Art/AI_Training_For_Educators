@@ -26,6 +26,29 @@ function buildScenarioMissionHTML(index, options = {}) {
     </section>`;
 }
 
+function resetSectionScroll(...elements) {
+  const targets = [
+    document.scrollingElement,
+    document.documentElement,
+    document.body,
+    document.getElementById('chat'),
+    document.getElementById('inputContainer'),
+    ...elements
+  ].filter(Boolean);
+
+  const reset = () => {
+    targets.forEach(target => {
+      try { target.scrollTop = 0; } catch(e) {}
+      try { target.scrollLeft = 0; } catch(e) {}
+    });
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); }
+    catch(e) { try { window.scrollTo(0, 0); } catch(_) {} }
+  };
+
+  reset();
+  requestAnimationFrame(reset);
+}
+
 function setScenarioInputVisible(visible, { focus = false } = {}) {
   const container = document.getElementById('inputContainer');
   if (!container) return;
@@ -63,7 +86,7 @@ function renderScenarioPlaceholder(index) {
         <button type="button" class="pc-shell-secondary" data-pc-action="launch-scenario" data-pc-scenario-index="1" data-pc-skip-name-gate="true">Play Scenario 2</button>
       </div>
     </section>`;
-  area.scrollTop = 0;
+  resetSectionScroll(area, container);
 }
 
 
@@ -137,7 +160,7 @@ function mountScenarioActivity({
   contentHTML = '',
   focusSelector = ''
 } = {}) {
-  if (!container) return false;
+  if (!container || Number(index) !== Number(scenarioIndex)) return false;
   container.className = 'pc-scenario-workbench';
   container.style.display = 'flex';
   container.innerHTML = `
@@ -145,8 +168,25 @@ function mountScenarioActivity({
       ${buildScenarioMissionHTML(index, { extraHTML: progressHTML })}
       ${contentHTML}
     </div>`;
-  container.scrollTop = 0;
-  if (focusSelector) setTimeout(() => container.querySelector(focusSelector)?.focus(), 80);
+  resetSectionScroll(container);
+  if (focusSelector) {
+    pcScheduleScenarioTask(() => {
+      if (Number(index) !== Number(scenarioIndex)) return;
+      const target = container.querySelector(focusSelector);
+      if (!target) return;
+      try {
+        target.focus({ preventScroll: true });
+      } catch(e) {
+        target.focus();
+        resetSectionScroll(container);
+      }
+      // Keep the Mission Briefing anchored at the top even if a browser ignores
+      // preventScroll or performs a delayed focus scroll after layout settles.
+      requestAnimationFrame(() => {
+        if (Number(index) === Number(scenarioIndex)) resetSectionScroll(container);
+      });
+    }, 80, index);
+  }
   return true;
 }
 

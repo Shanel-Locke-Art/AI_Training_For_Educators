@@ -53,6 +53,55 @@ let pcMainMenuLastFocused = null;
 let pcNameConfirmed = false;
 let pcPendingScenarioIndex = null;
 
+// Shared scenario-run lifecycle. Any delayed work scheduled for an older
+// scenario becomes inert as soon as the learner switches scenarios. This keeps
+// VN callbacks, delayed focus, audio starts, and result handoffs from leaking
+// into the newly selected scenario.
+let pcScenarioRunEpoch = 0;
+const pcScenarioScheduledTasks = new Set();
+
+function pcCaptureScenarioRun(index = scenarioIndex) {
+  return { epoch: pcScenarioRunEpoch, index: Number(index) };
+}
+
+function pcIsScenarioRunCurrent(token) {
+  return Boolean(
+    token &&
+    token.epoch === pcScenarioRunEpoch &&
+    Number(token.index) === Number(scenarioIndex)
+  );
+}
+
+function pcCancelScenarioTasks() {
+  pcScenarioScheduledTasks.forEach(taskId => clearTimeout(taskId));
+  pcScenarioScheduledTasks.clear();
+}
+
+function pcBeginScenarioRun() {
+  pcCancelScenarioTasks();
+  pcScenarioRunEpoch += 1;
+  window.pcScenarioRunEpoch = pcScenarioRunEpoch;
+  return pcScenarioRunEpoch;
+}
+
+function pcScheduleScenarioTask(callback, delay = 0, index = scenarioIndex) {
+  if (typeof callback !== 'function') return 0;
+  const token = pcCaptureScenarioRun(index);
+  const taskId = window.setTimeout(() => {
+    pcScenarioScheduledTasks.delete(taskId);
+    if (!pcIsScenarioRunCurrent(token)) return;
+    callback();
+  }, Math.max(0, Number(delay) || 0));
+  pcScenarioScheduledTasks.add(taskId);
+  return taskId;
+}
+
+pcExposeGlobals?.({
+  pcCaptureScenarioRun,
+  pcIsScenarioRunCurrent,
+  pcScheduleScenarioTask
+});
+
 const PC_RUNTIME_DEBUG = new URLSearchParams(window.location.search).get('debug') === '1';
 
 function pcDebug(...args) {

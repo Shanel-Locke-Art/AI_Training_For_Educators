@@ -41,20 +41,9 @@ function playScenarioIntroduction(index) {
   overlay?.classList.toggle('scenario-intro-active', useSpecialIntroLayout);
   const onDone = () => {
     if (useSpecialIntroLayout) overlay?.classList.remove('scenario-intro-active');
-    if (index === SCENARIO_INDEX.METACOGNITION) {
-      // Final S2 intro handoff: hide BOTH portrait containers before the
-      // two-character stage class is removed. Either container may currently
-      // hold Jordan on responsive speaker swaps, so hiding only the dedicated
-      // student container can expose one frame of legacy sizing and make Jordan
-      // appear to suddenly grow before the mission briefing.
-      const pixel = document.getElementById('vnCharacter');
-      const student = document.getElementById('vnStudentCharacter');
-      [pixel, student].forEach(character => {
-        character?.classList.remove('visible', 'is-active', 'is-inactive');
-        character?.style.setProperty('display', 'none', 'important');
-      });
-      overlay?.classList.remove('pc-s2-two-character');
-    }
+    // Every scenario uses the same cast cleanup when its VN introduction hands
+    // control to the workbench. No character-specific teardown belongs here.
+    pcResetVNCharacters();
     pcRunScenarioAfterIntroAction(ui.afterIntroAction);
   };
 
@@ -67,8 +56,10 @@ function playScenarioIntroduction(index) {
   window.pcScenarioIntroPending = false;
   pcApplyIpadLayoutV200();
   playPixelSequence(getScenarioStartDialogueKey(index), onDone);
-  requestAnimationFrame(pcApplyIpadLayoutV200);
-  window.setTimeout(pcApplyIpadLayoutV200, 120);
+  requestAnimationFrame(() => {
+    if (scenarioIndex === index) pcApplyIpadLayoutV200();
+  });
+  pcScheduleScenarioTask(pcApplyIpadLayoutV200, 120, index);
 }
 
 
@@ -76,6 +67,7 @@ function pcActivateScenario(index, { explicitButton = null, playIntroduction = t
   const normalized = pcNormalizeScenarioIndex(index);
   if (normalized === null) return false;
 
+  pcBeginScenarioRun();
   pcClearVNStateForScenarioSwitch();
   resetScenarioRunState(normalized);
   selectScenarioTab(normalized, explicitButton);
@@ -99,11 +91,34 @@ function switchScenario(i, btn) {
 
 
 function pcClearVNStateForScenarioSwitch() {
+  const overlay = document.getElementById('vnOverlay');
+  const dialogue = document.getElementById('vnDialogue');
+
+  // Stop callbacks and media owned by the scenario we just left before touching
+  // the new one. Attempt/history data stays intact for research logging; only
+  // live presentation state is discarded.
+  if (window.scenarioIntroTimer) clearTimeout(window.scenarioIntroTimer);
+  window.scenarioIntroTimer = null;
+  try { stopAutomaticNarration(); } catch (e) {}
+  try { pcStopS2JordanInterventionVoice(); } catch (e) {}
+  try { pcStopClaudeAnalysisProgressV360(); } catch (e) {}
+  try { pcClearLiveAnalyzingLayoutV256(); } catch (e) {}
+  try { pcClearAnalysisLayoutV122(); } catch (e) {}
+  try { pcSetBabbageSubmitting(false); } catch (e) {}
+  try { claudeTerminalCloseCallback = null; } catch (e) {}
+  try { pcSharedWorkstationResultContinue = null; } catch (e) {}
+
+  // Scenario state may add semantic markers, but presentation teardown is shared.
+  overlay?.classList.remove('pc-s2-jordan-recording', 'pc-s2-two-character', 'pc-s2-narrow-jordan');
+  dialogue?.classList.remove('pc-s2-recorded-dialogue', 'prediction-question', 'prediction-result');
+  document.getElementById('s2JordanVNControls')?.remove();
+
   pcSetVNOverlayState({ active: false });
   pcResetVNCharacters();
   pcResetVNDialogueState();
   document.querySelectorAll('#vnPredictionChoicePanel,#predictionGate,.pc-choice-panel-final,.pc-clean-choice-grid,.vn-choice-list').forEach(el => el.remove());
   if (typeof pcClearPredictionPresentationV191 === 'function') pcClearPredictionPresentationV191();
+  if (typeof pcClearPredictionLayoutInlineStylesV186 === 'function') pcClearPredictionLayoutInlineStylesV186();
 
   window.pendingPromptForPrediction = '';
   window.pendingPromptAfterPrediction = '';
@@ -119,6 +134,7 @@ function pcClearVNStateForScenarioSwitch() {
   setClaudeTerminalState('idle', 'BABBAGE ENGINE', 'AWAITING INPUT...');
   musicEndVN();
 }
+
 
 function pcFillS1DevFields() {
   const values = {
@@ -211,18 +227,15 @@ function prepareScenarioShell(index) {
   document.body.dataset.pcScenario = ui.key;
   document.body.dataset.pcWorkspace = ui.workspaceMode || 'development';
 
-  const scenarioText = document.getElementById('scenarioText');
   const boardText = document.getElementById('vnBoardText');
   const chat = document.getElementById('chat');
   const boardLoading = document.getElementById('vnBoardLoading');
   const boardImage = document.getElementById('vnBoardImg');
 
-  if (scenarioText) scenarioText.textContent = scenario.desc;
   if (boardText) boardText.textContent = ui.boardText || scenario.desc;
   if (chat) chat.innerHTML = '';
   if (boardLoading) boardLoading.style.display = 'none';
 
-  renderOSCQR(scenario.oscqr || [], []);
 
   if (ui.implemented) {
     loadSceneImage(ASSETS.images.scenes[index], LEGACY_ASSETS.images.scenes[index]);
@@ -261,14 +274,8 @@ function loadScenario(i) {
 
 
 // ══════════════════════════════════════════════════════
-//  OSCQR
+//  OSCQR metadata detection (used for learning analytics, not interface chrome)
 // ══════════════════════════════════════════════════════
-function renderOSCQR(indicators, active) {
-  document.getElementById('oscqrChips').innerHTML = indicators.map(ind =>
-    `<span class="oscqr-chip ${active.includes(ind.id) ? 'active' : ''}">${ind.label}</span>`
-  ).join('');
-}
-
 function detectOSCQR(text, indicators) {
   return indicators.filter(ind =>
     text.toLowerCase().includes(ind.label.toLowerCase().split(' ')[0]) ||
@@ -387,6 +394,7 @@ async function sendMain(text) {
   if (!text || isSubmittingToBabbage) return;
   if (scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT || !getScenarioUI(scenarioIndex).implemented) return;
 
+  const runToken = pcCaptureScenarioRun(SCENARIO_INDEX.ENGAGEMENT);
   pcSetBabbageSubmitting(true);
   attempts++;
   lastPromptText = text;
@@ -399,11 +407,12 @@ async function sendMain(text) {
   addTyping();
 
   try {
-    const data = await callClaude({
+    const data = await requestBabbageAnalysis({
       max_output_tokens: 5000,
       system: scenarios[SCENARIO_INDEX.ENGAGEMENT].system,
       messages: history
     }, 'main');
+    if (!pcIsScenarioRunCurrent(runToken)) return;
     removeTyping();
 
     if (data.error) {
@@ -417,7 +426,6 @@ async function sendMain(text) {
 
     const score = scorePrompt(text);
     const active = detectOSCQR(reply, scenarios[SCENARIO_INDEX.ENGAGEMENT].oscqr);
-    renderOSCQR(scenarios[SCENARIO_INDEX.ENGAGEMENT].oscqr, active);
     trackPrompt(SCENARIO_INDEX.ENGAGEMENT, text, score.total, reply, active.map(id => {
       const indicator = scenarios[SCENARIO_INDEX.ENGAGEMENT].oscqr.find(item => item.id === id);
       return indicator ? indicator.label : id;
@@ -437,8 +445,10 @@ async function sendMain(text) {
       showS1PostAnalysisReflection(score.total);
     }, score.total, data.mockReason || '', structuredAnalysis);
   } catch (error) {
-    removeTyping();
-    addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`);
+    if (pcIsScenarioRunCurrent(runToken)) {
+      removeTyping();
+      addMsg('ai', `<span style="color:var(--red)">Something went wrong. Please try again.</span>`);
+    }
   } finally {
     pcSetBabbageSubmitting(false);
     predictionGateActive = false;
@@ -842,6 +852,7 @@ function renderGuidedBuilder(container){
       </div>
     </div>`;
   restoreS1DraftToFields();
+  if (typeof resetSectionScroll === 'function') resetSectionScroll(container);
   setTimeout(() => {
     if (!pcScenarioInputMayReceiveFocusV216()) return;
     pcFocusWithoutScroll(document.getElementById('g-learners'));
@@ -1246,7 +1257,7 @@ function pcClearPredictionPresentationV191(){
   const character = document.getElementById('vnCharacter');
   const panel = document.getElementById('vnPredictionChoicePanel');
   const choiceButtons = panel?.querySelectorAll('.pc-clean-choice-btn') || [];
-  const continueButton = document.getElementById('pcContinueToClaudeBtn');
+  const continueButton = document.querySelector('#vnText .prediction-continue-btn');
 
   pcRemoveInlineStyles(output, [
     'font-size', 'font-weight', 'line-height', 'letter-spacing', 'text-align',
@@ -1394,7 +1405,7 @@ function pcApplyPredictionPresentationV191(){
   const character = document.getElementById('vnCharacter');
   const panel = document.getElementById('vnPredictionChoicePanel');
   const choiceButtons = panel?.querySelectorAll('.pc-clean-choice-btn') || [];
-  const continueButton = document.getElementById('pcContinueToClaudeBtn');
+  const continueButton = document.querySelector('#vnText .prediction-continue-btn');
   const terminal = document.getElementById('claudeTerminalScene');
   const terminalPhoto = terminal?.querySelector('.claude-terminal-photo');
   const terminalScreen = terminal?.querySelector('.claude-terminal-screen');
@@ -1422,14 +1433,6 @@ function pcApplyPredictionPresentationV191(){
       viewportHeight
     );
 
-    // S2 recorded dialogue shares the S1 prediction resize lifecycle, but its monitor
-    // glass needs a slightly different measured inset. Reapply that correction after
-    // every wide-desktop prediction layout pass so resizing cannot restore S1's screen
-    // coordinates over the S2 recording. Compact layouts remain CSS-owned.
-    if (overlay?.classList.contains('pc-s2-jordan-recording') &&
-        typeof pcApplyS2RecordedWideMonitorGeometry === 'function') {
-      pcApplyS2RecordedWideMonitorGeometry();
-    }
   }
 
   // The status must remain readable across phones and tablet/iPad widths.
@@ -1990,6 +1993,93 @@ function pcQueuePredictionPresentationV191(){
   window.setTimeout(apply, 80);
 }
 
+
+let pcSharedWorkstationResultContinue = null;
+
+function pcShowSharedWorkstationResult({
+  terminalText = 'AWAITING PREDICTION',
+  speakerName = 'Professor Pixel',
+  character = 'pixel',
+  expression = 'thinking',
+  heading = '',
+  bodyHTML = '',
+  button = {},
+  ariaLabel = '',
+  overlayClasses = []
+} = {}) {
+  pcClearPredictionUI();
+  pcStopVN();
+
+  const overlay = pcSetVNOverlayState({
+    active: true,
+    modes: ['claude-prediction', 'pc-clean-prediction', 'pc-prediction-result']
+  });
+  if (!overlay) return null;
+  overlayClasses.filter(Boolean).forEach(className => overlay.classList.add(className));
+  overlay.removeAttribute('aria-hidden');
+
+  const sceneBackground = document.getElementById('vnSceneBg');
+  if (sceneBackground) {
+    pcSetImageSource(
+      sceneBackground,
+      ASSETS.images.backgrounds.classroom,
+      LEGACY_ASSETS.images.backgrounds.classroom
+    );
+  }
+
+  try { setVNClaudeMode(false); } catch (e) {}
+  try { setVNClaudeTerminalMode(false); } catch (e) {}
+  try { setClaudeTerminalTextMode(false); } catch (e) {}
+  try { setClaudeShelfState('idle', String(terminalText || '').toLowerCase()); } catch (e) {}
+  try { setClaudeTerminalState('idle', 'BABBAGE ENGINE', terminalText); } catch (e) {}
+  try { pcClearPredictionLayoutInlineStylesV186(); } catch (e) {}
+
+  // The workstation result always uses the shared primary character slot.
+  // Scenario code supplies identity and expression; layout remains unchanged.
+  vnSetDialogueCharacter(character, expression, speakerName, [character]);
+
+  const dialogue = document.getElementById('vnDialogue');
+  if (dialogue) {
+    dialogue.classList.remove('has-choices', 'prediction-question');
+    dialogue.classList.add('prediction-result');
+    dialogue.setAttribute(
+      'aria-label',
+      ariaLabel || `${speakerName} result. Continue when ready.`
+    );
+    dialogue.style.removeProperty('display');
+  }
+
+  const buttonId = button.id ? ` id="${button.id}"` : '';
+  const stopPropagation = button.stopPropagation === false ? '' : ' data-pc-stop-propagation="true"';
+  const buttonLabel = button.label || 'Continue →';
+  pcSharedWorkstationResultContinue = typeof button.onActivate === 'function'
+    ? button.onActivate
+    : null;
+  const vnText = document.getElementById('vnText');
+  if (vnText) {
+    vnText.innerHTML = `
+      <div class="pc-feedback-copy">
+        <div class="pc-feedback-message">
+          ${heading ? `<div class="pc-feedback-heading"><strong>${heading}</strong></div>` : ''}
+          <div>${bodyHTML}</div>
+        </div>
+        <button${buttonId} class="prediction-continue-btn" type="button" data-pc-action="shared-workstation-result-continue"${stopPropagation}>${buttonLabel}</button>
+      </div>`;
+  }
+
+  const hint = document.getElementById('vnAdvanceHint');
+  if (hint) hint.classList.remove('show');
+  dialogue?.querySelector('.vn-skip')?.setAttribute('hidden', '');
+
+  // This is the same geometry/layout pass used by S1. Every scenario using a
+  // workstation result gets the identical frame, monitor, dialogue, and
+  // responsive behavior automatically.
+  pcQueuePredictionPresentationV191();
+  return { overlay, dialogue, vnText };
+}
+
+window.pcShowSharedWorkstationResult = pcShowSharedWorkstationResult;
+
 let pcPredictionResizeFrameV260 = 0;
 function pcSchedulePredictionPresentationV260(){
   if (pcPredictionResizeFrameV260) cancelAnimationFrame(pcPredictionResizeFrameV260);
@@ -2071,14 +2161,10 @@ function pcShowPredictionGate(text){
   try { setClaudeTerminalState('idle', 'BABBAGE ENGINE', 'AWAITING PREDICTION'); } catch(e) {}
   try { pcClearPredictionLayoutInlineStylesV186(); } catch(e) {}
   pcQueueModernTerminalAlignmentV147();
-  try { vnSetExpression('thinking'); } catch(e) {}
+  // Prediction questions use the same shared primary cast slot as every other
+  // single-character VN/workstation scene.
+  vnSetDialogueCharacter('pixel', 'thinking', 'Professor Pixel', ['pixel']);
   try { musicStartVN(); } catch(e) {}
-
-  const speaker = document.getElementById('vnSpeaker');
-  if (speaker) speaker.textContent = 'Professor Pixel';
-
-  const character = document.getElementById('vnCharacter');
-  if (character) character.classList.add('visible');
 
   const hint = document.getElementById('vnAdvanceHint');
   if (hint) hint.classList.remove('show');
@@ -2119,33 +2205,21 @@ function pcChoosePrediction(choice){
     s.selfReportPrediction = pcFormatPredictionsForSave(s, scenarioIndex);
   }
 
-  pcClearPredictionUI();
-
-  const overlay = document.getElementById('vnOverlay');
-  if (overlay) {
-    overlay.classList.remove('pc-prediction-question');
-    overlay.classList.add('pc-prediction-result');
-  }
-
-  const dialogue = document.getElementById('vnDialogue');
-  if (dialogue) {
-    dialogue.classList.remove('has-choices','prediction-question');
-    dialogue.classList.add('prediction-result');
-  }
-
   const reaction = (window.predictionReactions && window.predictionReactions[choice]) || PC_PREDICTION_REACTIONS[choice] || PC_PREDICTION_REACTIONS.not_sure;
-  const vnText = document.getElementById('vnText');
-  if (vnText) {
-    vnText.innerHTML = `
-      <div class="pc-feedback-copy">
-        <div class="pc-feedback-message">
-          <div class="pc-feedback-heading"><strong>Your prediction is logged.</strong></div>
-          <div>${reaction}</div>
-        </div>
-        <button id="pcContinueToClaudeBtn" class="prediction-continue-btn" type="button" data-pc-action="continue-to-claude" data-pc-stop-propagation="true">Continue to Babbage →</button>
-      </div>`;
-  }
-  pcQueuePredictionPresentationV191();
+  pcShowSharedWorkstationResult({
+    terminalText: 'AWAITING PREDICTION',
+    speakerName: 'Professor Pixel',
+    character: 'pixel',
+    expression: 'thinking',
+    heading: 'Your prediction is logged.',
+    bodyHTML: reaction,
+    button: {
+      id: 'pcContinueToClaudeBtn',
+      onActivate: pcContinueToClaudeAnalysis,
+      label: 'Continue to Babbage →'
+    },
+    ariaLabel: 'Professor Pixel prediction result. Continue to Babbage when ready.'
+  });
 }
 
 function pcContinueToClaudeAnalysis(){
@@ -2235,7 +2309,12 @@ pcExposeGlobals({
 
 pcRegisterUIActions({
   'choose-prediction': target => pcChoosePrediction(target.dataset.pcChoice),
-  'continue-to-claude': () => pcContinueToClaudeAnalysis()
+  'shared-workstation-result-continue': (target, event) => {
+    if (typeof pcSharedWorkstationResultContinue === 'function') {
+      return pcSharedWorkstationResultContinue(target, event);
+    }
+    return false;
+  }
 });
 
 if (!window.__pcPredictionWatchdogBound) {

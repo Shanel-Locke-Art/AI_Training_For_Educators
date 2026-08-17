@@ -125,7 +125,7 @@ def main() -> int:
                         activeScenario: window.devStatus().activeScenario,
                         selectedTab: [...document.querySelectorAll('.tab-btn')]
                           .findIndex(tab => tab.classList.contains('active')),
-                        scenarioText: document.getElementById('scenarioText')?.innerText.trim() || '',
+                        boardText: document.getElementById('vnBoardText')?.innerText.trim() || '',
                         inputText: document.getElementById('inputContainer')?.innerText.trim() || '',
                         bodyWidth: document.body.scrollWidth,
                         viewportWidth: window.innerWidth
@@ -136,8 +136,8 @@ def main() -> int:
                     failures.append(f"{label}: active scenario mismatch.")
                 if state["selectedTab"] != scenario:
                     failures.append(f"{label}: selected tab mismatch.")
-                if not state["scenarioText"]:
-                    failures.append(f"{label}: scenario text is empty.")
+                if not state["boardText"]:
+                    failures.append(f"{label}: scenario board text is empty.")
                 if scenario < 2 and not state["inputText"]:
                     failures.append(f"{label}: implemented workspace is empty.")
                 if state["bodyWidth"] > state["viewportWidth"] + 1:

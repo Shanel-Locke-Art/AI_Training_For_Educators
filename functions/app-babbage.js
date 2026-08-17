@@ -65,10 +65,6 @@ function mockBabbageResponse(payload, context = 'main', reason = 'forced') {
   });
 }
 
-// Compatibility alias retained for older scenario modules while the internal
-// DOM/class vocabulary is migrated gradually.
-const mockClaudeResponse = mockBabbageResponse;
-
 const BABBAGE_REQUEST_TIMEOUT_MS = 90000;
 
 async function requestBabbageAnalysis(payload, context = 'main') {
@@ -140,5 +136,3 @@ function formatBabbageAnalysisAsLegacyText(a = {}) {
   ].join('\n');
 }
 
-// Compatibility alias until the final cleanup pass.
-const callClaude = requestBabbageAnalysis;

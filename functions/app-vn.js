@@ -111,14 +111,43 @@ function pcSetVNOverlayState({ active = null, modes = [], preserve = [] } = {}) 
 
 function pcResetVNCharacters() {
   const overlay = document.getElementById('vnOverlay') || document.querySelector('.vn-overlay');
-  const pixel = document.getElementById('vnCharacter');
-  const student = document.getElementById('vnStudentCharacter');
+  const characters = [
+    document.getElementById('vnCharacter'),
+    document.getElementById('vnStudentCharacter')
+  ];
+  const portraits = [
+    document.getElementById('vnPortrait'),
+    document.getElementById('vnStudentPortrait')
+  ];
+  const characterProps = [
+    'display','visibility','opacity','filter','position','left','right','top','bottom',
+    'width','height','min-width','max-width','min-height','max-height','align-items',
+    'justify-content','transform','transform-origin','z-index'
+  ];
+  const portraitProps = [
+    'display','visibility','opacity','filter','width','height','min-width','max-width',
+    'min-height','max-height','object-fit','object-position','transform','transform-origin','z-index'
+  ];
 
-  pixel?.classList.remove('visible', 'is-active', 'is-inactive');
-  student?.classList.remove('visible', 'is-active', 'is-inactive');
-  pixel?.style.removeProperty('display');
-  student?.style.removeProperty('display');
-  overlay?.classList.remove('pc-dual-character', 'pc-s2-two-character');
+  characters.forEach(character => {
+    character?.classList.remove('visible', 'is-active', 'is-inactive');
+    characterProps.forEach(property => character?.style.removeProperty(property));
+    if (character) {
+      delete character.dataset.pcCharacter;
+      delete character.dataset.pcCastSide;
+    }
+  });
+  portraits.forEach(portrait => {
+    if (portrait?._pcExpressionTimer) {
+      clearTimeout(portrait._pcExpressionTimer);
+      portrait._pcExpressionTimer = null;
+    }
+    portraitProps.forEach(property => portrait?.style.removeProperty(property));
+    if (portrait) delete portrait.dataset.pcCharacter;
+  });
+  overlay?.classList.remove('pc-dual-character', 'pc-s2-two-character', 'pc-s2-narrow-jordan');
+  window.pcCurrentVNCast = [];
+  window.pcCurrentVNSpeaker = '';
 }
 
 function pcResetVNDialogueState() {
@@ -1631,10 +1660,6 @@ if (!window.pcModernTerminalAlignmentV147Installed) {
 // v161: Position the live analyzing readout inside the already-aligned
 // monitor rectangle. These percentages are relative to the physical green
 // screen, not to the full computer artwork.
-const PC_ANALYZING_READOUT_LEFT = '33%';
-const PC_ANALYZING_READOUT_TOP = '12%';
-const PC_ANALYZING_READOUT_WIDTH = '78%';
-
 function pcResetAnalyzingReadoutV203(){
   const screen = document.querySelector('#claudeTerminalScene .claude-terminal-screen');
   const output = document.getElementById('claudeTerminalOutput');
@@ -1958,9 +1983,6 @@ function pcApplyLiveComputerFrameV256({
   viewportWidth
 }) {
   const sceneBg = document.getElementById('vnSceneBg');
-  const overlayRect = overlay.getBoundingClientRect();
-  const isPortraitTablet = mode === 'tablet' && overlayRect.height > overlayRect.width * 1.08;
-
   // v327: whenever a photographed computer is visible, the analyzing state now
   // uses the exact workstation frame calculation as the completed diagnostic.
   // Only the monitor contents and bottom controls/dialogue differ between states.
@@ -2870,7 +2892,7 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null, mockRea
       <button id="claudeTTSBtn" class="claude-tts-btn" type="button" data-pc-action="toggle-claude-tts" data-pc-stop-propagation="true">🔊 Read Analysis</button>
       <button class="vn-return-btn terminal-return" type="button" data-pc-action="close-claude-consult" data-pc-stop-propagation="true">Continue</button>
     `;
-    setTimeout(() => vnText.querySelector('.vn-return-btn')?.focus(), 100);
+    pcScheduleScenarioTask(() => vnText.querySelector('.vn-return-btn')?.focus(), 100);
     pcScheduleAnalysisLayoutV255();
   }
 
@@ -2900,15 +2922,16 @@ function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose =
   pcMarkClaudeResponseParsedV360();
   const claudeProcessingHoldMs = pcGetClaudeProcessingHoldMsV316();
 
-  window.setTimeout(() => {
+  const resultScenario = scenarioIndex;
+  pcScheduleScenarioTask(() => {
     pcCompleteClaudeAnalysisProgressV360();
     const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
       ? buildS1TerminalDiagnosis(scoreTotal, responseText, structuredAnalysis)
       : responseText;
-    window.setTimeout(() => {
+    pcScheduleScenarioTask(() => {
       showClaudeConsultResult(terminalOutput, mock, effectiveClose, mockReason);
-    }, Math.min(180, claudeProcessingHoldMs));
-  }, Math.min(180, claudeProcessingHoldMs));
+    }, Math.min(180, claudeProcessingHoldMs), resultScenario);
+  }, Math.min(180, claudeProcessingHoldMs), resultScenario);
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
@@ -2924,7 +2947,7 @@ function closeClaudeConsultOverlay() {
   setClaudeTerminalState('idle', 'BABBAGE ENGINE', 'IDLE');
   musicEndVN();
   if (cb) {
-    setTimeout(cb, 250);
+    pcScheduleScenarioTask(cb, 250);
   } else {
     document.getElementById('promptInput')?.focus();
   }
@@ -2953,7 +2976,7 @@ function vnShow(expression, text, onComplete, meta = {}) {
 
 function vnPlayNext() {
   if (vnQueue.length === 0) {
-    setTimeout(() => {
+    pcScheduleScenarioTask(() => {
       pcSetVNOverlayState({ active: false });
       pcResetVNCharacters();
       pcResetVNDialogueState();
@@ -2966,7 +2989,7 @@ function vnPlayNext() {
     return;
   }
 
-  const { expression, text, onComplete, speaker = 'Professor Pixel', character = 'pixel' } = vnQueue.shift();
+  const { expression, text, onComplete, speaker = 'Professor Pixel', character = 'pixel', cast = null } = vnQueue.shift();
   vnOnComplete = onComplete || null;
   vnTyping = true;
 
@@ -2983,17 +3006,11 @@ function vnPlayNext() {
   musicStartVN();
   setClaudeShelfState('idle', 'idle');
 
-  vnSetDialogueCharacter(character, expression, speaker);
+  vnSetDialogueCharacter(character, expression, speaker, cast);
   requestAnimationFrame(() => {
+    // Responsive geometry remains owned by the shared S1 VN layout. The cast
+    // renderer only decides which character art occupies each reusable slot.
     pcApplyIpadLayoutV200();
-
-    // S2 narrow layouts use Jordan's dedicated portrait container, staged in
-    // the exact geometry already computed for S1's single-character portrait.
-    // Re-apply after responsive layout work so no later S1 refresh can swap the
-    // visible speaker back to Pixel.
-    const normalizedSpeaker = String(speaker || '').trim().toLowerCase();
-    const isJordanSpeaker = character === 'jordan' || normalizedSpeaker === 'jordan';
-    pcApplyS2NarrowSpeakerStage(isJordanSpeaker, expression);
   });
 
   setTimeout(() => {
@@ -3008,259 +3025,247 @@ function vnPlayNext() {
   vnTypeWriter(text);
 }
 
-function vnSetExpression(expr) {
-  const img = document.getElementById('vnPortrait');
-  const src = EXPRESSIONS[expr] || EXPRESSIONS.neutral;
-  if (!img) return;
+const pcVNCharacterRegistry = new Map();
 
-  // A previous Pixel line may still have a delayed portrait swap queued when
-  // the next speaker starts. Cancel it so a narrow-screen Jordan portrait is
-  // not overwritten by Pixel 150ms later.
-  if (img._pcExpressionTimer) {
-    clearTimeout(img._pcExpressionTimer);
-    img._pcExpressionTimer = null;
-  }
-
-  // Expression names are implementation state, not visible interface copy.
-  // Only swap the portrait image; never write labels such as "neutral" or
-  // "thinking" into the scene.
-  if (img.style.display !== 'none') {
-    img.style.opacity = '0';
-    img._pcExpressionTimer = setTimeout(() => {
-      pcSetImageSource(img, src, LEGACY_ASSETS.images.professorPixel[expr] || LEGACY_ASSETS.images.professorPixel.neutral);
-      img.style.opacity = '1';
-      img._pcExpressionTimer = null;
-    }, 150);
-  } else {
-    pcSetImageSource(img, src, LEGACY_ASSETS.images.professorPixel[expr] || LEGACY_ASSETS.images.professorPixel.neutral);
-  }
-}
-
-function vnSetStudentExpression(expr) {
-  const img = document.getElementById('vnStudentPortrait');
-  const expressions = ASSETS.images.students.jordan;
-  const src = expressions[expr] || expressions.neutral;
-  if (!img) return;
-  img.style.opacity = '0';
-  setTimeout(() => {
-    pcSetImageSource(img, src, LEGACY_ASSETS.images.students.jordan[expr] || LEGACY_ASSETS.images.students.jordan.neutral);
-    img.style.opacity = '1';
-  }, 120);
-}
-
-function pcApplyS2NarrowSpeakerStage(isJordan, expression = 'neutral') {
-  const viewportWidth = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0);
-  if (scenarioIndex !== SCENARIO_INDEX.METACOGNITION || viewportWidth > 700) return false;
-
-  const pixel = document.getElementById('vnCharacter');
-  const student = document.getElementById('vnStudentCharacter');
-  const jordanPortrait = document.getElementById('vnStudentPortrait');
-  if (!pixel || !student || !jordanPortrait) return false;
-
-  const overlay = document.getElementById('vnOverlay');
-
-  if (!isJordan) {
-    overlay?.classList.remove('pc-s2-narrow-jordan');
-    pixel.style.display = '';
-    student.style.display = 'none';
-    student.classList.remove('visible', 'is-active', 'is-inactive');
-    vnSetExpression(expression);
-    return true;
-  }
-
-  overlay?.classList.add('pc-s2-narrow-jordan');
-
-  // Measure Pixel BEFORE hiding it. This copies S1's resolved responsive
-  // geometry rather than recreating it for Scenario 2.
-  pixel.style.display = '';
-  const pixelStyle = window.getComputedStyle(pixel);
-  const pixelPortrait = document.getElementById('vnPortrait');
-  const pixelPortraitStyle = pixelPortrait ? window.getComputedStyle(pixelPortrait) : null;
-
-  const geometryProps = [
-    'position', 'left', 'right', 'top', 'bottom', 'width', 'height',
-    'minWidth', 'maxWidth', 'minHeight', 'maxHeight', 'alignItems',
-    'justifyContent', 'transform', 'transformOrigin', 'zIndex'
-  ];
-  geometryProps.forEach(prop => {
-    student.style[prop] = pixelStyle[prop];
+function pcRegisterVNCharacter(id, config = {}) {
+  const key = String(id || '').trim().toLowerCase();
+  if (!key) return false;
+  pcVNCharacterRegistry.set(key, {
+    id: key,
+    label: config.label || key,
+    expressions: config.expressions || {},
+    legacyExpressions: config.legacyExpressions || {}
   });
-
-  student.style.display = 'flex';
-  student.style.visibility = 'visible';
-  student.style.opacity = '1';
-  student.style.filter = 'none';
-  student.classList.add('visible', 'is-active');
-  student.classList.remove('is-inactive');
-
-  if (pixelPortraitStyle) {
-    jordanPortrait.style.height = pixelPortraitStyle.height;
-    jordanPortrait.style.width = pixelPortraitStyle.width;
-    jordanPortrait.style.maxWidth = pixelPortraitStyle.maxWidth;
-    jordanPortrait.style.maxHeight = pixelPortraitStyle.maxHeight;
-    jordanPortrait.style.objectFit = pixelPortraitStyle.objectFit;
-    jordanPortrait.style.objectPosition = pixelPortraitStyle.objectPosition;
-  }
-
-  const expressions = ASSETS.images.students.jordan;
-  const src = expressions[expression] || expressions.neutral;
-  pcSetImageSource(
-    jordanPortrait,
-    src,
-    LEGACY_ASSETS.images.students.jordan[expression] || LEGACY_ASSETS.images.students.jordan.neutral
-  );
-  jordanPortrait.style.opacity = '1';
-
-  // Pixel remains the geometry template but is not visible while Jordan speaks.
-  pixel.style.display = 'none';
   return true;
 }
 
-function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', speakerName = 'Professor Pixel') {
-  const overlay = document.getElementById('vnOverlay');
-  const pixel = document.getElementById('vnCharacter');
-  const student = document.getElementById('vnStudentCharacter');
-  const speaker = document.getElementById('vnSpeaker');
-  const dialogue = document.getElementById('vnDialogue');
-  const normalizedSpeakerName = String(speakerName || '').trim().toLowerCase();
-  const isJordan = character === 'jordan' || normalizedSpeakerName === 'jordan';
-  const useDualCast = scenarioIndex !== SCENARIO_INDEX.METACOGNITION && getScenarioUI(scenarioIndex).introCast === 'dual' && (isJordan || character === 'pixel');
-  // S2 keeps Scenario 1's board and dialogue geometry. On tablet/landscape-size
-  // viewports only, stage Jordan on the left and Pixel on the right without
-  // enabling the legacy dual-cast layout (which also rewrites the dialogue).
-  const useS2TwoCharacterStage = scenarioIndex === SCENARIO_INDEX.METACOGNITION &&
-    !window.pcS2PixelSolo &&
-    Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0) >= 701;
+function pcResolveVNCharacterMap(source) {
+  return typeof source === 'function' ? (source() || {}) : (source || {});
+}
 
-  if (speaker) speaker.textContent = speakerName || (isJordan ? 'Jordan' : 'Professor Pixel');
-  if (dialogue) dialogue.setAttribute('aria-label', `${speaker?.textContent || speakerName} is speaking. Press Space or Enter to continue.`);
-  overlay?.classList.toggle('pc-dual-character', useDualCast);
-  overlay?.classList.toggle('pc-s2-two-character', useS2TwoCharacterStage);
+function pcGetVNCharacterDefinition(id = 'pixel') {
+  const key = String(id || 'pixel').trim().toLowerCase();
+  return pcVNCharacterRegistry.get(key) || pcVNCharacterRegistry.get('pixel');
+}
 
-  if (useS2TwoCharacterStage) {
-    // S2 wide/tablet intro: always render BOTH people. Explicitly assign both
-    // image sources here so the secondary character cannot disappear because
-    // of a previous single-character line, resize, or delayed portrait swap.
-    pixel?.classList.add('visible');
-    student?.classList.add('visible');
-    pixel?.classList.toggle('is-active', !isJordan);
-    pixel?.classList.toggle('is-inactive', isJordan);
-    student?.classList.toggle('is-active', isJordan);
-    student?.classList.toggle('is-inactive', !isJordan);
+function pcGetVNCharacterImage(id = 'pixel', expression = 'neutral') {
+  const definition = pcGetVNCharacterDefinition(id);
+  if (!definition) return { src: '', fallback: '' };
+  const expressions = pcResolveVNCharacterMap(definition.expressions);
+  const legacy = pcResolveVNCharacterMap(definition.legacyExpressions);
+  return {
+    src: expressions[expression] || expressions.neutral || '',
+    fallback: legacy[expression] || legacy.neutral || ''
+  };
+}
 
-    const pixelPortrait = document.getElementById('vnPortrait');
-    const jordanPortrait = document.getElementById('vnStudentPortrait');
-    const pixelExpr = isJordan ? 'neutral' : expression;
-    const jordanExpr = isJordan ? expression : 'neutral';
-    const pixelSrc = EXPRESSIONS[pixelExpr] || EXPRESSIONS.neutral;
-    const jordanExpressions = ASSETS.images.students.jordan;
-    const jordanSrc = jordanExpressions[jordanExpr] || jordanExpressions.neutral;
+pcRegisterVNCharacter('pixel', {
+  label: 'Professor Pixel',
+  expressions: () => EXPRESSIONS,
+  legacyExpressions: () => LEGACY_ASSETS.images.professorPixel
+});
+pcRegisterVNCharacter('jordan', {
+  label: 'Jordan',
+  expressions: () => ASSETS.images.students.jordan,
+  legacyExpressions: () => LEGACY_ASSETS.images.students.jordan
+});
 
-    if (pixelPortrait) {
-      pixelPortrait.style.opacity = '1';
-      pcSetImageSource(
-        pixelPortrait,
-        pixelSrc,
-        LEGACY_ASSETS.images.professorPixel[pixelExpr] || LEGACY_ASSETS.images.professorPixel.neutral
-      );
-    }
-    if (jordanPortrait) {
-      jordanPortrait.style.opacity = '1';
-      pcSetImageSource(
-        jordanPortrait,
-        jordanSrc,
-        LEGACY_ASSETS.images.students.jordan[jordanExpr] || LEGACY_ASSETS.images.students.jordan.neutral
-      );
-    }
-  } else if (useDualCast) {
-    pixel?.classList.add('visible');
-    student?.classList.add('visible');
-    pixel?.classList.toggle('is-active', !isJordan);
-    pixel?.classList.toggle('is-inactive', isJordan);
-    student?.classList.toggle('is-active', isJordan);
-    student?.classList.toggle('is-inactive', !isJordan);
-  } else if (isJordan) {
-    // Standard single-cast intros reuse Scenario 1 geometry exactly. The
-    // active student's portrait is rendered inside Pixel's established
-    // character container rather than creating parallel positioning rules.
-    pixel?.classList.add('visible', 'is-active');
-    pixel?.classList.remove('is-inactive');
-    student?.classList.remove('visible', 'is-active', 'is-inactive');
-  } else {
-    pixel?.classList.add('visible', 'is-active');
-    pixel?.classList.remove('is-inactive');
-    student?.classList.remove('visible', 'is-active', 'is-inactive');
+const PC_VN_CAST_SLOTS = Object.freeze([
+  { containerId: 'vnCharacter', portraitId: 'vnPortrait', side: 'right' },
+  { containerId: 'vnStudentCharacter', portraitId: 'vnStudentPortrait', side: 'left' }
+]);
+
+const PC_VN_SLOT_INLINE_PROPERTIES = Object.freeze([
+  'display', 'visibility', 'opacity', 'filter', 'position',
+  'left', 'right', 'top', 'bottom', 'width', 'height',
+  'min-width', 'max-width', 'min-height', 'max-height',
+  'align-items', 'justify-content', 'transform', 'transform-origin', 'z-index'
+]);
+
+const PC_VN_PORTRAIT_INLINE_PROPERTIES = Object.freeze([
+  'display', 'visibility', 'opacity', 'filter', 'width', 'height',
+  'min-width', 'max-width', 'min-height', 'max-height',
+  'object-fit', 'object-position', 'transform', 'transform-origin', 'z-index'
+]);
+
+function pcGetVNSlot(slotIndex = 0) {
+  const slot = PC_VN_CAST_SLOTS[slotIndex];
+  if (!slot) return null;
+  return {
+    ...slot,
+    container: document.getElementById(slot.containerId),
+    portrait: document.getElementById(slot.portraitId)
+  };
+}
+
+function pcClearVNSlotInlineStyles(slot) {
+  if (!slot) return;
+  PC_VN_SLOT_INLINE_PROPERTIES.forEach(property => slot.container?.style.removeProperty(property));
+  PC_VN_PORTRAIT_INLINE_PROPERTIES.forEach(property => slot.portrait?.style.removeProperty(property));
+}
+
+function pcSetVNSlotPortrait(slotIndex, characterId, expression = 'neutral', { animate = false } = {}) {
+  const slot = pcGetVNSlot(slotIndex);
+  if (!slot?.portrait) return false;
+  const character = pcGetVNCharacterDefinition(characterId);
+  if (!character) return false;
+  const { src, fallback } = pcGetVNCharacterImage(character.id, expression);
+  if (!src && !fallback) return false;
+
+  const portrait = slot.portrait;
+  if (portrait._pcExpressionTimer) {
+    clearTimeout(portrait._pcExpressionTimer);
+    portrait._pcExpressionTimer = null;
   }
 
-  pcApplyDualCastResponsive();
-  if (useS2TwoCharacterStage) {
-    // Both portraits were assigned above. Do not replace Pixel's portrait with
-    // Jordan's image in the shared single-character container.
-  } else if (scenarioIndex === SCENARIO_INDEX.METACOGNITION && !useDualCast) {
-    // Narrow S2 uses the dedicated Jordan container in S1's resolved portrait
-    // geometry. Keeping separate image elements prevents Pixel's expression
-    // timers or responsive refreshes from overwriting Jordan mid-line.
-    pcApplyS2NarrowSpeakerStage(isJordan, expression);
-  } else if (isJordan) vnSetStudentExpression(expression);
-  else vnSetExpression(expression);
+  const apply = () => {
+    pcSetImageSource(portrait, src, fallback);
+    portrait.dataset.pcCharacter = character.id;
+    portrait.style.removeProperty('opacity');
+    portrait._pcExpressionTimer = null;
+  };
+
+  if (animate && portrait.isConnected && getComputedStyle(portrait).display !== 'none') {
+    portrait.style.opacity = '0';
+    portrait._pcExpressionTimer = setTimeout(apply, 120);
+  } else {
+    apply();
+  }
+  return true;
+}
+
+function pcSetVNSlotCharacter(
+  slotIndex,
+  characterId,
+  expression = 'neutral',
+  { active = true, side = '' } = {}
+) {
+  const slot = pcGetVNSlot(slotIndex);
+  if (!slot?.container || !slot?.portrait) return false;
+  pcClearVNSlotInlineStyles(slot);
+
+  if (!characterId) {
+    slot.container.classList.remove('visible', 'is-active', 'is-inactive');
+    slot.container.style.setProperty('display', 'none', 'important');
+    delete slot.container.dataset.pcCharacter;
+    delete slot.container.dataset.pcCastSide;
+    delete slot.portrait.dataset.pcCharacter;
+    return true;
+  }
+
+  const character = pcGetVNCharacterDefinition(characterId);
+  if (!character) return false;
+  const resolvedSide = side === 'left' || side === 'right' ? side : slot.side;
+  slot.container.dataset.pcCharacter = character.id;
+  slot.container.dataset.pcCastSide = resolvedSide;
+  slot.portrait.dataset.pcCharacter = character.id;
+  slot.container.classList.add('visible');
+  slot.container.classList.toggle('is-active', Boolean(active));
+  slot.container.classList.toggle('is-inactive', !active);
+  pcSetVNSlotPortrait(slotIndex, character.id, expression);
+  return true;
+}
+
+function pcNormalizeVNCast(cast, speakerId) {
+  const entries = (Array.isArray(cast) ? cast : [])
+    .map(entry => typeof entry === 'string' ? { id: entry } : { ...entry })
+    .filter(entry => entry && entry.id)
+    .slice(0, PC_VN_CAST_SLOTS.length);
+
+  const speaker = String(speakerId || '').trim().toLowerCase();
+  if (!entries.length && speaker) entries.push({ id: speaker });
+
+  // Cast order is no longer a positioning contract. A scenario can request a
+  // reusable left/right slot, while plain string arrays retain the default
+  // primary-right / secondary-left order for backward compatibility.
+  const positioned = new Array(PC_VN_CAST_SLOTS.length).fill(null);
+  const unpositioned = [];
+  entries.forEach(entry => {
+    const requestedSide = String(entry.slot || entry.side || '').toLowerCase();
+    const requestedIndex = requestedSide === 'right' ? 0 : requestedSide === 'left' ? 1 : -1;
+    if (requestedIndex >= 0 && !positioned[requestedIndex]) {
+      positioned[requestedIndex] = { ...entry, side: requestedSide };
+    } else {
+      unpositioned.push(entry);
+    }
+  });
+  positioned.forEach((entry, index) => {
+    if (entry) return;
+    positioned[index] = unpositioned.shift() || null;
+  });
+  return positioned.filter(Boolean);
+}
+
+function pcRenderVNCast({ cast = [], speaker = 'pixel', expression = 'neutral' } = {}) {
+  const overlay = document.getElementById('vnOverlay');
+  const speakerId = String(speaker || 'pixel').trim().toLowerCase();
+  const normalizedCast = pcNormalizeVNCast(cast, speakerId);
+  if (!normalizedCast.some(entry => String(entry.id).toLowerCase() === speakerId)) {
+    normalizedCast.splice(0, normalizedCast.length, { id: speakerId });
+  }
+
+  const isDual = normalizedCast.length > 1;
+  overlay?.classList.toggle('pc-dual-character', isDual);
+  // Retired scenario-specific cast classes must never become layout owners again.
+  overlay?.classList.remove('pc-s2-two-character', 'pc-s2-narrow-jordan');
+
+  PC_VN_CAST_SLOTS.forEach((_, slotIndex) => {
+    const entry = normalizedCast[slotIndex];
+    if (!entry) {
+      pcSetVNSlotCharacter(slotIndex, null);
+      return;
+    }
+    const id = String(entry.id).trim().toLowerCase();
+    const active = id === speakerId;
+    const slotExpression = active ? expression : (entry.expression || 'neutral');
+    pcSetVNSlotCharacter(slotIndex, id, slotExpression, {
+      active,
+      side: entry.side || entry.slot || ''
+    });
+  });
+
+  window.pcCurrentVNCast = normalizedCast.map(entry => String(entry.id).trim().toLowerCase());
+  window.pcCurrentVNSpeaker = speakerId;
+  return true;
+}
+
+function vnSetExpression(expr) {
+  const primary = pcGetVNSlot(0);
+  const characterId = primary?.container?.dataset.pcCharacter || 'pixel';
+  pcSetVNSlotPortrait(0, characterId, expr, { animate: true });
+}
+
+function vnSetStudentExpression(expr) {
+  const secondary = pcGetVNSlot(1);
+  const characterId = secondary?.container?.dataset.pcCharacter || 'jordan';
+  pcSetVNSlotPortrait(1, characterId, expr, { animate: true });
+}
+
+function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', speakerName = '', cast = null) {
+  const characterId = String(character || 'pixel').trim().toLowerCase();
+  const definition = pcGetVNCharacterDefinition(characterId);
+  const speaker = document.getElementById('vnSpeaker');
+  const dialogue = document.getElementById('vnDialogue');
+  const castList = Array.isArray(cast) && cast.length ? cast : [characterId];
+
+  pcRenderVNCast({ cast: castList, speaker: characterId, expression });
+
+  const resolvedSpeaker = speakerName || definition?.label || characterId;
+  if (speaker) speaker.textContent = resolvedSpeaker;
+  if (dialogue) {
+    dialogue.setAttribute('aria-label', `${resolvedSpeaker} is speaking. Press Space or Enter to continue.`);
+  }
 }
 
 function pcApplyDualCastResponsive() {
-  const overlay = document.getElementById('vnOverlay');
-  const pixel = document.getElementById('vnCharacter');
-  const student = document.getElementById('vnStudentCharacter');
-  const compact = window.matchMedia?.('(max-width: 620px), (max-height: 650px)').matches;
-  const useS2TwoCharacterStage = scenarioIndex === SCENARIO_INDEX.METACOGNITION &&
-    !window.pcS2PixelSolo &&
-    Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0) >= 701;
-  overlay?.classList.toggle('pc-s2-two-character', useS2TwoCharacterStage);
-
-  // When a narrow S2 layout is resized into a two-character layout while
-  // Jordan is speaking, #vnPortrait may still contain Jordan because phones
-  // reuse Pixel's S1 portrait container for the active speaker. Restore Pixel
-  // before showing the dedicated Jordan portrait so the wide scene never
-  // renders Jordan twice.
-  if (useS2TwoCharacterStage) {
-    const pixelPortrait = document.getElementById('vnPortrait');
-    if (pixelPortrait) {
-      if (pixelPortrait._pcExpressionTimer) {
-        clearTimeout(pixelPortrait._pcExpressionTimer);
-        pixelPortrait._pcExpressionTimer = null;
-      }
-      pcSetImageSource(
-        pixelPortrait,
-        EXPRESSIONS.neutral,
-        LEGACY_ASSETS.images.professorPixel.neutral
-      );
-      pixelPortrait.style.opacity = '1';
-    }
-  }
-
-  if (!overlay?.classList.contains('pc-dual-character')) {
-    const viewportWidth = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0);
-    const isS2Narrow = scenarioIndex === SCENARIO_INDEX.METACOGNITION && viewportWidth <= 700;
-    if (!isS2Narrow) {
-      if (pixel) pixel.style.display = '';
-      if (student) student.style.display = '';
-      if (!useS2TwoCharacterStage && student) student.classList.remove('visible', 'is-active', 'is-inactive');
-    }
-    return;
-  }
-  if (pixel) {
-    if (compact && pixel.classList.contains('is-inactive')) pixel.style.setProperty('display', 'none', 'important');
-    else pixel.style.removeProperty('display');
-  }
-  if (student) {
-    if (compact && student.classList.contains('is-inactive')) student.style.setProperty('display', 'none', 'important');
-    else student.style.removeProperty('display');
-  }
+  // Responsive cast geometry is CSS-owned. This compatibility hook remains for
+  // older callers but intentionally performs no viewport-specific positioning.
+  return Boolean(document.getElementById('vnOverlay')?.classList.contains('pc-dual-character'));
 }
 
-if (!window.pcDualCastResponsiveInstalled) {
-  window.pcDualCastResponsiveInstalled = true;
-  window.addEventListener('resize', pcApplyDualCastResponsive, { passive: true });
-  window.visualViewport?.addEventListener('resize', pcApplyDualCastResponsive, { passive: true });
-}
+window.pcRegisterVNCharacter = pcRegisterVNCharacter;
+window.pcRenderVNCast = pcRenderVNCast;
+window.pcGetVNCharacterDefinition = pcGetVNCharacterDefinition;
 
 function vnTypeWriter(text) {
   const el = document.getElementById('vnText');
@@ -3381,12 +3386,20 @@ function playPixelSequence(key, onDone) {
   const lines = pixelDialogue[key];
   if (!lines) return;
 
-  // Update board text and play intro audio on scenario starts
+  let introCharacters = null;
+
+  // Update board text and play intro audio on scenario starts. A scenario may
+  // also declare a reusable cast here; the VN renderer decides how that cast
+  // fits the current viewport without scenario-specific positioning code.
   if (key.startsWith('scenarioStart_')) {
     const i = getScenarioIndexFromDialogueKey(key);
     if (i >= 0 && scenarios[i]) {
       const boardText = document.getElementById('vnBoardText');
       if (boardText) boardText.textContent = scenarios[i].desc;
+      const ui = getScenarioUI(i);
+      if (ui?.introCast === 'dual' && Array.isArray(ui.introCharacters)) {
+        introCharacters = ui.introCharacters;
+      }
       // Play scenario intro — suppressed during initial load to avoid double audio
       if (window.scenarioIntroEnabled) playSound(`scenarioIntro${i}`);
     }
@@ -3398,7 +3411,12 @@ function playPixelSequence(key, onDone) {
   // Queue all lines
   lines.forEach((line, idx) => {
     const isLast = idx === lines.length - 1;
-    vnShow(line.expr, line.text, isLast && onDone ? onDone : null, { speaker: line.speaker || 'Professor Pixel', character: line.character || 'pixel', id: line.id || '' });
+    vnShow(line.expr, line.text, isLast && onDone ? onDone : null, {
+      speaker: line.speaker || 'Professor Pixel',
+      character: line.character || 'pixel',
+      cast: line.cast || introCharacters,
+      id: line.id || ''
+    });
   });
 }
 
@@ -3411,6 +3429,7 @@ function loadSceneImage(src, fallback = '') {
   const img = document.getElementById('vnBoardImg');
   const loading = document.getElementById('vnBoardLoading');
   if (!img) return;
+  const runToken = pcCaptureScenarioRun(scenarioIndex);
 
   if (loading) loading.style.display = 'none';
   img.classList.remove('loaded');
@@ -3423,11 +3442,13 @@ function loadSceneImage(src, fallback = '') {
 
   const test = new Image();
   test.onload = () => {
+    if (!pcIsScenarioRunCurrent(runToken)) return;
     img.src = src;
     img.alt = 'Scene illustration';
     img.classList.add('loaded');
   };
   test.onerror = () => {
+    if (!pcIsScenarioRunCurrent(runToken)) return;
     if (fallback && test.src !== pcProjectUrl(fallback)) {
       test.src = pcProjectUrl(fallback);
       return;
@@ -3454,11 +3475,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Safety check: if S1 content is still empty after load, render it again.
   setTimeout(() => {
-    const scenarioText = document.getElementById('scenarioText');
     const inputContainer = document.getElementById('inputContainer');
 
-    if ((!scenarioText || !scenarioText.textContent.trim()) ||
-        (!inputContainer || !inputContainer.textContent.trim())) {
+    if (!inputContainer || !inputContainer.textContent.trim()) {
       console.warn('[PromptCraft] Startup watchdog repaired empty initial scenario render.');
       try {
         window.scenarioIntroEnabled = false;
