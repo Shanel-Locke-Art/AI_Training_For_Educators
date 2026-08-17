@@ -550,15 +550,42 @@ function renderS2ThinkingMoveActivity() {
   return renderS2SelectionActivity(S2_ACTIVITY_CONFIG.thinkingMove);
 }
 
-function pcS2BuildDraftSystemPrompt(move) {
+function pcS2GetDraftIngredients(data = getS2Data()) {
+  const diagnosisId = (data.diagnosisFinal || [])[0] || pcGetLatestS2Selection('diagnosisAttempts')[0] || 'evidence';
+  const evidenceId = (data.evidenceFinal || [])[0] || pcGetLatestS2Selection('evidenceAttempts')[0] || 'evidence_check';
+  const moveId = data.thinkingMove || 'evaluate';
+  const diagnosis = S2_DIAGNOSIS_OPTIONS.find(item => item.id === diagnosisId) || S2_DIAGNOSIS_OPTIONS[0];
+  const intervention = S2_EVIDENCE_RESPONSES.find(item => item.id === evidenceId) || S2_EVIDENCE_RESPONSES[3];
+  const move = S2_THINKING_MOVES.find(item => item.id === moveId) || S2_THINKING_MOVES[2];
+  const recorded = pcGetS2JordanInterventionDialogue(evidenceId);
+
+  return {
+    diagnosisId,
+    diagnosisTitle: diagnosis.title,
+    diagnosisDetail: diagnosis.text,
+    evidenceId,
+    interventionTitle: intervention.title,
+    interventionDetail: intervention.text,
+    jordanEvidence: recorded.quote,
+    moveId,
+    moveTitle: move.title,
+    moveDetail: move.text
+  };
+}
+
+function pcS2BuildDraftSystemPrompt(ingredients) {
   return `You are Babbage, PromptCraft's instructional-design analysis engine.
 
 SCENARIO 2: METACOGNITION
 Jordan completes assignments and sometimes earns better grades, but he cannot identify which learning strategy helped, evaluate why it helped, or decide what to do next.
 
-The participant selected this metacognitive move as the starting point: ${move}.
+The participant is building a reflection activity from these learner-selected ingredients:
+- Diagnosis: ${ingredients.diagnosisTitle}
+- Intervention/evidence move: ${ingredients.interventionTitle}
+- Evidence Jordan produced: ${ingredients.jordanEvidence}
+- Metacognitive thinking move: ${ingredients.moveTitle}
 
-Create one short reflection activity for Jordan. The activity should be plausible enough that an instructor might accept it, but deliberately include exactly ONE subtle weakness so the participant can audit the AI-generated design.
+Create one short reflection activity for Jordan that responds to those ingredients. The activity should be plausible enough that an instructor might accept it, but deliberately include exactly ONE subtle weakness so the participant can audit the AI-generated design.
 
 Choose exactly one weakness from:
 - too_vague: the prompt is so broad that Jordan can answer without naming a strategy or learning evidence.
@@ -566,9 +593,116 @@ Choose exactly one weakness from:
 - no_transfer: Jordan evaluates learning but is not asked to make a future decision.
 - grade_focus: the activity centers grades/performance rather than how learning happened.
 
-Do not announce the weakness inside the activity prompt. Keep the activity concise and realistic.`;
+Do not announce the weakness inside the activity prompt. The design_rationale should explain the visible instructional intention without revealing the deliberate weakness. Put the explanation of the hidden weakness only in why_the_weakness_matters. Keep the activity concise and realistic.`;
 }
 
+function pcS2BuildDraftRequestText(ingredients) {
+  return `Build the reflection draft from exactly these ingredients:
+
+1. DIAGNOSIS
+${ingredients.diagnosisTitle}
+${ingredients.diagnosisDetail}
+
+2. INTERVENTION AND OBSERVED EVIDENCE
+${ingredients.interventionTitle}
+Jordan's recorded response: ${ingredients.jordanEvidence}
+
+3. THINKING MOVE
+${ingredients.moveTitle}
+${ingredients.moveDetail}
+
+Generate the draft now. Do not replace these ingredients with a different diagnosis or intervention.`;
+}
+
+function buildS2DraftAnalysisHTML(data, draft) {
+  const ingredients = pcS2GetDraftIngredients(data);
+  const isFallback = data.aiProvider === 'local-fallback';
+  const badge = isFallback ? 'DEMONSTRATION FALLBACK DRAFT' : 'LIVE BABBAGE DRAFT';
+  const auditQuestion = `Does Jordan's likely response actually show “${ingredients.moveTitle},” or can he still avoid part of that thinking?`;
+  const totalCharacters = [
+    ingredients.diagnosisTitle, ingredients.interventionTitle, ingredients.jordanEvidence,
+    ingredients.moveTitle, draft.activity_title, draft.activity_prompt,
+    draft.likely_student_response, auditQuestion
+  ].join(' ').length;
+  const densityClass = totalCharacters > 1100
+    ? 'analysis-report-very-dense'
+    : totalCharacters > 820
+      ? 'analysis-report-dense'
+      : '';
+
+  // Reuse S1's six semantic analysis slots instead of inventing a new grid.
+  // The shared auto-fit routine knows these classes and assigns stable grid areas
+  // across desktop, Nest Hub, tablets, foldables, and phones.
+  return `
+    <div class="analysis-report ${densityClass}" data-analysis-characters="${totalCharacters}" role="document" aria-label="Babbage reflection draft analysis">
+      <header class="analysis-header">
+        <div class="analysis-badge">${esc(badge)}</div>
+        <h2 class="analysis-title">How your choices became the draft</h2>
+        <p class="analysis-summary">Three inputs went to Babbage. Compare the thinking move you intended with the response the draft is likely to invite from Jordan.</p>
+      </header>
+
+      <div class="analysis-grid" aria-label="Reflection draft construction">
+        <section class="analysis-card analysis-status-card compact">
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">1</span><span>Input · Diagnosis</span></span>
+          <div class="analysis-value big">${esc(ingredients.diagnosisTitle)}</div>
+        </section>
+
+        <section class="analysis-card analysis-confidence-card compact">
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">3</span><span>Input · Thinking move</span></span>
+          <div class="analysis-value big">${esc(ingredients.moveTitle)}</div>
+        </section>
+
+        <section class="analysis-card analysis-issue-card">
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">2</span><span>Input · Evidence</span></span>
+          <div class="analysis-value"><strong>${esc(ingredients.interventionTitle)}</strong></div>
+          <div class="analysis-note">Jordan: “${esc(ingredients.jordanEvidence)}”</div>
+        </section>
+
+        <section class="analysis-card analysis-repair-card">
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">→</span><span>Output · Babbage draft</span></span>
+          <div class="analysis-value"><strong>${esc(draft.activity_title)}</strong></div>
+          <div class="analysis-note">${esc(draft.activity_prompt)}</div>
+        </section>
+
+        <section class="analysis-card analysis-impact-card wide">
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">▥</span><span>Effect · Likely Jordan response</span></span>
+          <div class="analysis-value">“${esc(draft.likely_student_response)}”</div>
+        </section>
+
+        <section class="analysis-card analysis-worked-card wide">
+          <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">?</span><span>Audit lens</span></span>
+          <div class="analysis-value">${esc(auditQuestion)}</div>
+        </section>
+      </div>
+    </div>`;
+}
+
+function showS2DraftAnalysisInTerminal(data, draft) {
+  const isFallback = data.aiProvider === 'local-fallback';
+  const reportOptions = {
+    reportHTML: buildS2DraftAnalysisHTML(data, draft),
+    terminalStateText: isFallback ? 'DEMONSTRATION DRAFT READY' : 'REFLECTION DRAFT READY',
+    engineLabel: isFallback ? 'BABBAGE FALLBACK' : 'BABBAGE ENGINE',
+    speakerName: 'Professor Pixel',
+    onClose: () => {
+      if (scenarioIndex === SCENARIO_INDEX.METACOGNITION) renderS2AuditActivity();
+    },
+    readLabel: '🔊 Read Draft Analysis',
+    continueLabel: 'Audit this draft →',
+    ariaLabel: 'Babbage reflection draft analysis'
+  };
+
+  // Match S1's visible response handoff: keep the analyzer on screen while the
+  // response is parsed, briefly show completion, then replace it with the report.
+  try { pcMarkClaudeResponseParsedV360(); } catch (e) {}
+  pcScheduleScenarioTask(() => {
+    try { pcCompleteClaudeAnalysisProgressV360(); } catch (e) {}
+    pcScheduleScenarioTask(() => {
+      showBabbageTerminalReport(reportOptions);
+    }, 160, SCENARIO_INDEX.METACOGNITION);
+  }, 260, SCENARIO_INDEX.METACOGNITION);
+  return true;
+}
 async function submitS2ThinkingMove() {
   const selection = getCheckedValues('s2-thinking-move');
   if (selection.length !== 1) return;
@@ -593,38 +727,26 @@ async function submitS2ThinkingMove() {
   });
 }
 
-function renderS2BabbageLoading(message = 'Babbage is building a reflection activity from the case evidence...') {
-  mountScenarioActivity({
-    scenarioIndex: SCENARIO_INDEX.METACOGNITION,
-    progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 3, ariaLabel: 'Scenario 2 progress' }),
-    contentHTML: `
-      <section class="pc-activity-card pc-s2-babbage-loading" aria-live="polite">
-        <div class="pc-activity-kicker">Babbage Engine</div>
-        <h2>Designing a reflection activity</h2>
-        <p>${esc(message)}</p>
-        <div class="pc-s2-engine-progress" role="progressbar" aria-label="Babbage activity generation in progress">
-          <span></span>
-        </div>
-        <p class="pc-s2-engine-note">The draft will be intentionally imperfect. Your job is to notice what the machine missed.</p>
-      </section>`
-  });
-}
-
 async function generateS2BabbageDraft() {
   const runToken = pcCaptureScenarioRun(SCENARIO_INDEX.METACOGNITION);
-  renderS2BabbageLoading();
   const data = getS2Data();
-  const move = data.thinkingMove || 'evaluate';
+  const ingredients = pcS2GetDraftIngredients(data);
+
+  showClaudeConsultOverlay('Reflection design', {
+    speakerName: 'Professor Pixel',
+    heading: 'Your choices are going to Babbage.',
+    body: 'Babbage is combining your diagnosis, the evidence Jordan produced, and your selected thinking move into a reflection activity.'
+  });
 
   let result;
   try {
     const response = await requestBabbageAnalysis({
       analysis_type: 's2_draft',
       max_output_tokens: 2200,
-      system: pcS2BuildDraftSystemPrompt(move),
+      system: pcS2BuildDraftSystemPrompt(ingredients),
       messages: [{
         role: 'user',
-        content: `Case evidence: Jordan says rereading sometimes made the material feel clearer, but he cannot tell what actually helped. He plans to repeat the same strategy next time and hope it works. Build the draft now.`
+        content: pcS2BuildDraftRequestText(ingredients)
       }]
     }, 's2-draft');
     if (!pcIsScenarioRunCurrent(runToken)) return false;
@@ -647,9 +769,10 @@ async function generateS2BabbageDraft() {
   data.babbageDraft = result;
   data.structuredAnalysis = { s2_draft: result };
   data.finalResponse = result.activity_prompt;
-  renderS2AuditActivity();
+  data.s2DraftIngredients = ingredients;
+  showS2DraftAnalysisInTerminal(data, result);
+  return true;
 }
-
 function renderS2AuditActivity() {
   const data = getS2Data();
   const draft = data.babbageDraft || S2_LOCAL_DRAFT_FALLBACK;
@@ -688,8 +811,8 @@ function renderS2AuditActivity() {
         ${buildScenarioTaskCardHTML({
           titleId: 's2AuditTitle',
           kicker: 'Decision 4 · Audit the machine',
-          title: 'What is the most important weakness in Babbage’s draft?',
-          instruction: 'Choose one. The draft is intentionally plausible, so focus on what Jordan could still avoid thinking about.',
+          title: 'What does Babbage’s draft still let Jordan avoid thinking about?',
+          instruction: 'You just traced the ingredients, the draft, and Jordan’s likely response in the terminal. Choose the gap that most clearly prevents the intended thinking move from becoming visible.',
           choiceGridId: 's2AuditChoices',
           choicesHTML,
           statusId: 's2AuditStatus',

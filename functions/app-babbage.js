@@ -66,12 +66,39 @@ function mockBabbageResponse(payload, context = 'main', reason = 'forced') {
 }
 
 const BABBAGE_REQUEST_TIMEOUT_MS = 90000;
+const BABBAGE_MIN_VISIBLE_ANALYSIS_MS = 900;
+
+function pcGetBabbageMinVisibleAnalysisMs() {
+  const configured = Number(window.PC_BABBAGE_MIN_VISIBLE_ANALYSIS_MS);
+  if (Number.isFinite(configured)) return Math.max(0, configured);
+  window.PC_BABBAGE_MIN_VISIBLE_ANALYSIS_MS = BABBAGE_MIN_VISIBLE_ANALYSIS_MS;
+  return BABBAGE_MIN_VISIBLE_ANALYSIS_MS;
+}
+
+async function pcHoldVisibleBabbageAnalysis(startedAt, isVisible) {
+  if (!isVisible || !Number.isFinite(startedAt)) return;
+  const remaining = pcGetBabbageMinVisibleAnalysisMs() - (performance.now() - startedAt);
+  if (remaining > 0) await new Promise(resolve => window.setTimeout(resolve, remaining));
+}
 
 async function requestBabbageAnalysis(payload, context = 'main') {
-  if (USE_MOCK_BABBAGE) return mockBabbageResponse(payload, context, FORCE_MOCK_BABBAGE ? 'query-parameter' : 'local-test');
+  // The analyzing terminal is part of the shared Babbage UX. Even mock/fallback
+  // responses must leave it on screen long enough to be perceivable; otherwise
+  // a fast local response replaces the loading state before the browser paints.
+  const tracksVisibleAnalysis = !!document.querySelector('#claudeTerminalOutput .pc-analyzing-progress');
+  const visibleAnalysisStartedAt = tracksVisibleAnalysis ? performance.now() : NaN;
+  if (tracksVisibleAnalysis && typeof window.pcStartClaudeAnalysisProgress === 'function') {
+    window.pcStartClaudeAnalysisProgress(BABBAGE_REQUEST_TIMEOUT_MS);
+  }
 
-  const tracksVisibleAnalysis = context === 'main' && !!document.querySelector('#claudeTerminalOutput .pc-analyzing-progress');
-  if (tracksVisibleAnalysis && typeof window.pcStartClaudeAnalysisProgress === 'function') window.pcStartClaudeAnalysisProgress(BABBAGE_REQUEST_TIMEOUT_MS);
+  if (USE_MOCK_BABBAGE) {
+    const mock = await mockBabbageResponse(payload, context, FORCE_MOCK_BABBAGE ? 'query-parameter' : 'local-test');
+    await pcHoldVisibleBabbageAnalysis(visibleAnalysisStartedAt, tracksVisibleAnalysis);
+    if (tracksVisibleAnalysis && typeof window.pcMarkClaudeResponseReceived === 'function') {
+      window.pcMarkClaudeResponseReceived();
+    }
+    return mock;
+  }
 
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
   const timeoutId = controller ? setTimeout(() => controller.abort(), BABBAGE_REQUEST_TIMEOUT_MS) : null;
@@ -81,6 +108,7 @@ async function requestBabbageAnalysis(payload, context = 'main') {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: controller ? controller.signal : undefined
     });
 
+    await pcHoldVisibleBabbageAnalysis(visibleAnalysisStartedAt, tracksVisibleAnalysis);
     if (tracksVisibleAnalysis && typeof window.pcMarkClaudeResponseReceived === 'function') window.pcMarkClaudeResponseReceived();
 
     const responseText = await res.text();
@@ -108,6 +136,7 @@ async function requestBabbageAnalysis(payload, context = 'main') {
   } catch (err) {
     console.warn('[PromptCraft] Babbage unavailable or timed out; using local fallback:', err && err.message ? err.message : err);
     if (tracksVisibleAnalysis && typeof window.pcFailClaudeAnalysisProgress === 'function') window.pcFailClaudeAnalysisProgress();
+    await pcHoldVisibleBabbageAnalysis(visibleAnalysisStartedAt, tracksVisibleAnalysis);
     return mockBabbageResponse(payload, context, 'backend-unavailable');
   } finally {
     if (timeoutId) clearTimeout(timeoutId);

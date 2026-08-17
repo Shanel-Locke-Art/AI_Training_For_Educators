@@ -130,12 +130,25 @@ function pcResetVNCharacters() {
   ];
 
   characters.forEach(character => {
-    character?.classList.remove('visible', 'is-active', 'is-inactive');
-    characterProps.forEach(property => character?.style.removeProperty(property));
-    if (character) {
-      delete character.dataset.pcCharacter;
-      delete character.dataset.pcCastSide;
-    }
+    if (!character) return;
+
+    // Hide the slot before releasing dual-cast geometry. Otherwise a portrait
+    // can remain visible for its opacity transition after pc-dual-character is
+    // removed, briefly falling back to intrinsic image dimensions between the
+    // VN introduction and the scenario workbench. The next cast render clears
+    // these inline properties through pcClearVNSlotInlineStyles().
+    character.style.setProperty('display', 'none', 'important');
+    character.style.setProperty('visibility', 'hidden', 'important');
+    character.style.setProperty('opacity', '0', 'important');
+    character.classList.remove('visible', 'is-active', 'is-inactive');
+
+    characterProps.forEach(property => {
+      if (!['display', 'visibility', 'opacity'].includes(property)) {
+        character.style.removeProperty(property);
+      }
+    });
+    delete character.dataset.pcCharacter;
+    delete character.dataset.pcCastSide;
   });
   portraits.forEach(portrait => {
     if (portrait?._pcExpressionTimer) {
@@ -2700,8 +2713,15 @@ if (!window.pcAnalysisLayoutV122Installed) {
   window.visualViewport?.addEventListener('resize', pcScheduleAnalysisLayoutV255, { passive: true });
 }
 
-function showClaudeConsultOverlay(partLabel) {
-  // This is an interaction moment: Pixel consults Babbage through the terminal close-up.
+function showClaudeConsultOverlay(partLabel, options = {}) {
+  // Shared Babbage analyzing presentation. Scenarios supply only copy; the
+  // workstation, terminal, dialogue, progress, and responsive behavior stay shared.
+  const {
+    speakerName = 'Professor Pixel',
+    heading = "Let's ask Babbage what it notices.",
+    body = 'Babbage is analyzing the teaching problem now.'
+  } = options || {};
+
   vnQueue = [];
   clearTimeout(vnTypeTimer);
   vnTyping = true;
@@ -2709,41 +2729,42 @@ function showClaudeConsultOverlay(partLabel) {
   vnFullText = '';
   vnCurrentText = '';
 
-pcClearAnalysisLayoutV122();
+  pcClearAnalysisLayoutV122();
 
-const overlay = pcSetVNOverlayState({
-  active: true,
-  modes: ['claude-terminal-consult']
-});
-setClaudeTerminalTextMode(false);
+  pcSetVNOverlayState({
+    active: true,
+    modes: ['claude-terminal-consult']
+  });
+  setClaudeTerminalTextMode(false);
+  musicStartVN();
+  setClaudeShelfState('idle', 'idle');
 
-musicStartVN();
+  setClaudeTerminalState(
+    'thinking',
+    'BABBAGE ENGINE',
+    `SECTION:
+${esc(partLabel).toUpperCase()}
 
-setClaudeShelfState('idle', 'idle');
+ANALYZING...`
+  );
 
-setClaudeTerminalState(
-  'thinking',
-  'BABBAGE ENGINE',
-  `SECTION:\n${esc(partLabel).toUpperCase()}\n\nANALYZING...`
-);
-
-renderClaudeAnalyzingReadout(partLabel);
-pcQueueModernTerminalAlignmentV147();
-pcScheduleLiveAnalyzingLayoutV256({ immediate: true });
+  renderClaudeAnalyzingReadout(partLabel);
+  pcQueueModernTerminalAlignmentV147();
+  pcScheduleLiveAnalyzingLayoutV256({ immediate: true });
 
   const speaker = document.getElementById('vnSpeaker');
-  if (speaker) speaker.textContent = 'Professor Pixel';
+  if (speaker) speaker.textContent = speakerName;
 
   const vnText = document.getElementById('vnText');
   if (vnText) {
-    vnText.innerHTML = `<div><strong>Let's ask Babbage what it notices.</strong></div><div style="margin-top:8px;">Babbage is analyzing the teaching problem now.</div><div class="vn-prediction-note">Terminal active...</div>`;
+    vnText.innerHTML = `<div><strong>${esc(heading)}</strong></div><div style="margin-top:8px;">${esc(body)}</div><div class="vn-prediction-note">Terminal active...</div>`;
   }
 
   const hint = document.getElementById('vnAdvanceHint');
   if (hint) hint.classList.remove('show');
 
-  setTimeout(() => {
-    document.getElementById('vnDialogue')?.focus();
+  pcScheduleScenarioTask(() => {
+    document.getElementById('vnDialogue')?.focus({ preventScroll: true });
   }, 100);
 }
 
@@ -2856,24 +2877,25 @@ function buildClaudeAnalysisHTML(feedback, mock = false, mockReason = '') {
   `;
 }
 
-function showClaudeConsultResult(feedback, mock = false, onClose = null, mockReason = '') {
+function showBabbageTerminalReport({
+  reportHTML = '',
+  terminalStateText = 'ANALYSIS COMPLETE',
+  engineLabel = 'BABBAGE ENGINE',
+  speakerName = 'Professor Pixel',
+  onClose = null,
+  readLabel = '🔊 Read Analysis',
+  continueLabel = 'Continue',
+  ariaLabel = 'Babbage analysis report'
+} = {}) {
   claudeTerminalCloseCallback = typeof onClose === 'function' ? onClose : null;
-  const label = mock ? (mockReason === 'backend-unavailable' ? 'BACKEND FALLBACK ANALYSIS' : 'MOCK ANALYSIS COMPLETE') : 'ANALYSIS COMPLETE';
-  const terminalText = `${label}\n\n${terminalizeClaudeText(feedback)}`;
-
   setClaudeTerminalTextMode(true);
-
-  setClaudeTerminalState(
-    'responding',
-    mock ? 'MOCK BABBAGE ENGINE' : 'BABBAGE ENGINE',
-    esc(terminalText)
-  );
+  setClaudeTerminalState('responding', engineLabel, esc(terminalStateText));
 
   const output = document.getElementById('claudeTerminalOutput');
-
   if (output) {
     output.classList.add('claude-analysis-layout');
-    output.innerHTML = buildClaudeAnalysisHTML(terminalText, mock, mockReason);
+    output.setAttribute('aria-label', ariaLabel);
+    output.innerHTML = reportHTML;
   }
 
   requestAnimationFrame(() => {
@@ -2884,22 +2906,42 @@ function showClaudeConsultResult(feedback, mock = false, onClose = null, mockRea
   });
 
   const speaker = document.getElementById('vnSpeaker');
-  if (speaker) speaker.textContent = 'Professor Pixel';
+  if (speaker) speaker.textContent = speakerName;
 
   const vnText = document.getElementById('vnText');
   if (vnText) {
+    const readButton = readLabel
+      ? `<button id="claudeTTSBtn" class="claude-tts-btn" type="button" data-pc-action="toggle-claude-tts" data-pc-stop-propagation="true">${esc(readLabel)}</button>`
+      : '';
     vnText.innerHTML = `
-      <button id="claudeTTSBtn" class="claude-tts-btn" type="button" data-pc-action="toggle-claude-tts" data-pc-stop-propagation="true">🔊 Read Analysis</button>
-      <button class="vn-return-btn terminal-return" type="button" data-pc-action="close-claude-consult" data-pc-stop-propagation="true">Continue</button>
+      ${readButton}
+      <button class="vn-return-btn terminal-return" type="button" data-pc-action="close-claude-consult" data-pc-stop-propagation="true">${esc(continueLabel)}</button>
     `;
-    pcScheduleScenarioTask(() => vnText.querySelector('.vn-return-btn')?.focus(), 100);
+    pcScheduleScenarioTask(() => vnText.querySelector('.vn-return-btn')?.focus({ preventScroll: true }), 100);
     pcScheduleAnalysisLayoutV255();
   }
 
   const hint = document.getElementById('vnAdvanceHint');
   if (hint) hint.classList.remove('show');
+  return true;
 }
 
+function showClaudeConsultResult(feedback, mock = false, onClose = null, mockReason = '') {
+  const label = mock ? (mockReason === 'backend-unavailable' ? 'BACKEND FALLBACK ANALYSIS' : 'MOCK ANALYSIS COMPLETE') : 'ANALYSIS COMPLETE';
+  const terminalText = `${label}
+
+${terminalizeClaudeText(feedback)}`;
+  return showBabbageTerminalReport({
+    reportHTML: buildClaudeAnalysisHTML(terminalText, mock, mockReason),
+    terminalStateText: terminalText,
+    engineLabel: mock ? 'MOCK BABBAGE ENGINE' : 'BABBAGE ENGINE',
+    speakerName: 'Professor Pixel',
+    onClose,
+    readLabel: '🔊 Read Analysis',
+    continueLabel: 'Continue',
+    ariaLabel: 'Babbage scenario diagnostic report'
+  });
+}
 
 // NOTE: Terminal diagnosis copy is still inline. Candidate for dialogue.js or scenario-data.js.
 function showClaudeFinalResponseInTerminal(responseText, mock = false, onClose = null, scoreTotal = null, mockReason = '', structuredAnalysis = null) {

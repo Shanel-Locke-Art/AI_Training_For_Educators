@@ -197,6 +197,32 @@ def main() -> int:
             if dual_pixel["retiredTwoCharacter"] or dual_pixel["retiredNarrowJordan"]:
                 failures.append(f"{label}: retired S2-specific cast classes returned.")
 
+            # Intro handoff: cast teardown must hide both slots immediately before
+            # releasing dual-cast geometry. Otherwise the secondary portrait can
+            # briefly render at intrinsic image size while the Mission Briefing mounts.
+            reset_cast = page.evaluate(
+                """() => {
+                  pcResetVNCharacters();
+                  const state = id => {
+                    const el = document.getElementById(id);
+                    const r = el.getBoundingClientRect();
+                    const cs = getComputedStyle(el);
+                    return { display: cs.display, visibility: cs.visibility, opacity: cs.opacity, w:r.width, h:r.height };
+                  };
+                  return {
+                    dual: document.getElementById('vnOverlay')?.classList.contains('pc-dual-character') || false,
+                    primary: state('vnCharacter'),
+                    secondary: state('vnStudentCharacter')
+                  };
+                }"""
+            )
+            if reset_cast["dual"]:
+                failures.append(f"{label}: dual-cast layout class survived shared character teardown.")
+            for slot_name in ("primary", "secondary"):
+                slot = reset_cast[slot_name]
+                if slot["display"] != "none" or slot["visibility"] != "hidden" or slot["opacity"] != "0":
+                    failures.append(f"{label}: {slot_name} cast slot remains paintable during intro-to-workbench handoff.")
+
             if width > 700:
                 if dual_pixel["primary"]["display"] == "none" or dual_pixel["secondary"]["display"] == "none":
                     failures.append(f"{label}: both cast members should be visible in wide dual-cast mode.")
