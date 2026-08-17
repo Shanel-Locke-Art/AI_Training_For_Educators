@@ -11263,6 +11263,89 @@ body #musicToggle.full-audio {
   opacity: 1;
 }
 
+/* Main-menu presentation QR: reusable launch card for projected demos. */
+.pc-menu-qr-card {
+  width: fit-content;
+  max-width: 100%;
+  display: inline-grid;
+  grid-template-columns: 116px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  margin-top: 24px;
+  padding: 12px 18px 12px 12px;
+  border: 1px solid rgba(45, 90, 61, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--forest-dark);
+  text-decoration: none;
+  box-shadow: 0 8px 22px rgba(30, 54, 38, 0.08);
+}
+
+.pc-menu-qr-card:hover,
+.pc-menu-qr-card:focus-visible {
+  border-color: var(--forest);
+  box-shadow: 0 0 0 3px rgba(45, 90, 61, 0.12), 0 10px 24px rgba(30, 54, 38, 0.12);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.pc-menu-qr-image {
+  width: 116px;
+  height: 116px;
+  display: block;
+  padding: 6px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: #fff;
+  image-rendering: pixelated;
+}
+
+.pc-menu-qr-copy {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.pc-menu-qr-copy strong {
+  font-family: "Fraunces", serif;
+  font-size: clamp(1.08rem, 2vw, 1.35rem);
+  line-height: 1.1;
+}
+
+.pc-menu-qr-copy span {
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .pc-menu-qr-card {
+    width: 100%;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 14px;
+    margin-top: 18px;
+    box-sizing: border-box;
+  }
+
+  .pc-menu-qr-image {
+    width: 92px;
+    height: 92px;
+  }
+}
+
+@media (max-width: 420px) {
+  .pc-menu-qr-card {
+    grid-template-columns: 78px minmax(0, 1fr);
+    padding: 10px;
+  }
+
+  .pc-menu-qr-image {
+    width: 78px;
+    height: 78px;
+  }
+}
+
 /* SOURCE: styles/50-layout.css */
 /* ==================================================
    v145 TERMINAL STAGE TUNE-UP
