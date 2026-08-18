@@ -177,7 +177,6 @@
 .s2-loop-puzzle>.pc-activity-task h2{max-width:760px;margin-bottom:5px}.s2-loop-puzzle>.pc-activity-task .pc-activity-instruction{max-width:780px;margin-top:0;margin-bottom:18px}
 .s2-loop-puzzle .pc-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 
-.s2-loop-puzzle .pc-choice-marker{width:28px;height:28px;padding:0;display:grid;place-items:center;border:1px solid var(--border-strong);background:#fff;border-radius:50%;font-size:0}.s2-loop-puzzle .pc-choice-marker::after{content:"";width:10px;height:10px;border-radius:50%;background:transparent}.s2-loop-puzzle .pc-choice-card:has(input:checked) .pc-choice-marker::after{background:var(--forest)}
 .s2-loop-puzzle .pc-choice-body{display:grid;gap:5px}.s2-loop-puzzle .pc-choice-body strong{color:var(--forest-dark);font-size:1rem;line-height:1.25}.s2-loop-puzzle .pc-choice-body>span{color:var(--ink-mid);font-size:.9rem;line-height:1.38}.s2-loop-puzzle .pc-selection-bar{margin-top:14px}
 @media(max-width:760px){.s2-loop-header{padding:14px 16px}.s2-loop-jordan span{display:none}.s2-loop-jordan img{width:48px;height:58px}.s2-learning-gap{padding:18px 16px}.s2-gap-intro{grid-template-columns:1fr}.s2-result-chip{grid-column:1;grid-row:auto;margin-top:12px;min-width:0;display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:8px}.s2-result-chip strong,.s2-result-chip small{margin:0}.s2-gap-flow{grid-template-columns:1fr;gap:6px}.s2-flow-node{min-height:78px}.s2-flow-arrow{transform:rotate(90deg);font-size:20px}.s2-loop-puzzle>.pc-activity-task{padding:20px 16px}.s2-loop-puzzle .pc-choice-grid{grid-template-columns:1fr}}
 
@@ -2252,11 +2251,6 @@ body[data-pc-scenario="metacognition"] .s2-loop-jordan span {
     font-size: 17px !important;
     line-height: 1.45 !important;
   }
-  
-  body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-marker {
-    width: 30px;
-    height: 30px;
-  }
   body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-body strong {
     font-size: 17px !important;
     line-height: 1.28 !important;
@@ -2379,12 +2373,6 @@ body[data-pc-scenario="metacognition"] .s2-loop-jordan span {
   body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-grid {
     grid-template-columns: repeat(2, minmax(0,1fr)) !important;
     gap: 14px !important;
-  }
-  
-  body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-marker {
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
   }
   body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-body strong {
     font-size: 17px !important;
@@ -4462,8 +4450,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-context-arrow {
 
 /* Later S2 decisions now use the same two-column choice rhythm as Diagnose. */
 body[data-pc-scenario="metacognition"] .pc-s2-step-shell > .pc-activity-task,
-body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task,
-body[data-pc-scenario="metacognition"] .pc-s2-repair-layout > .pc-activity-card {
+body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task {
   min-width: 0 !important;
   padding: clamp(20px, 2vw, 28px) !important;
   border-radius: 16px !important;
@@ -4515,13 +4502,52 @@ body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-body > span 
 }
 
 /* Audit gets a readable draft/task split without squeezing the choices. */
-body[data-pc-scenario="metacognition"] .pc-s2-audit-layout,
-body[data-pc-scenario="metacognition"] .pc-s2-repair-layout {
+body[data-pc-scenario="metacognition"] .pc-s2-audit-layout {
   display: grid !important;
-  grid-template-columns: minmax(260px, .78fr) minmax(0, 1.22fr) !important;
-  gap: clamp(14px, 1.8vw, 22px) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(16px, 1.8vw, 24px) !important;
   min-width: 0 !important;
-  align-items: start !important;
+  align-items: stretch !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > :is(.pc-s2-babbage-draft, .pc-activity-task) {
+  height: 100% !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-evidence {
+  flex: 1 1 220px !important;
+  min-height: 220px !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-rationale {
+  margin-top: 0 !important;
+  padding: 14px 16px !important;
+  border: 1px solid rgba(244, 229, 186, .18) !important;
+  border-left: 3px solid rgba(208, 174, 101, .8) !important;
+  border-radius: 9px !important;
+  background: rgba(255,255,255,.035) !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-rationale__label {
+  margin: 0 0 5px !important;
+  color: #f4e5ba !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-size: .72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-rationale p {
+  margin: 0 !important;
+  color: #eef9f1 !important;
+  font-size: clamp(.92rem, 1vw, 1rem) !important;
+  line-height: 1.5 !important;
 }
 
 body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-grid {
@@ -4534,18 +4560,12 @@ body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-card {
   padding: 14px 15px !important;
 }
 
-body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft,
-body[data-pc-scenario="metacognition"] .pc-s2-original-draft {
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft {
   min-width: 0 !important;
 }
 
-body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft h2,
-body[data-pc-scenario="metacognition"] .pc-s2-original-draft h3 {
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft h2 {
   overflow-wrap: anywhere !important;
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-repair-textarea {
-  min-height: clamp(180px, 26vh, 280px) !important;
 }
 
 /* Mid-size tablets/foldables: retain two choice columns but stack case context. */
@@ -4556,12 +4576,19 @@ body[data-pc-scenario="metacognition"] .pc-s2-repair-textarea {
   body[data-pc-scenario="metacognition"] .pc-s2-case-context__title {
     padding-bottom: 2px !important;
   }
-  body[data-pc-scenario="metacognition"] .pc-s2-audit-layout,
-  body[data-pc-scenario="metacognition"] .pc-s2-repair-layout {
+  body[data-pc-scenario="metacognition"] .pc-s2-audit-layout {
     grid-template-columns: 1fr !important;
   }
   body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+
+@media (max-width: 1050px) {
+  body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-evidence {
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
   }
 }
 
@@ -4588,8 +4615,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-repair-textarea {
   }
   
   body[data-pc-scenario="metacognition"] .pc-s2-step-shell > .pc-activity-task,
-  body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task,
-  body[data-pc-scenario="metacognition"] .pc-s2-repair-layout > .pc-activity-card {
+  body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task {
     padding: 18px 16px !important;
   }
   body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-selection-bar {
@@ -4651,7 +4677,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
   min-width: 0 !important;
   display: flex !important;
   align-self: stretch !important;
-  align-items: flex-end !important;
+  align-items: center !important;
   justify-content: center !important;
 }
 
@@ -4797,3 +4823,16 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
     justify-self: start !important;
   }
 }
+
+/* V425 — shared single-select radio marker stays consistent with S2 Diagnose. */
+@media (max-width: 600px) {
+  .pc-choice-grid--radio-marker .pc-choice-marker {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .pc-choice-grid--radio-marker .pc-choice-marker::after {
+    width: 10px !important;
+    height: 10px !important;
+  }
+}
+

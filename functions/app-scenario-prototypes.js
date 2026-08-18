@@ -65,7 +65,8 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     title: 'What does Jordan need before he can make an informed next move?',
     instruction: 'Jordan knows what he did and knows the result. Choose what belongs between his strategy and his next decision.',
     variant: 'detail',
-    marker: item => item.tag,
+    marker: () => '',
+    gridClass: 'pc-choice-grid--radio-marker',
     limit: 1,
     choiceGridId: 's2DiagnosisChoices',
     statusId: 's2DiagnosisStatus',
@@ -132,6 +133,7 @@ function getS2Data() {
   if (!Array.isArray(data.repairAttempts)) data.repairAttempts = [];
   if (!data.babbageDraft || typeof data.babbageDraft !== 'object') data.babbageDraft = null;
   if (!data.babbageReview || typeof data.babbageReview !== 'object') data.babbageReview = null;
+  if (typeof data.s2ReviewSource !== 'string') data.s2ReviewSource = '';
   return data;
 }
 
@@ -446,6 +448,7 @@ function pcCloseS2JordanRecordedDialogue() {
   const dialogue = document.getElementById('vnDialogue');
   dialogue?.classList.remove('pc-s2-recorded-dialogue', 'prediction-question', 'prediction-result');
   dialogue?.querySelector('.vn-skip')?.removeAttribute('hidden');
+  try { pcResetVNDialogueState(); } catch (e) {}
   try { pcClearPredictionPresentationV191(); } catch (e) {}
   try { pcClearPredictionLayoutInlineStylesV186(); } catch (e) {}
   try { pcClearPredictionUI(); } catch (e) {}
@@ -779,7 +782,8 @@ function renderS2AuditActivity() {
   const choicesHTML = buildScenarioChoiceCardsHTML({
     items: S2_AUDIT_OPTIONS,
     inputName: 's2-audit',
-    idPrefix: 's2-audit'
+    idPrefix: 's2-audit',
+    marker: () => ''
   });
 
   mountScenarioActivity({
@@ -806,7 +810,10 @@ function renderS2AuditActivity() {
               </blockquote>
             </div>
           </section>
-          <p><strong>Babbage's rationale:</strong> ${esc(draft.design_rationale)}</p>
+          <div class="pc-s2-babbage-rationale">
+            <div class="pc-s2-babbage-rationale__label">Why Babbage chose it</div>
+            <p>${esc(draft.design_rationale)}</p>
+          </div>
         </aside>
         ${buildScenarioTaskCardHTML({
           titleId: 's2AuditTitle',
@@ -818,10 +825,13 @@ function renderS2AuditActivity() {
           statusId: 's2AuditStatus',
           submitId: 's2AuditSubmit',
           submitLabel: 'Audit the draft',
-          feedbackId: 's2AuditFeedback'
+          feedbackId: 's2AuditFeedback',
+          gridClass: 'pc-choice-grid--radio-marker',
+          includeFeedback: false
         })}
         </div>
-      </div>`,
+      </div>
+      <div class="pc-s2-audit-feedback-wide" id="s2AuditFeedback" aria-live="polite"></div>`,
     focusSelector: 'input[name="s2-audit"]'
   });
 
@@ -862,9 +872,93 @@ function submitS2Audit() {
   });
 }
 
+function pcS2RepairFieldConfig() {
+  return [
+    {
+      id: 's2RepairEvidence',
+      key: 'evidence',
+      number: '1',
+      label: 'Evidence to reveal',
+      placeholder: 'What should Jordan have to describe about what he actually did, noticed, or understood?',
+      ariaLabel: 'Describe the learning evidence Jordan should reveal'
+    },
+    {
+      id: 's2RepairEvaluation',
+      key: 'evaluation',
+      number: '2',
+      label: 'Evaluate the strategy',
+      placeholder: 'How should Jordan judge whether the strategy actually helped his learning?',
+      ariaLabel: 'Describe how Jordan should evaluate the learning strategy'
+    },
+    {
+      id: 's2RepairNextMove',
+      key: 'nextMove',
+      number: '3',
+      label: 'Next move',
+      placeholder: 'What should Jordan decide to reuse, change, or try next time based on the evidence?',
+      ariaLabel: 'Describe the next learning move Jordan should decide'
+    },
+    {
+      id: 's2RepairSuccess',
+      key: 'success',
+      number: '4',
+      label: 'Success criteria',
+      placeholder: 'What must a strong reflection include so Jordan cannot answer with only a grade or feeling?',
+      ariaLabel: 'Describe what a strong metacognitive reflection must include'
+    }
+  ];
+}
+
+function pcS2RepairPartsFromValues(values = {}) {
+  return {
+    evidence: values.s2RepairEvidence || '',
+    evaluation: values.s2RepairEvaluation || '',
+    nextMove: values.s2RepairNextMove || '',
+    success: values.s2RepairSuccess || ''
+  };
+}
+
+function pcS2BuildRepairedReflectionPrompt(parts = {}) {
+  const evidence = String(parts.evidence || '').trim();
+  const evaluation = String(parts.evaluation || '').trim();
+  const nextMove = String(parts.nextMove || '').trim();
+  const success = String(parts.success || '').trim();
+  if (![evidence, evaluation, nextMove, success].some(Boolean)) return '';
+
+  const lines = [
+    'After completing the assignment, reflect on how your study strategy affected your learning.'
+  ];
+  if (evidence) lines.push(`1. Evidence — ${evidence}`);
+  if (evaluation) lines.push(`2. Evaluation — ${evaluation}`);
+  if (nextMove) lines.push(`3. Next move — ${nextMove}`);
+  if (success) lines.push(`A strong response should ${success}`);
+  return lines.join('\n');
+}
+
 function renderS2RepairActivity() {
   const data = getS2Data();
   const draft = data.babbageDraft || S2_LOCAL_DRAFT_FALLBACK;
+  const weakness = S2_AUDIT_OPTIONS.find(item => item.id === draft.deliberate_weakness);
+  const fields = pcS2RepairFieldConfig();
+
+  const referenceHTML = `
+    <div class="pc-activity-kicker">Original Babbage draft</div>
+    <h2 class="pc-guided-repair-reference-title">${esc(draft.activity_title)}</h2>
+    <div class="pc-guided-repair-source-prompt">${esc(draft.activity_prompt)}</div>
+    <div class="pc-guided-repair-problem">
+      <div class="pc-guided-repair-problem-label">What the audit found</div>
+      <strong>${esc(weakness?.label || draft.deliberate_weakness)}</strong>
+      <p>${esc(draft.why_the_weakness_matters)}</p>
+    </div>
+    <div class="pc-guided-repair-ingredients" aria-label="Repair ingredients">
+      <div class="pc-guided-repair-ingredients-heading">Repair ingredients</div>
+      <div class="pc-guided-repair-chip-row">
+        <span class="pc-guided-repair-chip" data-pc-repair-chip="evidence">Evidence</span>
+        <span class="pc-guided-repair-chip" data-pc-repair-chip="evaluation">Evaluation</span>
+        <span class="pc-guided-repair-chip" data-pc-repair-chip="nextMove">Next Move</span>
+        <span class="pc-guided-repair-chip" data-pc-repair-chip="success">Success Criteria</span>
+      </div>
+    </div>`;
 
   mountScenarioActivity({
     scenarioIndex: SCENARIO_INDEX.METACOGNITION,
@@ -872,40 +966,68 @@ function renderS2RepairActivity() {
     contentHTML: `
       <div class="pc-s2-step-shell">
         ${buildS2CaseContextHTML()}
-        <div class="pc-s2-repair-layout">
-        <aside class="pc-s2-original-draft">
-          <div class="pc-activity-kicker">Original Babbage draft</div>
-          <h3>${esc(draft.activity_title)}</h3>
-          <p>${esc(draft.activity_prompt)}</p>
-        </aside>
-        <section class="pc-activity-card" aria-labelledby="s2RepairTitle">
-          <div class="pc-activity-kicker">Decision 5 · Repair the design</div>
-          <h2 id="s2RepairTitle">Rewrite the reflection so Jordan has to reveal his thinking.</h2>
-          <p class="pc-activity-instruction">You do not need to rewrite everything. Fix the weakness you noticed by making the learning evidence, evaluation, or future decision more explicit.</p>
-          <label class="pc-s2-repair-label" for="s2RepairText">Your repaired reflection prompt</label>
-          <textarea id="s2RepairText" class="pc-s2-repair-textarea" rows="8" maxlength="1800" placeholder="Write the repaired reflection prompt here..."></textarea>
-          <div class="pc-selection-bar">
-            <span id="s2RepairStatus" role="status" aria-live="polite">0 characters</span>
-            <button class="pc-button pc-button--primary" id="s2RepairSubmit" type="button" disabled>Ask Babbage to review the repair</button>
-          </div>
-          <div id="s2RepairFeedback" aria-live="polite"></div>
-        </section>
-        </div>
+        ${buildGuidedRepairWorkspaceHTML({
+          referenceHTML,
+          titleId: 's2RepairTitle',
+          kicker: 'Decision 5 · Repair the design',
+          title: 'Rebuild the reflection so Jordan has to show his thinking.',
+          instruction: 'Fill in the four repair ingredients. PromptCraft will assemble them into the student-facing reflection prompt that Babbage reviews.',
+          fields,
+          previewLabel: 'Your assembled reflection prompt',
+          previewId: 's2RepairPreview',
+          nudgeId: 's2RepairNudge',
+          statusId: 's2RepairStatus',
+          submitId: 's2RepairSubmit',
+          submitLabel: 'Ask Babbage to review the repair',
+          feedbackId: 's2RepairFeedback'
+        })}
       </div>`,
-    focusSelector: '#s2RepairText'
+    focusSelector: '#s2RepairEvidence'
   });
 
-  const text = document.getElementById('s2RepairText');
-  const status = document.getElementById('s2RepairStatus');
-  const submit = document.getElementById('s2RepairSubmit');
-  const update = () => {
-    const value = text.value.trim();
-    status.textContent = `${value.length} characters`;
-    submit.disabled = value.length < 35;
+  const fieldIds = fields.map(field => field.id);
+  wireGuidedRepairWorkspace({
+    fieldIds,
+    previewId: 's2RepairPreview',
+    nudgeId: 's2RepairNudge',
+    statusId: 's2RepairStatus',
+    submitId: 's2RepairSubmit',
+    minLength: 12,
+    buildPreview: values => pcS2BuildRepairedReflectionPrompt(pcS2RepairPartsFromValues(values)),
+    onUpdate: (values, assembled, ready) => {
+      const parts = pcS2RepairPartsFromValues(values);
+      data.repairDraftParts = parts;
+      data.repairDraftText = assembled;
+      const readyKeys = new Set();
+      fields.forEach(field => {
+        if ((values[field.id] || '').length >= 12) readyKeys.add(field.key);
+      });
+      document.querySelectorAll('[data-pc-repair-chip]').forEach(chip => {
+        chip.classList.toggle('covered', readyKeys.has(chip.dataset.pcRepairChip));
+      });
+    },
+    onSubmit: submitS2Repair
+  });
+}
+
+function pcS2BuildLocalReviewFallback(data, repair) {
+  const parts = data.repairParts || {};
+  const improvements = [];
+  if (parts.evidence) improvements.push('The repair asks Jordan to surface evidence from his learning process.');
+  if (parts.evaluation) improvements.push('The repair asks Jordan to judge the strategy instead of reporting only a feeling or grade.');
+  if (parts.nextMove) improvements.push('The repair connects the reflection to a future learning decision.');
+  if (parts.success) improvements.push('The success criteria make the expected metacognitive evidence more explicit.');
+
+  return {
+    status: 'DEMONSTRATION FALLBACK',
+    confidence: 'LOW',
+    feedback_summary: 'Live Babbage review was unavailable. PromptCraft is showing a clearly labeled demonstration review so the scenario can continue; the repaired activity below is the prompt you assembled, not an AI rewrite.',
+    what_improved: improvements.length ? improvements.slice(0, 4) : ['The repair adds more explicit metacognitive structure than the original draft.'],
+    remaining_issue: 'Because this is a local fallback rather than a live AI review, rerun the repair when Babbage is available to receive a model-generated critique and revision.',
+    revised_activity: repair,
+    student_response_after: 'I can point to what I tried, what evidence showed me where my understanding held or broke down, and what I would change on the next assignment.',
+    why_student_thinking_changed: 'The repaired prompt requires Jordan to connect a strategy to evidence, evaluate what happened, and name a next move. This explanation is a demonstration fallback, not a live model judgment.'
   };
-  text.addEventListener('input', update);
-  submit.addEventListener('click', submitS2Repair, { once: true });
-  update();
 }
 
 function pcS2BuildReviewSystemPrompt(data, repair) {
@@ -923,7 +1045,13 @@ ${draft.activity_prompt}
 Known weakness in the original draft:
 ${draft.deliberate_weakness} — ${draft.why_the_weakness_matters}
 
-Faculty repair:
+Faculty repair ingredients:
+- Evidence to reveal: ${data.repairParts?.evidence || 'Not provided'}
+- Evaluation of the strategy: ${data.repairParts?.evaluation || 'Not provided'}
+- Next move: ${data.repairParts?.nextMove || 'Not provided'}
+- Success criteria: ${data.repairParts?.success || 'Not provided'}
+
+Assembled faculty repair:
 ${repair}
 
 Evaluate the repair specifically. Do not praise it merely for existing. If it is vague, irrelevant, contradictory, demeaning, or fails to require evidence about learning, say so plainly.
@@ -942,15 +1070,18 @@ The Jordan response should demonstrate metacognition, not merely a better grade 
 
 async function submitS2Repair() {
   const runToken = pcCaptureScenarioRun(SCENARIO_INDEX.METACOGNITION);
-  const text = document.getElementById('s2RepairText');
-  const repair = text?.value.trim() || '';
-  if (repair.length < 35) return;
+  const fieldIds = pcS2RepairFieldConfig().map(field => field.id);
+  const values = getGuidedRepairValues(fieldIds);
+  const parts = pcS2RepairPartsFromValues(values);
+  const repair = pcS2BuildRepairedReflectionPrompt(parts);
+  if (fieldIds.some(id => (values[id] || '').length < 12) || repair.length < 70) return;
 
   const data = getS2Data();
   data.attempts += 1;
-  data.repairAttempts.push({ text: repair, timestamp: new Date().toISOString() });
+  data.repairAttempts.push({ text: repair, parts: { ...parts }, timestamp: new Date().toISOString() });
   data.prompts.push(`S2 repair: ${repair}`);
   data.repairText = repair;
+  data.repairParts = { ...parts };
 
   const submit = document.getElementById('s2RepairSubmit');
   if (submit) submit.disabled = true;
@@ -972,19 +1103,27 @@ async function submitS2Repair() {
     }, 's2-review');
     if (!pcIsScenarioRunCurrent(runToken)) return false;
 
+    if (response?.mock || response?.provider === 'local-fallback') {
+      throw new Error(`Babbage returned a local fallback (${response?.mockReason || 'backend unavailable'}).`);
+    }
     review = response?.analysis || null;
     if (!review || !review.revised_activity || !review.student_response_after) throw new Error('Incomplete structured review.');
-    data.aiProvider = response.provider || data.aiProvider || '';
-    data.aiModel = response.model || data.aiModel || '';
-    data.aiRequestId = response.request_id || data.aiRequestId || '';
-    data.aiElapsedMs = response.elapsed_ms ?? data.aiElapsedMs;
-    data.aiUsage = response.usage || data.aiUsage || null;
+    data.aiProvider = response.provider || '';
+    data.aiModel = response.model || '';
+    data.aiRequestId = response.request_id || '';
+    data.aiElapsedMs = response.elapsed_ms ?? null;
+    data.aiUsage = response.usage || null;
+    data.s2ReviewSource = 'live';
   } catch (error) {
     if (!pcIsScenarioRunCurrent(runToken)) return false;
-    console.warn('[PromptCraft] S2 Babbage review unavailable; using local fallback.', error);
-    review = { ...S2_LOCAL_REVIEW_FALLBACK };
+    console.warn('[PromptCraft] S2 Babbage review unavailable; using labeled local fallback.', error);
+    review = pcS2BuildLocalReviewFallback(data, repair);
     data.aiProvider = 'local-fallback';
     data.aiModel = 'promptcraft-local-fallback';
+    data.aiRequestId = '';
+    data.aiElapsedMs = null;
+    data.aiUsage = null;
+    data.s2ReviewSource = 'fallback';
   }
 
   data.babbageReview = review;
@@ -1006,59 +1145,48 @@ function renderS2FinalComparison() {
   const data = getS2Data();
   const draft = data.babbageDraft || S2_LOCAL_DRAFT_FALLBACK;
   const review = data.babbageReview || S2_LOCAL_REVIEW_FALLBACK;
-  const improvedItems = Array.isArray(review.what_improved) ? review.what_improved : [String(review.what_improved || '')];
+  const improvedItems = Array.isArray(review.what_improved)
+    ? review.what_improved.filter(Boolean)
+    : [String(review.what_improved || '')].filter(Boolean);
 
   markScenarioComplete();
   saveIncrementalData(SCENARIO_INDEX.METACOGNITION);
 
-  mountScenarioActivity({
-    scenarioIndex: SCENARIO_INDEX.METACOGNITION,
-    progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 4, ariaLabel: 'Scenario 2 progress' }),
-    contentHTML: `
-      <section class="pc-s2-final" aria-labelledby="s2FinalTitle">
-        <div class="pc-s2-final-header">
-          <div class="pc-activity-kicker">Scenario 2 complete · Babbage review</div>
-          <h2 id="s2FinalTitle">${esc(review.status)}</h2>
-          <p>${esc(review.feedback_summary)}</p>
-        </div>
+  const reviewIsFallback = data.s2ReviewSource === 'fallback' || data.aiProvider === 'local-fallback';
+  const reviewEyebrow = reviewIsFallback
+    ? 'Demonstration fallback review · Scenario 2 complete'
+    : `Live Babbage review${data.aiModel ? ` · ${data.aiModel}` : ''} · Scenario 2 complete`;
+  const reviewTitle = reviewIsFallback
+    ? 'Demonstration Review · Babbage unavailable'
+    : "Babbage's Live Review of the Revision";
 
-        <div class="pc-s2-before-after">
-          <article class="pc-s2-comparison-card">
-            <span>BEFORE</span>
-            <h3>Babbage's first draft</h3>
-            <p>${esc(draft.activity_prompt)}</p>
-            <blockquote>${esc(draft.likely_student_response)}</blockquote>
-          </article>
-          <article class="pc-s2-comparison-card is-after">
-            <span>AFTER</span>
-            <h3>Repaired activity</h3>
-            <p>${esc(review.revised_activity)}</p>
-            <blockquote>${esc(review.student_response_after)}</blockquote>
-          </article>
-        </div>
-
-        <div class="pc-s2-review-grid">
-          <article>
-            <h3>What improved</h3>
-            <ul>${improvedItems.filter(Boolean).map(item => `<li>${esc(item)}</li>`).join('')}</ul>
-          </article>
-          <article>
-            <h3>Remaining limitation</h3>
-            <p>${esc(review.remaining_issue)}</p>
-          </article>
-          <article>
-            <h3>Why Jordan's thinking changed</h3>
-            <p>${esc(review.why_student_thinking_changed)}</p>
-          </article>
-        </div>
-
-        <div class="pc-feedback-actions pc-s2-final-actions">
-          <button class="pc-button pc-button--secondary" type="button" data-pc-action="replay-scenario" data-pc-scenario-index="1">Replay Scenario 2</button>
-          <button class="pc-button pc-button--primary" type="button" data-pc-action="open-main-menu" data-pc-panel="scenarios">Return to Scenario Select</button>
-        </div>
-      </section>`
+  pcRenderSharedScenarioResult({
+    eyebrow: reviewEyebrow,
+    title: 'Repaired Reflection Activity',
+    bodyHTML: fmt(review.revised_activity || ''),
+    reviewTitle,
+    reviewItems: [
+      {
+        label: 'Strongest improvement',
+        value: improvedItems.join(' ') || 'The repair makes the intended thinking more visible.'
+      },
+      { label: 'Remaining limitation', value: review.remaining_issue || '' },
+      { label: "Why Jordan's thinking changed", value: review.why_student_thinking_changed || '' }
+    ],
+    referenceTitle: 'Before and after',
+    referenceItems: [
+      { label: 'Original draft', value: draft.activity_prompt || '' },
+      { label: 'Jordan before', value: draft.likely_student_response || '' },
+      { label: 'Jordan after', value: review.student_response_after || '' }
+    ],
+    controlsTitle: 'Scenario 2 result',
+    controlsSub: reviewIsFallback ? 'Live Babbage was unavailable. This result uses the labeled demonstration fallback.' : 'Babbage reviewed your repair live. Choose the next step.',
+    controlsActionsHTML: `
+      <button class="s1-secondary-btn" type="button" data-pc-action="s2-repair-draft">Revise S2</button>
+      <button class="continue-btn" type="button" data-pc-action="navigate-next" data-pc-scenario-index="2">Next scenario →</button>`
   });
   document.querySelector('#inputContainer button')?.focus();
+  return true;
 }
 
 function pcGetLatestS2Selection(attemptKey) {

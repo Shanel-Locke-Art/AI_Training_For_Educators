@@ -162,6 +162,78 @@ function pcFillS1DevFields() {
   tryFill();
 }
 
+function pcFillS2DevRepairFields() {
+  const values = {
+    s2RepairEvidence: 'Describe one specific sign of what you could explain without notes and where your understanding still broke down.',
+    s2RepairEvaluation: 'Compare that evidence with the strategy you used and explain which part actually helped or failed to help your understanding.',
+    s2RepairNextMove: 'Decide what you will keep, change, or try next time based on that evidence instead of the grade alone.',
+    s2RepairSuccess: 'include the strategy, specific learning evidence, a judgment about why it worked or failed, and one evidence-based next move.'
+  };
+
+  const tryFill = (attempts = 0) => {
+    const fields = Object.keys(values).map(id => document.getElementById(id));
+    if (fields.every(Boolean)) {
+      Object.entries(values).forEach(([id, value]) => {
+        const field = document.getElementById(id);
+        field.value = value;
+        if (typeof autoGrow === 'function') autoGrow(field);
+        field.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      document.getElementById('s2RepairEvidence')?.focus({ preventScroll: true });
+      return true;
+    }
+    if (attempts < 30) pcScheduleScenarioTask(() => tryFill(attempts + 1), 80, SCENARIO_INDEX.METACOGNITION);
+    return false;
+  };
+
+  return tryFill();
+}
+
+function resetS2Dev() {
+  // The plain S2 DEV button still opens the scenario normally. S2 ✏️ is the
+  // fast-path for layout/content testing: establish one coherent successful
+  // run through Decisions 1–4, open Decision 5, then populate its guided fields.
+  pcActivateScenario(SCENARIO_INDEX.METACOGNITION, { playIntroduction: false });
+  const data = getS2Data();
+  const now = new Date().toISOString();
+
+  data.attempts = 4;
+  data.prompts = [
+    'S2 diagnosis: Evidence of what the strategy actually did',
+    'S2 intervention: Make the strategy produce evidence',
+    'S2 thinking move: evaluate',
+    'S2 audit: no_evidence'
+  ];
+  data.diagnosisAttempts = [{ selection: ['evidence'], result: 'strong', timestamp: now }];
+  data.diagnosisFinal = ['evidence'];
+  data.evidenceAttempts = [{ selection: ['evidence_check'], exact: true, consequence: 'Now Jordan has evidence he can act on.', timestamp: now }];
+  data.evidenceFinal = ['evidence_check'];
+  data.thinkingMoveAttempts = [{ selection: 'evaluate', timestamp: now }];
+  data.thinkingMove = 'evaluate';
+  data.auditAttempts = [{ selection: 'no_evidence', exact: true, weakness: 'no_evidence', timestamp: now }];
+  data.repairAttempts = [];
+  data.repairText = '';
+  data.repairParts = {};
+  data.repairDraftParts = {};
+  data.repairDraftText = '';
+  data.babbageDraft = { ...S2_LOCAL_DRAFT_FALLBACK };
+  data.babbageReview = null;
+  data.s2ReviewSource = '';
+  data.structuredAnalysis = { s2_draft: data.babbageDraft };
+  data.finalResponse = data.babbageDraft.activity_prompt;
+  data.lastEvidenceFeedback = {
+    heading: 'Now Jordan has evidence he can act on.',
+    copy: 'Jordan is no longer guessing from a feeling or grade. He monitored understanding, connected evidence to the strategy, and made a decision.',
+    tone: 'strong',
+    choice: 'evidence_check'
+  };
+  data.openingCheckpointReached = true;
+
+  renderS2RepairActivity();
+  pcScheduleScenarioTask(pcFillS2DevRepairFields, 90, SCENARIO_INDEX.METACOGNITION);
+  return false;
+}
+
 function resetS1Dev() {
     resetScenarioRunState(SCENARIO_INDEX.ENGAGEMENT);
 
@@ -214,7 +286,9 @@ function resetS1Dev() {
 pcExposeGlobals({
   pcClearVNStateForScenarioSwitch,
   pcFillS1DevFields,
-  resetS1Dev
+  pcFillS2DevRepairFields,
+  resetS1Dev,
+  resetS2Dev
 });
 
 function prepareScenarioShell(index) {
@@ -2042,9 +2116,12 @@ function pcShowSharedWorkstationResult({
   if (dialogue) {
     dialogue.classList.remove('has-choices', 'prediction-question');
     dialogue.classList.add('prediction-result');
+    dialogue.dataset.pcExplicitAction = 'true';
+    dialogue.setAttribute('role', 'group');
+    dialogue.setAttribute('tabindex', '-1');
     dialogue.setAttribute(
       'aria-label',
-      ariaLabel || `${speakerName} result. Continue when ready.`
+      ariaLabel || `${speakerName} result. Use the Continue button to proceed.`
     );
     dialogue.style.removeProperty('display');
   }
@@ -2343,6 +2420,7 @@ if (!window.__pcPredictionWatchdogBound) {
   function devFillScenario(index) {
     const target = pcNormalizeScenarioIndex(index, SCENARIO_INDEX.ENGAGEMENT);
     if (target === SCENARIO_INDEX.ENGAGEMENT) return resetS1Dev();
+    if (target === SCENARIO_INDEX.METACOGNITION) return resetS2Dev();
     return devGoScenario(target);
   }
 

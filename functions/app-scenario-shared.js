@@ -153,6 +153,127 @@ function buildScenarioTaskCardHTML({
     </section>`;
 }
 
+
+// ── SHARED GUIDED REPAIR WORKSPACE ───────────────────
+// Scenario 1 proved the numbered 2×2 repair workspace. This scenario-neutral
+// version lets later scenarios reuse the same interaction model while supplying
+// their own field prompts, reference material, assembly logic, and submit action.
+function buildGuidedRepairWorkspaceHTML({
+  referenceHTML = '',
+  titleId = 'pcGuidedRepairTitle',
+  kicker = 'Repair workspace',
+  title = 'Repair the design',
+  instruction = '',
+  fields = [],
+  previewLabel = 'Assembled prompt',
+  previewId = 'pcGuidedRepairPreview',
+  nudgeId = 'pcGuidedRepairNudge',
+  statusId = 'pcGuidedRepairStatus',
+  submitId = 'pcGuidedRepairSubmit',
+  submitLabel = 'Ask Babbage to review',
+  feedbackId = 'pcGuidedRepairFeedback'
+} = {}) {
+  const fieldsHTML = fields.map((field, index) => `
+    <div class="pc-guided-repair-field">
+      <label class="pc-guided-repair-label" for="${esc(field.id)}">
+        <span class="pc-guided-repair-num">${esc(field.number || String(index + 1))}</span>
+        <span>${esc(field.label)}</span>
+      </label>
+      <textarea
+        class="pc-guided-repair-textarea"
+        id="${esc(field.id)}"
+        rows="3"
+        maxlength="${Number(field.maxlength || 700)}"
+        placeholder="${esc(field.placeholder || '')}"
+        aria-label="${esc(field.ariaLabel || field.label)}"
+        data-pc-guided-repair-input="true"></textarea>
+    </div>`).join('');
+
+  return `
+    <div class="pc-guided-repair-layout">
+      <aside class="pc-guided-repair-reference" aria-label="Repair reference">
+        ${referenceHTML}
+      </aside>
+      <section class="pc-guided-repair-builder" aria-labelledby="${esc(titleId)}">
+        <div class="pc-guided-repair-head">
+          <div>
+            <div class="pc-activity-kicker">${esc(kicker)}</div>
+            <h2 id="${esc(titleId)}">${esc(title)}</h2>
+            ${instruction ? `<p class="pc-guided-repair-instruction">${esc(instruction)}</p>` : ''}
+          </div>
+        </div>
+        <div class="pc-guided-repair-fields">${fieldsHTML}</div>
+        <div class="pc-guided-repair-preview-wrap">
+          <div class="pc-guided-repair-preview-label">${esc(previewLabel)}</div>
+          <div class="pc-guided-repair-preview" id="${esc(previewId)}" role="status" aria-live="polite"></div>
+        </div>
+        <div class="pc-guided-repair-actions">
+          <div class="pc-guided-repair-nudge" id="${esc(nudgeId)}"></div>
+          <div class="pc-guided-repair-submit-wrap">
+            <span id="${esc(statusId)}" class="pc-guided-repair-status" role="status" aria-live="polite">0 of ${fields.length} ingredients ready</span>
+            <button class="pc-button pc-button--primary" id="${esc(submitId)}" type="button" disabled>${esc(submitLabel)}</button>
+          </div>
+        </div>
+        <div id="${esc(feedbackId)}" aria-live="polite"></div>
+      </section>
+    </div>`;
+}
+
+function getGuidedRepairValues(fieldIds = []) {
+  return Object.fromEntries(fieldIds.map(id => [id, document.getElementById(id)?.value.trim() || '']));
+}
+
+function wireGuidedRepairWorkspace({
+  fieldIds = [],
+  previewId,
+  nudgeId,
+  statusId,
+  submitId,
+  minLength = 12,
+  buildPreview,
+  onUpdate = null,
+  onSubmit
+} = {}) {
+  const fields = fieldIds.map(id => document.getElementById(id)).filter(Boolean);
+  const preview = document.getElementById(previewId);
+  const nudge = document.getElementById(nudgeId);
+  const status = document.getElementById(statusId);
+  const submit = document.getElementById(submitId);
+  if (!fields.length || !preview || !status || !submit) return false;
+
+  const update = () => {
+    const values = getGuidedRepairValues(fieldIds);
+    const ready = fieldIds.filter(id => (values[id] || '').length >= minLength);
+    const missing = fieldIds.filter(id => !ready.includes(id));
+    const assembled = typeof buildPreview === 'function' ? buildPreview(values) : '';
+
+    preview.textContent = assembled || 'Your repaired reflection prompt will assemble here as you complete the four ingredients.';
+    preview.classList.toggle('is-empty', !assembled);
+    status.textContent = `${ready.length} of ${fieldIds.length} ingredients ready`;
+    submit.disabled = ready.length !== fieldIds.length;
+
+    if (nudge) {
+      if (missing.length) {
+        nudge.style.display = 'block';
+        nudge.innerHTML = `<strong>Pixel's nudge:</strong> Complete each ingredient so the repaired prompt can require evidence, evaluation, and a next move.`;
+      } else {
+        nudge.style.display = 'none';
+        nudge.innerHTML = '';
+      }
+    }
+
+    if (typeof onUpdate === 'function') onUpdate(values, assembled, ready);
+  };
+
+  fields.forEach(field => field.addEventListener('input', () => {
+    if (typeof autoGrow === 'function') autoGrow(field);
+    update();
+  }));
+  if (typeof onSubmit === 'function') submit.addEventListener('click', onSubmit, { once: true });
+  update();
+  return true;
+}
+
 function mountScenarioActivity({
   container = document.getElementById('inputContainer'),
   scenarioIndex: index = scenarioIndex,

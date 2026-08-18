@@ -164,11 +164,17 @@ function pcResetVNCharacters() {
 }
 
 function pcResetVNDialogueState() {
-  document.getElementById('vnDialogue')?.classList.remove(
+  const dialogue = document.getElementById('vnDialogue');
+  dialogue?.classList.remove(
     'has-choices',
     'prediction-question',
     'prediction-result'
   );
+  if (dialogue) {
+    delete dialogue.dataset.pcExplicitAction;
+    dialogue.setAttribute('role', 'button');
+    dialogue.setAttribute('tabindex', '0');
+  }
 }
 
 function pcApplyIpadLayoutV200(){
@@ -630,6 +636,7 @@ function pcClearWideAnalysisReportContentStylesV215() {
   const labels = report ? [...report.querySelectorAll('.analysis-label')] : [];
   const values = report ? [...report.querySelectorAll('.analysis-value')] : [];
   const notes = report ? [...report.querySelectorAll('.analysis-note')] : [];
+  report?.classList.remove('analysis-report-overflow-safe');
 
   pcRemoveInlineStyles(output, [
     'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
@@ -758,6 +765,12 @@ function pcFitWideAnalysisReportV215(screen) {
         : clampNumber(1.02, viewportWidth / 860, viewportHeight >= 1100 ? 1.22 : 1.14))
     : 1;
   const useSingleColumn = screenRect.width < 420 || isCompactAnalysisPanel;
+  const declaredAnalysisCharacters = Number.parseInt(report.dataset.analysisCharacters || '0', 10) || 0;
+  const hasDenseAnalysisContent = declaredAnalysisCharacters >= 820 ||
+    report.classList.contains('analysis-report-dense') ||
+    report.classList.contains('analysis-report-very-dense');
+  const hasVeryDenseAnalysisContent = declaredAnalysisCharacters >= 1100 ||
+    report.classList.contains('analysis-report-very-dense');
   const widthFactor = screenRect.width / 900;
   const heightFactor = screenRect.height / 520;
   const fitFactor = clampNumber(
@@ -1086,6 +1099,70 @@ function pcFitWideAnalysisReportV215(screen) {
     ]);
   };
 
+  // v423: Variable-length Babbage output must never be squeezed into fixed
+  // fractional grid rows. Dense S1 and S2 reports keep the same two-column
+  // visual structure, but their rows become content-sized and the physical
+  // monitor glass owns vertical scrolling. This preserves readable type and
+  // prevents long prompt/report text from painting into neighboring cards.
+  const enableOverflowSafeWideReport = (scale = 0.96) => {
+    applyScale(scale);
+    report.classList.add('analysis-report-scrollable', 'analysis-report-overflow-safe');
+    pcSetImportantStyles(output, [
+      ['display', 'block'],
+      ['overflow-y', 'auto'],
+      ['overflow-x', 'hidden'],
+      ['overscroll-behavior-y', 'contain'],
+      ['touch-action', 'pan-y'],
+      ['scrollbar-gutter', 'stable'],
+      ['box-sizing', 'border-box']
+    ]);
+    pcSetImportantStyles(report, [
+      ['display', 'flex'],
+      ['flex-direction', 'column'],
+      ['height', 'auto'],
+      ['min-height', '100%'],
+      ['overflow', 'visible'],
+      ['box-sizing', 'border-box']
+    ]);
+    pcSetImportantStyles(grid, [
+      ['display', 'grid'],
+      ['grid-template-columns', useSingleColumn ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) minmax(0, 1fr)'],
+      ['grid-template-rows', useSingleColumn ? 'auto auto auto auto auto auto' : 'auto auto auto auto'],
+      ['grid-template-areas', useSingleColumn
+        ? '"status" "confidence" "issue" "repair" "impact" "worked"'
+        : '"status confidence" "issue repair" "impact impact" "worked worked"'],
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['align-items', 'start'],
+      ['align-content', 'start'],
+      ['overflow', 'visible'],
+      ['flex', '0 0 auto']
+    ]);
+    cards.forEach((card) => pcSetImportantStyles(card, [
+      ['height', 'auto'],
+      ['min-height', 'max-content'],
+      ['align-self', 'stretch'],
+      ['overflow', 'hidden'],
+      ['overflow-wrap', 'anywhere'],
+      ['word-break', 'normal']
+    ]));
+    values.forEach((value) => pcSetImportantStyles(value, [
+      ['display', 'block'],
+      ['position', 'static'],
+      ['white-space', 'normal'],
+      ['overflow-wrap', 'anywhere'],
+      ['word-break', 'break-word']
+    ]));
+    notes.forEach((note) => pcSetImportantStyles(note, [
+      ['display', 'block'],
+      ['position', 'static'],
+      ['white-space', 'normal'],
+      ['overflow-wrap', 'anywhere'],
+      ['word-break', 'break-word']
+    ]));
+    output.scrollTop = 0;
+  };
+
   if (isCompactAnalysisPanel) {
     applyScale(1);
     report.classList.add('analysis-report-scrollable');
@@ -1280,7 +1357,15 @@ function pcFitWideAnalysisReportV215(screen) {
     return true;
   }
 
-  const minScale = 0.48;
+  // Dense desktop reports go directly to the overflow-safe content-sized grid.
+  // Waiting until the fixed-row layout fails can leave one paint frame where
+  // long text overlaps a neighboring box, especially after web fonts settle.
+  if (isWideDesktopMonitor && hasDenseAnalysisContent) {
+    enableOverflowSafeWideReport(hasVeryDenseAnalysisContent ? 0.92 : 0.97);
+    return true;
+  }
+
+  const minScale = 0.72;
   const scaleStep = 0.94;
   const maxPasses = 18;
   let scale = report.classList.contains('analysis-report-very-dense') ? 0.86
@@ -1295,43 +1380,9 @@ function pcFitWideAnalysisReportV215(screen) {
   }
 
   if (!contentFits()) {
-    report.classList.add('analysis-report-scrollable');
-    pcSetImportantStyles(output, [
-      ['display', 'block'],
-      ['overflow-y', 'auto'],
-      ['overflow-x', 'hidden'],
-      ['overscroll-behavior-y', 'contain'],
-      ['touch-action', 'pan-y'],
-      ['scrollbar-gutter', 'stable'],
-      ['box-sizing', 'border-box']
-    ]);
-    pcSetImportantStyles(report, [
-      ['height', 'auto'],
-      ['min-height', '100%'],
-      ['overflow', 'visible']
-    ]);
-    pcSetImportantStyles(grid, [
-      ['grid-template-rows', useSingleColumn
-        ? 'auto auto auto auto auto auto'
-        : 'auto auto auto auto'],
-      ['height', 'auto'],
-      ['min-height', '0'],
-      ['align-items', 'start'],
-      ['align-content', 'start'],
-      ['overflow', 'visible'],
-      ['flex', '0 0 auto']
-    ]);
-    cards.forEach((card) => pcSetImportantStyles(card, [
-      ['height', 'auto'],
-      ['min-height', 'max-content'],
-      ['align-self', 'start'],
-      ['overflow', 'hidden'],
-      ['overflow-wrap', 'anywhere'],
-      ['word-break', 'normal']
-    ]));
-    output.scrollTop = 0;
+    enableOverflowSafeWideReport(Math.max(0.88, scale));
   } else {
-    report.classList.remove('analysis-report-scrollable');
+    report.classList.remove('analysis-report-scrollable', 'analysis-report-overflow-safe');
   }
 
   return true;
@@ -2905,6 +2956,17 @@ function showBabbageTerminalReport({
     if (output) output.scrollTop = 0;
   });
 
+  // v423: Font metrics can settle after the first report pass. Re-run the
+  // shared layout once fonts are ready so long user/AI text cannot outgrow a
+  // card after its initial measurements were captured.
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(() => {
+      if (output?.classList.contains('claude-analysis-layout') && pcIsAnalysisReportActiveV122()) {
+        pcScheduleAnalysisLayoutV255({ immediate: true });
+      }
+    }).catch(() => {});
+  }
+
   const speaker = document.getElementById('vnSpeaker');
   if (speaker) speaker.textContent = speakerName;
 
@@ -3345,6 +3407,13 @@ pcRegisterUIActions({
 
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');
+  const dialogue = document.getElementById('vnDialogue');
+
+  // Shared workstation-result scenes contain their own explicit action button.
+  // Clicking the surrounding dialogue surface must never consume the VN state;
+  // otherwise the text can clear without running the scenario transition that
+  // unlocks the next activity.
+  if (dialogue?.dataset.pcExplicitAction === 'true') return;
 
   // HARD STOP: during Babbage terminal/thinking screens, clicks on the black
   // dialogue panel must NOT advance or clear the VN text. Only the explicit

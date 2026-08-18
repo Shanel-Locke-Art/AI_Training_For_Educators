@@ -11263,86 +11263,128 @@ body #musicToggle.full-audio {
   opacity: 1;
 }
 
-/* Main-menu presentation QR: reusable launch card for projected demos. */
-.pc-menu-qr-card {
-  width: fit-content;
-  max-width: 100%;
-  display: inline-grid;
-  grid-template-columns: 116px minmax(0, 1fr);
+/* Main-menu presentation launch panel. The QR belongs to the hero rather than
+   occupying a separate content row, keeping the menu balanced on a projector. */
+.pc-menu-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 250px);
   align-items: center;
-  gap: 18px;
-  margin-top: 24px;
-  padding: 12px 18px 12px 12px;
-  border: 1px solid rgba(45, 90, 61, 0.28);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.72);
-  color: var(--forest-dark);
+  gap: clamp(34px, 5vw, 68px);
+}
+
+.pc-menu-hero-main {
+  min-width: 0;
+}
+
+.pc-menu-qr-card {
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 20px 18px 18px;
+  border: 2px solid #87c79a;
+  border-radius: 16px;
+  background: #173d29;
+  color: #ffffff;
+  text-align: center;
   text-decoration: none;
-  box-shadow: 0 8px 22px rgba(30, 54, 38, 0.08);
+  box-shadow: 0 12px 28px rgba(23, 61, 41, 0.18);
 }
 
 .pc-menu-qr-card:hover,
 .pc-menu-qr-card:focus-visible {
-  border-color: var(--forest);
-  box-shadow: 0 0 0 3px rgba(45, 90, 61, 0.12), 0 10px 24px rgba(30, 54, 38, 0.12);
+  border-color: #ffffff;
+  background: #0f3322;
+  box-shadow: 0 0 0 3px #f4b942, 0 14px 30px rgba(23, 61, 41, 0.22);
   outline: none;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .pc-menu-qr-image {
-  width: 116px;
-  height: 116px;
+  width: 142px;
+  height: 142px;
   display: block;
-  padding: 6px;
+  padding: 8px;
   box-sizing: border-box;
-  border-radius: 8px;
-  background: #fff;
+  border-radius: 10px;
+  background: #ffffff;
   image-rendering: pixelated;
 }
 
 .pc-menu-qr-copy {
   min-width: 0;
   display: grid;
-  gap: 6px;
+  justify-items: center;
+  gap: 4px;
+}
+
+.pc-menu-qr-kicker {
+  color: #b9ddc4;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.64rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .pc-menu-qr-copy strong {
+  color: #ffffff;
   font-family: "Fraunces", serif;
-  font-size: clamp(1.08rem, 2vw, 1.35rem);
+  font-size: 1.3rem;
   line-height: 1.1;
 }
 
-.pc-menu-qr-copy span {
+.pc-menu-qr-copy > span:last-child {
+  color: #d6f0dd;
   font-family: "Source Code Pro", monospace;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
+  .pc-menu-hero {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
   .pc-menu-qr-card {
-    width: 100%;
-    grid-template-columns: 92px minmax(0, 1fr);
-    gap: 14px;
-    margin-top: 18px;
-    box-sizing: border-box;
+    max-width: 460px;
+    grid-template-columns: 104px minmax(0, 1fr);
+    justify-items: start;
+    gap: 16px;
+    padding: 12px 16px 12px 12px;
+    text-align: left;
   }
 
   .pc-menu-qr-image {
-    width: 92px;
-    height: 92px;
+    width: 104px;
+    height: 104px;
+  }
+
+  .pc-menu-qr-copy {
+    align-self: center;
+    justify-items: start;
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 520px) {
   .pc-menu-qr-card {
-    grid-template-columns: 78px minmax(0, 1fr);
+    max-width: none;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 12px;
     padding: 10px;
   }
 
   .pc-menu-qr-image {
-    width: 78px;
-    height: 78px;
+    width: 88px;
+    height: 88px;
+  }
+
+  .pc-menu-qr-copy strong {
+    font-size: 1.15rem;
   }
 }
 
@@ -15299,6 +15341,31 @@ body.pc-scenario-activity-active #inputContainer {
   font-weight: 800;
 }
 
+/* Shared single-select marker. S2 Diagnose established this radio treatment;
+   later single-choice screens reuse it instead of reverting to numbered tiles. */
+.pc-choice-grid--radio-marker .pc-choice-marker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: #fff;
+  font-size: 0;
+}
+
+.pc-choice-grid--radio-marker .pc-choice-marker::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.pc-choice-grid--radio-marker .pc-choice-card:has(input:checked) .pc-choice-marker::after,
+.pc-choice-grid--radio-marker .pc-choice-card.selected .pc-choice-marker::after {
+  background: var(--forest);
+}
+
 .pc-choice-copy {
   color: var(--ink-mid);
   line-height: 1.45;
@@ -16089,16 +16156,14 @@ html body .pc-s2-engine-note {
   opacity: .78 !important;
 }
 
-html body .pc-s2-audit-layout,
-html body .pc-s2-repair-layout {
+html body .pc-s2-audit-layout {
   display: grid !important;
   grid-template-columns: minmax(280px, .88fr) minmax(0, 1.12fr) !important;
   gap: clamp(16px, 2.4vw, 28px) !important;
   align-items: start !important;
 }
 
-html body .pc-s2-babbage-draft,
-html body .pc-s2-original-draft {
+html body .pc-s2-babbage-draft {
   padding: clamp(18px, 2vw, 26px) !important;
   border: 1px solid rgba(194,156,82,.58) !important;
   border-radius: 16px !important;
@@ -16108,8 +16173,7 @@ html body .pc-s2-original-draft {
   box-shadow: 0 16px 40px rgba(0,0,0,.16) !important;
 }
 
-html body .pc-s2-babbage-draft h2,
-html body .pc-s2-original-draft h3 {
+html body .pc-s2-babbage-draft h2 {
   color: #f4e5ba !important;
 }
 
@@ -16126,32 +16190,6 @@ html body .pc-s2-babbage-draft details {
   margin-top: 14px !important;
   padding-top: 10px !important;
   border-top: 1px solid rgba(255,255,255,.14) !important;
-}
-
-html body .pc-s2-repair-label {
-  display: block !important;
-  margin: 16px 0 7px !important;
-  font-weight: 800 !important;
-  color: #173d27 !important;
-}
-
-html body .pc-s2-repair-textarea {
-  width: 100% !important;
-  min-height: 190px !important;
-  resize: vertical !important;
-  box-sizing: border-box !important;
-  padding: 14px 16px !important;
-  border: 2px solid #8cb29a !important;
-  border-radius: 12px !important;
-  background: #fffefb !important;
-  color: #1e2d23 !important;
-  font: inherit !important;
-  line-height: 1.55 !important;
-}
-
-html body .pc-s2-repair-textarea:focus {
-  outline: 3px solid rgba(63,120,83,.22) !important;
-  border-color: #3f7853 !important;
 }
 
 html body .pc-s2-final {
@@ -16231,13 +16269,319 @@ html body .pc-s2-final-actions {
 
 @media screen and (max-width: 900px) {
   html body .pc-s2-audit-layout,
-  html body .pc-s2-repair-layout,
   html body .pc-s2-before-after,
   html body .pc-s2-review-grid {
     grid-template-columns: 1fr !important;
   }
 }
 
+
+
+/* ══════════════════════════════════════════════════════
+   SHARED GUIDED REPAIR WORKSPACE
+   Scenario 1 established this interaction model. S2 is the first scenario to
+   consume the reusable version; later scenarios should supply content rather
+   than inventing another field layout.
+   ══════════════════════════════════════════════════════ */
+html body .pc-guided-repair-layout {
+  display: grid !important;
+  grid-template-columns: minmax(300px, .86fr) minmax(0, 1.34fr) !important;
+  gap: clamp(16px, 1.8vw, 24px) !important;
+  align-items: start !important;
+  min-width: 0 !important;
+}
+
+html body .pc-guided-repair-reference,
+html body .pc-guided-repair-builder {
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  padding: clamp(18px, 1.7vw, 24px) !important;
+  border: 2px solid var(--border-strong) !important;
+  border-radius: 16px !important;
+  background: #fffdf8 !important;
+  color: var(--ink) !important;
+  box-shadow: 0 6px 18px rgba(42,31,20,.10) !important;
+}
+
+html body .pc-guided-repair-reference-title,
+html body .pc-guided-repair-builder h2 {
+  margin: 3px 0 10px !important;
+  color: var(--forest-dark) !important;
+  font-family: "Fraunces", serif !important;
+  line-height: 1.16 !important;
+}
+
+html body .pc-guided-repair-reference-title {
+  font-size: clamp(1.25rem, 1.5vw, 1.62rem) !important;
+}
+
+html body .pc-guided-repair-builder h2 {
+  font-size: clamp(1.45rem, 1.9vw, 1.95rem) !important;
+}
+
+html body .pc-guided-repair-source-prompt {
+  margin: 12px 0 14px !important;
+  padding: 16px 18px !important;
+  border: 2px dashed var(--border-strong) !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  color: var(--ink) !important;
+  font-size: clamp(.96rem, 1.05vw, 1.06rem) !important;
+  line-height: 1.6 !important;
+  white-space: pre-line !important;
+}
+
+html body .pc-guided-repair-problem {
+  margin-top: 12px !important;
+  padding: 13px 15px !important;
+  border: 1.5px solid #d98052 !important;
+  border-radius: 11px !important;
+  background: #fff1e9 !important;
+  color: var(--ink-mid) !important;
+}
+
+html body .pc-guided-repair-problem-label,
+html body .pc-guided-repair-ingredients-heading,
+html body .pc-guided-repair-preview-label {
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .76rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .09em !important;
+  text-transform: uppercase !important;
+}
+
+html body .pc-guided-repair-problem-label {
+  margin-bottom: 5px !important;
+  color: #a4471e !important;
+}
+
+html body .pc-guided-repair-problem strong {
+  display: block !important;
+  color: #743418 !important;
+  line-height: 1.42 !important;
+}
+
+html body .pc-guided-repair-problem p {
+  margin: 5px 0 0 !important;
+  font-size: .92rem !important;
+  line-height: 1.5 !important;
+}
+
+html body .pc-guided-repair-ingredients {
+  margin-top: 14px !important;
+  padding: 12px !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 12px !important;
+  background: #f6efe2 !important;
+}
+
+html body .pc-guided-repair-ingredients-heading {
+  margin-bottom: 8px !important;
+  color: #7f3514 !important;
+}
+
+html body .pc-guided-repair-chip-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 7px !important;
+}
+
+html body .pc-guided-repair-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 32px !important;
+  padding: 6px 10px !important;
+  border: 1.5px solid #ae9b79 !important;
+  border-radius: 999px !important;
+  background: #fffaf0 !important;
+  color: var(--ink-mid) !important;
+  font-size: .84rem !important;
+  font-weight: 800 !important;
+}
+
+html body .pc-guided-repair-chip.covered {
+  border-color: #35724b !important;
+  background: #e4f2e8 !important;
+  color: #164c2f !important;
+}
+
+html body .pc-guided-repair-head {
+  margin-bottom: 12px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1.5px solid var(--border) !important;
+}
+
+html body .pc-guided-repair-instruction {
+  max-width: 960px !important;
+  margin: 6px 0 0 !important;
+  color: var(--ink-light) !important;
+  font-size: clamp(.95rem, 1.05vw, 1.05rem) !important;
+  line-height: 1.55 !important;
+}
+
+html body .pc-guided-repair-fields {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px 14px !important;
+}
+
+html body .pc-guided-repair-field {
+  min-width: 0 !important;
+}
+
+html body .pc-guided-repair-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 6px !important;
+  color: var(--ink-mid) !important;
+  font-size: clamp(.94rem, 1.05vw, 1.05rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.3 !important;
+}
+
+html body .pc-guided-repair-num {
+  width: 28px !important;
+  height: 28px !important;
+  flex: 0 0 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  background: var(--forest-dark) !important;
+  color: #d4edd9 !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .78rem !important;
+  font-weight: 900 !important;
+}
+
+html body .pc-guided-repair-textarea {
+  width: 100% !important;
+  min-height: 104px !important;
+  max-height: 200px !important;
+  box-sizing: border-box !important;
+  resize: vertical !important;
+  overflow: auto !important;
+  padding: 12px 13px !important;
+  border: 2px solid var(--border-strong) !important;
+  border-radius: 12px !important;
+  background: #fffdf8 !important;
+  color: var(--ink) !important;
+  font-family: "Nunito", sans-serif !important;
+  font-size: clamp(.96rem, 1.02vw, 1.04rem) !important;
+  line-height: 1.5 !important;
+  outline: none !important;
+  box-shadow: inset 0 1px 3px rgba(42,31,20,.05) !important;
+}
+
+html body .pc-guided-repair-textarea:focus {
+  border-color: var(--forest-mid) !important;
+  box-shadow: 0 0 0 3px rgba(45,90,61,.12), inset 0 1px 3px rgba(42,31,20,.05) !important;
+}
+
+html body .pc-guided-repair-preview-wrap {
+  margin-top: 15px !important;
+  padding-top: 14px !important;
+  border-top: 1.5px solid var(--border) !important;
+}
+
+html body .pc-guided-repair-preview-label {
+  margin-bottom: 7px !important;
+  color: var(--forest-dark) !important;
+}
+
+html body .pc-guided-repair-preview {
+  min-height: 98px !important;
+  box-sizing: border-box !important;
+  padding: 13px 15px !important;
+  border: 1.5px solid #8db49a !important;
+  border-radius: 11px !important;
+  background: #eef7f0 !important;
+  color: #173d27 !important;
+  font-size: .96rem !important;
+  line-height: 1.5 !important;
+  white-space: pre-wrap !important;
+}
+
+html body .pc-guided-repair-preview.is-empty {
+  border-style: dashed !important;
+  background: #f8f7f2 !important;
+  color: #7a7468 !important;
+  font-style: italic !important;
+}
+
+html body .pc-guided-repair-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-top: 12px !important;
+  padding-top: 11px !important;
+  border-top: 1.5px solid var(--border) !important;
+}
+
+html body .pc-guided-repair-nudge {
+  flex: 1 1 auto !important;
+  padding: 9px 11px !important;
+  border: 1.5px solid #d4a72c !important;
+  border-radius: 10px !important;
+  background: #fff6d6 !important;
+  color: #4a3728 !important;
+  font-size: .88rem !important;
+  line-height: 1.45 !important;
+}
+
+html body .pc-guided-repair-submit-wrap {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+html body .pc-guided-repair-status {
+  color: var(--ink-light) !important;
+  font-size: .85rem !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+@media screen and (max-width: 1050px) {
+  html body .pc-guided-repair-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  html body .pc-guided-repair-fields {
+    grid-template-columns: 1fr !important;
+  }
+  html body .pc-guided-repair-actions {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+  html body .pc-guided-repair-submit-wrap {
+    width: 100% !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+  }
+}
+
+@media screen and (max-width: 560px) {
+  html body .pc-guided-repair-reference,
+  html body .pc-guided-repair-builder {
+    padding: 16px !important;
+  }
+  html body .pc-guided-repair-textarea {
+    min-height: 116px !important;
+  }
+  html body .pc-guided-repair-submit-wrap,
+  html body .pc-guided-repair-submit-wrap .pc-button {
+    width: 100% !important;
+  }
+  html body .pc-guided-repair-submit-wrap .pc-button {
+    min-height: 50px !important;
+  }
+}
 
 /* ══════════════════════════════════════════════════════
    V366 — SCENARIO 3 AUTHENTIC ASSESSMENT
@@ -16896,6 +17240,19 @@ html body .pc-s5-final-actions {
   html body .pc-s5-source-grid {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* S2 Decision 4: keep the audit result as a shared full-width consequence panel. */
+.pc-s2-audit-feedback-wide {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
+  margin-top: clamp(16px, 2vw, 24px);
+}
+
+.pc-s2-audit-feedback-wide:empty {
+  display: none;
 }
 
 /* SOURCE: styles/115-intro-responsive.css */
@@ -20246,7 +20603,6 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
 .s2-loop-puzzle>.pc-activity-task h2{max-width:760px;margin-bottom:5px}.s2-loop-puzzle>.pc-activity-task .pc-activity-instruction{max-width:780px;margin-top:0;margin-bottom:18px}
 .s2-loop-puzzle .pc-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 
-.s2-loop-puzzle .pc-choice-marker{width:28px;height:28px;padding:0;display:grid;place-items:center;border:1px solid var(--border-strong);background:#fff;border-radius:50%;font-size:0}.s2-loop-puzzle .pc-choice-marker::after{content:"";width:10px;height:10px;border-radius:50%;background:transparent}.s2-loop-puzzle .pc-choice-card:has(input:checked) .pc-choice-marker::after{background:var(--forest)}
 .s2-loop-puzzle .pc-choice-body{display:grid;gap:5px}.s2-loop-puzzle .pc-choice-body strong{color:var(--forest-dark);font-size:1rem;line-height:1.25}.s2-loop-puzzle .pc-choice-body>span{color:var(--ink-mid);font-size:.9rem;line-height:1.38}.s2-loop-puzzle .pc-selection-bar{margin-top:14px}
 @media(max-width:760px){.s2-loop-header{padding:14px 16px}.s2-loop-jordan span{display:none}.s2-loop-jordan img{width:48px;height:58px}.s2-learning-gap{padding:18px 16px}.s2-gap-intro{grid-template-columns:1fr}.s2-result-chip{grid-column:1;grid-row:auto;margin-top:12px;min-width:0;display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:8px}.s2-result-chip strong,.s2-result-chip small{margin:0}.s2-gap-flow{grid-template-columns:1fr;gap:6px}.s2-flow-node{min-height:78px}.s2-flow-arrow{transform:rotate(90deg);font-size:20px}.s2-loop-puzzle>.pc-activity-task{padding:20px 16px}.s2-loop-puzzle .pc-choice-grid{grid-template-columns:1fr}}
 
@@ -22321,11 +22677,6 @@ body[data-pc-scenario="metacognition"] .s2-loop-jordan span {
     font-size: 17px !important;
     line-height: 1.45 !important;
   }
-  
-  body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-marker {
-    width: 30px;
-    height: 30px;
-  }
   body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-body strong {
     font-size: 17px !important;
     line-height: 1.28 !important;
@@ -22448,12 +22799,6 @@ body[data-pc-scenario="metacognition"] .s2-loop-jordan span {
   body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-grid {
     grid-template-columns: repeat(2, minmax(0,1fr)) !important;
     gap: 14px !important;
-  }
-  
-  body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-marker {
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
   }
   body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-choice-body strong {
     font-size: 17px !important;
@@ -24531,8 +24876,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-context-arrow {
 
 /* Later S2 decisions now use the same two-column choice rhythm as Diagnose. */
 body[data-pc-scenario="metacognition"] .pc-s2-step-shell > .pc-activity-task,
-body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task,
-body[data-pc-scenario="metacognition"] .pc-s2-repair-layout > .pc-activity-card {
+body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task {
   min-width: 0 !important;
   padding: clamp(20px, 2vw, 28px) !important;
   border-radius: 16px !important;
@@ -24584,13 +24928,52 @@ body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-choice-body > span 
 }
 
 /* Audit gets a readable draft/task split without squeezing the choices. */
-body[data-pc-scenario="metacognition"] .pc-s2-audit-layout,
-body[data-pc-scenario="metacognition"] .pc-s2-repair-layout {
+body[data-pc-scenario="metacognition"] .pc-s2-audit-layout {
   display: grid !important;
-  grid-template-columns: minmax(260px, .78fr) minmax(0, 1.22fr) !important;
-  gap: clamp(14px, 1.8vw, 22px) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(16px, 1.8vw, 24px) !important;
   min-width: 0 !important;
-  align-items: start !important;
+  align-items: stretch !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > :is(.pc-s2-babbage-draft, .pc-activity-task) {
+  height: 100% !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-evidence {
+  flex: 1 1 220px !important;
+  min-height: 220px !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-rationale {
+  margin-top: 0 !important;
+  padding: 14px 16px !important;
+  border: 1px solid rgba(244, 229, 186, .18) !important;
+  border-left: 3px solid rgba(208, 174, 101, .8) !important;
+  border-radius: 9px !important;
+  background: rgba(255,255,255,.035) !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-rationale__label {
+  margin: 0 0 5px !important;
+  color: #f4e5ba !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-size: .72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-rationale p {
+  margin: 0 !important;
+  color: #eef9f1 !important;
+  font-size: clamp(.92rem, 1vw, 1rem) !important;
+  line-height: 1.5 !important;
 }
 
 body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-grid {
@@ -24603,18 +24986,12 @@ body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-card {
   padding: 14px 15px !important;
 }
 
-body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft,
-body[data-pc-scenario="metacognition"] .pc-s2-original-draft {
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft {
   min-width: 0 !important;
 }
 
-body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft h2,
-body[data-pc-scenario="metacognition"] .pc-s2-original-draft h3 {
+body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft h2 {
   overflow-wrap: anywhere !important;
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-repair-textarea {
-  min-height: clamp(180px, 26vh, 280px) !important;
 }
 
 /* Mid-size tablets/foldables: retain two choice columns but stack case context. */
@@ -24625,12 +25002,19 @@ body[data-pc-scenario="metacognition"] .pc-s2-repair-textarea {
   body[data-pc-scenario="metacognition"] .pc-s2-case-context__title {
     padding-bottom: 2px !important;
   }
-  body[data-pc-scenario="metacognition"] .pc-s2-audit-layout,
-  body[data-pc-scenario="metacognition"] .pc-s2-repair-layout {
+  body[data-pc-scenario="metacognition"] .pc-s2-audit-layout {
     grid-template-columns: 1fr !important;
   }
   body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+
+@media (max-width: 1050px) {
+  body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-evidence {
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
   }
 }
 
@@ -24657,8 +25041,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-repair-textarea {
   }
   
   body[data-pc-scenario="metacognition"] .pc-s2-step-shell > .pc-activity-task,
-  body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task,
-  body[data-pc-scenario="metacognition"] .pc-s2-repair-layout > .pc-activity-card {
+  body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task {
     padding: 18px 16px !important;
   }
   body[data-pc-scenario="metacognition"] .pc-s2-step-shell .pc-selection-bar {
@@ -24720,7 +25103,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
   min-width: 0 !important;
   display: flex !important;
   align-self: stretch !important;
-  align-items: flex-end !important;
+  align-items: center !important;
   justify-content: center !important;
 }
 
@@ -24864,5 +25247,17 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
 
   .pc-choice-grid.pc-choice-grid--tagged-detail .pc-choice-marker {
     justify-self: start !important;
+  }
+}
+
+/* V425 — shared single-select radio marker stays consistent with S2 Diagnose. */
+@media (max-width: 600px) {
+  .pc-choice-grid--radio-marker .pc-choice-marker {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .pc-choice-grid--radio-marker .pc-choice-marker::after {
+    width: 10px !important;
+    height: 10px !important;
   }
 }

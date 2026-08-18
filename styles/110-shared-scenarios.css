@@ -246,6 +246,31 @@ body.pc-scenario-activity-active #inputContainer {
   font-weight: 800;
 }
 
+/* Shared single-select marker. S2 Diagnose established this radio treatment;
+   later single-choice screens reuse it instead of reverting to numbered tiles. */
+.pc-choice-grid--radio-marker .pc-choice-marker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: #fff;
+  font-size: 0;
+}
+
+.pc-choice-grid--radio-marker .pc-choice-marker::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.pc-choice-grid--radio-marker .pc-choice-card:has(input:checked) .pc-choice-marker::after,
+.pc-choice-grid--radio-marker .pc-choice-card.selected .pc-choice-marker::after {
+  background: var(--forest);
+}
+
 .pc-choice-copy {
   color: var(--ink-mid);
   line-height: 1.45;
@@ -1036,16 +1061,14 @@ html body .pc-s2-engine-note {
   opacity: .78 !important;
 }
 
-html body .pc-s2-audit-layout,
-html body .pc-s2-repair-layout {
+html body .pc-s2-audit-layout {
   display: grid !important;
   grid-template-columns: minmax(280px, .88fr) minmax(0, 1.12fr) !important;
   gap: clamp(16px, 2.4vw, 28px) !important;
   align-items: start !important;
 }
 
-html body .pc-s2-babbage-draft,
-html body .pc-s2-original-draft {
+html body .pc-s2-babbage-draft {
   padding: clamp(18px, 2vw, 26px) !important;
   border: 1px solid rgba(194,156,82,.58) !important;
   border-radius: 16px !important;
@@ -1055,8 +1078,7 @@ html body .pc-s2-original-draft {
   box-shadow: 0 16px 40px rgba(0,0,0,.16) !important;
 }
 
-html body .pc-s2-babbage-draft h2,
-html body .pc-s2-original-draft h3 {
+html body .pc-s2-babbage-draft h2 {
   color: #f4e5ba !important;
 }
 
@@ -1073,32 +1095,6 @@ html body .pc-s2-babbage-draft details {
   margin-top: 14px !important;
   padding-top: 10px !important;
   border-top: 1px solid rgba(255,255,255,.14) !important;
-}
-
-html body .pc-s2-repair-label {
-  display: block !important;
-  margin: 16px 0 7px !important;
-  font-weight: 800 !important;
-  color: #173d27 !important;
-}
-
-html body .pc-s2-repair-textarea {
-  width: 100% !important;
-  min-height: 190px !important;
-  resize: vertical !important;
-  box-sizing: border-box !important;
-  padding: 14px 16px !important;
-  border: 2px solid #8cb29a !important;
-  border-radius: 12px !important;
-  background: #fffefb !important;
-  color: #1e2d23 !important;
-  font: inherit !important;
-  line-height: 1.55 !important;
-}
-
-html body .pc-s2-repair-textarea:focus {
-  outline: 3px solid rgba(63,120,83,.22) !important;
-  border-color: #3f7853 !important;
 }
 
 html body .pc-s2-final {
@@ -1178,13 +1174,319 @@ html body .pc-s2-final-actions {
 
 @media screen and (max-width: 900px) {
   html body .pc-s2-audit-layout,
-  html body .pc-s2-repair-layout,
   html body .pc-s2-before-after,
   html body .pc-s2-review-grid {
     grid-template-columns: 1fr !important;
   }
 }
 
+
+
+/* ══════════════════════════════════════════════════════
+   SHARED GUIDED REPAIR WORKSPACE
+   Scenario 1 established this interaction model. S2 is the first scenario to
+   consume the reusable version; later scenarios should supply content rather
+   than inventing another field layout.
+   ══════════════════════════════════════════════════════ */
+html body .pc-guided-repair-layout {
+  display: grid !important;
+  grid-template-columns: minmax(300px, .86fr) minmax(0, 1.34fr) !important;
+  gap: clamp(16px, 1.8vw, 24px) !important;
+  align-items: start !important;
+  min-width: 0 !important;
+}
+
+html body .pc-guided-repair-reference,
+html body .pc-guided-repair-builder {
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  padding: clamp(18px, 1.7vw, 24px) !important;
+  border: 2px solid var(--border-strong) !important;
+  border-radius: 16px !important;
+  background: #fffdf8 !important;
+  color: var(--ink) !important;
+  box-shadow: 0 6px 18px rgba(42,31,20,.10) !important;
+}
+
+html body .pc-guided-repair-reference-title,
+html body .pc-guided-repair-builder h2 {
+  margin: 3px 0 10px !important;
+  color: var(--forest-dark) !important;
+  font-family: "Fraunces", serif !important;
+  line-height: 1.16 !important;
+}
+
+html body .pc-guided-repair-reference-title {
+  font-size: clamp(1.25rem, 1.5vw, 1.62rem) !important;
+}
+
+html body .pc-guided-repair-builder h2 {
+  font-size: clamp(1.45rem, 1.9vw, 1.95rem) !important;
+}
+
+html body .pc-guided-repair-source-prompt {
+  margin: 12px 0 14px !important;
+  padding: 16px 18px !important;
+  border: 2px dashed var(--border-strong) !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  color: var(--ink) !important;
+  font-size: clamp(.96rem, 1.05vw, 1.06rem) !important;
+  line-height: 1.6 !important;
+  white-space: pre-line !important;
+}
+
+html body .pc-guided-repair-problem {
+  margin-top: 12px !important;
+  padding: 13px 15px !important;
+  border: 1.5px solid #d98052 !important;
+  border-radius: 11px !important;
+  background: #fff1e9 !important;
+  color: var(--ink-mid) !important;
+}
+
+html body .pc-guided-repair-problem-label,
+html body .pc-guided-repair-ingredients-heading,
+html body .pc-guided-repair-preview-label {
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .76rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .09em !important;
+  text-transform: uppercase !important;
+}
+
+html body .pc-guided-repair-problem-label {
+  margin-bottom: 5px !important;
+  color: #a4471e !important;
+}
+
+html body .pc-guided-repair-problem strong {
+  display: block !important;
+  color: #743418 !important;
+  line-height: 1.42 !important;
+}
+
+html body .pc-guided-repair-problem p {
+  margin: 5px 0 0 !important;
+  font-size: .92rem !important;
+  line-height: 1.5 !important;
+}
+
+html body .pc-guided-repair-ingredients {
+  margin-top: 14px !important;
+  padding: 12px !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 12px !important;
+  background: #f6efe2 !important;
+}
+
+html body .pc-guided-repair-ingredients-heading {
+  margin-bottom: 8px !important;
+  color: #7f3514 !important;
+}
+
+html body .pc-guided-repair-chip-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 7px !important;
+}
+
+html body .pc-guided-repair-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 32px !important;
+  padding: 6px 10px !important;
+  border: 1.5px solid #ae9b79 !important;
+  border-radius: 999px !important;
+  background: #fffaf0 !important;
+  color: var(--ink-mid) !important;
+  font-size: .84rem !important;
+  font-weight: 800 !important;
+}
+
+html body .pc-guided-repair-chip.covered {
+  border-color: #35724b !important;
+  background: #e4f2e8 !important;
+  color: #164c2f !important;
+}
+
+html body .pc-guided-repair-head {
+  margin-bottom: 12px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1.5px solid var(--border) !important;
+}
+
+html body .pc-guided-repair-instruction {
+  max-width: 960px !important;
+  margin: 6px 0 0 !important;
+  color: var(--ink-light) !important;
+  font-size: clamp(.95rem, 1.05vw, 1.05rem) !important;
+  line-height: 1.55 !important;
+}
+
+html body .pc-guided-repair-fields {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px 14px !important;
+}
+
+html body .pc-guided-repair-field {
+  min-width: 0 !important;
+}
+
+html body .pc-guided-repair-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 6px !important;
+  color: var(--ink-mid) !important;
+  font-size: clamp(.94rem, 1.05vw, 1.05rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.3 !important;
+}
+
+html body .pc-guided-repair-num {
+  width: 28px !important;
+  height: 28px !important;
+  flex: 0 0 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  background: var(--forest-dark) !important;
+  color: #d4edd9 !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .78rem !important;
+  font-weight: 900 !important;
+}
+
+html body .pc-guided-repair-textarea {
+  width: 100% !important;
+  min-height: 104px !important;
+  max-height: 200px !important;
+  box-sizing: border-box !important;
+  resize: vertical !important;
+  overflow: auto !important;
+  padding: 12px 13px !important;
+  border: 2px solid var(--border-strong) !important;
+  border-radius: 12px !important;
+  background: #fffdf8 !important;
+  color: var(--ink) !important;
+  font-family: "Nunito", sans-serif !important;
+  font-size: clamp(.96rem, 1.02vw, 1.04rem) !important;
+  line-height: 1.5 !important;
+  outline: none !important;
+  box-shadow: inset 0 1px 3px rgba(42,31,20,.05) !important;
+}
+
+html body .pc-guided-repair-textarea:focus {
+  border-color: var(--forest-mid) !important;
+  box-shadow: 0 0 0 3px rgba(45,90,61,.12), inset 0 1px 3px rgba(42,31,20,.05) !important;
+}
+
+html body .pc-guided-repair-preview-wrap {
+  margin-top: 15px !important;
+  padding-top: 14px !important;
+  border-top: 1.5px solid var(--border) !important;
+}
+
+html body .pc-guided-repair-preview-label {
+  margin-bottom: 7px !important;
+  color: var(--forest-dark) !important;
+}
+
+html body .pc-guided-repair-preview {
+  min-height: 98px !important;
+  box-sizing: border-box !important;
+  padding: 13px 15px !important;
+  border: 1.5px solid #8db49a !important;
+  border-radius: 11px !important;
+  background: #eef7f0 !important;
+  color: #173d27 !important;
+  font-size: .96rem !important;
+  line-height: 1.5 !important;
+  white-space: pre-wrap !important;
+}
+
+html body .pc-guided-repair-preview.is-empty {
+  border-style: dashed !important;
+  background: #f8f7f2 !important;
+  color: #7a7468 !important;
+  font-style: italic !important;
+}
+
+html body .pc-guided-repair-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-top: 12px !important;
+  padding-top: 11px !important;
+  border-top: 1.5px solid var(--border) !important;
+}
+
+html body .pc-guided-repair-nudge {
+  flex: 1 1 auto !important;
+  padding: 9px 11px !important;
+  border: 1.5px solid #d4a72c !important;
+  border-radius: 10px !important;
+  background: #fff6d6 !important;
+  color: #4a3728 !important;
+  font-size: .88rem !important;
+  line-height: 1.45 !important;
+}
+
+html body .pc-guided-repair-submit-wrap {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+html body .pc-guided-repair-status {
+  color: var(--ink-light) !important;
+  font-size: .85rem !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+@media screen and (max-width: 1050px) {
+  html body .pc-guided-repair-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  html body .pc-guided-repair-fields {
+    grid-template-columns: 1fr !important;
+  }
+  html body .pc-guided-repair-actions {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+  html body .pc-guided-repair-submit-wrap {
+    width: 100% !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+  }
+}
+
+@media screen and (max-width: 560px) {
+  html body .pc-guided-repair-reference,
+  html body .pc-guided-repair-builder {
+    padding: 16px !important;
+  }
+  html body .pc-guided-repair-textarea {
+    min-height: 116px !important;
+  }
+  html body .pc-guided-repair-submit-wrap,
+  html body .pc-guided-repair-submit-wrap .pc-button {
+    width: 100% !important;
+  }
+  html body .pc-guided-repair-submit-wrap .pc-button {
+    min-height: 50px !important;
+  }
+}
 
 /* ══════════════════════════════════════════════════════
    V366 — SCENARIO 3 AUTHENTIC ASSESSMENT
@@ -1843,4 +2145,17 @@ html body .pc-s5-final-actions {
   html body .pc-s5-source-grid {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* S2 Decision 4: keep the audit result as a shared full-width consequence panel. */
+.pc-s2-audit-feedback-wide {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
+  margin-top: clamp(16px, 2vw, 24px);
+}
+
+.pc-s2-audit-feedback-wide:empty {
+  display: none;
 }

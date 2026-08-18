@@ -481,7 +481,7 @@ function startGame() {
 //  Paste your Google Apps Script Web App URL into SHEETS_URL
 // ══════════════════════════════════════════════════════
 const SURVEY_MODE   = 'sheets';
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzgR2zSd3nP_qmWPlqgWa67bONHuUbbgxPovqYL7cxSJocD8ama16XGpCoAJV9N3U0/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzAtqwPWbS-5BZQ3LyTjgDIkABoMM8KeL-OrzErb64SAipeu6gbxGFSjfHV_GVcH5ZU/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 
 // ══════════════════════════════════════════════════════
@@ -770,6 +770,7 @@ const scenarioData = Array.from({ length: SCENARIO_COUNT }, (_, index) => {
       thinkingMove: '',
       babbageDraft: null,
       babbageReview: null,
+      s2ReviewSource: '',
       repairText: '',
       openingCheckpointReached: false,
     };
@@ -1564,7 +1565,8 @@ function buildScenarioTaskCardHTML({
   submitId,
   submitLabel,
   feedbackId,
-  gridClass = ''
+  gridClass = '',
+  includeFeedback = true
 } = {}) {
   return `
     <section class="pc-activity-card pc-activity-task" aria-labelledby="${esc(titleId)}">
@@ -1576,8 +1578,203 @@ function buildScenarioTaskCardHTML({
         <span id="${esc(statusId)}" role="status" aria-live="polite">0 selected</span>
         <button class="pc-button pc-button--primary" id="${esc(submitId)}" type="button" disabled>${esc(submitLabel)}</button>
       </div>
-      <div id="${esc(feedbackId)}" aria-live="polite"></div>
+      ${includeFeedback && feedbackId ? `<div id="${esc(feedbackId)}" aria-live="polite"></div>` : ''}
     </section>`;
+}
+
+// ── SHARED SCENARIO RESULT PAGE ─────────────────────
+// Scenario 1 established the final-result presentation: one focused parchment
+// card, one review panel, one reference panel, and a persistent action bar.
+// Later scenarios feed content into this renderer rather than inventing a new
+// completion screen. The legacy S1 class names remain the visual owner so the
+// two scenarios literally share the same layout and responsive behavior.
+function pcRenderSharedScenarioResult({
+  eyebrow = 'Babbage result',
+  title = 'Revised activity',
+  bodyHTML = '',
+  reviewTitle = '',
+  reviewItems = [],
+  referenceTitle = '',
+  referenceItems = [],
+  controlsTitle = 'Scenario result',
+  controlsSub = '',
+  controlsActionsHTML = ''
+} = {}) {
+  document.body.classList.remove('pc-scenario-activity-active');
+  document.body.classList.add('s1-result-active', 'pc-shared-result-active');
+
+  const area = document.getElementById('chat');
+  if (!area) return null;
+  area.innerHTML = '';
+
+  const reviewHTML = reviewTitle && reviewItems.length ? `
+    <section class="s1-babbage-revision-review" aria-label="${esc(reviewTitle)}">
+      <div class="s1-clean-reference-title">${esc(reviewTitle)}</div>
+      ${reviewItems.filter(item => item && item.value).map(item => `
+        <div class="s1-babbage-review-item"><strong>${esc(item.label)}:</strong> ${esc(item.value)}</div>`).join('')}
+    </section>` : '';
+
+  const referenceHTML = referenceTitle && referenceItems.length ? `
+    <div class="s1-clean-reference">
+      <div class="s1-clean-reference-title">${esc(referenceTitle)}</div>
+      ${referenceItems.filter(item => item && item.value).map(item => `
+        <div><strong>${esc(item.label)}:</strong> ${esc(item.value)}</div>`).join('')}
+    </div>` : '';
+
+  const card = document.createElement('div');
+  card.className = 's1-result-card s1-result-card-focused pc-shared-result-card';
+  card.innerHTML = `
+    <div class="s1-result-eyebrow">${esc(eyebrow)}</div>
+    <div class="s1-result-title">${esc(title)}</div>
+    <div class="s1-result-content-box">
+      <div class="s1-result-body">${bodyHTML}</div>
+      ${reviewHTML}
+      ${referenceHTML}
+    </div>`;
+  area.appendChild(card);
+
+  const container = document.getElementById('inputContainer');
+  if (container) {
+    container.className = '';
+    container.style.display = 'block';
+    container.innerHTML = `
+      <div class="s1-result-controls" role="region" aria-label="${esc(controlsTitle)} options">
+        <div>
+          <div class="s1-result-controls-title">${esc(controlsTitle)}</div>
+          <div class="s1-result-controls-sub">${esc(controlsSub)}</div>
+        </div>
+        <div class="s1-result-controls-actions">${controlsActionsHTML}</div>
+      </div>`;
+  }
+
+  try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
+  area.scrollTop = 0;
+  requestAnimationFrame(() => {
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
+    try { area.scrollTop = 0; } catch(e) {}
+  });
+  return card;
+}
+
+
+// ── SHARED GUIDED REPAIR WORKSPACE ───────────────────
+// Scenario 1 proved the numbered 2×2 repair workspace. This scenario-neutral
+// version lets later scenarios reuse the same interaction model while supplying
+// their own field prompts, reference material, assembly logic, and submit action.
+function buildGuidedRepairWorkspaceHTML({
+  referenceHTML = '',
+  titleId = 'pcGuidedRepairTitle',
+  kicker = 'Repair workspace',
+  title = 'Repair the design',
+  instruction = '',
+  fields = [],
+  previewLabel = 'Assembled prompt',
+  previewId = 'pcGuidedRepairPreview',
+  nudgeId = 'pcGuidedRepairNudge',
+  statusId = 'pcGuidedRepairStatus',
+  submitId = 'pcGuidedRepairSubmit',
+  submitLabel = 'Ask Babbage to review',
+  feedbackId = 'pcGuidedRepairFeedback'
+} = {}) {
+  const fieldsHTML = fields.map((field, index) => `
+    <div class="pc-guided-repair-field">
+      <label class="pc-guided-repair-label" for="${esc(field.id)}">
+        <span class="pc-guided-repair-num">${esc(field.number || String(index + 1))}</span>
+        <span>${esc(field.label)}</span>
+      </label>
+      <textarea
+        class="pc-guided-repair-textarea"
+        id="${esc(field.id)}"
+        rows="3"
+        maxlength="${Number(field.maxlength || 700)}"
+        placeholder="${esc(field.placeholder || '')}"
+        aria-label="${esc(field.ariaLabel || field.label)}"
+        data-pc-guided-repair-input="true"></textarea>
+    </div>`).join('');
+
+  return `
+    <div class="pc-guided-repair-layout">
+      <aside class="pc-guided-repair-reference" aria-label="Repair reference">
+        ${referenceHTML}
+      </aside>
+      <section class="pc-guided-repair-builder" aria-labelledby="${esc(titleId)}">
+        <div class="pc-guided-repair-head">
+          <div>
+            <div class="pc-activity-kicker">${esc(kicker)}</div>
+            <h2 id="${esc(titleId)}">${esc(title)}</h2>
+            ${instruction ? `<p class="pc-guided-repair-instruction">${esc(instruction)}</p>` : ''}
+          </div>
+        </div>
+        <div class="pc-guided-repair-fields">${fieldsHTML}</div>
+        <div class="pc-guided-repair-preview-wrap">
+          <div class="pc-guided-repair-preview-label">${esc(previewLabel)}</div>
+          <div class="pc-guided-repair-preview" id="${esc(previewId)}" role="status" aria-live="polite"></div>
+        </div>
+        <div class="pc-guided-repair-actions">
+          <div class="pc-guided-repair-nudge" id="${esc(nudgeId)}"></div>
+          <div class="pc-guided-repair-submit-wrap">
+            <span id="${esc(statusId)}" class="pc-guided-repair-status" role="status" aria-live="polite">0 of ${fields.length} ingredients ready</span>
+            <button class="pc-button pc-button--primary" id="${esc(submitId)}" type="button" disabled>${esc(submitLabel)}</button>
+          </div>
+        </div>
+        <div id="${esc(feedbackId)}" aria-live="polite"></div>
+      </section>
+    </div>`;
+}
+
+function getGuidedRepairValues(fieldIds = []) {
+  return Object.fromEntries(fieldIds.map(id => [id, document.getElementById(id)?.value.trim() || '']));
+}
+
+function wireGuidedRepairWorkspace({
+  fieldIds = [],
+  previewId,
+  nudgeId,
+  statusId,
+  submitId,
+  minLength = 12,
+  buildPreview,
+  onUpdate = null,
+  onSubmit
+} = {}) {
+  const fields = fieldIds.map(id => document.getElementById(id)).filter(Boolean);
+  const preview = document.getElementById(previewId);
+  const nudge = document.getElementById(nudgeId);
+  const status = document.getElementById(statusId);
+  const submit = document.getElementById(submitId);
+  if (!fields.length || !preview || !status || !submit) return false;
+
+  const update = () => {
+    const values = getGuidedRepairValues(fieldIds);
+    const ready = fieldIds.filter(id => (values[id] || '').length >= minLength);
+    const missing = fieldIds.filter(id => !ready.includes(id));
+    const assembled = typeof buildPreview === 'function' ? buildPreview(values) : '';
+
+    preview.textContent = assembled || 'Your repaired reflection prompt will assemble here as you complete the four ingredients.';
+    preview.classList.toggle('is-empty', !assembled);
+    status.textContent = `${ready.length} of ${fieldIds.length} ingredients ready`;
+    submit.disabled = ready.length !== fieldIds.length;
+
+    if (nudge) {
+      if (missing.length) {
+        nudge.style.display = 'block';
+        nudge.innerHTML = `<strong>Pixel's nudge:</strong> Complete each ingredient so the repaired prompt can require evidence, evaluation, and a next move.`;
+      } else {
+        nudge.style.display = 'none';
+        nudge.innerHTML = '';
+      }
+    }
+
+    if (typeof onUpdate === 'function') onUpdate(values, assembled, ready);
+  };
+
+  fields.forEach(field => field.addEventListener('input', () => {
+    if (typeof autoGrow === 'function') autoGrow(field);
+    update();
+  }));
+  if (typeof onSubmit === 'function') submit.addEventListener('click', onSubmit, { once: true });
+  update();
+  return true;
 }
 
 function mountScenarioActivity({
@@ -2395,7 +2592,8 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     title: 'What does Jordan need before he can make an informed next move?',
     instruction: 'Jordan knows what he did and knows the result. Choose what belongs between his strategy and his next decision.',
     variant: 'detail',
-    marker: item => item.tag,
+    marker: () => '',
+    gridClass: 'pc-choice-grid--radio-marker',
     limit: 1,
     choiceGridId: 's2DiagnosisChoices',
     statusId: 's2DiagnosisStatus',
@@ -2462,6 +2660,7 @@ function getS2Data() {
   if (!Array.isArray(data.repairAttempts)) data.repairAttempts = [];
   if (!data.babbageDraft || typeof data.babbageDraft !== 'object') data.babbageDraft = null;
   if (!data.babbageReview || typeof data.babbageReview !== 'object') data.babbageReview = null;
+  if (typeof data.s2ReviewSource !== 'string') data.s2ReviewSource = '';
   return data;
 }
 
@@ -2776,6 +2975,7 @@ function pcCloseS2JordanRecordedDialogue() {
   const dialogue = document.getElementById('vnDialogue');
   dialogue?.classList.remove('pc-s2-recorded-dialogue', 'prediction-question', 'prediction-result');
   dialogue?.querySelector('.vn-skip')?.removeAttribute('hidden');
+  try { pcResetVNDialogueState(); } catch (e) {}
   try { pcClearPredictionPresentationV191(); } catch (e) {}
   try { pcClearPredictionLayoutInlineStylesV186(); } catch (e) {}
   try { pcClearPredictionUI(); } catch (e) {}
@@ -3109,7 +3309,8 @@ function renderS2AuditActivity() {
   const choicesHTML = buildScenarioChoiceCardsHTML({
     items: S2_AUDIT_OPTIONS,
     inputName: 's2-audit',
-    idPrefix: 's2-audit'
+    idPrefix: 's2-audit',
+    marker: () => ''
   });
 
   mountScenarioActivity({
@@ -3136,7 +3337,10 @@ function renderS2AuditActivity() {
               </blockquote>
             </div>
           </section>
-          <p><strong>Babbage's rationale:</strong> ${esc(draft.design_rationale)}</p>
+          <div class="pc-s2-babbage-rationale">
+            <div class="pc-s2-babbage-rationale__label">Why Babbage chose it</div>
+            <p>${esc(draft.design_rationale)}</p>
+          </div>
         </aside>
         ${buildScenarioTaskCardHTML({
           titleId: 's2AuditTitle',
@@ -3148,10 +3352,13 @@ function renderS2AuditActivity() {
           statusId: 's2AuditStatus',
           submitId: 's2AuditSubmit',
           submitLabel: 'Audit the draft',
-          feedbackId: 's2AuditFeedback'
+          feedbackId: 's2AuditFeedback',
+          gridClass: 'pc-choice-grid--radio-marker',
+          includeFeedback: false
         })}
         </div>
-      </div>`,
+      </div>
+      <div class="pc-s2-audit-feedback-wide" id="s2AuditFeedback" aria-live="polite"></div>`,
     focusSelector: 'input[name="s2-audit"]'
   });
 
@@ -3192,9 +3399,93 @@ function submitS2Audit() {
   });
 }
 
+function pcS2RepairFieldConfig() {
+  return [
+    {
+      id: 's2RepairEvidence',
+      key: 'evidence',
+      number: '1',
+      label: 'Evidence to reveal',
+      placeholder: 'What should Jordan have to describe about what he actually did, noticed, or understood?',
+      ariaLabel: 'Describe the learning evidence Jordan should reveal'
+    },
+    {
+      id: 's2RepairEvaluation',
+      key: 'evaluation',
+      number: '2',
+      label: 'Evaluate the strategy',
+      placeholder: 'How should Jordan judge whether the strategy actually helped his learning?',
+      ariaLabel: 'Describe how Jordan should evaluate the learning strategy'
+    },
+    {
+      id: 's2RepairNextMove',
+      key: 'nextMove',
+      number: '3',
+      label: 'Next move',
+      placeholder: 'What should Jordan decide to reuse, change, or try next time based on the evidence?',
+      ariaLabel: 'Describe the next learning move Jordan should decide'
+    },
+    {
+      id: 's2RepairSuccess',
+      key: 'success',
+      number: '4',
+      label: 'Success criteria',
+      placeholder: 'What must a strong reflection include so Jordan cannot answer with only a grade or feeling?',
+      ariaLabel: 'Describe what a strong metacognitive reflection must include'
+    }
+  ];
+}
+
+function pcS2RepairPartsFromValues(values = {}) {
+  return {
+    evidence: values.s2RepairEvidence || '',
+    evaluation: values.s2RepairEvaluation || '',
+    nextMove: values.s2RepairNextMove || '',
+    success: values.s2RepairSuccess || ''
+  };
+}
+
+function pcS2BuildRepairedReflectionPrompt(parts = {}) {
+  const evidence = String(parts.evidence || '').trim();
+  const evaluation = String(parts.evaluation || '').trim();
+  const nextMove = String(parts.nextMove || '').trim();
+  const success = String(parts.success || '').trim();
+  if (![evidence, evaluation, nextMove, success].some(Boolean)) return '';
+
+  const lines = [
+    'After completing the assignment, reflect on how your study strategy affected your learning.'
+  ];
+  if (evidence) lines.push(`1. Evidence — ${evidence}`);
+  if (evaluation) lines.push(`2. Evaluation — ${evaluation}`);
+  if (nextMove) lines.push(`3. Next move — ${nextMove}`);
+  if (success) lines.push(`A strong response should ${success}`);
+  return lines.join('\n');
+}
+
 function renderS2RepairActivity() {
   const data = getS2Data();
   const draft = data.babbageDraft || S2_LOCAL_DRAFT_FALLBACK;
+  const weakness = S2_AUDIT_OPTIONS.find(item => item.id === draft.deliberate_weakness);
+  const fields = pcS2RepairFieldConfig();
+
+  const referenceHTML = `
+    <div class="pc-activity-kicker">Original Babbage draft</div>
+    <h2 class="pc-guided-repair-reference-title">${esc(draft.activity_title)}</h2>
+    <div class="pc-guided-repair-source-prompt">${esc(draft.activity_prompt)}</div>
+    <div class="pc-guided-repair-problem">
+      <div class="pc-guided-repair-problem-label">What the audit found</div>
+      <strong>${esc(weakness?.label || draft.deliberate_weakness)}</strong>
+      <p>${esc(draft.why_the_weakness_matters)}</p>
+    </div>
+    <div class="pc-guided-repair-ingredients" aria-label="Repair ingredients">
+      <div class="pc-guided-repair-ingredients-heading">Repair ingredients</div>
+      <div class="pc-guided-repair-chip-row">
+        <span class="pc-guided-repair-chip" data-pc-repair-chip="evidence">Evidence</span>
+        <span class="pc-guided-repair-chip" data-pc-repair-chip="evaluation">Evaluation</span>
+        <span class="pc-guided-repair-chip" data-pc-repair-chip="nextMove">Next Move</span>
+        <span class="pc-guided-repair-chip" data-pc-repair-chip="success">Success Criteria</span>
+      </div>
+    </div>`;
 
   mountScenarioActivity({
     scenarioIndex: SCENARIO_INDEX.METACOGNITION,
@@ -3202,40 +3493,68 @@ function renderS2RepairActivity() {
     contentHTML: `
       <div class="pc-s2-step-shell">
         ${buildS2CaseContextHTML()}
-        <div class="pc-s2-repair-layout">
-        <aside class="pc-s2-original-draft">
-          <div class="pc-activity-kicker">Original Babbage draft</div>
-          <h3>${esc(draft.activity_title)}</h3>
-          <p>${esc(draft.activity_prompt)}</p>
-        </aside>
-        <section class="pc-activity-card" aria-labelledby="s2RepairTitle">
-          <div class="pc-activity-kicker">Decision 5 · Repair the design</div>
-          <h2 id="s2RepairTitle">Rewrite the reflection so Jordan has to reveal his thinking.</h2>
-          <p class="pc-activity-instruction">You do not need to rewrite everything. Fix the weakness you noticed by making the learning evidence, evaluation, or future decision more explicit.</p>
-          <label class="pc-s2-repair-label" for="s2RepairText">Your repaired reflection prompt</label>
-          <textarea id="s2RepairText" class="pc-s2-repair-textarea" rows="8" maxlength="1800" placeholder="Write the repaired reflection prompt here..."></textarea>
-          <div class="pc-selection-bar">
-            <span id="s2RepairStatus" role="status" aria-live="polite">0 characters</span>
-            <button class="pc-button pc-button--primary" id="s2RepairSubmit" type="button" disabled>Ask Babbage to review the repair</button>
-          </div>
-          <div id="s2RepairFeedback" aria-live="polite"></div>
-        </section>
-        </div>
+        ${buildGuidedRepairWorkspaceHTML({
+          referenceHTML,
+          titleId: 's2RepairTitle',
+          kicker: 'Decision 5 · Repair the design',
+          title: 'Rebuild the reflection so Jordan has to show his thinking.',
+          instruction: 'Fill in the four repair ingredients. PromptCraft will assemble them into the student-facing reflection prompt that Babbage reviews.',
+          fields,
+          previewLabel: 'Your assembled reflection prompt',
+          previewId: 's2RepairPreview',
+          nudgeId: 's2RepairNudge',
+          statusId: 's2RepairStatus',
+          submitId: 's2RepairSubmit',
+          submitLabel: 'Ask Babbage to review the repair',
+          feedbackId: 's2RepairFeedback'
+        })}
       </div>`,
-    focusSelector: '#s2RepairText'
+    focusSelector: '#s2RepairEvidence'
   });
 
-  const text = document.getElementById('s2RepairText');
-  const status = document.getElementById('s2RepairStatus');
-  const submit = document.getElementById('s2RepairSubmit');
-  const update = () => {
-    const value = text.value.trim();
-    status.textContent = `${value.length} characters`;
-    submit.disabled = value.length < 35;
+  const fieldIds = fields.map(field => field.id);
+  wireGuidedRepairWorkspace({
+    fieldIds,
+    previewId: 's2RepairPreview',
+    nudgeId: 's2RepairNudge',
+    statusId: 's2RepairStatus',
+    submitId: 's2RepairSubmit',
+    minLength: 12,
+    buildPreview: values => pcS2BuildRepairedReflectionPrompt(pcS2RepairPartsFromValues(values)),
+    onUpdate: (values, assembled, ready) => {
+      const parts = pcS2RepairPartsFromValues(values);
+      data.repairDraftParts = parts;
+      data.repairDraftText = assembled;
+      const readyKeys = new Set();
+      fields.forEach(field => {
+        if ((values[field.id] || '').length >= 12) readyKeys.add(field.key);
+      });
+      document.querySelectorAll('[data-pc-repair-chip]').forEach(chip => {
+        chip.classList.toggle('covered', readyKeys.has(chip.dataset.pcRepairChip));
+      });
+    },
+    onSubmit: submitS2Repair
+  });
+}
+
+function pcS2BuildLocalReviewFallback(data, repair) {
+  const parts = data.repairParts || {};
+  const improvements = [];
+  if (parts.evidence) improvements.push('The repair asks Jordan to surface evidence from his learning process.');
+  if (parts.evaluation) improvements.push('The repair asks Jordan to judge the strategy instead of reporting only a feeling or grade.');
+  if (parts.nextMove) improvements.push('The repair connects the reflection to a future learning decision.');
+  if (parts.success) improvements.push('The success criteria make the expected metacognitive evidence more explicit.');
+
+  return {
+    status: 'DEMONSTRATION FALLBACK',
+    confidence: 'LOW',
+    feedback_summary: 'Live Babbage review was unavailable. PromptCraft is showing a clearly labeled demonstration review so the scenario can continue; the repaired activity below is the prompt you assembled, not an AI rewrite.',
+    what_improved: improvements.length ? improvements.slice(0, 4) : ['The repair adds more explicit metacognitive structure than the original draft.'],
+    remaining_issue: 'Because this is a local fallback rather than a live AI review, rerun the repair when Babbage is available to receive a model-generated critique and revision.',
+    revised_activity: repair,
+    student_response_after: 'I can point to what I tried, what evidence showed me where my understanding held or broke down, and what I would change on the next assignment.',
+    why_student_thinking_changed: 'The repaired prompt requires Jordan to connect a strategy to evidence, evaluate what happened, and name a next move. This explanation is a demonstration fallback, not a live model judgment.'
   };
-  text.addEventListener('input', update);
-  submit.addEventListener('click', submitS2Repair, { once: true });
-  update();
 }
 
 function pcS2BuildReviewSystemPrompt(data, repair) {
@@ -3253,7 +3572,13 @@ ${draft.activity_prompt}
 Known weakness in the original draft:
 ${draft.deliberate_weakness} — ${draft.why_the_weakness_matters}
 
-Faculty repair:
+Faculty repair ingredients:
+- Evidence to reveal: ${data.repairParts?.evidence || 'Not provided'}
+- Evaluation of the strategy: ${data.repairParts?.evaluation || 'Not provided'}
+- Next move: ${data.repairParts?.nextMove || 'Not provided'}
+- Success criteria: ${data.repairParts?.success || 'Not provided'}
+
+Assembled faculty repair:
 ${repair}
 
 Evaluate the repair specifically. Do not praise it merely for existing. If it is vague, irrelevant, contradictory, demeaning, or fails to require evidence about learning, say so plainly.
@@ -3272,15 +3597,18 @@ The Jordan response should demonstrate metacognition, not merely a better grade 
 
 async function submitS2Repair() {
   const runToken = pcCaptureScenarioRun(SCENARIO_INDEX.METACOGNITION);
-  const text = document.getElementById('s2RepairText');
-  const repair = text?.value.trim() || '';
-  if (repair.length < 35) return;
+  const fieldIds = pcS2RepairFieldConfig().map(field => field.id);
+  const values = getGuidedRepairValues(fieldIds);
+  const parts = pcS2RepairPartsFromValues(values);
+  const repair = pcS2BuildRepairedReflectionPrompt(parts);
+  if (fieldIds.some(id => (values[id] || '').length < 12) || repair.length < 70) return;
 
   const data = getS2Data();
   data.attempts += 1;
-  data.repairAttempts.push({ text: repair, timestamp: new Date().toISOString() });
+  data.repairAttempts.push({ text: repair, parts: { ...parts }, timestamp: new Date().toISOString() });
   data.prompts.push(`S2 repair: ${repair}`);
   data.repairText = repair;
+  data.repairParts = { ...parts };
 
   const submit = document.getElementById('s2RepairSubmit');
   if (submit) submit.disabled = true;
@@ -3302,19 +3630,27 @@ async function submitS2Repair() {
     }, 's2-review');
     if (!pcIsScenarioRunCurrent(runToken)) return false;
 
+    if (response?.mock || response?.provider === 'local-fallback') {
+      throw new Error(`Babbage returned a local fallback (${response?.mockReason || 'backend unavailable'}).`);
+    }
     review = response?.analysis || null;
     if (!review || !review.revised_activity || !review.student_response_after) throw new Error('Incomplete structured review.');
-    data.aiProvider = response.provider || data.aiProvider || '';
-    data.aiModel = response.model || data.aiModel || '';
-    data.aiRequestId = response.request_id || data.aiRequestId || '';
-    data.aiElapsedMs = response.elapsed_ms ?? data.aiElapsedMs;
-    data.aiUsage = response.usage || data.aiUsage || null;
+    data.aiProvider = response.provider || '';
+    data.aiModel = response.model || '';
+    data.aiRequestId = response.request_id || '';
+    data.aiElapsedMs = response.elapsed_ms ?? null;
+    data.aiUsage = response.usage || null;
+    data.s2ReviewSource = 'live';
   } catch (error) {
     if (!pcIsScenarioRunCurrent(runToken)) return false;
-    console.warn('[PromptCraft] S2 Babbage review unavailable; using local fallback.', error);
-    review = { ...S2_LOCAL_REVIEW_FALLBACK };
+    console.warn('[PromptCraft] S2 Babbage review unavailable; using labeled local fallback.', error);
+    review = pcS2BuildLocalReviewFallback(data, repair);
     data.aiProvider = 'local-fallback';
     data.aiModel = 'promptcraft-local-fallback';
+    data.aiRequestId = '';
+    data.aiElapsedMs = null;
+    data.aiUsage = null;
+    data.s2ReviewSource = 'fallback';
   }
 
   data.babbageReview = review;
@@ -3336,59 +3672,48 @@ function renderS2FinalComparison() {
   const data = getS2Data();
   const draft = data.babbageDraft || S2_LOCAL_DRAFT_FALLBACK;
   const review = data.babbageReview || S2_LOCAL_REVIEW_FALLBACK;
-  const improvedItems = Array.isArray(review.what_improved) ? review.what_improved : [String(review.what_improved || '')];
+  const improvedItems = Array.isArray(review.what_improved)
+    ? review.what_improved.filter(Boolean)
+    : [String(review.what_improved || '')].filter(Boolean);
 
   markScenarioComplete();
   saveIncrementalData(SCENARIO_INDEX.METACOGNITION);
 
-  mountScenarioActivity({
-    scenarioIndex: SCENARIO_INDEX.METACOGNITION,
-    progressHTML: buildScenarioProgressHTML({ steps: S2_PROGRESS_STEPS, activeIndex: 4, ariaLabel: 'Scenario 2 progress' }),
-    contentHTML: `
-      <section class="pc-s2-final" aria-labelledby="s2FinalTitle">
-        <div class="pc-s2-final-header">
-          <div class="pc-activity-kicker">Scenario 2 complete · Babbage review</div>
-          <h2 id="s2FinalTitle">${esc(review.status)}</h2>
-          <p>${esc(review.feedback_summary)}</p>
-        </div>
+  const reviewIsFallback = data.s2ReviewSource === 'fallback' || data.aiProvider === 'local-fallback';
+  const reviewEyebrow = reviewIsFallback
+    ? 'Demonstration fallback review · Scenario 2 complete'
+    : `Live Babbage review${data.aiModel ? ` · ${data.aiModel}` : ''} · Scenario 2 complete`;
+  const reviewTitle = reviewIsFallback
+    ? 'Demonstration Review · Babbage unavailable'
+    : "Babbage's Live Review of the Revision";
 
-        <div class="pc-s2-before-after">
-          <article class="pc-s2-comparison-card">
-            <span>BEFORE</span>
-            <h3>Babbage's first draft</h3>
-            <p>${esc(draft.activity_prompt)}</p>
-            <blockquote>${esc(draft.likely_student_response)}</blockquote>
-          </article>
-          <article class="pc-s2-comparison-card is-after">
-            <span>AFTER</span>
-            <h3>Repaired activity</h3>
-            <p>${esc(review.revised_activity)}</p>
-            <blockquote>${esc(review.student_response_after)}</blockquote>
-          </article>
-        </div>
-
-        <div class="pc-s2-review-grid">
-          <article>
-            <h3>What improved</h3>
-            <ul>${improvedItems.filter(Boolean).map(item => `<li>${esc(item)}</li>`).join('')}</ul>
-          </article>
-          <article>
-            <h3>Remaining limitation</h3>
-            <p>${esc(review.remaining_issue)}</p>
-          </article>
-          <article>
-            <h3>Why Jordan's thinking changed</h3>
-            <p>${esc(review.why_student_thinking_changed)}</p>
-          </article>
-        </div>
-
-        <div class="pc-feedback-actions pc-s2-final-actions">
-          <button class="pc-button pc-button--secondary" type="button" data-pc-action="replay-scenario" data-pc-scenario-index="1">Replay Scenario 2</button>
-          <button class="pc-button pc-button--primary" type="button" data-pc-action="open-main-menu" data-pc-panel="scenarios">Return to Scenario Select</button>
-        </div>
-      </section>`
+  pcRenderSharedScenarioResult({
+    eyebrow: reviewEyebrow,
+    title: 'Repaired Reflection Activity',
+    bodyHTML: fmt(review.revised_activity || ''),
+    reviewTitle,
+    reviewItems: [
+      {
+        label: 'Strongest improvement',
+        value: improvedItems.join(' ') || 'The repair makes the intended thinking more visible.'
+      },
+      { label: 'Remaining limitation', value: review.remaining_issue || '' },
+      { label: "Why Jordan's thinking changed", value: review.why_student_thinking_changed || '' }
+    ],
+    referenceTitle: 'Before and after',
+    referenceItems: [
+      { label: 'Original draft', value: draft.activity_prompt || '' },
+      { label: 'Jordan before', value: draft.likely_student_response || '' },
+      { label: 'Jordan after', value: review.student_response_after || '' }
+    ],
+    controlsTitle: 'Scenario 2 result',
+    controlsSub: reviewIsFallback ? 'Live Babbage was unavailable. This result uses the labeled demonstration fallback.' : 'Babbage reviewed your repair live. Choose the next step.',
+    controlsActionsHTML: `
+      <button class="s1-secondary-btn" type="button" data-pc-action="s2-repair-draft">Revise S2</button>
+      <button class="continue-btn" type="button" data-pc-action="navigate-next" data-pc-scenario-index="2">Next scenario →</button>`
   });
   document.querySelector('#inputContainer button')?.focus();
+  return true;
 }
 
 function pcGetLatestS2Selection(attemptKey) {
@@ -5445,11 +5770,17 @@ function pcResetVNCharacters() {
 }
 
 function pcResetVNDialogueState() {
-  document.getElementById('vnDialogue')?.classList.remove(
+  const dialogue = document.getElementById('vnDialogue');
+  dialogue?.classList.remove(
     'has-choices',
     'prediction-question',
     'prediction-result'
   );
+  if (dialogue) {
+    delete dialogue.dataset.pcExplicitAction;
+    dialogue.setAttribute('role', 'button');
+    dialogue.setAttribute('tabindex', '0');
+  }
 }
 
 function pcApplyIpadLayoutV200(){
@@ -5911,6 +6242,7 @@ function pcClearWideAnalysisReportContentStylesV215() {
   const labels = report ? [...report.querySelectorAll('.analysis-label')] : [];
   const values = report ? [...report.querySelectorAll('.analysis-value')] : [];
   const notes = report ? [...report.querySelectorAll('.analysis-note')] : [];
+  report?.classList.remove('analysis-report-overflow-safe');
 
   pcRemoveInlineStyles(output, [
     'position', 'inset', 'left', 'right', 'top', 'bottom', 'width', 'height',
@@ -6039,6 +6371,12 @@ function pcFitWideAnalysisReportV215(screen) {
         : clampNumber(1.02, viewportWidth / 860, viewportHeight >= 1100 ? 1.22 : 1.14))
     : 1;
   const useSingleColumn = screenRect.width < 420 || isCompactAnalysisPanel;
+  const declaredAnalysisCharacters = Number.parseInt(report.dataset.analysisCharacters || '0', 10) || 0;
+  const hasDenseAnalysisContent = declaredAnalysisCharacters >= 820 ||
+    report.classList.contains('analysis-report-dense') ||
+    report.classList.contains('analysis-report-very-dense');
+  const hasVeryDenseAnalysisContent = declaredAnalysisCharacters >= 1100 ||
+    report.classList.contains('analysis-report-very-dense');
   const widthFactor = screenRect.width / 900;
   const heightFactor = screenRect.height / 520;
   const fitFactor = clampNumber(
@@ -6367,6 +6705,70 @@ function pcFitWideAnalysisReportV215(screen) {
     ]);
   };
 
+  // v423: Variable-length Babbage output must never be squeezed into fixed
+  // fractional grid rows. Dense S1 and S2 reports keep the same two-column
+  // visual structure, but their rows become content-sized and the physical
+  // monitor glass owns vertical scrolling. This preserves readable type and
+  // prevents long prompt/report text from painting into neighboring cards.
+  const enableOverflowSafeWideReport = (scale = 0.96) => {
+    applyScale(scale);
+    report.classList.add('analysis-report-scrollable', 'analysis-report-overflow-safe');
+    pcSetImportantStyles(output, [
+      ['display', 'block'],
+      ['overflow-y', 'auto'],
+      ['overflow-x', 'hidden'],
+      ['overscroll-behavior-y', 'contain'],
+      ['touch-action', 'pan-y'],
+      ['scrollbar-gutter', 'stable'],
+      ['box-sizing', 'border-box']
+    ]);
+    pcSetImportantStyles(report, [
+      ['display', 'flex'],
+      ['flex-direction', 'column'],
+      ['height', 'auto'],
+      ['min-height', '100%'],
+      ['overflow', 'visible'],
+      ['box-sizing', 'border-box']
+    ]);
+    pcSetImportantStyles(grid, [
+      ['display', 'grid'],
+      ['grid-template-columns', useSingleColumn ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) minmax(0, 1fr)'],
+      ['grid-template-rows', useSingleColumn ? 'auto auto auto auto auto auto' : 'auto auto auto auto'],
+      ['grid-template-areas', useSingleColumn
+        ? '"status" "confidence" "issue" "repair" "impact" "worked"'
+        : '"status confidence" "issue repair" "impact impact" "worked worked"'],
+      ['height', 'auto'],
+      ['min-height', '0'],
+      ['align-items', 'start'],
+      ['align-content', 'start'],
+      ['overflow', 'visible'],
+      ['flex', '0 0 auto']
+    ]);
+    cards.forEach((card) => pcSetImportantStyles(card, [
+      ['height', 'auto'],
+      ['min-height', 'max-content'],
+      ['align-self', 'stretch'],
+      ['overflow', 'hidden'],
+      ['overflow-wrap', 'anywhere'],
+      ['word-break', 'normal']
+    ]));
+    values.forEach((value) => pcSetImportantStyles(value, [
+      ['display', 'block'],
+      ['position', 'static'],
+      ['white-space', 'normal'],
+      ['overflow-wrap', 'anywhere'],
+      ['word-break', 'break-word']
+    ]));
+    notes.forEach((note) => pcSetImportantStyles(note, [
+      ['display', 'block'],
+      ['position', 'static'],
+      ['white-space', 'normal'],
+      ['overflow-wrap', 'anywhere'],
+      ['word-break', 'break-word']
+    ]));
+    output.scrollTop = 0;
+  };
+
   if (isCompactAnalysisPanel) {
     applyScale(1);
     report.classList.add('analysis-report-scrollable');
@@ -6561,7 +6963,15 @@ function pcFitWideAnalysisReportV215(screen) {
     return true;
   }
 
-  const minScale = 0.48;
+  // Dense desktop reports go directly to the overflow-safe content-sized grid.
+  // Waiting until the fixed-row layout fails can leave one paint frame where
+  // long text overlaps a neighboring box, especially after web fonts settle.
+  if (isWideDesktopMonitor && hasDenseAnalysisContent) {
+    enableOverflowSafeWideReport(hasVeryDenseAnalysisContent ? 0.92 : 0.97);
+    return true;
+  }
+
+  const minScale = 0.72;
   const scaleStep = 0.94;
   const maxPasses = 18;
   let scale = report.classList.contains('analysis-report-very-dense') ? 0.86
@@ -6576,43 +6986,9 @@ function pcFitWideAnalysisReportV215(screen) {
   }
 
   if (!contentFits()) {
-    report.classList.add('analysis-report-scrollable');
-    pcSetImportantStyles(output, [
-      ['display', 'block'],
-      ['overflow-y', 'auto'],
-      ['overflow-x', 'hidden'],
-      ['overscroll-behavior-y', 'contain'],
-      ['touch-action', 'pan-y'],
-      ['scrollbar-gutter', 'stable'],
-      ['box-sizing', 'border-box']
-    ]);
-    pcSetImportantStyles(report, [
-      ['height', 'auto'],
-      ['min-height', '100%'],
-      ['overflow', 'visible']
-    ]);
-    pcSetImportantStyles(grid, [
-      ['grid-template-rows', useSingleColumn
-        ? 'auto auto auto auto auto auto'
-        : 'auto auto auto auto'],
-      ['height', 'auto'],
-      ['min-height', '0'],
-      ['align-items', 'start'],
-      ['align-content', 'start'],
-      ['overflow', 'visible'],
-      ['flex', '0 0 auto']
-    ]);
-    cards.forEach((card) => pcSetImportantStyles(card, [
-      ['height', 'auto'],
-      ['min-height', 'max-content'],
-      ['align-self', 'start'],
-      ['overflow', 'hidden'],
-      ['overflow-wrap', 'anywhere'],
-      ['word-break', 'normal']
-    ]));
-    output.scrollTop = 0;
+    enableOverflowSafeWideReport(Math.max(0.88, scale));
   } else {
-    report.classList.remove('analysis-report-scrollable');
+    report.classList.remove('analysis-report-scrollable', 'analysis-report-overflow-safe');
   }
 
   return true;
@@ -8186,6 +8562,17 @@ function showBabbageTerminalReport({
     if (output) output.scrollTop = 0;
   });
 
+  // v423: Font metrics can settle after the first report pass. Re-run the
+  // shared layout once fonts are ready so long user/AI text cannot outgrow a
+  // card after its initial measurements were captured.
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(() => {
+      if (output?.classList.contains('claude-analysis-layout') && pcIsAnalysisReportActiveV122()) {
+        pcScheduleAnalysisLayoutV255({ immediate: true });
+      }
+    }).catch(() => {});
+  }
+
   const speaker = document.getElementById('vnSpeaker');
   if (speaker) speaker.textContent = speakerName;
 
@@ -8626,6 +9013,13 @@ pcRegisterUIActions({
 
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');
+  const dialogue = document.getElementById('vnDialogue');
+
+  // Shared workstation-result scenes contain their own explicit action button.
+  // Clicking the surrounding dialogue surface must never consume the VN state;
+  // otherwise the text can clear without running the scenario transition that
+  // unlocks the next activity.
+  if (dialogue?.dataset.pcExplicitAction === 'true') return;
 
   // HARD STOP: during Babbage terminal/thinking screens, clicks on the black
   // dialogue panel must NOT advance or clear the VN text. Only the explicit
@@ -8980,6 +9374,78 @@ function pcFillS1DevFields() {
   tryFill();
 }
 
+function pcFillS2DevRepairFields() {
+  const values = {
+    s2RepairEvidence: 'Describe one specific sign of what you could explain without notes and where your understanding still broke down.',
+    s2RepairEvaluation: 'Compare that evidence with the strategy you used and explain which part actually helped or failed to help your understanding.',
+    s2RepairNextMove: 'Decide what you will keep, change, or try next time based on that evidence instead of the grade alone.',
+    s2RepairSuccess: 'include the strategy, specific learning evidence, a judgment about why it worked or failed, and one evidence-based next move.'
+  };
+
+  const tryFill = (attempts = 0) => {
+    const fields = Object.keys(values).map(id => document.getElementById(id));
+    if (fields.every(Boolean)) {
+      Object.entries(values).forEach(([id, value]) => {
+        const field = document.getElementById(id);
+        field.value = value;
+        if (typeof autoGrow === 'function') autoGrow(field);
+        field.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      document.getElementById('s2RepairEvidence')?.focus({ preventScroll: true });
+      return true;
+    }
+    if (attempts < 30) pcScheduleScenarioTask(() => tryFill(attempts + 1), 80, SCENARIO_INDEX.METACOGNITION);
+    return false;
+  };
+
+  return tryFill();
+}
+
+function resetS2Dev() {
+  // The plain S2 DEV button still opens the scenario normally. S2 ✏️ is the
+  // fast-path for layout/content testing: establish one coherent successful
+  // run through Decisions 1–4, open Decision 5, then populate its guided fields.
+  pcActivateScenario(SCENARIO_INDEX.METACOGNITION, { playIntroduction: false });
+  const data = getS2Data();
+  const now = new Date().toISOString();
+
+  data.attempts = 4;
+  data.prompts = [
+    'S2 diagnosis: Evidence of what the strategy actually did',
+    'S2 intervention: Make the strategy produce evidence',
+    'S2 thinking move: evaluate',
+    'S2 audit: no_evidence'
+  ];
+  data.diagnosisAttempts = [{ selection: ['evidence'], result: 'strong', timestamp: now }];
+  data.diagnosisFinal = ['evidence'];
+  data.evidenceAttempts = [{ selection: ['evidence_check'], exact: true, consequence: 'Now Jordan has evidence he can act on.', timestamp: now }];
+  data.evidenceFinal = ['evidence_check'];
+  data.thinkingMoveAttempts = [{ selection: 'evaluate', timestamp: now }];
+  data.thinkingMove = 'evaluate';
+  data.auditAttempts = [{ selection: 'no_evidence', exact: true, weakness: 'no_evidence', timestamp: now }];
+  data.repairAttempts = [];
+  data.repairText = '';
+  data.repairParts = {};
+  data.repairDraftParts = {};
+  data.repairDraftText = '';
+  data.babbageDraft = { ...S2_LOCAL_DRAFT_FALLBACK };
+  data.babbageReview = null;
+  data.s2ReviewSource = '';
+  data.structuredAnalysis = { s2_draft: data.babbageDraft };
+  data.finalResponse = data.babbageDraft.activity_prompt;
+  data.lastEvidenceFeedback = {
+    heading: 'Now Jordan has evidence he can act on.',
+    copy: 'Jordan is no longer guessing from a feeling or grade. He monitored understanding, connected evidence to the strategy, and made a decision.',
+    tone: 'strong',
+    choice: 'evidence_check'
+  };
+  data.openingCheckpointReached = true;
+
+  renderS2RepairActivity();
+  pcScheduleScenarioTask(pcFillS2DevRepairFields, 90, SCENARIO_INDEX.METACOGNITION);
+  return false;
+}
+
 function resetS1Dev() {
     resetScenarioRunState(SCENARIO_INDEX.ENGAGEMENT);
 
@@ -9032,7 +9498,9 @@ function resetS1Dev() {
 pcExposeGlobals({
   pcClearVNStateForScenarioSwitch,
   pcFillS1DevFields,
-  resetS1Dev
+  pcFillS2DevRepairFields,
+  resetS1Dev,
+  resetS2Dev
 });
 
 function prepareScenarioShell(index) {
@@ -10860,9 +11328,12 @@ function pcShowSharedWorkstationResult({
   if (dialogue) {
     dialogue.classList.remove('has-choices', 'prediction-question');
     dialogue.classList.add('prediction-result');
+    dialogue.dataset.pcExplicitAction = 'true';
+    dialogue.setAttribute('role', 'group');
+    dialogue.setAttribute('tabindex', '-1');
     dialogue.setAttribute(
       'aria-label',
-      ariaLabel || `${speakerName} result. Continue when ready.`
+      ariaLabel || `${speakerName} result. Use the Continue button to proceed.`
     );
     dialogue.style.removeProperty('display');
   }
@@ -11161,6 +11632,7 @@ if (!window.__pcPredictionWatchdogBound) {
   function devFillScenario(index) {
     const target = pcNormalizeScenarioIndex(index, SCENARIO_INDEX.ENGAGEMENT);
     if (target === SCENARIO_INDEX.ENGAGEMENT) return resetS1Dev();
+    if (target === SCENARIO_INDEX.METACOGNITION) return resetS2Dev();
     return devGoScenario(target);
   }
 
