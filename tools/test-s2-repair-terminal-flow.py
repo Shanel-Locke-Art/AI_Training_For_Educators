@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import re
+ROOT = Path(__file__).resolve().parents[1]
+proto = (ROOT/'functions/app-scenario-prototypes.js').read_text()
+shared = (ROOT/'functions/app-scenario-shared.js').read_text()
+bundle = (ROOT/'functions/app.bundle.js').read_text()
+css = (ROOT/'styles/promptcraft.css').read_text()
+idx = (ROOT/'index.html').read_text()
+
+checks = {
+  'S2 requests shared full-width preview': "previewFullWidth: true" in proto,
+  'shared workspace supports full-width footer': 'pc-guided-repair-footer' in shared and 'previewFullWidth = false' in shared,
+  'inline review feedback removed': "panelId: 's2RepairFeedback'" not in proto,
+  'loading terminal used before review request': "showClaudeConsultOverlay('Repair review'" in proto,
+  'repair review maps to diagnostic sections': 'pcS2BuildRepairReviewDiagnosticText' in proto,
+  'shared analysis report shown after review': 'showBabbageTerminalReport({' in proto,
+  'final result waits for terminal Continue': 'onClose: () =>' in proto and 'renderS2FinalComparison();' in proto,
+  'compiled bundle synchronized': all(x in bundle for x in ['previewFullWidth: true','pcS2BuildRepairReviewDiagnosticText','pc-guided-repair-footer']),
+  'compiled CSS has full-width footer': '.pc-guided-repair-layout--full-preview .pc-guided-repair-footer' in css,
+  'cache bumped': 'promptcraft.css?v=429' in idx and 'app.bundle.js?v=429&amp;receiver=77' in idx,
+}
+failed=[k for k,v in checks.items() if not v]
+for k,v in checks.items(): print(('PASS' if v else 'FAIL'), k)
+if failed: raise SystemExit('Failed: '+', '.join(failed))

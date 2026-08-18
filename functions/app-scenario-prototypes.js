@@ -975,6 +975,7 @@ function renderS2RepairActivity() {
           fields,
           previewLabel: 'Your assembled reflection prompt',
           previewId: 's2RepairPreview',
+          previewFullWidth: true,
           nudgeId: 's2RepairNudge',
           statusId: 's2RepairStatus',
           submitId: 's2RepairSubmit',
@@ -1068,6 +1069,71 @@ Then produce:
 The Jordan response should demonstrate metacognition, not merely a better grade or positive feeling.`;
 }
 
+function pcS2BuildRepairReviewDiagnosticText(review = {}) {
+  const improved = Array.isArray(review.what_improved)
+    ? review.what_improved.filter(Boolean).join(' • ')
+    : String(review.what_improved || '').trim();
+
+  return [
+    'STATUS',
+    review.status || 'REPAIR REVIEW COMPLETE',
+    '',
+    'CONFIDENCE',
+    review.confidence || 'HIGH',
+    '',
+    'FEEDBACK SUMMARY',
+    review.feedback_summary || 'Babbage reviewed the repair against Jordan’s metacognitive learning gap.',
+    '',
+    'WHAT WORKED',
+    improved || 'The repaired reflection makes Jordan’s learning process more visible and gives him a clearer basis for evaluating the strategy.',
+    '',
+    'ISSUE DETECTED',
+    review.remaining_issue || 'No major remaining issue was identified in the repaired reflection.',
+    '',
+    'RECOMMENDED REPAIR',
+    review.revised_activity || 'Keep the assembled reflection focused on evidence, evaluation, and a next move.',
+    '',
+    'EXPECTED IMPACT',
+    review.why_student_thinking_changed || 'Jordan must connect a strategy to learning evidence before deciding what to do next.'
+  ].join('\n');
+}
+
+function pcS2ShowRepairReviewAnalysis(data, review, runToken) {
+  if (!pcIsScenarioRunCurrent(runToken)) return false;
+
+  const isFallback = data.s2ReviewSource === 'fallback' || data.aiProvider === 'local-fallback';
+  const diagnosticText = pcS2BuildRepairReviewDiagnosticText(review);
+
+  if (typeof pcMarkClaudeResponseParsedV360 === 'function') pcMarkClaudeResponseParsedV360();
+  if (typeof pcCompleteClaudeAnalysisProgressV360 === 'function') pcCompleteClaudeAnalysisProgressV360();
+
+  const reveal = () => {
+    if (!pcIsScenarioRunCurrent(runToken)) return false;
+    return showBabbageTerminalReport({
+      reportHTML: buildClaudeAnalysisHTML(diagnosticText, isFallback, isFallback ? 'backend-unavailable' : ''),
+      terminalStateText: `${isFallback ? 'BACKEND FALLBACK ANALYSIS' : 'ANALYSIS COMPLETE'}\n\n${diagnosticText}`,
+      engineLabel: isFallback ? 'DEMONSTRATION BABBAGE ENGINE' : 'BABBAGE ENGINE',
+      speakerName: 'Professor Pixel',
+      onClose: () => {
+        if (pcIsScenarioRunCurrent(runToken)) renderS2FinalComparison();
+      },
+      readLabel: '🔊 Read Analysis',
+      continueLabel: 'Continue',
+      ariaLabel: 'Babbage analysis of the repaired reflection activity'
+    });
+  };
+
+  const delay = typeof pcGetClaudeProcessingHoldMsV316 === 'function'
+    ? Math.min(180, pcGetClaudeProcessingHoldMsV316())
+    : 120;
+  if (typeof pcScheduleScenarioTask === 'function') {
+    pcScheduleScenarioTask(reveal, delay, SCENARIO_INDEX.METACOGNITION);
+  } else {
+    window.setTimeout(reveal, delay);
+  }
+  return true;
+}
+
 async function submitS2Repair() {
   const runToken = pcCaptureScenarioRun(SCENARIO_INDEX.METACOGNITION);
   const fieldIds = pcS2RepairFieldConfig().map(field => field.id);
@@ -1086,12 +1152,13 @@ async function submitS2Repair() {
   const submit = document.getElementById('s2RepairSubmit');
   if (submit) submit.disabled = true;
 
-  renderScenarioFeedback({
-    panelId: 's2RepairFeedback',
-    tone: 'developing',
-    heading: 'Babbage is reviewing your repair.',
-    text: 'The review compares your wording with Jordan’s actual metacognitive gap instead of scoring the prompt by length or polish.'
-  });
+  if (typeof showClaudeConsultOverlay === 'function') {
+    showClaudeConsultOverlay('Repair review', {
+      speakerName: 'Professor Pixel',
+      heading: 'Babbage is reviewing your repair.',
+      body: 'It is comparing your assembled reflection prompt with Jordan’s learning-process gap.'
+    });
+  }
 
   let review;
   try {
@@ -1137,7 +1204,7 @@ async function submitS2Repair() {
   data.currentScore = 5;
   data.oscqrLit = 'Metacognitive reflection; learner self-evaluation; future strategy transfer';
 
-  renderS2FinalComparison();
+  pcS2ShowRepairReviewAnalysis(data, review, runToken);
 }
 
 function renderS2FinalComparison() {

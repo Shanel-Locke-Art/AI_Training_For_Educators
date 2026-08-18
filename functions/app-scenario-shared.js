@@ -137,7 +137,8 @@ function buildScenarioTaskCardHTML({
   submitId,
   submitLabel,
   feedbackId,
-  gridClass = ''
+  gridClass = '',
+  includeFeedback = true
 } = {}) {
   return `
     <section class="pc-activity-card pc-activity-task" aria-labelledby="${esc(titleId)}">
@@ -149,8 +150,82 @@ function buildScenarioTaskCardHTML({
         <span id="${esc(statusId)}" role="status" aria-live="polite">0 selected</span>
         <button class="pc-button pc-button--primary" id="${esc(submitId)}" type="button" disabled>${esc(submitLabel)}</button>
       </div>
-      <div id="${esc(feedbackId)}" aria-live="polite"></div>
+      ${includeFeedback && feedbackId ? `<div id="${esc(feedbackId)}" aria-live="polite"></div>` : ''}
     </section>`;
+}
+
+// ── SHARED SCENARIO RESULT PAGE ─────────────────────
+// Scenario 1 established the final-result presentation: one focused parchment
+// card, one review panel, one reference panel, and a persistent action bar.
+// Later scenarios feed content into this renderer rather than inventing a new
+// completion screen. The legacy S1 class names remain the visual owner so the
+// two scenarios literally share the same layout and responsive behavior.
+function pcRenderSharedScenarioResult({
+  eyebrow = 'Babbage result',
+  title = 'Revised activity',
+  bodyHTML = '',
+  reviewTitle = '',
+  reviewItems = [],
+  referenceTitle = '',
+  referenceItems = [],
+  controlsTitle = 'Scenario result',
+  controlsSub = '',
+  controlsActionsHTML = ''
+} = {}) {
+  document.body.classList.remove('pc-scenario-activity-active');
+  document.body.classList.add('s1-result-active', 'pc-shared-result-active');
+
+  const area = document.getElementById('chat');
+  if (!area) return null;
+  area.innerHTML = '';
+
+  const reviewHTML = reviewTitle && reviewItems.length ? `
+    <section class="s1-babbage-revision-review" aria-label="${esc(reviewTitle)}">
+      <div class="s1-clean-reference-title">${esc(reviewTitle)}</div>
+      ${reviewItems.filter(item => item && item.value).map(item => `
+        <div class="s1-babbage-review-item"><strong>${esc(item.label)}:</strong> ${esc(item.value)}</div>`).join('')}
+    </section>` : '';
+
+  const referenceHTML = referenceTitle && referenceItems.length ? `
+    <div class="s1-clean-reference">
+      <div class="s1-clean-reference-title">${esc(referenceTitle)}</div>
+      ${referenceItems.filter(item => item && item.value).map(item => `
+        <div><strong>${esc(item.label)}:</strong> ${esc(item.value)}</div>`).join('')}
+    </div>` : '';
+
+  const card = document.createElement('div');
+  card.className = 's1-result-card s1-result-card-focused pc-shared-result-card';
+  card.innerHTML = `
+    <div class="s1-result-eyebrow">${esc(eyebrow)}</div>
+    <div class="s1-result-title">${esc(title)}</div>
+    <div class="s1-result-content-box">
+      <div class="s1-result-body">${bodyHTML}</div>
+      ${reviewHTML}
+      ${referenceHTML}
+    </div>`;
+  area.appendChild(card);
+
+  const container = document.getElementById('inputContainer');
+  if (container) {
+    container.className = '';
+    container.style.display = 'block';
+    container.innerHTML = `
+      <div class="s1-result-controls" role="region" aria-label="${esc(controlsTitle)} options">
+        <div>
+          <div class="s1-result-controls-title">${esc(controlsTitle)}</div>
+          <div class="s1-result-controls-sub">${esc(controlsSub)}</div>
+        </div>
+        <div class="s1-result-controls-actions">${controlsActionsHTML}</div>
+      </div>`;
+  }
+
+  try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
+  area.scrollTop = 0;
+  requestAnimationFrame(() => {
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch(e) { window.scrollTo(0, 0); }
+    try { area.scrollTop = 0; } catch(e) {}
+  });
+  return card;
 }
 
 
@@ -171,7 +246,8 @@ function buildGuidedRepairWorkspaceHTML({
   statusId = 'pcGuidedRepairStatus',
   submitId = 'pcGuidedRepairSubmit',
   submitLabel = 'Ask Babbage to review',
-  feedbackId = 'pcGuidedRepairFeedback'
+  feedbackId = 'pcGuidedRepairFeedback',
+  previewFullWidth = false
 } = {}) {
   const fieldsHTML = fields.map((field, index) => `
     <div class="pc-guided-repair-field">
@@ -189,8 +265,23 @@ function buildGuidedRepairWorkspaceHTML({
         data-pc-guided-repair-input="true"></textarea>
     </div>`).join('');
 
+  const previewHTML = `
+    <div class="pc-guided-repair-preview-wrap">
+      <div class="pc-guided-repair-preview-label">${esc(previewLabel)}</div>
+      <div class="pc-guided-repair-preview" id="${esc(previewId)}" role="status" aria-live="polite"></div>
+    </div>`;
+
+  const actionsHTML = `
+    <div class="pc-guided-repair-actions">
+      <div class="pc-guided-repair-nudge" id="${esc(nudgeId)}"></div>
+      <div class="pc-guided-repair-submit-wrap">
+        <span id="${esc(statusId)}" class="pc-guided-repair-status" role="status" aria-live="polite">0 of ${fields.length} ingredients ready</span>
+        <button class="pc-button pc-button--primary" id="${esc(submitId)}" type="button" disabled>${esc(submitLabel)}</button>
+      </div>
+    </div>`;
+
   return `
-    <div class="pc-guided-repair-layout">
+    <div class="pc-guided-repair-layout${previewFullWidth ? ' pc-guided-repair-layout--full-preview' : ''}">
       <aside class="pc-guided-repair-reference" aria-label="Repair reference">
         ${referenceHTML}
       </aside>
@@ -203,19 +294,11 @@ function buildGuidedRepairWorkspaceHTML({
           </div>
         </div>
         <div class="pc-guided-repair-fields">${fieldsHTML}</div>
-        <div class="pc-guided-repair-preview-wrap">
-          <div class="pc-guided-repair-preview-label">${esc(previewLabel)}</div>
-          <div class="pc-guided-repair-preview" id="${esc(previewId)}" role="status" aria-live="polite"></div>
-        </div>
-        <div class="pc-guided-repair-actions">
-          <div class="pc-guided-repair-nudge" id="${esc(nudgeId)}"></div>
-          <div class="pc-guided-repair-submit-wrap">
-            <span id="${esc(statusId)}" class="pc-guided-repair-status" role="status" aria-live="polite">0 of ${fields.length} ingredients ready</span>
-            <button class="pc-button pc-button--primary" id="${esc(submitId)}" type="button" disabled>${esc(submitLabel)}</button>
-          </div>
-        </div>
-        <div id="${esc(feedbackId)}" aria-live="polite"></div>
+        ${previewFullWidth ? '' : previewHTML}
+        ${previewFullWidth ? '' : actionsHTML}
+        ${previewFullWidth ? '' : `<div id="${esc(feedbackId)}" aria-live="polite"></div>`}
       </section>
+      ${previewFullWidth ? `<div class="pc-guided-repair-footer">${previewHTML}${actionsHTML}<div id="${esc(feedbackId)}" aria-live="polite"></div></div>` : ''}
     </div>`;
 }
 

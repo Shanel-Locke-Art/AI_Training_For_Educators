@@ -1674,7 +1674,8 @@ function buildGuidedRepairWorkspaceHTML({
   statusId = 'pcGuidedRepairStatus',
   submitId = 'pcGuidedRepairSubmit',
   submitLabel = 'Ask Babbage to review',
-  feedbackId = 'pcGuidedRepairFeedback'
+  feedbackId = 'pcGuidedRepairFeedback',
+  previewFullWidth = false
 } = {}) {
   const fieldsHTML = fields.map((field, index) => `
     <div class="pc-guided-repair-field">
@@ -1692,8 +1693,23 @@ function buildGuidedRepairWorkspaceHTML({
         data-pc-guided-repair-input="true"></textarea>
     </div>`).join('');
 
+  const previewHTML = `
+    <div class="pc-guided-repair-preview-wrap">
+      <div class="pc-guided-repair-preview-label">${esc(previewLabel)}</div>
+      <div class="pc-guided-repair-preview" id="${esc(previewId)}" role="status" aria-live="polite"></div>
+    </div>`;
+
+  const actionsHTML = `
+    <div class="pc-guided-repair-actions">
+      <div class="pc-guided-repair-nudge" id="${esc(nudgeId)}"></div>
+      <div class="pc-guided-repair-submit-wrap">
+        <span id="${esc(statusId)}" class="pc-guided-repair-status" role="status" aria-live="polite">0 of ${fields.length} ingredients ready</span>
+        <button class="pc-button pc-button--primary" id="${esc(submitId)}" type="button" disabled>${esc(submitLabel)}</button>
+      </div>
+    </div>`;
+
   return `
-    <div class="pc-guided-repair-layout">
+    <div class="pc-guided-repair-layout${previewFullWidth ? ' pc-guided-repair-layout--full-preview' : ''}">
       <aside class="pc-guided-repair-reference" aria-label="Repair reference">
         ${referenceHTML}
       </aside>
@@ -1706,19 +1722,11 @@ function buildGuidedRepairWorkspaceHTML({
           </div>
         </div>
         <div class="pc-guided-repair-fields">${fieldsHTML}</div>
-        <div class="pc-guided-repair-preview-wrap">
-          <div class="pc-guided-repair-preview-label">${esc(previewLabel)}</div>
-          <div class="pc-guided-repair-preview" id="${esc(previewId)}" role="status" aria-live="polite"></div>
-        </div>
-        <div class="pc-guided-repair-actions">
-          <div class="pc-guided-repair-nudge" id="${esc(nudgeId)}"></div>
-          <div class="pc-guided-repair-submit-wrap">
-            <span id="${esc(statusId)}" class="pc-guided-repair-status" role="status" aria-live="polite">0 of ${fields.length} ingredients ready</span>
-            <button class="pc-button pc-button--primary" id="${esc(submitId)}" type="button" disabled>${esc(submitLabel)}</button>
-          </div>
-        </div>
-        <div id="${esc(feedbackId)}" aria-live="polite"></div>
+        ${previewFullWidth ? '' : previewHTML}
+        ${previewFullWidth ? '' : actionsHTML}
+        ${previewFullWidth ? '' : `<div id="${esc(feedbackId)}" aria-live="polite"></div>`}
       </section>
+      ${previewFullWidth ? `<div class="pc-guided-repair-footer">${previewHTML}${actionsHTML}<div id="${esc(feedbackId)}" aria-live="polite"></div></div>` : ''}
     </div>`;
 }
 
@@ -3502,6 +3510,7 @@ function renderS2RepairActivity() {
           fields,
           previewLabel: 'Your assembled reflection prompt',
           previewId: 's2RepairPreview',
+          previewFullWidth: true,
           nudgeId: 's2RepairNudge',
           statusId: 's2RepairStatus',
           submitId: 's2RepairSubmit',
@@ -3595,6 +3604,71 @@ Then produce:
 The Jordan response should demonstrate metacognition, not merely a better grade or positive feeling.`;
 }
 
+function pcS2BuildRepairReviewDiagnosticText(review = {}) {
+  const improved = Array.isArray(review.what_improved)
+    ? review.what_improved.filter(Boolean).join(' • ')
+    : String(review.what_improved || '').trim();
+
+  return [
+    'STATUS',
+    review.status || 'REPAIR REVIEW COMPLETE',
+    '',
+    'CONFIDENCE',
+    review.confidence || 'HIGH',
+    '',
+    'FEEDBACK SUMMARY',
+    review.feedback_summary || 'Babbage reviewed the repair against Jordan’s metacognitive learning gap.',
+    '',
+    'WHAT WORKED',
+    improved || 'The repaired reflection makes Jordan’s learning process more visible and gives him a clearer basis for evaluating the strategy.',
+    '',
+    'ISSUE DETECTED',
+    review.remaining_issue || 'No major remaining issue was identified in the repaired reflection.',
+    '',
+    'RECOMMENDED REPAIR',
+    review.revised_activity || 'Keep the assembled reflection focused on evidence, evaluation, and a next move.',
+    '',
+    'EXPECTED IMPACT',
+    review.why_student_thinking_changed || 'Jordan must connect a strategy to learning evidence before deciding what to do next.'
+  ].join('\n');
+}
+
+function pcS2ShowRepairReviewAnalysis(data, review, runToken) {
+  if (!pcIsScenarioRunCurrent(runToken)) return false;
+
+  const isFallback = data.s2ReviewSource === 'fallback' || data.aiProvider === 'local-fallback';
+  const diagnosticText = pcS2BuildRepairReviewDiagnosticText(review);
+
+  if (typeof pcMarkClaudeResponseParsedV360 === 'function') pcMarkClaudeResponseParsedV360();
+  if (typeof pcCompleteClaudeAnalysisProgressV360 === 'function') pcCompleteClaudeAnalysisProgressV360();
+
+  const reveal = () => {
+    if (!pcIsScenarioRunCurrent(runToken)) return false;
+    return showBabbageTerminalReport({
+      reportHTML: buildClaudeAnalysisHTML(diagnosticText, isFallback, isFallback ? 'backend-unavailable' : ''),
+      terminalStateText: `${isFallback ? 'BACKEND FALLBACK ANALYSIS' : 'ANALYSIS COMPLETE'}\n\n${diagnosticText}`,
+      engineLabel: isFallback ? 'DEMONSTRATION BABBAGE ENGINE' : 'BABBAGE ENGINE',
+      speakerName: 'Professor Pixel',
+      onClose: () => {
+        if (pcIsScenarioRunCurrent(runToken)) renderS2FinalComparison();
+      },
+      readLabel: '🔊 Read Analysis',
+      continueLabel: 'Continue',
+      ariaLabel: 'Babbage analysis of the repaired reflection activity'
+    });
+  };
+
+  const delay = typeof pcGetClaudeProcessingHoldMsV316 === 'function'
+    ? Math.min(180, pcGetClaudeProcessingHoldMsV316())
+    : 120;
+  if (typeof pcScheduleScenarioTask === 'function') {
+    pcScheduleScenarioTask(reveal, delay, SCENARIO_INDEX.METACOGNITION);
+  } else {
+    window.setTimeout(reveal, delay);
+  }
+  return true;
+}
+
 async function submitS2Repair() {
   const runToken = pcCaptureScenarioRun(SCENARIO_INDEX.METACOGNITION);
   const fieldIds = pcS2RepairFieldConfig().map(field => field.id);
@@ -3613,12 +3687,13 @@ async function submitS2Repair() {
   const submit = document.getElementById('s2RepairSubmit');
   if (submit) submit.disabled = true;
 
-  renderScenarioFeedback({
-    panelId: 's2RepairFeedback',
-    tone: 'developing',
-    heading: 'Babbage is reviewing your repair.',
-    text: 'The review compares your wording with Jordan’s actual metacognitive gap instead of scoring the prompt by length or polish.'
-  });
+  if (typeof showClaudeConsultOverlay === 'function') {
+    showClaudeConsultOverlay('Repair review', {
+      speakerName: 'Professor Pixel',
+      heading: 'Babbage is reviewing your repair.',
+      body: 'It is comparing your assembled reflection prompt with Jordan’s learning-process gap.'
+    });
+  }
 
   let review;
   try {
@@ -3664,7 +3739,7 @@ async function submitS2Repair() {
   data.currentScore = 5;
   data.oscqrLit = 'Metacognitive reflection; learner self-evaluation; future strategy transfer';
 
-  renderS2FinalComparison();
+  pcS2ShowRepairReviewAnalysis(data, review, runToken);
 }
 
 function renderS2FinalComparison() {
@@ -6509,9 +6584,12 @@ function pcFitWideAnalysisReportV215(screen) {
   pcSetImportantStyles(grid, [
     ['display', 'grid'],
     ['grid-template-columns', useSingleColumn ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) minmax(0, 1fr)'],
+    // v428: Diagnostic copy is variable-length. Rows must be content-sized from
+    // the first paint; fractional rows can be shorter than their cards and make
+    // lower findings appear to collide before overflow-safe scrolling engages.
     ['grid-template-rows', useSingleColumn
       ? 'auto auto auto auto auto auto'
-      : 'minmax(0, .62fr) minmax(0, 1.18fr) minmax(0, .78fr) minmax(0, 1.02fr)'],
+      : 'auto auto auto auto'],
     ['grid-template-areas', useSingleColumn
       ? '"status" "confidence" "issue" "repair" "impact" "worked"'
       : '"status confidence" "issue repair" "impact impact" "worked worked"'],
@@ -6521,8 +6599,8 @@ function pcFitWideAnalysisReportV215(screen) {
     ['min-height', '0'],
     ['margin', '0'],
     ['align-items', 'stretch'],
-    ['align-content', 'stretch'],
-    ['flex', '1 1 auto'],
+    ['align-content', 'start'],
+    ['flex', '0 0 auto'],
     ['box-sizing', 'border-box']
   ]);
 
@@ -6608,7 +6686,8 @@ function pcFitWideAnalysisReportV215(screen) {
       ['padding', `${scaled(base.cardPadding, 4)}px`],
       ['min-width', '0'],
       ['min-height', '0'],
-      ['height', '100%'],
+      ['height', 'auto'],
+      ['align-self', 'stretch'],
       ['border-width', '1px'],
       ['border-radius', `${scaled(8, 5)}px`],
       ['box-shadow', 'inset 0 0 12px rgba(42,255,91,.04)'],
@@ -6737,6 +6816,9 @@ function pcFitWideAnalysisReportV215(screen) {
       ['grid-template-areas', useSingleColumn
         ? '"status" "confidence" "issue" "repair" "impact" "worked"'
         : '"status confidence" "issue repair" "impact impact" "worked worked"'],
+      ['grid-auto-rows', 'max-content'],
+      ['row-gap', `${Math.max(8, Math.round((base.gap * scale) + 3))}px`],
+      ['column-gap', `${Math.max(4, Math.round(base.gap * scale))}px`],
       ['height', 'auto'],
       ['min-height', '0'],
       ['align-items', 'start'],

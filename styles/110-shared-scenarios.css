@@ -246,31 +246,6 @@ body.pc-scenario-activity-active #inputContainer {
   font-weight: 800;
 }
 
-/* Shared single-select marker. S2 Diagnose established this radio treatment;
-   later single-choice screens reuse it instead of reverting to numbered tiles. */
-.pc-choice-grid--radio-marker .pc-choice-marker {
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 1px solid var(--border-strong);
-  border-radius: 50%;
-  background: #fff;
-  font-size: 0;
-}
-
-.pc-choice-grid--radio-marker .pc-choice-marker::after {
-  content: "";
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: transparent;
-}
-
-.pc-choice-grid--radio-marker .pc-choice-card:has(input:checked) .pc-choice-marker::after,
-.pc-choice-grid--radio-marker .pc-choice-card.selected .pc-choice-marker::after {
-  background: var(--forest);
-}
-
 .pc-choice-copy {
   color: var(--ink-mid);
   line-height: 1.45;
@@ -1488,6 +1463,32 @@ html body .pc-guided-repair-status {
   }
 }
 
+
+
+/* V429 — Full-width guided repair preview. The reference/learning-process area
+   and repair builder remain side by side; the assembled student-facing prompt
+   becomes a shared full-width conclusion beneath both columns. */
+html body .pc-guided-repair-layout--full-preview .pc-guided-repair-footer {
+  grid-column: 1 / -1 !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+html body .pc-guided-repair-layout--full-preview .pc-guided-repair-preview-wrap {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  border-top: 0 !important;
+}
+
+html body .pc-guided-repair-layout--full-preview .pc-guided-repair-preview {
+  width: 100% !important;
+  min-height: 108px !important;
+}
+
+html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
+  margin-top: 10px !important;
+}
+
 /* ══════════════════════════════════════════════════════
    V366 — SCENARIO 3 AUTHENTIC ASSESSMENT
    ══════════════════════════════════════════════════════ */
@@ -2149,10 +2150,7 @@ html body .pc-s5-final-actions {
 
 /* S2 Decision 4: keep the audit result as a shared full-width consequence panel. */
 .pc-s2-audit-feedback-wide {
-  grid-column: 1 / -1;
   width: 100%;
-  min-width: 0;
-  align-self: stretch;
   margin-top: clamp(16px, 2vw, 24px);
 }
 

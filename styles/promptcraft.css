@@ -16583,6 +16583,32 @@ html body .pc-guided-repair-status {
   }
 }
 
+
+
+/* V429 — Full-width guided repair preview. The reference/learning-process area
+   and repair builder remain side by side; the assembled student-facing prompt
+   becomes a shared full-width conclusion beneath both columns. */
+html body .pc-guided-repair-layout--full-preview .pc-guided-repair-footer {
+  grid-column: 1 / -1 !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+html body .pc-guided-repair-layout--full-preview .pc-guided-repair-preview-wrap {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  border-top: 0 !important;
+}
+
+html body .pc-guided-repair-layout--full-preview .pc-guided-repair-preview {
+  width: 100% !important;
+  min-height: 108px !important;
+}
+
+html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
+  margin-top: 10px !important;
+}
+
 /* ══════════════════════════════════════════════════════
    V366 — SCENARIO 3 AUTHENTIC ASSESSMENT
    ══════════════════════════════════════════════════════ */
@@ -25260,4 +25286,26 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
     width: 10px !important;
     height: 10px !important;
   }
+}
+
+
+/* V428 — shared completed-analysis content rows.
+   Babbage diagnostics are variable-length. Keep each row sized to its content
+   and give long-form rows enough separation that CRT borders never visually
+   collide while the monitor owns vertical scrolling. */
+html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+.analysis-report-overflow-safe .analysis-grid {
+  grid-auto-rows: max-content !important;
+  align-items: stretch !important;
+  align-content: start !important;
+  row-gap: max(8px, .62em) !important;
+}
+
+html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+.analysis-report-overflow-safe .analysis-card {
+  height: auto !important;
+  min-height: max-content !important;
+  align-self: stretch !important;
+  margin: 0 !important;
+  position: relative !important;
 }

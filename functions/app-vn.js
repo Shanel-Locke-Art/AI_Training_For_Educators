@@ -164,17 +164,11 @@ function pcResetVNCharacters() {
 }
 
 function pcResetVNDialogueState() {
-  const dialogue = document.getElementById('vnDialogue');
-  dialogue?.classList.remove(
+  document.getElementById('vnDialogue')?.classList.remove(
     'has-choices',
     'prediction-question',
     'prediction-result'
   );
-  if (dialogue) {
-    delete dialogue.dataset.pcExplicitAction;
-    dialogue.setAttribute('role', 'button');
-    dialogue.setAttribute('tabindex', '0');
-  }
 }
 
 function pcApplyIpadLayoutV200(){
@@ -903,9 +897,12 @@ function pcFitWideAnalysisReportV215(screen) {
   pcSetImportantStyles(grid, [
     ['display', 'grid'],
     ['grid-template-columns', useSingleColumn ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) minmax(0, 1fr)'],
+    // v428: Diagnostic copy is variable-length. Rows must be content-sized from
+    // the first paint; fractional rows can be shorter than their cards and make
+    // lower findings appear to collide before overflow-safe scrolling engages.
     ['grid-template-rows', useSingleColumn
       ? 'auto auto auto auto auto auto'
-      : 'minmax(0, .62fr) minmax(0, 1.18fr) minmax(0, .78fr) minmax(0, 1.02fr)'],
+      : 'auto auto auto auto'],
     ['grid-template-areas', useSingleColumn
       ? '"status" "confidence" "issue" "repair" "impact" "worked"'
       : '"status confidence" "issue repair" "impact impact" "worked worked"'],
@@ -915,8 +912,8 @@ function pcFitWideAnalysisReportV215(screen) {
     ['min-height', '0'],
     ['margin', '0'],
     ['align-items', 'stretch'],
-    ['align-content', 'stretch'],
-    ['flex', '1 1 auto'],
+    ['align-content', 'start'],
+    ['flex', '0 0 auto'],
     ['box-sizing', 'border-box']
   ]);
 
@@ -1002,7 +999,8 @@ function pcFitWideAnalysisReportV215(screen) {
       ['padding', `${scaled(base.cardPadding, 4)}px`],
       ['min-width', '0'],
       ['min-height', '0'],
-      ['height', '100%'],
+      ['height', 'auto'],
+      ['align-self', 'stretch'],
       ['border-width', '1px'],
       ['border-radius', `${scaled(8, 5)}px`],
       ['box-shadow', 'inset 0 0 12px rgba(42,255,91,.04)'],
@@ -1131,6 +1129,9 @@ function pcFitWideAnalysisReportV215(screen) {
       ['grid-template-areas', useSingleColumn
         ? '"status" "confidence" "issue" "repair" "impact" "worked"'
         : '"status confidence" "issue repair" "impact impact" "worked worked"'],
+      ['grid-auto-rows', 'max-content'],
+      ['row-gap', `${Math.max(8, Math.round((base.gap * scale) + 3))}px`],
+      ['column-gap', `${Math.max(4, Math.round(base.gap * scale))}px`],
       ['height', 'auto'],
       ['min-height', '0'],
       ['align-items', 'start'],
@@ -3407,13 +3408,6 @@ pcRegisterUIActions({
 
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');
-  const dialogue = document.getElementById('vnDialogue');
-
-  // Shared workstation-result scenes contain their own explicit action button.
-  // Clicking the surrounding dialogue surface must never consume the VN state;
-  // otherwise the text can clear without running the scenario transition that
-  // unlocks the next activity.
-  if (dialogue?.dataset.pcExplicitAction === 'true') return;
 
   // HARD STOP: during Babbage terminal/thinking screens, clicks on the black
   // dialogue panel must NOT advance or clear the VN text. Only the explicit
