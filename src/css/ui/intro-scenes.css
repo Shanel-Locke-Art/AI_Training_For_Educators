@@ -1,0 +1,127 @@
+/* ══════════════════════════════════════════════════════
+   PROMPTCRAFT V264 — REGULAR VN / SCENARIO INTRO OWNER
+   Shared dialogue typography and one responsive owner for special scenario
+   introductions. Prediction and terminal states keep their dedicated owners.
+   ══════════════════════════════════════════════════════ */
+
+/* Stable dialogue typography at every non-phone width. */
+@media screen and (min-width: 701px) {
+  html body #vnOverlay.vn-overlay.active:not(.babbage-terminal-textmode) #vnSpeaker,
+  html body #vnOverlay.vn-overlay.active:not(.babbage-terminal-textmode) .vn-speaker {
+    font-family: "Lora", Georgia, serif !important;
+    font-size: var(--pc-type-speaker) !important;
+    font-weight: 700 !important;
+    font-style: italic !important;
+    line-height: 1.18 !important;
+    margin-bottom: 10px !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active:not(.babbage-terminal-textmode) #vnText,
+  html body #vnOverlay.vn-overlay.active:not(.babbage-terminal-textmode) .vn-text,
+  html body #vnOverlay.vn-overlay.active:not(.babbage-terminal-textmode) .pc-feedback-copy,
+  html body #vnOverlay.vn-overlay.active:not(.babbage-terminal-textmode) .pc-feedback-message {
+    font-family: "Lora", Georgia, serif !important;
+    font-size: var(--pc-type-dialogue) !important;
+    font-weight: 600 !important;
+    line-height: 1.5 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active #vnAdvanceHint,
+  html body #vnOverlay.vn-overlay.active .vn-advance {
+    font-size: var(--pc-type-control) !important;
+    line-height: 1.25 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.babbage-consult, .babbage-prediction, .pc-clean-prediction, .pc-prediction-question, .babbage-terminal-consult, .babbage-terminal-textmode, .pc-clean-output)) .vn-board-text,
+  html body #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.babbage-consult, .babbage-prediction, .pc-clean-prediction, .pc-prediction-question, .babbage-terminal-consult, .babbage-terminal-textmode, .pc-clean-output)) .vn-board-text * {
+    font-size: var(--pc-type-board) !important;
+    line-height: 1.22 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.babbage-consult, .babbage-prediction, .pc-clean-prediction, .pc-prediction-question, .babbage-terminal-consult, .babbage-terminal-textmode, .pc-clean-output)) .vn-board-text::before,
+  html body #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.babbage-consult, .babbage-prediction, .pc-clean-prediction, .pc-prediction-question, .babbage-terminal-consult, .babbage-terminal-textmode, .pc-clean-output)) .vn-board-label {
+    font-size: var(--pc-type-xs) !important;
+    line-height: 1.2 !important;
+  }
+}
+
+/* Shared special-intro portrait baseline. */
+html body #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.babbage-consult, .babbage-prediction, .pc-clean-prediction, .pc-prediction-question, .babbage-terminal-consult, .babbage-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character) {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: absolute !important;
+  left: auto !important;
+  right: -2% !important;
+  bottom: 18px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: clamp(225px, min(46vh, 27vw), 560px) !important;
+  max-width: 38vw !important;
+  max-height: 560px !important;
+  transform: none !important;
+  transform-origin: right bottom !important;
+  align-items: flex-end !important;
+  justify-content: flex-end !important;
+  z-index: 7 !important;
+  pointer-events: none !important;
+}
+
+html body #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.babbage-consult, .babbage-prediction, .pc-clean-prediction, .pc-prediction-question, .babbage-terminal-consult, .babbage-terminal-textmode, .pc-clean-output)) #vnPortrait {
+  display: block !important;
+  width: auto !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: right bottom !important;
+}
+
+/* One fluid composition for tablet and intermediate laptop widths. */
+@media screen and (min-width: 701px) and (max-width: 1510px) {
+  html body #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.babbage-consult, .babbage-prediction, .pc-clean-prediction, .pc-prediction-question, .babbage-terminal-consult, .babbage-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap {
+    left: 50% !important;
+    right: auto !important;
+    top: clamp(72px, 8vh, 94px) !important;
+    width: min(78vw, 840px) !important;
+    max-width: 840px !important;
+    margin: 0 !important;
+    transform: translateX(-50%) !important;
+    transform-origin: top center !important;
+    z-index: 16 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.babbage-consult, .babbage-prediction, .pc-clean-prediction, .pc-prediction-question, .babbage-terminal-consult, .babbage-terminal-textmode, .pc-clean-output)) .vn-board-text {
+    position: absolute !important;
+    z-index: 18 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.babbage-consult, .babbage-prediction, .pc-clean-prediction, .pc-prediction-question, .babbage-terminal-consult, .babbage-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character) {
+    left: auto !important;
+    right: clamp(-20px, -1.2vw, -7px) !important;
+    bottom: 10px !important;
+    width: auto !important;
+    max-width: 32vw !important;
+    transform: none !important;
+    transform-origin: right bottom !important;
+    z-index: 12 !important;
+  }
+}
+
+/* Phone composition preserves the pre-refactor sizing. */
+@media screen and (max-width: 700px) {
+  html body #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.babbage-consult, .babbage-prediction, .pc-clean-prediction, .pc-prediction-question, .babbage-terminal-consult, .babbage-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character) {
+    right: -8% !important;
+    bottom: clamp(220px, 30dvh, 270px) !important;
+    height: clamp(175px, min(26dvh, 40vw), 225px) !important;
+    max-width: 42vw !important;
+    max-height: 225px !important;
+    z-index: 18 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.babbage-consult, .babbage-prediction, .pc-clean-prediction, .pc-prediction-question, .babbage-terminal-consult, .babbage-terminal-textmode, .pc-clean-output)) #vnPortrait {
+    max-width: 42vw !important;
+    max-height: 225px !important;
+  }
+}
+

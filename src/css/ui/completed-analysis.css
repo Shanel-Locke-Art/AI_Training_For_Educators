@@ -1,0 +1,1245 @@
+/* PromptCraft v268 completed-analysis owner.
+   Stage 6 finishes the migration: every active completed-report responsive
+   declaration now lives here, while the retired intermediate terminal mode
+   has been removed. JavaScript still owns wide workstation geometry. */
+
+/* ==============================================================
+   STAGE 6 — MIGRATED COMPLETED-ANALYSIS COMPATIBILITY LAYERS
+   These active declarations previously lived in mixed legacy modules.
+   They remain ahead of the current v255 owner to preserve the exact cascade.
+   ============================================================== */
+
+/* Keep the layout usable if the browser window is narrower. */
+
+
+@media (max-width: 1510px) {
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active {
+    overflow: hidden !important;
+    background: #070907 !important;
+    backdrop-filter: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .vn-scene {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    background:
+      radial-gradient(circle at 50% 18%, rgba(32, 255, 0, 0.09), transparent 46%),
+      linear-gradient(180deg, #10130f 0%, #050705 100%) !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .vn-bg,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .vn-character,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .vn-smartboard-wrap,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active #babbageShelf {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active #babbageTerminalScene,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .babbage-terminal-scene {
+    position: fixed !important;
+    left: 50% !important;
+    right: auto !important;
+    top: clamp(14px, 3vh, 34px) !important;
+    bottom: 84px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    overflow: hidden !important;
+    z-index: 55 !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .babbage-terminal-photo {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background-image: none !important;
+    background:
+      repeating-linear-gradient(0deg, rgba(32, 255, 0, 0.022) 0 1px, transparent 1px 5px),
+      radial-gradient(circle at 50% 12%, rgba(32, 255, 0, 0.08), transparent 44%),
+      linear-gradient(180deg, #061109 0%, #020503 100%) !important;
+    border: 2px solid rgba(68, 255, 92, 0.88) !important;
+    box-shadow:
+      0 0 0 1px rgba(32, 255, 0, 0.24),
+      0 0 24px rgba(32, 255, 0, 0.16),
+      inset 0 0 28px rgba(32, 255, 0, 0.05) !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .babbage-terminal-photo::before,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .babbage-terminal-photo::after,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .babbage-terminal-scene::before,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .babbage-terminal-scene::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .babbage-terminal-screen {
+    position: absolute !important;
+    inset: 0 !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: #e5ffeb !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    scrollbar-gutter: stable !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active #babbageTerminalTitle,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .babbage-terminal-title {
+    display: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active #babbageTerminalOutput,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .babbage-terminal-output {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    text-align: left !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    color: #e5ffeb !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-report {
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    color: #e5ffeb !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-header {
+    width: 100% !important;
+    margin: 0 0 12px !important;
+    padding: 12px 14px !important;
+    text-align: left !important;
+    border: 1px solid rgba(116, 255, 137, 0.58) !important;
+    background: rgba(0, 0, 0, 0.22) !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-badge {
+    display: inline-block !important;
+    margin: 0 0 7px !important;
+    padding: 3px 7px !important;
+    color: #bfffc9 !important;
+    border: 1px solid rgba(116, 255, 137, 0.58) !important;
+    background: transparent !important;
+    font-size: 0.7rem !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.07em !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-title {
+    display: block !important;
+    margin: 0 0 7px !important;
+    color: #f1fff4 !important;
+    font-size: clamp(1.35rem, 2.2vw, 1.85rem) !important;
+    line-height: 1.08 !important;
+    letter-spacing: 0.035em !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-summary {
+    display: block !important;
+    max-width: 72ch !important;
+    margin: 0 !important;
+    color: #e5ffeb !important;
+    font-size: clamp(0.86rem, 1.15vw, 1rem) !important;
+    line-height: 1.42 !important;
+    text-transform: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-grid {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-card,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-card.compact,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-card.wide,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-status-card,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-confidence-card,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-worked-card,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-issue-card,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-repair-card,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-impact-card {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 11px 12px !important;
+    overflow: visible !important;
+    border: 1px solid rgba(116, 255, 137, 0.48) !important;
+    border-radius: 3px !important;
+    background: rgba(0, 0, 0, 0.18) !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-label {
+    display: block !important;
+    margin: 0 0 5px !important;
+    color: #bfffc9 !important;
+    font-size: clamp(0.68rem, 0.9vw, 0.78rem) !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.07em !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-value,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-value.big {
+    display: block !important;
+    margin: 0 !important;
+    color: #f3fff6 !important;
+    font-size: clamp(0.88rem, 1.08vw, 1rem) !important;
+    line-height: 1.4 !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+    text-transform: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-note {
+    display: block !important;
+    margin: 5px 0 0 !important;
+    color: #d6ffde !important;
+    font-size: clamp(0.78rem, 0.95vw, 0.9rem) !important;
+    line-height: 1.35 !important;
+    opacity: 0.92 !important;
+    text-transform: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active #vnDialogue#vnDialogue#vnDialogue,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .vn-dialogue {
+    position: fixed !important;
+    inset: auto 0 0 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    overflow: visible !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+    z-index: 110 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .vn-speaker,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .vn-skip,
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .vn-advance {
+    display: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active #vnText#vnText#vnText {
+    position: fixed !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: 16px !important;
+    transform: translateX(-50%) !important;
+    width: min(88vw, 560px) !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: auto !important;
+    z-index: 120 !important;
+  }
+
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active #vnText#vnText#vnText button {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+  }
+}
+
+/* ==================================================
+   v149 RESPONSIVE BABBAGE ANALYSIS
+   1511px+: computer artwork with report inside monitor
+   761–1510px: terminal-only report
+   760px and below: stacked mobile report cards
+================================================== */
+
+/* Medium terminal-only layout. */
+@media (min-width: 761px) and (max-width: 1510px) {
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active {
+    background: rgba(0, 10, 5, 0.97) !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalScene {
+    position: absolute !important;
+    inset: 18px 22px 92px 22px !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    transform: none !important;
+    overflow: visible !important;
+    z-index: 20 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalScene .babbage-terminal-photo {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: none !important;
+    background-image: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalScene .babbage-terminal-photo::before,
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalScene .babbage-terminal-photo::after,
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalScene::before,
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalScene::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalScene .babbage-terminal-screen {
+    position: absolute !important;
+    inset: 0 !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: clamp(22px, 3vw, 38px) !important;
+    display: block !important;
+    transform: none !important;
+    overflow: hidden !important;
+    border: 2px solid rgba(60, 255, 105, 0.9) !important;
+    border-radius: 16px !important;
+    background:
+      radial-gradient(circle at 50% 22%, rgba(22, 92, 46, 0.56), rgba(0, 28, 12, 0.98) 68%),
+      repeating-linear-gradient(0deg, rgba(190,255,205,0.035) 0 1px, transparent 1px 5px) !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalOutput.babbage-analysis-layout {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 10px 12px 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    white-space: normal !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-report {
+    display: block !important;
+    width: min(100%, 1120px) !important;
+    min-width: 0 !important;
+    max-width: 1120px !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-card {
+    min-width: 0 !important;
+    width: auto !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-impact-card {
+    grid-column: 1 / -1 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .vn-dialogue {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 82px !important;
+    min-height: 82px !important;
+    max-height: 82px !important;
+    padding: 10px 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(0, 8, 4, 0.98) !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    z-index: 50 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .vn-dialogue #vnSpeaker,
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .vn-dialogue .vn-speaker,
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .vn-dialogue .vn-advance,
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .vn-dialogue .vn-skip,
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .vn-dialogue #vnText > div {
+    display: none !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .vn-dialogue #vnText {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 14px !important;
+    overflow: visible !important;
+  }
+}
+
+/* Phone layout: one full-width column with readable cards. */
+@media (max-width: 760px) {
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalScene {
+    position: absolute !important;
+    inset: 8px 6px 76px 6px !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    transform: none !important;
+    overflow: visible !important;
+    z-index: 20 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalScene .babbage-terminal-photo {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: none !important;
+    background-image: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalScene .babbage-terminal-screen {
+    position: absolute !important;
+    inset: 0 !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 16px 14px !important;
+    display: block !important;
+    transform: none !important;
+    overflow: hidden !important;
+    border: 2px solid rgba(60, 255, 105, 0.92) !important;
+    border-radius: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalOutput.babbage-analysis-layout {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 8px 12px 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-report {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-header {
+    width: 100% !important;
+    margin: 0 0 10px !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-title {
+    margin: 4px 0 8px !important;
+    font-size: clamp(1.38rem, 7vw, 2rem) !important;
+    line-height: 1.05 !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-summary {
+    font-size: clamp(0.92rem, 4vw, 1.05rem) !important;
+    line-height: 1.42 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-card,
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-card.compact,
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-card.wide {
+    grid-column: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-value,
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-value.big {
+    font-size: clamp(0.92rem, 4vw, 1.05rem) !important;
+    line-height: 1.35 !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .vn-dialogue {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 70px !important;
+    min-height: 70px !important;
+    max-height: 70px !important;
+    padding: 7px 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(0, 8, 4, 0.99) !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    z-index: 50 !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .vn-dialogue #vnText {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 6px !important;
+    align-items: center !important;
+    overflow: visible !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .vn-dialogue button,
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .terminal-return,
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .prediction-continue-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 48px !important;
+    margin: 0 !important;
+    padding: 8px 6px !important;
+    font-size: clamp(0.68rem, 3.2vw, 0.82rem) !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* ==================================================
+   v147 COMPLETED TERMINAL REPORT LAYOUT
+   Shared measured screen bounds are applied by app.js. These rules control
+   the completed diagnostic shown inside the workstation monitor.
+================================================== */
+
+/* Wide-screen completed analysis: approved large centered workstation and
+   roomy diagnostic grid inside the physical monitor glass. */
+@media (min-width: 1511px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalOutput.babbage-analysis-layout {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    overflow: hidden !important;
+    white-space: normal !important;
+    box-sizing: border-box !important;
+    font-family: "Source Code Pro", Consolas, monospace !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  #babbageTerminalOutput.babbage-analysis-layout .analysis-report {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    color: #f3fff6 !important;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0 1px, transparent 1px 5px),
+      radial-gradient(circle at 50% 12%, rgba(61,255,116,.09), transparent 42%),
+      linear-gradient(180deg, rgba(0,31,16,.99), rgba(0,12,7,.995)) !important;
+    border: 2px solid rgba(64,255,112,.92) !important;
+    border-radius: 13px !important;
+    box-shadow:
+      inset 0 0 0 1px rgba(150,255,183,.14),
+      inset 0 0 28px rgba(35,255,96,.055) !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-header {
+    text-align: center !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-badge {
+    display: table !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    color: #70ff94 !important;
+    background: rgba(0,24,12,.72) !important;
+    border: 1px solid rgba(76,255,119,.88) !important;
+    border-radius: 6px !important;
+    font-weight: 700 !important;
+    letter-spacing: .055em !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-title {
+    color: #f5fff7 !important;
+    font-weight: 800 !important;
+    letter-spacing: .025em !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-summary {
+    color: #f1fff4 !important;
+    font-weight: 500 !important;
+    text-align: left !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    min-width: 0 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-card.compact,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-card.wide {
+    margin: 0 !important;
+    min-width: 0 !important;
+    color: #f5fff7 !important;
+    background: linear-gradient(180deg, rgba(0,31,16,.86), rgba(0,18,9,.82)) !important;
+    border: 1px solid rgba(85,255,126,.82) !important;
+    border-radius: 9px !important;
+    box-shadow: inset 0 0 14px rgba(45,255,102,.03) !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-impact-card {
+    grid-column: 1 / -1 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-label {
+    display: flex !important;
+    align-items: center !important;
+    gap: .48em !important;
+    color: #79ff97 !important;
+    font-weight: 800 !important;
+    letter-spacing: .045em !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-value,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-value.big {
+    color: #f5fff7 !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-value.big {
+    font-weight: 800 !important;
+    letter-spacing: .01em !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active
+  .analysis-note {
+    color: #d8ffe1 !important;
+    opacity: .9 !important;
+  }
+}
+
+/* v150 completed-report polish ----------------------------------------- */
+/* Desktop analysis report inside the monitor: nudge the panel inward a touch
+   so the border reads centered within the bezel. */
+@media (min-width: 1511px) {
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-report {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   VERSION 255 — SINGLE COMPLETED-ANALYSIS LAYOUT OWNER
+   JavaScript assigns exactly one of:
+     .pc-analysis-panel    phone + tablet
+     .pc-analysis-computer wide photographed workstation
+   No intermediate terminal layout is used during resizing.
+   ══════════════════════════════════════════════════════ */
+
+/* Shared phone/tablet completed-analysis panel. */
+@media screen and (max-width: 1180px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel {
+    background: #07140d !important;
+    overflow: hidden !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .vn-bg,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .vn-character,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .vn-smartboard-wrap,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel #babbageShelf {
+    display: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel #babbageTerminalScene,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .babbage-terminal-scene {
+    position: fixed !important;
+    left: 50% !important;
+    right: auto !important;
+    top: 16px !important;
+    bottom: 96px !important;
+    width: min(calc(100vw - 32px), 760px) !important;
+    max-width: min(calc(100vw - 32px), 760px) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    overflow: hidden !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+    z-index: 60 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .babbage-terminal-photo {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: linear-gradient(180deg, rgba(0,44,23,.99), rgba(0,12,6,.995)) !important;
+    background-image: none !important;
+    border: 2px solid rgba(0,255,128,.74) !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 0 0 1px rgba(135,255,205,.12) !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    transform: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .babbage-terminal-screen {
+    position: absolute !important;
+    inset: 10px !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 12px 12px 18px !important;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0 1px, transparent 1px 5px) !important;
+    border: 1px solid rgba(49,255,114,.72) !important;
+    border-radius: 11px !important;
+    box-shadow: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: stable !important;
+    box-sizing: border-box !important;
+    transform: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel #babbageTerminalOutput,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .babbage-terminal-output,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-report {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+    transform: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-header,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-card.compact,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-card.wide,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-status-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-confidence-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-issue-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-repair-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-impact-card {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 0 10px !important;
+    padding: 12px !important;
+    grid-column: auto !important;
+    background: rgba(0,24,12,.72) !important;
+    border: 1px solid rgba(49,255,114,.62) !important;
+    border-radius: 5px !important;
+    box-shadow: inset 0 0 14px rgba(32,255,0,.035) !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-grid {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-title {
+    font-size: clamp(1.55rem, 3vw, 2rem) !important;
+    line-height: 1.08 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-summary,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-value,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-value.big {
+    font-size: clamp(1rem, 1.8vw, 1.14rem) !important;
+    line-height: 1.42 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-label {
+    font-size: clamp(.76rem, 1.2vw, .9rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-note {
+    font-size: clamp(.88rem, 1.5vw, 1rem) !important;
+    line-height: 1.38 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel #vnDialogue,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .vn-dialogue {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+    overflow: visible !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel #vnText {
+    position: fixed !important;
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 16px !important;
+    width: min(calc(100vw - 32px), 760px) !important;
+    max-width: min(calc(100vw - 32px), 760px) !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 10px !important;
+    transform: translateX(-50%) !important;
+    pointer-events: auto !important;
+    box-sizing: border-box !important;
+    z-index: 90 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel #vnText button {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 52px !important;
+    margin: 0 !important;
+    padding: 11px 14px !important;
+    font-size: .96rem !important;
+    line-height: 1.2 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel #babbageTerminalScene,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .babbage-terminal-scene {
+    top: 8px !important;
+    bottom: 76px !important;
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel #vnText {
+    bottom: 10px !important;
+    width: calc(100vw - 20px) !important;
+    max-width: calc(100vw - 20px) !important;
+    gap: 8px !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel #vnText button {
+    min-height: 46px !important;
+    font-size: .84rem !important;
+  }
+}
+
+/* Compact completed-analysis cleanup. Phones, foldables, and Surface Duo-sized
+   layouts do not need the two decorative terminal frames. Keep the individual
+   diagnostic cards, let every Babbage-generated field establish its natural
+   height, and scroll the terminal surface when the report is taller than the
+   available monitor area. */
+@media screen and (max-width: 540px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel #babbageTerminalScene,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .babbage-terminal-scene {
+    border-radius: 0 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .babbage-terminal-photo {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .babbage-terminal-screen {
+    inset: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    scrollbar-gutter: auto !important;
+    padding: 12px 10px 22px !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel #babbageTerminalOutput,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .babbage-terminal-output,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-report,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-header,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-grid,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-card.compact,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-card.wide,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-status-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-confidence-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-issue-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-repair-card,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-impact-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-badge,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-title,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-summary,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-label,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-value,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-value.big,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-note,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-report p,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-report ul,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-report ol,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-report li,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-report a,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-report strong,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-report em,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-report span {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-report img,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-panel .analysis-report svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
+
+/* Wide completed analysis. JS owns terminal and CRT geometry; CSS prevents
+   legacy responsive rules from hiding or flattening the photographed computer. */
+@media screen and (min-width: 1181px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-computer #babbageTerminalScene,
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-computer .babbage-terminal-scene {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    overflow: visible !important;
+    max-width: none !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-computer .babbage-terminal-photo {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    background-size: 100% 100% !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    overflow: visible !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   VERSION 257 — COMPLETED COMPUTER SAFEGUARDS
+   JavaScript owns completed workstation geometry. These rules suppress legacy
+   animation/aspect overrides and preserve report visibility.
+   ══════════════════════════════════════════════════════ */
+html body #vnOverlay.vn-overlay.active.pc-analysis-computer #babbageTerminalScene,
+html body #vnOverlay.vn-overlay.active.pc-analysis-computer .babbage-terminal-photo,
+html body #vnOverlay.vn-overlay.active.pc-analysis-computer .babbage-terminal-screen {
+  transition: none !important;
+  animation: none !important;
+}
+
+html body #vnOverlay.vn-overlay.active.pc-analysis-computer .babbage-terminal-photo {
+  background-size: 100% 100% !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+html body #vnOverlay.vn-overlay.active.pc-analysis-computer #babbageTerminalOutput {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+/* v355: Completed analysis readability and balanced information hierarchy.
+   The diagnostic header is informational, not another card. Long-form findings
+   span the full monitor width so variable Babbage feedback does not leave a
+   stranded half-column or create uneven visual weight. */
+html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-header {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 2px 4px 10px !important;
+  margin-bottom: 6px !important;
+  text-align: center !important;
+}
+
+html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-summary {
+  max-width: 84ch !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+}
+
+html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-worked-card,
+html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-impact-card {
+  grid-column: 1 / -1 !important;
+}
+
+@media (max-width: 760px) {
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-header {
+    padding: 0 2px 8px !important;
+    text-align: center !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-report-active .analysis-summary {
+    text-align: center !important;
+  }
+}

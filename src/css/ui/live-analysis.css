@@ -1,0 +1,332 @@
+/* ==============================================================
+   PromptCraft v309 — BABBAGE TERMINAL PRESENTATION OWNER
+   JavaScript owns workstation geometry. This module owns the stable
+   monitor UI for both the analyzing state and the completed diagnostic.
+   ============================================================== */
+
+/* Babbage replaces the classroom portrait while the live analysis runs. */
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult:not(.babbage-terminal-textmode)
+:is(#vnCharacter, .vn-character) {
+  display: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult:not(.babbage-terminal-textmode) {
+  background: #050805 !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult:not(.babbage-terminal-textmode)
+:is(#vnScene, .vn-scene) {
+  background: transparent !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult:not(.babbage-terminal-textmode)
+:is(#vnSceneBg, .vn-bg) {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 0.55 !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  filter: brightness(0.5) blur(1px) !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet, .pc-live-analysis-desktop)
+#babbageTerminalScene {
+  background: transparent !important;
+  overflow: visible !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet, .pc-live-analysis-desktop)
+#babbageTerminalScene .babbage-terminal-photo {
+  background-color: transparent !important;
+  background-image: var(--pc-app-background), var(--pc-app-background-legacy) !important;
+  background-size: 100% 100% !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet, .pc-live-analysis-desktop)
+#babbageTerminalScene .babbage-terminal-photo::before,
+html body #vnOverlay#vnOverlay.vn-overlay.active:is(.pc-live-analysis-tablet, .pc-live-analysis-desktop)
+#babbageTerminalScene .babbage-terminal-photo::after {
+  content: none !important;
+  display: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+#babbageTerminalScene .babbage-terminal-screen {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+#babbageTerminalOutput {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Shared analyzing screen. The same centered terminal card is used inside the
+   physical monitor on every computer layout. */
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+#babbageTerminalOutput.pc-analyzing-output {
+  color: #bfffd0 !important;
+  text-shadow: 0 0 7px rgba(75, 255, 113, 0.38) !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+.pc-analyzing-readout {
+  color: #bfffd0 !important;
+  text-transform: uppercase !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+.pc-analyzing-panel {
+  color: inherit !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+.pc-terminal-title-line {
+  color: #d9ffe2 !important;
+  font-weight: 900 !important;
+  text-shadow: 0 0 10px rgba(71, 255, 110, 0.42) !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+.pc-terminal-divider {
+  width: 100% !important;
+  height: 1px !important;
+  background: rgba(78, 255, 112, 0.82) !important;
+  box-shadow: 0 0 6px rgba(56, 255, 97, 0.2) !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+.pc-terminal-section {
+  display: grid !important;
+  gap: 0.18em !important;
+  min-width: 0 !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+.pc-terminal-kicker {
+  color: #62ff86 !important;
+  font-weight: 800 !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+.pc-terminal-value {
+  color: #e6ffeb !important;
+  font-size: 1.12em !important;
+  font-weight: 900 !important;
+  line-height: 1.08 !important;
+  overflow-wrap: break-word !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+.pc-analyzing-progress {
+  --pc-analysis-progress-duration: 220ms;
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: clamp(7px, 0.58em, 11px) !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(90, 255, 117, 0.9) !important;
+  border-radius: 999px !important;
+  background: rgba(0, 18, 8, 0.88) !important;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.72), 0 0 7px rgba(56, 255, 91, 0.13) !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+.pc-analyzing-progress-fill {
+  position: absolute !important;
+  inset: 0 auto 0 0 !important;
+  display: block !important;
+  width: 0 !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+  background: linear-gradient(90deg, rgba(38, 214, 69, 0.82), rgba(118, 255, 143, 1)) !important;
+  box-shadow: 0 0 10px rgba(78, 255, 112, 0.58) !important;
+  transform-origin: left center !important;
+  transition: width var(--pc-analysis-progress-duration) ease-out !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+.pc-analyzing-progress.is-complete .pc-analyzing-progress-fill {
+  width: 100% !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+.pc-analyzing-phase {
+  margin-top: clamp(4px, .34em, 7px) !important;
+  color: rgba(211, 255, 221, .84) !important;
+  font-family: "Source Code Pro", ui-monospace, SFMono-Regular, Consolas, monospace !important;
+  font-size: clamp(.48rem, .48vw, .68rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+  letter-spacing: .055em !important;
+  text-transform: uppercase !important;
+  overflow-wrap: anywhere !important;
+}
+
+/* Completed diagnostic screen. The report has one outer frame, a compact
+   centered header, and a stable 2-column / 3-row grid that can auto-fit longer
+   Babbage responses vertically and horizontally. */
+html body .analysis-report {
+  color: #eaffee !important;
+  font-family: "Source Code Pro", "Courier New", ui-monospace, monospace !important;
+}
+
+html body .analysis-header {
+  text-align: center !important;
+}
+
+html body .analysis-badge {
+  color: #77ff94 !important;
+  border: 1px solid rgba(75, 255, 108, 0.92) !important;
+  border-radius: 999px !important;
+  background: rgba(0, 38, 19, 0.72) !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.045em !important;
+  text-transform: uppercase !important;
+}
+
+html body .analysis-title {
+  color: #eaffee !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.035em !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 0 9px rgba(68, 255, 105, 0.32) !important;
+}
+
+html body .analysis-summary {
+  color: #e2fbe8 !important;
+  text-shadow: none !important;
+}
+
+html body .analysis-grid {
+  min-height: 0 !important;
+}
+
+html body .analysis-card,
+html body .analysis-card.compact,
+html body .analysis-card.wide {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  border: 1px solid rgba(72, 255, 101, 0.82) !important;
+  background: linear-gradient(180deg, rgba(0, 32, 16, 0.78), rgba(0, 18, 9, 0.88)) !important;
+}
+
+html body .analysis-label {
+  color: #72ff90 !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.045em !important;
+  text-transform: uppercase !important;
+}
+
+html body .analysis-icon {
+  display: inline-grid !important;
+  place-items: center !important;
+  flex: 0 0 auto !important;
+  color: #72ff90 !important;
+  border: 1px solid currentColor !important;
+  border-radius: 3px !important;
+  font-weight: 900 !important;
+}
+
+html body .analysis-value {
+  color: #effff2 !important;
+  font-family: "Source Code Pro", monospace !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 5px rgba(49, 255, 92, 0.2) !important;
+}
+
+html body .analysis-value.big {
+  font-weight: 900 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+}
+
+html body .analysis-note {
+  color: #d8f6df !important;
+  font-family: "Source Code Pro", monospace !important;
+  text-shadow: none !important;
+}
+
+html body .analysis-report-dense .analysis-summary,
+html body .analysis-report-very-dense .analysis-summary {
+  line-height: 1.12 !important;
+}
+
+html body .analysis-report-fitted-tight .analysis-note {
+  margin-top: 1px !important;
+}
+
+html body .analysis-report-scrollable {
+  overflow: visible !important;
+}
+
+@media (max-width: 700px) {
+  html body .analysis-report {
+    height: auto !important;
+    min-height: 100% !important;
+  }
+
+  html body .analysis-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto !important;
+    grid-template-areas:
+      "status"
+      "confidence"
+      "issue"
+      "repair"
+      "impact" !important;
+  }
+}
+
+/* Phone mode intentionally becomes a full-screen CRT instead of a tiny photo. */
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-live-analysis-phone
+#babbageTerminalScene .babbage-terminal-photo {
+  background-image: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active.babbage-terminal-consult
+  .pc-analyzing-progress-fill {
+    transition: none !important;
+    width: 100% !important;
+  }
+}
+
+
+/* v371: Variable-length Babbage diagnostics must remain inside their cards.
+   Grid placement is owned by app-vn.js; these are content-safety rules only. */
+html body .analysis-card .analysis-value,
+html body .analysis-card .analysis-note {
+  max-width: 100% !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+
+html body .analysis-report-scrollable .analysis-card {
+  height: auto !important;
+  min-height: max-content !important;
+  overflow: hidden !important;
+}

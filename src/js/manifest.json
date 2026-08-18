@@ -1,0 +1,34 @@
+{
+  "bundle": [
+    "app/runtime-state.js",
+    "app/config-and-assets.js",
+    "research/tracking.js",
+    "audio/audio-engine.js",
+    "ai/babbage-client.js",
+    "scenarios/shared-components.js",
+    "scenarios/registry.js",
+    "scenarios/s2-metacognition.js",
+    "ui/workstation-layout.js",
+    "ui/completed-analysis-layout.js",
+    "ui/live-analysis-layout.js",
+    "ui/analysis-layout-controller.js",
+    "ui/babbage-terminal.js",
+    "ui/visual-novel.js",
+    "app/scenario-runtime.js",
+    "scenarios/s1-engagement.js",
+    "ui/prediction-gate.js",
+    "dev/development-tools.js",
+    "audio/babbage-tts.js",
+    "app/bootstrap.js"
+  ],
+  "standalone": [
+    {
+      "source": "content/dialogue-data.js",
+      "runtime": "runtime/js/dialogue-data.js"
+    },
+    {
+      "source": "pages/ideas-wall.js",
+      "runtime": "runtime/js/ideas-wall.js"
+    }
+  ]
+}

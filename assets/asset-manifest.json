@@ -23,7 +23,8 @@
     "jordan-thinking.png": "assets/images/characters/students/jordan/thinking.png",
     "jordan-confident.png": "assets/images/characters/students/jordan/confident.png",
     "babbage-mark.svg": "assets/images/ui/babbage-mark.svg",
-    "babbage-engine-plate.svg": "assets/images/ui/babbage-engine-plate.svg"
+    "babbage-engine-plate.svg": "assets/images/ui/babbage-engine-plate.svg",
+    "promptcraft-qr.png": "assets/ui/promptcraft-qr.png"
   },
   "planned_runtime_images": {
     "scene-s7.png": "assets/images/scenes/scenario-07-overreliance/scene.png",
@@ -61,7 +62,29 @@
     "assets/audio/voice/professor-pixel/scenario-02/p94.mp3",
     "assets/audio/voice/students/jordan/scenario-02/jordan-s2-01.mp3",
     "assets/audio/voice/students/jordan/scenario-02/jordan-s2-02.mp3",
-    "assets/audio/voice/students/jordan/scenario-02/jordan-s2-03.mp3"
+    "assets/audio/voice/students/jordan/scenario-02/jordan-s2-03.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-0-a.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-0-b.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-0-c.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-1-a.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-1-b.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-1-c.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-2-a.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-2-b.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-2-c.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-3-a.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-3-b.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-3-c.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-4-a.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-4-b.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-4-c.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-5-a.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-5-b.mp3",
+    "assets/audio/voice/professor-pixel/scenario-01/s1-score-5-c.mp3",
+    "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-confidence.mp3",
+    "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-evidence.mp3",
+    "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-grade.mp3",
+    "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-strategy.mp3"
   ],
   "asset_documentation": [
     "assets/audio/voice/professor-pixel/scenario-02/README.md",

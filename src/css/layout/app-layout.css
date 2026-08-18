@@ -1,0 +1,1340 @@
+/* ==================================================
+   v145 TERMINAL STAGE TUNE-UP
+   Shrink the prediction workstation and enlarge its usable monitor area.
+   Live Babbage analysis no longer shares this geometry.
+================================================== */
+body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene,
+body .vn-overlay.active.babbage-prediction #babbageTerminalScene {
+  top: 28.8% !important;
+  width: min(68vw, 980px) !important;
+  aspect-ratio: 2.16 / 1 !important;
+}
+
+body .vn-overlay.active.pc-clean-prediction .babbage-terminal-photo,
+body .vn-overlay.active.babbage-prediction .babbage-terminal-photo {
+  border-radius: 16px !important;
+}
+
+body .vn-overlay.active.pc-clean-prediction .babbage-terminal-screen,
+body .vn-overlay.active.babbage-prediction .babbage-terminal-screen {
+  left: 24.1% !important;
+  top: 22.4% !important;
+  width: 31.4% !important;
+  height: 46.2% !important;
+  padding: clamp(10px, 1.15vw, 18px) !important;
+  border-radius: 14px !important;
+}
+
+body .vn-overlay.active.pc-clean-prediction #babbageTerminalOutput,
+body .vn-overlay.active.babbage-prediction #babbageTerminalOutput {
+  font-size: clamp(0.82rem, 1.18vw, 1.18rem) !important;
+  letter-spacing: 0.03em !important;
+}
+
+body .vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode #babbageTerminalScene.textmode.responding .babbage-terminal-screen {
+  left: 24.1% !important;
+  top: 22.4% !important;
+  width: 31.4% !important;
+  height: 46.2% !important;
+  border-radius: 14px !important;
+}
+
+@media (max-width: 1200px) {
+  body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene,
+  body .vn-overlay.active.babbage-prediction #babbageTerminalScene {
+    width: min(74vw, 900px) !important;
+    top: 27.8% !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene,
+  body .vn-overlay.active.babbage-prediction #babbageTerminalScene {
+    width: min(82vw, 760px) !important;
+    top: 26.4% !important;
+  }
+
+  body .vn-overlay.active.pc-clean-prediction .babbage-terminal-screen,
+  body .vn-overlay.active.babbage-prediction .babbage-terminal-screen,
+  body .vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode #babbageTerminalScene.textmode.responding .babbage-terminal-screen {
+    width: 33.5% !important;
+    height: 47.8% !important;
+    top: 21.7% !important;
+  }
+}
+
+@media (max-width: 620px) {
+  body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene,
+  body .vn-overlay.active.babbage-prediction #babbageTerminalScene {
+    width: min(92vw, 620px) !important;
+    top: 23.8% !important;
+  }
+
+  body .vn-overlay.active.pc-clean-prediction .babbage-terminal-screen,
+  body .vn-overlay.active.babbage-prediction .babbage-terminal-screen,
+  body .vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode #babbageTerminalScene.textmode.responding .babbage-terminal-screen {
+    left: 23.5% !important;
+    width: 35.8% !important;
+    height: 49.2% !important;
+    top: 21.4% !important;
+    padding: 8px !important;
+  }
+
+  body .vn-overlay.active.pc-clean-prediction #babbageTerminalOutput,
+  body .vn-overlay.active.babbage-prediction #babbageTerminalOutput {
+    font-size: clamp(0.74rem, 2.8vw, 0.96rem) !important;
+  }
+}
+
+
+/* Completed-analysis responsive declarations now live exclusively in
+   90-completed-analysis.css. */
+
+/* ══════════════════════════════════════════════════════
+   [30 SCENARIO 1 WORKBENCH: EQUAL DESKTOP COLUMNS]
+   Faculty Submission and Repair Workspace share one stretched grid row.
+   ══════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════
+   [20 NAVIGATION: COMPACT MOBILE NAV]
+   Desktop/tablet keep the original bars. Phones use two fixed-height native
+   disclosure menus. This section replaces the duplicated inline head styles.
+   ══════════════════════════════════════════════════════ */
+html body .pc-compact-nav,
+html body .pc-compact-nav > .mobile-compact-menu {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+}
+
+@media screen and (min-width: 641px) {
+  html body > .dev-bar,
+  html body .dev-bar {
+    display: flex !important;
+    visibility: visible !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 32px !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    flex-wrap: wrap !important;
+  }
+
+  html body > nav.scenario-tabs,
+  html body nav.scenario-tabs,
+  html body .scenario-tabs {
+    display: flex !important;
+    visibility: visible !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 38px !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    flex-wrap: nowrap !important;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  html body .pc-compact-nav {
+    position: relative !important;
+    z-index: 120 !important;
+    display: grid !important;
+    visibility: visible !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+    margin: 0 !important;
+    padding: 6px 10px !important;
+    border: 0 !important;
+    border-top: 1px solid #c8b99f !important;
+    border-bottom: 1px solid #c8b99f !important;
+    background: #f8f2e8 !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    contain: layout size !important;
+  }
+
+  html body .pc-compact-nav > .mobile-compact-menu {
+    position: relative !important;
+    display: block !important;
+    visibility: visible !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  html body .pc-compact-nav > .mobile-compact-menu > summary.mobile-dropdown-toggle {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 6px 9px !important;
+    margin: 0 !important;
+    border: 2px solid #0b3321 !important;
+    border-radius: 9px !important;
+    background: #174b32 !important;
+    color: #ffffff !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    list-style: none !important;
+    text-align: center !important;
+    font-family: "Nunito", sans-serif !important;
+    font-size: 0.78rem !important;
+    font-weight: 800 !important;
+    line-height: 1.05 !important;
+    box-shadow: 0 2px 5px rgba(25, 39, 30, 0.18) !important;
+  }
+
+  html body .pc-compact-nav > .mobile-compact-menu > summary.mobile-dropdown-toggle::-webkit-details-marker {
+    display: none !important;
+  }
+
+  html body .pc-compact-nav .mobile-dropdown-copy {
+    display: flex !important;
+    min-width: 0 !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+  }
+
+  html body .pc-compact-nav .mobile-dropdown-title,
+  html body .pc-compact-nav .mobile-dropdown-eyebrow,
+  html body .pc-compact-nav .mobile-scenario-current {
+    display: block !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  html body .pc-compact-nav .mobile-dropdown-title,
+  html body .pc-compact-nav .mobile-dropdown-eyebrow {
+    color: #ffffff !important;
+    font-size: 0.72rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.045em !important;
+  }
+
+  html body .pc-compact-nav .mobile-scenario-current {
+    color: #d8ecdf !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+  }
+
+  html body .pc-compact-nav .mobile-dropdown-caret {
+    flex: 0 0 auto !important;
+    color: #d8ecdf !important;
+    font-size: 0.8rem !important;
+    transition: transform 0.16s ease !important;
+  }
+
+  html body .pc-compact-nav details[open] > summary .mobile-dropdown-caret {
+    transform: rotate(180deg) !important;
+  }
+
+  html body .pc-compact-nav .mobile-dropdown-panel {
+    position: absolute !important;
+    top: calc(100% + 5px) !important;
+    left: 0 !important;
+    width: min(88vw, 330px) !important;
+    max-height: min(58vh, 430px) !important;
+    overflow-y: auto !important;
+    padding: 8px !important;
+    border: 2px solid #0b3321 !important;
+    border-radius: 10px !important;
+    background: #fffdf8 !important;
+    box-shadow: 0 12px 28px rgba(25, 31, 27, 0.28) !important;
+    box-sizing: border-box !important;
+  }
+
+  html body .pc-compact-nav .mobile-scenario-menu .mobile-dropdown-panel {
+    left: auto !important;
+    right: 0 !important;
+  }
+
+  html body .pc-compact-nav .mobile-dropdown-option {
+    display: block !important;
+    width: 100% !important;
+    min-height: 42px !important;
+    margin: 0 0 5px !important;
+    padding: 9px 11px !important;
+    border: 1px solid #aa9b82 !important;
+    border-radius: 7px !important;
+    background: #ffffff !important;
+    color: #21170f !important;
+    box-sizing: border-box !important;
+    text-align: left !important;
+    font-family: "Nunito", sans-serif !important;
+    font-size: 0.9rem !important;
+    font-weight: 750 !important;
+    line-height: 1.2 !important;
+  }
+
+  html body .pc-compact-nav .mobile-dropdown-option:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  html body .pc-compact-nav .mobile-dropdown-option:hover,
+  html body .pc-compact-nav .mobile-dropdown-option:focus-visible,
+  html body .pc-compact-nav .mobile-dropdown-option.is-active {
+    background: #e4efe7 !important;
+    border-color: #174b32 !important;
+    color: #092719 !important;
+    outline: none !important;
+  }
+
+  html body .pc-compact-nav .mobile-dropdown-option:focus-visible {
+    box-shadow: 0 0 0 3px #f2b705 !important;
+  }
+
+  html body > .dev-bar,
+  html body > nav.scenario-tabs,
+  html body .dev-bar,
+  html body .scenario-tabs {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: hidden !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   V228 — Wide-screen main menu
+   Keep the compact tablet proportions on desktop, but use the available
+   width so the home panel fits without becoming an oversized scroll tunnel.
+   ══════════════════════════════════════════════════════ */
+@media (min-width: 1100px) {
+  .pc-main-menu-shell {
+    width: min(1320px, calc(100vw - 40px));
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] {
+    padding-inline: clamp(56px, 5vw, 72px);
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-home-copy,
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-home-copy > p:last-child,
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-data-summary {
+    max-width: none;
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-home-copy h2 {
+    max-width: none;
+    font-size: clamp(2.9rem, 4.5vw, 3.2rem);
+  }
+}
+
+/* Common laptop-height screens need the same layout with slightly tighter
+   vertical spacing. The content still remains full size and readable. */
+@media (min-width: 1100px) and (max-height: 820px) {
+  .pc-main-menu-topbar {
+    min-height: 72px;
+    padding-block: 12px;
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] {
+    padding-block: 28px 24px;
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-home-copy h2 {
+    font-size: 2.75rem;
+    line-height: 1.06;
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-home-copy > p:last-child {
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-primary-actions {
+    margin-top: 24px;
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-secondary-actions {
+    margin-top: 20px;
+    padding-top: 14px;
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-secondary-actions button {
+    min-height: 36px;
+    padding-block: 6px;
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-data-summary {
+    margin-top: 18px;
+    padding: 14px 18px;
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-data-summary h3 {
+    font-size: 1.2rem;
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-data-summary p {
+    margin-top: 6px;
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+
+  .pc-menu-panel[data-menu-panel="home"] .pc-menu-data-summary button {
+    min-height: 36px;
+    margin-top: 6px;
+    padding-block: 4px;
+    font-size: 0.95rem;
+  }
+
+  .pc-main-menu-footer {
+    min-height: 46px;
+    padding-block: 8px;
+  }
+}
+
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 229 — S1 WORKBENCH + MOBILE HEADER REFINEMENTS
+   ══════════════════════════════════════════════════════ */
+
+/* Prompt Ingredients now forms a full-width checkpoint directly below the
+   Mission Briefing instead of being stranded at the bottom of the left card. */
+
+
+
+
+
+
+/* The current header markup separates player status from action buttons.
+   Give both groups an explicit layout before the mobile centering rules. */
+body .pc-app-header .header-status,
+body .pc-app-header .header-actions {
+  display: flex !important;
+  align-items: center !important;
+  min-width: 0 !important;
+}
+
+body .pc-app-header .header-status {
+  gap: 10px !important;
+}
+
+body .pc-app-header .header-actions {
+  gap: 8px !important;
+}
+
+@media screen and (max-width: 640px) {
+  /* Keep the brand at the left, then center both control rows beneath it. */
+  body .pc-app-header {
+    justify-content: center !important;
+    gap: 9px !important;
+    padding: 10px 12px !important;
+  }
+
+  body .pc-app-header .logo {
+    flex: 1 0 100% !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  body .pc-app-header .header-status,
+  body .pc-app-header .header-actions {
+    flex: 1 0 100% !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  
+
+  
+
+  
+
+  /* Pixel's nudge and the consultation button become one vertical sequence
+     instead of two narrow columns fighting over phone-width scraps. */
+  
+
+  
+
+  
+}
+
+/* ══════════════════════════════════════════════════════
+   VERSION 230 — MOBILE BRAND + CONTENT-SIZED S1 COLUMNS
+   ══════════════════════════════════════════════════════ */
+
+@media screen and (max-width: 640px) {
+  /* Center the complete PromptCraft brand, not merely the controls beneath it. */
+  body .pc-app-header .logo {
+    justify-content: center !important;
+    text-align: left !important;
+  }
+}
+
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 231 — MOBILE PREDICTION COMPOSITION + TABLET CRT FIT
+   ══════════════════════════════════════════════════════ */
+
+/* The compact navigation has a higher stacking level than the older VN layer.
+   Put an active VN scene above it so only the VN's own MENU control remains. */
+body .vn-overlay.active {
+  z-index: 500 !important;
+}
+
+@media screen and (max-width: 700px) {
+  /* Let the prediction dialogue size itself from its actual copy and choices.
+     The earlier viewport-based minimum created a large empty black chamber. */
+  html body .vn-overlay.active.babbage-prediction #vnDialogue,
+  html body .vn-overlay.active.pc-clean-prediction #vnDialogue,
+  html body .vn-overlay.active.pc-prediction-question #vnDialogue,
+  html body .vn-overlay.active.babbage-prediction .vn-dialogue,
+  html body .vn-overlay.active.pc-clean-prediction .vn-dialogue,
+  html body .vn-overlay.active.pc-prediction-question .vn-dialogue {
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 16px 24px 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnSpeaker,
+  html body .vn-overlay.active.pc-clean-prediction #vnSpeaker,
+  html body .vn-overlay.active.pc-prediction-question #vnSpeaker,
+  html body .vn-overlay.active.babbage-prediction #vnText,
+  html body .vn-overlay.active.pc-clean-prediction #vnText,
+  html body .vn-overlay.active.pc-prediction-question #vnText {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: left !important;
+    box-sizing: border-box !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnText .pc-feedback-copy,
+  html body .vn-overlay.active.pc-clean-prediction #vnText .pc-feedback-copy,
+  html body .vn-overlay.active.pc-prediction-question #vnText .pc-feedback-copy {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: left !important;
+  }
+
+  /* JavaScript now places the answer panel in normal flow. These declarations
+     keep old absolute-position rules from reappearing before the first layout pass. */
+  html body .vn-overlay.active.babbage-prediction #vnPredictionChoicePanel,
+  html body .vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel,
+  html body .vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 16px auto 0 !important;
+    padding: 6px 4px 4px !important;
+    transform: none !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnPredictionChoicePanel button,
+  html body .vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel button,
+  html body .vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+    margin: 0 !important;
+    padding: 11px 12px !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Tie Pixel to the measured dialogue height so she stays seated on the panel
+     after the empty reservation is removed. */
+  html body .vn-overlay.active.babbage-prediction #vnCharacter,
+  html body .vn-overlay.active.pc-clean-prediction #vnCharacter,
+  html body .vn-overlay.active.pc-prediction-question #vnCharacter,
+  html body .vn-overlay.active.babbage-prediction .vn-character,
+  html body .vn-overlay.active.pc-clean-prediction .vn-character,
+  html body .vn-overlay.active.pc-prediction-question .vn-character {
+    bottom: calc(var(--pc-prediction-dialogue-height, 220px) - 8px) !important;
+  }
+
+  /* The terminal surface owns the entire scene behind Pixel and the dialogue. */
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalScene,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalScene,
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalScene .babbage-terminal-photo,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene .babbage-terminal-photo,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalScene .babbage-terminal-photo,
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalScene .babbage-terminal-screen,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene .babbage-terminal-screen,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalScene .babbage-terminal-screen {
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 232 — VN SMARTBOARD + PREDICTION LAYOUT REFINEMENTS
+   ══════════════════════════════════════════════════════ */
+
+/* Desktop/wide prediction scenes: keep the question copy clear of the choice row
+   and give the bottom panel enough real estate. */
+@media screen and (min-width: 1101px) {
+  html body .vn-overlay.active.babbage-prediction #vnDialogue,
+  html body .vn-overlay.active.pc-clean-prediction #vnDialogue,
+  html body .vn-overlay.active.pc-prediction-question #vnDialogue,
+  html body .vn-overlay.active.babbage-prediction .vn-dialogue,
+  html body .vn-overlay.active.pc-clean-prediction .vn-dialogue,
+  html body .vn-overlay.active.pc-prediction-question .vn-dialogue {
+    min-height: 260px !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 28px 44px 132px 44px !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnSpeaker,
+  html body .vn-overlay.active.pc-clean-prediction #vnSpeaker,
+  html body .vn-overlay.active.pc-prediction-question #vnSpeaker {
+    font-size: clamp(1.28rem, 1.5vw, 1.6rem) !important;
+    margin-bottom: 10px !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnText,
+  html body .vn-overlay.active.pc-clean-prediction #vnText,
+  html body .vn-overlay.active.pc-prediction-question #vnText {
+    max-width: min(470px, 31vw) !important;
+    font-size: clamp(0.98rem, 1.02vw, 1.08rem) !important;
+    line-height: 1.48 !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnPredictionChoicePanel,
+  html body .vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel,
+  html body .vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel {
+    left: 25vw !important;
+    right: 24px !important;
+    bottom: 26px !important;
+    grid-template-columns: repeat(2, minmax(220px, 1fr)) !important;
+    gap: 14px !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnPredictionChoicePanel button,
+  html body .vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel button,
+  html body .vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel button {
+    min-height: 48px !important;
+    padding: 11px 14px !important;
+    white-space: normal !important;
+  }
+}
+
+/* Tablet prediction scenes: enlarge Pixel a bit and keep the monitor text safely
+   inside the photographed CRT. */
+@media screen and (min-width: 701px) and (max-width: 1100px) {
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalScene,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalScene,
+  html body .vn-overlay.active.babbage-prediction .babbage-terminal-scene,
+  html body .vn-overlay.active.pc-clean-prediction .babbage-terminal-scene,
+  html body .vn-overlay.active.pc-prediction-question .babbage-terminal-scene {
+    top: clamp(238px, 28vh, 320px) !important;
+    width: min(74vw, 760px) !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalScene .babbage-terminal-screen,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene .babbage-terminal-screen,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalScene .babbage-terminal-screen,
+  html body .vn-overlay.active.babbage-prediction .babbage-terminal-screen,
+  html body .vn-overlay.active.pc-clean-prediction .babbage-terminal-screen,
+  html body .vn-overlay.active.pc-prediction-question .babbage-terminal-screen {
+    left: 24.8% !important;
+    top: 23.8% !important;
+    width: 25.6% !important;
+    height: 31.5% !important;
+    padding: clamp(10px, 1vw, 16px) clamp(10px, .9vw, 16px) clamp(8px, .8vw, 12px) clamp(18px, 1.8vw, 28px) !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalOutput,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalOutput,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalOutput,
+  html body .vn-overlay.active.babbage-prediction .babbage-terminal-output,
+  html body .vn-overlay.active.pc-clean-prediction .babbage-terminal-output,
+  html body .vn-overlay.active.pc-prediction-question .babbage-terminal-output {
+    font-size: clamp(0.58rem, 0.82vw, 0.76rem) !important;
+    line-height: 1.16 !important;
+    letter-spacing: 0.02em !important;
+    white-space: nowrap !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnCharacter,
+  html body .vn-overlay.active.pc-clean-prediction #vnCharacter,
+  html body .vn-overlay.active.pc-prediction-question #vnCharacter,
+  html body .vn-overlay.active.babbage-prediction .vn-character,
+  html body .vn-overlay.active.pc-clean-prediction .vn-character,
+  html body .vn-overlay.active.pc-prediction-question .vn-character {
+    height: min(38vh, 400px) !important;
+    left: 6vw !important;
+    bottom: calc(var(--pc-prediction-dialogue-height, 230px) - 10px) !important;
+    opacity: 0.96 !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnSpeaker,
+  html body .vn-overlay.active.pc-clean-prediction #vnSpeaker,
+  html body .vn-overlay.active.pc-prediction-question #vnSpeaker {
+    font-size: clamp(1.18rem, 1.6vw, 1.36rem) !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnText,
+  html body .vn-overlay.active.pc-clean-prediction #vnText,
+  html body .vn-overlay.active.pc-prediction-question #vnText {
+    font-size: clamp(0.96rem, 1.1vw, 1.04rem) !important;
+    line-height: 1.44 !important;
+  }
+}
+
+/* Phone scenes: lower the smartboard, pull the prediction label upward, and keep
+   the dialogue hierarchy clear. */
+@media screen and (max-width: 700px) {
+  html body .vn-overlay.active:not(.babbage-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.babbage-terminal-consult):not(.babbage-terminal-textmode) .vn-smartboard-wrap,
+  html body .vn-overlay.active.pc-clean-output:not(.babbage-terminal-consult):not(.babbage-terminal-textmode):not(.babbage-prediction):not(.pc-clean-prediction):not(.pc-prediction-question) .vn-smartboard-wrap {
+    top: clamp(20px, 4dvh, 34px) !important;
+    height: clamp(182px, 31dvh, 250px) !important;
+    max-height: 33dvh !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnSpeaker,
+  html body .vn-overlay.active.pc-clean-prediction #vnSpeaker,
+  html body .vn-overlay.active.pc-prediction-question #vnSpeaker,
+  html body .vn-overlay.active.babbage-prediction .vn-speaker,
+  html body .vn-overlay.active.pc-clean-prediction .vn-speaker,
+  html body .vn-overlay.active.pc-prediction-question .vn-speaker {
+    font-size: clamp(1.18rem, 4.9vw, 1.34rem) !important;
+    line-height: 1.12 !important;
+    margin-bottom: 10px !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnText,
+  html body .vn-overlay.active.pc-clean-prediction #vnText,
+  html body .vn-overlay.active.pc-prediction-question #vnText,
+  html body .vn-overlay.active.babbage-prediction .vn-text,
+  html body .vn-overlay.active.pc-clean-prediction .vn-text,
+  html body .vn-overlay.active.pc-prediction-question .vn-text {
+    font-size: clamp(0.96rem, 4vw, 1.04rem) !important;
+    line-height: 1.46 !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnDialogue,
+  html body .vn-overlay.active.pc-clean-prediction #vnDialogue,
+  html body .vn-overlay.active.pc-prediction-question #vnDialogue,
+  html body .vn-overlay.active.babbage-prediction .vn-dialogue,
+  html body .vn-overlay.active.pc-clean-prediction .vn-dialogue,
+  html body .vn-overlay.active.pc-prediction-question .vn-dialogue {
+    padding: 14px 16px 16px !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnPredictionChoicePanel,
+  html body .vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel,
+  html body .vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel {
+    margin-top: 14px !important;
+    padding: 4px 2px 2px !important;
+    gap: 12px !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnPredictionChoicePanel button,
+  html body .vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel button,
+  html body .vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel button {
+    padding: 12px 12px !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalScene,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalScene,
+  html body .vn-overlay.active.babbage-prediction .babbage-terminal-scene,
+  html body .vn-overlay.active.pc-clean-prediction .babbage-terminal-scene,
+  html body .vn-overlay.active.pc-prediction-question .babbage-terminal-scene {
+    top: 0 !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalScene .babbage-terminal-screen,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene .babbage-terminal-screen,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalScene .babbage-terminal-screen,
+  html body .vn-overlay.active.babbage-prediction .babbage-terminal-screen,
+  html body .vn-overlay.active.pc-clean-prediction .babbage-terminal-screen,
+  html body .vn-overlay.active.pc-prediction-question .babbage-terminal-screen {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding-top: 30vh !important;
+    padding-bottom: 24vh !important;
+    text-align: center !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalOutput,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalOutput,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalOutput,
+  html body .vn-overlay.active.babbage-prediction .babbage-terminal-output,
+  html body .vn-overlay.active.pc-clean-prediction .babbage-terminal-output,
+  html body .vn-overlay.active.pc-prediction-question .babbage-terminal-output {
+    font-size: clamp(1.02rem, 4.25vw, 1.26rem) !important;
+    line-height: 1.18 !important;
+    width: 100% !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 235 — MOBILE SMARTBOARD CACHE-BUST + POSITION
+   ══════════════════════════════════════════════════════ */
+@media screen and (max-width: 700px) {
+  /* Give the smartboard a little more clearance below the mobile MENU control. */
+  html body .vn-overlay.active:not(.babbage-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.babbage-terminal-consult):not(.babbage-terminal-textmode) .vn-smartboard-wrap,
+  html body .vn-overlay.active.pc-clean-output:not(.babbage-terminal-consult):not(.babbage-terminal-textmode):not(.babbage-prediction):not(.pc-clean-prediction):not(.pc-prediction-question) .vn-smartboard-wrap {
+    top: clamp(76px, 9dvh, 92px) !important;
+  }
+
+  /* Use one typography hierarchy for every mobile Professor Pixel dialogue.
+     Her name remains clearly larger than the dialogue copy. */
+  html body .vn-overlay.active #vnSpeaker,
+  html body .vn-overlay.active .vn-speaker {
+    margin: 0 0 10px !important;
+    padding: 0 !important;
+    color: #b9e6c8 !important;
+    font-family: "Lora", Georgia, serif !important;
+    font-size: clamp(1.18rem, 4.9vw, 1.34rem) !important;
+    font-weight: 800 !important;
+    font-style: italic !important;
+    line-height: 1.12 !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.72) !important;
+  }
+
+  html body .vn-overlay.active #vnText,
+  html body .vn-overlay.active .vn-text {
+    color: #f5f7f5 !important;
+    font-family: "Lora", Georgia, serif !important;
+    font-size: clamp(0.96rem, 4vw, 1.04rem) !important;
+    font-weight: 650 !important;
+    line-height: 1.46 !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.78) !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   VERSION 236 — AUTHORITATIVE MOBILE VN POSITION + TYPE
+   The repeated #vnOverlay ID is deliberate. It outranks the older scenario-
+   specific selectors that were silently winning the cascade.
+   ══════════════════════════════════════════════════════ */
+@media screen and (max-width: 700px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active:not(.babbage-consult):not(.babbage-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.babbage-terminal-consult):not(.babbage-terminal-textmode):not(.pc-clean-output) .vn-smartboard-wrap {
+    top: 78px !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active:not(.babbage-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.babbage-terminal-consult):not(.babbage-terminal-textmode) #vnSpeaker {
+    margin: 0 0 8px !important;
+    padding: 0 !important;
+    font-family: "Lora", Georgia, serif !important;
+    font-size: clamp(1.05rem, 3.8vw, 1.2rem) !important;
+    font-weight: 700 !important;
+    font-style: italic !important;
+    line-height: 1.2 !important;
+  }
+
+  html body #vnOverlay#vnOverlay.vn-overlay.active:not(.babbage-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.babbage-terminal-consult):not(.babbage-terminal-textmode) #vnText {
+    font-family: "Lora", Georgia, serif !important;
+    font-size: clamp(1rem, 3.45vw, 1.12rem) !important;
+    font-weight: 600 !important;
+    line-height: 1.5 !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 238 — FULLSCREEN S1 REPAIR WORKSPACE TALLER FIELDS
+   Use extra vertical room on wide desktop/fullscreen layouts so the guided
+   boxes are not squatting in the top half of large cards.
+   ══════════════════════════════════════════════════════ */
+
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 239 — TABLET CRT ALIGNMENT + WIDE PREDICTION GRID
+   ══════════════════════════════════════════════════════ */
+@media screen and (min-width: 701px) and (max-width: 1100px) {
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalScene .babbage-terminal-screen,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene .babbage-terminal-screen,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalScene .babbage-terminal-screen {
+    left: 19.8% !important;
+    top: 15.2% !important;
+    width: 38.3% !important;
+    height: 44.5% !important;
+    padding: clamp(12px, 1.4vw, 20px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+@media screen and (min-width: 1511px) {
+  html body .vn-overlay.active.babbage-prediction #vnDialogue,
+  html body .vn-overlay.active.pc-clean-prediction #vnDialogue,
+  html body .vn-overlay.active.pc-prediction-question #vnDialogue {
+    display: grid !important;
+    grid-template-columns: minmax(360px, 500px) minmax(620px, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    column-gap: clamp(34px, 3vw, 64px) !important;
+    row-gap: 8px !important;
+    min-height: 250px !important;
+    height: auto !important;
+    padding: 28px clamp(48px, 5vw, 96px) !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #vnPredictionChoicePanel,
+  html body .vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel,
+  html body .vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel {
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    width: 100% !important;
+    max-width: 920px !important;
+    margin: 0 !important;
+    place-self: center !important;
+    grid-template-columns: repeat(2, minmax(240px, 1fr)) !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 242 — TABLET PREDICTION COMPUTER TALLER
+   The workstation on iPad/tablet had drifted into a too-wide, flattened aspect.
+   Give the photographed computer stage a little more height so it reads closer
+   to the desktop composition.
+   ══════════════════════════════════════════════════════ */
+@media screen and (min-width: 701px) and (max-width: 1100px) {
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalScene,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalScene,
+  html body .vn-overlay.active.babbage-prediction .babbage-terminal-scene,
+  html body .vn-overlay.active.pc-clean-prediction .babbage-terminal-scene,
+  html body .vn-overlay.active.pc-prediction-question .babbage-terminal-scene {
+    width: min(78vw, 760px) !important;
+    aspect-ratio: 1.82 / 1 !important;
+    top: clamp(170px, 18vh, 220px) !important;
+  }
+
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalScene .babbage-terminal-photo,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene .babbage-terminal-photo,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalScene .babbage-terminal-photo,
+  html body .vn-overlay.active.babbage-prediction .babbage-terminal-photo,
+  html body .vn-overlay.active.pc-clean-prediction .babbage-terminal-photo,
+  html body .vn-overlay.active.pc-prediction-question .babbage-terminal-photo {
+    aspect-ratio: 1.82 / 1 !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 243 — STABLE MOBILE STATUS + WIDE RESULT COPY
+   ══════════════════════════════════════════════════════ */
+@media screen and (min-width: 1511px) {
+  html body .vn-overlay.active.pc-prediction-result #vnDialogue,
+  html body .vn-overlay.active.pc-prediction-result .vn-dialogue {
+    min-height: 230px !important;
+    height: auto !important;
+    max-height: none !important;
+    padding-bottom: 28px !important;
+    overflow: visible !important;
+  }
+
+  html body .vn-overlay.active.pc-prediction-result #vnText,
+  html body .vn-overlay.active.pc-prediction-result .vn-text,
+  html body .vn-overlay.active.pc-prediction-result .pc-feedback-copy,
+  html body .vn-overlay.active.pc-prediction-result .pc-feedback-message {
+    width: 100% !important;
+    max-width: min(980px, 62vw) !important;
+  }
+
+  html body .vn-overlay.active.pc-prediction-result .prediction-continue-btn {
+    margin-top: 18px !important;
+    margin-bottom: 0 !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 244 — LARGER TABLET TYPOGRAPHY
+   Increase readability across tablet VN dialogue, prediction/result panels,
+   and Babbage analysis/textmode screens.
+   ══════════════════════════════════════════════════════ */
+@media screen and (min-width: 701px) and (max-width: 1100px) {
+  html body .vn-overlay.active:not(.babbage-terminal-textmode) #vnSpeaker,
+  html body .vn-overlay.active:not(.babbage-terminal-textmode) .vn-speaker {
+    font-size: clamp(1.34rem, 1.9vw, 1.58rem) !important;
+    line-height: 1.14 !important;
+  }
+
+  html body .vn-overlay.active:not(.babbage-terminal-textmode) #vnText,
+  html body .vn-overlay.active:not(.babbage-terminal-textmode) .vn-text {
+    font-size: clamp(1.08rem, 1.28vw, 1.2rem) !important;
+    line-height: 1.54 !important;
+  }
+
+  html body .vn-overlay.active #vnPredictionChoicePanel button,
+html body .vn-overlay.active .pc-clean-choice-btn {
+    font-size: clamp(0.96rem, 1.05vw, 1.08rem) !important;
+    line-height: 1.28 !important;
+  }
+
+  html body .vn-overlay.active.babbage-terminal-textmode #babbageTerminalTitle,
+  html body .vn-overlay.active.pc-clean-output #babbageTerminalTitle,
+  html body .vn-overlay.active.babbage-terminal-textmode .babbage-terminal-title,
+  html body .vn-overlay.active.pc-clean-output .babbage-terminal-title {
+    font-size: clamp(1.14rem, 1.28vw, 1.28rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  html body .vn-overlay.active.babbage-terminal-textmode #babbageTerminalOutput,
+  html body .vn-overlay.active.pc-clean-output #babbageTerminalOutput,
+  html body .vn-overlay.active.babbage-terminal-textmode .babbage-terminal-output,
+  html body .vn-overlay.active.pc-clean-output .babbage-terminal-output,
+  html body .vn-overlay.active.babbage-terminal-textmode .babbage-terminal-output.babbage-analysis-layout,
+  html body .vn-overlay.active.pc-clean-output .babbage-terminal-output.babbage-analysis-layout {
+    font-size: clamp(1rem, 1.18vw, 1.14rem) !important;
+    line-height: 1.58 !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 245 — TABLET COMPUTER LOWER + MOBILE RESULT TYPE TUNE
+   Lower the tablet computer stage a bit across prediction/result variants,
+   and make phone result copy slightly smaller and wider before wrapping.
+   ══════════════════════════════════════════════════════ */
+@media screen and (min-width: 701px) and (max-width: 1100px) {
+  html body .vn-overlay.active.babbage-prediction #babbageTerminalScene,
+  html body .vn-overlay.active.pc-clean-prediction #babbageTerminalScene,
+  html body .vn-overlay.active.pc-prediction-question #babbageTerminalScene,
+  html body .vn-overlay.active.pc-prediction-result #babbageTerminalScene,
+  html body .vn-overlay.active.babbage-prediction .babbage-terminal-scene,
+  html body .vn-overlay.active.pc-clean-prediction .babbage-terminal-scene,
+  html body .vn-overlay.active.pc-prediction-question .babbage-terminal-scene,
+  html body .vn-overlay.active.pc-prediction-result .babbage-terminal-scene {
+    top: clamp(205px, 21.5vh, 258px) !important;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  html body .vn-overlay.active.pc-prediction-result .vn-dialogue,
+  html body .vn-overlay.active.pc-prediction-result #vnDialogue {
+    padding: 20px 14px 24px 14px !important;
+  }
+
+  html body .vn-overlay.active.pc-prediction-result #vnText,
+  html body .vn-overlay.active.pc-prediction-result .vn-text,
+  html body .vn-overlay.active.pc-prediction-result .pc-feedback-copy,
+  html body .vn-overlay.active.pc-prediction-result .pc-feedback-message {
+    max-width: calc(100vw - 44px) !important;
+    font-size: clamp(0.92rem, 3.45vw, 0.98rem) !important;
+    line-height: 1.42 !important;
+  }
+
+  html body .vn-overlay.active.pc-prediction-result .prediction-continue-btn,
+html body .vn-overlay.active.pc-prediction-result #pcContinueToBabbageBtn {
+    margin-top: 14px !important;
+    font-size: 0.92rem !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 246 — CONSISTENT FULLSCREEN TEXT WRAP WIDTH
+   Give wide-screen dialogue and feedback copy a shared, wider reading measure.
+   Prediction questions keep their intentional two-column question/button grid.
+   ══════════════════════════════════════════════════════ */
+@media screen and (min-width: 1511px) {
+  html body #vnOverlay#vnOverlay.vn-overlay.active:not(.pc-prediction-question) #vnDialogue #vnText,
+  html body #vnOverlay#vnOverlay.vn-overlay.active:not(.pc-prediction-question) #vnDialogue .vn-text,
+  html body #vnOverlay#vnOverlay.vn-overlay.active:not(.pc-prediction-question) #vnDialogue .pc-feedback-copy,
+  html body #vnOverlay#vnOverlay.vn-overlay.active:not(.pc-prediction-question) #vnDialogue .pc-feedback-message {
+    width: 100% !important;
+    max-width: min(1280px, calc(100vw - 180px)) !important;
+    box-sizing: border-box !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 247 — LARGER TABLET TYPOGRAPHY FOR MAIN APP
+   Increase the non-VN tablet text sizes across the workbench, header,
+   scenario tabs, and input controls so the iPad layout reads more comfortably.
+   ══════════════════════════════════════════════════════ */
+@media screen and (min-width: 701px) and (max-width: 1100px) {
+  body {
+    font-size: 17px !important;
+  }
+
+  body .dev-bar,
+  body .dev-bar span,
+  body .dev-btn {
+    font-size: 0.9rem !important;
+    line-height: 1.2 !important;
+  }
+
+  body header {
+    padding: 14px 18px !important;
+  }
+
+  body .logo-name,
+  body .logo-name span {
+    font-size: 1.28rem !important;
+    line-height: 1.15 !important;
+  }
+
+  body .logo-sub,
+  body .level-tag,
+  body .xp-label,
+  body .ideas-wall-btn,
+  body .main-menu-toggle {
+    font-size: 0.88rem !important;
+    line-height: 1.2 !important;
+  }
+
+  body .tab-btn,
+  body .scenario-tabs button,
+  body .scenario-tabs a {
+    font-size: 1.02rem !important;
+    line-height: 1.24 !important;
+  }
+
+  
+  body.s1-active:not(.s1-result-active) .ingredient-heading,
+  body.s1-active:not(.s1-result-active) .s1-clean-reference-title {
+    font-size: 0.92rem !important;
+  }
+
+  
+
+  
+  body.s1-active:not(.s1-result-active) .s1-clean-reference{
+    font-size: 1.12rem !important;
+    line-height: 1.62 !important;
+  }
+
+  
+
+  
+  body.s1-active:not(.s1-result-active) .ingredient-chip{
+    font-size: 1.04rem !important;
+    line-height: 1.3 !important;
+  }
+
+  
+
+  
+  body.s1-active:not(.s1-result-active) textarea {
+    font-size: 1.14rem !important;
+    line-height: 1.62 !important;
+    min-height: 112px !important;
+  }
+
+  
+  body.s1-active:not(.s1-result-active) textarea::placeholder {
+    font-size: 1.06rem !important;
+  }
+
+  
+}
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 250 — COMPREHENSIVE TABLET TYPOGRAPHY BOOST
+   Increase readability across the entire app in tablet mode:
+   main workbench, header/tabs, VN dialogue, prediction/result screens,
+   Babbage terminal screens, and completed analysis.
+   ══════════════════════════════════════════════════════ */
+@media screen and (min-width: 701px) and (max-width: 1180px) {
+  html {
+    font-size: 18px !important;
+  }
+
+  body,
+  body button,
+  body input,
+  body textarea,
+  body select {
+    font-size: 1rem !important;
+  }
+
+  /* Global top chrome */
+  body .dev-bar,
+  body .dev-bar *,
+  body .dev-btn,
+  body .main-menu-toggle,
+  body .ideas-wall-btn,
+  body .level-tag,
+  body .xp-label,
+  body .tab-btn,
+  body .scenario-tabs button,
+  body .scenario-tabs a {
+    font-size: 0.98rem !important;
+    line-height: 1.25 !important;
+  }
+
+  body .logo-name,
+  body .logo-name span {
+    font-size: 1.35rem !important;
+    line-height: 1.15 !important;
+  }
+
+  body .logo-sub {
+    font-size: 0.88rem !important;
+    line-height: 1.15 !important;
+  }
+
+  /* Scenario 1 / main workbench */
+  
+  body.s1-active:not(.s1-result-active) .ingredient-heading,
+  body.s1-active:not(.s1-result-active) .s1-clean-reference-title {
+    font-size: 0.96rem !important;
+    line-height: 1.2 !important;
+  }
+
+  
+  body.s1-active:not(.s1-result-active) .s1-clean-reference,
+body.s1-active:not(.s1-result-active) .s1-result-card {
+    font-size: 1.14rem !important;
+    line-height: 1.62 !important;
+  }
+
+  
+  body.s1-active:not(.s1-result-active) .ingredient-chip {
+    font-size: 1.06rem !important;
+    line-height: 1.28 !important;
+  }
+
+  
+
+  
+  body.s1-active:not(.s1-result-active) textarea,
+  body.s1-active:not(.s1-result-active) input[type="text"],
+  body.s1-active:not(.s1-result-active) input[type="search"] {
+    font-size: 1.16rem !important;
+    line-height: 1.6 !important;
+  }
+
+  
+  body.s1-active:not(.s1-result-active) textarea::placeholder,
+  body.s1-active:not(.s1-result-active) input::placeholder {
+    font-size: 1.08rem !important;
+  }
+
+  
+  body.s1-active:not(.s1-result-active) .s1-secondary-btn,
+body.s1-active:not(.s1-result-active) .continue-btn {
+    font-size: 1.14rem !important;
+    line-height: 1.25 !important;
+  }
+
+  /* Visual novel dialogue */
+  html body .vn-overlay.active:not(.babbage-terminal-textmode) #vnSpeaker,
+  html body .vn-overlay.active:not(.babbage-terminal-textmode) .vn-speaker {
+    font-size: clamp(1.42rem, 1.9vw, 1.62rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  html body .vn-overlay.active:not(.babbage-terminal-textmode) #vnText,
+  html body .vn-overlay.active:not(.babbage-terminal-textmode) .vn-text,
+  html body .vn-overlay.active:not(.babbage-terminal-textmode) .pc-feedback-copy,
+  html body .vn-overlay.active:not(.babbage-terminal-textmode) .pc-feedback-message {
+    font-size: clamp(1.12rem, 1.32vw, 1.22rem) !important;
+    line-height: 1.56 !important;
+  }
+
+  html body .vn-overlay.active #vnPredictionChoicePanel button,
+html body .vn-overlay.active .pc-clean-choice-btn,
+html body .vn-overlay.active .prediction-continue-btn,
+html body .vn-overlay.active .terminal-return {
+    font-size: clamp(1rem, 1.12vw, 1.1rem) !important;
+    line-height: 1.24 !important;
+  }
+
+  /* Babbage terminal / analysis text */
+  html body .vn-overlay.active.babbage-terminal-textmode #babbageTerminalTitle,
+  html body .vn-overlay.active.pc-clean-output #babbageTerminalTitle,
+  html body .vn-overlay.active.babbage-terminal-textmode .babbage-terminal-title,
+  html body .vn-overlay.active.pc-clean-output .babbage-terminal-title {
+    font-size: clamp(1.18rem, 1.35vw, 1.34rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  html body .vn-overlay.active.babbage-terminal-textmode #babbageTerminalOutput,
+  html body .vn-overlay.active.pc-clean-output #babbageTerminalOutput,
+  html body .vn-overlay.active.babbage-terminal-textmode .babbage-terminal-output,
+  html body .vn-overlay.active.pc-clean-output .babbage-terminal-output {
+    font-size: clamp(1.04rem, 1.2vw, 1.14rem) !important;
+    line-height: 1.58 !important;
+  }
+
+}
+
+
+/* ══════════════════════════════════════════════════════
+   VERSION 256 — INTERNAL EXPRESSION LABELS
+   Expression labels are state metadata and must never be player-facing.
+   Live-analysis presentation now lives in 80-live-analysis.css.
+   ══════════════════════════════════════════════════════ */

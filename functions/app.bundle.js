@@ -3653,6 +3653,7 @@ function pcS2ShowRepairReviewAnalysis(data, review, runToken) {
         if (pcIsScenarioRunCurrent(runToken)) renderS2FinalComparison();
       },
       readLabel: '🔊 Read Analysis',
+      printLabel: 'Print / Save PDF',
       continueLabel: 'Continue',
       ariaLabel: 'Babbage analysis of the repaired reflection activity'
     });
@@ -5845,17 +5846,11 @@ function pcResetVNCharacters() {
 }
 
 function pcResetVNDialogueState() {
-  const dialogue = document.getElementById('vnDialogue');
-  dialogue?.classList.remove(
+  document.getElementById('vnDialogue')?.classList.remove(
     'has-choices',
     'prediction-question',
     'prediction-result'
   );
-  if (dialogue) {
-    delete dialogue.dataset.pcExplicitAction;
-    dialogue.setAttribute('role', 'button');
-    dialogue.setAttribute('tabindex', '0');
-  }
 }
 
 function pcApplyIpadLayoutV200(){
@@ -8616,6 +8611,90 @@ function buildClaudeAnalysisHTML(feedback, mock = false, mockReason = '') {
   `;
 }
 
+function pcGetBabbagePrintContext() {
+  let scenarioLabel = `Scenario ${Number(scenarioIndex || 0) + 1}`;
+  try {
+    const ui = typeof getScenarioUI === 'function' ? getScenarioUI(scenarioIndex) : null;
+    scenarioLabel = ui?.tabLabel || ui?.missionTitle || scenarioLabel;
+  } catch (e) {}
+
+  const data = (typeof scenarioData !== 'undefined' && scenarioData?.[scenarioIndex])
+    ? scenarioData[scenarioIndex]
+    : {};
+  const submittedWork = String(
+    data?.repairText ||
+    data?.revisedPrompt ||
+    data?.revised_prompt ||
+    data?.promptText ||
+    data?.prompt_text ||
+    lastPromptText ||
+    document.getElementById('promptInput')?.value ||
+    ''
+  ).trim();
+
+  return { scenarioLabel, submittedWork };
+}
+
+function pcPrintCurrentBabbageReport() {
+  const report = document.querySelector('#claudeTerminalOutput .analysis-report');
+  if (!report) return false;
+
+  const { scenarioLabel, submittedWork } = pcGetBabbagePrintContext();
+  const printedAt = new Date().toLocaleString();
+  const reportClone = report.cloneNode(true);
+  reportClone.querySelectorAll('button, [data-pc-action]').forEach(el => el.remove());
+
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return false;
+  try { printWindow.opener = null; } catch (e) {}
+
+  const inputSection = submittedWork
+    ? `<section class="pc-print-input"><h2>Your prompt / repair</h2><div>${esc(submittedWork).replace(/\n/g, '<br>')}</div></section>`
+    : '';
+
+  printWindow.document.open();
+  printWindow.document.write(`<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PromptCraft · Babbage Diagnosis · ${esc(scenarioLabel)}</title>
+  <style>
+    :root{color-scheme:light;}*{box-sizing:border-box;}body{margin:0;background:#f4f1e8;color:#1e2821;font-family:Arial,Helvetica,sans-serif;line-height:1.5;}
+    .pc-print-shell{max-width:920px;margin:0 auto;padding:34px 42px 48px;background:#fff;min-height:100vh;}
+    .pc-print-kicker{font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#356046;}
+    .pc-print-title{margin:4px 0 4px;font-size:30px;line-height:1.1;color:#173d29;}.pc-print-meta{margin:0 0 24px;color:#687269;font-size:13px;}
+    .pc-print-input{margin:0 0 24px;padding:18px 20px;border:1px solid #b8c7b9;border-left:5px solid #356046;background:#f7faf7;break-inside:avoid;}
+    .pc-print-input h2{margin:0 0 8px;font-size:15px;color:#244b34;}.pc-print-input div{font-size:14px;white-space:normal;}
+    .analysis-header{margin-bottom:18px}.analysis-badge{display:inline-block;padding:4px 8px;border:1px solid #356046;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#244b34;}
+    .analysis-title{margin:8px 0 4px;font-size:24px;color:#173d29}.analysis-summary{margin:0;color:#4b574e;}
+    .analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.analysis-card{padding:16px;border:1px solid #bfc9c0;border-radius:8px;break-inside:avoid;background:#fff;}
+    .analysis-card.wide,.analysis-impact-card,.analysis-worked-card{grid-column:1/-1}.analysis-label{display:block;margin-bottom:7px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#356046}.analysis-icon{margin-right:6px}.analysis-value{font-size:14px}.analysis-value.big{font-size:16px;font-weight:700}.analysis-note{margin-top:7px;color:#687269;font-size:12px;}
+    .pc-print-footer{margin-top:28px;padding-top:14px;border-top:1px solid #d6ddd6;color:#69736b;font-size:11px;}.pc-print-toolbar{display:flex;justify-content:flex-end;gap:10px;max-width:920px;margin:18px auto;padding:0 8px;}.pc-print-toolbar button{padding:10px 16px;border:0;border-radius:6px;background:#174b2f;color:#fff;font-weight:700;cursor:pointer;}
+    @media(max-width:680px){.pc-print-shell{padding:24px 20px}.analysis-grid{grid-template-columns:1fr}.analysis-card,.analysis-card.wide,.analysis-impact-card,.analysis-worked-card{grid-column:1;}}
+    @media print{body{background:#fff}.pc-print-toolbar{display:none}.pc-print-shell{max-width:none;padding:0;background:#fff}.analysis-card{border-color:#888}.pc-print-footer{page-break-inside:avoid}@page{margin:.55in;}}
+  </style>
+</head>
+<body>
+  <div class="pc-print-toolbar"><button type="button" onclick="window.print()">Print / Save PDF</button></div>
+  <main class="pc-print-shell">
+    <div class="pc-print-kicker">PromptCraft · Faculty AI Training</div>
+    <h1 class="pc-print-title">Babbage Diagnosis</h1>
+    <p class="pc-print-meta">${esc(scenarioLabel)} · Generated ${esc(printedAt)}</p>
+    ${inputSection}
+    ${reportClone.outerHTML}
+    <footer class="pc-print-footer">Babbage feedback is an AI-supported diagnostic aid. Review recommendations using your instructional context and professional judgment.</footer>
+  </main>
+</body>
+</html>`);
+  printWindow.document.close();
+  printWindow.focus();
+  window.setTimeout(() => {
+    try { printWindow.print(); } catch (e) {}
+  }, 250);
+  return true;
+}
+
 function showBabbageTerminalReport({
   reportHTML = '',
   terminalStateText = 'ANALYSIS COMPLETE',
@@ -8623,6 +8702,7 @@ function showBabbageTerminalReport({
   speakerName = 'Professor Pixel',
   onClose = null,
   readLabel = '🔊 Read Analysis',
+  printLabel = '',
   continueLabel = 'Continue',
   ariaLabel = 'Babbage analysis report'
 } = {}) {
@@ -8663,8 +8743,12 @@ function showBabbageTerminalReport({
     const readButton = readLabel
       ? `<button id="claudeTTSBtn" class="claude-tts-btn" type="button" data-pc-action="toggle-claude-tts" data-pc-stop-propagation="true">${esc(readLabel)}</button>`
       : '';
+    const printButton = printLabel
+      ? `<button class="claude-tts-btn claude-print-btn" type="button" data-pc-action="print-babbage-report" data-pc-stop-propagation="true">${esc(printLabel)}</button>`
+      : '';
     vnText.innerHTML = `
       ${readButton}
+      ${printButton}
       <button class="vn-return-btn terminal-return" type="button" data-pc-action="close-claude-consult" data-pc-stop-propagation="true">${esc(continueLabel)}</button>
     `;
     pcScheduleScenarioTask(() => vnText.querySelector('.vn-return-btn')?.focus({ preventScroll: true }), 100);
@@ -8688,6 +8772,7 @@ ${terminalizeClaudeText(feedback)}`;
     speakerName: 'Professor Pixel',
     onClose,
     readLabel: '🔊 Read Analysis',
+    printLabel: 'Print / Save PDF',
     continueLabel: 'Continue',
     ariaLabel: 'Babbage scenario diagnostic report'
   });
@@ -8747,6 +8832,8 @@ function closeClaudeConsultOverlay() {
 
 pcRegisterUIActions({
   'toggle-claude-tts': () => toggleClaudeTTS(),
+  'print-babbage-report': () => pcPrintCurrentBabbageReport(),
+  'open-ideas-wall': () => window.open('wall.html', '_blank', 'noopener,noreferrer'),
   'close-claude-consult': () => closeClaudeConsultOverlay()
 });
 
@@ -9095,13 +9182,6 @@ pcRegisterUIActions({
 
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');
-  const dialogue = document.getElementById('vnDialogue');
-
-  // Shared workstation-result scenes contain their own explicit action button.
-  // Clicking the surrounding dialogue surface must never consume the VN state;
-  // otherwise the text can clear without running the scenario transition that
-  // unlocks the next activity.
-  if (dialogue?.dataset.pcExplicitAction === 'true') return;
 
   // HARD STOP: during Babbage terminal/thinking screens, clicks on the black
   // dialogue panel must NOT advance or clear the VN text. Only the explicit

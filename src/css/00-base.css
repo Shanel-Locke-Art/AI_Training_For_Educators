@@ -1,0 +1,361 @@
+/* PromptCraft base stylesheet
+   Stable search map:
+     [00 TOKENS + RESET]              shared variables and base defaults
+     [10 APP SHELL]                   body, header, tabs, chat, inputs
+     [20 NAVIGATION]                  DEV bar, scenarios, compact mobile menus
+     [30 SCENARIO 1 WORKBENCH]        Faculty Submission + Repair Workspace
+     [40 VISUAL NOVEL]                Pixel, smartboard, dialogue, controls
+     [50 CLAUDE TERMINAL]             workstation, monitor, live analysis
+     [60 COMPLETED ANALYSIS]          diagnostic report, phone/tablet stack
+     [70 RESPONSIVE]                  breakpoint-specific layout rules
+     [90 COMPONENTS]                  reflection room and scenario shells
+
+   Editing rule: JavaScript owns photographed workstation geometry. CSS owns
+   normal document flow and terminal-only/mobile report presentation. Avoid
+   adding new version patches at the bottom; edit the labeled owner instead.
+*/
+
+
+/* ══════════════════════════════════════════════════════
+   PromptCraft — The Prompt Lab
+   Cozy Classroom Edition
+   Great Falls College MSU / Shanel Locke
+   ══════════════════════════════════════════════════════ */
+
+/* ── TOKENS ────────────────────────────────────────── */
+
+/* [00 TOKENS + RESET] [10 APP SHELL] */
+/* ── RESET ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── BASE ──────────────────────────────────────────── */
+body {
+  font-family: "Nunito", sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+  background-image: radial-gradient(ellipse at 15% 10%, rgba(196,124,45,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 90%, rgba(45,90,61,0.05) 0%, transparent 55%);
+}
+
+/* ── ANIMATIONS ────────────────────────────────────── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes blink {
+  0%,60%,100% { opacity: 0.3; transform: scale(1); }
+    30%          { opacity: 1;   transform: scale(1.3); }
+}
+@keyframes pinDrop {
+  0%   { opacity: 0; transform: translateY(-8px) scale(0.92); }
+    65%  { transform: translateY(2px) scale(1.02); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+
+/* ── DEV BAR ───────────────────────────────────────── */
+.dev-bar {
+  background: var(--chalkboard);
+  color: var(--chalk-white);
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.68rem;
+  padding: 5px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid var(--chalk-green);
+}
+.dev-bar span {
+  color: #a8d5b5;
+}
+.dev-btn {
+  background: transparent;
+  border: 1px solid var(--chalk-green);
+  border-radius: 4px;
+  color: #a8d5b5;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.62rem;
+  padding: 2px 9px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.dev-btn:hover {
+  background: var(--chalk-green);
+  color: var(--chalkboard);
+}
+
+/* ── HEADER ────────────────────────────────────────── */
+header {
+  background: var(--chalkboard);
+  border-bottom: 3px solid var(--chalk-green);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 8px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--forest-mid);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  border: 2px solid var(--chalk-green);
+}
+.logo-name span {
+  color: #a8d5b5;
+}
+.logo-sub {
+  font-size: 0.62rem;
+  color: rgba(240,237,232,0.45);
+  font-weight: 500;
+  margin-top: -2px;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.level-tag {
+  background: rgba(74,124,94,0.25);
+  color: #a8d5b5;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.63rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--chalk-green);
+  white-space: nowrap;
+  letter-spacing: 0.06em;
+}
+.xp-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.xp-label {
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.6rem;
+  color: rgba(240,237,232,0.4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.xp-track {
+  width: 72px;
+  height: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--chalk-green), #a8d5b5);
+  border-radius: 2px;
+  width: 20%;
+  transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* ── SCENARIO TABS ─────────────────────────────────── */
+.scenario-tabs {
+  background: var(--parchment);
+  border-bottom: 2px solid var(--border);
+  padding: 0 16px;
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scenario-tabs::-webkit-scrollbar {
+  display: none;
+}
+.tab-btn:hover {
+  color: var(--forest);
+}
+.tab-btn.active {
+  color: var(--forest-dark);
+  border-bottom-color: var(--forest);
+  background: rgba(45,90,61,0.06);
+}
+.tab-btn.locked {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── CHAT AREA ─────────────────────────────────────── */ */
+
+/* ── MESSAGES ──────────────────────────────────────── */
+.message {
+  display: flex;
+  gap: 10px;
+  animation: slideUp 0.28s ease forwards;
+  opacity: 0;
+}
+.message.user {
+  flex-direction: row-reverse;
+}
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  border: 2px solid var(--border);
+}
+.avatar.user-av {
+  background: var(--terracotta);
+  border-color: var(--terra-dark);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.bubble-wrap {
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.message.user .bubble-wrap {
+  align-items: flex-end;
+}
+.message.ai .bubble {
+  background: var(--chalk);
+  border-color: var(--border);
+  border-top-left-radius: 4px;
+  color: var(--ink);
+  box-shadow: 1px 2px 5px rgba(42,31,20,0.06);
+}
+
+/* ── PROFESSOR PIXEL STICKY NOTE ───────────────────── */
+
+/* ── TYPING ────────────────────────────────────────── */
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 0;
+}
+.typing-dots span {
+  width: 8px;
+  height: 8px;
+  background: var(--forest-mid);
+  border-radius: 50%;
+  animation: blink 1.3s infinite;
+}
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.22s;
+}
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.44s;
+}
+
+
+/* ── INPUT AREA ────────────────────────────────────── */
+
+
+textarea {
+  flex: 1;
+  background: var(--cream);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-family: "Nunito", sans-serif;
+  font-size: 16px;
+  padding: 10px 13px;
+  resize: none;
+  min-height: 46px;
+  max-height: 110px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: inset 0 1px 3px rgba(42,31,20,0.06);
+}
+textarea:focus {
+  border-color: var(--forest-mid);
+  box-shadow: inset 0 1px 3px rgba(42,31,20,0.06), 0 0 0 3px rgba(45,90,61,0.1);
+  background: #fff;
+}
+textarea::placeholder {
+  color: var(--ink-muted);
+  font-size: 0.84rem;
+  font-style: italic;
+}
+
+
+/* ── COMPLETION BUTTON ─────────────────────────────── */
+
+
+/* ── REFLECTION ROOM ───────────────────────────────── */
+
+
+/* ── MOBILE ────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .logo-sub {
+    display: none;
+  }
+  .xp-group {
+    display: none;
+  }
+  .level-tag {
+    font-size: 0.6rem;
+    padding: 3px 8px;
+  }
+  .chat-area {
+    padding: 12px;
+    gap: 12px;
+  }
+  .bubble-wrap {
+    max-width: 88%;
+  }
+  .bubble {
+    font-size: 0.81rem;
+    padding: 10px 12px;
+  }
+
+  
+
+  
+}
+@media (max-width: 360px) {
+  .tab-btn {
+    font-size: 0.68rem;
+    padding: 9px 10px;
+  }
+  header {
+    padding: 8px 12px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   PromptCraft — Visual Novel System additions
+   Append to src/css/manifest.css
+   ══════════════════════════════════════════════════════ */
+

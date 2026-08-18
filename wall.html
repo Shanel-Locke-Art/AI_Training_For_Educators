@@ -1,57 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- IDEAS WALL PAGE MAP: metadata/assets, page styles, wall form, local script -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Approved instructional ideas shared from PromptCraft scenarios." />
   <title>PromptCraft — Ideas Wall</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Nunito:wght@400;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/wall.css?v=320">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,600&family=Lora:ital,wght@0,400;0,500;1,400&family=Nunito:wght@500;600;700;800&family=Source+Code+Pro:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="runtime/css/ideas-wall.css?v=431" />
 </head>
 <body>
+  <a class="skip-link" href="#ideasGrid">Skip to ideas</a>
 
-<header class="wall-header">
-  <div class="wall-badge">🌿 PromptCraft</div>
-  <div class="wall-title">The <em>Ideas</em> Wall</div>
-  <div class="wall-subtitle">
-    Real instructional ideas generated during the Prompt Lab —
-    submitted anonymously by educators like you.
-  </div>
-  <div class="wall-stats">
-    <div class="wall-stat">
-      <div class="wall-stat-num" id="statTotal">—</div>
-      <div class="wall-stat-label">Ideas shared</div>
-    </div>
-    <div class="wall-stat">
-      <div class="wall-stat-num" id="statScenarios">—</div>
-      <div class="wall-stat-label">Scenarios covered</div>
-    </div>
-  </div>
-</header>
+  <header class="site-bar">
+    <a class="brand" href="index.html" aria-label="PromptCraft main menu">
+      <span class="brand-mark" aria-hidden="true">✦</span>
+      <span class="brand-word">PromptCraft</span>
+      <span class="brand-sub">THE PROMPT LAB</span>
+    </a>
+    <nav class="site-nav" aria-label="Ideas Wall navigation">
+      <a href="index.html">Main Menu</a>
+      <a class="active" href="wall.html" aria-current="page">Ideas Wall</a>
+    </nav>
+  </header>
 
-<div class="filter-bar" id="filterBar">
-  <button class="filter-btn active" type="button" data-filter="all">All Ideas</button>
-  <button class="filter-btn" type="button" data-filter="1">Engagement</button>
-  <button class="filter-btn" type="button" data-filter="2">Differentiation</button>
-  <button class="filter-btn" type="button" data-filter="3">Assessment</button>
-</div>
+  <main>
+    <section class="hero" aria-labelledby="wallTitle">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow">PROMPT LAB COMMUNITY</div>
+          <h1 id="wallTitle">The <em>Ideas</em> Wall</h1>
+          <p>
+            Approved instructional ideas shared from PromptCraft scenarios.
+            Browse what educators are building, revising, and testing.
+          </p>
+        </div>
 
-<main class="wall-grid" id="wallGrid" aria-live="polite">
-  <div class="wall-state">
-    <span class="wall-state-icon">🌿</span>
-    <div class="wall-state-title">Loading ideas</div>
-    <div class="wall-state-sub">
-      <div class="loading-dots"><span></span><span></span><span></span></div>
-    </div>
-  </div>
-</main>
+        <div class="stats" aria-label="Ideas Wall statistics">
+          <article class="stat-card">
+            <div class="stat-icon" aria-hidden="true">▤</div>
+            <div>
+              <div class="stat-value" id="statTotal">—</div>
+              <div class="stat-label">Ideas Shared</div>
+              <div class="stat-note">Approved for the wall</div>
+            </div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-icon" aria-hidden="true">◇</div>
+            <div>
+              <div class="stat-value" id="statScenarios">—</div>
+              <div class="stat-label">Scenarios Represented</div>
+              <div class="stat-note">Across PromptCraft</div>
+            </div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-icon" aria-hidden="true">◷</div>
+            <div>
+              <div class="stat-value stat-value-small" id="statLatest">—</div>
+              <div class="stat-label">Latest Addition</div>
+              <div class="stat-note" id="statLatestNote">No approved ideas yet</div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
 
-<div class="back-bar">
-  <button class="refresh-btn" id="refreshIdeasBtn" type="button">↻ Refresh</button>
-  <br><br>
-  <a class="back-link" href="index.html">← Back to PromptCraft</a>
-</div>
+    <section class="wall-content" aria-label="Ideas Wall browser">
+      <div class="toolbar">
+        <div class="filters" id="filterBar" role="group" aria-label="Filter ideas by scenario">
+          <button class="filter-btn active" type="button" data-filter="all">All Ideas</button>
+          <button class="filter-btn" type="button" data-filter="1">S1 Engagement</button>
+          <button class="filter-btn" type="button" data-filter="2">S2 Metacognition</button>
+          <button class="filter-btn" type="button" data-filter="3">S3 Assessment</button>
+          <button class="filter-btn" type="button" data-filter="4">S4 Sync Bias</button>
+          <button class="filter-btn" type="button" data-filter="5">S5 Hallucination</button>
+          <button class="filter-btn" type="button" data-filter="6">S6 Prediction</button>
+          <button class="filter-btn" type="button" data-filter="7">S7 Overreliance</button>
+          <button class="filter-btn" type="button" data-filter="8">S8 Reflect &amp; Revise</button>
+        </div>
 
-<script src="functions/wall.js?v=320"></script>
+        <label class="sort-control">
+          <span class="sr-only">Sort ideas</span>
+          <select id="sortIdeas">
+            <option value="recent">Most Recent</option>
+            <option value="scenario">Scenario</option>
+            <option value="score">Highest Score</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="sample-note" id="sampleNote" hidden>
+        SAMPLE IDEAS · APPROVED SUBMISSIONS WILL APPEAR HERE
+      </div>
+
+      <div class="ideas-grid" id="ideasGrid" aria-live="polite" aria-busy="true">
+        <div class="wall-state">
+          <div class="wall-state-mark" aria-hidden="true">✦</div>
+          <h2>Loading ideas</h2>
+          <p>Checking the approved Ideas Wall submissions.</p>
+          <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+
+      <footer class="community-footer">
+        <div class="community-mark" aria-hidden="true">◎</div>
+        <div class="community-copy">
+          <strong>Built by educators, for educators.</strong>
+          <span>Only ideas approved for the public wall appear here.</span>
+        </div>
+        <div class="footer-actions">
+          <button class="secondary-btn" id="refreshIdeasBtn" type="button">↻ Refresh</button>
+          <a class="primary-btn" href="index.html">Back to PromptCraft</a>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <script src="runtime/js/ideas-wall.js?v=432"></script>
 </body>
 </html>

@@ -1,0 +1,2187 @@
+/* ══════════════════════════════════════════════════════
+   PROMPTCRAFT V271 — SHARED SCENARIO SYSTEM
+   One component vocabulary and one fluid type scale for S1–S8. Scenario
+   content may differ, but mission cards, activity cards, choices, feedback,
+   buttons, checkpoints, and VN dialogue now resize through the same tokens.
+   ══════════════════════════════════════════════════════ */
+
+:root {
+  /* Pixel units keep the shared scale independent from legacy root-font breakpoints. */
+  --pc-type-xs: clamp(11.5px, calc(11px + 0.09vw), 12.8px);
+  --pc-type-small: clamp(13.1px, calc(12.5px + 0.13vw), 14.7px);
+  --pc-type-body: clamp(15.5px, calc(14.9px + 0.15vw), 17.3px);
+  --pc-type-control: clamp(16px, calc(15.4px + 0.12vw), 17.3px);
+  --pc-type-label: clamp(14.7px, calc(13.8px + 0.18vw), 16.6px);
+  --pc-type-card-title: clamp(18.4px, calc(16.3px + 0.42vw), 24px);
+  --pc-type-mission-title: clamp(26.4px, calc(21.8px + 0.88vw), 37.6px);
+  --pc-type-dialogue: clamp(16px, calc(15px + 0.18vw), 18px);
+  --pc-type-speaker: clamp(18px, calc(16.3px + 0.30vw), 22px);
+  --pc-type-board: clamp(15.2px, calc(14.1px + 0.20vw), 18px);
+  --pc-leading-body: 1.58;
+  --pc-leading-tight: 1.22;
+  --pc-stage-pad-inline: clamp(10px, 2vw, 24px);
+  --pc-stage-pad-block: clamp(12px, 2vw, 24px);
+  --pc-card-pad: clamp(18px, 2.6vw, 34px);
+}
+
+/* Shared mission typography across guided, activity, and development screens. */
+.scenario-mission .mission-eyebrow,
+.s1-clean-eyebrow,
+.pc-activity-kicker,
+.pc-shell-status {
+  font-size: var(--pc-type-small) !important;
+  line-height: var(--pc-leading-tight) !important;
+}
+
+.scenario-mission .mission-title,
+body.s1-active:not(.s1-result-active) .s1-clean-mission .mission-title {
+  font-size: var(--pc-type-mission-title) !important;
+  line-height: 1.12 !important;
+}
+
+.scenario-mission .mission-copy,
+body.s1-active:not(.s1-result-active) .s1-clean-mission .mission-copy,
+.pc-shell-copy,
+.pc-shell-note,
+.pc-shell-loop {
+  font-size: var(--pc-type-body) !important;
+  line-height: var(--pc-leading-body) !important;
+}
+
+/* One reusable activity workspace for current and future scenarios. */
+body.pc-scenario-activity-active .chat-area,
+body.pc-scenario-activity-active #chat {
+  display: none !important;
+}
+
+body.pc-scenario-activity-active #inputContainer {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none !important;
+  overflow-y: auto !important;
+  border-top: 0 !important;
+  background: var(--cream);
+}
+
+.pc-scenario-workbench {
+  display: flex;
+  flex-direction: column;
+  background: var(--cream);
+  font-size: var(--pc-type-body);
+}
+
+.pc-scenario-stage {
+  width: min(100%, 1500px);
+  margin: 0 auto;
+  padding: var(--pc-stage-pad-block) var(--pc-stage-pad-inline) clamp(28px, 4vw, 44px);
+}
+
+.pc-scenario-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(6px, 1vw, 10px);
+  margin-top: 13px;
+}
+
+.pc-scenario-progress span {
+  border: 1px solid rgba(255,255,255,.4);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: var(--pc-type-xs);
+  line-height: 1.25;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.82);
+}
+
+.pc-scenario-progress span.active {
+  background: #fff;
+  color: var(--forest-dark);
+  font-weight: 800;
+}
+
+.pc-activity-card,
+.pc-evidence-card {
+  background: #fffdf9;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(45,34,20,.08);
+}
+
+.pc-activity-card h2,
+.pc-evidence-card h3 {
+  font-family: "Lora", Georgia, serif;
+  color: var(--forest-dark);
+  font-size: var(--pc-type-card-title);
+  line-height: 1.25;
+  margin: 5px 0 10px;
+}
+
+.pc-activity-card p,
+.pc-evidence-card p,
+.pc-evidence-card blockquote,
+.pc-choice-copy,
+.pc-choice-body {
+  font-size: var(--pc-type-body);
+}
+
+.pc-activity-standby {
+  margin-top: 14px;
+  padding: var(--pc-card-pad);
+  text-align: center;
+}
+
+.pc-activity-kicker {
+  font-family: "Source Code Pro", monospace;
+  color: var(--terracotta);
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.pc-activity-layout {
+  display: grid;
+  grid-template-columns: minmax(270px, .72fr) minmax(0, 1.65fr);
+  gap: clamp(14px, 2vw, 22px);
+  margin-top: 14px;
+  align-items: start;
+}
+
+.pc-evidence-card {
+  overflow: hidden;
+  position: sticky;
+  top: 10px;
+}
+
+.pc-evidence-card img {
+  width: 100%;
+  height: min(44vh, 470px);
+  object-fit: contain;
+  object-position: center bottom;
+  background: linear-gradient(145deg, #241a29, #5e4766);
+  display: block;
+}
+
+.pc-evidence-card-copy {
+  padding: clamp(18px, 2.2vw, 24px);
+}
+
+.pc-evidence-card blockquote {
+  margin: 0 0 12px;
+  padding: 14px 16px;
+  border-left: 4px solid var(--terracotta);
+  background: var(--terra-light);
+  color: var(--ink-mid);
+  line-height: var(--pc-leading-body);
+}
+
+.pc-evidence-card p {
+  margin: 0;
+  color: var(--ink-light);
+  line-height: var(--pc-leading-body);
+}
+
+.pc-activity-task {
+  padding: var(--pc-card-pad);
+}
+
+.pc-activity-instruction {
+  margin: 0 0 18px;
+  color: var(--ink-light);
+  line-height: var(--pc-leading-body);
+}
+
+.pc-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
+  gap: clamp(10px, 1.4vw, 14px);
+}
+
+.pc-choice-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  padding: clamp(12px, 1.5vw, 15px);
+  cursor: pointer;
+  transition: border-color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease;
+}
+
+.pc-choice-card:hover {
+  border-color: var(--forest-mid);
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(45,90,61,.09);
+}
+
+.pc-choice-card.selected {
+  border-color: var(--forest-mid);
+  background: var(--forest-light);
+  box-shadow: inset 0 0 0 1px var(--forest-mid);
+}
+
+.pc-choice-card:has(input:focus-visible) {
+  outline: 4px solid rgba(196,124,45,.35);
+  outline-offset: 2px;
+}
+
+.pc-choice-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pc-choice-marker {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--parchment);
+  color: var(--forest-dark);
+  font-family: "Source Code Pro", monospace;
+  font-size: var(--pc-type-small);
+  font-weight: 800;
+}
+
+/* Shared single-select marker. S2 Diagnose established this radio treatment;
+   later single-choice screens reuse it instead of reverting to numbered tiles. */
+.pc-choice-grid--radio-marker .pc-choice-marker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: #fff;
+  font-size: 0;
+}
+
+.pc-choice-grid--radio-marker .pc-choice-marker::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.pc-choice-grid--radio-marker .pc-choice-card:has(input:checked) .pc-choice-marker::after,
+.pc-choice-grid--radio-marker .pc-choice-card.selected .pc-choice-marker::after {
+  background: var(--forest);
+}
+
+.pc-choice-copy {
+  color: var(--ink-mid);
+  line-height: 1.45;
+  font-weight: 650;
+}
+
+.pc-choice-body {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: var(--ink-mid);
+  line-height: 1.5;
+}
+
+.pc-choice-body strong {
+  color: var(--forest-dark);
+}
+
+.pc-selection-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  color: var(--ink-light);
+  font-size: var(--pc-type-label);
+  font-weight: 700;
+}
+
+.pc-button {
+  min-height: 46px;
+  border-radius: 9px;
+  padding: 10px 17px;
+  font-family: "Nunito", Arial, sans-serif;
+  font-size: var(--pc-type-control);
+  line-height: 1.25;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pc-button--primary {
+  border: 2px solid var(--forest-dark);
+  background: var(--forest-dark);
+  color: #fff;
+}
+
+.pc-button--primary:hover,
+.pc-button--primary:focus-visible {
+  background: var(--forest-mid);
+  border-color: var(--forest-mid);
+}
+
+.pc-button--primary:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.pc-button--secondary {
+  border: 2px solid var(--forest-dark);
+  background: #fff;
+  color: var(--forest-dark);
+}
+
+.pc-button:focus-visible {
+  outline: 4px solid rgba(196,124,45,.36);
+  outline-offset: 2px;
+}
+
+.pc-feedback-card {
+  margin-top: 18px;
+  border-radius: 12px;
+  padding: clamp(16px, 2vw, 20px);
+  border: 1.5px solid var(--border);
+}
+
+.pc-feedback-card.is-strong {
+  background: var(--forest-light);
+  border-color: var(--forest-mid);
+}
+
+.pc-feedback-card.is-developing {
+  background: var(--amber-light);
+  border-color: var(--amber);
+}
+
+.pc-feedback-heading {
+  color: var(--forest-dark);
+  font-family: "Lora", Georgia, serif;
+  font-size: var(--pc-type-card-title);
+  line-height: 1.3;
+  font-weight: 800;
+}
+
+.pc-feedback-card p {
+  color: var(--ink-mid);
+  font-size: var(--pc-type-body);
+  line-height: var(--pc-leading-body);
+}
+
+.pc-feedback-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.pc-activity-checkpoint {
+  display: grid;
+  grid-template-columns: minmax(220px, 34%) 1fr;
+  gap: clamp(20px, 3vw, 32px);
+  align-items: center;
+  margin-top: 14px;
+  padding: var(--pc-card-pad);
+}
+
+.pc-activity-checkpoint img {
+  width: 100%;
+  max-height: 480px;
+  object-fit: contain;
+  object-position: center bottom;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #241a29, #5e4766);
+}
+
+.pc-activity-checkpoint p {
+  color: var(--ink-mid);
+  line-height: var(--pc-leading-body);
+}
+
+/* Development shells use the same fluid scale rather than a separate one. */
+.pc-scenario-shell h2 {
+  font-size: var(--pc-type-mission-title);
+}
+
+.pc-shell-plan h3 {
+  font-size: var(--pc-type-card-title);
+}
+
+.pc-shell-primary,
+.pc-shell-secondary {
+  font-size: var(--pc-type-control);
+}
+
+/* S1 uses a specialized activity, but it consumes the same type tokens. */
+body.s1-active:not(.s1-result-active) #inputContainer {
+  font-size: var(--pc-type-body) !important;
+}
+
+body.s1-active:not(.s1-result-active) .s1-clean-title,
+body.s1-active:not(.s1-result-active) .s1-clean-builder-title {
+  font-size: var(--pc-type-card-title) !important;
+  line-height: 1.25 !important;
+}
+
+body.s1-active:not(.s1-result-active) .s1-clean-title--small {
+  font-size: var(--pc-type-label) !important;
+  margin-bottom: 7px;
+}
+
+body.s1-active:not(.s1-result-active) :is(
+  .s1-clean-builder-sub,
+  .s1-clean-nudge,
+  .s1-clean-observed div,
+  .s1-clean-prompt
+) {
+  font-size: var(--pc-type-body) !important;
+  line-height: var(--pc-leading-body) !important;
+}
+
+body.s1-active:not(.s1-result-active) :is(
+  .s1-clean-label,
+  .s1-clean-ingredients .ingredient-chip
+) {
+  font-size: var(--pc-type-label) !important;
+  line-height: 1.3 !important;
+}
+
+body.s1-active:not(.s1-result-active) .s1-clean-num {
+  width: clamp(28px, 2.4vw, 34px) !important;
+  height: clamp(28px, 2.4vw, 34px) !important;
+  font-size: var(--pc-type-small) !important;
+}
+
+body.s1-active:not(.s1-result-active) .s1-clean-submit {
+  font-size: var(--pc-type-control) !important;
+  line-height: 1.25 !important;
+}
+
+/* Regular portraits may fade or slide when a line changes, but their geometry
+   must follow the viewport immediately while the browser is being resized. */
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(:is(
+  .claude-prediction,
+  .pc-clean-prediction,
+  .pc-prediction-question,
+  .claude-terminal-consult,
+  .claude-terminal-textmode,
+  .pc-clean-output
+)) :is(#vnCharacter, .vn-character, #vnStudentCharacter, .vn-student-character) {
+  transition-property: opacity, transform !important;
+  transition-duration: .24s !important;
+  transition-timing-function: ease !important;
+}
+
+/* VN dialogue and smartboard text use one continuous scale at every width.
+   Repeated IDs deliberately outrank the remaining legacy breakpoint rules. */
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) #vnSpeaker,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) .vn-speaker {
+  font-size: var(--pc-type-speaker) !important;
+  line-height: 1.18 !important;
+}
+
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) #vnText,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) .vn-text,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) .pc-feedback-copy,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) .pc-feedback-message {
+  font-size: var(--pc-type-dialogue) !important;
+  line-height: 1.5 !important;
+}
+
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active #vnAdvanceHint,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active .vn-advance,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active .prediction-continue-btn,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active #pcContinueToClaudeBtn,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active #vnPredictionChoicePanel button {
+  font-size: var(--pc-type-control) !important;
+}
+
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(:is(
+  .claude-consult,
+  .claude-prediction,
+  .pc-clean-prediction,
+  .pc-prediction-question,
+  .claude-terminal-consult,
+  .claude-terminal-textmode,
+  .pc-clean-output
+)) .vn-board-text,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(:is(
+  .claude-consult,
+  .claude-prediction,
+  .pc-clean-prediction,
+  .pc-prediction-question,
+  .claude-terminal-consult,
+  .claude-terminal-textmode,
+  .pc-clean-output
+)) .vn-board-text * {
+  font-size: var(--pc-type-board) !important;
+  line-height: 1.24 !important;
+}
+
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(:is(
+  .claude-consult,
+  .claude-prediction,
+  .pc-clean-prediction,
+  .pc-prediction-question,
+  .claude-terminal-consult,
+  .claude-terminal-textmode,
+  .pc-clean-output
+)) .vn-board-text::before,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(:is(
+  .claude-consult,
+  .claude-prediction,
+  .pc-clean-prediction,
+  .pc-prediction-question,
+  .claude-terminal-consult,
+  .claude-terminal-textmode,
+  .pc-clean-output
+)) .vn-board-label {
+  font-size: var(--pc-type-xs) !important;
+  line-height: 1.2 !important;
+}
+
+/* The standard Pixel composition uses the same fluid portrait model as the
+   special intro. Width and height both participate, so short laptops no longer
+   receive a tablet-sized character that covers the board. */
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(
+  .claude-consult,
+  .claude-prediction,
+  .pc-clean-prediction,
+  .pc-prediction-question,
+  .claude-terminal-consult,
+  .claude-terminal-textmode,
+  .pc-clean-output
+)) .vn-smartboard-wrap {
+  z-index: 16 !important;
+}
+
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(
+  .claude-consult,
+  .claude-prediction,
+  .pc-clean-prediction,
+  .pc-prediction-question,
+  .claude-terminal-consult,
+  .claude-terminal-textmode,
+  .pc-clean-output
+)) .vn-board-text {
+  z-index: 18 !important;
+}
+
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(
+  .claude-consult,
+  .claude-prediction,
+  .pc-clean-prediction,
+  .pc-prediction-question,
+  .claude-terminal-consult,
+  .claude-terminal-textmode,
+  .pc-clean-output
+)) :is(#vnCharacter, .vn-character) {
+  left: auto !important;
+  right: clamp(-24px, -1.2vw, -8px) !important;
+  bottom: 12px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: clamp(210px, min(46vh, 27vw), 560px) !important;
+  max-width: 36vw !important;
+  max-height: 560px !important;
+  transform: none !important;
+  transform-origin: right bottom !important;
+  align-items: flex-end !important;
+  justify-content: flex-end !important;
+  z-index: 12 !important;
+}
+
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(
+  .claude-consult,
+  .claude-prediction,
+  .pc-clean-prediction,
+  .pc-prediction-question,
+  .claude-terminal-consult,
+  .claude-terminal-textmode,
+  .pc-clean-output
+)) #vnPortrait {
+  width: auto !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: right bottom !important;
+}
+
+@media screen and (min-width: 701px) and (max-width: 1510px) {
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(
+    .claude-consult,
+    .claude-prediction,
+    .pc-clean-prediction,
+    .pc-prediction-question,
+    .claude-terminal-consult,
+    .claude-terminal-textmode,
+    .pc-clean-output
+  )) :is(#vnCharacter, .vn-character) {
+    right: clamp(-20px, -1vw, -7px) !important;
+    bottom: 10px !important;
+    max-width: 31vw !important;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(
+    .claude-consult,
+    .claude-prediction,
+    .pc-clean-prediction,
+    .pc-prediction-question,
+    .claude-terminal-consult,
+    .claude-terminal-textmode,
+    .pc-clean-output
+  )) :is(#vnCharacter, .vn-character) {
+    right: -8% !important;
+    bottom: clamp(205px, 29dvh, 255px) !important;
+    height: clamp(165px, min(24dvh, 38vw), 210px) !important;
+    max-width: 44vw !important;
+    max-height: 210px !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .pc-activity-layout,
+  .pc-activity-checkpoint {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-evidence-card {
+    position: static;
+    display: grid;
+    grid-template-columns: minmax(180px, 32%) 1fr;
+  }
+
+  .pc-evidence-card img {
+    height: 100%;
+    min-height: 280px;
+  }
+}
+
+@media (max-width: 650px) {
+  .pc-evidence-card {
+    display: block;
+  }
+
+  .pc-evidence-card img {
+    height: min(330px, 42vh);
+    min-height: 240px;
+  }
+
+  .pc-selection-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pc-selection-bar .pc-button,
+  .pc-feedback-actions .pc-button {
+    width: 100%;
+  }
+
+  .pc-activity-checkpoint {
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-choice-card {
+    transition: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   V272 — SHARED VIEWPORT FAMILIES FOR VN SCENES
+   JavaScript assigns a single viewport family to html/body/#vnOverlay so the
+   regular intro, standard Pixel dialogue, and prediction scenes all inherit
+   the same responsive intent. This trims the breakpoint pile-up and keeps the
+   device-zoo rules from arguing with one another.
+   ══════════════════════════════════════════════════════ */
+
+html[data-pc-viewport-family],
+body[data-pc-viewport-family] {
+  --pc-vn-dialogue-pad-inline: clamp(18px, 3.2vw, 34px);
+  --pc-vn-dialogue-pad-block: clamp(18px, 2.8vh, 24px);
+  --pc-vn-dialogue-min-height: 210px;
+  --pc-vn-dialogue-speaker-size: var(--pc-type-speaker);
+  --pc-vn-dialogue-copy-size: var(--pc-type-dialogue);
+  --pc-vn-dialogue-hint-size: var(--pc-type-control);
+
+  --pc-vn-board-wrap-width: min(78vw, 860px);
+  --pc-vn-board-wrap-top: clamp(68px, 7vh, 92px);
+  --pc-vn-board-box-top: clamp(52px, 8%, 80px);
+  --pc-vn-board-box-inline: 9.5%;
+  --pc-vn-board-pad-block: clamp(14px, 1.7vw, 22px);
+  --pc-vn-board-pad-inline: clamp(16px, 2.2vw, 30px);
+  --pc-vn-board-body-size: clamp(0.98rem, 1.08vw, 1.34rem);
+  --pc-vn-board-meta-size: clamp(0.44rem, 0.78vw, 0.62rem);
+  --pc-vn-board-line: 1.2;
+
+  --pc-vn-character-right: clamp(-16px, -1vw, -6px);
+  --pc-vn-character-left: auto;
+  --pc-vn-character-bottom: 12px;
+  --pc-vn-character-height: clamp(225px, min(44vh, 24vw), 420px);
+  --pc-vn-character-max-width: 30vw;
+  --pc-vn-character-transform: none;
+  --pc-vn-character-origin: right bottom;
+  --pc-vn-character-justify: flex-end;
+
+  --pc-prediction-terminal-width: min(72vw, 980px);
+  --pc-prediction-terminal-top: 30%;
+  --pc-prediction-output-size: 14px;
+}
+
+body[data-pc-viewport-family="desktop"] {
+  --pc-vn-dialogue-min-height: 205px;
+  --pc-vn-board-wrap-width: min(78vw, 860px);
+  --pc-vn-character-height: clamp(230px, min(44vh, 24vw), 420px);
+}
+
+body[data-pc-viewport-family="compact-desktop"] {
+  --pc-vn-dialogue-pad-inline: clamp(22px, 3vw, 36px);
+  --pc-vn-dialogue-pad-block: 18px;
+  --pc-vn-dialogue-min-height: 190px;
+  --pc-vn-dialogue-speaker-size: clamp(21px, 1.7vw, 25px);
+  --pc-vn-dialogue-copy-size: clamp(17px, 1.25vw, 19px);
+  --pc-vn-dialogue-hint-size: clamp(15px, 1.1vw, 17px);
+
+  --pc-vn-board-wrap-width: min(56vw, 700px);
+  --pc-vn-board-wrap-top: 70px;
+  --pc-vn-board-box-top: clamp(38px, 6.5%, 54px);
+  --pc-vn-board-box-inline: 10%;
+  --pc-vn-board-pad-block: 12px;
+  --pc-vn-board-pad-inline: 16px;
+  --pc-vn-board-body-size: clamp(0.92rem, 1.05vw, 1.08rem);
+  --pc-vn-board-meta-size: clamp(0.46rem, 0.65vw, 0.56rem);
+  --pc-vn-board-line: 1.15;
+
+  --pc-vn-character-left: 50%;
+  --pc-vn-character-right: auto;
+  --pc-vn-character-bottom: 190px;
+  --pc-vn-character-height: clamp(245px, 25vw, 315px);
+  --pc-vn-character-max-width: 34vw;
+  --pc-vn-character-transform: translateX(-50%);
+  --pc-vn-character-origin: center bottom;
+  --pc-vn-character-justify: center;
+}
+
+body[data-pc-viewport-family="portrait-tablet"] {
+  --pc-vn-dialogue-pad-inline: clamp(30px, 5vw, 54px);
+  --pc-vn-dialogue-pad-block: clamp(24px, 3vh, 34px);
+  --pc-vn-dialogue-min-height: clamp(250px, 22vh, 315px);
+  --pc-vn-dialogue-speaker-size: clamp(30px, 3.4vw, 38px);
+  --pc-vn-dialogue-copy-size: clamp(24px, 2.75vw, 31px);
+  --pc-vn-dialogue-hint-size: clamp(20px, 2.1vw, 24px);
+
+  --pc-vn-board-wrap-width: min(82vw, 820px);
+  --pc-vn-board-wrap-top: clamp(88px, 8vh, 112px);
+  --pc-vn-board-box-top: clamp(40px, 6.5%, 60px);
+  --pc-vn-board-box-inline: 8.5%;
+  --pc-vn-board-pad-block: clamp(14px, 1.8vw, 22px);
+  --pc-vn-board-pad-inline: clamp(16px, 2.2vw, 28px);
+  --pc-vn-board-body-size: clamp(1.02rem, 1.7vw, 1.28rem);
+  --pc-vn-board-meta-size: clamp(0.56rem, 0.9vw, 0.7rem);
+  --pc-vn-board-line: 1.18;
+
+  --pc-vn-character-left: 50%;
+  --pc-vn-character-right: auto;
+  --pc-vn-character-bottom: clamp(220px, 20dvh, 280px);
+  --pc-vn-character-height: clamp(330px, 40vw, 440px);
+  --pc-vn-character-max-width: 52vw;
+  --pc-vn-character-transform: translateX(-50%);
+  --pc-vn-character-origin: center bottom;
+  --pc-vn-character-justify: center;
+
+  --pc-prediction-terminal-width: min(84vw, 1040px);
+  --pc-prediction-terminal-top: 28.5%;
+  --pc-prediction-output-size: 15px;
+}
+
+body[data-pc-viewport-family="short-landscape"] {
+  --pc-vn-dialogue-pad-inline: clamp(18px, 2.6vw, 30px);
+  --pc-vn-dialogue-pad-block: 16px;
+  --pc-vn-dialogue-min-height: 168px;
+  --pc-vn-dialogue-speaker-size: clamp(20px, 1.55vw, 24px);
+  --pc-vn-dialogue-copy-size: clamp(16.5px, 1.25vw, 19px);
+  --pc-vn-dialogue-hint-size: clamp(15px, 1.05vw, 17px);
+
+  --pc-vn-board-wrap-width: min(54vw, 560px);
+  --pc-vn-board-wrap-top: 58px;
+  --pc-vn-board-box-top: clamp(34px, 6%, 46px);
+  --pc-vn-board-box-inline: 10.5%;
+  --pc-vn-board-pad-block: 10px;
+  --pc-vn-board-pad-inline: 14px;
+  --pc-vn-board-body-size: clamp(0.82rem, 0.92vw, 0.96rem);
+  --pc-vn-board-meta-size: clamp(0.42rem, 0.68vw, 0.52rem);
+  --pc-vn-board-line: 1.14;
+
+  --pc-vn-character-left: 50%;
+  --pc-vn-character-right: auto;
+  --pc-vn-character-bottom: 168px;
+  --pc-vn-character-height: clamp(190px, 32vh, 225px);
+  --pc-vn-character-max-width: 32vw;
+  --pc-vn-character-transform: translateX(-50%);
+  --pc-vn-character-origin: center bottom;
+  --pc-vn-character-justify: center;
+
+  --pc-prediction-terminal-width: min(68vw, 880px);
+  --pc-prediction-terminal-top: 27.5%;
+  --pc-prediction-output-size: 13px;
+}
+
+body[data-pc-viewport-family="standard-phone"] {
+  --pc-vn-dialogue-pad-inline: 22px;
+  --pc-vn-dialogue-pad-block: 18px;
+  --pc-vn-dialogue-min-height: 248px;
+  --pc-vn-dialogue-speaker-size: clamp(20px, 5.1vw, 23px);
+  --pc-vn-dialogue-copy-size: clamp(16px, 4.35vw, 18.5px);
+  --pc-vn-dialogue-hint-size: clamp(15px, 3.9vw, 17px);
+
+  --pc-vn-board-wrap-width: calc(100vw - 28px);
+  --pc-vn-board-wrap-top: 72px;
+  --pc-vn-board-box-top: 25px;
+  --pc-vn-board-box-inline: 9%;
+  --pc-vn-board-pad-block: 8px;
+  --pc-vn-board-pad-inline: 11px;
+  --pc-vn-board-body-size: clamp(0.9rem, 4vw, 1.04rem);
+  --pc-vn-board-meta-size: clamp(0.5rem, 2vw, 0.6rem);
+  --pc-vn-board-line: 1.12;
+
+  --pc-vn-character-left: 50%;
+  --pc-vn-character-right: auto;
+  --pc-vn-character-bottom: clamp(218px, 25dvh, 245px);
+  --pc-vn-character-height: clamp(235px, min(31dvh, 58vw), 300px);
+  --pc-vn-character-max-width: 66vw;
+  --pc-vn-character-transform: translateX(-50%);
+  --pc-vn-character-origin: center bottom;
+  --pc-vn-character-justify: center;
+
+  --pc-prediction-terminal-width: calc(100vw - 26px);
+  --pc-prediction-terminal-top: 28%;
+  --pc-prediction-output-size: clamp(13px, 3.2vw, 15px);
+}
+
+body[data-pc-viewport-family="compact-phone"] {
+  --pc-vn-dialogue-pad-inline: 18px;
+  --pc-vn-dialogue-pad-block: 16px;
+  --pc-vn-dialogue-min-height: 232px;
+  --pc-vn-dialogue-speaker-size: clamp(19px, 5vw, 22px);
+  --pc-vn-dialogue-copy-size: clamp(15.5px, 4.25vw, 17.5px);
+  --pc-vn-dialogue-hint-size: clamp(14px, 3.8vw, 16px);
+
+  --pc-vn-board-wrap-width: calc(100vw - 24px);
+  --pc-vn-board-wrap-top: 68px;
+  --pc-vn-board-box-top: 22px;
+  --pc-vn-board-box-inline: 8.5%;
+  --pc-vn-board-pad-block: 7px;
+  --pc-vn-board-pad-inline: 10px;
+  --pc-vn-board-body-size: clamp(0.82rem, 3.85vw, 0.96rem);
+  --pc-vn-board-meta-size: clamp(0.46rem, 1.9vw, 0.56rem);
+  --pc-vn-board-line: 1.08;
+
+  --pc-vn-character-left: 50%;
+  --pc-vn-character-right: auto;
+  --pc-vn-character-bottom: clamp(198px, 27dvh, 220px);
+  --pc-vn-character-height: clamp(205px, min(31dvh, 59vw), 255px);
+  --pc-vn-character-max-width: 68vw;
+  --pc-vn-character-transform: translateX(-50%);
+  --pc-vn-character-origin: center bottom;
+  --pc-vn-character-justify: center;
+
+  --pc-prediction-terminal-width: calc(100vw - 22px);
+  --pc-prediction-terminal-top: 27%;
+  --pc-prediction-output-size: clamp(12px, 3.1vw, 14px);
+}
+
+/* Shared dialogue sizing for regular VN scenes and prediction feedback. */
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active #vnDialogue,
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active .vn-dialogue {
+  min-height: var(--pc-vn-dialogue-min-height) !important;
+  padding: var(--pc-vn-dialogue-pad-block) var(--pc-vn-dialogue-pad-inline) !important;
+  box-sizing: border-box !important;
+}
+
+html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay.vn-overlay.active #vnText,
+html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay.vn-overlay.active .vn-text {
+  max-width: 100% !important;
+}
+
+html body[data-pc-viewport-family="short-landscape"] #vnOverlay.vn-overlay.active #vnDialogue,
+html body[data-pc-viewport-family="short-landscape"] #vnOverlay.vn-overlay.active .vn-dialogue {
+  max-height: 190px !important;
+  overflow: hidden !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) #vnSpeaker,
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) .vn-speaker {
+  font-size: var(--pc-vn-dialogue-speaker-size) !important;
+  line-height: 1.16 !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) #vnText,
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) .vn-text,
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) .pc-feedback-copy,
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:not(.claude-terminal-textmode) .pc-feedback-message {
+  font-size: var(--pc-vn-dialogue-copy-size) !important;
+  line-height: 1.48 !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active #vnAdvanceHint,
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active .vn-advance,
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active #vnPredictionChoicePanel button,
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active :is(.prediction-continue-btn, #pcContinueToClaudeBtn) {
+  font-size: var(--pc-vn-dialogue-hint-size) !important;
+}
+
+/* Shared board and Pixel composition for regular intro / guided scenes. */
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-smartboard-wrap {
+  left: 50% !important;
+  right: auto !important;
+  top: var(--pc-vn-board-wrap-top) !important;
+  width: var(--pc-vn-board-wrap-width) !important;
+  max-width: calc(100vw - 20px) !important;
+  margin: 0 !important;
+  transform: translateX(-50%) !important;
+  transform-origin: top center !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text *,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text * {
+  font-size: var(--pc-vn-board-body-size) !important;
+  line-height: var(--pc-vn-board-line) !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text {
+  left: var(--pc-vn-board-box-inline) !important;
+  right: var(--pc-vn-board-box-inline) !important;
+  top: var(--pc-vn-board-box-top) !important;
+  padding: var(--pc-vn-board-pad-block) var(--pc-vn-board-pad-inline) !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-label,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-text::before,
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) .vn-board-label {
+  font-size: var(--pc-vn-board-meta-size) !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character),
+html body[data-pc-viewport-family] #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active:not(.scenario-intro-active):not(.pc-dual-character):not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) :is(#vnCharacter, .vn-character) {
+  left: var(--pc-vn-character-left) !important;
+  right: var(--pc-vn-character-right) !important;
+  bottom: var(--pc-vn-character-bottom) !important;
+  width: auto !important;
+  height: var(--pc-vn-character-height) !important;
+  max-width: var(--pc-vn-character-max-width) !important;
+  max-height: none !important;
+  transform: var(--pc-vn-character-transform) !important;
+  transform-origin: var(--pc-vn-character-origin) !important;
+  align-items: flex-end !important;
+  justify-content: var(--pc-vn-character-justify) !important;
+  z-index: 17 !important;
+}
+
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay.vn-overlay.active:not(.pc-dual-character) #vnPortrait,
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay.vn-overlay.active:not(.pc-dual-character) #vnPortrait,
+html body[data-pc-viewport-family="portrait-tablet"] #vnOverlay.vn-overlay.active:not(.pc-dual-character) #vnPortrait,
+html body[data-pc-viewport-family="compact-desktop"] #vnOverlay.vn-overlay.active:not(.pc-dual-character) #vnPortrait,
+html body[data-pc-viewport-family="short-landscape"] #vnOverlay.vn-overlay.active:not(.pc-dual-character) #vnPortrait {
+  object-position: center bottom !important;
+}
+
+html body[data-pc-viewport-family="compact-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) #vnAdvanceHint,
+html body[data-pc-viewport-family="standard-phone"] #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.claude-consult, .claude-prediction, .pc-clean-prediction, .pc-prediction-question, .claude-terminal-consult, .claude-terminal-textmode, .pc-clean-output)) #vnAdvanceHint {
+  letter-spacing: 0.18em !important;
+}
+
+/* Prediction scenes inherit the same viewport families so the terminal stops
+   jumping between tiny tablet and oversized intermediate states. */
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #claudeTerminalScene,
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:is(.claude-terminal-consult) #claudeTerminalScene {
+  width: var(--pc-prediction-terminal-width) !important;
+  top: var(--pc-prediction-terminal-top) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:is(.claude-prediction, .pc-clean-prediction, .pc-prediction-question, .pc-prediction-result) #claudeTerminalOutput {
+  font-size: var(--pc-prediction-output-size) !important;
+  line-height: 1.08 !important;
+}
+
+/* V273 viewport-family tuning: short landscape is classified before compact
+   phones; portrait tablets receive independently larger board, dialogue, and
+   Pixel dimensions instead of a globally shrunken desktop composition. */
+
+/* V274 single-character staging: compact phones, standard phones, portrait
+   tablets, and short landscape views use the same centered active-speaker
+   composition as the dual-character system. Pixel scales independently from
+   the board and dialogue, while the dual-character layouts keep their own
+   dedicated staging rules. */
+
+
+/* ══════════════════════════════════════════════════════
+   V365 — SCENARIO 2 FULL METACOGNITION LOOP
+   ══════════════════════════════════════════════════════ */
+
+html body .pc-s2-engine-progress {
+  width: min(680px, 100%) !important;
+  height: 12px !important;
+  margin: 18px auto 10px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(32,255,0,.7) !important;
+  background: rgba(2,19,8,.9) !important;
+}
+
+html body .pc-s2-engine-progress > span {
+  display: block !important;
+  width: 72% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, rgba(32,255,0,.32), rgba(32,255,0,.9)) !important;
+  animation: pcS2EnginePulse 1.4s ease-in-out infinite alternate !important;
+}
+
+@keyframes pcS2EnginePulse {
+  from { transform: translateX(-35%); opacity: .55; }
+  to { transform: translateX(38%); opacity: 1; }
+}
+
+html body .pc-s2-engine-note {
+  font-size: .88rem !important;
+  opacity: .78 !important;
+}
+
+html body .pc-s2-audit-layout {
+  display: grid !important;
+  grid-template-columns: minmax(280px, .88fr) minmax(0, 1.12fr) !important;
+  gap: clamp(16px, 2.4vw, 28px) !important;
+  align-items: start !important;
+}
+
+html body .pc-s2-babbage-draft {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border: 1px solid rgba(194,156,82,.58) !important;
+  border-radius: 16px !important;
+  background:
+    linear-gradient(180deg, rgba(23,57,46,.98), rgba(8,27,21,.98)) !important;
+  color: #eef9f1 !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,.16) !important;
+}
+
+html body .pc-s2-babbage-draft h2 {
+  color: #f4e5ba !important;
+}
+
+html body .pc-s2-draft-prompt {
+  margin: 14px 0 !important;
+  padding: 14px 16px !important;
+  border-left: 4px solid #d0ae65 !important;
+  background: rgba(255,255,255,.055) !important;
+  font-size: 1.02rem !important;
+  line-height: 1.55 !important;
+}
+
+html body .pc-s2-babbage-draft details {
+  margin-top: 14px !important;
+  padding-top: 10px !important;
+  border-top: 1px solid rgba(255,255,255,.14) !important;
+}
+
+html body .pc-s2-final {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+
+html body .pc-s2-final-header {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border-radius: 16px !important;
+  background: #173f32 !important;
+  color: #f5fbf7 !important;
+}
+
+html body .pc-s2-final-header h2 {
+  color: #f4e5ba !important;
+  margin: 4px 0 8px !important;
+}
+
+html body .pc-s2-before-after {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+html body .pc-s2-comparison-card {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border: 1px solid #c9d4cc !important;
+  border-radius: 16px !important;
+  background: #f8f7f2 !important;
+}
+
+html body .pc-s2-comparison-card.is-after {
+  border-color: #78a587 !important;
+  background: #eef7f0 !important;
+}
+
+html body .pc-s2-comparison-card > span {
+  display: inline-block !important;
+  margin-bottom: 8px !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+  color: #466350 !important;
+}
+
+html body .pc-s2-comparison-card blockquote {
+  margin: 14px 0 0 !important;
+  padding: 12px 14px !important;
+  border-left: 4px solid #6f9c7c !important;
+  background: rgba(255,255,255,.65) !important;
+}
+
+html body .pc-s2-review-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+html body .pc-s2-review-grid article {
+  padding: 16px !important;
+  border: 1px solid #cad7cd !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+}
+
+html body .pc-s2-review-grid h3 {
+  margin-top: 0 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s2-final-actions {
+  justify-content: flex-end !important;
+}
+
+@media screen and (max-width: 900px) {
+  html body .pc-s2-audit-layout,
+  html body .pc-s2-before-after,
+  html body .pc-s2-review-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+
+/* ══════════════════════════════════════════════════════
+   SHARED GUIDED REPAIR WORKSPACE
+   Scenario 1 established this interaction model. S2 is the first scenario to
+   consume the reusable version; later scenarios should supply content rather
+   than inventing another field layout.
+   ══════════════════════════════════════════════════════ */
+html body .pc-guided-repair-layout {
+  display: grid !important;
+  grid-template-columns: minmax(300px, .86fr) minmax(0, 1.34fr) !important;
+  gap: clamp(16px, 1.8vw, 24px) !important;
+  align-items: start !important;
+  min-width: 0 !important;
+}
+
+html body .pc-guided-repair-reference,
+html body .pc-guided-repair-builder {
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  padding: clamp(18px, 1.7vw, 24px) !important;
+  border: 2px solid var(--border-strong) !important;
+  border-radius: 16px !important;
+  background: #fffdf8 !important;
+  color: var(--ink) !important;
+  box-shadow: 0 6px 18px rgba(42,31,20,.10) !important;
+}
+
+html body .pc-guided-repair-reference-title,
+html body .pc-guided-repair-builder h2 {
+  margin: 3px 0 10px !important;
+  color: var(--forest-dark) !important;
+  font-family: "Fraunces", serif !important;
+  line-height: 1.16 !important;
+}
+
+html body .pc-guided-repair-reference-title {
+  font-size: clamp(1.25rem, 1.5vw, 1.62rem) !important;
+}
+
+html body .pc-guided-repair-builder h2 {
+  font-size: clamp(1.45rem, 1.9vw, 1.95rem) !important;
+}
+
+html body .pc-guided-repair-source-prompt {
+  margin: 12px 0 14px !important;
+  padding: 16px 18px !important;
+  border: 2px dashed var(--border-strong) !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  color: var(--ink) !important;
+  font-size: clamp(.96rem, 1.05vw, 1.06rem) !important;
+  line-height: 1.6 !important;
+  white-space: pre-line !important;
+}
+
+html body .pc-guided-repair-problem {
+  margin-top: 12px !important;
+  padding: 13px 15px !important;
+  border: 1.5px solid #d98052 !important;
+  border-radius: 11px !important;
+  background: #fff1e9 !important;
+  color: var(--ink-mid) !important;
+}
+
+html body .pc-guided-repair-problem-label,
+html body .pc-guided-repair-ingredients-heading,
+html body .pc-guided-repair-preview-label {
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .76rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .09em !important;
+  text-transform: uppercase !important;
+}
+
+html body .pc-guided-repair-problem-label {
+  margin-bottom: 5px !important;
+  color: #a4471e !important;
+}
+
+html body .pc-guided-repair-problem strong {
+  display: block !important;
+  color: #743418 !important;
+  line-height: 1.42 !important;
+}
+
+html body .pc-guided-repair-problem p {
+  margin: 5px 0 0 !important;
+  font-size: .92rem !important;
+  line-height: 1.5 !important;
+}
+
+html body .pc-guided-repair-ingredients {
+  margin-top: 14px !important;
+  padding: 12px !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 12px !important;
+  background: #f6efe2 !important;
+}
+
+html body .pc-guided-repair-ingredients-heading {
+  margin-bottom: 8px !important;
+  color: #7f3514 !important;
+}
+
+html body .pc-guided-repair-chip-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 7px !important;
+}
+
+html body .pc-guided-repair-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 32px !important;
+  padding: 6px 10px !important;
+  border: 1.5px solid #ae9b79 !important;
+  border-radius: 999px !important;
+  background: #fffaf0 !important;
+  color: var(--ink-mid) !important;
+  font-size: .84rem !important;
+  font-weight: 800 !important;
+}
+
+html body .pc-guided-repair-chip.covered {
+  border-color: #35724b !important;
+  background: #e4f2e8 !important;
+  color: #164c2f !important;
+}
+
+html body .pc-guided-repair-head {
+  margin-bottom: 12px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1.5px solid var(--border) !important;
+}
+
+html body .pc-guided-repair-instruction {
+  max-width: 960px !important;
+  margin: 6px 0 0 !important;
+  color: var(--ink-light) !important;
+  font-size: clamp(.95rem, 1.05vw, 1.05rem) !important;
+  line-height: 1.55 !important;
+}
+
+html body .pc-guided-repair-fields {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px 14px !important;
+}
+
+html body .pc-guided-repair-field {
+  min-width: 0 !important;
+}
+
+html body .pc-guided-repair-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 6px !important;
+  color: var(--ink-mid) !important;
+  font-size: clamp(.94rem, 1.05vw, 1.05rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.3 !important;
+}
+
+html body .pc-guided-repair-num {
+  width: 28px !important;
+  height: 28px !important;
+  flex: 0 0 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  background: var(--forest-dark) !important;
+  color: #d4edd9 !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .78rem !important;
+  font-weight: 900 !important;
+}
+
+html body .pc-guided-repair-textarea {
+  width: 100% !important;
+  min-height: 104px !important;
+  max-height: 200px !important;
+  box-sizing: border-box !important;
+  resize: vertical !important;
+  overflow: auto !important;
+  padding: 12px 13px !important;
+  border: 2px solid var(--border-strong) !important;
+  border-radius: 12px !important;
+  background: #fffdf8 !important;
+  color: var(--ink) !important;
+  font-family: "Nunito", sans-serif !important;
+  font-size: clamp(.96rem, 1.02vw, 1.04rem) !important;
+  line-height: 1.5 !important;
+  outline: none !important;
+  box-shadow: inset 0 1px 3px rgba(42,31,20,.05) !important;
+}
+
+html body .pc-guided-repair-textarea:focus {
+  border-color: var(--forest-mid) !important;
+  box-shadow: 0 0 0 3px rgba(45,90,61,.12), inset 0 1px 3px rgba(42,31,20,.05) !important;
+}
+
+html body .pc-guided-repair-preview-wrap {
+  margin-top: 15px !important;
+  padding-top: 14px !important;
+  border-top: 1.5px solid var(--border) !important;
+}
+
+html body .pc-guided-repair-preview-label {
+  margin-bottom: 7px !important;
+  color: var(--forest-dark) !important;
+}
+
+html body .pc-guided-repair-preview {
+  min-height: 98px !important;
+  box-sizing: border-box !important;
+  padding: 13px 15px !important;
+  border: 1.5px solid #8db49a !important;
+  border-radius: 11px !important;
+  background: #eef7f0 !important;
+  color: #173d27 !important;
+  font-size: .96rem !important;
+  line-height: 1.5 !important;
+  white-space: pre-wrap !important;
+}
+
+html body .pc-guided-repair-preview.is-empty {
+  border-style: dashed !important;
+  background: #f8f7f2 !important;
+  color: #7a7468 !important;
+  font-style: italic !important;
+}
+
+html body .pc-guided-repair-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-top: 12px !important;
+  padding-top: 11px !important;
+  border-top: 1.5px solid var(--border) !important;
+}
+
+html body .pc-guided-repair-nudge {
+  flex: 1 1 auto !important;
+  padding: 9px 11px !important;
+  border: 1.5px solid #d4a72c !important;
+  border-radius: 10px !important;
+  background: #fff6d6 !important;
+  color: #4a3728 !important;
+  font-size: .88rem !important;
+  line-height: 1.45 !important;
+}
+
+html body .pc-guided-repair-submit-wrap {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+html body .pc-guided-repair-status {
+  color: var(--ink-light) !important;
+  font-size: .85rem !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+@media screen and (max-width: 1050px) {
+  html body .pc-guided-repair-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  html body .pc-guided-repair-fields {
+    grid-template-columns: 1fr !important;
+  }
+  html body .pc-guided-repair-actions {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+  html body .pc-guided-repair-submit-wrap {
+    width: 100% !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+  }
+}
+
+@media screen and (max-width: 560px) {
+  html body .pc-guided-repair-reference,
+  html body .pc-guided-repair-builder {
+    padding: 16px !important;
+  }
+  html body .pc-guided-repair-textarea {
+    min-height: 116px !important;
+  }
+  html body .pc-guided-repair-submit-wrap,
+  html body .pc-guided-repair-submit-wrap .pc-button {
+    width: 100% !important;
+  }
+  html body .pc-guided-repair-submit-wrap .pc-button {
+    min-height: 50px !important;
+  }
+}
+
+
+
+/* V429 — Full-width guided repair preview. The reference/learning-process area
+   and repair builder remain side by side; the assembled student-facing prompt
+   becomes a shared full-width conclusion beneath both columns. */
+html body .pc-guided-repair-layout--full-preview .pc-guided-repair-footer {
+  grid-column: 1 / -1 !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+html body .pc-guided-repair-layout--full-preview .pc-guided-repair-preview-wrap {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  border-top: 0 !important;
+}
+
+html body .pc-guided-repair-layout--full-preview .pc-guided-repair-preview {
+  width: 100% !important;
+  min-height: 108px !important;
+}
+
+html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
+  margin-top: 10px !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   V366 — SCENARIO 3 AUTHENTIC ASSESSMENT
+   ══════════════════════════════════════════════════════ */
+
+html body .pc-s3-case-grid,
+html body .pc-s3-audit-layout,
+html body .pc-s3-repair-layout {
+  display: grid !important;
+  grid-template-columns: minmax(280px, .86fr) minmax(0, 1.14fr) !important;
+  gap: clamp(16px, 2.4vw, 28px) !important;
+  align-items: start !important;
+}
+
+html body .pc-s3-case-card,
+html body .pc-s3-assessment-draft {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border: 1px solid rgba(92, 126, 101, .42) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, #f7f4ea, #ece7d8) !important;
+  color: #253329 !important;
+  box-shadow: 0 16px 38px rgba(0,0,0,.10) !important;
+}
+
+html body .pc-s3-case-card h2,
+html body .pc-s3-assessment-draft h2,
+html body .pc-s3-assessment-draft h3 {
+  color: #173d27 !important;
+}
+
+html body .pc-s3-evidence-list {
+  display: grid !important;
+  gap: 10px !important;
+  margin-top: 14px !important;
+}
+
+html body .pc-s3-evidence-list p {
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  border-left: 4px solid #6d9678 !important;
+  background: rgba(255,255,255,.62) !important;
+}
+
+html body .pc-s3-draft-details {
+  display: grid !important;
+  gap: 10px !important;
+  margin: 14px 0 18px !important;
+}
+
+html body .pc-s3-draft-details > div {
+  display: grid !important;
+  grid-template-columns: 112px minmax(0, 1fr) !important;
+  gap: 10px !important;
+  padding: 9px 0 !important;
+  border-bottom: 1px solid rgba(45,74,55,.14) !important;
+}
+
+html body .pc-s3-draft-details dt {
+  font-weight: 900 !important;
+  color: #486451 !important;
+}
+
+html body .pc-s3-draft-details dd {
+  margin: 0 !important;
+}
+
+html body .pc-s3-assessment-draft.is-compact {
+  background: linear-gradient(180deg, rgba(23,57,46,.98), rgba(8,27,21,.98)) !important;
+  color: #eef9f1 !important;
+  border-color: rgba(197,165,94,.52) !important;
+}
+
+html body .pc-s3-assessment-draft.is-compact h3 {
+  color: #f3e1ae !important;
+}
+
+html body .pc-s3-repair-label {
+  display: block !important;
+  margin: 16px 0 7px !important;
+  font-weight: 900 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s3-repair-textarea {
+  width: 100% !important;
+  min-height: 170px !important;
+  padding: 14px 16px !important;
+  box-sizing: border-box !important;
+  resize: vertical !important;
+  border: 2px solid #8eae96 !important;
+  border-radius: 12px !important;
+  background: #fffefb !important;
+  color: #1d2c22 !important;
+  font: inherit !important;
+  line-height: 1.55 !important;
+}
+
+html body .pc-s3-repair-textarea.is-short {
+  min-height: 112px !important;
+}
+
+html body .pc-s3-repair-textarea:focus {
+  outline: 3px solid rgba(68, 126, 87, .22) !important;
+  border-color: #447e57 !important;
+}
+
+html body .pc-s3-final {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+
+html body .pc-s3-final-header {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border-radius: 16px !important;
+  background: #173f32 !important;
+  color: #f5fbf7 !important;
+}
+
+html body .pc-s3-final-header h2 {
+  margin: 4px 0 8px !important;
+  color: #f3dfaa !important;
+}
+
+html body .pc-s3-before-after {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+html body .pc-s3-comparison-card {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border: 1px solid #c7d1c9 !important;
+  border-radius: 16px !important;
+  background: #f7f5ef !important;
+}
+
+html body .pc-s3-comparison-card.is-after {
+  border-color: #75a182 !important;
+  background: #eef7f0 !important;
+}
+
+html body .pc-s3-comparison-card > span {
+  display: inline-block !important;
+  margin-bottom: 8px !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+  color: #4f6a57 !important;
+}
+
+html body .pc-s3-consequence {
+  margin-top: 16px !important;
+  padding: 10px 12px !important;
+  border-left: 4px solid #b1843a !important;
+  background: #fff7e3 !important;
+}
+
+html body .pc-s3-evidence-callout {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border: 2px solid #6f9d7e !important;
+  border-radius: 16px !important;
+  background: #f4fbf6 !important;
+}
+
+html body .pc-s3-evidence-callout p {
+  margin: 7px 0 0 !important;
+  font-size: 1.04rem !important;
+  line-height: 1.58 !important;
+}
+
+html body .pc-s3-review-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+html body .pc-s3-review-grid article {
+  padding: 16px !important;
+  border: 1px solid #cad7cd !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+}
+
+html body .pc-s3-review-grid h3 {
+  margin-top: 0 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s3-final-actions {
+  justify-content: flex-end !important;
+}
+
+@media screen and (max-width: 900px) {
+  html body .pc-s3-case-grid,
+  html body .pc-s3-audit-layout,
+  html body .pc-s3-repair-layout,
+  html body .pc-s3-before-after,
+  html body .pc-s3-review-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  html body .pc-s3-draft-details > div {
+    grid-template-columns: 1fr !important;
+    gap: 2px !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   V367 — SCENARIO 4 SYNCHRONOUS BIAS
+   ══════════════════════════════════════════════════════ */
+
+html body .pc-s4-case-grid,
+html body .pc-s4-audit-layout,
+html body .pc-s4-repair-layout {
+  display: grid !important;
+  grid-template-columns: minmax(280px, .88fr) minmax(0, 1.12fr) !important;
+  gap: clamp(16px, 2.4vw, 28px) !important;
+  align-items: start !important;
+}
+
+html body .pc-s4-case-card,
+html body .pc-s4-plan-card {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border: 1px solid rgba(92, 126, 101, .42) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, #f4f6ef, #e6ece4) !important;
+  color: #253329 !important;
+  box-shadow: 0 16px 38px rgba(0,0,0,.10) !important;
+}
+
+html body .pc-s4-case-card h2,
+html body .pc-s4-plan-card h2,
+html body .pc-s4-plan-card h3 {
+  color: #173d27 !important;
+}
+
+html body .pc-s4-student-notes {
+  display: grid !important;
+  gap: 10px !important;
+  margin-top: 14px !important;
+}
+
+html body .pc-s4-student-notes p {
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  border-left: 4px solid #6a9476 !important;
+  background: rgba(255,255,255,.68) !important;
+}
+
+html body .pc-s4-path-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  margin: 16px 0 !important;
+}
+
+html body .pc-s4-path-grid section {
+  padding: 14px !important;
+  border: 1px solid rgba(70,102,79,.24) !important;
+  border-radius: 12px !important;
+  background: rgba(255,255,255,.68) !important;
+}
+
+html body .pc-s4-path-grid span {
+  display: inline-block !important;
+  margin-bottom: 6px !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .08em !important;
+  color: #4a6652 !important;
+}
+
+html body .pc-s4-plan-card.is-compact {
+  background: linear-gradient(180deg, rgba(23,57,46,.98), rgba(8,27,21,.98)) !important;
+  color: #eef9f1 !important;
+  border-color: rgba(197,165,94,.52) !important;
+}
+
+html body .pc-s4-risk-note,
+html body .pc-s4-consequence {
+  margin-top: 14px !important;
+  padding: 11px 13px !important;
+  border-left: 4px solid #b7893d !important;
+  background: #fff6df !important;
+  color: #4b3820 !important;
+}
+
+html body .pc-s4-repair-label {
+  display: block !important;
+  margin: 16px 0 7px !important;
+  font-weight: 900 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s4-repair-textarea {
+  width: 100% !important;
+  min-height: 170px !important;
+  padding: 14px 16px !important;
+  box-sizing: border-box !important;
+  resize: vertical !important;
+  border: 2px solid #8eae96 !important;
+  border-radius: 12px !important;
+  background: #fffefb !important;
+  color: #1d2c22 !important;
+  font: inherit !important;
+  line-height: 1.55 !important;
+}
+
+html body .pc-s4-repair-textarea.is-short {
+  min-height: 112px !important;
+}
+
+html body .pc-s4-repair-textarea:focus {
+  outline: 3px solid rgba(68,126,87,.22) !important;
+  border-color: #447e57 !important;
+}
+
+html body .pc-s4-final {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+
+html body .pc-s4-final-header {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border-radius: 16px !important;
+  background: #173f32 !important;
+  color: #f5fbf7 !important;
+}
+
+html body .pc-s4-final-header h2 {
+  margin: 4px 0 8px !important;
+  color: #f3dfaa !important;
+}
+
+html body .pc-s4-before-after {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+html body .pc-s4-comparison-card {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border: 1px solid #c7d1c9 !important;
+  border-radius: 16px !important;
+  background: #f7f5ef !important;
+}
+
+html body .pc-s4-comparison-card.is-after {
+  border-color: #75a182 !important;
+  background: #eef7f0 !important;
+}
+
+html body .pc-s4-comparison-card > span {
+  display: inline-block !important;
+  margin-bottom: 8px !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+  color: #4f6a57 !important;
+}
+
+html body .pc-s4-evidence-callout {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border: 2px solid #6f9d7e !important;
+  border-radius: 16px !important;
+  background: #f4fbf6 !important;
+}
+
+html body .pc-s4-evidence-callout p {
+  margin: 7px 0 0 !important;
+  font-size: 1.04rem !important;
+  line-height: 1.58 !important;
+}
+
+html body .pc-s4-review-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+html body .pc-s4-review-grid article {
+  padding: 16px !important;
+  border: 1px solid #cad7cd !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+}
+
+html body .pc-s4-review-grid h3 {
+  margin-top: 0 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s4-final-actions {
+  justify-content: flex-end !important;
+}
+
+@media screen and (max-width: 900px) {
+  html body .pc-s4-case-grid,
+  html body .pc-s4-audit-layout,
+  html body .pc-s4-repair-layout,
+  html body .pc-s4-before-after,
+  html body .pc-s4-review-grid,
+  html body .pc-s4-path-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   V368 — SCENARIO 5 HALLUCINATION HUNT
+   ══════════════════════════════════════════════════════ */
+
+html body .pc-s5-evidence-stage,
+html body .pc-s5-final {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+
+html body .pc-s5-evidence-header,
+html body .pc-s5-final-header {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border-radius: 16px !important;
+  background: #173f32 !important;
+  color: #f5fbf7 !important;
+}
+
+html body .pc-s5-evidence-header h2,
+html body .pc-s5-final-header h2 {
+  margin: 4px 0 8px !important;
+  color: #f3dfaa !important;
+}
+
+html body .pc-s5-source-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+html body .pc-s5-source-grid.is-compact {
+  margin-top: 14px !important;
+}
+
+html body .pc-s5-source-card {
+  padding: 16px !important;
+  border: 1px solid #c9d4cc !important;
+  border-radius: 14px !important;
+  background: #fffdf7 !important;
+  color: #253329 !important;
+}
+
+html body .pc-s5-source-card h3 {
+  margin: 5px 0 6px !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s5-source-id {
+  display: inline-block !important;
+  padding: 4px 8px !important;
+  border-radius: 999px !important;
+  background: #173f32 !important;
+  color: #f3dfaa !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .08em !important;
+}
+
+html body .pc-s5-source-type {
+  margin: 0 0 9px !important;
+  font-size: .82rem !important;
+  font-weight: 800 !important;
+  color: #607164 !important;
+}
+
+html body .pc-s5-audit-layout,
+html body .pc-s5-correction-layout {
+  display: grid !important;
+  grid-template-columns: minmax(300px, .95fr) minmax(0, 1.05fr) !important;
+  gap: clamp(16px, 2.4vw, 28px) !important;
+  align-items: start !important;
+}
+
+html body .pc-s5-brief-card,
+html body .pc-s5-unsafe-card {
+  padding: clamp(18px, 2vw, 26px) !important;
+  border: 1px solid rgba(196,164,94,.55) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, rgba(23,57,46,.98), rgba(8,27,21,.98)) !important;
+  color: #eef9f1 !important;
+}
+
+html body .pc-s5-brief-card h2,
+html body .pc-s5-unsafe-card h3 {
+  color: #f3dfaa !important;
+}
+
+html body .pc-s5-claim-stack {
+  display: grid !important;
+  gap: 10px !important;
+  margin-top: 16px !important;
+}
+
+html body .pc-s5-claim-stack article {
+  padding: 12px 14px !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  border-radius: 12px !important;
+  background: rgba(255,255,255,.055) !important;
+}
+
+html body .pc-s5-claim-stack article > span {
+  display: inline-block !important;
+  margin-bottom: 5px !important;
+  color: #d9bc75 !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+}
+
+html body .pc-s5-claim-stack p {
+  margin: 0 0 6px !important;
+}
+
+html body .pc-s5-claim-stack small {
+  color: #b8cdbc !important;
+}
+
+html body .pc-s5-evidence-drawer {
+  margin-bottom: 14px !important;
+  padding: 12px 14px !important;
+  border: 1px solid #b8c9bd !important;
+  border-radius: 12px !important;
+  background: #f5f8f3 !important;
+}
+
+html body .pc-s5-evidence-drawer summary {
+  cursor: pointer !important;
+  font-weight: 900 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s5-issue-note {
+  margin-top: 14px !important;
+  padding: 11px 13px !important;
+  border-left: 4px solid #d29a3e !important;
+  background: #fff3d4 !important;
+  color: #4b3820 !important;
+}
+
+html body .pc-s5-correction-label {
+  display: block !important;
+  margin: 16px 0 7px !important;
+  font-weight: 900 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s5-correction-textarea {
+  width: 100% !important;
+  min-height: 150px !important;
+  padding: 14px 16px !important;
+  box-sizing: border-box !important;
+  resize: vertical !important;
+  border: 2px solid #8eae96 !important;
+  border-radius: 12px !important;
+  background: #fffefb !important;
+  color: #1d2c22 !important;
+  font: inherit !important;
+  line-height: 1.55 !important;
+}
+
+html body .pc-s5-correction-textarea.is-short {
+  min-height: 108px !important;
+}
+
+html body .pc-s5-correction-textarea:focus {
+  outline: 3px solid rgba(68,126,87,.22) !important;
+  border-color: #447e57 !important;
+}
+
+html body .pc-s5-before-after {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+html body .pc-s5-comparison-card {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border-radius: 16px !important;
+}
+
+html body .pc-s5-comparison-card.is-unsafe {
+  border: 1px solid #c38a7f !important;
+  background: #fff2ee !important;
+}
+
+html body .pc-s5-comparison-card.is-safe {
+  border: 1px solid #78a587 !important;
+  background: #eef7f0 !important;
+}
+
+html body .pc-s5-comparison-card > span {
+  display: inline-block !important;
+  margin-bottom: 8px !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+  color: #4f6a57 !important;
+}
+
+html body .pc-s5-verification-callout {
+  padding: clamp(18px, 2vw, 24px) !important;
+  border: 2px solid #6f9d7e !important;
+  border-radius: 16px !important;
+  background: #f4fbf6 !important;
+}
+
+html body .pc-s5-verification-callout p {
+  margin: 7px 0 0 !important;
+  line-height: 1.58 !important;
+}
+
+html body .pc-s5-review-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+html body .pc-s5-review-grid article {
+  padding: 16px !important;
+  border: 1px solid #cad7cd !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+}
+
+html body .pc-s5-review-grid h3 {
+  margin-top: 0 !important;
+  color: #173d27 !important;
+}
+
+html body .pc-s5-final-actions {
+  justify-content: flex-end !important;
+}
+
+@media screen and (max-width: 900px) {
+  html body .pc-s5-audit-layout,
+  html body .pc-s5-correction-layout,
+  html body .pc-s5-before-after,
+  html body .pc-s5-review-grid,
+  html body .pc-s5-source-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* S2 Decision 4: keep the audit result as a shared full-width consequence panel. */
+.pc-s2-audit-feedback-wide {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
+  margin-top: clamp(16px, 2vw, 24px);
+}
+
+.pc-s2-audit-feedback-wide:empty {
+  display: none;
+}

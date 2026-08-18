@@ -1,0 +1,21 @@
+/* PromptCraft application CSS manifest.
+   Import order is the browser cascade order used by tools/build.py. */
+
+@import url("foundation/base.css");
+@import url("ui/visual-novel.css");
+@import url("ui/babbage-terminal.css");
+@import url("compat/legacy-responsive.css");
+@import url("ui/components.css");
+@import url("layout/app-layout.css");
+@import url("ui/intro-scenes.css");
+@import url("ui/prediction-scenes.css");
+@import url("ui/live-analysis.css");
+@import url("ui/completed-analysis.css");
+@import url("scenarios/s1-engagement.css");
+@import url("scenarios/shared.css");
+@import url("responsive/intro.css");
+@import url("responsive/workbench.css");
+@import url("ui/brand-menu.css");
+@import url("responsive/large-tablet.css");
+@import url("responsive/prediction.css");
+@import url("responsive/final-overrides.css");

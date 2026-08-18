@@ -1,80 +1,192 @@
-# PromptCraft project structure
+# PromptCraft V429
 
-PromptCraft runs as a classic browser application with shared globals. The main application loads one generated stylesheet and two JavaScript files:
+PromptCraft is a static browser application for scenario-based AI literacy training. The repository separates editable source, generated browser runtime files, media assets, research integration, serverless AI access, regression tests, and development documentation.
 
-1. `styles/promptcraft.css` for the complete ordered application cascade.
-2. `functions/dialogue.js` for dialogue content and expression metadata.
-3. `functions/app.bundle.js` for the application runtime.
+## Authoritative baseline
 
-The separate Ideas Wall page loads `styles/wall.css` and `functions/wall.js`. Its page-owned files are intentionally excluded from the main application bundles.
+- Application build: `PROMPTCRAFT_V429`
+- App schema: `V121`
+- Research receiver: `PromptCraft_Receiver_V82_Ideas_Wall_Moderation.js`
+- Receiver deployment: keep using the existing Apps Script deployment URL configured in source
+- Main application: `index.html`
+- Public Ideas Wall: `wall.html`
+- Active browser scenarios: S1 Engagement and S2 Metacognition
+- Development shells: S3 through S8
 
-The generated JavaScript bundle is assembled, in order, from:
+Cache/query revisions are deployment/cache controls. They do **not** automatically change the PromptCraft application build number.
 
-1. `functions/app.js` for shared state, configuration, research logging, assets, and audio.
-2. `functions/app-scenarios.js` for scenario definitions, menus, reusable activity builders, and scenario navigation state.
-3. `functions/app-vn.js` for the visual-novel engine, Babbage terminal flows, and responsive scene controllers.
-4. `functions/app-workbench.js` for scenario workbenches, scoring, completion, reflection, and development tools.
+## Repository map
 
-## Editing JavaScript
-
-Edit the four modular source files. Do not edit `functions/app.bundle.js` directly. Rebuild and validate with:
-
-```bash
-python tools/build-production.py
-python tools/validate-project.py
-python tools/test-runtime.py
+```text
+PromptCraft_V429/
+├── index.html
+├── wall.html
+├── favicon.ico
+├── netlify.toml
+├── assets/
+│   ├── audio/
+│   ├── images/
+│   ├── ui/
+│   └── asset-manifest.json
+├── src/
+│   ├── js/
+│   │   ├── manifest.json
+│   │   ├── ai/
+│   │   ├── app/
+│   │   ├── audio/
+│   │   ├── content/
+│   │   ├── dev/
+│   │   ├── pages/
+│   │   ├── research/
+│   │   ├── scenarios/
+│   │   └── ui/
+│   └── css/
+│       ├── manifest.css
+│       ├── compat/
+│       ├── foundation/
+│       ├── layout/
+│       ├── pages/
+│       ├── responsive/
+│       ├── scenarios/
+│       └── ui/
+├── runtime/
+│   ├── js/
+│   └── css/
+├── netlify/functions/
+├── tests/
+├── tools/
+└── docs/
+    ├── asset-management/
+    └── development/
 ```
 
-The build adds defensive semicolon boundaries between JavaScript source files, compiles the complete CSS owner cascade into one runtime stylesheet, and runs `node --check` against every runtime script. Validation checks bundle drift, duplicate HTML IDs, local file references, UI action ownership, CSS structure, retired selectors, exact duplicate CSS rules, asset ownership, the Babbage/OpenAI proxy, synchronized cache versions, and the temporary Claude-analysis hold. The runtime test exercises all eight scenarios at desktop, tablet, and phone sizes, plus onboarding, the Babbage analyzing geometry, and Ideas Wall interactions. It requires Python Playwright and Chromium.
+The ownership rule is intentionally simple:
 
-Do not add `async`, `defer`, or `type="module"` to the runtime script tags without first converting the shared globals.
+- **Edit `src/`.**
+- **Generate `runtime/`.** Do not hand-edit bundles.
+- **Keep browser media in `assets/`.**
+- **Keep tests in `tests/`.**
+- **Keep build/audit/check utilities in `tools/`.**
+- **Keep architecture decisions in `docs/development/`.**
 
+## JavaScript architecture
 
-## Phase 2 JavaScript ownership
+`src/js/manifest.json` is the source of truth for bundle order. The current owners are grouped by responsibility rather than by historical patch number.
 
-PromptCraft now routes application-owned button clicks through the delegated `PC_UI_ACTIONS` registry in `functions/app.js`. Static and generated controls declare a `data-pc-action` value; the module that owns the behavior registers the matching handler with `pcRegisterUIActions()`. This keeps rerendered controls from accumulating duplicate listeners and makes action ownership searchable.
+### Application and integration
 
-Scenario activation is owned by `pcActivateScenario()` in `functions/app-workbench.js`. Scenario index validation, tab unlocking, workspace renderers, and post-introduction actions are shared through the registries in `functions/app-scenarios.js`. Scenario-specific content remains in configuration objects such as `S2_ACTIVITY_CONFIG`, while the reusable renderers own the DOM assembly.
+- `app/runtime-state.js` — shared application state, UI action registry, modal/audio setup state, and lifecycle primitives.
+- `app/config-and-assets.js` — application/schema constants, endpoint configuration, and centralized asset paths.
+- `app/scenario-runtime.js` — scenario opening/closing, navigation, workbench routing, and scenario lifecycle cleanup.
+- `app/bootstrap.js` — startup and initial browser wiring.
+- `research/tracking.js` — research events, session/result payloads, and receiver submission.
+- `ai/babbage-client.js` — provider-neutral browser client for the Babbage Netlify proxy.
+- `audio/audio-engine.js` and `audio/babbage-tts.js` — shared audio/TTS behavior.
 
-Use native `submit`, `change`, and keyboard events where those semantics matter. Do not replace them with click actions merely for uniformity.
+### Shared UI and responsive systems
 
-## Phase 3 CSS ownership
+- `ui/visual-novel.js` — shared VN dialogue/cast engine.
+- `ui/workstation-layout.js` — shared viewport families, VN reset helpers, workstation geometry, and prediction frame capture.
+- `ui/completed-analysis-layout.js` — completed diagnostic fitting and workstation alignment.
+- `ui/live-analysis-layout.js` — live Babbage analyzing layout and progress lifecycle.
+- `ui/analysis-layout-controller.js` — responsive completed-analysis mode selection and scheduling.
+- `ui/babbage-terminal.js` — Babbage report rendering, Print/Save PDF, and terminal interaction.
+- `ui/prediction-gate.js` — prediction/question presentation and responsive state handling.
 
-`style.css` is the source manifest and records the complete owner order. `tools/build-production.py` compiles all 17 owner files into `styles/promptcraft.css`, which is the only local stylesheet loaded by `index.html`. Do not edit the generated stylesheet directly or load an owner file separately to win a cascade dispute. That is how a stylesheet becomes a geological record.
+### Scenarios
 
-The compatibility layer in `styles/30-legacy-responsive.css` remains active, but it is now formatted and searchable. Retired selectors from removed navigation, feedback, expression-badge, and terminal-gap interfaces were deleted. `tools/audit-css.py` rejects those selectors if they return and also detects exact duplicate rules.
+- `scenarios/shared-components.js` — reusable scenario activity components.
+- `scenarios/registry.js` — scenario metadata, availability, menu/navigation, and shared scenario services.
+- `scenarios/s1-engagement.js` — S1 implementation.
+- `scenarios/s2-metacognition.js` — S2 implementation.
 
-Modify the existing owner rule whenever possible. Add a new owner file only for a genuinely new screen family or state, and place it deliberately in `style.css`. See `styles/README.md` for the ownership map and maintenance rules.
+S3 through S8 are intentionally development shells. Old playable S3–S5 browser prototypes were removed before S3 development so dormant implementations cannot compete with the new shared architecture. The Netlify proxy still retains structured S3–S5 contracts for future use.
 
+### Standalone browser files
 
-## Phase 4 hardening
+- `content/dialogue-data.js` → `runtime/js/dialogue-data.js`
+- `pages/ideas-wall.js` → `runtime/js/ideas-wall.js`
 
-Phase 4 establishes the clean baseline for future interface work. Application controls now use the delegated action registry for click, submit, change, keyboard, and details-toggle behavior; inline HTML event handlers are prohibited by validation. Image fallbacks retain their error handlers, and research payload logging is disabled unless the page is opened with `?debug=1`.
+`tools/build.py` keeps these synchronized.
 
-The Ideas Wall owns its CSS and JavaScript in `styles/wall.css` and `functions/wall.js`. Project links are relative so the site can run from a subfolder or Canvas-hosted package rather than assuming deployment at the domain root. The Babbage Netlify proxy validates methods, body size, JSON, and message content, preserves upstream status codes, prevents caching, and has a local test in `tools/test-netlify-function.js`.
+## CSS architecture
 
-`assets/asset-manifest.json` classifies every shipped asset as runtime, planned, development reference, or documentation. `tools/audit-assets.py` rejects missing, unclassified, or unregistered assets. The following obsolete files were removed from the clean baseline:
+`src/css/manifest.css` is the sole ordered application CSS manifest. It compiles to `runtime/css/promptcraft.css`. `index.html` loads only that generated local application stylesheet.
 
-- `test-reflection.html`
-- `netlify/netlify.toml`
-- `assets/images/characters/students/jordan/dryly-amused.png`
+The Ideas Wall remains isolated in `src/css/pages/ideas-wall.css` and synchronizes to `runtime/css/ideas-wall.css`; its approved design is not part of the main application cascade.
 
-Before packaging a release, run:
+The historical compatibility/late-override owners remain only where they still affect approved S1/S2 behavior. Dead selectors tied to removed interfaces are audited as retired and may not be restored casually. New S3 work should go into semantic shared/scenario owners, not into the legacy compatibility pile.
+
+See `docs/development/css-architecture.md`.
+
+## Build and checks
+
+After source changes:
 
 ```bash
-python tools/build-production.py --check
-python tools/validate-project.py
-python tools/test-runtime.py
+python tools/build.py
+python tools/check.py
 ```
 
-The browser runtime is intentionally framework-free and uses relative local paths, which keeps the package suitable for ordinary static hosting and Canvas-compatible web delivery. External services still require network access and their configured endpoints.
+Before packaging a release or beginning a new scenario:
 
-## Babbage analysis transition
+```bash
+python tools/check.py --full
+```
 
-Babbage's progress display now follows observable request stages. After a live response arrives, the final parsing/render transition uses the short `PC_CLAUDE_PROCESSING_HOLD_DEFAULT_MS` compatibility constant in `functions/app-vn.js`; it should remain brief because the progress bar itself owns the waiting experience.
+The full check includes source/runtime synchronization, structural hardening, proxy contracts, Print/Save and Ideas Wall contracts, S2 terminal flow, scenario runtime smoke tests, shared VN geometry, analysis overflow checks, and the S2 interaction regression suite.
 
-## V369 refactor baseline
+A live deployed Babbage health check remains available separately because it requires a deployed site:
 
-Scenario 1 is the regression reference for visual and interaction behavior. The browser application is now split into a provider-neutral Babbage client (`functions/app-babbage.js`), shared scenario framework (`functions/app-scenario-shared.js`), core scenario/menu runtime (`functions/app-scenarios.js`), and current S2-S5 development prototypes (`functions/app-scenario-prototypes.js`). Prototype scenarios are preserved for design reference but are not considered approved final implementations.
+```bash
+node tests/test_babbage_live.js <site-url>
+```
 
-The deployed Babbage GET health response reports the proxy version, OpenAI configuration state, model, and supported structured contracts. `node tools/test-babbage-live.js <site-url>` performs a free GET-only deployment check. Add `--contracts` only when intentionally testing every live structured contract because it makes model API calls.
+Do not add `async`, `defer`, or `type="module"` to the browser script tags without first converting the current shared-global bundle architecture.
+
+## Compatibility contracts
+
+The pre-S3 cleanup deliberately preserves several external contracts:
+
+1. App build remains `PROMPTCRAFT_V429`.
+2. Research schema remains `V121`.
+3. Receiver remains V82 and keeps the existing deployment URL.
+4. The V121 payload still includes the historical `claude_response` field **only for receiver compatibility**, alongside the provider-neutral `babbage_response` field. Browser UI, DOM selectors, actions, and AI code use Babbage terminology.
+5. `netlify/functions/babbage.js` is the only AI serverless endpoint in the repository.
+6. S3–S5 structured backend contracts remain available, while old S3–S5 browser implementations do not.
+7. Ideas Wall candidates are not auto-published; only Review Status `Publish` appears publicly.
+
+See `docs/development/compatibility-contracts.md`.
+
+## Development rules
+
+1. Check shared S1/S2 architecture before adding CSS or JavaScript.
+2. Prefer shared components and viewport families over scenario/device-specific patches.
+3. Preserve approved visual design and behavior unless a change is explicitly requested.
+4. Character placement belongs to reusable slots/components, not individual character positioning rules.
+5. Scenario switching must cancel timers, callbacks, AI requests, audio, overlays, animation frames, and stale state.
+6. Keep source and generated runtime synchronized with `tools/build.py`.
+7. Treat real screenshots as the source of truth for visual defects.
+8. Do not restore retired tabs, receiver schemas, VN positioning rules, provider-specific UI names, or dormant scenario prototypes.
+9. Do not hand-edit generated bundles.
+10. Do not increment `PROMPTCRAFT_V429` merely because a cache/query revision changes.
+
+## Ideas Wall
+
+The public wall is owned by:
+
+- `wall.html`
+- `src/js/pages/ideas-wall.js`
+- `src/css/pages/ideas-wall.css`
+
+Cards display the complete descriptive paragraph. Publication still requires Review Status `Publish`; meeting candidate thresholds alone never publishes a submission.
+
+## Asset management
+
+`assets/asset-manifest.json` classifies runtime, planned, reference, and documentation assets. Tracking workbooks are stored without patch-number filenames:
+
+- `docs/asset-management/dialogue-voiceover-tracker.xlsx`
+- `docs/asset-management/master-asset-tracker.xlsx`
+- `docs/asset-management/visual-asset-tracker.xlsx`
+
+Run `python tools/audit_assets.py` to verify classification and references.

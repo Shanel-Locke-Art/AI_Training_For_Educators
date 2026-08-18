@@ -25289,6 +25289,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
 }
 
 
+
 /* V428 — shared completed-analysis content rows.
    Babbage diagnostics are variable-length. Keep each row sized to its content
    and give long-form rows enough separation that CRT borders never visually
@@ -25308,4 +25309,21 @@ html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-repo
   align-self: stretch !important;
   margin: 0 !important;
   position: relative !important;
+}
+
+/* V430 — completed Babbage diagnosis utility controls.
+   Three actions (read, print/save, continue) share the terminal footer without
+   colliding on narrow screens. Intermediate Babbage reports omit the print action. */
+@media (max-width: 900px) {
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .vn-dialogue #vnText:has(.claude-print-btn) {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+  }
+
+  html body #vnOverlay.vn-overlay.active.claude-terminal-textmode.pc-analysis-report-active-v122
+  .vn-dialogue #vnText:has(.claude-print-btn) button {
+    padding-inline: 4px !important;
+    font-size: clamp(0.62rem, 2.75vw, 0.78rem) !important;
+  }
 }
