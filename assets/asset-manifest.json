@@ -1,5 +1,5 @@
 {
-  "version": 143,
+  "version": 144,
   "runtime_images": {
     "background.png": "assets/images/backgrounds/app-background.png",
     "classroom-bg.png": "assets/images/backgrounds/classroom.png",
@@ -27,7 +27,8 @@
     "babbage-mark.svg": "assets/images/ui/babbage-mark.svg",
     "charles-babbage.png": "assets/images/ui/charles-babbage.png",
     "promptcraft-qr.png": "assets/ui/promptcraft-qr.png",
-    "gfc-print-logo.jpg": "assets/images/brand/great-falls-college-logo.jpg"
+    "gfc-print-logo.jpg": "assets/images/brand/great-falls-college-logo.jpg",
+    "babbage-engine.webp": "assets/images/ui/babbage-engine.webp"
   },
   "planned_runtime_images": {
     "scene-s7.png": "assets/images/scenes/scenario-07-overreliance/scene.png",

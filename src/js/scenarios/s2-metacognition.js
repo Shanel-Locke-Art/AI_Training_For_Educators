@@ -1217,6 +1217,7 @@ function renderS2FinalComparison() {
     ? review.what_improved.filter(Boolean)
     : [String(review.what_improved || '')].filter(Boolean);
 
+  awardScenarioScoreXP(SCENARIO_INDEX.METACOGNITION, data.currentScore || data.bestScore || 5, 5);
   markScenarioComplete();
   saveIncrementalData(SCENARIO_INDEX.METACOGNITION);
 

@@ -515,7 +515,7 @@ async function sendMain(text) {
       structured: structuredAnalysis
     });
 
-    gainXP(score.total * 6);
+    awardScenarioScoreXP(SCENARIO_INDEX.ENGAGEMENT, score.total, 5);
     lastScore = score.total;
     showBabbageFinalResponseInTerminal(reply, !!data.mock, () => {
       addS1BabbageResultCard(reply, structuredAnalysis);
@@ -626,20 +626,145 @@ function autoGrow(el) {
   el.style.height = Math.min(el.scrollHeight, cap) + 'px';
 }
 
-function gainXP(amount) {
-  xp = Math.min(100, xp + amount);
-  document.getElementById('xpFill').style.width = xp + '%';
-  document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', Math.round(xp));
-  if (xp >= 40) document.getElementById('levelTag').textContent = 'lead educator · developing';
-  if (xp >= 75) document.getElementById('levelTag').textContent = 'master prompter · proficient';
+function pcNormalizeProgressState(raw = {}) {
+  const bestScores = Array.from({ length: SCENARIO_COUNT }, (_, index) => {
+    const value = Number(raw?.bestScores?.[index] || 0);
+    return Math.max(0, Math.min(5, Number.isFinite(value) ? value : 0));
+  });
+  const completedAwards = Array.from({ length: SCENARIO_COUNT }, (_, index) => Boolean(raw?.completedAwards?.[index]));
+  const scoreXP = bestScores.reduce((total, score) => total + (score * PC_SCORE_XP_PER_POINT), 0);
+  const completionXP = completedAwards.filter(Boolean).length * PC_COMPLETION_XP;
+  const computedXP = Math.min(PC_MAX_XP, scoreXP + completionXP);
+  return { xp: computedXP, bestScores, completedAwards };
 }
+
+function pcSaveProgressState() {
+  try { localStorage.setItem(PC_PROGRESS_STORAGE_KEY, JSON.stringify(pcProgressState)); } catch (error) {}
+}
+
+function pcLoadProgressState() {
+  let stored = {};
+  try { stored = JSON.parse(localStorage.getItem(PC_PROGRESS_STORAGE_KEY) || '{}'); } catch (error) { stored = {}; }
+  pcProgressState = pcNormalizeProgressState(stored);
+  xp = pcProgressState.xp;
+  return pcProgressState;
+}
+
+function pcGetEducatorLevel(xpValue = xp) {
+  const safeXP = Math.max(0, Math.min(PC_MAX_XP, Number(xpValue) || 0));
+  let levelIndex = 0;
+  PC_EDUCATOR_LEVELS.forEach((level, index) => {
+    if (safeXP >= level.threshold) levelIndex = index;
+  });
+  return {
+    ...PC_EDUCATOR_LEVELS[levelIndex],
+    index: levelIndex,
+    number: levelIndex + 1,
+    next: PC_EDUCATOR_LEVELS[levelIndex + 1] || null
+  };
+}
+
+function pcRenderProgressHUD() {
+  const progress = pcNormalizeProgressState(pcProgressState);
+  pcProgressState = progress;
+  xp = progress.xp;
+  const level = pcGetEducatorLevel(progress.xp);
+  const completedCount = progress.completedAwards.filter(Boolean).length;
+  const levelStart = Number(level.threshold || 0);
+  const levelEnd = level.next ? Number(level.next.threshold) : PC_MAX_XP;
+  const levelSpan = Math.max(1, levelEnd - levelStart);
+  const levelXP = Math.max(0, Math.min(levelSpan, progress.xp - levelStart));
+  const levelPercent = Math.min(100, (levelXP / levelSpan) * 100);
+
+  const levelTag = document.getElementById('levelTag');
+  const headerLevel = document.getElementById('progressHeaderLevel');
+  const xpLabel = document.getElementById('xpLabel');
+  const xpFill = document.getElementById('xpFill');
+  const progressbar = document.querySelector('.pc-progress-menu [role="progressbar"]');
+  const levelName = document.getElementById('progressLevelName');
+  const levelNumber = document.getElementById('progressLevelNumber');
+  const levelDescription = document.getElementById('progressLevelDescription');
+  const xpText = document.getElementById('progressXPText');
+  const panelFill = document.getElementById('progressPanelFill');
+  const scenarioText = document.getElementById('progressScenarioText');
+  const nextLevel = document.getElementById('progressNextLevel');
+  const lifetimeXP = document.getElementById('progressLifetimeXP');
+
+  if (levelTag) levelTag.textContent = level.title;
+  if (headerLevel) headerLevel.textContent = `Level ${level.number}`;
+  if (xpLabel) xpLabel.textContent = level.next
+    ? `${levelXP} / ${levelSpan} XP`
+    : `${progress.xp} XP`;
+  if (xpFill) xpFill.style.width = `${levelPercent}%`;
+  if (progressbar) {
+    progressbar.setAttribute('aria-valuenow', String(levelXP));
+    progressbar.setAttribute('aria-valuemax', String(levelSpan));
+    progressbar.setAttribute('aria-valuetext', level.next
+      ? `${levelXP} of ${levelSpan} XP toward ${level.next.title}. Current level: ${level.title}.`
+      : `${progress.xp} total XP. Highest teaching level reached.`);
+  }
+  if (levelName) levelName.textContent = level.title;
+  if (levelNumber) levelNumber.textContent = `Level ${level.number}`;
+  if (levelDescription) levelDescription.textContent = level.description;
+  if (xpText) xpText.textContent = level.next
+    ? `${levelXP} / ${levelSpan} XP to next level`
+    : 'Highest teaching level reached';
+  if (panelFill) panelFill.style.width = `${levelPercent}%`;
+  if (scenarioText) scenarioText.textContent = `${completedCount} of ${SCENARIO_COUNT} scenarios completed`;
+  if (nextLevel) nextLevel.textContent = level.next
+    ? `Next: ${level.next.title}`
+    : 'Progression complete';
+  if (lifetimeXP) lifetimeXP.textContent = `Total XP: ${progress.xp} / ${PC_MAX_XP}`;
+}
+
+function pcInitializeProgressSystem() {
+  pcLoadProgressState();
+  pcRenderProgressHUD();
+}
+
+function awardScenarioScoreXP(index, score, maxScore = 5) {
+  const normalizedIndex = Math.max(0, Math.min(SCENARIO_COUNT - 1, Number(index) || 0));
+  const normalizedMax = Math.max(1, Number(maxScore) || 5);
+  const normalizedScore = Math.max(0, Math.min(normalizedMax, Number(score) || 0));
+  const fivePointScore = Math.round((normalizedScore / normalizedMax) * 5);
+  const previous = Number(pcProgressState.bestScores[normalizedIndex] || 0);
+  if (fivePointScore <= previous) return 0;
+  pcProgressState.bestScores[normalizedIndex] = fivePointScore;
+  const earned = (fivePointScore - previous) * PC_SCORE_XP_PER_POINT;
+  pcProgressState = pcNormalizeProgressState(pcProgressState);
+  xp = pcProgressState.xp;
+  pcSaveProgressState();
+  pcRenderProgressHUD();
+  return earned;
+}
+
+function awardScenarioCompletionXP(index) {
+  const normalizedIndex = Math.max(0, Math.min(SCENARIO_COUNT - 1, Number(index) || 0));
+  if (pcProgressState.completedAwards[normalizedIndex]) return 0;
+  pcProgressState.completedAwards[normalizedIndex] = true;
+  pcProgressState = pcNormalizeProgressState(pcProgressState);
+  xp = pcProgressState.xp;
+  pcSaveProgressState();
+  pcRenderProgressHUD();
+  return PC_COMPLETION_XP;
+}
+
+pcExposeGlobals({
+  pcInitializeProgressSystem,
+  pcRenderProgressHUD,
+  pcGetEducatorLevel,
+  awardScenarioScoreXP,
+  awardScenarioCompletionXP
+});
 
 // ══════════════════════════════════════════════════════
 //  COMPLETION
 // ══════════════════════════════════════════════════════
 function markScenarioComplete() {
   if (!getScenarioUI(scenarioIndex).implemented) return;
+  const wasComplete = Boolean(scenarioCompleted[scenarioIndex]);
   scenarioCompleted[scenarioIndex] = true;
+  if (!wasComplete) awardScenarioCompletionXP(scenarioIndex);
   saveIncrementalData(scenarioIndex);
 
   const area = document.getElementById('chat');

@@ -12,14 +12,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=443">
+<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=446">
 <!-- Production CSS is generated from src/css by tools/build.py. -->
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
 <script src="runtime/js/dialogue-data.js?v=141"></script>
-<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=443&amp;receiver=82"></script>
+<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=446&amp;receiver=82"></script>
 
 </head>
 
@@ -196,15 +196,49 @@
     </div>
   </details>
 
-  <div class="header-status" aria-label="Player progress">
-    <div class="level-tag" id="levelTag" aria-label="Current level" aria-live="polite">substitute · novice</div>
-    <div class="xp-group" aria-label="Experience points">
-      <span class="xp-label" aria-hidden="true">XP</span>
-      <div class="xp-track" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" aria-label="XP progress">
-        <div class="xp-fill" id="xpFill"></div>
+  <details class="pc-progress-menu" id="pcProgressMenu"
+           name="promptcraft-header-navigation"
+           data-pc-toggle-action="close-other-details">
+    <summary class="header-status" aria-label="Open teaching progress">
+      <span class="pc-progress-level-badge" id="progressHeaderLevel">Level 1</span>
+      <span class="pc-progress-summary-copy">
+        <span class="pc-progress-summary-kicker">Teaching Progress</span>
+        <span class="level-tag" id="levelTag" aria-label="Current teaching level" aria-live="polite">Teaching Explorer</span>
+        <span class="xp-group" aria-label="Experience points">
+          <span class="xp-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Progress toward the next teaching level">
+            <span class="xp-fill" id="xpFill"></span>
+          </span>
+          <span class="xp-label" id="xpLabel">0 / 100 XP</span>
+        </span>
+      </span>
+      <span class="pc-progress-view-label">View Progress</span>
+      <span class="pc-progress-caret" aria-hidden="true">▾</span>
+    </summary>
+    <div class="pc-progress-panel" aria-label="Teaching progress details">
+      <div class="pc-progress-panel-heading">
+        <div>
+          <div class="pc-progress-eyebrow">Teaching Progress</div>
+          <h2 id="progressLevelName">Teaching Explorer</h2>
+        </div>
+        <span class="pc-progress-level-number" id="progressLevelNumber">Level 1</span>
       </div>
+      <div class="pc-progress-panel-body">
+        <figure class="pc-progress-engine-figure">
+          <img src="assets/images/ui/babbage-engine.webp" alt="Historic Babbage computing engine model">
+          <figcaption>Babbage Progress Engine</figcaption>
+        </figure>
+        <div class="pc-progress-details">
+          <p id="progressLevelDescription">Explores how AI can support teaching without replacing professional judgment.</p>
+          <div class="pc-progress-next" id="progressNextLevel">Next: Engagement Facilitator</div>
+          <div class="pc-progress-total" id="progressXPText">0 / 100 XP to next level</div>
+          <div class="pc-progress-full-track" aria-hidden="true"><span id="progressPanelFill"></span></div>
+          <div class="pc-progress-scenarios" id="progressScenarioText">0 of 8 scenarios completed</div>
+          <div class="pc-progress-lifetime" id="progressLifetimeXP">Total XP: 0 / 880</div>
+        </div>
+      </div>
+      <div class="pc-progress-note"><strong>How XP works:</strong> strong scenario decisions and completed scenarios earn XP. Replaying the same result does not add more.</div>
     </div>
-  </div>
+  </details>
 
   <div class="header-actions" aria-label="PromptCraft actions">
     <button class="main-menu-toggle" id="mainMenuToggle"

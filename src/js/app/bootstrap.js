@@ -49,6 +49,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // quietly behind it as a safe fallback, but no dialogue begins until the
   // learner chooses Start or selects a scenario.
   updateAudioSettingsButton();
+  pcInitializeProgressSystem();
   startGame();
 
   // V443: external PromptCraft pages (such as Ideas Wall) can return to a

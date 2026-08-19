@@ -1039,3 +1039,181 @@ html body .pc-scenario-shell .pc-shell-primary:is(:hover,:focus-visible) {
 html body .pc-scenario-shell .pc-shell-secondary:is(:hover,:focus-visible) {
   background: var(--gfc-sky-pale) !important;
 }
+
+
+/* V446 — header + progress HUD final cascade ownership. */
+html body .pc-app-header {
+  padding: 11px 22px !important;
+  min-height: 86px !important;
+}
+html body .pc-app-header .pc-brand-summary {
+  min-height: 62px !important;
+  gap: 12px !important;
+  padding: 7px 11px !important;
+}
+html body .pc-app-header .pc-brand-summary .logo-icon,
+html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  border-radius: 11px !important;
+}
+html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon img {
+  width: 43px !important;
+  height: 43px !important;
+}
+html body .pc-app-header .pc-brand-summary .logo-name,
+html body .pc-app-header .pc-brand-summary .logo-name span {
+  font-size: 1.28rem !important;
+  line-height: 1.02 !important;
+}
+html body .pc-app-header .pc-brand-summary .logo-sub {
+  margin-top: 2px !important;
+  font-size: .66rem !important;
+  line-height: 1.05 !important;
+  letter-spacing: .075em !important;
+}
+html body .pc-app-header .pc-brand-caret {
+  font-size: .9rem !important;
+}
+
+html body .pc-app-header .pc-progress-menu {
+  position: relative !important;
+  z-index: 240 !important;
+  justify-self: end !important;
+  font-family: "Nunito", Arial, sans-serif !important;
+}
+html body .pc-app-header .pc-progress-menu .header-status {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  column-gap: 12px !important;
+  width: auto !important;
+  min-width: min(430px, 39vw) !important;
+  min-height: 72px !important;
+  margin: 0 !important;
+  padding: 10px 13px !important;
+}
+html body .pc-app-header .pc-progress-menu :is(
+  .pc-progress-level-badge,
+  .pc-progress-summary-kicker,
+  .level-tag,
+  .xp-label,
+  .pc-progress-view-label,
+  .pc-progress-caret
+) {
+  font-family: "Nunito", Arial, sans-serif !important;
+  font-style: normal !important;
+}
+html body .pc-app-header .pc-progress-menu .pc-progress-level-badge {
+  font-size: .76rem !important;
+}
+html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+  font-size: .68rem !important;
+}
+html body .pc-app-header .pc-progress-menu .level-tag {
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  font-size: 1.04rem !important;
+  font-weight: 900 !important;
+  line-height: 1.12 !important;
+  text-align: left !important;
+}
+html body .pc-app-header .pc-progress-menu .xp-group {
+  display: grid !important;
+  grid-template-columns: minmax(150px, 1fr) auto !important;
+  gap: 9px !important;
+}
+html body .pc-app-header .pc-progress-menu .xp-label {
+  font-size: .72rem !important;
+  line-height: 1 !important;
+  color: #e1f0f7 !important;
+}
+html body .pc-app-header .pc-progress-menu .xp-track {
+  width: 100% !important;
+  min-width: 150px !important;
+  height: 14px !important;
+}
+html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+  font-size: .72rem !important;
+}
+
+@media screen and (max-width: 1100px) {
+  html body .pc-app-header {
+    padding: 10px 16px !important;
+  }
+  html body .pc-app-header .pc-brand-summary .logo-icon,
+  html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+  }
+  html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon img {
+    width: 39px !important;
+    height: 39px !important;
+  }
+  html body .pc-app-header .pc-brand-summary .logo-name,
+  html body .pc-app-header .pc-brand-summary .logo-name span {
+    font-size: 1.18rem !important;
+  }
+  html body .pc-app-header .pc-brand-summary .logo-sub {
+    font-size: .61rem !important;
+  }
+}
+@media screen and (max-width: 1000px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    min-width: min(360px, 44vw) !important;
+  }
+}
+@media screen and (max-width: 640px) {
+  html body .pc-app-header {
+    min-height: 0 !important;
+    padding: 10px 12px 12px !important;
+  }
+  html body .pc-app-header .pc-brand-menu {
+    width: min(100%, 330px) !important;
+  }
+  html body .pc-app-header .pc-brand-summary {
+    min-height: 56px !important;
+  }
+  html body .pc-app-header .pc-brand-summary .logo-icon,
+  html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon {
+    width: 43px !important;
+    height: 43px !important;
+    min-width: 43px !important;
+  }
+  html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon img {
+    width: 38px !important;
+    height: 38px !important;
+  }
+  html body .pc-app-header .pc-brand-summary .logo-name,
+  html body .pc-app-header .pc-brand-summary .logo-name span {
+    font-size: 1.15rem !important;
+  }
+  html body .pc-app-header .pc-brand-summary .logo-sub {
+    font-size: .6rem !important;
+  }
+  html body .pc-app-header .pc-progress-menu {
+    grid-area: status !important;
+    width: min(100%, 370px) !important;
+    justify-self: center !important;
+  }
+  html body .pc-app-header .pc-progress-menu .header-status {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 8px 9px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+    font-size: .61rem !important;
+  }
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    font-size: .91rem !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-label {
+    font-size: .66rem !important;
+  }
+}

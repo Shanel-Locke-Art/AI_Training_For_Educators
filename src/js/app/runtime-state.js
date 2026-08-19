@@ -23,6 +23,26 @@ const SCENARIO_INDEX = Object.freeze({
 const SCENARIO_COUNT = Object.keys(SCENARIO_INDEX).length;
 
 let xp = 0;
+const PC_PROGRESS_STORAGE_KEY = 'promptcraft_teaching_progress_v1';
+const PC_MAX_XP = SCENARIO_COUNT * 110;
+const PC_SCORE_XP_PER_POINT = 10;
+const PC_COMPLETION_XP = 60;
+const PC_EDUCATOR_LEVELS = Object.freeze([
+  Object.freeze({ threshold: 0, title: 'Teaching Explorer', description: 'Explores how AI can support teaching without replacing professional judgment.' }),
+  Object.freeze({ threshold: 100, title: 'Engagement Facilitator', description: 'Designs participation so learners respond to ideas, evidence, and one another.' }),
+  Object.freeze({ threshold: 200, title: 'Reflective Practitioner', description: 'Connects learning strategies to evidence, self-evaluation, and purposeful next steps.' }),
+  Object.freeze({ threshold: 300, title: 'Assessment Designer', description: 'Builds assessment around authentic evidence of learning rather than convenient proxies.' }),
+  Object.freeze({ threshold: 400, title: 'Equitable Learning Designer', description: 'Notices where tools, formats, and assumptions create uneven access or participation.' }),
+  Object.freeze({ threshold: 500, title: 'Evidence Evaluator', description: 'Checks AI claims against sources, context, and disciplinary evidence before trusting them.' }),
+  Object.freeze({ threshold: 600, title: 'Intentional Prompt Designer', description: 'Anticipates what AI may assume and makes audience, purpose, evidence, and constraints visible.' }),
+  Object.freeze({ threshold: 700, title: 'Learning Architect', description: 'Uses AI selectively while protecting learner agency, voice, and instructional purpose.' }),
+  Object.freeze({ threshold: 800, title: 'Reflective Leader', description: 'Uses evidence and reflection to revise teaching practice and guide responsible AI use.' })
+]);
+let pcProgressState = {
+  xp: 0,
+  bestScores: Array(SCENARIO_COUNT).fill(0),
+  completedAwards: Array(SCENARIO_COUNT).fill(false)
+};
 let attempts = 0;
 let lastPromptText = ''; // tracks last prompt for pre-filling on next attempt
 let scenarioIndex = 0;
