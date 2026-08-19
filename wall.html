@@ -8,21 +8,40 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,600&family=Lora:ital,wght@0,400;0,500;1,400&family=Nunito:wght@500;600;700;800&family=Source+Code+Pro:wght@500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="runtime/css/ideas-wall.css?v=433" />
+  <link rel="stylesheet" href="runtime/css/ideas-wall.css?v=443" />
 </head>
 <body>
   <a class="skip-link" href="#ideasGrid">Skip to ideas</a>
 
   <header class="site-bar">
-    <a class="brand" href="index.html" aria-label="PromptCraft main menu">
-      <span class="brand-mark" aria-hidden="true">✦</span>
-      <span class="brand-word">PromptCraft</span>
-      <span class="brand-sub">THE PROMPT LAB · GFC MSU</span>
-    </a>
-    <nav class="site-nav" aria-label="Ideas Wall navigation">
-      <a href="index.html">Main Menu</a>
-      <a class="active" href="wall.html" aria-current="page">Ideas Wall</a>
-    </nav>
+    <details class="wall-brand-menu" name="promptcraft-wall-navigation">
+      <summary class="wall-brand-summary" aria-label="Open PromptCraft menu">
+        <span class="wall-brand-mark" aria-hidden="true"><img src="assets/images/ui/babbage-mark.svg" alt=""></span>
+        <span class="wall-brand-copy">
+          <span class="brand-word">PromptCraft</span>
+          <span class="brand-sub">THE PROMPT LAB · GFC MSU</span>
+        </span>
+        <span class="wall-brand-caret" aria-hidden="true">▾</span>
+      </summary>
+      <nav class="wall-brand-panel" aria-label="PromptCraft menu">
+        <a class="wall-brand-menu-item" href="index.html">
+          <span aria-hidden="true">☰</span><span>Main Menu</span>
+        </a>
+        <a class="wall-brand-menu-item" href="index.html?open=audio">
+          <span aria-hidden="true">🔇</span><span>Audio Settings</span>
+        </a>
+        <a class="wall-brand-menu-item wall-brand-menu-babbage" href="index.html?open=babbage">
+          <img src="assets/images/ui/babbage-mark.svg" alt="" aria-hidden="true"><span>Meet Babbage</span>
+        </a>
+        <a class="wall-brand-menu-item wall-brand-menu-ideas" href="wall.html" aria-current="page">
+          <span aria-hidden="true">💡</span><span>Ideas Wall</span>
+        </a>
+      </nav>
+    </details>
+    <div class="wall-header-context" aria-label="Current page">
+      <span>Prompt Lab Community</span>
+      <strong>Ideas Wall</strong>
+    </div>
   </header>
 
   <main>

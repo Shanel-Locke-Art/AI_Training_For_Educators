@@ -16,6 +16,7 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parents[1]
 VIEWPORTS = {
     "desktop": (1600, 1000),
+    "nest-hub-max": (1280, 800),
     "nest-hub": (1024, 600),
 }
 CONTENT_TYPES = {

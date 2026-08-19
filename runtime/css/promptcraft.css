@@ -13411,7 +13411,7 @@ html body .analysis-report-scrollable .analysis-card {
     display: block !important;
     margin: 0 0 7px !important;
     color: #f1fff4 !important;
-    font-size: clamp(1.35rem, 2.2vw, 1.85rem) !important;
+    font-size: clamp(1.5rem, 2.45vw, 2.05rem) !important;
     line-height: 1.08 !important;
     letter-spacing: 0.035em !important;
     text-transform: uppercase !important;
@@ -13422,7 +13422,7 @@ html body .analysis-report-scrollable .analysis-card {
     max-width: 72ch !important;
     margin: 0 !important;
     color: #e5ffeb !important;
-    font-size: clamp(0.86rem, 1.15vw, 1rem) !important;
+    font-size: clamp(0.96rem, 1.28vw, 1.08rem) !important;
     line-height: 1.42 !important;
     text-transform: none !important;
   }
@@ -13449,7 +13449,7 @@ html body .analysis-report-scrollable .analysis-card {
     min-height: 0 !important;
     height: auto !important;
     margin: 0 !important;
-    padding: 11px 12px !important;
+    padding: 12px 13px !important;
     overflow: visible !important;
     border: 1px solid rgba(116, 255, 137, 0.48) !important;
     border-radius: 3px !important;
@@ -13462,7 +13462,7 @@ html body .analysis-report-scrollable .analysis-card {
     display: block !important;
     margin: 0 0 5px !important;
     color: #bfffc9 !important;
-    font-size: clamp(0.68rem, 0.9vw, 0.78rem) !important;
+    font-size: clamp(0.76rem, 1vw, 0.86rem) !important;
     line-height: 1.1 !important;
     letter-spacing: 0.07em !important;
     text-transform: uppercase !important;
@@ -13473,7 +13473,7 @@ html body .analysis-report-scrollable .analysis-card {
     display: block !important;
     margin: 0 !important;
     color: #f3fff6 !important;
-    font-size: clamp(0.88rem, 1.08vw, 1rem) !important;
+    font-size: clamp(0.98rem, 1.24vw, 1.12rem) !important;
     line-height: 1.4 !important;
     overflow-wrap: anywhere !important;
     word-break: normal !important;
@@ -13484,7 +13484,7 @@ html body .analysis-report-scrollable .analysis-card {
     display: block !important;
     margin: 5px 0 0 !important;
     color: #d6ffde !important;
-    font-size: clamp(0.78rem, 0.95vw, 0.9rem) !important;
+    font-size: clamp(0.88rem, 1.08vw, 1rem) !important;
     line-height: 1.35 !important;
     opacity: 0.92 !important;
     text-transform: none !important;
@@ -15024,6 +15024,46 @@ body.s1-result-active .s1-babbage-revision-review .s1-clean-reference-title {
   line-height: 1.25 !important;
 }
 body.s1-result-active .s1-babbage-review-item strong { color: #173d27 !important; }
+
+
+/* v438 — S1 uses the same full-width guided-repair conclusion pattern as S2.
+   The assembled brief and Babbage review action sit beneath both workbench
+   columns instead of being trapped inside the right-hand builder. */
+body.s1-active:not(.s1-result-active) .s1-clean-repair-footer {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-preview-wrap {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  border-top: 0 !important;
+}
+
+body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-preview {
+  width: 100% !important;
+  min-height: 108px !important;
+}
+
+body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-actions {
+  margin-top: 10px !important;
+}
+
+@media (max-width: 900px) {
+  body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-actions {
+    align-items: stretch !important;
+  }
+
+  body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-submit-wrap {
+    width: 100% !important;
+  }
+
+  body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .s1-clean-submit {
+    width: 100% !important;
+  }
+}
 
 /* SOURCE: src/css/scenarios/shared.css */
 /* ══════════════════════════════════════════════════════
@@ -23623,9 +23663,9 @@ body[data-pc-scenario="metacognition"] .s2-case-file .pc-choice-card.is-correct 
    without inheriting Decision 1's narrow quote-copy geometry. */
 body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-evidence {
   display: grid !important;
-  grid-template-columns: clamp(116px, 18%, 148px) minmax(0, 1fr) !important;
+  grid-template-columns: clamp(128px, 19%, 160px) minmax(0, 1fr) !important;
   align-items: center !important;
-  gap: clamp(14px, 1.6vw, 22px) !important;
+  gap: clamp(16px, 1.8vw, 24px) !important;
   margin: 16px 0 !important;
   padding: clamp(12px, 1.2vw, 16px) !important;
   border: 1px solid rgba(168,213,181,.34) !important;
@@ -23644,9 +23684,9 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
 
 body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-portrait img {
   display: block !important;
-  width: min(100%, 138px) !important;
-  height: 164px !important;
-  max-width: 138px !important;
+  width: min(100%, 152px) !important;
+  height: 182px !important;
+  max-width: 152px !important;
   margin: 0 !important;
   padding: 0 0 6px !important;
   box-sizing: border-box !important;
@@ -23709,14 +23749,14 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
 
 @media (max-width: 700px) {
   body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-evidence {
-    grid-template-columns: 92px minmax(0, 1fr) !important;
+    grid-template-columns: 100px minmax(0, 1fr) !important;
     gap: 12px !important;
     padding: 12px !important;
   }
 
   body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-portrait img {
-    width: 88px !important;
-    height: 116px !important;
+    width: 96px !important;
+    height: 128px !important;
   }
 
   body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-label {
@@ -24328,7 +24368,7 @@ html body :is(
   .s1-result-controls .continue-btn
 ) {
   background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
-  border: 2px solid var(--gfc-gold) !important;
+  border: 2px solid rgba(117,191,225,.88) !important;
   color: #ffffff !important;
   box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.18) !important;
   text-shadow: none !important;
@@ -24344,9 +24384,9 @@ html body :is(
   .s1-result-controls .continue-btn
 ):is(:hover,:focus-visible):not(:disabled) {
   background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
-  border-color: #ffd56b !important;
+  border-color: var(--gfc-gold) !important;
   color: #ffffff !important;
-  outline: 3px solid rgba(230,165,29,.32) !important;
+  outline: 2px solid rgba(230,165,29,.34) !important;
   outline-offset: 2px !important;
   box-shadow: 0 3px 0 rgba(8,26,54,.88), 0 0 0 4px rgba(89,183,227,.16), 0 8px 20px rgba(8,38,72,.22) !important;
 }
@@ -24641,6 +24681,21 @@ html body[data-pc-scenario="metacognition"] .pc-guided-repair-status {
   color: #425b6d !important;
 }
 
+/* v439: S1 and S2 share the same assembled-repair footer treatment. Keep the
+   component colors identical across both scenarios instead of allowing S1 to
+   fall back to the older green guided-repair defaults. */
+html body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-preview-label {
+  color: var(--gfc-navy) !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-preview:not(.is-empty) {
+  border-color: #7eb7d1 !important;
+  background: #edf7fb !important;
+  color: #17324d !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-status {
+  color: #425b6d !important;
+}
+
 
 /* High-specificity action ownership. Several pre-theme terminal/result rules are
    intentionally strong (!important); these selectors make the GFC interaction
@@ -24653,7 +24708,7 @@ html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode .vn-return-btn.
 html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode .babbage-tts-btn,
 html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode .vn-return-btn.terminal-return {
   background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
-  border-color: var(--gfc-gold) !important;
+  border-color: rgba(117,191,225,.88) !important;
   color: #ffffff !important;
   box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.20) !important;
   text-shadow: none !important;
@@ -24666,9 +24721,9 @@ html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode .vn-return-btn.
 html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode .babbage-tts-btn:is(:hover,:focus-visible),
 html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode .vn-return-btn.terminal-return:is(:hover,:focus-visible) {
   background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
-  border-color: #ffd56b !important;
+  border-color: var(--gfc-gold) !important;
   color: #ffffff !important;
-  outline: 3px solid rgba(230,165,29,.30) !important;
+  outline: 2px solid rgba(230,165,29,.30) !important;
   outline-offset: 2px !important;
 }
 
@@ -24678,7 +24733,7 @@ html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal
 html body #vnOverlay.vn-overlay.active:has(#babbageTerminalScene.textmode.responding) #vnText button,
 html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode:has(#babbageTerminalScene.textmode.responding) #vnText button {
   background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
-  border: 2px solid var(--gfc-gold) !important;
+  border: 2px solid rgba(117,191,225,.88) !important;
   color: #ffffff !important;
   box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.20) !important;
   text-shadow: none !important;
@@ -24686,9 +24741,9 @@ html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode:has(#babbageTer
 html body #vnOverlay.vn-overlay.active:has(#babbageTerminalScene.textmode.responding) #vnText button:is(:hover,:focus-visible),
 html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode:has(#babbageTerminalScene.textmode.responding) #vnText button:is(:hover,:focus-visible) {
   background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
-  border-color: #ffd56b !important;
+  border-color: var(--gfc-gold) !important;
   color: #ffffff !important;
-  outline: 3px solid rgba(230,165,29,.30) !important;
+  outline: 2px solid rgba(230,165,29,.30) !important;
   outline-offset: 2px !important;
 }
 
@@ -24723,16 +24778,16 @@ html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:is(.pc-predictio
 html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result #pcContinueToBabbageBtn,
 html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result .prediction-continue-btn {
   background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
-  border: 2px solid var(--gfc-gold) !important;
+  border: 2px solid rgba(117,191,225,.88) !important;
   color: #ffffff !important;
   box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.20) !important;
 }
 html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result #pcContinueToBabbageBtn:is(:hover,:focus-visible),
 html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result .prediction-continue-btn:is(:hover,:focus-visible) {
   background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
-  border-color: #ffd56b !important;
+  border-color: var(--gfc-gold) !important;
   color: #ffffff !important;
-  outline: 3px solid rgba(230,165,29,.30) !important;
+  outline: 2px solid rgba(230,165,29,.30) !important;
   outline-offset: 2px !important;
 }
 
@@ -24842,7 +24897,7 @@ html body .pc-scenario-shell .pc-shell-plan {
   background: linear-gradient(90deg, #fff5d8, #fffaf0) !important;
 }
 html body .pc-scenario-shell .pc-shell-primary {
-  border: 2px solid var(--gfc-gold) !important;
+  border: 2px solid rgba(117,191,225,.88) !important;
   background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
   color: #fff !important;
   box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.16) !important;
@@ -24854,7 +24909,7 @@ html body .pc-scenario-shell .pc-shell-secondary {
 }
 html body .pc-scenario-shell :is(.pc-shell-primary,.pc-shell-secondary):is(:hover,:focus-visible) {
   border-color: var(--gfc-gold) !important;
-  outline: 3px solid rgba(230,165,29,.24) !important;
+  outline: 2px solid rgba(230,165,29,.28) !important;
   outline-offset: 2px !important;
 }
 html body .pc-scenario-shell .pc-shell-primary:is(:hover,:focus-visible) {

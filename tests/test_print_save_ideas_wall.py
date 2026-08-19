@@ -13,7 +13,7 @@ cssb=(ROOT/'runtime/css/promptcraft.css').read_text(encoding='utf-8')
 checks={
  'shared print function': 'function pcPrintCurrentBabbageReport()' in terminal,
  'print uses structured report': "#babbageTerminalOutput .analysis-report" in terminal,
- 'print includes submitted repair context': 'Input provided to Babbage' in terminal,
+ 'print includes submitted repair context': 'Repair brief submitted' in terminal,
  'print/save action registered': "'print-babbage-report': () => pcPrintCurrentBabbageReport()" in terminal,
  'Ideas Wall action registered': "'open-ideas-wall': () => window.open('wall.html'" in terminal,
  'Ideas Wall is on main menu': 'data-pc-action="open-ideas-wall"' in idx,
@@ -24,9 +24,10 @@ checks={
  'print includes GFC logo': 'great-falls-college-logo.jpg' in terminal,
  'print uses GFC navy': '--navy:#112650' in terminal,
  'print uses GFC gold': '--gold:#e6a51d' in terminal,
+ 'print is document-first not CRT clone': 'Babbage Analysis Report' in terminal and 'Diagnostic findings' in terminal and 'reportClone.outerHTML' not in terminal,
  'print waits for logo before print': 'Promise.all(images.map' in terminal,
- 'print replaces about:blank URL': "printUrl.hash = 'babbage-diagnosis'" in terminal,
- 'app build stays receiver-compatible V429': 'runtime/js/promptcraft.bundle.js?v=429&amp;patch=435&amp;receiver=82' in idx,
+ 'print replaces about:blank URL': "printUrl.hash = 'babbage-analysis-report'" in terminal,
+ 'app build stays receiver-compatible V429': 'runtime/js/promptcraft.bundle.js?v=429&amp;patch=443&amp;receiver=82' in idx,
  'compiled JS contains print feature': 'function pcPrintCurrentBabbageReport()' in bundle,
  'compiled CSS contains print control rule': ':has(.babbage-print-btn)' in cssb,
 }

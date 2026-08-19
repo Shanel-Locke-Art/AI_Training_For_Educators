@@ -489,7 +489,7 @@ html body :is(
   .s1-result-controls .continue-btn
 ) {
   background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
-  border: 2px solid var(--gfc-gold) !important;
+  border: 2px solid rgba(117,191,225,.88) !important;
   color: #ffffff !important;
   box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.18) !important;
   text-shadow: none !important;
@@ -505,9 +505,9 @@ html body :is(
   .s1-result-controls .continue-btn
 ):is(:hover,:focus-visible):not(:disabled) {
   background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
-  border-color: #ffd56b !important;
+  border-color: var(--gfc-gold) !important;
   color: #ffffff !important;
-  outline: 3px solid rgba(230,165,29,.32) !important;
+  outline: 2px solid rgba(230,165,29,.34) !important;
   outline-offset: 2px !important;
   box-shadow: 0 3px 0 rgba(8,26,54,.88), 0 0 0 4px rgba(89,183,227,.16), 0 8px 20px rgba(8,38,72,.22) !important;
 }
@@ -802,6 +802,21 @@ html body[data-pc-scenario="metacognition"] .pc-guided-repair-status {
   color: #425b6d !important;
 }
 
+/* v439: S1 and S2 share the same assembled-repair footer treatment. Keep the
+   component colors identical across both scenarios instead of allowing S1 to
+   fall back to the older green guided-repair defaults. */
+html body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-preview-label {
+  color: var(--gfc-navy) !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-preview:not(.is-empty) {
+  border-color: #7eb7d1 !important;
+  background: #edf7fb !important;
+  color: #17324d !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-status {
+  color: #425b6d !important;
+}
+
 
 /* High-specificity action ownership. Several pre-theme terminal/result rules are
    intentionally strong (!important); these selectors make the GFC interaction
@@ -814,7 +829,7 @@ html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode .vn-return-btn.
 html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode .babbage-tts-btn,
 html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode .vn-return-btn.terminal-return {
   background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
-  border-color: var(--gfc-gold) !important;
+  border-color: rgba(117,191,225,.88) !important;
   color: #ffffff !important;
   box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.20) !important;
   text-shadow: none !important;
@@ -827,9 +842,9 @@ html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode .vn-return-btn.
 html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode .babbage-tts-btn:is(:hover,:focus-visible),
 html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode .vn-return-btn.terminal-return:is(:hover,:focus-visible) {
   background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
-  border-color: #ffd56b !important;
+  border-color: var(--gfc-gold) !important;
   color: #ffffff !important;
-  outline: 3px solid rgba(230,165,29,.30) !important;
+  outline: 2px solid rgba(230,165,29,.30) !important;
   outline-offset: 2px !important;
 }
 
@@ -839,7 +854,7 @@ html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal
 html body #vnOverlay.vn-overlay.active:has(#babbageTerminalScene.textmode.responding) #vnText button,
 html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode:has(#babbageTerminalScene.textmode.responding) #vnText button {
   background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
-  border: 2px solid var(--gfc-gold) !important;
+  border: 2px solid rgba(117,191,225,.88) !important;
   color: #ffffff !important;
   box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.20) !important;
   text-shadow: none !important;
@@ -847,9 +862,9 @@ html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode:has(#babbageTer
 html body #vnOverlay.vn-overlay.active:has(#babbageTerminalScene.textmode.responding) #vnText button:is(:hover,:focus-visible),
 html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode:has(#babbageTerminalScene.textmode.responding) #vnText button:is(:hover,:focus-visible) {
   background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
-  border-color: #ffd56b !important;
+  border-color: var(--gfc-gold) !important;
   color: #ffffff !important;
-  outline: 3px solid rgba(230,165,29,.30) !important;
+  outline: 2px solid rgba(230,165,29,.30) !important;
   outline-offset: 2px !important;
 }
 
@@ -884,16 +899,16 @@ html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:is(.pc-predictio
 html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result #pcContinueToBabbageBtn,
 html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result .prediction-continue-btn {
   background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
-  border: 2px solid var(--gfc-gold) !important;
+  border: 2px solid rgba(117,191,225,.88) !important;
   color: #ffffff !important;
   box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.20) !important;
 }
 html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result #pcContinueToBabbageBtn:is(:hover,:focus-visible),
 html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result .prediction-continue-btn:is(:hover,:focus-visible) {
   background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
-  border-color: #ffd56b !important;
+  border-color: var(--gfc-gold) !important;
   color: #ffffff !important;
-  outline: 3px solid rgba(230,165,29,.30) !important;
+  outline: 2px solid rgba(230,165,29,.30) !important;
   outline-offset: 2px !important;
 }
 
@@ -1003,7 +1018,7 @@ html body .pc-scenario-shell .pc-shell-plan {
   background: linear-gradient(90deg, #fff5d8, #fffaf0) !important;
 }
 html body .pc-scenario-shell .pc-shell-primary {
-  border: 2px solid var(--gfc-gold) !important;
+  border: 2px solid rgba(117,191,225,.88) !important;
   background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
   color: #fff !important;
   box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.16) !important;
@@ -1015,7 +1030,7 @@ html body .pc-scenario-shell .pc-shell-secondary {
 }
 html body .pc-scenario-shell :is(.pc-shell-primary,.pc-shell-secondary):is(:hover,:focus-visible) {
   border-color: var(--gfc-gold) !important;
-  outline: 3px solid rgba(230,165,29,.24) !important;
+  outline: 2px solid rgba(230,165,29,.28) !important;
   outline-offset: 2px !important;
 }
 html body .pc-scenario-shell .pc-shell-primary:is(:hover,:focus-visible) {

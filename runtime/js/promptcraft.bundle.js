@@ -4371,9 +4371,9 @@ window.pcApplyWidePredictionComputer = () => {
 const PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY = {
   // v346: Restore the proven monitor-glass geometry. The v345 geometry pushed
   // the terminal layer outside the photographed inner bezel on several tablets.
-  left: '22.2%',
+  left: '22.35%',
   top: '12.85%',
-  width: '40.3%',
+  width: '42.2%',
   height: '45.45%'
 };
 
@@ -4621,29 +4621,29 @@ function pcFitWideAnalysisReport(screen) {
     cardPadding: 13,
     headerGap: 9
   } : {
-    badge: clampNumber(7.5, 10.5 * fitFactor, 12),
-    title: clampNumber(19, 32 * fitFactor, 36),
-    summary: clampNumber(10, 15.5 * fitFactor, 17.5),
-    label: clampNumber(8, 11.5 * fitFactor, 12.5),
-    value: clampNumber(10, 15.2 * fitFactor, 17.5),
-    big: clampNumber(11, 17 * fitFactor, 19.5),
+    badge: clampNumber(8, 10.9 * fitFactor, 12.4),
+    title: clampNumber(20, 34 * fitFactor, 37.5),
+    summary: clampNumber(10.8, 16.3 * fitFactor, 18.2),
+    label: clampNumber(8.4, 12 * fitFactor, 12.9),
+    value: clampNumber(10.9, 16 * fitFactor, 18.3),
+    big: clampNumber(12, 18 * fitFactor, 20.4),
     note: isWideDesktopMonitor
-      ? clampNumber(10, 13.8 * fitFactor, 15.5)
-      : clampNumber(8.5, 12.2 * fitFactor, 13.5),
+      ? clampNumber(10.8, 14.5 * fitFactor, 16)
+      : clampNumber(8.7, 12.4 * fitFactor, 13.8),
     outputPadding: isWideDesktopMonitor
-      ? clampNumber(0, 1.1 * fitFactor, 2)
+      ? clampNumber(0, 0.9 * fitFactor, 1.5)
       : clampNumber(2, 4.5 * fitFactor, 6),
     reportPadding: isWideDesktopMonitor
-      ? clampNumber(1, 3 * fitFactor, 5)
+      ? clampNumber(1, 2.7 * fitFactor, 4.25)
       : clampNumber(3.5, 6 * fitFactor, 8),
     gap: isWideDesktopMonitor
-      ? clampNumber(2, 4.4 * fitFactor, 6)
+      ? clampNumber(2, 4 * fitFactor, 5.4)
       : clampNumber(4, 6.5 * fitFactor, 9),
     cardPadding: isWideDesktopMonitor
-      ? clampNumber(3, 5.6 * fitFactor, 7)
+      ? clampNumber(3, 5.1 * fitFactor, 6.5)
       : clampNumber(5, 8 * fitFactor, 10),
     headerGap: isWideDesktopMonitor
-      ? clampNumber(1.25, 3 * fitFactor, 4.5)
+      ? clampNumber(1.25, 2.7 * fitFactor, 4)
       : clampNumber(3, 4.75 * fitFactor, 6)
   };
 
@@ -4752,13 +4752,13 @@ function pcFitWideAnalysisReport(screen) {
   // The higher floors apply only to photographed workstation layouts; compact
   // and medium panel modes already use their own readable scrolling profiles.
   const readableFloor = isWideDesktopMonitor ? {
-    badge: 8,
-    title: 20,
-    summary: 12.5,
-    label: 9,
-    value: 13,
-    big: 14,
-    note: 12.5
+    badge: 8.5,
+    title: 22,
+    summary: 13.2,
+    label: 9.5,
+    value: 14,
+    big: 15,
+    note: 13.2
   } : isMediumAnalysisPanel ? {
     badge: isTallMediumPortraitReadableProfile ? 11 : 9.5,
     title: isTallMediumPortraitReadableProfile ? 30 : 26,
@@ -5193,8 +5193,24 @@ function pcFitWideAnalysisReport(screen) {
   // Dense desktop reports go directly to the overflow-safe content-sized grid.
   // Waiting until the fixed-row layout fails can leave one paint frame where
   // long text overlaps a neighboring box, especially after web fonts settle.
-  if (isWideDesktopMonitor && hasDenseAnalysisContent) {
-    enableOverflowSafeWideReport(hasVeryDenseAnalysisContent ? 0.82 : 0.93);
+  // v436: Short wide workstation displays (including Nest Hub Max) should also
+  // prefer the overflow-safe grid on the first completed-analysis paint. That
+  // keeps the two-column structure, allows the monitor glass to scroll when a
+  // card runs long, and eliminates the transient box-collision state reported
+  // on the 1280x800 profile while preserving readable text.
+  const prefersOverflowSafeWideReport = isWideDesktopMonitor && (
+    hasDenseAnalysisContent ||
+    (viewportWidth <= 1366 && viewportHeight <= 900)
+  );
+  if (prefersOverflowSafeWideReport) {
+    const preferredScale = hasVeryDenseAnalysisContent
+      ? 0.86
+      : hasDenseAnalysisContent
+        ? 0.96
+        : viewportWidth <= 1100
+          ? 1.02
+          : 1;
+    enableOverflowSafeWideReport(preferredScale);
     return true;
   }
 
@@ -5213,7 +5229,7 @@ function pcFitWideAnalysisReport(screen) {
   }
 
   if (!contentFits()) {
-    enableOverflowSafeWideReport(Math.max(0.88, scale));
+    enableOverflowSafeWideReport(Math.max(0.92, scale));
   } else {
     report.classList.remove('analysis-report-scrollable', 'analysis-report-overflow-safe');
   }
@@ -6802,8 +6818,18 @@ function pcPrintCurrentBabbageReport() {
 
   const { scenarioLabel, submittedWork } = pcGetBabbagePrintContext();
   const printedAt = new Date().toLocaleString();
-  const reportClone = report.cloneNode(true);
-  reportClone.querySelectorAll('button, [data-pc-action]').forEach(el => el.remove());
+  const textOf = selector => String(report.querySelector(selector)?.textContent || '').trim();
+  const cardValue = selector => String(report.querySelector(`${selector} .analysis-value`)?.textContent || '').trim();
+  const cardNote = selector => String(report.querySelector(`${selector} .analysis-note`)?.textContent || '').trim();
+
+  const summary = textOf('.analysis-summary');
+  const status = cardValue('.analysis-status-card');
+  const confidence = cardValue('.analysis-confidence-card');
+  const confidenceNote = cardNote('.analysis-confidence-card');
+  const whatWorked = cardValue('.analysis-worked-card');
+  const issue = cardValue('.analysis-issue-card');
+  const repair = cardValue('.analysis-repair-card');
+  const impact = cardValue('.analysis-impact-card');
 
   const printWindow = window.open('', '_blank');
   if (!printWindow) return false;
@@ -6828,11 +6854,18 @@ function pcPrintCurrentBabbageReport() {
     .join('');
 
   const inputSection = workBlocks
-    ? `<section class="pc-print-input"><div class="pc-print-section-label">Input provided to Babbage</div><div class="pc-print-work">${workBlocks}</div></section>`
+    ? `<section class="pc-print-section pc-print-input">
+        <h2>Repair brief submitted</h2>
+        <div class="pc-print-work">${workBlocks}</div>
+      </section>`
     : '';
 
   const logoHTML = printLogoUrl
-    ? `<img class="pc-print-logo" src="${esc(printLogoUrl)}" alt="Great Falls College Montana State University">`
+    ? `<img class="pc-print-logo" src="${esc(printLogoUrl)}" alt="" onerror="this.style.display='none'">`
+    : '';
+
+  const finding = (label, value, className = '') => value
+    ? `<section class="pc-print-finding ${className}"><h3>${esc(label)}</h3><p>${esc(value)}</p></section>`
     : '';
 
   printWindow.document.open();
@@ -6841,46 +6874,54 @@ function pcPrintCurrentBabbageReport() {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>PromptCraft · Babbage Diagnosis · ${esc(scenarioLabel)}</title>
+  <title>PromptCraft · Babbage Analysis Report · ${esc(scenarioLabel)}</title>
   <style>
-    :root{color-scheme:light;--navy:#112650;--navy-deep:#081a36;--blue:#086c9f;--sky:#59b7e3;--sky-pale:#e9f5fb;--gold:#e6a51d;--gold-pale:#fff4d5;--ink:#172236;--muted:#5f6e7f;--paper:#fffdf8;--line:#b9c9d6;}
-    *{box-sizing:border-box}html,body{margin:0;padding:0}body{background:#edf2f6;color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.42;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .pc-print-shell{max-width:940px;margin:0 auto 32px;background:#fff;box-shadow:0 14px 42px rgba(8,26,54,.13)}
-    .pc-print-brand{display:grid;grid-template-columns:108px 1fr;gap:24px;align-items:center;padding:24px 30px 20px;border-top:9px solid var(--navy);border-bottom:4px solid var(--gold);background:linear-gradient(105deg,#f8fbfd,#fff 68%)}
-    .pc-print-logo{display:block;width:100px;height:100px;object-fit:contain}
-    .pc-print-brand-copy{min-width:0}.pc-print-kicker{margin:0 0 3px;font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
-    .pc-print-title{margin:0;font-family:Georgia,'Times New Roman',serif;font-size:32px;line-height:1.05;color:var(--navy)}
-    .pc-print-meta{margin:7px 0 0;color:var(--muted);font-size:12.5px;font-weight:600}
-    .pc-print-content{padding:25px 30px 30px}
-    .pc-print-input{margin:22px 0 0;padding:16px 18px 14px;border:1px solid #c7d7e2;border-left:6px solid var(--blue);border-radius:8px;background:var(--sky-pale)}
-    .pc-print-section-label{margin:0 0 9px;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--navy)}
-    .pc-print-work{font-size:12.5px;line-height:1.42;color:#263547}.pc-print-work-line{margin:0 0 7px}.pc-print-work-line:last-child{margin-bottom:0}.pc-print-work-line strong{color:var(--navy)}.pc-print-work-opening{font-weight:600}
-    .analysis-report{margin:0}.analysis-header{margin:0 0 14px;padding:16px 18px 15px;border-radius:10px;background:var(--navy);color:#fff;break-after:avoid}
-    .analysis-badge{display:inline-block;margin:0 0 7px;padding:3px 8px;border:1px solid var(--gold);border-radius:999px;background:rgba(255,255,255,.08);font-size:9.5px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:#ffe5a4}
-    .analysis-title{margin:0 0 4px;font-family:Georgia,'Times New Roman',serif;font-size:25px;line-height:1.08;color:#fff}.analysis-summary{margin:0;color:#e8f3fa;font-size:12.5px;line-height:1.38}
-    .analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}.analysis-card{padding:13px 14px 12px;border:1px solid var(--line);border-top:4px solid var(--sky);border-radius:8px;background:#fff;break-inside:avoid;page-break-inside:avoid}
-    .analysis-card.wide,.analysis-impact-card,.analysis-worked-card{grid-column:1/-1}.analysis-label{display:flex;align-items:center;gap:5px;margin:0 0 6px;font-size:9.5px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--blue)}.analysis-icon{margin:0;color:var(--gold-dark,#98670d)}
-    .analysis-value{font-size:12.5px;line-height:1.34;color:#1c2b3b}.analysis-value.big{font-size:14px;font-weight:800;color:var(--navy)}.analysis-note{margin-top:5px;color:var(--muted);font-size:10.5px;line-height:1.34}
-    .analysis-issue-card{border-top-color:#d66b39;background:#fffaf7}.analysis-repair-card{border-top-color:var(--gold);background:#fffdf6}.analysis-impact-card{border-top-color:var(--blue);background:#f8fcff}.analysis-worked-card{border-top-color:var(--navy);background:#f6f8fb}
-    .pc-print-footer{margin:24px 0 0;padding:12px 15px;border-top:2px solid var(--gold);background:#f6f8fb;color:#536273;font-size:10.5px;line-height:1.35;break-inside:avoid;page-break-inside:avoid}
-    .pc-print-toolbar{display:flex;justify-content:flex-end;gap:10px;max-width:940px;margin:16px auto;padding:0 8px}.pc-print-toolbar button{padding:10px 16px;border:2px solid var(--gold);border-radius:7px;background:var(--navy);color:#fff;font-weight:800;cursor:pointer}
-    @media(max-width:680px){.pc-print-brand{grid-template-columns:78px 1fr;padding:20px}.pc-print-logo{width:72px;height:72px}.pc-print-content{padding:20px}.analysis-grid{grid-template-columns:1fr}.analysis-card,.analysis-card.wide,.analysis-impact-card,.analysis-worked-card{grid-column:1}.pc-print-title{font-size:27px}}
-    @media print{body{background:#fff}.pc-print-toolbar{display:none}.pc-print-shell{max-width:none;margin:0;box-shadow:none}.pc-print-brand{padding:0 0 14px;margin:0 0 17px;border-top:0;border-bottom:3px solid var(--gold);background:#fff}.pc-print-logo{width:86px;height:86px}.pc-print-content{padding:0}.pc-print-input{margin:0;padding:12px 14px;break-before:page;page-break-before:always}.analysis-header{padding:13px 15px}.analysis-grid{display:block}.analysis-card,.analysis-card.wide,.analysis-impact-card,.analysis-worked-card{display:block;width:100%;margin:0 0 8px;padding:10px 11px 9px}.pc-print-footer{margin-top:14px}@page{size:auto;margin:.52in .58in}}
+    :root{color-scheme:light;--navy:#112650;--navy-deep:#081a36;--blue:#086c9f;--sky:#59b7e3;--sky-pale:#edf7fc;--gold:#e6a51d;--gold-pale:#fff7e2;--ink:#172236;--muted:#607083;--paper:#fff;--line:#cad6df;}
+    *{box-sizing:border-box}html,body{margin:0;padding:0}body{background:#eef3f7;color:var(--ink);font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.52;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .pc-print-toolbar{display:flex;justify-content:flex-end;max-width:900px;margin:14px auto;padding:0 4px}.pc-print-toolbar button{padding:10px 16px;border:2px solid var(--gold);border-radius:7px;background:var(--navy);color:#fff;font-weight:800;cursor:pointer}
+    .pc-print-shell{max-width:900px;margin:0 auto 36px;background:var(--paper);box-shadow:0 14px 40px rgba(8,26,54,.12)}
+    .pc-print-header{padding:28px 34px 22px;border-top:8px solid var(--navy);border-bottom:3px solid var(--gold)}
+    .pc-print-brand-row{display:flex;align-items:center;gap:18px;margin-bottom:17px}.pc-print-logo{width:68px;height:68px;object-fit:contain;flex:0 0 auto}.pc-print-brand-text{min-width:0}.pc-print-brand{font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}.pc-print-affiliation{margin-top:3px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    .pc-print-title{margin:0;font-family:Georgia,'Times New Roman',serif;font-size:34px;line-height:1.05;color:var(--navy)}.pc-print-meta{margin:8px 0 0;color:var(--muted);font-size:12.5px}
+    .pc-print-body{padding:27px 34px 30px}.pc-print-section{margin:0 0 26px}.pc-print-section>h2{margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid var(--navy);font-family:Georgia,'Times New Roman',serif;font-size:20px;line-height:1.2;color:var(--navy)}
+    .pc-print-summary{margin:0 0 17px;font-size:14.5px;line-height:1.55;color:#28384b}.pc-print-glance{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;padding:14px 16px;border:1px solid var(--line);border-left:5px solid var(--blue);background:#f8fbfd}.pc-print-glance-item{min-width:0}.pc-print-label{display:block;margin-bottom:4px;font-size:9.5px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}.pc-print-glance strong{display:block;font-size:14.5px;line-height:1.3;color:var(--navy)}.pc-print-glance small{display:block;margin-top:4px;color:var(--muted);font-size:11.5px;line-height:1.4}
+    .pc-print-findings{margin-top:4px}.pc-print-finding{padding:0 0 15px;margin:0 0 15px;border-bottom:1px solid var(--line);break-inside:avoid;page-break-inside:avoid}.pc-print-finding:last-child{margin-bottom:0;border-bottom:0}.pc-print-finding h3{margin:0 0 5px;font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--blue)}.pc-print-finding p{margin:0;font-size:13.5px;line-height:1.52;color:#263548}.pc-print-finding.issue h3{color:#a34d27}.pc-print-finding.repair h3{color:#8a5d08}.pc-print-finding.impact h3{color:var(--navy)}
+    .pc-print-input{margin-top:29px;padding-top:2px}.pc-print-work{padding:14px 16px;border:1px solid #b9d5e4;border-left:5px solid var(--sky);background:var(--sky-pale);color:#263548;font-size:12.5px;line-height:1.5}.pc-print-work-line{margin:0 0 8px;break-inside:avoid;page-break-inside:avoid}.pc-print-work-line:last-child{margin-bottom:0}.pc-print-work-line strong{color:var(--navy)}.pc-print-work-opening{font-weight:600}
+    .pc-print-footer{margin-top:30px;padding:12px 0 0;border-top:2px solid var(--gold);color:#5d6a79;font-size:10.5px;line-height:1.4}.pc-print-footer strong{color:var(--navy)}
+    @media(max-width:680px){.pc-print-header,.pc-print-body{padding-left:22px;padding-right:22px}.pc-print-title{font-size:29px}.pc-print-glance{grid-template-columns:1fr}.pc-print-brand-row{align-items:flex-start}.pc-print-logo{width:54px;height:54px}}
+    @media print{body{background:#fff;font-size:11.5pt}.pc-print-toolbar{display:none}.pc-print-shell{max-width:none;margin:0;box-shadow:none}.pc-print-header{padding:0 0 16px;border-top:0;border-bottom:2.5px solid var(--gold)}.pc-print-brand-row{margin-bottom:13px}.pc-print-logo{width:58px;height:58px}.pc-print-title{font-size:27pt}.pc-print-meta{font-size:9pt}.pc-print-body{padding:18px 0 0}.pc-print-section{margin-bottom:19px}.pc-print-section>h2{font-size:15pt}.pc-print-summary{font-size:10.5pt}.pc-print-glance{padding:10px 12px;gap:12px}.pc-print-glance strong{font-size:10.5pt}.pc-print-finding{padding-bottom:10px;margin-bottom:10px}.pc-print-finding p{font-size:10pt;line-height:1.43}.pc-print-input{margin-top:18px}.pc-print-work{padding:10px 12px;font-size:9.5pt}.pc-print-footer{margin-top:20px;font-size:8pt}@page{size:auto;margin:.58in .62in}}
   </style>
 </head>
 <body>
   <div class="pc-print-toolbar"><button type="button" onclick="window.print()">Print / Save PDF</button></div>
   <main class="pc-print-shell">
-    <header class="pc-print-brand">
-      ${logoHTML}
-      <div class="pc-print-brand-copy">
-        <div class="pc-print-kicker">PromptCraft · The Prompt Lab</div>
-        <h1 class="pc-print-title">Babbage Diagnosis</h1>
-        <p class="pc-print-meta">${esc(scenarioLabel)} · Generated ${esc(printedAt)}</p>
+    <header class="pc-print-header">
+      <div class="pc-print-brand-row">
+        ${logoHTML}
+        <div class="pc-print-brand-text">
+          <div class="pc-print-brand">PromptCraft · The Prompt Lab</div>
+          <div class="pc-print-affiliation">Great Falls College Montana State University</div>
+        </div>
       </div>
+      <h1 class="pc-print-title">Babbage Analysis Report</h1>
+      <p class="pc-print-meta">${esc(scenarioLabel)} · Generated ${esc(printedAt)}</p>
     </header>
-    <div class="pc-print-content">
-      ${reportClone.outerHTML}
+    <div class="pc-print-body">
+      <section class="pc-print-section">
+        <h2>Analysis summary</h2>
+        ${summary ? `<p class="pc-print-summary">${esc(summary)}</p>` : ''}
+        <div class="pc-print-glance">
+          <div class="pc-print-glance-item"><span class="pc-print-label">Status</span><strong>${esc(status || 'Analysis complete')}</strong></div>
+          <div class="pc-print-glance-item"><span class="pc-print-label">Confidence</span><strong>${esc(confidence || 'Not stated')}</strong>${confidenceNote ? `<small>${esc(confidenceNote)}</small>` : ''}</div>
+        </div>
+      </section>
+      <section class="pc-print-section pc-print-findings">
+        <h2>Diagnostic findings</h2>
+        ${finding('What worked', whatWorked)}
+        ${finding('Issue detected', issue, 'issue')}
+        ${finding('Recommended repair', repair, 'repair')}
+        ${finding('Expected impact', impact, 'impact')}
+      </section>
       ${inputSection}
       <footer class="pc-print-footer"><strong>Instructional judgment still matters.</strong> Babbage feedback is an AI-supported diagnostic aid. Review recommendations using your course context, student needs, and professional judgment.</footer>
     </div>
@@ -6891,7 +6932,7 @@ function pcPrintCurrentBabbageReport() {
   try {
     const printUrl = new URL(window.location.href);
     printUrl.search = '';
-    printUrl.hash = 'babbage-diagnosis';
+    printUrl.hash = 'babbage-analysis-report';
     printWindow.history.replaceState(null, '', printUrl.href);
   } catch (e) {}
   printWindow.focus();
@@ -8442,11 +8483,24 @@ function buildS1RightHTML(){
             <textarea class="s1-clean-textarea" id="g-constraints" rows="3" placeholder="What limits matter? What should a strong reply include?" data-pc-guided-input="true" aria-label="Describe constraints and success criteria"></textarea>
           </div>
         </div>
-        <div class="s1-clean-actions">
-          <div class="s1-clean-nudge" id="s1BuilderNudge"></div>
-          <button class="s1-clean-submit" id="sendBtn" type="button" data-pc-action="send-guided">Consult Babbage →</button>
-        </div>
       </section>
+    </div>`;
+}
+
+function buildS1RepairFooterHTML(){
+  return `
+    <div class="pc-guided-repair-footer s1-clean-repair-footer">
+      <div class="pc-guided-repair-preview-wrap">
+        <div class="pc-guided-repair-preview-label">Your assembled repair brief</div>
+        <div class="pc-guided-repair-preview is-empty" id="s1AssembledPrompt" role="status" aria-live="polite"></div>
+      </div>
+      <div class="pc-guided-repair-actions">
+        <div class="s1-clean-nudge pc-guided-repair-nudge" id="s1BuilderNudge"></div>
+        <div class="pc-guided-repair-submit-wrap">
+          <span id="s1BuilderStatus" class="pc-guided-repair-status" role="status" aria-live="polite">0 of 4 ingredients ready</span>
+          <button class="s1-clean-submit" id="sendBtn" type="button" data-pc-action="send-guided" disabled>Ask Babbage to review the repair</button>
+        </div>
+      </div>
     </div>`;
 }
 
@@ -8460,9 +8514,10 @@ function renderGuidedBuilder(container){
   container.innerHTML = `
     <div class="s1-clean-stage">
       ${buildS1MissionHTML()}
-      <div class="s1-clean-grid">
+      <div class="s1-clean-grid pc-guided-repair-layout--full-preview">
         ${buildS1LeftHTML()}
         ${buildS1RightHTML()}
+        ${buildS1RepairFooterHTML()}
       </div>
     </div>`;
   restoreS1DraftToFields();
@@ -8473,10 +8528,45 @@ function renderGuidedBuilder(container){
   }, 60);
 };
 
+
+function buildS1RepairBriefPreview(values){
+  const lines = [
+    'Repair the discussion so peer replies have a clear instructional purpose.'
+  ];
+  if (values.learners) lines.push(`1. Learners + course — ${values.learners}`);
+  if (values.issue) lines.push(`2. Problem — ${values.issue}`);
+  if (values.interaction) lines.push(`3. Interaction move — ${values.interaction}`);
+  if (values.constraints) lines.push(`4. Constraints + success criteria — ${values.constraints}`);
+  lines.push('Babbage will use this brief to create and explain a revised student-facing discussion prompt.');
+  return lines.join('\n');
+}
+
+function updateS1AssembledPreview(values){
+  const preview = document.getElementById('s1AssembledPrompt');
+  const status = document.getElementById('s1BuilderStatus');
+  const submit = document.getElementById('sendBtn');
+  const fieldMap = {
+    learners: 'g-learners',
+    issue: 'g-issue',
+    interaction: 'g-interaction',
+    constraints: 'g-constraints'
+  };
+  const ready = Object.keys(fieldMap).filter(key => String(values[key] || '').trim().length >= 12);
+  const assembled = ready.length ? buildS1RepairBriefPreview(values) : '';
+
+  if (preview) {
+    preview.textContent = assembled || 'Your repaired discussion prompt will assemble here as you complete the four ingredients.';
+    preview.classList.toggle('is-empty', !assembled);
+  }
+  if (status) status.textContent = `${ready.length} of 4 ingredients ready`;
+  if (submit) submit.disabled = ready.length !== 4;
+}
+
 function onGuidedInput(el){
   if (el && typeof autoGrow === 'function') autoGrow(el);
   const values = getS1GuidedValues();
   saveS1Draft(values);
+  updateS1AssembledPreview(values);
   const checks = analyzeS1Guided(values);
   const ingredientChecks = {
     audience: checks.audience,
@@ -10077,6 +10167,17 @@ window.addEventListener('DOMContentLoaded', () => {
   // learner chooses Start or selects a scenario.
   updateAudioSettingsButton();
   startGame();
+
+  // V443: external PromptCraft pages (such as Ideas Wall) can return to a
+  // specific shared menu destination without duplicating app UI on the page.
+  // The query is intentionally presentation-only; scenario state and research
+  // tracking are untouched.
+  const externalOpenTarget = new URLSearchParams(window.location.search).get('open');
+  if (externalOpenTarget === 'babbage') {
+    openMainMenu('babbage', { initial: true });
+  } else if (externalOpenTarget === 'audio') {
+    window.setTimeout(() => showAudioSetup({ onboarding: false }), 80);
+  }
 
   // Safety check: if S1 content is still empty after load, render it again.
   setTimeout(() => {

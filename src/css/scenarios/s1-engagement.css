@@ -540,3 +540,43 @@ body.s1-result-active .s1-babbage-revision-review .s1-clean-reference-title {
   line-height: 1.25 !important;
 }
 body.s1-result-active .s1-babbage-review-item strong { color: #173d27 !important; }
+
+
+/* v438 — S1 uses the same full-width guided-repair conclusion pattern as S2.
+   The assembled brief and Babbage review action sit beneath both workbench
+   columns instead of being trapped inside the right-hand builder. */
+body.s1-active:not(.s1-result-active) .s1-clean-repair-footer {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-preview-wrap {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  border-top: 0 !important;
+}
+
+body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-preview {
+  width: 100% !important;
+  min-height: 108px !important;
+}
+
+body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-actions {
+  margin-top: 10px !important;
+}
+
+@media (max-width: 900px) {
+  body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-actions {
+    align-items: stretch !important;
+  }
+
+  body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-submit-wrap {
+    width: 100% !important;
+  }
+
+  body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .s1-clean-submit {
+    width: 100% !important;
+  }
+}

@@ -3818,9 +3818,9 @@ body[data-pc-scenario="metacognition"] .s2-case-file .pc-choice-card.is-correct 
    without inheriting Decision 1's narrow quote-copy geometry. */
 body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-evidence {
   display: grid !important;
-  grid-template-columns: clamp(116px, 18%, 148px) minmax(0, 1fr) !important;
+  grid-template-columns: clamp(128px, 19%, 160px) minmax(0, 1fr) !important;
   align-items: center !important;
-  gap: clamp(14px, 1.6vw, 22px) !important;
+  gap: clamp(16px, 1.8vw, 24px) !important;
   margin: 16px 0 !important;
   padding: clamp(12px, 1.2vw, 16px) !important;
   border: 1px solid rgba(168,213,181,.34) !important;
@@ -3839,9 +3839,9 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
 
 body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-portrait img {
   display: block !important;
-  width: min(100%, 138px) !important;
-  height: 164px !important;
-  max-width: 138px !important;
+  width: min(100%, 152px) !important;
+  height: 182px !important;
+  max-width: 152px !important;
   margin: 0 !important;
   padding: 0 0 6px !important;
   box-sizing: border-box !important;
@@ -3904,14 +3904,14 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
 
 @media (max-width: 700px) {
   body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-evidence {
-    grid-template-columns: 92px minmax(0, 1fr) !important;
+    grid-template-columns: 100px minmax(0, 1fr) !important;
     gap: 12px !important;
     padding: 12px !important;
   }
 
   body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-portrait img {
-    width: 88px !important;
-    height: 116px !important;
+    width: 96px !important;
+    height: 128px !important;
   }
 
   body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-label {

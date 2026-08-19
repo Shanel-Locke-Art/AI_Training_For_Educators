@@ -51,6 +51,17 @@ window.addEventListener('DOMContentLoaded', () => {
   updateAudioSettingsButton();
   startGame();
 
+  // V443: external PromptCraft pages (such as Ideas Wall) can return to a
+  // specific shared menu destination without duplicating app UI on the page.
+  // The query is intentionally presentation-only; scenario state and research
+  // tracking are untouched.
+  const externalOpenTarget = new URLSearchParams(window.location.search).get('open');
+  if (externalOpenTarget === 'babbage') {
+    openMainMenu('babbage', { initial: true });
+  } else if (externalOpenTarget === 'audio') {
+    window.setTimeout(() => showAudioSetup({ onboarding: false }), 80);
+  }
+
   // Safety check: if S1 content is still empty after load, render it again.
   setTimeout(() => {
     const inputContainer = document.getElementById('inputContainer');

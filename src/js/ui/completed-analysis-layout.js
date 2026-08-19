@@ -9,9 +9,9 @@
 const PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY = {
   // v346: Restore the proven monitor-glass geometry. The v345 geometry pushed
   // the terminal layer outside the photographed inner bezel on several tablets.
-  left: '22.2%',
+  left: '22.35%',
   top: '12.85%',
-  width: '40.3%',
+  width: '42.2%',
   height: '45.45%'
 };
 
@@ -259,29 +259,29 @@ function pcFitWideAnalysisReport(screen) {
     cardPadding: 13,
     headerGap: 9
   } : {
-    badge: clampNumber(7.5, 10.5 * fitFactor, 12),
-    title: clampNumber(19, 32 * fitFactor, 36),
-    summary: clampNumber(10, 15.5 * fitFactor, 17.5),
-    label: clampNumber(8, 11.5 * fitFactor, 12.5),
-    value: clampNumber(10, 15.2 * fitFactor, 17.5),
-    big: clampNumber(11, 17 * fitFactor, 19.5),
+    badge: clampNumber(8, 10.9 * fitFactor, 12.4),
+    title: clampNumber(20, 34 * fitFactor, 37.5),
+    summary: clampNumber(10.8, 16.3 * fitFactor, 18.2),
+    label: clampNumber(8.4, 12 * fitFactor, 12.9),
+    value: clampNumber(10.9, 16 * fitFactor, 18.3),
+    big: clampNumber(12, 18 * fitFactor, 20.4),
     note: isWideDesktopMonitor
-      ? clampNumber(10, 13.8 * fitFactor, 15.5)
-      : clampNumber(8.5, 12.2 * fitFactor, 13.5),
+      ? clampNumber(10.8, 14.5 * fitFactor, 16)
+      : clampNumber(8.7, 12.4 * fitFactor, 13.8),
     outputPadding: isWideDesktopMonitor
-      ? clampNumber(0, 1.1 * fitFactor, 2)
+      ? clampNumber(0, 0.9 * fitFactor, 1.5)
       : clampNumber(2, 4.5 * fitFactor, 6),
     reportPadding: isWideDesktopMonitor
-      ? clampNumber(1, 3 * fitFactor, 5)
+      ? clampNumber(1, 2.7 * fitFactor, 4.25)
       : clampNumber(3.5, 6 * fitFactor, 8),
     gap: isWideDesktopMonitor
-      ? clampNumber(2, 4.4 * fitFactor, 6)
+      ? clampNumber(2, 4 * fitFactor, 5.4)
       : clampNumber(4, 6.5 * fitFactor, 9),
     cardPadding: isWideDesktopMonitor
-      ? clampNumber(3, 5.6 * fitFactor, 7)
+      ? clampNumber(3, 5.1 * fitFactor, 6.5)
       : clampNumber(5, 8 * fitFactor, 10),
     headerGap: isWideDesktopMonitor
-      ? clampNumber(1.25, 3 * fitFactor, 4.5)
+      ? clampNumber(1.25, 2.7 * fitFactor, 4)
       : clampNumber(3, 4.75 * fitFactor, 6)
   };
 
@@ -390,13 +390,13 @@ function pcFitWideAnalysisReport(screen) {
   // The higher floors apply only to photographed workstation layouts; compact
   // and medium panel modes already use their own readable scrolling profiles.
   const readableFloor = isWideDesktopMonitor ? {
-    badge: 8,
-    title: 20,
-    summary: 12.5,
-    label: 9,
-    value: 13,
-    big: 14,
-    note: 12.5
+    badge: 8.5,
+    title: 22,
+    summary: 13.2,
+    label: 9.5,
+    value: 14,
+    big: 15,
+    note: 13.2
   } : isMediumAnalysisPanel ? {
     badge: isTallMediumPortraitReadableProfile ? 11 : 9.5,
     title: isTallMediumPortraitReadableProfile ? 30 : 26,
@@ -831,8 +831,24 @@ function pcFitWideAnalysisReport(screen) {
   // Dense desktop reports go directly to the overflow-safe content-sized grid.
   // Waiting until the fixed-row layout fails can leave one paint frame where
   // long text overlaps a neighboring box, especially after web fonts settle.
-  if (isWideDesktopMonitor && hasDenseAnalysisContent) {
-    enableOverflowSafeWideReport(hasVeryDenseAnalysisContent ? 0.82 : 0.93);
+  // v436: Short wide workstation displays (including Nest Hub Max) should also
+  // prefer the overflow-safe grid on the first completed-analysis paint. That
+  // keeps the two-column structure, allows the monitor glass to scroll when a
+  // card runs long, and eliminates the transient box-collision state reported
+  // on the 1280x800 profile while preserving readable text.
+  const prefersOverflowSafeWideReport = isWideDesktopMonitor && (
+    hasDenseAnalysisContent ||
+    (viewportWidth <= 1366 && viewportHeight <= 900)
+  );
+  if (prefersOverflowSafeWideReport) {
+    const preferredScale = hasVeryDenseAnalysisContent
+      ? 0.86
+      : hasDenseAnalysisContent
+        ? 0.96
+        : viewportWidth <= 1100
+          ? 1.02
+          : 1;
+    enableOverflowSafeWideReport(preferredScale);
     return true;
   }
 
@@ -851,7 +867,7 @@ function pcFitWideAnalysisReport(screen) {
   }
 
   if (!contentFits()) {
-    enableOverflowSafeWideReport(Math.max(0.88, scale));
+    enableOverflowSafeWideReport(Math.max(0.92, scale));
   } else {
     report.classList.remove('analysis-report-scrollable', 'analysis-report-overflow-safe');
   }

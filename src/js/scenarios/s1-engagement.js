@@ -118,11 +118,24 @@ function buildS1RightHTML(){
             <textarea class="s1-clean-textarea" id="g-constraints" rows="3" placeholder="What limits matter? What should a strong reply include?" data-pc-guided-input="true" aria-label="Describe constraints and success criteria"></textarea>
           </div>
         </div>
-        <div class="s1-clean-actions">
-          <div class="s1-clean-nudge" id="s1BuilderNudge"></div>
-          <button class="s1-clean-submit" id="sendBtn" type="button" data-pc-action="send-guided">Consult Babbage →</button>
-        </div>
       </section>
+    </div>`;
+}
+
+function buildS1RepairFooterHTML(){
+  return `
+    <div class="pc-guided-repair-footer s1-clean-repair-footer">
+      <div class="pc-guided-repair-preview-wrap">
+        <div class="pc-guided-repair-preview-label">Your assembled repair brief</div>
+        <div class="pc-guided-repair-preview is-empty" id="s1AssembledPrompt" role="status" aria-live="polite"></div>
+      </div>
+      <div class="pc-guided-repair-actions">
+        <div class="s1-clean-nudge pc-guided-repair-nudge" id="s1BuilderNudge"></div>
+        <div class="pc-guided-repair-submit-wrap">
+          <span id="s1BuilderStatus" class="pc-guided-repair-status" role="status" aria-live="polite">0 of 4 ingredients ready</span>
+          <button class="s1-clean-submit" id="sendBtn" type="button" data-pc-action="send-guided" disabled>Ask Babbage to review the repair</button>
+        </div>
+      </div>
     </div>`;
 }
 
@@ -136,9 +149,10 @@ function renderGuidedBuilder(container){
   container.innerHTML = `
     <div class="s1-clean-stage">
       ${buildS1MissionHTML()}
-      <div class="s1-clean-grid">
+      <div class="s1-clean-grid pc-guided-repair-layout--full-preview">
         ${buildS1LeftHTML()}
         ${buildS1RightHTML()}
+        ${buildS1RepairFooterHTML()}
       </div>
     </div>`;
   restoreS1DraftToFields();
@@ -149,10 +163,45 @@ function renderGuidedBuilder(container){
   }, 60);
 };
 
+
+function buildS1RepairBriefPreview(values){
+  const lines = [
+    'Repair the discussion so peer replies have a clear instructional purpose.'
+  ];
+  if (values.learners) lines.push(`1. Learners + course — ${values.learners}`);
+  if (values.issue) lines.push(`2. Problem — ${values.issue}`);
+  if (values.interaction) lines.push(`3. Interaction move — ${values.interaction}`);
+  if (values.constraints) lines.push(`4. Constraints + success criteria — ${values.constraints}`);
+  lines.push('Babbage will use this brief to create and explain a revised student-facing discussion prompt.');
+  return lines.join('\n');
+}
+
+function updateS1AssembledPreview(values){
+  const preview = document.getElementById('s1AssembledPrompt');
+  const status = document.getElementById('s1BuilderStatus');
+  const submit = document.getElementById('sendBtn');
+  const fieldMap = {
+    learners: 'g-learners',
+    issue: 'g-issue',
+    interaction: 'g-interaction',
+    constraints: 'g-constraints'
+  };
+  const ready = Object.keys(fieldMap).filter(key => String(values[key] || '').trim().length >= 12);
+  const assembled = ready.length ? buildS1RepairBriefPreview(values) : '';
+
+  if (preview) {
+    preview.textContent = assembled || 'Your repaired discussion prompt will assemble here as you complete the four ingredients.';
+    preview.classList.toggle('is-empty', !assembled);
+  }
+  if (status) status.textContent = `${ready.length} of 4 ingredients ready`;
+  if (submit) submit.disabled = ready.length !== 4;
+}
+
 function onGuidedInput(el){
   if (el && typeof autoGrow === 'function') autoGrow(el);
   const values = getS1GuidedValues();
   saveS1Draft(values);
+  updateS1AssembledPreview(values);
   const checks = analyzeS1Guided(values);
   const ingredientChecks = {
     audience: checks.audience,
