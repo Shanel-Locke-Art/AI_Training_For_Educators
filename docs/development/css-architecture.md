@@ -24,6 +24,7 @@ PromptCraft keeps editable CSS in `src/css/` and browser-loaded output in `runti
 16. `responsive/large-tablet.css`
 17. `responsive/prediction.css`
 18. `responsive/final-overrides.css`
+19. `ui/gfc-theme.css`
 
 `tools/build.py` concatenates those owners into `runtime/css/promptcraft.css` without changing their cascade order.
 
@@ -37,15 +38,32 @@ The Ideas Wall is deliberately isolated:
 1. Put new rules in the semantic owner that controls the component/state.
 2. Prefer shared viewport-family rules over device-name patches.
 3. Do not add S3 styling to `compat/legacy-responsive.css` or `responsive/final-overrides.css` merely because those files load late.
-4. Treat the compatibility and final-override owners as preserved S1/S2 debt scheduled for gradual migration, not as extension points.
+4. Treat compatibility and final-override owners as preserved S1/S2 debt scheduled for gradual migration, not as extension points.
 5. Keep scenario-specific rules under `scenarios/` only when behavior is genuinely scenario-specific.
 6. Shared VN character layout belongs to the VN/slot system, never to a named student portrait.
 7. Never hand-edit `runtime/css/promptcraft.css`.
 8. Keep Ideas Wall rules out of the main application cascade unless a component truly becomes shared.
+9. Shared GFC/PromptCraft visual tokens and cross-component theme overrides belong in `ui/gfc-theme.css`; scenario behavior does not.
+10. Gold is an interaction/accent color, not a permanent heavy border around every button. Resting controls should use the current blue/navy border system; gold is reserved for focus, selection, or intentional emphasis.
+
+## Current theme-sensitive components
+
+The shared GFC theme currently covers, among other surfaces:
+
+- brand/header menu and PromptCraft/Babbage identity
+- onboarding/name and audio dialogs
+- scenario workspaces and assembled-repair previews
+- prediction/result actions
+- Babbage workstation controls while preserving the green CRT content
+- completed-analysis/readability adjustments
+- locked scenario development shells
+- teaching-progression HUD and expanded progress panel
+
+The Ideas Wall uses its own equivalent navy/blue/gold page treatment in `pages/ideas-wall.css`.
 
 ## Dead-selector policy
 
-The pre-S3 cleanup removed CSS for interfaces/classes that current HTML and JavaScript cannot create, including abandoned S2 case-file/evidence variants, retired menu toggles, and old final-review layouts. Those class names are now listed as retired in `tools/audit_css.py`.
+The pre-S3 cleanup removed CSS for interfaces/classes that current HTML and JavaScript cannot create, including abandoned S2 case-file/evidence variants, retired menu toggles, and old final-review layouts. Those class names are listed as retired in `tools/audit_css.py`.
 
 A retired selector failing the audit is intentional friction. Reuse the current component instead of reviving an old selector unless there is an explicit architectural reason.
 

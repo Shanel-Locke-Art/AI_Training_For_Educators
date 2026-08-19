@@ -1,6 +1,6 @@
 # PromptCraft repository architecture
 
-This is the canonical pre-S3 repository map for `PROMPTCRAFT_V429`. Older flat/numeric layouts should not be reconstructed from memory.
+This is the canonical repository map for `PROMPTCRAFT_V429` as represented by the current V429 / cache revision 446 development baseline. Older flat/numeric layouts should not be reconstructed from memory.
 
 ## Runtime entry points
 
@@ -24,8 +24,8 @@ src/js/
 ├── ai/
 │   └── babbage-client.js
 ├── app/
-│   ├── runtime-state.js
-│   ├── config-and-assets.js
+│   ├── runtime-state.js          # global runtime + teaching progress state
+│   ├── config-and-assets.js      # ASSETS registry + receiver configuration
 │   ├── scenario-runtime.js
 │   └── bootstrap.js
 ├── audio/
@@ -65,12 +65,32 @@ src/css/
 ├── foundation/
 ├── layout/
 ├── pages/
+│   └── ideas-wall.css
 ├── responsive/
 ├── scenarios/
 └── ui/
+    └── gfc-theme.css
 ```
 
 `src/css/manifest.css` defines the application cascade. `pages/ideas-wall.css` is intentionally standalone. `tools/build.py` fails if an undeclared CSS owner appears.
+
+## Assets
+
+`assets/asset-manifest.json` is the canonical asset classification map. Current manifest version: `144`.
+
+Major current asset groups:
+
+- application/classroom backgrounds
+- GFC S1/S2 campus backgrounds
+- Professor Pixel portraits
+- Jordan S2 portraits
+- scenario scene art
+- Babbage mark, Charles Babbage portrait, Babbage engine
+- Great Falls College print/logo asset
+- PromptCraft QR code
+- current runtime audio
+- planned line-by-line audio
+- development-only character references
 
 ## Tooling
 
@@ -82,11 +102,13 @@ src/css/
 | `tools/audit_assets.py` | Asset classification/reference audit |
 | `tools/check.py` | One-command regression runner; `--full` includes browser tests |
 
+Current browser regression coverage also includes teaching progression, Ideas Wall header/theme, GFC action borders, Babbage print/save, S1/S2 guided repair, terminal handoffs, and analysis overflow.
+
 ## Scenario boundary
 
-Only S1 and S2 have active browser implementations in this baseline. S3–S8 are development shells. Old S3–S5 browser prototype code and styling were removed so new scenario development starts from shared architecture rather than inherited dormant behavior.
+Only S1 and S2 have active browser implementations in this baseline. S3-S8 are development shells. Old S3-S5 browser prototype code and styling were removed so new scenario development starts from shared architecture rather than inherited dormant behavior.
 
-The server-side Babbage proxy keeps S3–S5 structured response contracts because those are future-facing integration contracts, not playable browser implementations.
+The server-side Babbage proxy keeps S3-S5 structured response contracts because those are future-facing integration contracts, not playable browser implementations.
 
 ## Retired layout/naming patterns
 
@@ -100,14 +122,14 @@ Do not restore:
 - patch-number suffixes on runtime state classes/functions when a semantic name exists
 - removed S2 case-file/evidence layout selectors recorded by `tools/audit_css.py`
 
-The only retained Claude-named browser-source tokens are the two `claude_response` research payload keys required by schema V121 compatibility.
+The retained `claude_response` tokens exist only for V121 receiver compatibility.
 
-## Asset-management filenames
+## Asset-management files
 
-Current workbooks:
+Canonical workbooks:
 
-- `dialogue-voiceover-tracker.xlsx`
-- `master-asset-tracker.xlsx`
-- `visual-asset-tracker.xlsx`
+- `docs/asset-management/master-asset-tracker.xlsx`
+- `docs/asset-management/visual-asset-tracker.xlsx`
+- `docs/asset-management/dialogue-voiceover-tracker.xlsx`
 
-Version history belongs in source control/research records, not in filenames that must be renamed every time the project changes.
+Do not create version-number duplicates of these workbooks for routine updates. Version history belongs in source control/research records.
