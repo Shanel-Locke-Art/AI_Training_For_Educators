@@ -106,6 +106,7 @@ function pcClearVNStateForScenarioSwitch() {
   try { pcClearAnalysisLayout(); } catch (e) {}
   try { pcSetBabbageSubmitting(false); } catch (e) {}
   try { babbageTerminalCloseCallback = null; } catch (e) {}
+  try { babbageTerminalCloseHandoff = 'app'; } catch (e) {}
   try { pcSharedWorkstationResultContinue = null; } catch (e) {}
 
   // Scenario state may add semantic markers, but presentation teardown is shared.
@@ -319,7 +320,13 @@ function prepareScenarioShell(index) {
   }
 
   const sceneBackground = document.getElementById('vnSceneBg');
-  if (sceneBackground) pcSetImageSource(sceneBackground, ASSETS.images.backgrounds.classroom, LEGACY_ASSETS.images.backgrounds.classroom);
+  if (sceneBackground) {
+    pcSetImageSource(
+      sceneBackground,
+      pcGetScenarioBackgroundAsset(index),
+      LEGACY_ASSETS.images.backgrounds.classroom
+    );
+  }
 }
 
 

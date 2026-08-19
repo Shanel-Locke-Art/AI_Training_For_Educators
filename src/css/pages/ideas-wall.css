@@ -1,11 +1,11 @@
 :root {
-  --forest-950: #0d3528;
-  --forest-900: #123f30;
-  --forest-800: #174d39;
-  --forest-700: #215c45;
-  --forest-600: #2f7156;
-  --forest-200: #cfe0d4;
-  --forest-100: #e9f1eb;
+  --forest-950: #081a36;
+  --forest-900: #112650;
+  --forest-800: #0b5783;
+  --forest-700: #086c9f;
+  --forest-600: #2c8dbe;
+  --forest-200: #cde8f4;
+  --forest-100: #e9f5fb;
   --cream-50: #fffdf8;
   --cream-100: #faf6ee;
   --cream-200: #f3ecdd;
@@ -128,7 +128,7 @@ a { color: inherit; }
   overflow: hidden;
   background:
     radial-gradient(circle at 84% 28%, rgba(79, 139, 93, .16), transparent 18rem),
-    linear-gradient(110deg, var(--forest-950) 0%, var(--forest-900) 58%, #1b563d 100%);
+    linear-gradient(110deg, var(--forest-950) 0%, var(--forest-900) 58%, #0b5c89 100%);
   border-bottom: 3px solid var(--amber-500);
   color: #fff8df;
 }
@@ -549,3 +549,20 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+
+/* Great Falls College visual skin: palette only, approved Ideas Wall layout preserved. */
+.site-bar {
+  border-bottom-color: var(--gold);
+  background: linear-gradient(100deg, var(--forest-950), var(--forest-900));
+}
+.brand-mark { color: var(--gold); }
+.site-nav a.active { box-shadow: inset 0 -3px 0 var(--gold); }
+.hero { border-bottom-color: var(--gold); }
+.hero::after {
+  background: radial-gradient(circle, rgba(89,183,227,.12) 0 1px, transparent 1.4px);
+  background-size: 18px 18px;
+}
+.stat-icon { color: #c8ecfa; background: rgba(89,183,227,.14); }
+.filter-btn.active { box-shadow: 0 4px 12px rgba(8,62,94,.16); }
+.idea-card { box-shadow: 0 8px 24px rgba(17,38,80,.07); }

@@ -124,9 +124,17 @@ def main() -> int:
             failures.append(f'Analysis card content overflows its card: {report_state["overflowCards"]}')
 
         page.evaluate('closeBabbageConsultOverlay()')
-        page.wait_for_timeout(520)
-        if page.locator('#s2AuditTitle').count() != 1:
+        page.wait_for_timeout(220)
+        handoff = page.evaluate("""() => ({
+          audit: !!document.getElementById('s2AuditTitle'),
+          overlayActive: document.getElementById('vnOverlay')?.classList.contains('active') || false,
+          terminalMode: document.getElementById('vnOverlay')?.classList.contains('babbage-terminal-textmode') || false,
+          staleAction: (document.getElementById('vnText')?.textContent || '').includes('Audit this draft')
+        })""")
+        if not handoff['audit']:
             failures.append('Closing the terminal report did not hand off to Decision 4.')
+        if handoff['overlayActive'] or handoff['terminalMode'] or handoff['staleAction']:
+            failures.append(f'S2 draft report left stale VN/terminal UI over the audit workspace: {handoff}')
         browser.close()
 
     if failures:

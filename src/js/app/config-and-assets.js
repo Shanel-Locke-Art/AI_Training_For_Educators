@@ -96,7 +96,11 @@ const ASSETS = Object.freeze({
   images: Object.freeze({
     backgrounds: Object.freeze({
       app: pcProjectUrl('assets/images/backgrounds/app-background.png?v=2'),
-      classroom: pcProjectUrl('assets/images/backgrounds/classroom.png')
+      classroom: pcProjectUrl('assets/images/backgrounds/classroom.png'),
+      scenarios: Object.freeze({
+        0: pcProjectUrl('assets/images/backgrounds/gfc/s1-science-wing.jpg'),
+        1: pcProjectUrl('assets/images/backgrounds/gfc/s2-study-lounge.jpg')
+      })
     }),
     professorPixel: Object.freeze({
       neutral: pcProjectUrl('assets/images/characters/professor-pixel/neutral.png'),
@@ -141,6 +145,13 @@ const ASSETS = Object.freeze({
     })
   })
 });
+
+function pcGetScenarioBackgroundAsset(index) {
+  const normalized = Number(index);
+  return ASSETS.images.backgrounds.scenarios[normalized] || ASSETS.images.backgrounds.classroom;
+}
+
+pcExposeGlobals({ pcGetScenarioBackgroundAsset });
 
 const LEGACY_ASSETS = Object.freeze({
   images: Object.freeze({

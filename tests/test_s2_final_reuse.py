@@ -65,6 +65,30 @@ def main()->int:
         if audit['feedbackWidth'] <= audit['taskWidth']*1.4:
             failures.append(f'Audit feedback is not materially wider than the right task column: {audit}')
 
+        # Closing S2's repair-review report must reveal the app result page, not
+        # leave the old VN smartboard/dialogue shell active over it.
+        page.evaluate("""() => {
+          const d=getS2Data();
+          d.babbageDraft={...S2_LOCAL_DRAFT_FALLBACK};
+          d.babbageReview={...S2_LOCAL_REVIEW_FALLBACK};
+          d.s2ReviewSource='fallback'; d.aiProvider='local-fallback';
+          showBabbageTerminalReport({
+            reportHTML: buildBabbageAnalysisHTML(pcS2BuildRepairReviewDiagnosticText(d.babbageReview), true, 'backend-unavailable'),
+            onClose: () => renderS2FinalComparison(),
+            readLabel:'Read Analysis', printLabel:'Print / Save PDF', continueLabel:'Continue'
+          });
+        }""")
+        page.wait_for_timeout(140)
+        page.evaluate('closeBabbageConsultOverlay()')
+        page.wait_for_timeout(140)
+        close_state=page.evaluate("""() => ({
+          overlayActive:document.getElementById('vnOverlay')?.classList.contains('active')||false,
+          result:!!document.querySelector('.pc-shared-result-card'),
+          stalePrint:(document.getElementById('vnText')?.textContent||'').includes('Print / Save PDF')
+        })""")
+        if close_state['overlayActive'] or not close_state['result'] or close_state['stalePrint']:
+            failures.append(f'S2 repair-review close left stale VN controls instead of the result page: {close_state}')
+
         # S2 completion must literally consume the S1 result-page visual owner classes.
         page.evaluate("""() => {
           const d=getS2Data();

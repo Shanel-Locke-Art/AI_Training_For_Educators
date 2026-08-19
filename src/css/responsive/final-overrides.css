@@ -228,7 +228,7 @@ body[data-pc-scenario="metacognition"] .pc-scenario-stage {
   /* Match S1's edge-to-edge workbench footprint instead of the shared 1500px stage cap. */
   position: relative;
   left: 50%;
-  width: calc(100vw - 16px);
+  width: calc(100vw - clamp(40px, 4vw, 72px));
   max-width: none;
   margin-left: 0;
   margin-right: 0;
@@ -374,7 +374,7 @@ body[data-pc-scenario="metacognition"] .s2-loop-puzzle .pc-selection-bar {
 
 @media (max-width: 760px) {
   body[data-pc-scenario="metacognition"] .pc-scenario-stage {
-    width: calc(100vw - 12px);
+    width: calc(100vw - 24px);
     padding-inline: 0;
   }
 

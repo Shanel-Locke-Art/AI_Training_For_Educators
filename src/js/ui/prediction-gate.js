@@ -834,7 +834,7 @@ function pcShowSharedWorkstationResult({
   if (sceneBackground) {
     pcSetImageSource(
       sceneBackground,
-      ASSETS.images.backgrounds.classroom,
+      pcGetScenarioBackgroundAsset(window.scenarioIndex),
       LEGACY_ASSETS.images.backgrounds.classroom
     );
   }
@@ -958,7 +958,7 @@ function pcShowPredictionGate(text){
   if (sceneBackground) {
     pcSetImageSource(
       sceneBackground,
-      ASSETS.images.backgrounds.classroom,
+      pcGetScenarioBackgroundAsset(window.scenarioIndex),
       LEGACY_ASSETS.images.backgrounds.classroom
     );
   }

@@ -577,6 +577,7 @@ const EXPRESSIONS = PIXEL_EXPR;
 // Queue of dialogue sequences waiting to play
 let vnQueue = [];
 let babbageTerminalCloseCallback = null;
+let babbageTerminalCloseHandoff = 'app';
 let vnTyping = false;
 let vnTypeTimer = null;
 let vnCurrentText = '';

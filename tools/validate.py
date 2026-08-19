@@ -115,10 +115,10 @@ def main() -> int:
         value for value in index_inspector.stylesheets if local_reference_path(value) is not None
     ]
     if len(local_index_styles) != 1 or not re.fullmatch(
-        r"runtime/css/promptcraft\.css\?v=\d+", local_index_styles[0] if local_index_styles else ""
+        r"runtime/css/promptcraft\.css\?v=\d+(?:&patch=\d+)?", local_index_styles[0] if local_index_styles else ""
     ):
         errors.append(
-            "index.html must load exactly one local stylesheet: runtime/css/promptcraft.css?v=<number>."
+            "index.html must load exactly one local stylesheet: runtime/css/promptcraft.css?v=<build>[&patch=<cache>]."
         )
 
     wall_inspector = inspectors["wall.html"]

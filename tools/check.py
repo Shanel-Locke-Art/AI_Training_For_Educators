@@ -9,6 +9,8 @@ responsive and interaction regression tests.
 from __future__ import annotations
 
 import argparse
+import os
+import signal
 import subprocess
 import sys
 from pathlib import Path
@@ -18,6 +20,8 @@ ROOT = Path(__file__).resolve().parents[1]
 QUICK_CHECKS = (
     ("Source/runtime synchronization", [sys.executable, "tools/build.py", "--check"]),
     ("Structural hardening", [sys.executable, "tools/validate.py"]),
+    ("Great Falls College theme contract", [sys.executable, "tests/test_gfc_theme.py"]),
+    ("Babbage-to-VN transition handoff", [sys.executable, "tests/test_transition_handoff.py"]),
     ("Print, Save PDF, and Ideas Wall", [sys.executable, "tests/test_print_save_ideas_wall.py"]),
     ("S2 repair terminal contract", [sys.executable, "tests/test_s2_repair_terminal_flow.py"]),
 )
@@ -39,14 +43,56 @@ BROWSER_CHECKS = (
 )
 
 
+def _terminate_process_tree(process: subprocess.Popen) -> None:
+    """Terminate the test process and any browser children it spawned.
+
+    Playwright/Chromium can leave helper processes alive after an otherwise
+    successful test. Isolating each check in its own session prevents those
+    helpers from accumulating and starving later viewport tests.
+    """
+    if os.name == "posix":
+        try:
+            os.killpg(process.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            return
+        try:
+            process.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        return
+
+    if process.poll() is None:
+        process.terminate()
+        try:
+            process.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            process.kill()
+
+
 def run(label: str, command: list[str]) -> bool:
     print(f"\n== {label} ==", flush=True)
+    popen_kwargs = {"cwd": ROOT}
+    if os.name == "posix":
+        popen_kwargs["start_new_session"] = True
+    process = subprocess.Popen(command, **popen_kwargs)
+    timed_out = False
     try:
-        result = subprocess.run(command, cwd=ROOT, check=False, timeout=180)
+        returncode = process.wait(timeout=180)
     except subprocess.TimeoutExpired:
+        timed_out = True
+        returncode = None
+    finally:
+        # Always reap the isolated process group. Successful Playwright tests
+        # occasionally leave Chromium helpers behind even after Python exits.
+        _terminate_process_tree(process)
+
+    if timed_out:
         print(f"TIMEOUT: {label}", file=sys.stderr)
         return False
-    if result.returncode:
+    if returncode:
         print(f"FAILED: {label}", file=sys.stderr)
         return False
     return True

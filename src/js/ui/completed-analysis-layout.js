@@ -572,6 +572,7 @@ function pcFitWideAnalysisReport(screen) {
       ['overscroll-behavior-y', 'contain'],
       ['touch-action', 'pan-y'],
       ['scrollbar-gutter', 'stable'],
+      ['scroll-padding-bottom', '18px'],
       ['box-sizing', 'border-box']
     ]);
     pcSetImportantStyles(report, [
@@ -582,6 +583,15 @@ function pcFitWideAnalysisReport(screen) {
       ['overflow', 'visible'],
       ['box-sizing', 'border-box']
     ]);
+    // Very dense desktop reports are usually only a few pixels taller than the
+    // physical monitor. Recover that space from decorative padding before we
+    // ask the user to scroll; text stays at the established readable floor.
+    if (isWideDesktopMonitor && hasVeryDenseAnalysisContent) {
+      pcSetImportantStyles(report, [['padding', '1px 2px 2px']]);
+      pcSetImportantStyles(header, [['gap', '2px']]);
+      pcSetImportantStyles(grid, [['gap', '2px']]);
+      cards.forEach((card) => pcSetImportantStyles(card, [['padding', '2px 4px']]));
+    }
     pcSetImportantStyles(grid, [
       ['display', 'grid'],
       ['grid-template-columns', useSingleColumn ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) minmax(0, 1fr)'],
@@ -822,7 +832,7 @@ function pcFitWideAnalysisReport(screen) {
   // Waiting until the fixed-row layout fails can leave one paint frame where
   // long text overlaps a neighboring box, especially after web fonts settle.
   if (isWideDesktopMonitor && hasDenseAnalysisContent) {
-    enableOverflowSafeWideReport(hasVeryDenseAnalysisContent ? 0.92 : 0.97);
+    enableOverflowSafeWideReport(hasVeryDenseAnalysisContent ? 0.82 : 0.93);
     return true;
   }
 

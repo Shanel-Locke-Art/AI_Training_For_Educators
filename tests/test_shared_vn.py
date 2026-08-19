@@ -35,6 +35,8 @@ CONTENT_TYPES = {
     ".json": "application/json",
     ".mp3": "audio/mpeg",
     ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
 }
 TOLERANCE = 1.0
 

@@ -203,15 +203,281 @@ html body .pc-babbage-logo-icon img{display:block!important;width:31px!important
 html body .pc-brand-menu-babbage{border-color:rgba(209,181,107,.66)!important;background:linear-gradient(90deg,rgba(185,139,57,.16),transparent 44%),#173f32!important}
 html body .pc-brand-menu-babbage img{display:block!important;width:25px!important;height:25px!important;object-fit:contain!important}
 html body .pc-brand-menu-babbage:hover,html body .pc-brand-menu-babbage:focus-visible{background:linear-gradient(90deg,rgba(212,181,107,.24),transparent 52%),#205542!important;border-color:#e3c779!important}
-html body .pc-babbage-hero{display:grid!important;grid-template-columns:minmax(280px,.95fr) minmax(0,1.05fr)!important;gap:clamp(18px,3vw,34px)!important;align-items:center!important;margin:20px 0 24px!important}
-html body .pc-babbage-visual{min-width:0!important;padding:clamp(8px,1.2vw,14px)!important;border:1px solid rgba(205,178,108,.42)!important;border-radius:14px!important;background:radial-gradient(circle at 24% 20%,rgba(205,178,108,.12),transparent 38%),#0d281f!important}
-html body .pc-babbage-visual img{display:block!important;width:100%!important;height:auto!important}
-html body .pc-babbage-intro{min-width:0!important}
-html body .pc-babbage-intro h3{margin:4px 0 10px!important;color:#173d27!important}
-html body .pc-babbage-intro p{margin:0 0 10px!important}
-html body .pc-babbage-role-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
-html body .pc-babbage-role-grid article{position:relative!important;overflow:hidden!important}
-html body .pc-babbage-role-grid article::after{content:""!important;position:absolute!important;width:76px!important;height:76px!important;right:-24px!important;bottom:-28px!important;border:2px dashed rgba(185,139,57,.24)!important;border-radius:50%!important;pointer-events:none!important}
-html body .pc-babbage-role-grid article>span{min-width:52px!important;width:auto!important;padding-inline:9px!important;border-color:rgba(185,139,57,.52)!important;background:#193c30!important;color:#f3dfaa!important;font-family:"Source Code Pro",ui-monospace,monospace!important;font-size:.68rem!important;letter-spacing:.08em!important}
-html body .pc-menu-babbage-notes{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;margin-top:18px!important}
-@media screen and (max-width:820px){html body .pc-babbage-hero,html body .pc-babbage-role-grid,html body .pc-menu-babbage-notes{grid-template-columns:1fr!important}html body .pc-babbage-visual{max-width:620px!important;margin-inline:auto!important}}
+/* Meet Babbage page: concise namesake + human-judgment explainer. */
+html body .pc-babbage-panel-heading {
+  max-width: 900px !important;
+  margin-bottom: 22px !important;
+}
+
+html body .pc-babbage-hero {
+  display: grid !important;
+  grid-template-columns: minmax(270px, .82fr) minmax(0, 1.18fr) !important;
+  gap: clamp(28px, 4vw, 58px) !important;
+  align-items: center !important;
+  margin: 18px 0 30px !important;
+}
+
+html body .pc-babbage-portrait-card {
+  width: min(100%, 430px) !important;
+  margin: 0 auto !important;
+  overflow: hidden !important;
+  border: 2px solid var(--gfc-navy) !important;
+  border-radius: 18px !important;
+  background: #fffdfa !important;
+  box-shadow: 0 12px 28px rgba(17,38,80,.12) !important;
+}
+
+html body .pc-babbage-portrait-frame {
+  position: relative !important;
+  padding: 10px !important;
+  border-bottom: 1px solid #c9d6df !important;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255,255,255,.62), transparent 54%),
+    linear-gradient(145deg, #dff2fb, #c6e4f3) !important;
+}
+
+html body .pc-babbage-portrait-frame::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 9px !important;
+  border: 1.5px solid rgba(230,165,29,.86) !important;
+  border-radius: 10px !important;
+  pointer-events: none !important;
+}
+
+html body .pc-babbage-portrait-frame img {
+  display: block !important;
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  border-radius: 9px !important;
+}
+
+html body .pc-babbage-portrait-card figcaption {
+  display: grid !important;
+  justify-items: center !important;
+  gap: 4px !important;
+  padding: 14px 16px 16px !important;
+  text-align: center !important;
+}
+
+html body .pc-babbage-portrait-card figcaption strong {
+  color: var(--gfc-navy) !important;
+  font-family: "Fraunces", Georgia, serif !important;
+  font-size: clamp(1.25rem, 2.3vw, 1.65rem) !important;
+  line-height: 1.1 !important;
+}
+
+html body .pc-babbage-portrait-card figcaption span {
+  position: relative !important;
+  padding-top: 8px !important;
+  color: #0a5f8c !important;
+  font-family: "Source Code Pro", ui-monospace, monospace !important;
+  font-size: .72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: .13em !important;
+  text-transform: uppercase !important;
+}
+
+html body .pc-babbage-portrait-card figcaption span::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 2px !important;
+  left: 50% !important;
+  width: 50px !important;
+  height: 2px !important;
+  transform: translateX(-50%) !important;
+  background: var(--gfc-gold) !important;
+}
+
+html body .pc-babbage-intro {
+  min-width: 0 !important;
+  max-width: 690px !important;
+}
+
+html body .pc-babbage-intro .pc-menu-card-label {
+  color: #a96605 !important;
+}
+
+html body .pc-babbage-intro h3 {
+  margin: 6px 0 16px !important;
+  color: var(--gfc-navy) !important;
+  font-family: "Fraunces", Georgia, serif !important;
+  font-size: clamp(1.7rem, 3vw, 2.35rem) !important;
+  line-height: 1.12 !important;
+}
+
+html body .pc-babbage-intro p {
+  margin: 0 0 16px !important;
+  color: #33475a !important;
+  font-size: clamp(.96rem, 1.35vw, 1.06rem) !important;
+  line-height: 1.72 !important;
+}
+
+html body .pc-babbage-intro p strong {
+  color: var(--gfc-navy) !important;
+}
+
+html body .pc-babbage-role-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+html body .pc-babbage-role-grid article {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: 58px minmax(0,1fr) !important;
+  gap: 14px !important;
+  align-items: start !important;
+  min-height: 174px !important;
+  padding: 20px !important;
+  overflow: hidden !important;
+  border: 2px solid #779ab0 !important;
+  border-radius: 14px !important;
+  background: #fffdfa !important;
+  box-shadow: 0 6px 16px rgba(17,38,80,.06) !important;
+}
+
+html body .pc-babbage-role-grid article::after {
+  content: "" !important;
+  position: absolute !important;
+  width: 76px !important;
+  height: 76px !important;
+  right: -28px !important;
+  bottom: -30px !important;
+  border: 2px dashed rgba(230,165,29,.28) !important;
+  border-radius: 50% !important;
+  pointer-events: none !important;
+}
+
+html body .pc-babbage-role-grid .pc-babbage-role-icon {
+  display: grid !important;
+  place-items: center !important;
+  width: 54px !important;
+  height: 54px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #dff2fb !important;
+  color: var(--gfc-navy) !important;
+}
+
+html body .pc-babbage-role-grid .pc-babbage-role-icon svg {
+  width: 28px !important;
+  height: 28px !important;
+  fill: currentColor !important;
+}
+
+html body .pc-babbage-role-grid h3 {
+  margin: 1px 0 8px !important;
+  color: var(--gfc-navy) !important;
+  font-size: clamp(1.08rem, 1.7vw, 1.28rem) !important;
+}
+
+html body .pc-babbage-role-grid p {
+  margin: 0 !important;
+  color: #3d4b57 !important;
+  font-size: .93rem !important;
+  line-height: 1.58 !important;
+}
+
+html body .pc-menu-babbage-notes {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  margin-top: 18px !important;
+}
+
+html body .pc-babbage-note {
+  display: grid !important;
+  grid-template-columns: 58px minmax(0,1fr) !important;
+  gap: 16px !important;
+  align-items: start !important;
+  padding: 22px !important;
+  border: 2px solid #7ea8be !important;
+  border-radius: 14px !important;
+  background: #edf7fb !important;
+  color: #2c3e50 !important;
+}
+
+html body .pc-babbage-note--judgment {
+  border-color: #c58a16 !important;
+  background: #fff7e7 !important;
+}
+
+html body .pc-babbage-note-icon {
+  display: grid !important;
+  place-items: center !important;
+  width: 54px !important;
+  height: 54px !important;
+  border-radius: 50% !important;
+  background: #d6edf8 !important;
+  color: var(--gfc-navy) !important;
+}
+
+html body .pc-babbage-note--judgment .pc-babbage-note-icon {
+  background: #f8e8bd !important;
+  color: #9b6808 !important;
+}
+
+html body .pc-babbage-note-icon svg {
+  width: 28px !important;
+  height: 28px !important;
+  fill: currentColor !important;
+}
+
+html body .pc-babbage-note h3 {
+  margin: 0 0 7px !important;
+  color: var(--gfc-navy) !important;
+  font-family: "Fraunces", Georgia, serif !important;
+  font-size: 1.25rem !important;
+  line-height: 1.2 !important;
+}
+
+html body .pc-babbage-note--judgment h3 {
+  color: #81530a !important;
+}
+
+html body .pc-babbage-note p {
+  margin: 0 !important;
+  color: #3c4b58 !important;
+  font-size: .94rem !important;
+  line-height: 1.58 !important;
+}
+
+@media screen and (max-width: 900px) {
+  html body .pc-babbage-hero,
+  html body .pc-babbage-role-grid,
+  html body .pc-menu-babbage-notes {
+    grid-template-columns: 1fr !important;
+  }
+
+  html body .pc-babbage-intro {
+    max-width: none !important;
+  }
+
+  html body .pc-babbage-role-grid article {
+    min-height: 0 !important;
+  }
+}
+
+@media screen and (max-width: 540px) {
+  html body .pc-babbage-role-grid article,
+  html body .pc-babbage-note {
+    grid-template-columns: 46px minmax(0,1fr) !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+
+  html body .pc-babbage-role-grid .pc-babbage-role-icon,
+  html body .pc-babbage-note-icon {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  html body .pc-babbage-role-grid .pc-babbage-role-icon svg,
+  html body .pc-babbage-note-icon svg {
+    width: 23px !important;
+    height: 23px !important;
+  }
+}

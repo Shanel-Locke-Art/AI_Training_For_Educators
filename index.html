@@ -6,20 +6,20 @@
      ══════════════════════════════════════════════════════ -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#2c3e35">
+<meta name="theme-color" content="#112650">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429">
+<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=435">
 <!-- Production CSS is generated from src/css by tools/build.py. -->
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
 <script src="runtime/js/dialogue-data.js?v=141"></script>
-<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=430&amp;receiver=82"></script>
+<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=435&amp;receiver=82"></script>
 
 </head>
 
@@ -168,7 +168,7 @@
       <span class="logo-icon pc-babbage-logo-icon" aria-hidden="true"><img src="assets/images/ui/babbage-mark.svg" alt=""></span>
       <span class="logo-copy">
         <span class="logo-name">Prompt<span>Craft</span></span>
-        <span class="logo-sub">The Prompt Lab</span>
+        <span class="logo-sub">The Prompt Lab · GFC MSU</span>
       </span>
       <span class="pc-brand-caret" aria-hidden="true">▾</span>
     </summary>
@@ -293,6 +293,7 @@
       <div class="pc-main-menu-brand">
         <span class="pc-main-menu-kicker">PromptCraft</span>
         <h1 id="mainMenuTitle">The Prompt Lab</h1>
+        <span class="pc-main-menu-affiliation">Great Falls College Montana State University</span>
       </div>
       <button class="pc-main-menu-close" id="mainMenuCloseBtn"
               type="button"
@@ -428,31 +429,66 @@
     </section>
 
     <section class="pc-menu-panel pc-menu-babbage-panel" id="menuPanelBabbage" data-menu-panel="babbage" hidden>
-      <div class="pc-menu-panel-heading">
+      <div class="pc-menu-panel-heading pc-babbage-panel-heading">
         <button class="pc-menu-back" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home">← Main Menu</button>
         <p class="pc-menu-eyebrow">Meet Babbage</p>
-        <h2>The machine can analyze. You still have to think.</h2>
-        <p>Babbage is PromptCraft's fictional AI analysis engine: part retro computer, part instructional-design critic, and deliberately not an oracle.</p>
+        <h2>Meet the namesake behind the machine.</h2>
+        <p>PromptCraft uses Babbage as the name of its analysis system. The name is a nod to Charles Babbage and the early history of programmable computing.</p>
       </div>
+
       <div class="pc-babbage-hero">
-        <div class="pc-babbage-visual">
-          <img src="assets/images/ui/babbage-engine-plate.svg" alt="Babbage Engine nameplate with a brass-and-green mechanical computing motif and the phrase Human Judgment Required.">
-        </div>
+        <figure class="pc-babbage-portrait-card">
+          <div class="pc-babbage-portrait-frame">
+            <img src="assets/images/ui/charles-babbage.png" alt="Stylized portrait of Charles Babbage.">
+          </div>
+          <figcaption>
+            <strong>Charles Babbage</strong>
+            <span>Pioneer of computing</span>
+          </figcaption>
+        </figure>
+
         <div class="pc-babbage-intro">
           <p class="pc-menu-card-label">Why Babbage?</p>
-          <h3>A small homage to the long history of computing</h3>
-          <p>The name nods to Charles Babbage, whose nineteenth-century designs for mechanical calculating engines helped shape later ideas about programmable computation. The 1837 detail in the visual identity is a quiet reference to the period in which Babbage described the Analytical Engine.</p>
-          <p>PromptCraft borrows the name for a fictional system rather than presenting the AI model itself as a character. That keeps the game's identity stable even when the underlying technology changes.</p>
+          <h3>We're inspired by a pioneer.</h3>
+          <p>Charles Babbage was a nineteenth-century inventor whose Analytical Engine helped establish the idea of a programmable, general-purpose computer.</p>
+          <p>In PromptCraft, <strong>Babbage</strong> is the analysis system. It reviews the context you provide and offers feedback or a draft for you to inspect.</p>
         </div>
       </div>
-      <div class="pc-menu-info-grid pc-babbage-role-grid">
-        <article><span>PIXEL</span><h3>Professor Pixel teaches</h3><p>Pixel frames the instructional problem, asks you to make a decision, and helps connect the experience back to teaching practice.</p></article>
-        <article><span>BABBAGE</span><h3>Babbage analyzes</h3><p>Babbage examines the information you provide, challenges weak assumptions, and generates feedback or a revised design for you to inspect.</p></article>
-        <article><span>YOU</span><h3>You decide</h3><p>AI output is evidence to evaluate, not an answer key. You decide whether Babbage's reasoning is useful, incomplete, biased, impractical, or simply wrong.</p></article>
+
+      <div class="pc-menu-info-grid pc-babbage-role-grid" aria-label="How PromptCraft uses Babbage">
+        <article>
+          <span class="pc-babbage-role-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0H5Z"/></svg>
+          </span>
+          <div><h3>Professor Pixel guides</h3><p>Pixel introduces the teaching problem and helps connect the experience back to practice.</p></div>
+        </article>
+        <article>
+          <span class="pc-babbage-role-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="m19.1 13 .1-1-.1-1 2-1.6-2-3.4-2.5 1a8 8 0 0 0-1.7-1L14.5 3h-4L10 6a8 8 0 0 0-1.7 1L5.8 6 3.9 9.4 5.9 11l-.1 1 .1 1-2 1.6 1.9 3.4 2.5-1a8 8 0 0 0 1.7 1l.5 3h4l.5-3a8 8 0 0 0 1.7-1l2.5 1 2-3.4-2-1.6ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/></svg>
+          </span>
+          <div><h3>Babbage analyzes</h3><p>Babbage reviews the context you provide and generates feedback or a draft for you to inspect.</p></div>
+        </article>
+        <article>
+          <span class="pc-babbage-role-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="M11 4H5.5L3 9h8L8.5 4H11v14H5v2h14v-2h-6V4h2.5L13 9h8l-2.5-5H13V2h-2v2Zm-5.5 2.2L6.4 8H4.6l.9-1.8Zm12 0 .9 1.8h-1.8l.9-1.8Z"/></svg>
+          </span>
+          <div><h3>You decide</h3><p>You evaluate the output, keep what is useful, and revise what is weak, incomplete, or wrong.</p></div>
+        </article>
       </div>
+
       <div class="pc-menu-babbage-notes">
-        <section class="pc-menu-research-card"><h3>Behind the machine</h3><p>Babbage is a fictional interface layered over a generative AI service. During development, the underlying provider or model may change. PromptCraft should identify that technical provider separately rather than pretending the fictional character is the commercial AI system itself.</p></section>
-        <section class="pc-menu-research-card pc-menu-research-warning"><h3>Human judgment required</h3><p>Babbage can generate confident but incomplete or incorrect feedback. The learning goal is not to obey the machine. It is to practice giving useful context, noticing what the AI does with it, and deciding what deserves to survive revision.</p></section>
+        <section class="pc-babbage-note pc-babbage-note--oracle">
+          <span class="pc-babbage-note-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="M12 2 4 5v6c0 5.2 3.4 9.2 8 11 4.6-1.8 8-5.8 8-11V5l-8-3Zm0 2.2L18 6.4V11c0 3.9-2.3 7.1-6 8.8C8.3 18.1 6 14.9 6 11V6.4l6-2.2Z"/></svg>
+          </span>
+          <div><h3>Not an oracle</h3><p>Babbage is a tool for critique and revision, not an answer key.</p></div>
+        </section>
+        <section class="pc-babbage-note pc-babbage-note--judgment">
+          <span class="pc-babbage-note-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0H5Z"/></svg>
+          </span>
+          <div><h3>Human judgment required</h3><p>AI suggestions should be tested against teaching goals, context, and professional judgment.</p></div>
+        </section>
       </div>
     </section>
 
@@ -702,10 +738,10 @@
            name="promptcraft-vn-navigation"
            data-pc-toggle-action="close-other-details">
     <summary class="pc-brand-summary" aria-label="Open PromptCraft menu">
-      <span class="logo-icon" aria-hidden="true">🌿</span>
+      <span class="logo-icon" aria-hidden="true">✦</span>
       <span class="logo-copy">
         <span class="logo-name">Prompt<span>Craft</span></span>
-        <span class="logo-sub">The Prompt Lab</span>
+        <span class="logo-sub">The Prompt Lab · GFC MSU</span>
       </span>
       <span class="pc-brand-caret" aria-hidden="true">▾</span>
     </summary>

@@ -18,7 +18,7 @@ checks = {
   'final result waits for terminal Continue': 'onClose: () =>' in proto and 'renderS2FinalComparison();' in proto,
   'compiled bundle synchronized': all(x in bundle for x in ['previewFullWidth: true','pcS2BuildRepairReviewDiagnosticText','pc-guided-repair-footer']),
   'compiled CSS has full-width footer': '.pc-guided-repair-layout--full-preview .pc-guided-repair-footer' in css,
-  'V429 cache/query markers current': 'runtime/css/promptcraft.css?v=429' in idx and 'runtime/js/promptcraft.bundle.js?v=429&amp;patch=430&amp;receiver=82' in idx,
+  'V429 cache/query markers current': 'runtime/css/promptcraft.css?v=429&patch=435' in idx and 'runtime/js/promptcraft.bundle.js?v=429&amp;patch=435&amp;receiver=82' in idx,
 }
 failed=[k for k,v in checks.items() if not v]
 for k,v in checks.items(): print(('PASS' if v else 'FAIL'), k)

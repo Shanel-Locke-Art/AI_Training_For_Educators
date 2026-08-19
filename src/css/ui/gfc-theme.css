@@ -1,0 +1,1026 @@
+/* ══════════════════════════════════════════════════════
+   PROMPTCRAFT · GREAT FALLS COLLEGE VISUAL THEME
+   Visual skin only. Layout, game loop, scenario state, and Babbage's retro
+   terminal language remain owned by their existing components.
+   ══════════════════════════════════════════════════════ */
+
+:root {
+  --gfc-navy: #112650;
+  --gfc-navy-deep: #081a36;
+  --gfc-blue: #086c9f;
+  --gfc-blue-mid: #2c8dbe;
+  --gfc-sky: #59b7e3;
+  --gfc-sky-pale: #e9f5fb;
+  --gfc-gold: #e6a51d;
+  --gfc-gold-dark: #98670d;
+  --gfc-gold-pale: #fff4d5;
+
+  /* Map the existing shared PromptCraft token vocabulary onto the campus skin. */
+  --cream: #fbfaf6;
+  --parchment: #f2f5f6;
+  --parchment-drk: #e4eaed;
+  --chalk: #fffdfa;
+  --forest: var(--gfc-blue);
+  --forest-light: var(--gfc-sky-pale);
+  --forest-mid: var(--gfc-blue-mid);
+  --forest-dark: var(--gfc-navy);
+  --terracotta: #c77f10;
+  --terra-light: #fff5df;
+  --terra-dark: #8b5708;
+  --amber: var(--gfc-gold);
+  --amber-light: var(--gfc-gold-pale);
+  --amber-dark: var(--gfc-gold-dark);
+  --chalkboard: var(--gfc-navy);
+  --chalk-white: #f8fbfd;
+  --chalk-green: var(--gfc-sky);
+  --ink: #1e2834;
+  --ink-mid: #3e4b58;
+  --ink-light: #687987;
+  --ink-muted: #8d9aa5;
+  --border: #d5dde2;
+  --border-light: #e8edf0;
+  --border-strong: #aebbc4;
+  --good: #2f7156;
+  --warn: #8d610e;
+  --ref-paper: #f8f8f5;
+  --ref-border: #cdd7dd;
+  --ref-ink: #202b37;
+  --ref-ink-mid: #3e4b58;
+  --ref-input-bdr: #afbdc7;
+
+  --pc-a11y-ink: #182330;
+  --pc-a11y-ink-mid: #344351;
+  --pc-a11y-forest: #0b527b;
+  --pc-a11y-forest-dark: #091f3f;
+  --pc-a11y-border: #8797a3;
+  --pc-a11y-panel: #fffdfa;
+  --pc-a11y-bg: #f2f5f6;
+}
+
+body {
+  background-color: var(--cream);
+  background-image:
+    radial-gradient(ellipse at 12% 8%, rgba(89, 183, 227, 0.08), transparent 48%),
+    radial-gradient(ellipse at 88% 92%, rgba(230, 165, 29, 0.055), transparent 50%);
+  color: var(--ink);
+}
+
+/* ── Persistent app chrome ─────────────────────────── */
+.dev-bar {
+  background: var(--gfc-navy-deep) !important;
+  border-bottom-color: rgba(89, 183, 227, 0.75) !important;
+}
+.dev-bar span,
+.dev-btn { color: #dceff8 !important; }
+.dev-btn { border-color: rgba(89, 183, 227, 0.72) !important; }
+.dev-btn:hover,
+.dev-btn:focus-visible {
+  background: var(--gfc-blue) !important;
+  border-color: var(--gfc-sky) !important;
+  color: #fff !important;
+}
+
+header.pc-app-header {
+  background: linear-gradient(105deg, var(--gfc-navy-deep), var(--gfc-navy) 72%, #14345f) !important;
+  border-bottom-color: var(--gfc-gold) !important;
+  box-shadow: 0 4px 16px rgba(8, 26, 54, 0.18);
+}
+.logo-icon,
+.pc-brand-summary .logo-icon {
+  background: #0b5f8d !important;
+  border-color: rgba(230, 165, 29, 0.9) !important;
+}
+.logo-name,
+.logo-name span { color: #fff !important; }
+.logo-name span { color: var(--gfc-sky) !important; }
+.logo-sub { color: #d9eaf3 !important; }
+.pc-brand-caret { color: #d9eaf3 !important; }
+.level-tag {
+  background: rgba(89, 183, 227, 0.12) !important;
+  border-color: rgba(89, 183, 227, 0.62) !important;
+  color: #f4fbff !important;
+}
+.xp-label { color: #cfe5f0 !important; }
+.xp-fill { background: linear-gradient(90deg, var(--gfc-sky), var(--gfc-gold)) !important; }
+.music-toggle,
+.main-menu-toggle,
+.ideas-wall-btn {
+  border-color: rgba(89, 183, 227, 0.46) !important;
+  color: #f7fbfd !important;
+}
+.main-menu-toggle:hover,
+.main-menu-toggle:focus-visible,
+.music-toggle:hover,
+.music-toggle:focus-visible,
+.ideas-wall-btn:hover,
+.ideas-wall-btn:focus-visible {
+  background: rgba(89, 183, 227, 0.15) !important;
+  border-color: var(--gfc-sky) !important;
+}
+.ideas-wall-btn { box-shadow: inset 0 -2px 0 rgba(230, 165, 29, 0.5); }
+
+.scenario-tabs {
+  background: #f4f3ed !important;
+  border-bottom-color: #c6d1d7 !important;
+}
+.tab-btn { color: #344351 !important; }
+.tab-btn:hover { color: var(--gfc-blue) !important; }
+.tab-btn.active {
+  color: var(--gfc-navy) !important;
+  border-bottom-color: var(--gfc-gold) !important;
+  background: rgba(89, 183, 227, 0.12) !important;
+}
+
+/* Native compact navigation mirrors the same palette on phones. */
+@media screen and (max-width: 640px) {
+  html body .pc-compact-nav {
+    border-color: #b6c3cb !important;
+    background: #eef3f5 !important;
+  }
+  html body .pc-compact-nav > .mobile-compact-menu > summary.mobile-dropdown-toggle {
+    border-color: var(--gfc-navy) !important;
+    background: var(--gfc-blue) !important;
+    color: #fff !important;
+  }
+  html body .pc-compact-nav .mobile-dropdown-panel {
+    border-color: #aabac4 !important;
+    background: #fffdfa !important;
+  }
+  html body .pc-compact-nav .mobile-dropdown-option:hover,
+  html body .pc-compact-nav .mobile-dropdown-option:focus-visible,
+  html body .pc-compact-nav .mobile-dropdown-option.is-active {
+    background: var(--gfc-sky-pale) !important;
+    color: var(--gfc-navy) !important;
+  }
+}
+
+/* ── Brand dropdown ────────────────────────────────── */
+html body .pc-brand-menu[open] .pc-brand-summary {
+  border-color: rgba(89, 183, 227, 0.6) !important;
+}
+html body .pc-brand-menu-panel {
+  border-color: rgba(89, 183, 227, 0.8) !important;
+  background: #0b2142 !important;
+  box-shadow: 0 16px 34px rgba(4, 15, 31, 0.46) !important;
+}
+html body .pc-brand-menu-item {
+  border-color: rgba(89, 183, 227, 0.38) !important;
+  background: #12335d !important;
+  color: #fff !important;
+}
+html body .pc-brand-menu-item:hover,
+html body .pc-brand-menu-item:focus-visible {
+  background: #174b78 !important;
+  border-color: var(--gfc-sky) !important;
+}
+html body .pc-brand-menu-ideas {
+  background: #72520b !important;
+  border-color: var(--gfc-gold) !important;
+}
+html body .pc-brand-menu-ideas:hover,
+html body .pc-brand-menu-ideas:focus-visible { background: #8a6511 !important; }
+
+/* ── Main menu ─────────────────────────────────────── */
+.pc-main-menu-backdrop {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(89, 183, 227, 0.19), transparent 38%),
+    linear-gradient(145deg, rgba(5, 22, 46, 0.975), rgba(17, 38, 80, 0.985)) !important;
+}
+.pc-main-menu-shell {
+  border-color: rgba(89, 183, 227, 0.55) !important;
+  background: linear-gradient(rgba(251,250,246,.99), rgba(241,245,247,.99)), var(--cream) !important;
+}
+.pc-main-menu-topbar {
+  background: linear-gradient(100deg, var(--gfc-navy-deep), var(--gfc-navy)) !important;
+  border-bottom-color: var(--gfc-gold) !important;
+}
+.pc-main-menu-kicker,
+.pc-menu-eyebrow { color: var(--gfc-blue) !important; }
+.pc-main-menu-topbar .pc-main-menu-kicker { color: var(--gfc-sky) !important; }
+.pc-main-menu-affiliation {
+  display: block;
+  margin-top: 4px;
+  color: #d8e9f2;
+  font: 700 0.62rem/1.2 "Source Code Pro", ui-monospace, monospace;
+  letter-spacing: .095em;
+  text-transform: uppercase;
+}
+.pc-main-menu-close {
+  border-color: rgba(89,183,227,.65) !important;
+  color: #fff !important;
+}
+.pc-main-menu-close:hover,
+.pc-main-menu-close:focus-visible { background: rgba(89,183,227,.15) !important; }
+.pc-menu-home-copy h2,
+.pc-menu-panel-heading h2 { color: #1d2733 !important; }
+.pc-menu-action {
+  border-color: var(--gfc-blue) !important;
+  color: var(--gfc-navy) !important;
+}
+.pc-menu-action-primary {
+  background: var(--gfc-blue) !important;
+  border-color: var(--gfc-navy) !important;
+  color: #fff !important;
+  box-shadow: inset 0 -3px 0 rgba(8,26,54,.25), 0 4px 10px rgba(8,26,54,.12);
+}
+.pc-menu-action:hover,
+.pc-menu-action:focus-visible {
+  box-shadow: 0 0 0 3px rgba(89,183,227,.2) !important;
+}
+.pc-menu-action-primary:hover,
+.pc-menu-action-primary:focus-visible { background: #075e8a !important; }
+.pc-menu-secondary-actions button { color: var(--gfc-navy) !important; }
+.pc-menu-secondary-actions button:hover,
+.pc-menu-secondary-actions button:focus-visible { color: var(--gfc-blue) !important; }
+.pc-menu-data-summary {
+  border-color: #c99324 !important;
+  background: #fff6e4 !important;
+}
+.pc-menu-data-summary h3,
+.pc-menu-data-summary button { color: #7e5005 !important; }
+.pc-menu-scenario-card {
+  border-color: #8a9aa5 !important;
+  background: #fff !important;
+}
+.pc-menu-scenario-card:hover,
+.pc-menu-scenario-card:focus-visible {
+  border-color: var(--gfc-blue) !important;
+  box-shadow: 0 5px 14px rgba(8, 62, 94, 0.15) !important;
+}
+.pc-menu-scenario-card:focus-visible { outline-color: var(--gfc-gold) !important; }
+.pc-menu-scenario-number { background: var(--gfc-navy) !important; color: #fff !important; }
+.pc-menu-scenario-title,
+.pc-menu-info-grid h3 { color: var(--gfc-navy) !important; }
+.pc-menu-scenario-card.is-current {
+  border-color: var(--gfc-gold-dark) !important;
+  background: #fff8e9 !important;
+}
+.pc-menu-scenario-card.is-current .pc-menu-scenario-status {
+  background: #f7e1aa !important;
+  color: #704804 !important;
+}
+.pc-menu-scenario-card.is-complete {
+  border-color: var(--gfc-blue) !important;
+  background: var(--gfc-sky-pale) !important;
+}
+.pc-menu-scenario-card.is-complete .pc-menu-scenario-status {
+  background: #cfeaf6 !important;
+  color: #0b4f75 !important;
+}
+.pc-main-menu-footer {
+  border-top-color: #a9b7c0 !important;
+  background: #e8edef !important;
+  color: #344351 !important;
+}
+.pc-menu-qr-card {
+  border-color: var(--gfc-blue) !important;
+  background: linear-gradient(145deg, #0c3158, var(--gfc-navy)) !important;
+}
+.pc-menu-qr-kicker { color: var(--gfc-sky) !important; }
+
+/* ── Scenario workspaces ───────────────────────────── */
+.s1-clean-stage { background: #fbfaf6 !important; }
+.s1-clean-mission,
+.scenario-mission {
+  background: linear-gradient(120deg, var(--gfc-navy), #0c5f8d) !important;
+  border-color: var(--gfc-navy-deep) !important;
+  box-shadow: 0 8px 22px rgba(8,38,72,.17) !important;
+}
+.s1-clean-mission .mission-eyebrow,
+.scenario-mission .mission-eyebrow { color: #bfe8f8 !important; }
+.s1-clean-mission .mission-copy,
+.scenario-mission .mission-copy { color: #eef8fc !important; }
+.s1-clean-card,
+.s1-clean-builder,
+.pc-activity-card,
+.pc-panel {
+  border-color: #aab8c1 !important;
+  box-shadow: 0 6px 16px rgba(24,43,58,.07) !important;
+}
+.s1-clean-eyebrow { color: #a96706 !important; }
+.s1-clean-builder-title,
+.s1-clean-title { color: var(--gfc-navy) !important; }
+.s1-clean-prompt,
+.s1-clean-textarea { border-color: #aebbc4 !important; }
+.s1-clean-textarea:focus {
+  border-color: var(--gfc-blue-mid) !important;
+  box-shadow: 0 0 0 3px rgba(44,141,190,.14), inset 0 1px 3px rgba(26,39,52,.04) !important;
+}
+.s1-clean-num { background: var(--gfc-navy) !important; color: #dff2fb !important; }
+.s1-clean-submit,
+.continue-btn,
+.pc-primary-action {
+  border-color: var(--gfc-navy) !important;
+  background: var(--gfc-blue) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 10px rgba(8,54,84,.17) !important;
+}
+.s1-clean-submit:hover,
+.s1-clean-submit:focus,
+.continue-btn:hover,
+.continue-btn:focus-visible,
+.pc-primary-action:hover,
+.pc-primary-action:focus-visible { background: var(--gfc-navy) !important; }
+.s1-clean-ingredients { background: #eef3f5 !important; }
+.s1-clean-observed div {
+  background: #fff5df !important;
+  border-color: rgba(198,128,17,.36) !important;
+}
+.s1-clean-observed strong { color: #875608 !important; }
+.s1-clean-nudge { background: #fff4d5 !important; border-color: #d39b23 !important; }
+
+/* ── VN world: real GFC rooms, same VN/game geometry ── */
+.vn-overlay { background: #071321 !important; }
+.vn-scene { background: var(--gfc-navy-deep) !important; }
+.vn-scene::before {
+  background:
+    linear-gradient(to bottom, rgba(5,20,38,.20), rgba(5,20,38,.43)),
+    radial-gradient(circle at 28% 28%, rgba(89,183,227,.06), transparent 32%) !important;
+}
+.vn-bg {
+  opacity: .72 !important;
+  filter: brightness(.68) saturate(.92) contrast(1.02) !important;
+}
+.vn-screen {
+  background: #061625 !important;
+  box-shadow:
+    0 0 0 2px rgba(0,0,0,.45),
+    inset 4px 4px 12px rgba(0,0,0,.7),
+    inset -1px -1px 6px rgba(0,0,0,.3),
+    0 0 0 4px rgba(89,183,227,.08),
+    0 0 24px rgba(89,183,227,.17),
+    0 0 56px rgba(8,108,159,.10) !important;
+}
+.vn-screen::before {
+  background: linear-gradient(160deg, rgba(5,20,38,.56) 0%, rgba(5,20,38,.12) 45%, rgba(5,20,38,.76) 100%) !important;
+}
+.vn-screen-inner-border { border-color: rgba(89,183,227,.3) !important; }
+.vn-board-label { color: rgba(179,226,246,.92) !important; }
+.vn-board-label::before {
+  background: var(--gfc-gold) !important;
+  box-shadow: 0 0 8px rgba(230,165,29,.8), 0 0 16px rgba(230,165,29,.4) !important;
+}
+.vn-board-loading { color: rgba(179,226,246,.75) !important; }
+.vn-dialogue::before,
+.vn-dialogue::after { border-color: rgba(89,183,227,.62) !important; }
+.vn-speaker,
+.vn-advance { color: #bde8f8 !important; }
+.vn-cursor { background: var(--gfc-sky) !important; }
+.vn-skip {
+  border-color: rgba(89,183,227,.52) !important;
+  color: #c9edf9 !important;
+}
+.vn-skip:hover { border-color: var(--gfc-sky) !important; }
+.vn-control-rail { border-bottom: 2px solid rgba(230,165,29,.45); }
+.vn-brand { color: rgba(17,38,80,.55) !important; }
+.vn-brand-menu .logo-icon { color: #fff !important; }
+
+/* Focus is a campus-gold signal across light and dark surfaces. */
+:focus-visible { outline-color: var(--gfc-gold) !important; }
+.vn-overlay :focus-visible { outline-color: var(--gfc-sky) !important; }
+
+/* Babbage is intentionally NOT recolored here. Its green CRT language is a
+   distinct machine state, not an institutional surface. */
+
+/* ── High-specificity cleanup for legacy green owners ────────────
+   These rules intentionally live at the very end of the cascade. Older
+   accessibility/responsive owners use !important with scenario-qualified
+   selectors, so the GFC theme must match or exceed that specificity rather
+   than changing the underlying layout rules. */
+html body > .dev-bar,
+html body .dev-bar {
+  background: var(--gfc-navy-deep) !important;
+  border-bottom-color: rgba(89,183,227,.7) !important;
+  color: #eef8fc !important;
+}
+html body .dev-bar .dev-label,
+html body .dev-bar .dev-btn,
+html body .dev-bar button,
+html body .dev-bar span {
+  color: #eef8fc !important;
+  border-color: rgba(183,228,247,.58) !important;
+}
+html body .dev-bar .dev-btn:hover,
+html body .dev-bar .dev-btn:focus-visible,
+html body .dev-bar button:hover,
+html body .dev-bar button:focus-visible {
+  background: rgba(89,183,227,.14) !important;
+  border-color: var(--gfc-sky) !important;
+}
+
+html body.s1-active:not(.s1-result-active) .s1-clean-mission {
+  background: linear-gradient(120deg, var(--gfc-navy), #0c5f8d) !important;
+  border-color: var(--gfc-navy-deep) !important;
+  box-shadow: 0 8px 22px rgba(8,38,72,.17) !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-mission .mission-eyebrow {
+  color: #bfe8f8 !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-mission .mission-copy {
+  color: #eef8fc !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-builder-title {
+  color: var(--gfc-navy) !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-num {
+  background: var(--gfc-navy) !important;
+  color: #e8f7fc !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-textarea:focus {
+  outline-color: var(--gfc-gold) !important;
+  border-color: var(--gfc-blue) !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-submit {
+  background: var(--gfc-blue) !important;
+  color: #fff !important;
+  border-color: var(--gfc-navy) !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-submit:hover,
+html body.s1-active:not(.s1-result-active) .s1-clean-submit:focus {
+  background: var(--gfc-navy) !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-ingredients {
+  background: #eef3f5 !important;
+  border-color: #aab8c1 !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-observed div {
+  background: #fff5df !important;
+  border-color: rgba(198,128,17,.48) !important;
+}
+html body.s1-active:not(.s1-result-active) .s1-clean-observed strong {
+  color: #875608 !important;
+}
+
+/* S2 evidence remains a distinct information card, but its non-semantic
+   green framing now belongs to the campus palette. Babbage corner marks stay. */
+html body[data-pc-scenario="metacognition"] .s2-evidence-panel {
+  border-color: rgba(44,141,190,.48) !important;
+  background: #eef7fb !important;
+  box-shadow: 0 8px 22px rgba(17,38,80,.05) !important;
+}
+html body[data-pc-scenario="metacognition"] .s2-evidence-panel .s2-loop-result {
+  border-left-color: rgba(44,141,190,.24) !important;
+}
+html body[data-pc-scenario="metacognition"] .s2-evidence-portrait {
+  border-color: var(--gfc-navy) !important;
+  box-shadow: 0 2px 0 rgba(17,38,80,.14) !important;
+}
+html body[data-pc-scenario="metacognition"] .s2-evidence-portrait::before {
+  border-color: var(--gfc-gold) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   V429 GFC VISUAL QA CORRECTIONS
+   Screenshots 2026-08-18: normalize remaining legacy-green UI without
+   changing PromptCraft structure. Babbage's CRT content remains green;
+   surrounding controls belong to the campus blue/gold interaction system.
+   ══════════════════════════════════════════════════════ */
+
+/* Shared interactive language: navy/blue action surface + gold interaction
+   accent. Secondary actions stay warm/cream so primary choices remain obvious. */
+html body :is(
+  .name-modal-btn,
+  .audio-setup-primary,
+  .pc-button--primary,
+  .s1-clean-submit,
+  .prediction-continue-btn,
+  .babbage-tts-btn,
+  .vn-return-btn.terminal-return,
+  .s1-result-controls .continue-btn
+) {
+  background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
+  border: 2px solid var(--gfc-gold) !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.18) !important;
+  text-shadow: none !important;
+}
+html body :is(
+  .name-modal-btn,
+  .audio-setup-primary,
+  .pc-button--primary,
+  .s1-clean-submit,
+  .prediction-continue-btn,
+  .babbage-tts-btn,
+  .vn-return-btn.terminal-return,
+  .s1-result-controls .continue-btn
+):is(:hover,:focus-visible):not(:disabled) {
+  background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
+  border-color: #ffd56b !important;
+  color: #ffffff !important;
+  outline: 3px solid rgba(230,165,29,.32) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 3px 0 rgba(8,26,54,.88), 0 0 0 4px rgba(89,183,227,.16), 0 8px 20px rgba(8,38,72,.22) !important;
+}
+html body :is(.audio-setup-primary,.pc-button--primary,.s1-clean-submit):disabled {
+  background: #a8b6c0 !important;
+  border-color: #7f909d !important;
+  color: #f7f9fa !important;
+  box-shadow: none !important;
+  opacity: .74 !important;
+}
+
+/* Prediction choice buttons are part of the PromptCraft UI, not the CRT. */
+html body #vnOverlay.vn-overlay.active :is(#vnPredictionChoicePanel button,.pc-clean-choice-btn) {
+  background: linear-gradient(180deg, rgba(17,38,80,.98), rgba(8,61,96,.98)) !important;
+  border: 2px solid rgba(89,183,227,.88) !important;
+  color: #f7fbfd !important;
+  box-shadow: 0 3px 0 rgba(8,26,54,.78), 0 6px 14px rgba(8,38,72,.18) !important;
+}
+html body #vnOverlay.vn-overlay.active :is(#vnPredictionChoicePanel button,.pc-clean-choice-btn):is(:hover,:focus-visible) {
+  background: linear-gradient(180deg, #0d79ad, #0a5b8b) !important;
+  border-color: var(--gfc-gold) !important;
+  color: #ffffff !important;
+  outline: 3px solid rgba(230,165,29,.3) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(89,183,227,.14), 0 8px 18px rgba(8,38,72,.22) !important;
+}
+
+/* Name onboarding: PromptCraft/GFC blue identity, stronger text contrast. */
+html body .name-modal-overlay {
+  background:
+    radial-gradient(ellipse at 22% 18%, rgba(89,183,227,.18) 0%, transparent 52%),
+    radial-gradient(ellipse at 78% 82%, rgba(230,165,29,.10) 0%, transparent 50%),
+    rgba(8,26,54,.94) !important;
+}
+html body .name-modal {
+  background: #fffdfa !important;
+  border: 2px solid #8ebdd4 !important;
+  box-shadow: 0 24px 64px rgba(2,17,35,.45), 0 0 0 1px rgba(230,165,29,.24) !important;
+}
+html body .name-modal-brand { color: var(--gfc-navy) !important; }
+html body .name-modal-brand-icon {
+  background: linear-gradient(145deg, var(--gfc-navy), var(--gfc-blue)) !important;
+  border-color: var(--gfc-gold) !important;
+  box-shadow: 0 4px 12px rgba(8,38,72,.24) !important;
+}
+html body .name-modal-brand-name { color: var(--gfc-navy) !important; }
+html body .name-modal-brand-name > span { color: var(--gfc-mid-blue) !important; }
+html body .name-modal-brand-sub {
+  color: #42586a !important;
+  font-weight: 800 !important;
+}
+html body .name-modal-title { color: #142a53 !important; }
+html body .name-modal-sub {
+  color: #425466 !important;
+  font-weight: 700 !important;
+}
+html body .name-modal-input {
+  background: #ffffff !important;
+  border-color: #91a9b8 !important;
+  color: #17283b !important;
+}
+html body .name-modal-input::placeholder { color: #657681 !important; }
+html body .name-modal-input:focus {
+  border-color: var(--gfc-blue) !important;
+  box-shadow: 0 0 0 3px rgba(89,183,227,.28), 0 0 0 5px rgba(230,165,29,.18) !important;
+}
+html body .name-modal-skip {
+  color: #30475a !important;
+  font-weight: 700 !important;
+}
+html body .name-modal-skip:is(:hover,:focus-visible) { color: var(--gfc-navy) !important; }
+
+/* Audio preference onboarding uses the same campus skin and keeps every line
+   comfortably above AA-like visual contrast on the cream card. */
+html body .audio-setup-overlay {
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(89,183,227,.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 82% 85%, rgba(230,165,29,.10) 0%, transparent 50%),
+    rgba(8,26,54,.95) !important;
+}
+html body .audio-setup-modal {
+  color: #18283a !important;
+  background: #fffdfa !important;
+  border-color: #8ebdd4 !important;
+  box-shadow: 0 24px 64px rgba(2,17,35,.45), 0 0 0 1px rgba(230,165,29,.22) !important;
+}
+html body .audio-setup-speaker { color: var(--gfc-blue) !important; }
+html body .audio-setup-title { color: var(--gfc-navy) !important; }
+html body .audio-setup-help {
+  color: #45586a !important;
+  font-weight: 650 !important;
+}
+html body .audio-choice-card {
+  background: #fffdf9 !important;
+  border-color: #a9bac5 !important;
+  color: #18283a !important;
+}
+html body .audio-choice-card:hover {
+  background: #f0f8fc !important;
+  border-color: var(--gfc-mid-blue) !important;
+}
+html body .audio-choice-card:has(input:checked) {
+  background: #e9f5fb !important;
+  border-color: var(--gfc-blue) !important;
+  box-shadow: 0 0 0 3px rgba(89,183,227,.22), inset 4px 0 0 var(--gfc-gold) !important;
+}
+html body .audio-choice-card:has(input:focus-visible) {
+  box-shadow: 0 0 0 3px rgba(89,183,227,.3), 0 0 0 5px rgba(230,165,29,.18) !important;
+}
+html body .audio-choice-card input { accent-color: var(--gfc-blue) !important; }
+html body .audio-choice-copy strong { color: #17283b !important; }
+html body .audio-choice-copy span { color: #4b5d6d !important; }
+html body .audio-setup-cancel {
+  color: #344b5f !important;
+  font-weight: 800 !important;
+}
+html body .audio-setup-cancel:is(:hover,:focus-visible) {
+  color: var(--gfc-navy) !important;
+  background: rgba(89,183,227,.12) !important;
+}
+
+/* Prediction / pre-Babbage VN: campus chrome around the machine while its
+   monitor text remains green. */
+html body #vnOverlay.vn-overlay.active:is(.pc-prediction-question,.pc-clean-prediction,.pc-prediction-result) .babbage-terminal-photo {
+  border-color: rgba(89,183,227,.72) !important;
+  box-shadow: 0 0 0 2px rgba(230,165,29,.24), 0 12px 32px rgba(2,17,35,.34) !important;
+}
+html body #vnOverlay.vn-overlay.active:is(.pc-prediction-question,.pc-clean-prediction,.pc-prediction-result) .vn-dialogue {
+  border-top-color: var(--gfc-sky) !important;
+}
+html body #vnOverlay.vn-overlay.active:is(.pc-prediction-question,.pc-clean-prediction,.pc-prediction-result) .vn-dialogue::before,
+html body #vnOverlay.vn-overlay.active:is(.pc-prediction-question,.pc-clean-prediction,.pc-prediction-result) .vn-dialogue::after {
+  border-color: rgba(230,165,29,.74) !important;
+}
+html body #vnOverlay.vn-overlay.active:is(.pc-prediction-question,.pc-clean-prediction,.pc-prediction-result) .vn-speaker {
+  color: #8ed7f4 !important;
+}
+html body #vnOverlay.vn-overlay.active.pc-prediction-result .pc-feedback-heading {
+  color: #ffd46a !important;
+  text-shadow: 0 1px 10px rgba(230,165,29,.18) !important;
+}
+html body #vnOverlay.vn-overlay.active.pc-prediction-result .pc-feedback-message,
+html body #vnOverlay.vn-overlay.active.pc-prediction-result .pc-feedback-message * {
+  color: #f5fbff !important;
+}
+
+/* S1 result: keep the editorial/academic result page, remove remaining forest
+   accents and reserve green only for semantic success if needed. */
+html body.s1-result-active .s1-result-eyebrow { color: #a76505 !important; }
+html body.s1-result-active .s1-result-title,
+html body.s1-result-active .s1-result-body :is(h1,h2,h3,strong) {
+  color: var(--gfc-navy) !important;
+}
+html body.s1-result-active .s1-result-controls {
+  background: rgba(244,248,250,.98) !important;
+  border-top-color: #a9becb !important;
+  box-shadow: 0 -12px 30px rgba(17,38,80,.10) !important;
+}
+html body.s1-result-active .s1-result-controls-title { color: var(--gfc-navy) !important; }
+html body.s1-result-active .s1-result-controls-title::before { color: var(--gfc-blue) !important; }
+html body.s1-result-active .s1-result-controls-sub { color: #425466 !important; }
+html body.s1-result-active .s1-result-controls .s1-secondary-btn {
+  background: #fffdfa !important;
+  color: var(--gfc-navy) !important;
+  border: 2px solid #7ea9bf !important;
+  box-shadow: none !important;
+}
+html body.s1-result-active .s1-result-controls .s1-secondary-btn:is(:hover,:focus-visible) {
+  background: #eef7fb !important;
+  border-color: var(--gfc-gold) !important;
+  outline: 3px solid rgba(230,165,29,.22) !important;
+  outline-offset: 2px !important;
+}
+
+/* S2 Decision 4 audit: same information architecture, rebuilt visual hierarchy.
+   The Babbage draft is a navy analysis panel; Jordan's evidence becomes a light
+   evidence card so the student quote remains the focal content. */
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft {
+  background: linear-gradient(145deg, #0d2448 0%, #0b4267 100%) !important;
+  border: 2px solid #396f8d !important;
+  box-shadow: 0 10px 24px rgba(8,38,72,.18) !important;
+  color: #f7fbfd !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-activity-kicker,
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft > .pc-activity-kicker {
+  color: #ffd36c !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft h2 {
+  color: #ffffff !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-draft-prompt {
+  background: rgba(89,183,227,.10) !important;
+  border-left-color: var(--gfc-gold) !important;
+  color: #f6fbfd !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-evidence {
+  background: #f4f9fc !important;
+  border: 2px solid #86bad3 !important;
+  box-shadow: inset 4px 0 0 rgba(230,165,29,.82) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-portrait img {
+  border-color: var(--gfc-mid-blue) !important;
+  box-shadow: 0 0 0 2px rgba(230,165,29,.28) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-label {
+  color: #176b9a !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-quote,
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-quote-copy {
+  color: var(--gfc-navy) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-quote-mark {
+  color: var(--gfc-gold-dark) !important;
+  opacity: .55 !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-rationale {
+  background: rgba(3,18,39,.46) !important;
+  border: 1px solid rgba(89,183,227,.44) !important;
+  border-left: 3px solid var(--gfc-gold) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-rationale__label {
+  color: #ffd36c !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-babbage-rationale p {
+  color: #f4f9fc !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task {
+  background: #fffdfa !important;
+  border: 2px solid #a8bac5 !important;
+  box-shadow: 0 10px 24px rgba(17,38,80,.08) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task .pc-activity-kicker {
+  color: #b36f06 !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-audit-layout > .pc-activity-task h2 {
+  color: var(--gfc-navy) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-card {
+  background: #ffffff !important;
+  border-color: #b9c7cf !important;
+  color: #213344 !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-card:is(:hover,:focus-within) {
+  border-color: var(--gfc-mid-blue) !important;
+  background: #f3f9fc !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-card.selected,
+html body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-card.is-selected {
+  border-color: var(--gfc-blue) !important;
+  background: #e9f5fb !important;
+  box-shadow: inset 4px 0 0 var(--gfc-gold), 0 0 0 2px rgba(89,183,227,.16) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-marker {
+  border-color: #7896a8 !important;
+  background: #ffffff !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-card:is(.selected,.is-selected) .pc-choice-marker {
+  border-color: var(--gfc-blue) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-s2-audit-layout .pc-choice-card:is(.selected,.is-selected) .pc-choice-marker::after {
+  background: var(--gfc-blue) !important;
+}
+
+/* S2 guided repair: preserve the shared component, align its visual vocabulary
+   with the same campus theme used by S1. */
+html body[data-pc-scenario="metacognition"] :is(.pc-guided-repair-reference-title,.pc-guided-repair-builder h2) {
+  color: var(--gfc-navy) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-guided-repair-num {
+  background: var(--gfc-navy) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(89,183,227,.18) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-guided-repair-chip.covered {
+  border-color: var(--gfc-mid-blue) !important;
+  background: #e7f4fa !important;
+  color: var(--gfc-navy) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-guided-repair-textarea:focus {
+  border-color: var(--gfc-blue) !important;
+  box-shadow: 0 0 0 3px rgba(89,183,227,.24), 0 0 0 5px rgba(230,165,29,.13), inset 0 1px 3px rgba(42,31,20,.05) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-guided-repair-preview-label {
+  color: var(--gfc-navy) !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-guided-repair-preview:not(.is-empty) {
+  border-color: #7eb7d1 !important;
+  background: #edf7fb !important;
+  color: #17324d !important;
+}
+html body[data-pc-scenario="metacognition"] .pc-guided-repair-status {
+  color: #425b6d !important;
+}
+
+
+/* High-specificity action ownership. Several pre-theme terminal/result rules are
+   intentionally strong (!important); these selectors make the GFC interaction
+   layer the final owner without weakening the underlying component contracts. */
+html body .pc-button.pc-button--primary,
+html body.s1-active:not(.s1-result-active) .s1-clean-submit,
+html body.s1-result-active .s1-result-controls .continue-btn,
+html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode .babbage-tts-btn,
+html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode .vn-return-btn.terminal-return,
+html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode .babbage-tts-btn,
+html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode .vn-return-btn.terminal-return {
+  background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
+  border-color: var(--gfc-gold) !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.20) !important;
+  text-shadow: none !important;
+}
+html body .pc-button.pc-button--primary:is(:hover,:focus-visible):not(:disabled),
+html body.s1-active:not(.s1-result-active) .s1-clean-submit:is(:hover,:focus-visible):not(:disabled),
+html body.s1-result-active .s1-result-controls .continue-btn:is(:hover,:focus-visible),
+html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode .babbage-tts-btn:is(:hover,:focus-visible),
+html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode .vn-return-btn.terminal-return:is(:hover,:focus-visible),
+html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode .babbage-tts-btn:is(:hover,:focus-visible),
+html body #vnOverlay.vn-overlay.active.babbage-terminal-consult.babbage-terminal-textmode .vn-return-btn.terminal-return:is(:hover,:focus-visible) {
+  background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
+  border-color: #ffd56b !important;
+  color: #ffffff !important;
+  outline: 3px solid rgba(230,165,29,.30) !important;
+  outline-offset: 2px !important;
+}
+
+/* Terminal footer controls inherit several legacy :has() rules with ID-heavy
+   specificity. Own the actual #vnText control row explicitly so every button
+   outside the CRT display follows the blue/gold campus interaction system. */
+html body #vnOverlay.vn-overlay.active:has(#babbageTerminalScene.textmode.responding) #vnText button,
+html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode:has(#babbageTerminalScene.textmode.responding) #vnText button {
+  background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
+  border: 2px solid var(--gfc-gold) !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.20) !important;
+  text-shadow: none !important;
+}
+html body #vnOverlay.vn-overlay.active:has(#babbageTerminalScene.textmode.responding) #vnText button:is(:hover,:focus-visible),
+html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode:has(#babbageTerminalScene.textmode.responding) #vnText button:is(:hover,:focus-visible) {
+  background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
+  border-color: #ffd56b !important;
+  color: #ffffff !important;
+  outline: 3px solid rgba(230,165,29,.30) !important;
+  outline-offset: 2px !important;
+}
+
+/* Keep the logged-prediction headline visually distinct from its white
+   explanatory copy. */
+html body #vnOverlay.vn-overlay.active.pc-prediction-result .pc-feedback-message .pc-feedback-heading,
+html body #vnOverlay.vn-overlay.active.pc-prediction-result #vnText .pc-feedback-heading {
+  color: #ffd46a !important;
+  text-shadow: 0 1px 10px rgba(230,165,29,.20) !important;
+}
+
+/* Prediction workstation chrome is PromptCraft UI even though the monitor
+   content is Babbage. Remove the remaining forest-green frame and floating
+   brand card without recoloring the CRT itself. */
+html body #vnOverlay.vn-overlay.active:is(.pc-prediction-question,.pc-clean-prediction,.babbage-prediction,.pc-prediction-result) #babbageTerminalScene .babbage-terminal-photo {
+  border: 2px solid rgba(89,183,227,.78) !important;
+  background-color: #03080d !important;
+  box-shadow:
+    0 0 0 2px rgba(230,165,29,.18),
+    inset 0 0 0 14px rgba(7,29,53,.48),
+    inset 0 0 30px rgba(23,112,157,.20),
+    0 10px 26px rgba(2,17,35,.28) !important;
+}
+html body[data-pc-viewport-family] #vnOverlay.vn-overlay.active:is(.pc-prediction-question,.pc-clean-prediction,.babbage-prediction,.pc-prediction-result) .vn-brand-menu .pc-brand-summary {
+  background: linear-gradient(135deg, rgba(17,38,80,.97), rgba(9,73,108,.97)) !important;
+  border-color: rgba(89,183,227,.82) !important;
+  box-shadow: 0 0 0 2px rgba(230,165,29,.22), 0 10px 24px rgba(2,17,35,.34) !important;
+}
+
+/* The prediction result CTA has intentionally ID-heavy legacy geometry rules.
+   Keep that geometry and replace only the action colors. */
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result #pcContinueToBabbageBtn,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result .prediction-continue-btn {
+  background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
+  border: 2px solid var(--gfc-gold) !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.20) !important;
+}
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result #pcContinueToBabbageBtn:is(:hover,:focus-visible),
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-prediction-result .prediction-continue-btn:is(:hover,:focus-visible) {
+  background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
+  border-color: #ffd56b !important;
+  color: #ffffff !important;
+  outline: 3px solid rgba(230,165,29,.30) !important;
+  outline-offset: 2px !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   V429 GFC VISUAL QA · SHARED RESULT + DEVELOPMENT SHELL
+   Screenshots 2026-08-19: retire the last green completion/development owners.
+   These are shared components so S1/S2 results and S3–S8 locked shells use the
+   same campus visual language without scenario-specific color patches.
+   ══════════════════════════════════════════════════════ */
+
+/* Shared completed-result page. Preserve the proven S1 geometry, but move the
+   visual hierarchy to navy / sky / gold and remove the residual green panels. */
+html body.s1-result-active.pc-shared-result-active #chat {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(89,183,227,.08), transparent 42%),
+    #fbfaf6 !important;
+}
+html body.s1-result-active.pc-shared-result-active .pc-shared-result-card,
+html body.s1-result-active.pc-shared-result-active .s1-result-card {
+  border-color: #9fb4c2 !important;
+  background: #fffdfa !important;
+  box-shadow: 0 12px 30px rgba(17,38,80,.10) !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-result-eyebrow {
+  color: #a96605 !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-result-title {
+  color: var(--gfc-navy) !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-result-body,
+html body.s1-result-active.pc-shared-result-active .s1-result-content-box {
+  color: #26384a !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-babbage-revision-review {
+  border-color: #9bc3d8 !important;
+  border-left: 5px solid var(--gfc-blue) !important;
+  background: #edf7fb !important;
+  color: #26384a !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-babbage-revision-review .s1-clean-reference-title {
+  color: var(--gfc-navy) !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-babbage-review-item strong {
+  color: #0b5f8d !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-clean-reference {
+  border-color: #dac796 !important;
+  border-left: 5px solid var(--gfc-gold) !important;
+  background: #fff7e5 !important;
+  color: #3a3f48 !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-clean-reference .s1-clean-reference-title,
+html body.s1-result-active.pc-shared-result-active .s1-clean-reference strong {
+  color: #765007 !important;
+}
+html body.s1-result-active.pc-shared-result-active #inputContainer {
+  border-top-color: #9bc3d8 !important;
+  background: linear-gradient(180deg, #eef7fb, #e7f1f6) !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-result-controls-title {
+  color: var(--gfc-navy) !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-result-controls-sub {
+  color: #43596b !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-result-controls-title::first-letter {
+  color: var(--gfc-blue) !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-result-controls .s1-secondary-btn {
+  border: 2px solid #7fa9c0 !important;
+  background: #fffdfa !important;
+  color: var(--gfc-navy) !important;
+  box-shadow: none !important;
+}
+html body.s1-result-active.pc-shared-result-active .s1-result-controls .s1-secondary-btn:is(:hover,:focus-visible) {
+  border-color: var(--gfc-gold) !important;
+  background: #f5fbfe !important;
+  color: var(--gfc-navy) !important;
+  outline: 3px solid rgba(230,165,29,.22) !important;
+  outline-offset: 2px !important;
+}
+
+/* Locked scenario shell. S3–S8 intentionally remain development placeholders,
+   but no longer look like a surviving copy of the forest-green prototype. */
+html body .pc-scenario-shell {
+  border-color: #8fb1c4 !important;
+  background: linear-gradient(180deg, #fffdfa 0%, #f8fbfd 100%) !important;
+  color: #26384a !important;
+  box-shadow: 0 14px 34px rgba(17,38,80,.10) !important;
+}
+html body .pc-scenario-shell .pc-shell-status {
+  border-color: #c58a16 !important;
+  background: var(--gfc-gold-pale) !important;
+  color: #694707 !important;
+}
+html body .pc-scenario-shell h2,
+html body .pc-scenario-shell .pc-shell-plan h3 {
+  color: var(--gfc-navy) !important;
+}
+html body .pc-scenario-shell .pc-shell-copy,
+html body .pc-scenario-shell .pc-shell-note,
+html body .pc-scenario-shell .pc-shell-loop {
+  color: #34495b !important;
+}
+html body .pc-scenario-shell .pc-shell-plan {
+  border-left-color: var(--gfc-gold) !important;
+  background: linear-gradient(90deg, #fff5d8, #fffaf0) !important;
+}
+html body .pc-scenario-shell .pc-shell-primary {
+  border: 2px solid var(--gfc-gold) !important;
+  background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 3px 0 rgba(8,26,54,.82), 0 7px 16px rgba(8,38,72,.16) !important;
+}
+html body .pc-scenario-shell .pc-shell-secondary {
+  border: 2px solid #79a8c1 !important;
+  background: #fffdfa !important;
+  color: var(--gfc-navy) !important;
+}
+html body .pc-scenario-shell :is(.pc-shell-primary,.pc-shell-secondary):is(:hover,:focus-visible) {
+  border-color: var(--gfc-gold) !important;
+  outline: 3px solid rgba(230,165,29,.24) !important;
+  outline-offset: 2px !important;
+}
+html body .pc-scenario-shell .pc-shell-primary:is(:hover,:focus-visible) {
+  background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
+}
+html body .pc-scenario-shell .pc-shell-secondary:is(:hover,:focus-visible) {
+  background: var(--gfc-sky-pale) !important;
+}

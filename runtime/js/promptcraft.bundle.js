@@ -568,7 +568,11 @@ const ASSETS = Object.freeze({
   images: Object.freeze({
     backgrounds: Object.freeze({
       app: pcProjectUrl('assets/images/backgrounds/app-background.png?v=2'),
-      classroom: pcProjectUrl('assets/images/backgrounds/classroom.png')
+      classroom: pcProjectUrl('assets/images/backgrounds/classroom.png'),
+      scenarios: Object.freeze({
+        0: pcProjectUrl('assets/images/backgrounds/gfc/s1-science-wing.jpg'),
+        1: pcProjectUrl('assets/images/backgrounds/gfc/s2-study-lounge.jpg')
+      })
     }),
     professorPixel: Object.freeze({
       neutral: pcProjectUrl('assets/images/characters/professor-pixel/neutral.png'),
@@ -613,6 +617,13 @@ const ASSETS = Object.freeze({
     })
   })
 });
+
+function pcGetScenarioBackgroundAsset(index) {
+  const normalized = Number(index);
+  return ASSETS.images.backgrounds.scenarios[normalized] || ASSETS.images.backgrounds.classroom;
+}
+
+pcExposeGlobals({ pcGetScenarioBackgroundAsset });
 
 const LEGACY_ASSETS = Object.freeze({
   images: Object.freeze({
@@ -2448,6 +2459,7 @@ const EXPRESSIONS = PIXEL_EXPR;
 // Queue of dialogue sequences waiting to play
 let vnQueue = [];
 let babbageTerminalCloseCallback = null;
+let babbageTerminalCloseHandoff = 'app';
 let vnTyping = false;
 let vnTypeTimer = null;
 let vnCurrentText = '';
@@ -4922,6 +4934,7 @@ function pcFitWideAnalysisReport(screen) {
       ['overscroll-behavior-y', 'contain'],
       ['touch-action', 'pan-y'],
       ['scrollbar-gutter', 'stable'],
+      ['scroll-padding-bottom', '18px'],
       ['box-sizing', 'border-box']
     ]);
     pcSetImportantStyles(report, [
@@ -4932,6 +4945,15 @@ function pcFitWideAnalysisReport(screen) {
       ['overflow', 'visible'],
       ['box-sizing', 'border-box']
     ]);
+    // Very dense desktop reports are usually only a few pixels taller than the
+    // physical monitor. Recover that space from decorative padding before we
+    // ask the user to scroll; text stays at the established readable floor.
+    if (isWideDesktopMonitor && hasVeryDenseAnalysisContent) {
+      pcSetImportantStyles(report, [['padding', '1px 2px 2px']]);
+      pcSetImportantStyles(header, [['gap', '2px']]);
+      pcSetImportantStyles(grid, [['gap', '2px']]);
+      cards.forEach((card) => pcSetImportantStyles(card, [['padding', '2px 4px']]));
+    }
     pcSetImportantStyles(grid, [
       ['display', 'grid'],
       ['grid-template-columns', useSingleColumn ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) minmax(0, 1fr)'],
@@ -5172,7 +5194,7 @@ function pcFitWideAnalysisReport(screen) {
   // Waiting until the fixed-row layout fails can leave one paint frame where
   // long text overlaps a neighboring box, especially after web fonts settle.
   if (isWideDesktopMonitor && hasDenseAnalysisContent) {
-    enableOverflowSafeWideReport(hasVeryDenseAnalysisContent ? 0.92 : 0.97);
+    enableOverflowSafeWideReport(hasVeryDenseAnalysisContent ? 0.82 : 0.93);
     return true;
   }
 
@@ -6787,8 +6809,30 @@ function pcPrintCurrentBabbageReport() {
   if (!printWindow) return false;
   try { printWindow.opener = null; } catch (e) {}
 
-  const inputSection = submittedWork
-    ? `<section class="pc-print-input"><h2>Your prompt / repair</h2><div>${esc(submittedWork).replace(/\n/g, '<br>')}</div></section>`
+  let printLogoUrl = '';
+  try {
+    printLogoUrl = new URL('assets/images/brand/great-falls-college-logo.jpg', window.location.href).href;
+  } catch (e) {}
+
+  const workBlocks = String(submittedWork || '')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map((line, index) => {
+      const match = line.match(/^([^:]{2,48}:)(\s*)(.*)$/);
+      if (match) {
+        return `<p class="pc-print-work-line"><strong>${esc(match[1])}</strong> ${esc(match[3])}</p>`;
+      }
+      return `<p class="pc-print-work-line${index === 0 ? ' pc-print-work-opening' : ''}">${esc(line)}</p>`;
+    })
+    .join('');
+
+  const inputSection = workBlocks
+    ? `<section class="pc-print-input"><div class="pc-print-section-label">Input provided to Babbage</div><div class="pc-print-work">${workBlocks}</div></section>`
+    : '';
+
+  const logoHTML = printLogoUrl
+    ? `<img class="pc-print-logo" src="${esc(printLogoUrl)}" alt="Great Falls College Montana State University">`
     : '';
 
   printWindow.document.open();
@@ -6799,38 +6843,71 @@ function pcPrintCurrentBabbageReport() {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>PromptCraft · Babbage Diagnosis · ${esc(scenarioLabel)}</title>
   <style>
-    :root{color-scheme:light;}*{box-sizing:border-box;}body{margin:0;background:#f4f1e8;color:#1e2821;font-family:Arial,Helvetica,sans-serif;line-height:1.5;}
-    .pc-print-shell{max-width:920px;margin:0 auto;padding:34px 42px 48px;background:#fff;min-height:100vh;}
-    .pc-print-kicker{font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#356046;}
-    .pc-print-title{margin:4px 0 4px;font-size:30px;line-height:1.1;color:#173d29;}.pc-print-meta{margin:0 0 24px;color:#687269;font-size:13px;}
-    .pc-print-input{margin:0 0 24px;padding:18px 20px;border:1px solid #b8c7b9;border-left:5px solid #356046;background:#f7faf7;break-inside:avoid;}
-    .pc-print-input h2{margin:0 0 8px;font-size:15px;color:#244b34;}.pc-print-input div{font-size:14px;white-space:normal;}
-    .analysis-header{margin-bottom:18px}.analysis-badge{display:inline-block;padding:4px 8px;border:1px solid #356046;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#244b34;}
-    .analysis-title{margin:8px 0 4px;font-size:24px;color:#173d29}.analysis-summary{margin:0;color:#4b574e;}
-    .analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.analysis-card{padding:16px;border:1px solid #bfc9c0;border-radius:8px;break-inside:avoid;background:#fff;}
-    .analysis-card.wide,.analysis-impact-card,.analysis-worked-card{grid-column:1/-1}.analysis-label{display:block;margin-bottom:7px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#356046}.analysis-icon{margin-right:6px}.analysis-value{font-size:14px}.analysis-value.big{font-size:16px;font-weight:700}.analysis-note{margin-top:7px;color:#687269;font-size:12px;}
-    .pc-print-footer{margin-top:28px;padding-top:14px;border-top:1px solid #d6ddd6;color:#69736b;font-size:11px;}.pc-print-toolbar{display:flex;justify-content:flex-end;gap:10px;max-width:920px;margin:18px auto;padding:0 8px;}.pc-print-toolbar button{padding:10px 16px;border:0;border-radius:6px;background:#174b2f;color:#fff;font-weight:700;cursor:pointer;}
-    @media(max-width:680px){.pc-print-shell{padding:24px 20px}.analysis-grid{grid-template-columns:1fr}.analysis-card,.analysis-card.wide,.analysis-impact-card,.analysis-worked-card{grid-column:1;}}
-    @media print{body{background:#fff}.pc-print-toolbar{display:none}.pc-print-shell{max-width:none;padding:0;background:#fff}.analysis-card{border-color:#888}.pc-print-footer{page-break-inside:avoid}@page{margin:.55in;}}
+    :root{color-scheme:light;--navy:#112650;--navy-deep:#081a36;--blue:#086c9f;--sky:#59b7e3;--sky-pale:#e9f5fb;--gold:#e6a51d;--gold-pale:#fff4d5;--ink:#172236;--muted:#5f6e7f;--paper:#fffdf8;--line:#b9c9d6;}
+    *{box-sizing:border-box}html,body{margin:0;padding:0}body{background:#edf2f6;color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.42;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .pc-print-shell{max-width:940px;margin:0 auto 32px;background:#fff;box-shadow:0 14px 42px rgba(8,26,54,.13)}
+    .pc-print-brand{display:grid;grid-template-columns:108px 1fr;gap:24px;align-items:center;padding:24px 30px 20px;border-top:9px solid var(--navy);border-bottom:4px solid var(--gold);background:linear-gradient(105deg,#f8fbfd,#fff 68%)}
+    .pc-print-logo{display:block;width:100px;height:100px;object-fit:contain}
+    .pc-print-brand-copy{min-width:0}.pc-print-kicker{margin:0 0 3px;font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+    .pc-print-title{margin:0;font-family:Georgia,'Times New Roman',serif;font-size:32px;line-height:1.05;color:var(--navy)}
+    .pc-print-meta{margin:7px 0 0;color:var(--muted);font-size:12.5px;font-weight:600}
+    .pc-print-content{padding:25px 30px 30px}
+    .pc-print-input{margin:22px 0 0;padding:16px 18px 14px;border:1px solid #c7d7e2;border-left:6px solid var(--blue);border-radius:8px;background:var(--sky-pale)}
+    .pc-print-section-label{margin:0 0 9px;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--navy)}
+    .pc-print-work{font-size:12.5px;line-height:1.42;color:#263547}.pc-print-work-line{margin:0 0 7px}.pc-print-work-line:last-child{margin-bottom:0}.pc-print-work-line strong{color:var(--navy)}.pc-print-work-opening{font-weight:600}
+    .analysis-report{margin:0}.analysis-header{margin:0 0 14px;padding:16px 18px 15px;border-radius:10px;background:var(--navy);color:#fff;break-after:avoid}
+    .analysis-badge{display:inline-block;margin:0 0 7px;padding:3px 8px;border:1px solid var(--gold);border-radius:999px;background:rgba(255,255,255,.08);font-size:9.5px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:#ffe5a4}
+    .analysis-title{margin:0 0 4px;font-family:Georgia,'Times New Roman',serif;font-size:25px;line-height:1.08;color:#fff}.analysis-summary{margin:0;color:#e8f3fa;font-size:12.5px;line-height:1.38}
+    .analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}.analysis-card{padding:13px 14px 12px;border:1px solid var(--line);border-top:4px solid var(--sky);border-radius:8px;background:#fff;break-inside:avoid;page-break-inside:avoid}
+    .analysis-card.wide,.analysis-impact-card,.analysis-worked-card{grid-column:1/-1}.analysis-label{display:flex;align-items:center;gap:5px;margin:0 0 6px;font-size:9.5px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--blue)}.analysis-icon{margin:0;color:var(--gold-dark,#98670d)}
+    .analysis-value{font-size:12.5px;line-height:1.34;color:#1c2b3b}.analysis-value.big{font-size:14px;font-weight:800;color:var(--navy)}.analysis-note{margin-top:5px;color:var(--muted);font-size:10.5px;line-height:1.34}
+    .analysis-issue-card{border-top-color:#d66b39;background:#fffaf7}.analysis-repair-card{border-top-color:var(--gold);background:#fffdf6}.analysis-impact-card{border-top-color:var(--blue);background:#f8fcff}.analysis-worked-card{border-top-color:var(--navy);background:#f6f8fb}
+    .pc-print-footer{margin:24px 0 0;padding:12px 15px;border-top:2px solid var(--gold);background:#f6f8fb;color:#536273;font-size:10.5px;line-height:1.35;break-inside:avoid;page-break-inside:avoid}
+    .pc-print-toolbar{display:flex;justify-content:flex-end;gap:10px;max-width:940px;margin:16px auto;padding:0 8px}.pc-print-toolbar button{padding:10px 16px;border:2px solid var(--gold);border-radius:7px;background:var(--navy);color:#fff;font-weight:800;cursor:pointer}
+    @media(max-width:680px){.pc-print-brand{grid-template-columns:78px 1fr;padding:20px}.pc-print-logo{width:72px;height:72px}.pc-print-content{padding:20px}.analysis-grid{grid-template-columns:1fr}.analysis-card,.analysis-card.wide,.analysis-impact-card,.analysis-worked-card{grid-column:1}.pc-print-title{font-size:27px}}
+    @media print{body{background:#fff}.pc-print-toolbar{display:none}.pc-print-shell{max-width:none;margin:0;box-shadow:none}.pc-print-brand{padding:0 0 14px;margin:0 0 17px;border-top:0;border-bottom:3px solid var(--gold);background:#fff}.pc-print-logo{width:86px;height:86px}.pc-print-content{padding:0}.pc-print-input{margin:0;padding:12px 14px;break-before:page;page-break-before:always}.analysis-header{padding:13px 15px}.analysis-grid{display:block}.analysis-card,.analysis-card.wide,.analysis-impact-card,.analysis-worked-card{display:block;width:100%;margin:0 0 8px;padding:10px 11px 9px}.pc-print-footer{margin-top:14px}@page{size:auto;margin:.52in .58in}}
   </style>
 </head>
 <body>
   <div class="pc-print-toolbar"><button type="button" onclick="window.print()">Print / Save PDF</button></div>
   <main class="pc-print-shell">
-    <div class="pc-print-kicker">PromptCraft · Faculty AI Training</div>
-    <h1 class="pc-print-title">Babbage Diagnosis</h1>
-    <p class="pc-print-meta">${esc(scenarioLabel)} · Generated ${esc(printedAt)}</p>
-    ${inputSection}
-    ${reportClone.outerHTML}
-    <footer class="pc-print-footer">Babbage feedback is an AI-supported diagnostic aid. Review recommendations using your instructional context and professional judgment.</footer>
+    <header class="pc-print-brand">
+      ${logoHTML}
+      <div class="pc-print-brand-copy">
+        <div class="pc-print-kicker">PromptCraft · The Prompt Lab</div>
+        <h1 class="pc-print-title">Babbage Diagnosis</h1>
+        <p class="pc-print-meta">${esc(scenarioLabel)} · Generated ${esc(printedAt)}</p>
+      </div>
+    </header>
+    <div class="pc-print-content">
+      ${reportClone.outerHTML}
+      ${inputSection}
+      <footer class="pc-print-footer"><strong>Instructional judgment still matters.</strong> Babbage feedback is an AI-supported diagnostic aid. Review recommendations using your course context, student needs, and professional judgment.</footer>
+    </div>
   </main>
 </body>
 </html>`);
   printWindow.document.close();
+  try {
+    const printUrl = new URL(window.location.href);
+    printUrl.search = '';
+    printUrl.hash = 'babbage-diagnosis';
+    printWindow.history.replaceState(null, '', printUrl.href);
+  } catch (e) {}
   printWindow.focus();
-  window.setTimeout(() => {
-    try { printWindow.print(); } catch (e) {}
-  }, 250);
+
+  const images = Array.from(printWindow.document.images || []);
+  Promise.all(images.map(img => img.complete
+    ? Promise.resolve()
+    : new Promise(resolve => {
+        img.addEventListener('load', resolve, { once: true });
+        img.addEventListener('error', resolve, { once: true });
+      })
+  )).finally(() => {
+    window.setTimeout(() => {
+      try { printWindow.print(); } catch (e) {}
+    }, 120);
+  });
   return true;
 }
 
@@ -6843,9 +6920,16 @@ function showBabbageTerminalReport({
   readLabel = '🔊 Read Analysis',
   printLabel = '',
   continueLabel = 'Continue',
-  ariaLabel = 'Babbage analysis report'
+  ariaLabel = 'Babbage analysis report',
+  closeHandoff = 'app'
 } = {}) {
   babbageTerminalCloseCallback = typeof onClose === 'function' ? onClose : null;
+  babbageTerminalCloseHandoff = closeHandoff === 'vn' ? 'vn' : 'app';
+
+  // V429 GFC QA: A report can be revealed from several VN states. Reassert
+  // the shared Babbage computer shell before text mode so a stale smartboard
+  // or dialogue state can never remain visible underneath report controls.
+  pcSetVNOverlayState({ active: true, modes: ['babbage-terminal-consult'] });
   setBabbageTerminalTextMode(true);
   setBabbageTerminalState('responding', engineLabel, esc(terminalStateText));
 
@@ -6857,6 +6941,10 @@ function showBabbageTerminalReport({
   }
 
   requestAnimationFrame(() => {
+    const reportOverlay = document.getElementById('vnOverlay');
+    if (reportOverlay?.classList.contains('active')) {
+      reportOverlay.classList.add('babbage-terminal-consult', 'babbage-terminal-textmode');
+    }
     pcScheduleAnalysisLayout({ immediate: true });
     const screen = output?.closest('.babbage-terminal-screen');
     if (screen) screen.scrollTop = 0;
@@ -6913,7 +7001,8 @@ ${terminalizeBabbageText(feedback)}`;
     readLabel: '🔊 Read Analysis',
     printLabel: 'Print / Save PDF',
     continueLabel: 'Continue',
-    ariaLabel: 'Babbage scenario diagnostic report'
+    ariaLabel: 'Babbage scenario diagnostic report',
+    closeHandoff: 'vn'
   });
 }
 
@@ -6953,18 +7042,18 @@ function showBabbageFinalResponseInTerminal(responseText, mock = false, onClose 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.
 function closeBabbageConsultOverlay() {
   const cb = babbageTerminalCloseCallback;
+  const handoff = babbageTerminalCloseHandoff;
   babbageTerminalCloseCallback = null;
-  const directVNHandoff = typeof cb === 'function';
+  babbageTerminalCloseHandoff = 'app';
+  const directVNHandoff = typeof cb === 'function' && handoff === 'vn';
 
   pcClearAnalysisLayout();
 
-  // A completed Babbage report can hand directly back to Professor Pixel. Keep
-  // the shared VN overlay active for that handoff so the browser never paints
-  // the underlying workbench or a half-reset terminal between the two scenes.
-  // The previous 250 ms close/reopen gap exposed legacy/base overlay geometry
-  // during the VN opacity transition, producing the visible flash captured in
-  // the August 18 screen recording. All mode cleanup still happens in this same
-  // task, before the callback renders the next VN line.
+  // Completed reports have two legitimate destinations: another VN line or an
+  // application/workbench screen. Keeping the overlay active is correct only
+  // for a direct VN handoff. Treating every callback as VN left S2's report
+  // controls stranded over its smartboard after the app workspace had already
+  // rendered underneath. The handoff contract now owns that distinction.
   pcSetVNOverlayState({ active: directVNHandoff });
   pcResetVNCharacters();
   pcResetVNDialogueState();
@@ -6977,7 +7066,13 @@ function closeBabbageConsultOverlay() {
     return;
   }
 
+  const vnText = document.getElementById('vnText');
+  if (vnText) vnText.innerHTML = '';
+  const hint = document.getElementById('vnAdvanceHint');
+  if (hint) hint.classList.remove('show');
+
   musicEndVN();
+  if (typeof cb === 'function') cb();
   document.getElementById('promptInput')?.focus();
 }
 
@@ -7551,6 +7646,7 @@ function pcClearVNStateForScenarioSwitch() {
   try { pcClearAnalysisLayout(); } catch (e) {}
   try { pcSetBabbageSubmitting(false); } catch (e) {}
   try { babbageTerminalCloseCallback = null; } catch (e) {}
+  try { babbageTerminalCloseHandoff = 'app'; } catch (e) {}
   try { pcSharedWorkstationResultContinue = null; } catch (e) {}
 
   // Scenario state may add semantic markers, but presentation teardown is shared.
@@ -7764,7 +7860,13 @@ function prepareScenarioShell(index) {
   }
 
   const sceneBackground = document.getElementById('vnSceneBg');
-  if (sceneBackground) pcSetImageSource(sceneBackground, ASSETS.images.backgrounds.classroom, LEGACY_ASSETS.images.backgrounds.classroom);
+  if (sceneBackground) {
+    pcSetImageSource(
+      sceneBackground,
+      pcGetScenarioBackgroundAsset(index),
+      LEGACY_ASSETS.images.backgrounds.classroom
+    );
+  }
 }
 
 
@@ -9535,7 +9637,7 @@ function pcShowSharedWorkstationResult({
   if (sceneBackground) {
     pcSetImageSource(
       sceneBackground,
-      ASSETS.images.backgrounds.classroom,
+      pcGetScenarioBackgroundAsset(window.scenarioIndex),
       LEGACY_ASSETS.images.backgrounds.classroom
     );
   }
@@ -9659,7 +9761,7 @@ function pcShowPredictionGate(text){
   if (sceneBackground) {
     pcSetImageSource(
       sceneBackground,
-      ASSETS.images.backgrounds.classroom,
+      pcGetScenarioBackgroundAsset(window.scenarioIndex),
       LEGACY_ASSETS.images.backgrounds.classroom
     );
   }

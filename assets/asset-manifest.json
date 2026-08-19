@@ -1,8 +1,10 @@
 {
-  "version": 141,
+  "version": 143,
   "runtime_images": {
     "background.png": "assets/images/backgrounds/app-background.png",
     "classroom-bg.png": "assets/images/backgrounds/classroom.png",
+    "gfc-s1-science-wing.jpg": "assets/images/backgrounds/gfc/s1-science-wing.jpg",
+    "gfc-s2-study-lounge.jpg": "assets/images/backgrounds/gfc/s2-study-lounge.jpg",
     "desk-extension.png": "assets/images/backgrounds/desk-extension.png",
     "pixel-neutral.png": "assets/images/characters/professor-pixel/neutral.png",
     "pixel-thinking.png": "assets/images/characters/professor-pixel/thinking.png",
@@ -23,8 +25,9 @@
     "jordan-thinking.png": "assets/images/characters/students/jordan/thinking.png",
     "jordan-confident.png": "assets/images/characters/students/jordan/confident.png",
     "babbage-mark.svg": "assets/images/ui/babbage-mark.svg",
-    "babbage-engine-plate.svg": "assets/images/ui/babbage-engine-plate.svg",
-    "promptcraft-qr.png": "assets/ui/promptcraft-qr.png"
+    "charles-babbage.png": "assets/images/ui/charles-babbage.png",
+    "promptcraft-qr.png": "assets/ui/promptcraft-qr.png",
+    "gfc-print-logo.jpg": "assets/images/brand/great-falls-college-logo.jpg"
   },
   "planned_runtime_images": {
     "scene-s7.png": "assets/images/scenes/scenario-07-overreliance/scene.png",
@@ -37,7 +40,8 @@
     "assets/images/characters/students/jordan/references/concept-sheet.png",
     "assets/images/characters/students/lena/references/concept-sheet.png",
     "assets/images/characters/students/maya/references/concept-sheet.png",
-    "assets/images/characters/students/samira/references/concept-sheet.png"
+    "assets/images/characters/students/samira/references/concept-sheet.png",
+    "assets/images/ui/babbage-engine-plate.svg"
   ],
   "runtime_audio": {
     "background.mp3": "assets/audio/music/background.mp3",
