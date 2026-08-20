@@ -66,6 +66,18 @@ function mockBabbageResponse(payload, context = 'main', reason = 'forced') {
 
 const BABBAGE_REQUEST_TIMEOUT_MS = 90000;
 const BABBAGE_MIN_VISIBLE_ANALYSIS_MS = 900;
+const pcBabbageActiveControllers = new Set();
+
+function pcAbortScenarioBabbageRequests() {
+  pcBabbageActiveControllers.forEach(controller => {
+    try {
+      controller._pcScenarioAbort = true;
+      controller.abort();
+    } catch (e) {}
+  });
+  pcBabbageActiveControllers.clear();
+}
+window.pcAbortScenarioBabbageRequests = pcAbortScenarioBabbageRequests;
 
 function pcGetBabbageMinVisibleAnalysisMs() {
   const configured = Number(window.PC_BABBAGE_MIN_VISIBLE_ANALYSIS_MS);
@@ -100,7 +112,11 @@ async function requestBabbageAnalysis(payload, context = 'main') {
   }
 
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-  const timeoutId = controller ? setTimeout(() => controller.abort(), BABBAGE_REQUEST_TIMEOUT_MS) : null;
+  if (controller) pcBabbageActiveControllers.add(controller);
+  const timeoutId = controller ? setTimeout(() => {
+    controller._pcTimeoutAbort = true;
+    controller.abort();
+  }, BABBAGE_REQUEST_TIMEOUT_MS) : null;
 
   try {
     const res = await fetch('/.netlify/functions/babbage', {
@@ -133,12 +149,14 @@ async function requestBabbageAnalysis(payload, context = 'main') {
     }
     return data;
   } catch (err) {
+    if (controller?._pcScenarioAbort) throw err;
     console.warn('[PromptCraft] Babbage unavailable or timed out; using local fallback:', err && err.message ? err.message : err);
     if (tracksVisibleAnalysis && typeof window.pcFailBabbageAnalysisProgress === 'function') window.pcFailBabbageAnalysisProgress();
     await pcHoldVisibleBabbageAnalysis(visibleAnalysisStartedAt, tracksVisibleAnalysis);
     return mockBabbageResponse(payload, context, 'backend-unavailable');
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
+    if (controller) pcBabbageActiveControllers.delete(controller);
   }
 }
 

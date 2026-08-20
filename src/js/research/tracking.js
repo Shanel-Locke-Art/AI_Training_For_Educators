@@ -40,6 +40,29 @@ const scenarioData = Array.from({ length: SCENARIO_COUNT }, (_, index) => {
       openingCheckpointReached: false,
     };
   }
+  if (index === SCENARIO_INDEX.ASSESSMENT) {
+    return {
+      ...base,
+      diagnosisAttempts: [],
+      diagnosisFinal: {},
+      blueprintAttempts: [],
+      blueprintInitial: {},
+      blueprintFinal: {},
+      evidenceAttempts: [],
+      evidenceFinal: [],
+      auditAttempts: [],
+      repairAttempts: [],
+      dragEvents: [],
+      babbageEvidenceAnalysis: null,
+      s3AnalysisSource: '',
+      evidenceStatement: '',
+      repairText: '',
+      initialScore: 0,
+      revisedScore: 0,
+      currentScore: 0,
+      scoreDelta: 0
+    };
+  }
   if (index === SCENARIO_INDEX.HALLUCINATION) {
     return { ...base, selfReport: '' };
   }
@@ -334,10 +357,19 @@ async function saveIncrementalData(scenarioIdx) {
       s2_audit_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.auditAttempts || []) : '',
       s2_repair_text: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? (s.repairText || '') : '',
       s3_diagnosis_json: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? JSON.stringify(s.diagnosisAttempts || []) : '',
-      s3_evidence_json: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? JSON.stringify(s.evidenceAttempts || []) : '',
+      s3_evidence_json: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? JSON.stringify({
+        blueprintAttempts: s.blueprintAttempts || [],
+        evidenceAttempts: s.evidenceAttempts || [],
+        evidenceFinal: s.evidenceFinal || [],
+        dragEvents: s.dragEvents || [],
+        initialScore: Number(s.initialScore || 0),
+        revisedScore: Number(s.revisedScore || s.currentScore || 0),
+        scoreDelta: Number(s.scoreDelta || 0)
+      }) : '',
       s3_audit_json: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? JSON.stringify(s.auditAttempts || []) : '',
       s3_repair_text: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? (s.repairText || '') : '',
       s3_evidence_statement: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? (s.evidenceStatement || '') : '',
+      s3_transfer_metadata_json: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? JSON.stringify(s.transferLabMetadata || {}) : '',
       s4_diagnosis_json: scenarioIdx === SCENARIO_INDEX.SYNC ? JSON.stringify(s.diagnosisAttempts || []) : '',
       s4_function_json: scenarioIdx === SCENARIO_INDEX.SYNC ? JSON.stringify(s.functionAttempts || []) : '',
       s4_audit_json: scenarioIdx === SCENARIO_INDEX.SYNC ? JSON.stringify(s.auditAttempts || []) : '',

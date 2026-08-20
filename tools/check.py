@@ -40,6 +40,7 @@ BROWSER_CHECKS = (
     ("S2 final-result reuse", [sys.executable, "tests/test_s2_final_reuse.py"]),
     ("S2 menu/development shell", [sys.executable, "tests/test_s2_menu_dev.py"]),
     ("S2 recorded-dialogue guard", [sys.executable, "tests/test_s2_recorded_dialogue_guard.py"]),
+    ("S3 authentic-assessment drag/drop", [sys.executable, "tests/test_s3_dragdrop.py"]),
 )
 
 

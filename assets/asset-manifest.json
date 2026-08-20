@@ -1,5 +1,5 @@
 {
-  "version": 144,
+  "version": 145,
   "runtime_images": {
     "background.png": "assets/images/backgrounds/app-background.png",
     "classroom-bg.png": "assets/images/backgrounds/classroom.png",
@@ -14,7 +14,6 @@
     "pixel-proud.png": "assets/images/characters/professor-pixel/proud.png",
     "scene-s1.png": "assets/images/scenes/scenario-01-engagement/scene.png",
     "scene-s2.png": "assets/images/scenes/scenario-02-metacognition/scene.png",
-    "scene-s3.png": "assets/images/scenes/scenario-03-authentic-assessment/scene.png",
     "scene-s4.png": "assets/images/scenes/scenario-04-sync-bias/scene.png",
     "scene-s5.png": "assets/images/scenes/scenario-05-hallucination-hunt/scene.png",
     "scene-s6.png": "assets/images/scenes/scenario-06-predict-output/scene.png",
@@ -28,7 +27,12 @@
     "charles-babbage.png": "assets/images/ui/charles-babbage.png",
     "promptcraft-qr.png": "assets/ui/promptcraft-qr.png",
     "gfc-print-logo.jpg": "assets/images/brand/great-falls-college-logo.jpg",
-    "babbage-engine.webp": "assets/images/ui/babbage-engine.webp"
+    "babbage-engine.webp": "assets/images/ui/babbage-engine.webp",
+    "maya-neutral.png": "assets/images/characters/students/maya/neutral.png",
+    "maya-thinking.png": "assets/images/characters/students/maya/thinking.png",
+    "maya-uncertain.png": "assets/images/characters/students/maya/uncertain.png",
+    "maya-frustrated.png": "assets/images/characters/students/maya/frustrated.png",
+    "maya-confident.png": "assets/images/characters/students/maya/confident.png"
   },
   "planned_runtime_images": {
     "scene-s7.png": "assets/images/scenes/scenario-07-overreliance/scene.png",
@@ -42,17 +46,12 @@
     "assets/images/characters/students/lena/references/concept-sheet.png",
     "assets/images/characters/students/maya/references/concept-sheet.png",
     "assets/images/characters/students/samira/references/concept-sheet.png",
-    "assets/images/ui/babbage-engine-plate.svg"
+    "assets/images/ui/babbage-engine-plate.svg",
+    "assets/images/scenes/scenario-03-authentic-assessment/scene.png"
   ],
   "runtime_audio": {
     "background.mp3": "assets/audio/music/background.mp3",
-    "welcome.mp3": "assets/audio/voice/professor-pixel/system/welcome.mp3",
-    "vague.mp3": "assets/audio/voice/professor-pixel/feedback/vague.mp3",
-    "decent.mp3": "assets/audio/voice/professor-pixel/feedback/decent.mp3",
-    "strong.mp3": "assets/audio/voice/professor-pixel/feedback/strong.mp3",
     "scenario-1-intro.mp3": "assets/audio/voice/professor-pixel/scenario-01/intro.mp3",
-    "scenario-complete.mp3": "assets/audio/voice/professor-pixel/completion/scenario-complete.mp3",
-    "all-complete.mp3": "assets/audio/voice/professor-pixel/completion/all-complete.mp3",
     "reflection-open.mp3": "assets/audio/voice/professor-pixel/reflection/open.mp3"
   },
   "planned_audio": [
@@ -89,7 +88,13 @@
     "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-confidence.mp3",
     "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-evidence.mp3",
     "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-grade.mp3",
-    "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-strategy.mp3"
+    "assets/audio/voice/students/jordan/scenario-02/jordan-s2-intervention-strategy.mp3",
+    "assets/audio/voice/professor-pixel/system/welcome.mp3",
+    "assets/audio/voice/professor-pixel/feedback/vague.mp3",
+    "assets/audio/voice/professor-pixel/feedback/decent.mp3",
+    "assets/audio/voice/professor-pixel/feedback/strong.mp3",
+    "assets/audio/voice/professor-pixel/completion/scenario-complete.mp3",
+    "assets/audio/voice/professor-pixel/completion/all-complete.mp3"
   ],
   "asset_documentation": [
     "assets/audio/voice/professor-pixel/scenario-02/README.md",

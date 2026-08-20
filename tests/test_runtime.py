@@ -140,7 +140,7 @@ def main() -> int:
                     failures.append(f"{label}: selected tab mismatch.")
                 if not state["boardText"]:
                     failures.append(f"{label}: scenario board text is empty.")
-                if scenario < 2 and not state["inputText"]:
+                if scenario < 3 and not state["inputText"]:
                     failures.append(f"{label}: implemented workspace is empty.")
                 if state["bodyWidth"] > state["viewportWidth"] + 1:
                     failures.append(f"{label}: horizontal overflow detected.")

@@ -372,39 +372,12 @@ function showS1ResultControls(scoreTotal, mode = 'postReflection'){
 
 function getS1PixelScoreReflection(scoreTotal){
   const score = Math.max(0, Math.min(5, Math.round(Number(scoreTotal) || 0)));
-  const reactions = {
-    0: [
-      { expr: 'skeptical', audioKey: 's1-score-0-a', text: "That landed at zero out of five. I am not going to pretend Babbage had a usable design brief here. The response either missed the scenario or gave us information we cannot responsibly design from." },
-      { expr: 'thinking', audioKey: 's1-score-0-b', text: "A useful repair needs a real learner context, a specific interaction problem, a meaningful interaction move, practical constraints, and some sign of what success should look like." },
-      { expr: 'encouraging', audioKey: 's1-score-0-c', text: "Go back to the repair notes and rebuild the foundation. Give Babbage instructional information, not filler, and the next analysis should change substantially." }
-    ],
-    1: [
-      { expr: 'skeptical', audioKey: 's1-score-1-a', text: "That scored one out of five. There is one usable signal in the response, but Babbage is still being asked to fill in most of the instructional design for you." },
-      { expr: 'thinking', audioKey: 's1-score-1-b', text: "When the design brief is this thin, even a polished AI response can look smarter than the reasoning underneath it. That is exactly the trap this scenario is trying to expose." },
-      { expr: 'encouraging', audioKey: 's1-score-1-c', text: "Strengthen the repair notes before you move on. Make the problem and the interaction you want students to have much more concrete." }
-    ],
-    2: [
-      { expr: 'thinking', audioKey: 's1-score-2-a', text: "Two out of five. Babbage has enough to see part of your intent, but too much of the redesign is still guesswork." },
-      { expr: 'skeptical', audioKey: 's1-score-2-b', text: "The important question is not whether the draft sounds better. It is whether your input gives Babbage enough evidence to make the right instructional change instead of inventing one." },
-      { expr: 'encouraging', audioKey: 's1-score-2-c', text: "Add the missing design information and try again. You are close to having a brief Babbage can actually reason from." }
-    ],
-    3: [
-      { expr: 'encouraging', audioKey: 's1-score-3-a', text: "Three out of five. That is enough structure for Babbage to attempt a defensible repair, but I would not call the design brief complete yet." },
-      { expr: 'thinking', audioKey: 's1-score-3-b', text: "The draft may work, but some of its quality still depends on Babbage making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify." },
-      { expr: 'encouraging', audioKey: 's1-score-3-c', text: "You can move forward, or revise once more and see whether a more complete brief produces a more precise repair." }
-    ],
-    4: [
-      { expr: 'proud', audioKey: 's1-score-4-a', text: "Four out of five. This is a strong design brief. Babbage had enough context to make a targeted repair instead of simply rewriting the discussion prompt." },
-      { expr: 'thinking', audioKey: 's1-score-4-b', text: "There is still one area that could be clearer, which matters because small gaps are where AI starts making quiet assumptions on your behalf." },
-      { expr: 'proud', audioKey: 's1-score-4-c', text: "The important shift is here: you gave the replies an instructional purpose, not just a participation requirement. That is a meaningful redesign." }
-    ],
-    5: [
-      { expr: 'proud', audioKey: 's1-score-5-a', text: "Five out of five. You gave Babbage a complete design brief: learner context, the actual problem, the interaction you want, the constraints, and a clear success signal." },
-      { expr: 'thinking', audioKey: 's1-score-5-b', text: "That does not mean Babbage is automatically right. It means you gave it enough information that you can judge whether its repair actually follows your instructional intent." },
-      { expr: 'proud', audioKey: 's1-score-5-c', text: "That is the habit I want you to carry forward: make the reasoning visible first, then use AI to help execute the design." }
-    ]
-  };
-  return reactions[score];
+  const source = window.pixelDialogue?.[`scoreReflection_${score}`];
+  if (!Array.isArray(source)) return [];
+  return source.map(line => ({
+    ...line,
+    audioKey: line.id || ''
+  }));
 }
 
 function showS1PostAnalysisReflection(scoreTotal){

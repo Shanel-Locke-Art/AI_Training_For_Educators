@@ -6,14 +6,9 @@
 // as the approved prediction/live-analysis workstation. The full 2:1 computer
 // render stays intact so the monitor can scale up without re-cropping the tower
 // or shifting the report outside the physical screen.
-const PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY = {
-  // v346: Restore the proven monitor-glass geometry. The v345 geometry pushed
-  // the terminal layer outside the photographed inner bezel on several tablets.
-  left: '22.35%',
-  top: '12.85%',
-  width: '42.2%',
-  height: '45.45%'
-};
+// v461: Completed reports use the exact same measured CRT glass as prediction
+// and live analysis. Geometry ownership lives in workstation-layout.js.
+const PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY = PC_WORKSTATION_MONITOR_GLASS_GEOMETRY;
 
 function pcClearWideAnalysisActions() {
   const actionRow = document.getElementById('vnText');
@@ -1207,4 +1202,3 @@ if (!window.pcModernTerminalAlignmentInstalled) {
   window.addEventListener('orientationchange', pcQueueModernTerminalAlignment, { passive: true });
   window.visualViewport?.addEventListener('resize', pcQueueModernTerminalAlignment, { passive: true });
 }
-

@@ -1,6 +1,6 @@
 const DEFAULT_OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5.6-terra';
 const OPENAI_BASE_URL = String(process.env.OPENAI_BASE_URL || 'https://api.openai.com').replace(/\/+$/, '');
-const PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V369';
+const PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V370';
 
 const CORS_HEADERS = Object.freeze({
   'Access-Control-Allow-Origin': '*',
@@ -144,6 +144,61 @@ const S3_REVIEW_SCHEMA = {
 };
 
 
+const S3_EVIDENCE_ANALYSIS_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: [
+    'claim_about_learning', 'confidence', 'evidence_used', 'judgment',
+    'recommendation', 'deliberate_issue', 'why_this_inference_is_plausible'
+  ],
+  properties: {
+    claim_about_learning: { type: 'string' },
+    confidence: { type: 'string', enum: ['LOW', 'MODERATE', 'HIGH'] },
+    evidence_used: { type: 'array', minItems: 1, maxItems: 5, items: { type: 'string' } },
+    judgment: { type: 'string', enum: ['SUFFICIENT', 'PARTIAL', 'INSUFFICIENT'] },
+    recommendation: { type: 'string' },
+    deliberate_issue: { type: 'string', enum: ['ignores_transfer'] },
+    why_this_inference_is_plausible: { type: 'string' }
+  }
+};
+
+
+const S3_TRANSFER_ASSESSMENT_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: [
+    'status', 'confidence', 'feedback_summary', 'current_evidence',
+    'alignment_gap', 'authenticity_opportunity', 'suggested_revision',
+    'why_stronger_evidence', 'remaining_limitation', 'suggested_components',
+    'share_title', 'share_summary'
+  ],
+  properties: {
+    status: { type: 'string' },
+    confidence: { type: 'string', enum: ['LOW', 'MODERATE', 'HIGH'] },
+    feedback_summary: { type: 'string' },
+    current_evidence: { type: 'string' },
+    alignment_gap: { type: 'string' },
+    authenticity_opportunity: { type: 'string' },
+    suggested_revision: { type: 'string' },
+    why_stronger_evidence: { type: 'string' },
+    remaining_limitation: { type: 'string' },
+    suggested_components: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['situation', 'performance', 'evidence', 'reasoning', 'criteria'],
+      properties: {
+        situation: { type: 'string' },
+        performance: { type: 'string' },
+        evidence: { type: 'string' },
+        reasoning: { type: 'string' },
+        criteria: { type: 'string' }
+      }
+    },
+    share_title: { type: 'string' },
+    share_summary: { type: 'string' }
+  }
+};
+
 const S4_DRAFT_SCHEMA = {
   type: 'object',
   additionalProperties: false,
@@ -277,6 +332,22 @@ function getAnalysisContract_(incoming) {
       schema: S3_REVIEW_SCHEMA
     };
   }
+  if (analysisType === 's3_evidence_analysis') {
+    return {
+      analysisType,
+      schemaName: 'promptcraft_s3_evidence_analysis',
+      schemaVersion: 'promptcraft_s3_evidence_analysis_v1',
+      schema: S3_EVIDENCE_ANALYSIS_SCHEMA
+    };
+  }
+  if (analysisType === 's3_transfer_assessment') {
+    return {
+      analysisType,
+      schemaName: 'promptcraft_s3_transfer_assessment',
+      schemaVersion: 'promptcraft_s3_transfer_assessment_v1',
+      schema: S3_TRANSFER_ASSESSMENT_SCHEMA
+    };
+  }
   if (analysisType === 's4_draft') {
     return {
       analysisType,
@@ -357,7 +428,7 @@ exports.handler = async (event = {}) => {
       supported_contracts: [
         'scenario1',
         's2_draft', 's2_review',
-        's3_draft', 's3_review',
+        's3_draft', 's3_review', 's3_evidence_analysis', 's3_transfer_assessment',
         's4_draft', 's4_review',
         's5_brief', 's5_review'
       ],

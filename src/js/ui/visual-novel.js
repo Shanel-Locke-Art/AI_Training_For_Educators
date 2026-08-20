@@ -7,7 +7,9 @@ function pcRegisterVNCharacter(id, config = {}) {
     id: key,
     label: config.label || key,
     expressions: config.expressions || {},
-    legacyExpressions: config.legacyExpressions || {}
+    legacyExpressions: config.legacyExpressions || {},
+    slotBottomOffsetVar: config.slotBottomOffsetVar || '',
+    portraitOffsetVar: config.portraitOffsetVar || ''
   });
   return true;
 }
@@ -41,6 +43,13 @@ pcRegisterVNCharacter('jordan', {
   label: 'Jordan',
   expressions: () => ASSETS.images.students.jordan,
   legacyExpressions: () => LEGACY_ASSETS.images.students.jordan
+});
+pcRegisterVNCharacter('maya', {
+  label: 'Maya',
+  expressions: () => ASSETS.images.students.maya,
+  legacyExpressions: () => LEGACY_ASSETS.images.students.maya,
+  slotBottomOffsetVar: '--pc-character-maya-vn-bottom-offset',
+  portraitOffsetVar: '--pc-character-maya-portrait-offset'
 });
 
 const PC_VN_CAST_SLOTS = Object.freeze([
@@ -132,6 +141,20 @@ function pcSetVNSlotCharacter(
   slot.container.dataset.pcCharacter = character.id;
   slot.container.dataset.pcCastSide = resolvedSide;
   slot.portrait.dataset.pcCharacter = character.id;
+  if (character.slotBottomOffsetVar) {
+    slot.container.style.setProperty(
+      'bottom',
+      `calc(var(--pc-vn-character-bottom) + var(${character.slotBottomOffsetVar}, 0px))`,
+      'important'
+    );
+  }
+  if (character.portraitOffsetVar) {
+    slot.portrait.style.setProperty(
+      'transform',
+      `translateY(var(${character.portraitOffsetVar}, 0px))`,
+      'important'
+    );
+  }
   slot.container.classList.add('visible');
   slot.container.classList.toggle('is-active', Boolean(active));
   slot.container.classList.toggle('is-inactive', !active);
@@ -259,6 +282,22 @@ pcRegisterUIActions({
   'vn-skip': () => vnSkipType()
 });
 
+function pcVNHasActiveHandoff() {
+  const overlay = document.getElementById('vnOverlay');
+  return Boolean(
+    overlay &&
+    overlay.classList.contains('active') &&
+    (
+      overlay.classList.contains('babbage-terminal-consult') ||
+      overlay.classList.contains('babbage-terminal-textmode') ||
+      overlay.classList.contains('babbage-prediction') ||
+      overlay.classList.contains('pc-clean-prediction') ||
+      overlay.classList.contains('pc-prediction-question') ||
+      overlay.classList.contains('pc-clean-output')
+    )
+  );
+}
+
 function vnAdvance() {
   const overlay = document.getElementById('vnOverlay');
   const dialogue = document.getElementById('vnDialogue');
@@ -324,6 +363,11 @@ function vnAdvance() {
     cb();
   }
   vnTyping = false;
+
+  // A completion callback may hand the VN directly to another shared overlay
+  // state, most notably the Babbage analyzing workstation. Do not let the old
+  // empty VN queue schedule a close over the newly opened state.
+  if (vnQueue.length === 0 && pcVNHasActiveHandoff()) return;
   vnPlayNext();
 }
 
@@ -347,8 +391,12 @@ function getScenarioIndexFromDialogueKey(key) {
 }
 
 function playPixelSequence(key, onDone) {
-  const lines = pixelDialogue[key];
-  if (!lines) return;
+  const lines = window.pixelDialogue?.[key];
+  if (!Array.isArray(lines) || !lines.length) {
+    console.warn(`[PromptCraft] Dialogue sequence "${key}" is missing; continuing without VN dialogue.`);
+    if (typeof onDone === 'function') onDone();
+    return false;
+  }
 
   let introCharacters = null;
 
@@ -382,4 +430,5 @@ function playPixelSequence(key, onDone) {
       id: line.id || ''
     });
   });
+  return true;
 }

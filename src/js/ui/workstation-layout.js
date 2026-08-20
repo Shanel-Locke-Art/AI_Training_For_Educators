@@ -459,12 +459,19 @@ window.pcClearPredictionLayoutInlineStyles = pcClearPredictionLayoutInlineStyles
 // large workstation with a small floating terminal panel. Keep this helper in
 // JavaScript because prediction is rebuilt dynamically and later passes can
 // otherwise win the cascade with stale inline values.
-const PC_WIDE_PREDICTION_SCREEN_GEOMETRY = {
-  left: '21.7%',
-  top: '12.7%',
-  width: '39.0%',
-  height: '44.1%'
-};
+// v461: One measured monitor-glass rectangle for every photographed Babbage
+// workstation state. The app-background source artwork places the usable CRT
+// glass at x=22.2%..62.5%. Keeping prediction, live analysis, and completed
+// analysis on this single geometry prevents the green layer from drifting onto
+// the bezel when responsive workstation frames scale or crop differently.
+const PC_WORKSTATION_MONITOR_GLASS_GEOMETRY = Object.freeze({
+  left: '22.2%',
+  top: '12.85%',
+  width: '40.3%',
+  height: '45.45%'
+});
+
+const PC_WIDE_PREDICTION_SCREEN_GEOMETRY = PC_WORKSTATION_MONITOR_GLASS_GEOMETRY;
 
 // [WORKSTATION FRAME: DESKTOP PREDICTION + LIVE ANALYSIS]
 function pcApplyWidePredictionComputerFrame(terminal, photo, screen, viewportHeight) {
@@ -544,5 +551,3 @@ window.pcApplyWidePredictionComputer = () => {
   const viewportHeight = pcViewportHeight();
   return pcApplyWidePredictionComputerFrame(terminal, photo, screen, viewportHeight);
 };
-
-

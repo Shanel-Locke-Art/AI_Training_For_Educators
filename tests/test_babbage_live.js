@@ -10,6 +10,7 @@ const contractCases = [
   ['s2_review', 'Review a repaired metacognition reflection activity.'],
   ['s3_draft', 'Create a short authentic assessment with one deliberate weakness.'],
   ['s3_review', 'Review a repaired authentic assessment.'],
+  ['s3_evidence_analysis', 'Analyze a student performance and make an evidence-sufficiency inference with the required transfer overreach.'],
   ['s4_draft', 'Create synchronous and asynchronous participation paths with one deliberate weakness.'],
   ['s4_review', 'Review a repaired equivalent-participation plan.'],
   ['s5_brief', 'Create a four-claim closed-evidence brief.'],
@@ -30,7 +31,7 @@ async function main() {
   assert.equal(health.status, 'ok');
   assert.equal(health.service, 'PromptCraft Babbage proxy');
   assert.equal(health.provider, 'openai');
-  assert.equal(health.proxy_version, 'V369');
+  assert.equal(health.proxy_version, 'V370');
   assert.equal(health.configured, true, 'OPENAI_API_KEY is not available to the deployed function.');
   assert.ok(Array.isArray(health.supported_contracts));
   console.log(`Health OK: ${health.proxy_version} / ${health.model}`);

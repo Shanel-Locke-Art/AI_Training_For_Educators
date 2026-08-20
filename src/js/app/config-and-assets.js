@@ -117,12 +117,19 @@ const ASSETS = Object.freeze({
         frustrated: pcProjectUrl('assets/images/characters/students/jordan/frustrated.png'),
         thinking: pcProjectUrl('assets/images/characters/students/jordan/thinking.png'),
         confident: pcProjectUrl('assets/images/characters/students/jordan/confident.png')
+      }),
+      maya: Object.freeze({
+        neutral: pcProjectUrl('assets/images/characters/students/maya/neutral.png'),
+        thinking: pcProjectUrl('assets/images/characters/students/maya/thinking.png'),
+        uncertain: pcProjectUrl('assets/images/characters/students/maya/uncertain.png'),
+        frustrated: pcProjectUrl('assets/images/characters/students/maya/frustrated.png'),
+        confident: pcProjectUrl('assets/images/characters/students/maya/confident.png')
       })
     }),
     scenes: Object.freeze({
       0: pcProjectUrl('assets/images/scenes/scenario-01-engagement/scene.png'),
       1: pcProjectUrl('assets/images/scenes/scenario-02-metacognition/scene.png'),
-      2: pcProjectUrl('assets/images/scenes/scenario-03-authentic-assessment/scene.png'),
+      2: pcProjectUrl('assets/images/backgrounds/classroom.png'),
       3: pcProjectUrl('assets/images/scenes/scenario-04-sync-bias/scene.png'),
       4: pcProjectUrl('assets/images/scenes/scenario-05-hallucination-hunt/scene.png'),
       5: pcProjectUrl('assets/images/scenes/scenario-06-predict-output/scene.png'),
@@ -134,12 +141,6 @@ const ASSETS = Object.freeze({
       background: pcProjectUrl('assets/audio/music/background.mp3')
     }),
     professorPixel: Object.freeze({
-      welcome: pcProjectUrl('assets/audio/voice/professor-pixel/system/welcome.mp3'),
-      vague: pcProjectUrl('assets/audio/voice/professor-pixel/feedback/vague.mp3'),
-      decent: pcProjectUrl('assets/audio/voice/professor-pixel/feedback/decent.mp3'),
-      strong: pcProjectUrl('assets/audio/voice/professor-pixel/feedback/strong.mp3'),
-      scenarioComplete: pcProjectUrl('assets/audio/voice/professor-pixel/completion/scenario-complete.mp3'),
-      allComplete: pcProjectUrl('assets/audio/voice/professor-pixel/completion/all-complete.mp3'),
       scenarioIntro0: pcProjectUrl('assets/audio/voice/professor-pixel/scenario-01/intro.mp3'),
       reflectionOpen: pcProjectUrl('assets/audio/voice/professor-pixel/reflection/open.mp3')
     })
@@ -174,12 +175,19 @@ const LEGACY_ASSETS = Object.freeze({
         frustrated: 'images/characters/students/jordan/frustrated.png',
         thinking: 'images/characters/students/jordan/thinking.png',
         confident: 'images/characters/students/jordan/confident.png'
+      }),
+      maya: Object.freeze({
+        neutral: 'images/characters/students/maya/neutral.png',
+        thinking: 'images/characters/students/maya/thinking.png',
+        uncertain: 'images/characters/students/maya/uncertain.png',
+        frustrated: 'images/characters/students/maya/frustrated.png',
+        confident: 'images/characters/students/maya/confident.png'
       })
     }),
     scenes: Object.freeze({
       0: 'images/scene-s1.png',
       1: 'images/scene-s2.png',
-      2: 'images/scene-s3.png',
+      2: 'images/classroom-bg.png',
       3: 'images/scene-s4.png',
       4: 'images/scene-s5.png',
       5: 'images/scene-s6.png',

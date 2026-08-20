@@ -1217,3 +1217,40 @@ html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
     font-size: .66rem !important;
   }
 }
+
+
+/* ══════════════════════════════════════════════════════
+   V448 — TEACHING PROGRESS HEADING ALIGNMENT
+   Center and strengthen the Teaching Progress hierarchy without changing
+   progression logic or the expanded-panel behavior.
+   ══════════════════════════════════════════════════════ */
+html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+  text-align: center !important;
+}
+html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+  display: block !important;
+  width: 100% !important;
+  justify-self: stretch !important;
+  text-align: center !important;
+  font-size: .82rem !important;
+  line-height: 1.05 !important;
+  letter-spacing: .065em !important;
+}
+html body .pc-app-header .pc-progress-menu .level-tag {
+  display: block !important;
+  width: 100% !important;
+  position: relative !important;
+  top: 5px !important;
+  text-align: center !important;
+  font-size: 1.30rem !important;
+  line-height: 1.06 !important;
+}
+@media screen and (max-width: 640px) {
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+    font-size: .74rem !important;
+  }
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    top: 4px !important;
+    font-size: 1.08rem !important;
+  }
+}

@@ -456,7 +456,7 @@ function updatePixelWelcomeForName() {
   if (playerName !== 'You') {
     // Personalise the welcome dialogue
     pixelDialogue.welcome[0].text =
-      `Welcome to the Prompt Lab, ${playerName}! I am Professor Pixel, your AI coaching companion.`;
+      `Welcome to the Prompt Lab, ${playerName}! I'm Professor Pixel. I'll guide you through each teaching challenge.`;
   }
 }
 

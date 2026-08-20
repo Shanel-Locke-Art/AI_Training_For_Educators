@@ -185,8 +185,9 @@ def main() -> int:
     if "innerHTML = narrative.replace" in workbench_source:
         errors.append("AI growth narratives must be escaped before rendering.")
 
-    # Pre-S3 architecture guards: retired browser implementations and provider-specific
-    # UI terminology must not creep back into the shared runtime. The two legacy
+    # Architecture guards: retired S4-S5 browser prototypes and provider-specific
+    # UI terminology must not creep back into the shared runtime. S3 is now an intentional
+    # shared-architecture implementation rather than a dormant prototype. The two legacy
     # `claude_response` keys are an intentional V121 research-schema compatibility contract.
     legacy_provider_lines = [
         line.strip()
@@ -208,10 +209,10 @@ def main() -> int:
     if re.search(r"claude", index_text + "\n" + css_source_text, flags=re.IGNORECASE):
         errors.append("Provider-specific Claude terminology remains in browser markup or CSS.")
 
-    if re.search(r"\b(?:render|open|start)S[345]", workbench_source):
-        errors.append("Dormant S3-S5 browser prototype implementation code has returned.")
-    if re.search(r"(?<![\w-])\.pc-s[345]-", css_source_text):
-        errors.append("Dormant S3-S5 browser prototype selectors have returned.")
+    if re.search(r"\b(?:render|open|start)S[45]", workbench_source):
+        errors.append("Dormant S4-S5 browser prototype implementation code has returned.")
+    if re.search(r"(?<![\w-])\.pc-s[45]-", css_source_text):
+        errors.append("Dormant S4-S5 browser prototype selectors have returned.")
     if "netlify/functions/claude.js" in workbench_source or (ROOT / "netlify/functions/claude.js").exists():
         errors.append("The retired Claude Netlify endpoint must not be restored.")
     if re.search(r"pc-live-analysis-\$\{mode\}-v\d+", workbench_source):

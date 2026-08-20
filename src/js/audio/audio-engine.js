@@ -4,18 +4,12 @@
 // ══════════════════════════════════════════════════════
 const audioReady = typeof Howl !== 'undefined';
 const sounds = audioReady ? {
-  welcome:           new Howl({ src: [ASSETS.audio.professorPixel.welcome],          volume: 0.9 }),
-  vague:             new Howl({ src: [ASSETS.audio.professorPixel.vague],            volume: 0.9 }),
-  decent:            new Howl({ src: [ASSETS.audio.professorPixel.decent],           volume: 0.9 }),
-  strong:            new Howl({ src: [ASSETS.audio.professorPixel.strong],           volume: 0.9 }),
-  scenarioComplete:  new Howl({ src: [ASSETS.audio.professorPixel.scenarioComplete], volume: 0.9 }),
-  allComplete:       new Howl({ src: [ASSETS.audio.professorPixel.allComplete],      volume: 0.9 }),
   scenarioIntro0:    new Howl({ src: [ASSETS.audio.professorPixel.scenarioIntro0],   volume: 0.9 }),
   reflectionOpen:    new Howl({ src: [ASSETS.audio.professorPixel.reflectionOpen],   volume: 0.9 })
 } : {};
 
 // Narration sounds should not overlap one another.
-const NARRATION_KEYS = new Set(['welcome','vague','decent','strong','scenarioComplete','allComplete','scenarioIntro0','reflectionOpen']);
+const NARRATION_KEYS = new Set(['scenarioIntro0','reflectionOpen']);
 let _currentNarration = null;
 
 function playSound(name) {

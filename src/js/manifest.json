@@ -8,6 +8,7 @@
     "scenarios/shared-components.js",
     "scenarios/registry.js",
     "scenarios/s2-metacognition.js",
+    "scenarios/s3-authentic-assessment.js",
     "ui/workstation-layout.js",
     "ui/completed-analysis-layout.js",
     "ui/live-analysis-layout.js",

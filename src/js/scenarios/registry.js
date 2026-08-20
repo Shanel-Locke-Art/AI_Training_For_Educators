@@ -27,7 +27,7 @@ The revised prompt itself must also be evaluated. Identify its strongest improve
 Be specific enough that materially different faculty input produces materially different feedback. Avoid generic praise and stock advice.`
   },
   { desc: "Mission: Listen to Jordan and diagnose what is missing from his learning process.", oscqr: [], system: "" },
-  { desc: "Mission: Convert a recall-heavy assessment into authentic practice, audit Babbage\'s redesign, and make the evidence of learning defensible.", oscqr: [], system: "" },
+  { desc: "Mission: Investigate what Maya’s 96% actually proves, build an assessment from evidence, stress-test it against her performance, audit Babbage, and repair the inference gap.", oscqr: [], system: "" },
   { desc: "Mission: Separate the learning value of live interaction from the assumption that everyone must be present at the same time.", oscqr: [], system: "" },
   { desc: "Mission: Verify a polished AI research brief against a controlled evidence packet before deciding what is safe to use.", oscqr: [], system: "" },
   { desc: "Scenario 6 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
@@ -80,16 +80,18 @@ const SCENARIO_UI = [
     key: 'assessment',
     dataLabel: 'S3: Authentic Assessment',
     tabLabel: 'S3: Assessment',
-    missionTitle: 'Authentic Assessment is being rebuilt.',
-    missionCopy: 'This scenario is intentionally unavailable while its gameplay and instructional design are rebuilt from the ground up.',
-    boardText: 'Scenario 3 is in development.',
-    rendererKey: 'development-shell',
-    workspaceMode: 'development',
-    introLayout: 'none',
-    introCast: 'single',
-    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Locked · In development',
-    plannedLoop: ['Diagnose', 'Design', 'Test', 'Revise']
+    missionTitle: 'The 96% Problem',
+    missionCopy: 'Maya earned an excellent score, but the assessment mostly asked her to reproduce information. Sort the evidence, build a stronger assessment, stress-test what it proves, audit Babbage, repair the inference gap, then apply the framework to one of your own assessments.',
+    boardText: 'A high score can be accurate while the learning claim attached to it is too large.',
+    rendererKey: 'assessment-opening',
+    workspaceMode: 'activity',
+    introLayout: 'standard',
+    introCast: 'dual',
+    introCharacters: [{ id: 'pixel', slot: 'right' }, { id: 'maya', slot: 'left' }],
+    afterIntroAction: 's3-diagnosis',
+    inputMode: 'scenario-3', inputVisible: true, supportsPrompt: false,
+    implemented: true, developmentStatus: 'Playable',
+    plannedLoop: ['Sort evidence', 'Build assessment', 'Stress-test evidence', 'Audit Babbage', 'Repair the inference', 'Apply to your teaching']
   },
   {
     key: 'sync-bias',
@@ -184,11 +186,13 @@ function pcUnlockScenarioTab(index) {
 const PC_SCENARIO_RENDERERS = Object.freeze({
   'guided-builder': ({ container }) => renderGuidedBuilder(container),
   'metacognition-opening': ({ container }) => renderS2Standby(container),
+  'assessment-opening': ({ container }) => renderS3Standby(container),
   'development-shell': ({ index }) => renderScenarioPlaceholder(index)
 });
 
 const PC_SCENARIO_AFTER_INTRO_ACTIONS = Object.freeze({
-  's2-diagnosis': () => renderS2DiagnosisActivity()
+  's2-diagnosis': () => renderS2DiagnosisActivity(),
+  's3-diagnosis': () => renderS3DiagnosisActivity()
 });
 
 function pcRenderScenarioWorkspace(index, container) {

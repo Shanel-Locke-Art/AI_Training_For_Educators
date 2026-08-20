@@ -101,6 +101,7 @@ function pcClearVNStateForScenarioSwitch() {
   window.scenarioIntroTimer = null;
   try { stopAutomaticNarration(); } catch (e) {}
   try { pcStopS2JordanInterventionVoice(); } catch (e) {}
+  try { window.pcAbortScenarioBabbageRequests?.(); } catch (e) {}
   try { pcStopBabbageAnalysisProgress(); } catch (e) {}
   try { pcClearLiveAnalyzingLayout(); } catch (e) {}
   try { pcClearAnalysisLayout(); } catch (e) {}

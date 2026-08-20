@@ -700,7 +700,7 @@ let pcBabbageAnalysisProgressStartedAt = 0;
 
 /*
   V360 progress model:
-  Anthropic's non-streaming Messages API does not expose a true percentage
+  The current non-streaming model request does not expose a true percentage
   complete. PromptCraft therefore reports real lifecycle stages and uses a
   conservative elapsed-time estimate only while the network request is
   outstanding. It never reaches 100% until an actual response has arrived and

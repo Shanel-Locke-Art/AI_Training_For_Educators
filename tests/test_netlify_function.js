@@ -12,8 +12,10 @@ async function run() {
     assert.equal(health.statusCode, 200);
     const healthBody = JSON.parse(health.body);
     assert.equal(healthBody.provider, 'openai');
-    assert.equal(healthBody.proxy_version, 'V369');
+    assert.equal(healthBody.proxy_version, 'V370');
     assert.ok(healthBody.supported_contracts.includes('s5_review'));
+    assert.ok(healthBody.supported_contracts.includes('s3_evidence_analysis'));
+    assert.ok(healthBody.supported_contracts.includes('s3_transfer_assessment'));
 
     const fixtures = {
       promptcraft_s1_babbage_analysis: {
@@ -46,6 +48,26 @@ async function run() {
         what_improved:['Audience affects decision'], remaining_issue:'Criteria',
         final_assessment:'Final task', alignment_rationale:'Alignment',
         student_evidence_of_learning:'Observable evidence'
+      },
+      promptcraft_s3_evidence_analysis: {
+        claim_about_learning:'Maya can transfer this skill independently to new planning problems.',
+        confidence:'HIGH',
+        evidence_used:['Decision','Evidence','Reasoning'],
+        judgment:'SUFFICIENT',
+        recommendation:'Move to an independent brief.',
+        deliberate_issue:'ignores_transfer',
+        why_this_inference_is_plausible:'The performance is strong, but transfer is not yet established.'
+      },
+      promptcraft_s3_transfer_assessment: {
+        status:'REDESIGN OPPORTUNITY', confidence:'HIGH', feedback_summary:'Summary',
+        current_evidence:'Current evidence', alignment_gap:'Alignment gap',
+        authenticity_opportunity:'Authenticity opportunity', suggested_revision:'Revised assessment',
+        why_stronger_evidence:'Stronger evidence', remaining_limitation:'One task is limited',
+        suggested_components:{
+          situation:'Realistic situation', performance:'Make a decision', evidence:'Decision brief',
+          reasoning:'Explain evidence and trade-offs', criteria:'Judge alignment and reasoning'
+        },
+        share_title:'Assessment redesign', share_summary:'A generalized assessment redesign summary suitable for moderation.'
       },
       promptcraft_s4_babbage_draft: {
         plan_title:'Choose a path', essential_learning_function:'Peer exchange',
@@ -99,6 +121,8 @@ async function run() {
       ['s2_review', 'promptcraft_s2_babbage_review', 'promptcraft_s2_babbage_review_v1'],
       ['s3_draft', 'promptcraft_s3_babbage_draft', 'promptcraft_s3_babbage_draft_v1'],
       ['s3_review', 'promptcraft_s3_babbage_review', 'promptcraft_s3_babbage_review_v1'],
+      ['s3_evidence_analysis', 'promptcraft_s3_evidence_analysis', 'promptcraft_s3_evidence_analysis_v1'],
+      ['s3_transfer_assessment', 'promptcraft_s3_transfer_assessment', 'promptcraft_s3_transfer_assessment_v1'],
       ['s4_draft', 'promptcraft_s4_babbage_draft', 'promptcraft_s4_babbage_draft_v1'],
       ['s4_review', 'promptcraft_s4_babbage_review', 'promptcraft_s4_babbage_review_v1'],
       ['s5_brief', 'promptcraft_s5_babbage_brief', 'promptcraft_s5_babbage_brief_v1'],
@@ -119,13 +143,13 @@ async function run() {
       assert.equal(result.statusCode, 200);
       const body = JSON.parse(result.body);
       assert.equal(body.analysis_schema, expectedSchema);
-      assert.equal(body.proxy_version, 'V369');
+      assert.equal(body.proxy_version, 'V370');
       assert.equal(lastPayload.text.format.name, expectedName);
       assert.equal(lastPayload.text.format.strict, true);
       assert.equal(lastPayload.model, 'gpt-5.6-terra');
     }
 
-    console.log('PromptCraft Babbage S1-S5 structured proxy tests passed.');
+    console.log('PromptCraft Babbage structured proxy tests passed, including the S3 evidence-analysis and Transfer Lab contracts.');
   } finally {
     if (originalKey === undefined) delete process.env.OPENAI_API_KEY;
     else process.env.OPENAI_API_KEY = originalKey;

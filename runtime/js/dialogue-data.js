@@ -1,86 +1,27 @@
 /* ══════════════════════════════════════════════════════
    PromptCraft active dialogue data
-   Active runtime dialogue for shared systems, Scenario 1, and the Scenario 2 opening.
+   Active runtime dialogue for shared systems and the playable Scenario 1–3 experiences.
    ══════════════════════════════════════════════════════ */
 
 window.pixelDialogue = {
   "welcome": [
     {
       "expr": "excited",
-      "text": "Welcome to the Prompt Lab! I am Professor Pixel, your AI coaching companion.",
+      "text": "Welcome to the Prompt Lab! I'm Professor Pixel. I'll guide you through each teaching challenge.",
       "id": "p1"
     },
     {
       "expr": "encouraging",
-      "text": "Read the challenge on the smartboard, then write your prompt in the box below.",
+      "text": "You'll diagnose what is happening, make a decision, and test what changes.",
       "id": "p2"
     },
     {
       "expr": "neutral",
-      "text": "The more specific and contextual your prompt, the more useful the AI will be. Let us get started!",
+      "text": "Babbage can analyze the information you provide, but the final judgment stays with you.",
       "id": "p3"
     }
   ],
-  "vague": [
-    {
-      "expr": "thinking",
-      "text": "Hmm. The AI did its best, but that prompt could have been written by anyone, for anyone.",
-      "id": "p4"
-    },
-    {
-      "expr": "skeptical",
-      "text": "Try telling it who your students actually are and what you specifically need from them.",
-      "id": "p5"
-    }
-  ],
-  "decent": [
-    {
-      "expr": "encouraging",
-      "text": "Getting warmer! You gave the AI something real to work with.",
-      "id": "p6"
-    },
-    {
-      "expr": "neutral",
-      "text": "Now push a little further — what constraints or context would make this even more useful in your actual classroom?",
-      "id": "p7"
-    }
-  ],
-  "strong": [
-    {
-      "expr": "excited",
-      "text": "Now that is what I am talking about!",
-      "id": "p8"
-    },
-    {
-      "expr": "proud",
-      "text": "Did you notice how much more specific and useful that response was? That is what happens when you treat AI like a capable colleague.",
-      "id": "p9"
-    }
-  ],
-  "scenarioComplete": [
-    {
-      "expr": "encouraging",
-      "text": "Nice work finishing that one. Each scenario builds on the last.",
-      "id": "p10"
-    },
-    {
-      "expr": "neutral",
-      "text": "Your prompting instincts are already getting sharper.",
-      "id": "p11"
-    }
-  ],
-  "allComplete": [
-    {
-      "expr": "excited",
-      "text": "You made it through all eight scenarios!",
-      "id": "p12"
-    },
-    {
-      "expr": "proud",
-      "text": "Head into the Reflection Room when you are ready — I would love to know what surprised you.",
-      "id": "p13"
-    }
-  ],
+  // The old vague/decent/strong prompt-quality loop was retired before S3.
   "scenarioStart_engagement": [
     {
       "expr": "neutral",
@@ -106,6 +47,58 @@ window.pixelDialogue = {
     { "speaker": "Jordan", "character": "jordan", "expr": "frustrated", "text": "Next time I'll probably reread everything again and hope it works.", "id": "jordan-s2-03" },
     { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "His performance improved. His strategy might have worked. But listen carefully to what Jordan actually knows about his learning.", "id": "p88" },
     { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Let's figure out what's missing.", "id": "p89" }
+  ],
+  "scenarioStart_assessment": [
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "Maya brought us a strange case: a 96 percent.", "id": "p-s3-01" },
+    { "speaker": "Maya", "character": "maya", "expr": "neutral", "text": "I should feel pretty good about that. I knew almost every answer.", "id": "maya-s3-01" },
+    { "speaker": "Maya", "character": "maya", "expr": "uncertain", "text": "But if someone handed me a real planning problem tomorrow, I wouldn't know where to start.", "id": "maya-s3-02" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "That's why the grade caught my attention. The score may be accurate, but the claim attached to it may be too large.", "id": "p-s3-02" },
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "The test was mostly definitions, the planning cycle, and explaining terms.", "id": "maya-s3-03" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "The outcome says you should analyze a rural planning problem, recommend a response, and justify the trade-offs.", "id": "p-s3-03" },
+    { "speaker": "Maya", "character": "maya", "expr": "frustrated", "text": "I never actually had to do that on the test.", "id": "maya-s3-04" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Then let's stop staring at the number and map the evidence.", "id": "p-s3-04" }
+  ],
+  "s3_after_diagnosis": [
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "That explains why the test was easy to study for. I knew what to memorize.", "id": "maya-s3-05" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "And the assessment wasn't useless. It measured knowledge and explanation. It just didn't measure the whole outcome.", "id": "p-s3-05" },
+    { "speaker": "Maya", "character": "maya", "expr": "uncertain", "text": "So the 96 percent is real. It just doesn't prove I can make the decision.", "id": "maya-s3-06" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Exactly. Now build a task that gives you evidence of the decision.", "id": "p-s3-06" }
+  ],
+  "s3_blueprint_strong": [
+    { "speaker": "Maya", "character": "maya", "expr": "confident", "text": "Okay, that feels different. I couldn't memorize my way through a county brief with real constraints.", "id": "maya-s3-07a" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "Good. But a realistic task can still hide weak evidence.", "id": "p-s3-07a" },
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "So we test what the task actually lets the instructor see.", "id": "maya-s3-08a" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "Exactly. Stress-test it.", "id": "p-s3-08a" }
+  ],
+  "s3_blueprint_mixed": [
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "Some of this feels much closer to a real decision, but I can still see places where I could complete the task without showing why.", "id": "maya-s3-07b" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "That's the right suspicion. Authentic-looking is not the same as evidence-rich.", "id": "p-s3-07b" },
+    { "speaker": "Maya", "character": "maya", "expr": "neutral", "text": "Then let's see which parts of my work really prove the outcome.", "id": "maya-s3-08b" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Stress-test it.", "id": "p-s3-08b" }
+  ],
+  "s3_blueprint_weak": [
+    { "speaker": "Maya", "character": "maya", "expr": "uncertain", "text": "I think I could still study the format more than the decision.", "id": "maya-s3-07c" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "skeptical", "text": "Then we may have changed the scenery more than the assessment.", "id": "p-s3-07c" },
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "So the student evidence should expose that pretty quickly.", "id": "maya-s3-08c" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Exactly. Let's test it.", "id": "p-s3-08c" }
+  ],
+  "s3_after_stress_test": [
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "The polished memo is the part I'd probably worry about most, but it barely tells you whether my recommendation makes sense.", "id": "maya-s3-09" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "Right. Authentic assessment is not 'make a fancy product.' The product has to expose the performance you care about.", "id": "p-s3-09" },
+    { "speaker": "Maya", "character": "maya", "expr": "confident", "text": "The evidence, trade-offs, and changed constraint are what make the decision visible.", "id": "maya-s3-10" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Now let's give the same evidence to Babbage and see what it claims.", "id": "p-s3-10" }
+  ],
+  "s3_after_babbage_audit": [
+    { "speaker": "Maya", "character": "maya", "expr": "uncertain", "text": "So doing well once doesn't prove I can handle every new version of the problem.", "id": "maya-s3-11" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "Right. Evidence supports claims at the level it actually reaches.", "id": "p-s3-11" },
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "Then if we want to claim transfer, the assessment needs to make adaptation visible.", "id": "maya-s3-12" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Exactly. Don't rebuild the whole thing. Repair that one inference gap.", "id": "p-s3-12" }
+  ],
+  "s3_final_exchange": [
+    { "speaker": "Maya", "character": "maya", "expr": "confident", "text": "That changed-constraint piece is the first part that makes me feel like I'd know what to do when the situation stops matching the example.", "id": "maya-s3-13" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "And now the assessment can show why, not just whether, you got the answer.", "id": "p-s3-13" },
+    { "speaker": "Maya", "character": "maya", "expr": "neutral", "text": "The grade still matters. It just means more when I know what evidence is underneath it.", "id": "maya-s3-14" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "That's the point. A score is a summary. The evidence is the argument.", "id": "p-s3-14" }
   ],
   "s2_diagnosis_correct": [
     { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "That's the hidden problem. Jordan has an outcome and a strategy, but no evidence connecting the two. He cannot judge what helped or use that judgment to make his next decision.", "id": "p90" }
@@ -166,7 +159,7 @@ window.pixelDialogue = {
     },
     {
       "expr": "encouraging",
-      "text": "Add the missing design information and try again. You are close to having a brief Babbage can actually reason from.",
+      "text": "Add the missing design information and try again. You are close to having a brief Babbage can analyze without filling in the gaps.",
       "id": "s1-score-2-c"
     }
   ],
@@ -178,7 +171,7 @@ window.pixelDialogue = {
     },
     {
       "expr": "thinking",
-      "text": "The draft may work, but some of its quality still depends on Babbage making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify.",
+      "text": "The draft may work, but some of its quality still depends on Babbage filling in gaps for you. A stronger design brief reduces those assumptions and makes your instructional intent easier to verify.",
       "id": "s1-score-3-b"
     },
     {
@@ -230,21 +223,11 @@ window.predictionReactions = {
   "not_sure": "That is a useful answer too. Predicting before you look helps you notice what Babbage changes, misses, or invents instead of just accepting the shiny paragraph."
 };
 
-// Exact-text fallback map for active S1/shared recordings.
+// Exact-text fallback map for current recordable dialogue.
 window.pixelAudioByText = {
-  "Welcome to the Prompt Lab! I am Professor Pixel, your AI coaching companion.": "p1",
-  "Read the challenge on the smartboard, then write your prompt in the box below.": "p2",
-  "The more specific and contextual your prompt, the more useful the AI will be. Let us get started!": "p3",
-  "Hmm. The AI did its best, but that prompt could have been written by anyone, for anyone.": "p4",
-  "Try telling it who your students actually are and what you specifically need from them.": "p5",
-  "Getting warmer! You gave the AI something real to work with.": "p6",
-  "Now push a little further — what constraints or context would make this even more useful in your actual classroom?": "p7",
-  "Now that is what I am talking about!": "p8",
-  "Did you notice how much more specific and useful that response was? That is what happens when you treat AI like a capable colleague.": "p9",
-  "Nice work finishing that one. Each scenario builds on the last.": "p10",
-  "Your prompting instincts are already getting sharper.": "p11",
-  "You made it through all eight scenarios!": "p12",
-  "Head into the Reflection Room when you are ready — I would love to know what surprised you.": "p13",
+  "Welcome to the Prompt Lab! I'm Professor Pixel. I'll guide you through each teaching challenge.": "p1",
+  "You'll diagnose what is happening, make a decision, and test what changes.": "p2",
+  "Babbage can analyze the information you provide, but the final judgment stays with you.": "p3",
   "A faculty member brought me this discussion prompt. Nothing is technically wrong with it.": "p14",
   "Students are posting. Students are replying. The assignment is being completed.": "p15",
   "But the conversation dies after a single exchange. Let's figure out why.": "p16",
@@ -256,9 +239,9 @@ window.pixelAudioByText = {
   "Strengthen the repair notes before you move on. Make the problem and the interaction you want students to have much more concrete.": "s1-score-1-c",
   "Two out of five. Babbage has enough to see part of your intent, but too much of the redesign is still guesswork.": "s1-score-2-a",
   "The important question is not whether the draft sounds better. It is whether your input gives Babbage enough evidence to make the right instructional change instead of inventing one.": "s1-score-2-b",
-  "Add the missing design information and try again. You are close to having a brief Babbage can actually reason from.": "s1-score-2-c",
+  "Add the missing design information and try again. You are close to having a brief Babbage can analyze without filling in the gaps.": "s1-score-2-c",
   "Three out of five. That is enough structure for Babbage to attempt a defensible repair, but I would not call the design brief complete yet.": "s1-score-3-a",
-  "The draft may work, but some of its quality still depends on Babbage making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify.": "s1-score-3-b",
+  "The draft may work, but some of its quality still depends on Babbage filling in gaps for you. A stronger design brief reduces those assumptions and makes your instructional intent easier to verify.": "s1-score-3-b",
   "You can move forward, or revise once more and see whether a more complete brief produces a more precise repair.": "s1-score-3-c",
   "Four out of five. This is a strong design brief. Babbage had enough context to make a targeted repair instead of simply rewriting the discussion prompt.": "s1-score-4-a",
   "There is still one area that could be clearer, which matters because small gaps are where AI starts making quiet assumptions on your behalf.": "s1-score-4-b",
@@ -270,99 +253,30 @@ window.pixelAudioByText = {
   "That could happen. Babbage can still drift into polite template language if it treats the issue as make this better instead of fix this exact discussion breakdown.": "p48",
   "Good caution. Constraints are where AI often gets mushy. Naming them before the output helps you check whether Babbage actually respected them.": "p49",
   "That is a useful answer too. Predicting before you look helps you notice what Babbage changes, misses, or invents instead of just accepting the shiny paragraph.": "p50",
-  "Welcome to the Prompt Lab, [player name]! I am Professor Pixel, your AI coaching companion.": "p51",
-  "Professor Pixel is thinking.": "p52",
-  "Professor Pixel has thoughts — tap to hear them.": "p53",
-  "Hmm, I lost my train of thought — take a look at the Prompt Analysis panel and try another attempt.": "p54",
   "Let's ask Babbage what it notices.": "p58",
   "Babbage is analyzing the teaching problem now.": "p59",
   "Before we consult Babbage...": "p60",
   "Based on the context you gave, what do you predict Babbage will do?": "p61",
-  "Your prediction is logged.": "p62",
-  "Now we have something useful. Babbage found that the original prompt was not broken because students ignored it. It was broken because students were doing exactly what it asked.": "p63",
-  "That is the design problem: compliance is not the same thing as interaction. A reply requirement can create activity without creating a reason to continue the conversation.": "p64",
-  "Your revision gives students a clearer interaction move, a purpose for replying, and criteria for what a stronger response should include. That is a real repair, not just prettier wording.": "p65",
-  "Your revision is moving in the right direction. Before moving on, strengthen the prompt so students know how to extend, challenge, compare, or build on a peer's idea.": "p66",
-  "Before we test this, connect your prompt back to the dead discussion board. Add: [missing items].": "p67"
+  "Your prediction is logged.": "p62"
 };
 
 window.pixelAudioLabels = {
   "p1": {
     "source": "welcome",
     "expression": "excited",
-    "text": "Welcome to the Prompt Lab! I am Professor Pixel, your AI coaching companion.",
+    "text": "Welcome to the Prompt Lab! I'm Professor Pixel. I'll guide you through each teaching challenge.",
     "notes": ""
   },
   "p2": {
     "source": "welcome",
     "expression": "encouraging",
-    "text": "Read the challenge on the smartboard, then write your prompt in the box below.",
+    "text": "You'll diagnose what is happening, make a decision, and test what changes.",
     "notes": ""
   },
   "p3": {
     "source": "welcome",
     "expression": "neutral",
-    "text": "The more specific and contextual your prompt, the more useful the AI will be. Let us get started!",
-    "notes": ""
-  },
-  "p4": {
-    "source": "vague",
-    "expression": "thinking",
-    "text": "Hmm. The AI did its best, but that prompt could have been written by anyone, for anyone.",
-    "notes": ""
-  },
-  "p5": {
-    "source": "vague",
-    "expression": "skeptical",
-    "text": "Try telling it who your students actually are and what you specifically need from them.",
-    "notes": ""
-  },
-  "p6": {
-    "source": "decent",
-    "expression": "encouraging",
-    "text": "Getting warmer! You gave the AI something real to work with.",
-    "notes": ""
-  },
-  "p7": {
-    "source": "decent",
-    "expression": "neutral",
-    "text": "Now push a little further — what constraints or context would make this even more useful in your actual classroom?",
-    "notes": ""
-  },
-  "p8": {
-    "source": "strong",
-    "expression": "excited",
-    "text": "Now that is what I am talking about!",
-    "notes": ""
-  },
-  "p9": {
-    "source": "strong",
-    "expression": "proud",
-    "text": "Did you notice how much more specific and useful that response was? That is what happens when you treat AI like a capable colleague.",
-    "notes": ""
-  },
-  "p10": {
-    "source": "scenarioComplete",
-    "expression": "encouraging",
-    "text": "Nice work finishing that one. Each scenario builds on the last.",
-    "notes": ""
-  },
-  "p11": {
-    "source": "scenarioComplete",
-    "expression": "neutral",
-    "text": "Your prompting instincts are already getting sharper.",
-    "notes": ""
-  },
-  "p12": {
-    "source": "allComplete",
-    "expression": "excited",
-    "text": "You made it through all eight scenarios!",
-    "notes": ""
-  },
-  "p13": {
-    "source": "allComplete",
-    "expression": "proud",
-    "text": "Head into the Reflection Room when you are ready — I would love to know what surprised you.",
+    "text": "Babbage can analyze the information you provide, but the final judgment stays with you.",
     "notes": ""
   },
   "p14": {
@@ -434,7 +348,7 @@ window.pixelAudioLabels = {
   "s1-score-2-c": {
     "source": "scoreReflection_2",
     "expression": "encouraging",
-    "text": "Add the missing design information and try again. You are close to having a brief Babbage can actually reason from.",
+    "text": "Add the missing design information and try again. You are close to having a brief Babbage can analyze without filling in the gaps.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 2/5 branch."
   },
   "s1-score-3-a": {
@@ -446,7 +360,7 @@ window.pixelAudioLabels = {
   "s1-score-3-b": {
     "source": "scoreReflection_3",
     "expression": "thinking",
-    "text": "The draft may work, but some of its quality still depends on Babbage making assumptions for you. A stronger prompt reduces those assumptions and makes your instructional intent easier to verify.",
+    "text": "The draft may work, but some of its quality still depends on Babbage filling in gaps for you. A stronger design brief reduces those assumptions and makes your instructional intent easier to verify.",
     "notes": "Scenario 1 score-specific post-analysis line. Record exactly as written for the 3/5 branch."
   },
   "s1-score-3-c": {
@@ -515,30 +429,6 @@ window.pixelAudioLabels = {
     "text": "That is a useful answer too. Predicting before you look helps you notice what Babbage changes, misses, or invents instead of just accepting the shiny paragraph.",
     "notes": "Displayed after learner chooses a prediction."
   },
-  "p51": {
-    "source": "name_modal_dynamic_welcome",
-    "expression": "excited",
-    "text": "Welcome to the Prompt Lab, [player name]! I am Professor Pixel, your AI coaching companion.",
-    "notes": "Dynamic variant if the learner enters a name. Consider recording the generic welcome only, unless you remove name personalization."
-  },
-  "p52": {
-    "source": "pixel_status",
-    "expression": "thinking",
-    "text": "Professor Pixel is thinking.",
-    "notes": "Status text. Optional for voiceover."
-  },
-  "p53": {
-    "source": "pixel_reveal_button",
-    "expression": "",
-    "text": "Professor Pixel has thoughts — tap to hear them.",
-    "notes": "Button text. Optional for voiceover."
-  },
-  "p54": {
-    "source": "pixel_dynamic_feedback_fallback",
-    "expression": "thinking",
-    "text": "Hmm, I lost my train of thought — take a look at the Prompt Analysis panel and try another attempt.",
-    "notes": "Fallback if dynamic Pixel feedback fails."
-  },
   "p58": {
     "source": "babbage_analyzing_bridge_1",
     "expression": "",
@@ -568,41 +458,11 @@ window.pixelAudioLabels = {
     "expression": "",
     "text": "Your prediction is logged.",
     "notes": "Shown after learner chooses a prediction."
-  },
-  "p63": {
-    "source": "s1_post_analysis_1",
-    "expression": "encouraging",
-    "text": "Now we have something useful. Babbage found that the original prompt was not broken because students ignored it. It was broken because students were doing exactly what it asked.",
-    "notes": "S1 post-Babbage Pixel reflection."
-  },
-  "p64": {
-    "source": "s1_post_analysis_2",
-    "expression": "thinking",
-    "text": "That is the design problem: compliance is not the same thing as interaction. A reply requirement can create activity without creating a reason to continue the conversation.",
-    "notes": "S1 post-Babbage Pixel reflection."
-  },
-  "p65": {
-    "source": "s1_post_analysis_success",
-    "expression": "proud",
-    "text": "Your revision gives students a clearer interaction move, a purpose for replying, and criteria for what a stronger response should include. That is a real repair, not just prettier wording.",
-    "notes": "Conditional S1 line if score meets threshold."
-  },
-  "p66": {
-    "source": "s1_post_analysis_retry",
-    "expression": "encouraging",
-    "text": "Your revision is moving in the right direction. Before moving on, strengthen the prompt so students know how to extend, challenge, compare, or build on a peer's idea.",
-    "notes": "Conditional S1 line if score is below threshold."
-  },
-  "p67": {
-    "source": "s1_builder_nudge",
-    "expression": "",
-    "text": "Before we test this, connect your prompt back to the dead discussion board. Add: [missing items].",
-    "notes": "Dynamic nudge. The missing items are inserted by the app."
   }
 };
 
 
-// S1 v356 score-specific recordings. Stable IDs match app-workbench.js audioKey values.
+// S1 score-specific recordings. Stable IDs match the S1 score-feedback audio keys.
 window.s1ScoreVoiceover = {
   "s1-score-0-a": "assets/audio/voice/professor-pixel/scenario-01/s1-score-0-a.mp3",
   "s1-score-0-b": "assets/audio/voice/professor-pixel/scenario-01/s1-score-0-b.mp3",
@@ -628,14 +488,12 @@ window.s1ScoreVoiceover = {
 // completed recordings are placed at the listed paths.
 window.s2VoiceoverDrafts = {
   p86: "assets/audio/voice/professor-pixel/scenario-02/p86.mp3",
-  p87: "assets/audio/voice/professor-pixel/scenario-02/p87.mp3",
   p88: "assets/audio/voice/professor-pixel/scenario-02/p88.mp3",
   p89: "assets/audio/voice/professor-pixel/scenario-02/p89.mp3",
   p90: "assets/audio/voice/professor-pixel/scenario-02/p90.mp3",
   p91: "assets/audio/voice/professor-pixel/scenario-02/p91.mp3",
   p92: "assets/audio/voice/professor-pixel/scenario-02/p92.mp3",
   p93: "assets/audio/voice/professor-pixel/scenario-02/p93.mp3",
-  p94: "assets/audio/voice/professor-pixel/scenario-02/p94.mp3",
   "jordan-s2-01": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-01.mp3",
   "jordan-s2-02": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-02.mp3",
   "jordan-s2-03": "assets/audio/voice/students/jordan/scenario-02/jordan-s2-03.mp3",
