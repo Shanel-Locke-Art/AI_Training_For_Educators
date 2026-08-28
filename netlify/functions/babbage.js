@@ -494,6 +494,7 @@ exports.handler = async (event = {}) => {
       model: DEFAULT_OPENAI_MODEL,
       supported_contracts: [
         'scenario1',
+        's1_evidence_analysis',
         's1_canvas_rescue',
         's2_draft', 's2_review',
         's3_draft', 's3_review', 's3_evidence_analysis', 's3_transfer_assessment',

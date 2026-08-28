@@ -516,8 +516,12 @@ const PC_BABBAGE_ENDPOINT = String(
 //  the saved research-data structure changes.
 // ══════════════════════════════════════════════════════
 const PC_APP_SCRIPT_URL = (() => {
+  const currentScriptUrl = document.currentScript?.src || '';
+  if (/(?:^|\/)runtime\/js\/promptcraft\.bundle\.js(?:[?#]|$)/.test(currentScriptUrl)) {
+    return currentScriptUrl;
+  }
   const script = [...document.scripts].find(item =>
-    /(?:^|\/)functions\/(?:app\.bundle|app)\.js(?:[?#]|$)/.test(item.src)
+    /(?:^|\/)(?:runtime\/js\/promptcraft\.bundle|functions\/(?:app\.bundle|app))\.js(?:[?#]|$)/.test(item.src)
   );
   return script?.src || new URL('runtime/js/promptcraft.bundle.js', document.baseURI).href;
 })();

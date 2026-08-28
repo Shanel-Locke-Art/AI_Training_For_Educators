@@ -18,7 +18,7 @@ def main():
         "proxy has a dedicated evidence contract": "promptcraft_s1_evidence_analysis_v1" in proxy,
         "proxy version advanced": "PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V372'" in proxy,
         "runtime bundle synchronized": "s1_evidence_analysis_complete" in bundle,
-        "deployment marker advanced": "patch=512" in index and "DEV · 512" in index,
+        "deployment marker advanced": "patch=513" in index and "DEV · 513" in index,
     }
     failures = [name for name, passed in checks.items() if not passed]
     if failures:
