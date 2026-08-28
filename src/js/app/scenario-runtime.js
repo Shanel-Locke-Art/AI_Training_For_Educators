@@ -31,7 +31,7 @@ function selectScenarioTab(index, explicitButton = null) {
 
 function playScenarioIntroduction(index) {
   const ui = getScenarioUI(index);
-  if (!ui.implemented) {
+  if (!ui.implemented && !ui.previewIntroduction) {
     window.pcScenarioIntroPending = false;
     return;
   }
@@ -45,6 +45,9 @@ function playScenarioIntroduction(index) {
     // control to the workbench. No character-specific teardown belongs here.
     pcResetVNCharacters();
     pcRunScenarioAfterIntroAction(ui.afterIntroAction);
+    if (index === SCENARIO_INDEX.CONTENT_AVALANCHE) {
+      pcScheduleS1CanvasDialogueSceneCleanup();
+    }
   };
 
   if (window.scenarioIntroTimer) clearTimeout(window.scenarioIntroTimer);
@@ -55,7 +58,14 @@ function playScenarioIntroduction(index) {
   // settled, making the entire page appear to drop just before the challenge.
   window.pcScenarioIntroPending = false;
   pcApplyIpadLayout();
-  playPixelSequence(getScenarioStartDialogueKey(index), onDone);
+  if (index === SCENARIO_INDEX.CONTENT_AVALANCHE) {
+    pcPrepareS1ClassroomDialogueScene();
+    playPixelSequence(getScenarioStartDialogueKey(index), () => {
+      pcPlayS1PreviewBriefing(0, onDone);
+    });
+  } else {
+    playPixelSequence(getScenarioStartDialogueKey(index), onDone);
+  }
   requestAnimationFrame(() => {
     if (scenarioIndex === index) pcApplyIpadLayout();
   });
@@ -73,14 +83,16 @@ function pcActivateScenario(index, { explicitButton = null, playIntroduction = t
   selectScenarioTab(normalized, explicitButton);
   window.scenarioIntroEnabled = true;
 
-  const implemented = Boolean(getScenarioUI(normalized).implemented);
+  const ui = getScenarioUI(normalized);
+  const implemented = Boolean(ui.implemented);
+  const introductionAvailable = implemented || Boolean(ui.previewIntroduction);
   // v216: Mark the introduction before rendering the workbench. This prevents
   // its first textarea from briefly stealing focus and scrolling the page just
   // before Professor Pixel states the challenge.
-  window.pcScenarioIntroPending = implemented && playIntroduction;
+  window.pcScenarioIntroPending = introductionAvailable && playIntroduction;
   loadScenario(normalized);
 
-  if (implemented && playIntroduction) playScenarioIntroduction(normalized);
+  if (introductionAvailable && playIntroduction) playScenarioIntroduction(normalized);
   else window.pcScenarioIntroPending = false;
   return false;
 }
@@ -112,6 +124,9 @@ function pcClearVNStateForScenarioSwitch() {
 
   // Scenario state may add semantic markers, but presentation teardown is shared.
   overlay?.classList.remove('pc-s2-jordan-recording', 'pc-s2-two-character', 'pc-s2-narrow-jordan');
+  try { pcClearS1CanvasDialogueScene(); } catch (e) {
+    document.body.classList.remove('pc-s1-canvas-dialogue-active', 'pc-s1-canvas-smartboard-active');
+  }
   dialogue?.classList.remove('pc-s2-recorded-dialogue', 'prediction-question', 'prediction-result');
   document.getElementById('s2JordanVNControls')?.remove();
 
@@ -139,29 +154,29 @@ function pcClearVNStateForScenarioSwitch() {
 
 
 function pcFillS1DevFields() {
-  const values = {
-    'g-learners': 'online first-year general education students in an 8-week fully asynchronous course',
-    'g-issue': 'students are posting one-sentence reactions, replying only because it is required, and the conversation dies after one exchange',
-    'g-interaction': 'compare two possible interpretations of the reading, support their claim with one specific example, and ask a follow-up question that invites a peer to extend or challenge the idea',
-    'g-constraints': "no extra tools, one initial post, two substantive peer replies, and strong replies must explain reasoning, use evidence or examples, and build on a classmate's idea"
-  };
-
   const tryFill = (attempts = 0) => {
-    const fields = Object.keys(values).map(id => document.getElementById(id));
-    if (fields.every(Boolean)) {
-      Object.entries(values).forEach(([id, val]) => {
-        const el = document.getElementById(id);
-        el.value = val;
-        if (typeof autoGrow === 'function') autoGrow(el);
-      });
-      if (typeof onGuidedInput === 'function') onGuidedInput(document.getElementById('g-learners'));
-      document.getElementById('g-learners')?.focus();
-      return;
+    let field = document.getElementById('pcS1CaseReflectionText');
+    if (field) {
+      if (typeof pcSetS1PreviewState === 'function') pcSetS1PreviewState('after');
+      field = document.getElementById('pcS1CaseReflectionText') || field;
+      field.disabled = false;
+      field.readOnly = false;
+      field.value = 'The After module gives students a clear starting point, a visible learning sequence, and directions beside the assignment where they need them.';
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+      if (typeof autoGrow === 'function') autoGrow(field);
+      field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      field.focus({ preventScroll: true });
+      return true;
     }
-    if (attempts < 30) setTimeout(() => tryFill(attempts + 1), 100);
+    if (attempts < 30) pcScheduleScenarioTask(
+      () => tryFill(attempts + 1),
+      100,
+      SCENARIO_INDEX.CONTENT_AVALANCHE
+    );
+    return false;
   };
 
-  tryFill();
+  return tryFill();
 }
 
 function pcFillS2DevRepairFields() {
@@ -237,7 +252,7 @@ function resetS2Dev() {
 }
 
 function resetS1Dev() {
-    resetScenarioRunState(SCENARIO_INDEX.ENGAGEMENT);
+    resetScenarioRunState(SCENARIO_INDEX.CONTENT_AVALANCHE);
 
     if (window.scenarioIntroTimer) {
       clearTimeout(window.scenarioIntroTimer);
@@ -270,15 +285,15 @@ function resetS1Dev() {
       };
     }
 
-    document.body.classList.remove('s1-result-active');
+  document.body.classList.remove('s1-result-active', 'pc-s1-canvas-dialogue-active', 'pc-s1-canvas-smartboard-active');
     document.body.classList.add('s1-active');
 
-    selectScenarioTab(SCENARIO_INDEX.ENGAGEMENT);
+    selectScenarioTab(SCENARIO_INDEX.CONTENT_AVALANCHE);
 
     window.scenarioIntroEnabled = true;
-    if (Array.isArray(navCardShown)) navCardShown[SCENARIO_INDEX.ENGAGEMENT] = false;
+    if (Array.isArray(navCardShown)) navCardShown[SCENARIO_INDEX.CONTENT_AVALANCHE] = false;
 
-    loadScenario(SCENARIO_INDEX.ENGAGEMENT);
+    loadScenario(SCENARIO_INDEX.CONTENT_AVALANCHE);
 
     setTimeout(() => {
       pcFillS1DevFields();
@@ -335,6 +350,17 @@ function renderScenarioInput(index) {
   const ui = getScenarioUI(index);
   const container = document.getElementById('inputContainer');
   if (!container) return;
+
+  // Preview renderers are real interactive workspaces even though they are not
+  // counted as finished scenarios. Route them before the development-shell
+  // guard so a partial/stale implementation flag cannot relock the preview.
+  const previewAvailable = Boolean(
+    ui.previewAvailable || ui.rendererKey === 'content-avalanche-preview'
+  );
+  if (previewAvailable) {
+    pcRenderScenarioWorkspace(index, container);
+    return;
+  }
 
   if (!ui.implemented) {
     renderScenarioPlaceholder(index);
@@ -456,7 +482,7 @@ let isSubmittingToBabbage = false;
 //  SEND
 // ══════════════════════════════════════════════════════
 async function send() {
-  if (scenarioIndex === SCENARIO_INDEX.ENGAGEMENT && typeof sendGuided === 'function') {
+  if (scenarioIndex === SCENARIO_INDEX.CONTENT_AVALANCHE && typeof sendGuided === 'function') {
     return sendGuided();
   }
   return false;
@@ -470,9 +496,9 @@ function pcSetBabbageSubmitting(value) {
 
 async function sendMain(text) {
   if (!text || isSubmittingToBabbage) return;
-  if (scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT || !getScenarioUI(scenarioIndex).implemented) return;
+  if (scenarioIndex !== SCENARIO_INDEX.CONTENT_AVALANCHE || !getScenarioUI(scenarioIndex).implemented) return;
 
-  const runToken = pcCaptureScenarioRun(SCENARIO_INDEX.ENGAGEMENT);
+  const runToken = pcCaptureScenarioRun(SCENARIO_INDEX.CONTENT_AVALANCHE);
   pcSetBabbageSubmitting(true);
   attempts++;
   lastPromptText = text;
@@ -487,7 +513,7 @@ async function sendMain(text) {
   try {
     const data = await requestBabbageAnalysis({
       max_output_tokens: 5000,
-      system: scenarios[SCENARIO_INDEX.ENGAGEMENT].system,
+      system: scenarios[SCENARIO_INDEX.CONTENT_AVALANCHE].system,
       messages: history
     }, 'main');
     if (!pcIsScenarioRunCurrent(runToken)) return;
@@ -503,9 +529,9 @@ async function sendMain(text) {
     history.push({ role: 'assistant', content: reply });
 
     const score = scorePrompt(text);
-    const active = detectOSCQR(reply, scenarios[SCENARIO_INDEX.ENGAGEMENT].oscqr);
-    trackPrompt(SCENARIO_INDEX.ENGAGEMENT, text, score.total, reply, active.map(id => {
-      const indicator = scenarios[SCENARIO_INDEX.ENGAGEMENT].oscqr.find(item => item.id === id);
+    const active = detectOSCQR(reply, scenarios[SCENARIO_INDEX.CONTENT_AVALANCHE].oscqr);
+    trackPrompt(SCENARIO_INDEX.CONTENT_AVALANCHE, text, score.total, reply, active.map(id => {
+      const indicator = scenarios[SCENARIO_INDEX.CONTENT_AVALANCHE].oscqr.find(item => item.id === id);
       return indicator ? indicator.label : id;
     }), {
       provider: data.provider || (data.mock ? 'local-fallback' : ''),
@@ -516,7 +542,7 @@ async function sendMain(text) {
       structured: structuredAnalysis
     });
 
-    awardScenarioScoreXP(SCENARIO_INDEX.ENGAGEMENT, score.total, 5);
+    awardScenarioScoreXP(SCENARIO_INDEX.CONTENT_AVALANCHE, score.total, 5);
     lastScore = score.total;
     showBabbageFinalResponseInTerminal(reply, !!data.mock, () => {
       addS1BabbageResultCard(reply, structuredAnalysis);

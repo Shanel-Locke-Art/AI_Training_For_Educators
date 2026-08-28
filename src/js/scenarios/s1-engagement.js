@@ -57,7 +57,7 @@ function analyzeS1Guided(values){
 };
 
 function buildS1MissionHTML(){
-  return buildScenarioMissionHTML(SCENARIO_INDEX.ENGAGEMENT, { className: 's1-clean-mission' });
+  return buildScenarioMissionHTML(SCENARIO_INDEX.CONTENT_AVALANCHE, { className: 's1-clean-mission' });
 }
 
 function buildS1LeftHTML(){
@@ -494,6 +494,7 @@ pcRegisterUIActions({
   },
   'dev-go-scenario': target => window.devGoScenario?.(target.dataset.pcScenarioIndex),
   'dev-fill-scenario': target => window.devFillScenario?.(target.dataset.pcScenarioIndex),
+  'dev-fill-s1-transfer': () => window.devFillS1TransferTask?.(),
   'dev-next-scenario': () => window.devNextScenario?.(),
   'navigate-next': target => window.navigateToNext?.(target.dataset.pcScenarioIndex)
 });

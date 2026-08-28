@@ -12,14 +12,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=461">
+<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=509">
 <!-- Production CSS is generated from src/css by tools/build.py. -->
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
-<script src="runtime/js/dialogue-data.js?v=143&amp;patch=461"></script>
-<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=461&amp;receiver=82"></script>
+<script src="runtime/js/dialogue-data.js?v=149&amp;patch=509"></script>
+<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=509&amp;receiver=82"></script>
 
 </head>
 
@@ -141,9 +141,10 @@
      S1 fill resets the playable baseline. S2 opens its playable case; S3–S8 remain development shells.
 ══════════════════════════════════════════════════════ -->
 <div class="dev-bar" role="toolbar" aria-label="PromptCraft development shortcuts">
-  <span class="dev-label">DEV</span>
+  <span class="dev-label" title="Responsive S1 evidence modal, transfer prompts, and dedicated DEV transfer fill">DEV · 509</span>
   <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="0">S1</button>
   <button class="dev-btn dev-btn-fill" data-pc-action="dev-fill-scenario" data-pc-scenario-index="0">S1 ✏️</button>
+  <button class="dev-btn dev-btn-fill" data-pc-action="dev-fill-s1-transfer">S1 Path ✏️</button>
   <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="1">S2</button>
   <button class="dev-btn dev-btn-fill" data-pc-action="dev-fill-scenario" data-pc-scenario-index="1">S2 ✏️</button>
   <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="2">S3 shell</button>
@@ -273,6 +274,7 @@
     <div class="mobile-dropdown-panel" id="mobileDevToolsPanel" role="menu">
       <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="0" data-pc-close-details="true">S1</button>
       <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-fill-scenario" data-pc-scenario-index="0" data-pc-close-details="true">S1 ✏️</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-fill-s1-transfer" data-pc-close-details="true">S1 Path ✏️</button>
       <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="1" data-pc-close-details="true">S2</button>
       <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-fill-scenario" data-pc-scenario-index="1" data-pc-close-details="true">S2 ✏️</button>
       <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="2" data-pc-close-details="true">S3 shell</button>
@@ -291,19 +293,19 @@
     <summary class="mobile-dropdown-toggle">
       <span class="mobile-dropdown-copy">
         <span class="mobile-dropdown-eyebrow">SCENARIO MENU</span>
-        <span class="mobile-scenario-current">S1: Engagement</span>
+        <span class="mobile-scenario-current">S1: The Content Avalanche</span>
       </span>
       <span class="mobile-dropdown-caret" aria-hidden="true">▾</span>
     </summary>
     <div class="mobile-dropdown-panel" id="mobileScenarioMenuPanel" role="menu">
-      <button class="mobile-dropdown-option is-active" data-source-index="0" type="button" role="menuitem" aria-current="page" data-pc-action="switch-scenario" data-pc-scenario-index="0" data-pc-close-details="true">S1: Engagement</button>
-      <button class="mobile-dropdown-option" data-source-index="1" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="1" data-pc-close-details="true">S2: Metacognition</button>
-      <button class="mobile-dropdown-option" data-source-index="2" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="2" data-pc-close-details="true">S3: Assessment</button>
-      <button class="mobile-dropdown-option" data-source-index="3" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="3" data-pc-close-details="true">S4: Sync Bias</button>
-      <button class="mobile-dropdown-option" data-source-index="4" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="4" data-pc-close-details="true">S5: Hallucination</button>
-      <button class="mobile-dropdown-option" data-source-index="5" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="5" data-pc-close-details="true">S6: Prediction</button>
-      <button class="mobile-dropdown-option" data-source-index="6" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="6" data-pc-close-details="true">S7: Overreliance</button>
-      <button class="mobile-dropdown-option" data-source-index="7" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="7" data-pc-close-details="true">S8: Reflect &amp; Revise</button>
+      <button class="mobile-dropdown-option is-active" data-source-index="0" type="button" role="menuitem" aria-current="page" data-pc-action="switch-scenario" data-pc-scenario-index="0" data-pc-close-details="true">S1: The Content Avalanche</button>
+      <button class="mobile-dropdown-option" data-source-index="1" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="1" data-pc-close-details="true">S2: Access Is Part of the Design</button>
+      <button class="mobile-dropdown-option" data-source-index="2" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="2" data-pc-close-details="true">S3: The Confident Student Problem</button>
+      <button class="mobile-dropdown-option" data-source-index="3" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="3" data-pc-close-details="true">S4: The 96% Problem</button>
+      <button class="mobile-dropdown-option" data-source-index="4" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="4" data-pc-close-details="true">S5: Hallucination Hunt</button>
+      <button class="mobile-dropdown-option" data-source-index="5" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="5" data-pc-close-details="true">S6: Predict the Output</button>
+      <button class="mobile-dropdown-option" data-source-index="6" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="6" data-pc-close-details="true">S7: The Human Judgment Line</button>
+      <button class="mobile-dropdown-option" data-source-index="7" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="7" data-pc-close-details="true">S8: Reflect, Revise, Reuse</button>
     </div>
   </details>
 </nav>
@@ -576,14 +578,14 @@
      ══════════════════════════════════════════════════════ -->
 
 <nav class="scenario-tabs" role="tablist" aria-label="Training scenarios">
-  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="0">S1: Engagement</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="1">S2: Metacognition</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="2">S3: Assessment</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="3">S4: Sync Bias</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="4">S5: Hallucination</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="5">S6: Prediction</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="6">S7: Overreliance</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="7">S8: Reflect &amp; Revise</button>
+  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="0">S1: The Content Avalanche</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="1">S2: Access Is Part of the Design</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="2">S3: The Confident Student Problem</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="3">S4: The 96% Problem</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="4">S5: Hallucination Hunt</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="5">S6: Predict the Output</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="6">S7: The Human Judgment Line</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="7">S8: Reflect, Revise, Reuse</button>
 </nav>
 
 

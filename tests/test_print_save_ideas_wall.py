@@ -10,6 +10,12 @@ css=(ROOT/'src/css/responsive/final-overrides.css').read_text(encoding='utf-8')
 bundle=(ROOT/'runtime/js/promptcraft.bundle.js').read_text(encoding='utf-8')
 cssb=(ROOT/'runtime/css/promptcraft.css').read_text(encoding='utf-8')
 
+# Read the live cache-buster patch number instead of hardcoding one, since it
+# advances on every release.
+_patch_match = re.search(r"promptcraft\.css\?v=429&patch=(\d+)", idx)
+assert _patch_match, "Could not find promptcraft.css patch marker in index.html"
+_patch = _patch_match.group(1)
+
 checks={
  'shared print function': 'function pcPrintCurrentBabbageReport()' in terminal,
  'print uses structured report': "#babbageTerminalOutput .analysis-report" in terminal,
@@ -27,7 +33,7 @@ checks={
  'print is document-first not CRT clone': 'Babbage Analysis Report' in terminal and 'Diagnostic findings' in terminal and 'reportClone.outerHTML' not in terminal,
  'print waits for logo before print': 'Promise.all(images.map' in terminal,
  'print replaces about:blank URL': "printUrl.hash = 'babbage-analysis-report'" in terminal,
- 'app build stays receiver-compatible V429': 'runtime/js/promptcraft.bundle.js?v=429&amp;patch=451&amp;receiver=82' in idx,
+ 'app build stays receiver-compatible V429': f'runtime/js/promptcraft.bundle.js?v=429&amp;patch={_patch}&amp;receiver=82' in idx,
  'compiled JS contains print feature': 'function pcPrintCurrentBabbageReport()' in bundle,
  'compiled CSS contains print control rule': ':has(.babbage-print-btn)' in cssb,
 }

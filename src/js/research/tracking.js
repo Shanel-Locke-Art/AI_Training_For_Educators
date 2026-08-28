@@ -69,10 +69,10 @@ const scenarioData = Array.from({ length: SCENARIO_COUNT }, (_, index) => {
   if (index === SCENARIO_INDEX.PREDICTION) {
     return { ...base, prediction: '', predictionCorrect: false };
   }
-  if (index === SCENARIO_INDEX.OVERRELIANCE) {
+  if (index === SCENARIO_INDEX.HUMAN_JUDGMENT) {
     return { ...base, overrelianceDecisions: {} };
   }
-  if (index === SCENARIO_INDEX.REFLECT_REVISE) {
+  if (index === SCENARIO_INDEX.REFLECT_REVISE_REUSE) {
     return {
       ...base,
       initialPrompt: '',
@@ -189,8 +189,9 @@ function buildGrowthScores() {
 
 
 async function generateGrowthReport(reflectionAnswers) {
-  const score = scenarioData[SCENARIO_INDEX.ENGAGEMENT].bestScore || 0;
-  return `Scenario 1 score: ${score}/5. Additional growth reporting will be added as Scenarios 2–8 are rebuilt and their research measures are finalized.`;
+  const metacognitionScore = scenarioData[SCENARIO_INDEX.METACOGNITION].bestScore || 0;
+  const assessmentScore = scenarioData[SCENARIO_INDEX.ASSESSMENT].bestScore || 0;
+  return `Scenario 3 score: ${metacognitionScore}/5. Scenario 4 score: ${assessmentScore}/5. Additional growth reporting will be added as the Canvas roadmap is implemented.`;
 }
 
 
@@ -204,7 +205,7 @@ function buildSessionPayload(formData) {
   const totalAttempts = scenarioData.reduce((sum, s) => sum + (s.attempts || 0), 0);
 
   // Build S7 decisions object from scenarioData
-  const d7 = scenarioData[SCENARIO_INDEX.OVERRELIANCE]?.overrelianceDecisions || {};
+  const d7 = scenarioData[SCENARIO_INDEX.HUMAN_JUDGMENT]?.overrelianceDecisions || {};
 
   return {
     type: 'full_response',
@@ -222,33 +223,35 @@ function buildSessionPayload(formData) {
     presubmit_predictions: pcFormatAllPresubmitPredictions(),
 
     // S1
-    s1_attempts:          scenarioData[SCENARIO_INDEX.ENGAGEMENT].attempts,
-    s1_best_score:        scenarioData[SCENARIO_INDEX.ENGAGEMENT].bestScore,
-    s1_prompts:           scenarioData[SCENARIO_INDEX.ENGAGEMENT].prompts.join(' | '),
-    s1_final_response:    scenarioData[SCENARIO_INDEX.ENGAGEMENT].finalResponse,
-    s1_oscqr:             scenarioData[SCENARIO_INDEX.ENGAGEMENT].oscqrLit,
-    s1_section_reviews:   JSON.stringify(scenarioData[SCENARIO_INDEX.ENGAGEMENT].sectionReviews || []),
+    s1_attempts:          scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].attempts,
+    s1_best_score:        scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].bestScore,
+    s1_prompts:           scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].prompts.join(' | '),
+    s1_final_response:    scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].finalResponse,
+    s1_oscqr:             scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].oscqrLit,
+    s1_section_reviews:   JSON.stringify(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].sectionReviews || []),
 
-    // S2
+    // Legacy receiver columns retained for the metacognition implementation,
+    // which is now presented as Scenario 3 in the Canvas roadmap.
     s2_attempts:          scenarioData[SCENARIO_INDEX.METACOGNITION].attempts,
     s2_best_score:        scenarioData[SCENARIO_INDEX.METACOGNITION].bestScore,
     s2_prompts:           scenarioData[SCENARIO_INDEX.METACOGNITION].prompts.join(' | '),
     s2_final_response:    scenarioData[SCENARIO_INDEX.METACOGNITION].finalResponse,
     s2_oscqr:             scenarioData[SCENARIO_INDEX.METACOGNITION].oscqrLit,
 
-    // S3
+    // Legacy receiver columns retained for the assessment implementation,
+    // which is now presented as Scenario 4 in the Canvas roadmap.
     s3_attempts:          scenarioData[SCENARIO_INDEX.ASSESSMENT].attempts,
     s3_best_score:        scenarioData[SCENARIO_INDEX.ASSESSMENT].bestScore,
     s3_prompts:           scenarioData[SCENARIO_INDEX.ASSESSMENT].prompts.join(' | '),
     s3_final_response:    scenarioData[SCENARIO_INDEX.ASSESSMENT].finalResponse,
     s3_oscqr:             scenarioData[SCENARIO_INDEX.ASSESSMENT].oscqrLit,
 
-    // S4 — synchronous assumption bias
-    s4_attempts:          scenarioData[SCENARIO_INDEX.SYNC_BIAS].attempts,
-    s4_best_score:        scenarioData[SCENARIO_INDEX.SYNC_BIAS].bestScore,
-    s4_prompts:           scenarioData[SCENARIO_INDEX.SYNC_BIAS].prompts.join(' | '),
-    s4_final_response:    scenarioData[SCENARIO_INDEX.SYNC_BIAS].finalResponse,
-    s4_oscqr:             scenarioData[SCENARIO_INDEX.SYNC_BIAS].oscqrLit,
+    // S4 — current roadmap position for the assessment implementation
+    s4_attempts:          scenarioData[SCENARIO_INDEX.ASSESSMENT].attempts,
+    s4_best_score:        scenarioData[SCENARIO_INDEX.ASSESSMENT].bestScore,
+    s4_prompts:           scenarioData[SCENARIO_INDEX.ASSESSMENT].prompts.join(' | '),
+    s4_final_response:    scenarioData[SCENARIO_INDEX.ASSESSMENT].finalResponse,
+    s4_oscqr:             scenarioData[SCENARIO_INDEX.ASSESSMENT].oscqrLit,
 
     // S5 — hallucination hunt
     s5_attempts:          scenarioData[SCENARIO_INDEX.HALLUCINATION].attempts,
@@ -271,19 +274,19 @@ function buildSessionPayload(formData) {
       scenarios:  d7.scenarios  || '',
       objectives: d7.objectives || '',
     },
-    s7_best_score:        scenarioData[SCENARIO_INDEX.OVERRELIANCE].bestScore || 0,
+    s7_best_score:        scenarioData[SCENARIO_INDEX.HUMAN_JUDGMENT].bestScore || 0,
 
     // S8 — reflect & revise
-    s8_initial_prompt:    scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialPrompt  || '',
-    s8_initial_score:     scenarioData[SCENARIO_INDEX.REFLECT_REVISE].initialScore   || 0,
-    s8_revised_prompt:    scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedPrompt  || '',
-    s8_revised_score:     scenarioData[SCENARIO_INDEX.REFLECT_REVISE].revisedScore   || 0,
-    s8_score_delta:       scenarioData[SCENARIO_INDEX.REFLECT_REVISE].scoreDelta     || 0,
-    s8_reflection_1:      scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection1    || '',
+    s8_initial_prompt:    scenarioData[SCENARIO_INDEX.REFLECT_REVISE_REUSE].initialPrompt  || '',
+    s8_initial_score:     scenarioData[SCENARIO_INDEX.REFLECT_REVISE_REUSE].initialScore   || 0,
+    s8_revised_prompt:    scenarioData[SCENARIO_INDEX.REFLECT_REVISE_REUSE].revisedPrompt  || '',
+    s8_revised_score:     scenarioData[SCENARIO_INDEX.REFLECT_REVISE_REUSE].revisedScore   || 0,
+    s8_score_delta:       scenarioData[SCENARIO_INDEX.REFLECT_REVISE_REUSE].scoreDelta     || 0,
+    s8_reflection_1:      scenarioData[SCENARIO_INDEX.REFLECT_REVISE_REUSE].reflection1    || '',
     ai_narrative:         '',  // populated after async generation
     growth_json:          '',  // populated after async generation
-    s8_reflection_2:      scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection2    || '',
-    s8_reflection_3:      scenarioData[SCENARIO_INDEX.REFLECT_REVISE].reflection3    || '',
+    s8_reflection_2:      scenarioData[SCENARIO_INDEX.REFLECT_REVISE_REUSE].reflection2    || '',
+    s8_reflection_3:      scenarioData[SCENARIO_INDEX.REFLECT_REVISE_REUSE].reflection3    || '',
 
     // Reflection Room
     q1_surprise:    formData ? (formData.get('q1_surprise')  || '') : '',
@@ -370,11 +373,11 @@ async function saveIncrementalData(scenarioIdx) {
       s3_repair_text: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? (s.repairText || '') : '',
       s3_evidence_statement: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? (s.evidenceStatement || '') : '',
       s3_transfer_metadata_json: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? JSON.stringify(s.transferLabMetadata || {}) : '',
-      s4_diagnosis_json: scenarioIdx === SCENARIO_INDEX.SYNC ? JSON.stringify(s.diagnosisAttempts || []) : '',
-      s4_function_json: scenarioIdx === SCENARIO_INDEX.SYNC ? JSON.stringify(s.functionAttempts || []) : '',
-      s4_audit_json: scenarioIdx === SCENARIO_INDEX.SYNC ? JSON.stringify(s.auditAttempts || []) : '',
-      s4_async_repair: scenarioIdx === SCENARIO_INDEX.SYNC ? (s.asyncRepair || '') : '',
-      s4_evidence_statement: scenarioIdx === SCENARIO_INDEX.SYNC ? (s.evidenceStatement || '') : '',
+      s4_diagnosis_json: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? JSON.stringify(s.diagnosisAttempts || []) : '',
+      s4_function_json: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? JSON.stringify(s.blueprintAttempts || s.evidenceAttempts || []) : '',
+      s4_audit_json: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? JSON.stringify(s.auditAttempts || []) : '',
+      s4_async_repair: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? (s.repairText || '') : '',
+      s4_evidence_statement: scenarioIdx === SCENARIO_INDEX.ASSESSMENT ? (s.evidenceStatement || '') : '',
       s5_check_json: scenarioIdx === SCENARIO_INDEX.HALLUCINATION ? JSON.stringify(s.checkAttempts || []) : '',
       s5_audit_json: scenarioIdx === SCENARIO_INDEX.HALLUCINATION ? JSON.stringify(s.auditAttempts || []) : '',
       s5_flagged_claim: scenarioIdx === SCENARIO_INDEX.HALLUCINATION ? (s.flaggedClaim || '') : '',

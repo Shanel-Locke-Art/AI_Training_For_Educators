@@ -93,7 +93,8 @@ const PC_VN_OVERLAY_MODE_CLASSES = Object.freeze([
   'pc-clean-output',
   'pc-clean-final',
   'analysis-complete',
-  'scenario-intro-active'
+  'scenario-intro-active',
+  'pc-s1-dialogue-choice'
 ]);
 
 function pcSetVNOverlayState({ active = null, modes = [], preserve = [] } = {}) {
@@ -156,8 +157,15 @@ function pcResetVNCharacters() {
       clearTimeout(portrait._pcExpressionTimer);
       portrait._pcExpressionTimer = null;
     }
+    if (portrait?._pcEntranceTimer) {
+      clearTimeout(portrait._pcEntranceTimer);
+      portrait._pcEntranceTimer = null;
+    }
     portraitProps.forEach(property => portrait?.style.removeProperty(property));
-    if (portrait) delete portrait.dataset.pcCharacter;
+    if (portrait) {
+      portrait.classList.remove('pc-vn-enter-slide-left');
+      delete portrait.dataset.pcCharacter;
+    }
   });
   overlay?.classList.remove('pc-dual-character', 'pc-s2-two-character', 'pc-s2-narrow-jordan');
   window.pcCurrentVNCast = [];
@@ -167,7 +175,7 @@ function pcResetVNCharacters() {
 function pcResetVNDialogueState() {
   const dialogue = document.getElementById('vnDialogue');
   if (!dialogue) return;
-  dialogue.classList.remove('has-choices', 'prediction-question', 'prediction-result');
+  dialogue.classList.remove('has-choices', 'prediction-question', 'prediction-result', 'pc-s1-diagnosis-dialogue');
   delete dialogue.dataset.pcExplicitAction;
   dialogue.setAttribute('role', 'button');
   dialogue.setAttribute('tabindex', '0');
@@ -214,7 +222,7 @@ function pcApplyIpadLayout(){
   // exact-height media query from moving the complete board upward.
   const isLevelOneIphoneSEIntro = Boolean(
     isRegularMobileDialogue &&
-    scenarioIndex === SCENARIO_INDEX.ENGAGEMENT &&
+    scenarioIndex === SCENARIO_INDEX.CONTENT_AVALANCHE &&
     viewportWidth >= 370 && viewportWidth <= 380 &&
     viewportHeight >= 650 && viewportHeight <= 690 &&
     viewportHeight > viewportWidth

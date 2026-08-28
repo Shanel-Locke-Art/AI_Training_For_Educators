@@ -8,8 +8,8 @@ These contracts are intentionally preserved while PromptCraft is refactored and 
 - Research schema: `V121`
 - Apps Script receiver: `V82`
 - Apps Script deployment: existing configured deployment URL
-- Current asset manifest: `v144`
-- Current documentation/cache revision: `446`
+- Current asset manifest: `v148`
+- Current documentation/cache revision: `489`
 - Scenario result tabs retain full narrative text; Process Log remains abbreviated by design
 
 The V121 payload still sends both `babbage_response` and the historical `claude_response` key. `claude_response` exists only because the current receiver/schema expects it. It is not permission to restore Claude terminology in browser UI, DOM selectors, actions, function names, or the Netlify endpoint.
@@ -25,11 +25,19 @@ The V121 payload still sends both `babbage_response` and the historical `claude_
 
 ## Scenario availability
 
-- S1 Engagement: implemented
-- S2 Metacognition: implemented
-- S3-S8: locked development shells
+Registry position (`registry.js`) is authoritative for what's playable, not
+source filenames. Internal filenames/action keys retain earlier `s2`/`s3`
+naming for receiver and saved-data compatibility, while registry position
+and dataLabel identify the current scenario order:
 
-Do not restore old S3-S5 prototype browser implementations as a shortcut when S3 development begins.
+- S1 The Content Avalanche (`content-avalanche`): preview available, in development
+- S2 Access Is Part of the Design (`accessibility`): planned, in development
+- S3 The Confident Student Problem (`metacognition`, implemented in `s2-metacognition.js`): playable
+- S4 The 96% Problem (`assessment`, implemented in `s3-authentic-assessment.js`): playable
+- S5-S8: locked development shells
+
+Do not restore old S3-S5 prototype browser implementations as a shortcut when
+S5+ development begins.
 
 ## Shared gameplay and lifecycle
 

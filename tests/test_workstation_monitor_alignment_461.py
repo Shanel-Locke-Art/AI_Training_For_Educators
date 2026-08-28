@@ -14,8 +14,11 @@ checks={
  'completed analysis reuses glass constant': 'const PC_WIDE_ANALYSIS_REPORT_SCREEN_GEOMETRY = PC_WORKSTATION_MONITOR_GLASS_GEOMETRY;' in analysis,
  'stale too-wide analysis width removed': "width: '42.2%'" not in analysis,
  'bundle has shared geometry': 'PC_WORKSTATION_MONITOR_GLASS_GEOMETRY' in bundle and "width: '40.3%'" in bundle,
- 'cache patch 461': 'patch=461' in idx,
 }
+# The cache patch only needs to be at or past 461 (when this fix shipped), not
+# pinned to exactly 461, since it keeps advancing on every later release.
+_patch_match = re.search(r"promptcraft\.css\?v=429&patch=(\d+)", idx)
+checks['cache patch 461 or later'] = bool(_patch_match) and int(_patch_match.group(1)) >= 461
 
 def source_block(rel):
     marker=f'/* SOURCE: {rel} */\n'

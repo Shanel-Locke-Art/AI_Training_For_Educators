@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+"""V503 contract: full-size evidence selects a readable responsive capture."""
+
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def read(relative: str) -> str:
+    return (ROOT / relative).read_text(encoding="utf-8")
+
+
+def main() -> None:
+    shared = read("src/js/scenarios/shared-components.js")
+    css = read("src/css/scenarios/shared.css")
+    runtime = read("runtime/js/promptcraft.bundle.js")
+    runtime_css = read("runtime/css/promptcraft.css")
+    index = read("index.html")
+
+    for token in (
+        "function pcRefreshS1EvidenceModalLayout()",
+        "width <= 560",
+        "width <= 1100",
+        "evidence.mobileSrc",
+        "evidence.compactSrc",
+        "pc-s1-evidence-modal--${mode}-capture",
+        "image.dataset.pcModalSource",
+        "modal._pcS1Evidence = evidence",
+        "window.visualViewport?.addEventListener('resize', pcScheduleS1EvidenceModalLayout",
+        "pcRefreshS1EvidenceModalLayout();",
+    ):
+        assert token in shared
+        assert token in runtime
+
+    for token in (
+        ".pc-s1-evidence-modal--phone-capture .pc-s1-evidence-modal-scroll img",
+        ".pc-s1-evidence-modal--compact-capture .pc-s1-evidence-modal-scroll img",
+        ".pc-s1-evidence-modal--desktop-capture .pc-s1-evidence-modal-scroll img",
+        "grid-template-columns:minmax(0,1fr) 40px",
+        "touch-action:pan-x pan-y pinch-zoom",
+        "object-fit:contain",
+        ".pc-s1-evidence-modal-shell > footer p { display:none; }",
+    ):
+        assert token in css
+        assert token in runtime_css
+
+    assert "data-pc-action=\"s1-close-evidence-modal\"" in shared
+    assert "pcHandleS1EvidenceModalKeydown" in shared
+    assert "patch=509" in index
+    assert "DEV · 509" in index
+    print("V503 responsive full-size Canvas-evidence modal contract passed.")
+
+
+if __name__ == "__main__":
+    main()

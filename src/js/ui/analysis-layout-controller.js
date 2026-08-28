@@ -11,6 +11,7 @@ const PC_ANALYSIS_LAYOUT_CLASSES = [
 let pcAnalysisLayoutMode = null;
 let pcAnalysisLayoutFrame = 0;
 let pcAnalysisLayoutSettleTimer = 0;
+let pcAnalysisLayoutFontTimer = 0;
 let pcAnalysisLayoutGeneration = 0;
 
 function pcAnalysisViewportWidth() {
@@ -181,6 +182,10 @@ function pcScheduleAnalysisLayout({ immediate = false } = {}) {
     clearTimeout(pcAnalysisLayoutSettleTimer);
     pcAnalysisLayoutSettleTimer = 0;
   }
+  if (pcAnalysisLayoutFontTimer) {
+    clearTimeout(pcAnalysisLayoutFontTimer);
+    pcAnalysisLayoutFontTimer = 0;
+  }
 
   const apply = () => {
     if (generation !== pcAnalysisLayoutGeneration) return;
@@ -196,6 +201,13 @@ function pcScheduleAnalysisLayout({ immediate = false } = {}) {
     pcAnalysisLayoutSettleTimer = 0;
     apply();
   }, 120);
+  // V492: web fonts and generated analysis copy can settle after the first
+  // measurement. Re-run once after that window so content-sized cards are
+  // measured from their final typography instead of overlapping a later row.
+  pcAnalysisLayoutFontTimer = window.setTimeout(() => {
+    pcAnalysisLayoutFontTimer = 0;
+    apply();
+  }, 480);
 }
 
 function pcClearAnalysisLayout() {
@@ -203,8 +215,10 @@ function pcClearAnalysisLayout() {
   pcAnalysisLayoutGeneration += 1;
   if (pcAnalysisLayoutFrame) cancelAnimationFrame(pcAnalysisLayoutFrame);
   if (pcAnalysisLayoutSettleTimer) clearTimeout(pcAnalysisLayoutSettleTimer);
+  if (pcAnalysisLayoutFontTimer) clearTimeout(pcAnalysisLayoutFontTimer);
   pcAnalysisLayoutFrame = 0;
   pcAnalysisLayoutSettleTimer = 0;
+  pcAnalysisLayoutFontTimer = 0;
   pcAnalysisLayoutMode = null;
 
   const overlay = document.getElementById('vnOverlay');

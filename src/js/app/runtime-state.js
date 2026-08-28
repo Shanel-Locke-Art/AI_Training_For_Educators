@@ -11,14 +11,14 @@
 //  STATE
 // ══════════════════════════════════════════════════════
 const SCENARIO_INDEX = Object.freeze({
-  ENGAGEMENT: 0,
-  METACOGNITION: 1,
-  ASSESSMENT: 2,
-  SYNC_BIAS: 3,
+  CONTENT_AVALANCHE: 0,
+  ACCESSIBILITY: 1,
+  METACOGNITION: 2,
+  ASSESSMENT: 3,
   HALLUCINATION: 4,
   PREDICTION: 5,
-  OVERRELIANCE: 6,
-  REFLECT_REVISE: 7,
+  HUMAN_JUDGMENT: 6,
+  REFLECT_REVISE_REUSE: 7,
 });
 const SCENARIO_COUNT = Object.keys(SCENARIO_INDEX).length;
 
@@ -29,14 +29,14 @@ const PC_SCORE_XP_PER_POINT = 10;
 const PC_COMPLETION_XP = 60;
 const PC_EDUCATOR_LEVELS = Object.freeze([
   Object.freeze({ threshold: 0, title: 'Teaching Explorer', description: 'Explores how AI can support teaching without replacing professional judgment.' }),
-  Object.freeze({ threshold: 100, title: 'Engagement Facilitator', description: 'Designs participation so learners respond to ideas, evidence, and one another.' }),
-  Object.freeze({ threshold: 200, title: 'Reflective Practitioner', description: 'Connects learning strategies to evidence, self-evaluation, and purposeful next steps.' }),
-  Object.freeze({ threshold: 300, title: 'Assessment Designer', description: 'Builds assessment around authentic evidence of learning rather than convenient proxies.' }),
-  Object.freeze({ threshold: 400, title: 'Equitable Learning Designer', description: 'Notices where tools, formats, and assumptions create uneven access or participation.' }),
+  Object.freeze({ threshold: 100, title: 'Learning Path Builder', description: 'Turns crowded Canvas modules into visible, purposeful learning paths.' }),
+  Object.freeze({ threshold: 200, title: 'Accessibility-Minded Designer', description: 'Finds barriers, connects them to standards, and verifies repairs with informed human review.' }),
+  Object.freeze({ threshold: 300, title: 'Reflective Learning Designer', description: 'Connects Canvas evidence to self-evaluation and purposeful next steps.' }),
+  Object.freeze({ threshold: 400, title: 'Assessment Designer', description: 'Builds assessment around transferable evidence of learning rather than convenient score proxies.' }),
   Object.freeze({ threshold: 500, title: 'Evidence Evaluator', description: 'Checks AI claims against sources, context, and disciplinary evidence before trusting them.' }),
-  Object.freeze({ threshold: 600, title: 'Intentional Prompt Designer', description: 'Anticipates what AI may assume and makes audience, purpose, evidence, and constraints visible.' }),
-  Object.freeze({ threshold: 700, title: 'Learning Architect', description: 'Uses AI selectively while protecting learner agency, voice, and instructional purpose.' }),
-  Object.freeze({ threshold: 800, title: 'Reflective Leader', description: 'Uses evidence and reflection to revise teaching practice and guide responsible AI use.' })
+  Object.freeze({ threshold: 600, title: 'Intentional Prompt Designer', description: 'Anticipates what AI may misunderstand and makes Canvas purpose, audience, evidence, and constraints visible.' }),
+  Object.freeze({ threshold: 700, title: 'Responsible Course Architect', description: 'Uses AI selectively while protecting faculty responsibility, learner agency, and instructional purpose.' }),
+  Object.freeze({ threshold: 800, title: 'Reflective Canvas Leader', description: 'Evaluates results and reuses thoughtful AI-assisted course-design practices.' })
 ]);
 let pcProgressState = {
   xp: 0,
@@ -472,12 +472,12 @@ function startGame() {
   window.pcGameStarted = true;
   pcSyncAppVersionLabels();
 
-  // S1 remains rendered behind the menu as the safe default, but its VN intro
+  // S1 remains rendered behind the menu as the safe default, but its scenario
   // does not begin until the learner actually chooses a scenario.
   window.scenarioIntroEnabled = false;
 
   try {
-    loadScenario(SCENARIO_INDEX.ENGAGEMENT);
+    loadScenario(SCENARIO_INDEX.CONTENT_AVALANCHE);
     window.pcInitialScenarioRendered = true;
   } catch (err) {
     console.error('[PromptCraft] Initial scenario render failed:', err);

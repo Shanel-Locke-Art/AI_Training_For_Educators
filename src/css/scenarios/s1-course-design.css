@@ -1,0 +1,160 @@
+/* Scenario 1 · The Content Avalanche */
+.pc-s1-course-case {
+  display: grid;
+  grid-template-columns: minmax(280px, .9fr) minmax(320px, 1.1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.pc-s1-course-case.is-compact {
+  grid-template-columns: minmax(260px, .75fr) minmax(320px, 1.25fr);
+}
+
+.pc-canvas-preview,
+.pc-s1-course-brief-copy,
+.pc-s1-course-babbage-draft {
+  border: 1px solid rgba(148, 163, 184, .28);
+  border-radius: 16px;
+  background: rgba(9, 18, 32, .86);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, .2);
+  overflow: hidden;
+}
+
+.pc-canvas-preview header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .75rem;
+  padding: .8rem 1rem;
+  color: #fff;
+  background: linear-gradient(100deg, #9f1239, #be123c);
+}
+
+.pc-canvas-preview header span {
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.pc-canvas-preview-list { padding: .5rem; }
+
+.pc-canvas-preview-item {
+  display: grid;
+  grid-template-columns: 74px 1fr auto;
+  align-items: center;
+  gap: .65rem;
+  min-height: 48px;
+  padding: .48rem .65rem;
+  border-bottom: 1px solid rgba(148, 163, 184, .18);
+}
+
+.pc-canvas-preview-item:last-child { border-bottom: 0; }
+.pc-canvas-preview-item span {
+  color: #fda4af;
+  font-size: .64rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.pc-canvas-preview-item p { margin: 0; color: #e5edf7; font-size: .86rem; }
+.pc-canvas-preview-item b { color: #64748b; font-size: 1.3rem; }
+.pc-canvas-preview.is-improved header { background: linear-gradient(100deg, #075985, #0f766e); }
+.pc-canvas-preview.is-improved .pc-canvas-preview-item span { color: #67e8f9; }
+
+.pc-s1-course-brief-copy {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: rgba(148, 163, 184, .2);
+}
+
+.pc-s1-course-brief-copy > div {
+  padding: .9rem 1rem;
+  background: rgba(9, 18, 32, .96);
+}
+
+.pc-s1-course-brief-copy span,
+.pc-s1-course-draft-rationale span,
+.pc-s1-course-babbage-draft blockquote span {
+  display: block;
+  margin-bottom: .35rem;
+  color: #67e8f9;
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.pc-s1-course-brief-copy p,
+.pc-s1-course-draft-rationale p { margin: 0; color: #d7e1ec; font-size: .86rem; line-height: 1.5; }
+
+.pc-s1-course-audit-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, .95fr) minmax(360px, 1.05fr);
+  gap: 1rem;
+}
+
+.pc-s1-course-babbage-draft { padding: 1.1rem; }
+.pc-s1-course-babbage-draft h2 { margin: .25rem 0 1rem; color: #f8fafc; }
+
+.pc-s1-course-sequence {
+  display: grid;
+  gap: .42rem;
+  margin-bottom: 1rem;
+}
+
+.pc-s1-course-sequence > div {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: center;
+  gap: .55rem;
+  padding: .55rem .65rem;
+  border: 1px solid rgba(34, 211, 238, .2);
+  border-radius: 9px;
+  background: rgba(8, 145, 178, .08);
+}
+
+.pc-s1-course-sequence > div span {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #155e75;
+  color: #cffafe;
+  font-size: .72rem;
+  font-weight: 900;
+}
+.pc-s1-course-sequence > div strong { color: #e2e8f0; font-size: .84rem; }
+.pc-s1-course-sequence--compact > div { padding: .4rem .5rem; }
+
+.pc-s1-course-draft-rationale {
+  padding: .75rem;
+  border-left: 3px solid #22d3ee;
+  background: rgba(34, 211, 238, .06);
+}
+
+.pc-s1-course-babbage-draft blockquote {
+  margin: .85rem 0 0;
+  padding: .85rem;
+  border: 1px solid rgba(251, 191, 36, .25);
+  border-radius: 11px;
+  background: rgba(120, 53, 15, .12);
+  color: #fef3c7;
+  font-size: .86rem;
+  line-height: 1.55;
+}
+
+.pc-s1-course-audit-feedback { margin-top: 1rem; }
+.pc-s1-course-final-overview { white-space: pre-line; }
+
+@media (max-width: 900px) {
+  .pc-s1-course-case,
+  .pc-s1-course-case.is-compact,
+  .pc-s1-course-audit-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .pc-s1-course-brief-copy { grid-template-columns: 1fr; }
+  .pc-canvas-preview-item { grid-template-columns: 62px 1fr auto; }
+}

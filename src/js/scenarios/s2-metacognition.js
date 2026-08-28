@@ -76,7 +76,7 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     activeIndex: 0,
     focusSelector: 'input[name="s2-diagnosis"]',
     onSubmit: submitS2Diagnosis,
-    wrapContent: taskHTML => `<section class="s2-loop-puzzle" aria-labelledby="s2CaseFileTitle"><header class="s2-loop-header"><div class="s2-loop-title"><div class="pc-activity-kicker">Case File 02 · Jordan</div><h1 id="s2CaseFileTitle">The Confident Student Problem</h1></div><section class="s2-evidence-panel" aria-labelledby="s2EvidencePanelTitle"><h2 id="s2EvidencePanelTitle" class="s2-evidence-title">Student Evidence</h2><div class="s2-evidence-portrait"><img src="${ASSETS.images.students.jordan.uncertain}" alt="Jordan, an adult online learner, looking uncertain" /></div><blockquote class="s2-jordan-quote"><span class="s2-quote-mark" aria-hidden="true">“</span><span class="s2-quote-copy">I guess something<br />worked.</span><span class="s2-quote-mark" aria-hidden="true">”</span></blockquote><div class="s2-loop-result"><span>Result</span><strong>84% ↑</strong><small>Improved from last time</small></div></section></header>${buildS2JordanEvidenceHTML()}${taskHTML}</section>`
+    wrapContent: taskHTML => `<section class="pc-s2-diagnosis-layout" aria-labelledby="s2CaseContextTitle">${buildStudentEvidencePanelHTML({ title: 'Student Evidence', portraitSrc: ASSETS.images.students.jordan.uncertain, portraitAlt: 'Jordan, an adult online learner, looking uncertain', characterId: 'jordan', quote: 'I guess something worked.', resultLabel: 'Result', resultValue: '84% ↑', resultNote: 'Improved from last time' })}${buildS2CaseContextHTML()}${taskHTML}</section>`
   }),
   evidence: Object.freeze({
     items: S2_EVIDENCE_RESPONSES,
@@ -140,17 +140,24 @@ function getS2Data() {
 
 function buildS2CaseContextHTML() {
   return `
-    <section class="pc-s2-case-context" aria-labelledby="s2CaseContextTitle">
-      <div class="pc-s2-case-context__title">
+    <section class="pc-case-brief pc-case-brief--context pc-s2-case-brief" aria-labelledby="s2CaseContextTitle">
+      <div class="pc-s2-case-header">
         <div class="pc-activity-kicker">Case File 02 · Jordan</div>
         <h2 id="s2CaseContextTitle">The Confident Student Problem</h2>
       </div>
-      <div class="pc-s2-context-flow" aria-label="Jordan's learning process after diagnosis">
-        <div class="pc-s2-context-node"><span>Strategy</span><strong>Reread ×3</strong><small>What Jordan did</small></div>
-        <div class="pc-s2-context-arrow" aria-hidden="true">→</div>
-        <div class="pc-s2-context-node pc-s2-context-node--evidence"><span>Evidence</span><strong>Test understanding</strong><small>The missing link</small></div>
-        <div class="pc-s2-context-arrow" aria-hidden="true">→</div>
-        <div class="pc-s2-context-node"><span>Next move</span><strong>Choose from evidence</strong><small>Not from the grade alone</small></div>
+      <div class="pc-case-brief-copy">
+        <div>
+          <span>Observed strategy</span>
+          <p>Jordan reread the chapter three times and treated a better grade as proof that the strategy worked.</p>
+        </div>
+        <div>
+          <span>Current problem</span>
+          <p>He can name the strategy and the result, but he cannot explain what specifically helped his learning.</p>
+        </div>
+        <div>
+          <span>Missing link</span>
+          <p>Evidence of what the strategy actually did, so Jordan can decide what to keep, change, or try next.</p>
+        </div>
       </div>
     </section>`;
 }

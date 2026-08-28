@@ -1243,3 +1243,59 @@ html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-rep
     text-align: center !important;
   }
 }
+
+/* V493 cascade lock — intentionally last. Variable Babbage output expands in
+   normal flow; the monitor glass scrolls instead of clipping or overlapping. */
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
+.babbage-terminal-screen {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain !important;
+  touch-action: pan-y !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
+#babbageTerminalOutput.babbage-analysis-layout,
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
+.analysis-report {
+  height: auto !important;
+  min-height: 100% !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
+.analysis-grid {
+  grid-auto-flow: row !important;
+  grid-auto-rows: max-content !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  align-items: start !important;
+  align-content: start !important;
+  overflow: visible !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
+:is(.analysis-card, .analysis-card.compact, .analysis-card.wide) {
+  position: relative !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  align-self: stretch !important;
+  overflow: visible !important;
+  contain: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
+:is(.analysis-label, .analysis-value, .analysis-value.big, .analysis-note) {
+  position: static !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}

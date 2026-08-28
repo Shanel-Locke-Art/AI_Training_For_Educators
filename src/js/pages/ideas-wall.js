@@ -4,36 +4,44 @@
   const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzAtqwPWbS-5BZQ3LyTjgDIkABoMM8KeL-OrzErb64SAipeu6gbxGFSjfHV_GVcH5ZU/exec';
 
   const SCENARIOS = Object.freeze({
-    1: { label: 'S1: Engagement', short: 'Engagement', tag: 'tag-1' },
-    2: { label: 'S2: Metacognition', short: 'Metacognition', tag: 'tag-2' },
-    3: { label: 'S3: Authentic Assessment', short: 'Assessment', tag: 'tag-3' },
-    4: { label: 'S4: Sync Bias', short: 'Sync Bias', tag: 'tag-4' },
-    5: { label: 'S5: Hallucination Hunt', short: 'Hallucination', tag: 'tag-5' },
-    6: { label: 'S6: Predict the Output', short: 'Prediction', tag: 'tag-6' },
-    7: { label: 'S7: Overreliance', short: 'Overreliance', tag: 'tag-7' },
-    8: { label: 'S8: Reflect & Revise', short: 'Reflect & Revise', tag: 'tag-8' }
+    1: { label: 'S1: Course Design', short: 'Course Design', tag: 'tag-1' },
+    2: { label: 'S2: Accessibility', short: 'Accessibility', tag: 'tag-2' },
+    3: { label: 'S3: Engagement', short: 'Engagement', tag: 'tag-3' },
+    4: { label: 'S4: Authentic Assessment', short: 'Assessment', tag: 'tag-4' },
+    5: { label: 'S5: Predict the Output', short: 'Prediction', tag: 'tag-5' },
+    6: { label: 'S6: Hallucination Hunt', short: 'Hallucination', tag: 'tag-6' },
+    7: { label: 'S7: Appropriate Reliance', short: 'Appropriate Reliance', tag: 'tag-7' },
+    8: { label: 'S8: Course-Copy Reckoning', short: 'Course Copy', tag: 'tag-8' }
   });
 
   const SAMPLE_IDEAS = [
     {
       scenario: 1,
-      scenarioLabel: 'S1: Engagement',
+      scenarioLabel: 'S1: Course Design',
+      score: 5,
+      timestamp: '',
+      isDemo: true,
+      idea: '**Start Here: Week 4 Learning Path**\n\nThe module overview names the purpose, workload, due point, and first action before students open any files. Items use verb-first labels and follow a Learn → Practice → Submit → Continue sequence.\n\n**Student-visible signals**\n\n- What the week is for\n- What to do in order\n- What to submit and how success is judged\n- How to know the week is complete'
+    },
+    {
+      scenario: 2,
+      scenarioLabel: 'S2: Accessibility',
+      score: 5,
+      timestamp: '',
+      isDemo: true,
+      idea: '**Multiple Ways In**\n\nThe lesson pairs descriptive headings, meaningful link text, captions, and a transcript with a keyboard-checkable reading order. The same essential directions remain available without relying on color, sound, or mouse input alone.'
+    },
+    {
+      scenario: 3,
+      scenarioLabel: 'S3: Engagement',
       score: 5,
       timestamp: '',
       isDemo: true,
       idea: '**Perspective Bridges Discussion**\n\nStudents compare two perspectives before posting a response, then use evidence from course material to explain where the perspectives connect or remain in tension.\n\n**How it works**\n\n1. Name two perspectives on the issue.\n2. Support each perspective with a specific course example.\n3. End with a question that invites a classmate to extend or challenge the comparison.'
     },
     {
-      scenario: 2,
-      scenarioLabel: 'S2: Metacognition',
-      score: 5,
-      timestamp: '',
-      isDemo: true,
-      idea: '**Weekly Reflection Ladder**\n\nA short check-in asks students to connect a study strategy to evidence of what they can now explain, identify where understanding still breaks down, and choose one evidence-based next move.\n\n**Reflection sequence**\n\n- What can you explain without notes?\n- What strategy helped or failed to help?\n- What will you keep, change, or try next time?'
-    },
-    {
-      scenario: 3,
-      scenarioLabel: 'S3: Authentic Assessment',
+      scenario: 4,
+      scenarioLabel: 'S4: Authentic Assessment',
       score: 5,
       timestamp: '',
       isDemo: true,

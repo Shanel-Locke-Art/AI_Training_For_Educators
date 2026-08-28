@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -6,6 +7,13 @@ ROOT = Path(__file__).resolve().parents[1]
 def require(path, needle):
     text=(ROOT/path).read_text(encoding="utf-8")
     assert needle in text, f"Missing {needle!r} in {path}"
+
+def current_patch(index_html):
+    """Read the live cache-buster patch number from index.html instead of
+    hardcoding one, since it advances on every release."""
+    match = re.search(r"promptcraft\.css\?v=429&patch=(\d+)", index_html)
+    assert match, "Could not find promptcraft.css patch marker in index.html"
+    return match.group(1)
 
 def main():
     for rel in (
@@ -19,8 +27,10 @@ def main():
     require("src/js/app/config-and-assets.js", "s2-study-lounge.jpg")
     require("src/js/app/scenario-runtime.js", "pcGetScenarioBackgroundAsset(index)")
     require("index.html", "Great Falls College Montana State University")
-    require("index.html", "runtime/css/promptcraft.css?v=429&patch=451")
-    require("index.html", "runtime/js/promptcraft.bundle.js?v=429&amp;patch=451&amp;receiver=82")
+    index_html = (ROOT / "index.html").read_text(encoding="utf-8")
+    patch = current_patch(index_html)
+    require("index.html", f"runtime/css/promptcraft.css?v=429&patch={patch}")
+    require("index.html", f"runtime/js/promptcraft.bundle.js?v=429&amp;patch={patch}&amp;receiver=82")
     require("wall.html", "GFC MSU")
     require("wall.html", "runtime/css/ideas-wall.css?v=443")
     require("src/css/pages/ideas-wall.css", "--forest-950: #071a36")

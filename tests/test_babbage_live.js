@@ -6,6 +6,7 @@ const endpoint = `${baseUrl}/.netlify/functions/babbage`;
 
 const contractCases = [
   ['scenario1', 'Return a concise Scenario 1 analysis.'],
+  ['s1_canvas_rescue', 'Create the five required Canvas Rescue proposals and flag the two instructor-review boundaries.'],
   ['s2_draft', 'Create a short metacognition reflection activity with one deliberate weakness.'],
   ['s2_review', 'Review a repaired metacognition reflection activity.'],
   ['s3_draft', 'Create a short authentic assessment with one deliberate weakness.'],
@@ -31,7 +32,7 @@ async function main() {
   assert.equal(health.status, 'ok');
   assert.equal(health.service, 'PromptCraft Babbage proxy');
   assert.equal(health.provider, 'openai');
-  assert.equal(health.proxy_version, 'V370');
+  assert.equal(health.proxy_version, 'V371');
   assert.equal(health.configured, true, 'OPENAI_API_KEY is not available to the deployed function.');
   assert.ok(Array.isArray(health.supported_contracts));
   console.log(`Health OK: ${health.proxy_version} / ${health.model}`);

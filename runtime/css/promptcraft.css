@@ -14841,6 +14841,62 @@ html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-rep
   }
 }
 
+/* V493 cascade lock — intentionally last. Variable Babbage output expands in
+   normal flow; the monitor glass scrolls instead of clipping or overlapping. */
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
+.babbage-terminal-screen {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain !important;
+  touch-action: pan-y !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
+#babbageTerminalOutput.babbage-analysis-layout,
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
+.analysis-report {
+  height: auto !important;
+  min-height: 100% !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
+.analysis-grid {
+  grid-auto-flow: row !important;
+  grid-auto-rows: max-content !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  align-items: start !important;
+  align-content: start !important;
+  overflow: visible !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
+:is(.analysis-card, .analysis-card.compact, .analysis-card.wide) {
+  position: relative !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  align-self: stretch !important;
+  overflow: visible !important;
+  contain: none !important;
+}
+
+html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
+:is(.analysis-label, .analysis-value, .analysis-value.big, .analysis-note) {
+  position: static !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+
 /* SOURCE: src/css/scenarios/s1-engagement.css */
 /* PromptCraft Scenario 1 workbench.
    Stage 7 consolidates the active Scenario 1 repair workspace while keeping
@@ -15425,6 +15481,168 @@ body.s1-active:not(.s1-result-active) .s1-clean-repair-footer .pc-guided-repair-
   }
 }
 
+/* SOURCE: src/css/scenarios/s1-course-design.css */
+/* Scenario 1 · The Content Avalanche */
+.pc-s1-course-case {
+  display: grid;
+  grid-template-columns: minmax(280px, .9fr) minmax(320px, 1.1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.pc-s1-course-case.is-compact {
+  grid-template-columns: minmax(260px, .75fr) minmax(320px, 1.25fr);
+}
+
+.pc-canvas-preview,
+.pc-s1-course-brief-copy,
+.pc-s1-course-babbage-draft {
+  border: 1px solid rgba(148, 163, 184, .28);
+  border-radius: 16px;
+  background: rgba(9, 18, 32, .86);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, .2);
+  overflow: hidden;
+}
+
+.pc-canvas-preview header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .75rem;
+  padding: .8rem 1rem;
+  color: #fff;
+  background: linear-gradient(100deg, #9f1239, #be123c);
+}
+
+.pc-canvas-preview header span {
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.pc-canvas-preview-list { padding: .5rem; }
+
+.pc-canvas-preview-item {
+  display: grid;
+  grid-template-columns: 74px 1fr auto;
+  align-items: center;
+  gap: .65rem;
+  min-height: 48px;
+  padding: .48rem .65rem;
+  border-bottom: 1px solid rgba(148, 163, 184, .18);
+}
+
+.pc-canvas-preview-item:last-child { border-bottom: 0; }
+.pc-canvas-preview-item span {
+  color: #fda4af;
+  font-size: .64rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.pc-canvas-preview-item p { margin: 0; color: #e5edf7; font-size: .86rem; }
+.pc-canvas-preview-item b { color: #64748b; font-size: 1.3rem; }
+.pc-canvas-preview.is-improved header { background: linear-gradient(100deg, #075985, #0f766e); }
+.pc-canvas-preview.is-improved .pc-canvas-preview-item span { color: #67e8f9; }
+
+.pc-s1-course-brief-copy {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: rgba(148, 163, 184, .2);
+}
+
+.pc-s1-course-brief-copy > div {
+  padding: .9rem 1rem;
+  background: rgba(9, 18, 32, .96);
+}
+
+.pc-s1-course-brief-copy span,
+.pc-s1-course-draft-rationale span,
+.pc-s1-course-babbage-draft blockquote span {
+  display: block;
+  margin-bottom: .35rem;
+  color: #67e8f9;
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.pc-s1-course-brief-copy p,
+.pc-s1-course-draft-rationale p { margin: 0; color: #d7e1ec; font-size: .86rem; line-height: 1.5; }
+
+.pc-s1-course-audit-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, .95fr) minmax(360px, 1.05fr);
+  gap: 1rem;
+}
+
+.pc-s1-course-babbage-draft { padding: 1.1rem; }
+.pc-s1-course-babbage-draft h2 { margin: .25rem 0 1rem; color: #f8fafc; }
+
+.pc-s1-course-sequence {
+  display: grid;
+  gap: .42rem;
+  margin-bottom: 1rem;
+}
+
+.pc-s1-course-sequence > div {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: center;
+  gap: .55rem;
+  padding: .55rem .65rem;
+  border: 1px solid rgba(34, 211, 238, .2);
+  border-radius: 9px;
+  background: rgba(8, 145, 178, .08);
+}
+
+.pc-s1-course-sequence > div span {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #155e75;
+  color: #cffafe;
+  font-size: .72rem;
+  font-weight: 900;
+}
+.pc-s1-course-sequence > div strong { color: #e2e8f0; font-size: .84rem; }
+.pc-s1-course-sequence--compact > div { padding: .4rem .5rem; }
+
+.pc-s1-course-draft-rationale {
+  padding: .75rem;
+  border-left: 3px solid #22d3ee;
+  background: rgba(34, 211, 238, .06);
+}
+
+.pc-s1-course-babbage-draft blockquote {
+  margin: .85rem 0 0;
+  padding: .85rem;
+  border: 1px solid rgba(251, 191, 36, .25);
+  border-radius: 11px;
+  background: rgba(120, 53, 15, .12);
+  color: #fef3c7;
+  font-size: .86rem;
+  line-height: 1.55;
+}
+
+.pc-s1-course-audit-feedback { margin-top: 1rem; }
+.pc-s1-course-final-overview { white-space: pre-line; }
+
+@media (max-width: 900px) {
+  .pc-s1-course-case,
+  .pc-s1-course-case.is-compact,
+  .pc-s1-course-audit-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .pc-s1-course-brief-copy { grid-template-columns: 1fr; }
+  .pc-canvas-preview-item { grid-template-columns: 62px 1fr auto; }
+}
+
 /* SOURCE: src/css/scenarios/shared.css */
 /* ══════════════════════════════════════════════════════
    PROMPTCRAFT V271 — SHARED SCENARIO SYSTEM
@@ -15770,6 +15988,2080 @@ body.pc-scenario-activity-active #inputContainer {
 .pc-shell-primary,
 .pc-shell-secondary {
   font-size: var(--pc-type-control);
+}
+
+/* S1 Content Avalanche unlocked evidence preview. */
+.pc-s1-preview {
+  width: min(1480px, calc(100% - 24px));
+  margin: 18px auto 34px;
+  color: #172334;
+}
+
+.pc-s1-preview-hero {
+  padding: clamp(24px, 4vw, 48px);
+  border: 2px solid #0a3d62;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #102b52 0%, #075e8a 100%);
+  color: #fff;
+  box-shadow: 0 14px 32px rgba(8, 38, 72, .16);
+}
+
+.pc-s1-preview-status {
+  display: inline-flex;
+  margin-bottom: 16px;
+  padding: 6px 11px;
+  border: 1px solid #f2c14e;
+  border-radius: 999px;
+  background: #fff4ce;
+  color: #593b00;
+  font-size: var(--pc-type-small);
+  font-weight: 850;
+}
+
+.pc-s1-preview-hero .pc-activity-kicker {
+  color: #bfe8f8;
+}
+
+.pc-s1-preview-hero h2 {
+  margin: 7px 0 12px;
+  color: #fff;
+  font-family: "Lora", Georgia, serif;
+  font-size: var(--pc-type-mission-title);
+  line-height: 1.1;
+}
+
+.pc-s1-preview-hero > p {
+  max-width: 1040px;
+  margin: 0;
+  color: #eef8fc;
+  font-size: var(--pc-type-body);
+  line-height: var(--pc-leading-body);
+}
+
+.pc-s1-preview-loop {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.pc-s1-preview-loop span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 255, 255, .42);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .1);
+  color: #fff;
+  font-size: var(--pc-type-small);
+  font-weight: 750;
+}
+
+.pc-s1-preview-loop b {
+  color: #f7d77e;
+  font-family: "Source Code Pro", monospace;
+}
+
+.pc-s1-preview-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(280px, .95fr);
+  gap: clamp(18px, 3vw, 42px);
+  align-items: end;
+  margin: 24px 0 16px;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid #aab8c3;
+  border-left: 6px solid #c99324;
+  border-radius: 14px;
+  background: #fffdf8;
+}
+
+.pc-s1-preview-intro h3,
+.pc-s1-preview-next h3 {
+  margin: 6px 0 0;
+  color: #112650;
+  font-family: "Lora", Georgia, serif;
+  font-size: var(--pc-type-card-title);
+  line-height: 1.25;
+}
+
+.pc-s1-preview-intro p,
+.pc-s1-comparison > p,
+.pc-s1-preview-next p {
+  margin: 0;
+  color: #3c4c58;
+  font-size: var(--pc-type-body);
+  line-height: var(--pc-leading-body);
+}
+
+.pc-s1-comparison-list {
+  display: grid;
+  gap: 18px;
+}
+
+.pc-s1-comparison {
+  padding: clamp(18px, 2.5vw, 28px);
+  border: 1px solid #aab8c3;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 9px 24px rgba(17, 38, 80, .07);
+}
+
+.pc-s1-comparison-heading > span {
+  color: #7b4e05;
+  font-family: "Source Code Pro", monospace;
+  font-size: var(--pc-type-xs);
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.pc-s1-comparison-heading h3 {
+  margin: 5px 0 15px;
+  color: #112650;
+  font-family: "Lora", Georgia, serif;
+  font-size: var(--pc-type-card-title);
+  line-height: 1.25;
+}
+
+.pc-s1-evidence-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 15px;
+}
+
+.pc-s1-evidence-card {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #9eacb7;
+  border-radius: 12px;
+  background: #f3f6f8;
+}
+
+.pc-s1-evidence-card figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 11px;
+  border-bottom: 1px solid #bac5cd;
+  background: #e8eef2;
+}
+
+.pc-s1-evidence-card figcaption span {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: var(--pc-type-xs);
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.pc-s1-evidence-card--before figcaption span {
+  background: #f6dfd7;
+  color: #7c2f19;
+}
+
+.pc-s1-evidence-card--after figcaption span {
+  background: #dceef7;
+  color: #0b4f75;
+}
+
+.pc-s1-evidence-card figcaption small {
+  color: #445661;
+  font-size: var(--pc-type-xs);
+  text-transform: capitalize;
+}
+
+.pc-s1-evidence-card a {
+  display: block;
+  background: #fff;
+}
+
+.pc-s1-evidence-card a:focus-visible {
+  outline: 4px solid #c99324;
+  outline-offset: -4px;
+}
+
+.pc-s1-evidence-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 8.3;
+  object-fit: contain;
+  background: #fff;
+}
+
+.pc-s1-preview-next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 20px;
+  padding: clamp(20px, 3vw, 30px);
+  border: 2px solid #c99324;
+  border-radius: 16px;
+  background: #fff6e4;
+}
+
+.pc-s1-preview-next > div {
+  max-width: 960px;
+}
+
+.pc-s1-preview-next .pc-shell-primary {
+  flex: 0 0 auto;
+}
+
+.pc-s1-preview-task {
+  display: grid;
+  grid-template-columns: minmax(250px, .8fr) minmax(420px, 1.2fr);
+  gap: clamp(18px, 3vw, 36px);
+  align-items: center;
+  margin-top: 24px;
+  padding: clamp(18px, 2.5vw, 28px);
+  border: 1px solid rgba(255, 255, 255, .48);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .12);
+}
+
+.pc-s1-preview-task span {
+  color: #f7d77e;
+  font-family: "Source Code Pro", monospace;
+  font-size: var(--pc-type-xs);
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.pc-s1-preview-task h3 {
+  margin: 6px 0 0;
+  color: #fff;
+  font-family: "Lora", Georgia, serif;
+  font-size: var(--pc-type-card-title);
+  line-height: 1.25;
+}
+
+.pc-s1-preview-task ol {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding-left: 1.4rem;
+  color: #eef8fc;
+  font-size: var(--pc-type-small);
+  line-height: 1.5;
+}
+
+.pc-s1-preview-task b { color: #fff; }
+
+.pc-s1-case-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.pc-s1-case-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 10px 13px;
+  border: 2px solid #9aabb8;
+  border-radius: 12px;
+  background: #fff;
+  color: #24394d;
+  font: inherit;
+  font-size: var(--pc-type-small);
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pc-s1-case-tab b {
+  color: #8a5b0b;
+  font-family: "Source Code Pro", monospace;
+}
+
+.pc-s1-case-tab:is(:hover, :focus-visible) {
+  border-color: #087aa9;
+  outline: 3px solid rgba(201, 147, 36, .22);
+  outline-offset: 2px;
+}
+
+.pc-s1-case-tab.is-active {
+  border-color: #c99324;
+  background: #fff6e4;
+  color: #112650;
+  box-shadow: inset 0 -4px 0 #c99324;
+}
+
+.pc-s1-evidence-station {
+  overflow: hidden;
+  border: 2px solid #315b78;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(17, 38, 80, .11);
+}
+
+.pc-s1-evidence-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(18px, 2.6vw, 30px);
+  border-bottom: 1px solid #aab8c3;
+  background: #f6f9fb;
+}
+
+.pc-s1-evidence-heading #pcS1CaseCounter,
+.pc-s1-evidence-heading #pcS1CaseKicker {
+  display: block;
+  color: #7b4e05;
+  font-family: "Source Code Pro", monospace;
+  font-size: var(--pc-type-xs);
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.pc-s1-evidence-heading #pcS1CaseKicker {
+  margin-top: 5px;
+  color: #506575;
+  letter-spacing: .03em;
+}
+
+.pc-s1-evidence-heading h3 {
+  margin: 7px 0 0;
+  color: #112650;
+  font-family: "Lora", Georgia, serif;
+  font-size: var(--pc-type-card-title);
+  line-height: 1.25;
+}
+
+.pc-s1-state-switch {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  min-width: 250px;
+  padding: 4px;
+  border: 1px solid #8fa2b0;
+  border-radius: 12px;
+  background: #e7edf1;
+}
+
+.pc-s1-state-switch button {
+  min-height: 42px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #3f5362;
+  font: inherit;
+  font-size: var(--pc-type-small);
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.pc-s1-state-switch button:is(:hover, :focus-visible) {
+  outline: 3px solid rgba(201, 147, 36, .28);
+  outline-offset: 1px;
+}
+
+.pc-s1-state-switch button.is-active {
+  background: #112650;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(17, 38, 80, .18);
+}
+
+.pc-s1-evidence-viewer {
+  margin: clamp(14px, 2vw, 24px);
+  overflow: hidden;
+  border: 1px solid #91a4b3;
+  border-radius: 12px;
+  background: #e8eef2;
+}
+
+.pc-s1-viewer-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 9px 12px;
+  border-bottom: 1px solid #9fb0bc;
+  color: #455b6b;
+  font-size: var(--pc-type-xs);
+  text-transform: capitalize;
+}
+
+.pc-s1-viewer-state {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #f6dfd7;
+  color: #7c2f19;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.pc-s1-evidence-viewer[data-state="after"] .pc-s1-viewer-state {
+  background: #dceef7;
+  color: #0b4f75;
+}
+
+.pc-s1-viewer-bar a {
+  color: #075e8a;
+  font-weight: 800;
+}
+
+.pc-s1-evidence-image-link {
+  display: block;
+  background: #fff;
+  cursor: zoom-in;
+}
+
+.pc-s1-evidence-image-link:focus-visible {
+  outline: 5px solid #c99324;
+  outline-offset: -5px;
+}
+
+.pc-s1-evidence-image-link img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
+  background: #fff;
+}
+
+.pc-s1-inspection-panel {
+  display: grid;
+  gap: 0;
+  padding: 0 clamp(14px, 2vw, 24px) clamp(14px, 2vw, 24px);
+}
+
+.pc-s1-inspection-copy {
+  padding: clamp(15px, 1.8vw, 20px) clamp(17px, 2vw, 24px);
+  border: 1px solid #9eacb7;
+  border-left: 5px solid #315b78;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.pc-s1-inspection-panel span {
+  display: block;
+  margin-bottom: 6px;
+  color: #7b4e05;
+  font-family: "Source Code Pro", monospace;
+  font-size: var(--pc-type-xs);
+  font-weight: 850;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.pc-s1-inspection-panel p {
+  margin: 0;
+  color: #304555;
+  font-size: var(--pc-type-body);
+  line-height: var(--pc-leading-body);
+}
+
+.pc-s1-case-handoff {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 10px;
+  overflow: hidden;
+  border: 1px solid #9eacb7;
+  border-radius: 12px;
+  background: #f7fafc;
+}
+
+.pc-s1-case-handoff[hidden] {
+  display: none;
+}
+
+.pc-s1-handoff-step {
+  min-width: 0;
+  padding: clamp(14px, 1.5vw, 19px) clamp(15px, 1.7vw, 22px);
+  border-top: 4px solid #315b78;
+  background: #fff;
+}
+
+.pc-s1-handoff-step + .pc-s1-handoff-step {
+  border-left: 1px solid #c7d1d8;
+}
+
+.pc-s1-handoff-step > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  color: #304f67;
+}
+
+.pc-s1-handoff-step > span b {
+  display: inline-grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #315b78;
+  color: #fff;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+.pc-s1-handoff-step p {
+  font-size: var(--pc-type-small);
+  line-height: 1.5;
+}
+
+.pc-s1-handoff-step--ai {
+  border-top-color: #087aa9;
+  background: #f3fafe;
+}
+
+.pc-s1-handoff-step--ai > span {
+  color: #075e8a;
+}
+
+.pc-s1-handoff-step--ai > span b {
+  background: #087aa9;
+}
+
+.pc-s1-handoff-step--human {
+  border-top-color: #c99324;
+  background: #fffaf0;
+}
+
+.pc-s1-handoff-step--human > span {
+  color: #7b4e05;
+}
+
+.pc-s1-handoff-step--human > span b {
+  background: #9a6410;
+}
+
+.pc-s1-evidence-actions {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px clamp(14px, 2vw, 24px);
+  border-top: 1px solid #aab8c3;
+  background: #f4f7f9;
+}
+
+.pc-s1-evidence-actions p {
+  margin: 0;
+  color: #526674;
+  font-size: var(--pc-type-xs);
+  line-height: 1.45;
+  text-align: center;
+}
+
+.pc-s1-evidence-actions button:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+}
+
+/* S1 keeps the classroom scene and brings Canvas into the existing smartboard.
+   The evidence is contained inside the screen rather than becoming a background
+   behind Pixel, Jordan, and the dialogue. */
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active .vn-smartboard-wrap::after {
+  content: "Canvas focus · Before";
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  z-index: 20;
+  transform: translateX(-50%);
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, .72);
+  border-radius: 999px;
+  background: rgba(17, 38, 80, .92);
+  color: #fff;
+  font-family: "Source Code Pro", monospace;
+  font-size: var(--pc-type-xs);
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  box-shadow: 0 5px 18px rgba(17, 38, 80, .24);
+  white-space: nowrap;
+}
+
+html body.pc-s1-canvas-smartboard-active[data-pc-s1-canvas-state="after"]
+#vnOverlay#vnOverlay.vn-overlay.active .vn-smartboard-wrap::after {
+  content: "Canvas focus · After";
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay#vnOverlay.vn-overlay.active .vn-smartboard-wrap {
+  display: block !important;
+  visibility: visible !important;
+  position: absolute !important;
+  top: clamp(34px, 4vh, 48px) !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: min(58vw, 1040px) !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9.8 !important;
+  transform: translateX(-50%) !important;
+  opacity: 1 !important;
+  z-index: 11 !important;
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active .vn-screen {
+  background: #fff !important;
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active .vn-board-img.loaded {
+  opacity: 1 !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  background: #fff !important;
+}
+
+/* The source Canvas screenshot remains visible on larger screens. On phones,
+   shrinking 1,000+ desktop pixels into a 300px board made the evidence
+   technically present but functionally unreadable. The mobile evidence lens
+   transcribes the exact focus details without introducing another scroll box. */
+.pc-s1-mobile-evidence-lens {
+  display: none;
+}
+
+@media screen and (max-width: 700px) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active .vn-smartboard-wrap::after {
+    top: 3px;
+    padding: 5px 9px;
+    font-size: clamp(8px, 2.35vw, 10px);
+    letter-spacing: .045em;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active .vn-board-img.loaded {
+    opacity: .08 !important;
+    object-fit: cover !important;
+    object-position: left top !important;
+    filter: saturate(.75) contrast(.9);
+  }
+
+  .pc-s1-mobile-evidence-lens {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: 3px;
+    min-width: 0;
+    min-height: 0;
+    padding: clamp(7px, 2vw, 10px) clamp(9px, 2.8vw, 13px);
+    overflow: hidden;
+    background:
+      linear-gradient(90deg, rgba(9, 122, 73, .95) 0 4px, transparent 4px),
+      rgba(255, 255, 255, .965);
+    color: #122c44;
+    font-family: "Source Sans 3", "Source Sans Pro", Arial, sans-serif;
+    text-align: left;
+  }
+
+  .pc-s1-mobile-evidence-lens--after {
+    background:
+      linear-gradient(90deg, rgba(0, 112, 163, .96) 0 4px, transparent 4px),
+      rgba(246, 252, 255, .975);
+  }
+
+  .pc-s1-mobile-evidence-context {
+    min-width: 0;
+    overflow: hidden;
+    color: #50677b;
+    font-family: "Source Code Pro", monospace;
+    font-size: clamp(7.5px, 2.15vw, 9.5px);
+    font-weight: 800;
+    letter-spacing: .055em;
+    line-height: 1.05;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .pc-s1-mobile-evidence-title {
+    display: block;
+    min-width: 0;
+    color: #112650;
+    font-size: clamp(12px, 3.6vw, 15.5px);
+    font-weight: 850;
+    line-height: 1.08;
+  }
+
+  .pc-s1-mobile-evidence-rows {
+    display: grid;
+    align-content: center;
+    gap: 2px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pc-s1-mobile-evidence-rows li {
+    display: grid;
+    grid-template-columns: 12px minmax(0, 1fr);
+    gap: 3px;
+    align-items: start;
+    min-width: 0;
+    padding: 2px 4px;
+    border-bottom: 1px solid #d9e2e8;
+    font-size: clamp(9.5px, 2.85vw, 12px);
+    font-weight: 700;
+    line-height: 1.12;
+  }
+
+  .pc-s1-mobile-evidence-rows li span {
+    color: #087aa8;
+    font-weight: 900;
+    text-align: center;
+  }
+
+  .pc-s1-mobile-evidence-finding {
+    min-width: 0;
+    overflow: hidden;
+    padding: 3px 6px;
+    border-radius: 4px;
+    background: #fff2c8;
+    color: #684508;
+    font-size: clamp(8px, 2.35vw, 10px);
+    line-height: 1.08;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Babbage is a workspace, not a webpage squeezed into the classroom prop.
+   It temporarily takes over the viewport, presents one readable step at a
+   time, and gives the scrolling region a real grid row with min-height: 0. */
+body.pc-s1-ai-workspace-active {
+  overflow: hidden !important;
+}
+
+.pc-s1-ai-workspace {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(0px, 2vw, 24px);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(28, 113, 154, .34), transparent 44%),
+    linear-gradient(145deg, #071a31 0%, #0d2b4d 52%, #071727 100%);
+  color: #172f46;
+  animation: pc-s1-ai-workspace-enter 360ms cubic-bezier(.2, .75, .2, 1) both;
+}
+
+.pc-s1-ai-workspace::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .18;
+  background-image:
+    linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+@keyframes pc-s1-ai-workspace-enter {
+  from { opacity: 0; transform: scale(.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.pc-s1-ai-workspace-shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  width: min(1180px, 100%);
+  height: calc(100vh - clamp(0px, 4vw, 48px));
+  height: calc(100dvh - clamp(0px, 4vw, 48px));
+  max-height: 900px;
+  min-height: 0;
+  overflow: hidden;
+  border: 2px solid #65b8dd;
+  border-radius: 20px;
+  background: #f6f9fb;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, .52), inset 0 0 0 1px rgba(255,255,255,.8);
+}
+
+.pc-s1-ai-workspace-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: clamp(12px, 2vw, 22px);
+  align-items: center;
+  padding: clamp(15px, 2vw, 23px) clamp(18px, 3vw, 34px);
+  border-bottom: 3px solid #58b8e2;
+  background: linear-gradient(110deg, #102b52, #075e8a);
+  color: #fff;
+}
+
+.pc-s1-ai-workspace-mark {
+  display: grid;
+  place-items: center;
+  width: clamp(46px, 5vw, 62px);
+  height: clamp(46px, 5vw, 62px);
+  border: 2px solid #f2c14e;
+  border-radius: 16px;
+  background: #071a31;
+  color: #f7d77e;
+  font-family: "Lora", Georgia, serif;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 850;
+  box-shadow: inset 0 0 18px rgba(242, 193, 78, .12);
+}
+
+.pc-s1-ai-workspace-header p,
+.pc-s1-ai-workspace-header h2 {
+  margin: 0;
+  color: #fff;
+}
+
+.pc-s1-ai-workspace-header p {
+  margin-bottom: 3px;
+  color: #bfe8f8;
+  font-family: "Source Code Pro", monospace;
+  font-size: clamp(11px, 1.2vw, 14px);
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.pc-s1-ai-workspace-header h2 {
+  font-family: "Lora", Georgia, serif;
+  font-size: clamp(24px, 3vw, 38px);
+  line-height: 1.08;
+}
+
+.pc-s1-ai-workspace-badge {
+  padding: 8px 12px;
+  border: 1px solid rgba(255,255,255,.58);
+  border-radius: 999px;
+  background: rgba(0,0,0,.16);
+  color: #fff;
+  font-size: clamp(12px, 1.2vw, 15px);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.pc-s1-ai-workspace-progress {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 0 clamp(12px, 3vw, 34px);
+  border-bottom: 1px solid #b9c7d1;
+  background: #e9eff3;
+  list-style: none;
+}
+
+.pc-s1-ai-workspace-progress li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 12px 8px;
+  border-bottom: 4px solid transparent;
+  color: #536978;
+  font-size: clamp(12px, 1.25vw, 15px);
+  font-weight: 800;
+  text-align: center;
+}
+
+.pc-s1-ai-workspace-progress li b {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #c9d4db;
+  color: #30485b;
+  font-family: "Source Code Pro", monospace;
+  font-size: 11px;
+}
+
+.pc-s1-ai-workspace-progress li.is-complete {
+  color: #287246;
+}
+
+.pc-s1-ai-workspace-progress li.is-complete b {
+  background: #287246;
+  color: #fff;
+}
+
+.pc-s1-ai-workspace-progress li.is-current {
+  border-bottom-color: #c99324;
+  background: #fff;
+  color: #112650;
+}
+
+.pc-s1-ai-workspace-progress li.is-current b {
+  background: #112650;
+  color: #f7d77e;
+}
+
+.pc-s1-ai-workspace-handoff {
+  display: grid;
+  grid-template-columns: minmax(190px, .7fr) minmax(0, 2.3fr);
+  gap: clamp(12px, 2vw, 24px);
+  align-items: center;
+  padding: 12px clamp(18px, 3vw, 34px);
+  border-bottom: 1px solid #b9c7d1;
+  background: #f4f8fa;
+}
+
+.pc-s1-ai-workspace-handoff-heading span {
+  display: block;
+  margin-bottom: 2px;
+  color: #8a5b0b;
+  font-family: "Source Code Pro", monospace;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.pc-s1-ai-workspace-handoff-heading strong {
+  display: block;
+  color: #102b52;
+  font-size: clamp(14px, 1.4vw, 17px);
+  line-height: 1.25;
+}
+
+.pc-s1-ai-workspace-handoff ol {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pc-s1-ai-workspace-handoff li {
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid #b6c6d0;
+  border-radius: 9px;
+  background: #fff;
+  color: #3a5264;
+}
+
+.pc-s1-ai-workspace-handoff li > span {
+  display: block;
+  margin-bottom: 3px;
+  color: #587081;
+  font-family: "Source Code Pro", monospace;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+}
+
+.pc-s1-ai-workspace-handoff li > strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: inherit;
+  font-size: clamp(11px, 1.05vw, 13px);
+  font-weight: 750;
+  line-height: 1.28;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.pc-s1-ai-workspace-handoff li.is-complete {
+  border-color: #62a679;
+  background: #edf8f1;
+  color: #245e39;
+}
+
+.pc-s1-ai-workspace-handoff li.is-current {
+  border-color: #d4a137;
+  background: #fff8e9;
+  color: #684508;
+  box-shadow: inset 4px 0 0 #d4a137;
+}
+
+.pc-s1-ai-workspace-content {
+  min-width: 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  padding: clamp(22px, 4vw, 46px);
+  background:
+    linear-gradient(rgba(255,255,255,.86), rgba(255,255,255,.86)),
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(17,38,80,.05) 31px 32px);
+}
+
+.pc-s1-ai-workspace-content:focus-visible {
+  outline: 4px solid #c99324;
+  outline-offset: -5px;
+}
+
+.pc-s1-ai-workspace-step {
+  width: min(900px, 100%);
+  margin: 0 auto;
+}
+
+.pc-s1-ai-workspace-kicker {
+  margin: 0 0 7px;
+  color: #8a5b0b;
+  font-family: "Source Code Pro", monospace;
+  font-size: clamp(12px, 1.3vw, 15px);
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.pc-s1-ai-workspace-step > h3 {
+  margin: 0;
+  color: #102b52;
+  font-family: "Lora", Georgia, serif;
+  font-size: clamp(27px, 4vw, 43px);
+  line-height: 1.12;
+}
+
+.pc-s1-ai-workspace-step > h3:focus {
+  outline: none;
+}
+
+.pc-s1-ai-workspace-lead {
+  max-width: 800px;
+  margin: 12px 0 22px;
+  color: #40596a;
+  font-size: clamp(17px, 1.8vw, 21px);
+  line-height: 1.55;
+}
+
+.pc-s1-ai-workspace-task-card,
+.pc-s1-ai-workspace-review-card {
+  padding: clamp(20px, 3vw, 30px);
+  border: 2px solid #83abc2;
+  border-left: 8px solid #087aa9;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 9px 24px rgba(17,38,80,.09);
+}
+
+.pc-s1-ai-workspace-task-card > span,
+.pc-s1-ai-workspace-review-card > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #7b4e05;
+  font-family: "Source Code Pro", monospace;
+  font-size: clamp(12px, 1.25vw, 15px);
+  font-weight: 850;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.pc-s1-ai-workspace-task-card h4,
+.pc-s1-ai-workspace-review-card h4 {
+  margin: 0;
+  color: #102b52;
+  font-family: "Lora", Georgia, serif;
+  font-size: clamp(22px, 2.8vw, 32px);
+  line-height: 1.2;
+}
+
+.pc-s1-ai-workspace-task-card > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.pc-s1-ai-workspace-task-card > div p {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 9px;
+  background: #eef5f8;
+  color: #334d60;
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.5;
+}
+
+.pc-s1-ai-workspace-draft-list {
+  display: grid;
+  gap: 11px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pc-s1-ai-workspace-draft-list li {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 17px 20px;
+  border: 1px solid #9db3c1;
+  border-radius: 11px;
+  background: #fff;
+  color: #284358;
+  font-size: clamp(16px, 1.7vw, 20px);
+  line-height: 1.45;
+  box-shadow: 0 5px 14px rgba(17,38,80,.055);
+}
+
+.pc-s1-ai-workspace-draft-list li b {
+  color: #087aa9;
+  font-family: "Source Code Pro", monospace;
+  font-size: 14px;
+}
+
+.pc-s1-ai-workspace-status {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 9px;
+  background: #e7f2f7;
+  color: #075e8a;
+  font-size: clamp(14px, 1.4vw, 17px);
+  font-weight: 800;
+}
+
+.pc-s1-ai-workspace-status span {
+  color: #c99324;
+}
+
+.pc-s1-ai-workspace-review-card {
+  border-color: #d7ac50;
+  border-left-color: #c99324;
+  background: #fff9ec;
+}
+
+.pc-s1-ai-workspace-review-card > p {
+  margin: 13px 0 0;
+  color: #3a5061;
+  font-size: clamp(16px, 1.7vw, 20px);
+  line-height: 1.55;
+}
+
+.pc-s1-ai-workspace-review-card ul {
+  display: grid;
+  gap: 8px;
+  margin: 17px 0 0;
+  padding-left: 24px;
+  color: #31495b;
+  font-size: clamp(15px, 1.55vw, 18px);
+  line-height: 1.5;
+}
+
+.pc-s1-ai-workspace-coach {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid #88a9bc;
+  border-radius: 12px;
+  background: #edf6fa;
+}
+
+.pc-s1-ai-workspace-avatar {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #112650;
+  color: #f7d77e;
+  font-family: "Lora", Georgia, serif;
+  font-size: 24px;
+  font-weight: 850;
+}
+
+.pc-s1-ai-workspace-coach--eli {
+  border-color: #a18eb0;
+  background: #f5f0f8;
+}
+
+.pc-s1-ai-workspace-coach--eli .pc-s1-ai-workspace-avatar {
+  background: #4a354f;
+  color: #fff;
+}
+
+.pc-s1-ai-workspace-coach strong {
+  display: block;
+  margin: 1px 0 3px;
+  color: #102b52;
+  font-size: clamp(15px, 1.5vw, 18px);
+}
+
+.pc-s1-ai-workspace-coach p {
+  margin: 0;
+  color: #3b5364;
+  font-size: clamp(15px, 1.55vw, 18px);
+  line-height: 1.52;
+}
+
+.pc-s1-ai-workspace-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 13px clamp(18px, 3vw, 34px) calc(13px + env(safe-area-inset-bottom));
+  border-top: 1px solid #afbec8;
+  background: #eef3f6;
+  box-shadow: 0 -7px 20px rgba(17,38,80,.07);
+}
+
+.pc-s1-ai-workspace-footer > p {
+  margin: 0;
+  color: #526978;
+  font-size: clamp(12px, 1.25vw, 15px);
+  line-height: 1.4;
+}
+
+.pc-s1-ai-workspace-footer > div {
+  display: flex;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.pc-s1-ai-workspace-footer button {
+  min-height: 48px;
+}
+
+@media (max-width: 640px) {
+  .pc-s1-ai-workspace {
+    padding: 0;
+  }
+
+  .pc-s1-ai-workspace-shell {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .pc-s1-ai-workspace-header {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 12px 15px;
+  }
+
+  .pc-s1-ai-workspace-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    font-size: 24px;
+  }
+
+  .pc-s1-ai-workspace-header h2 {
+    font-size: clamp(22px, 7vw, 29px);
+  }
+
+  .pc-s1-ai-workspace-badge {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    padding: 6px 10px;
+    text-align: center;
+  }
+
+  .pc-s1-ai-workspace-progress {
+    display: none;
+  }
+
+  .pc-s1-ai-workspace-handoff {
+    display: block;
+    padding: 9px 12px;
+  }
+
+  .pc-s1-ai-workspace-handoff-heading {
+    margin-bottom: 7px;
+  }
+
+  .pc-s1-ai-workspace-handoff-heading strong {
+    font-size: 13px;
+  }
+
+  .pc-s1-ai-workspace-handoff ol {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .pc-s1-ai-workspace-handoff li {
+    padding: 6px 9px;
+  }
+
+  .pc-s1-ai-workspace-handoff li > span {
+    display: inline;
+    margin: 0 5px 0 0;
+    font-size: 9px;
+  }
+
+  .pc-s1-ai-workspace-handoff li > strong {
+    display: inline;
+    overflow: visible;
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  .pc-s1-ai-workspace-content {
+    padding: 18px 16px 24px;
+    scrollbar-gutter: auto;
+  }
+
+  .pc-s1-ai-workspace-step > h3 {
+    font-size: clamp(25px, 8vw, 34px);
+  }
+
+  .pc-s1-ai-workspace-lead {
+    margin-bottom: 17px;
+    font-size: 17px;
+  }
+
+  .pc-s1-ai-workspace-task-card,
+  .pc-s1-ai-workspace-review-card {
+    padding: 18px;
+    border-left-width: 6px;
+  }
+
+  .pc-s1-ai-workspace-task-card > div {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-s1-ai-workspace-draft-list li {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 8px;
+    padding: 14px;
+    font-size: 16px;
+  }
+
+  .pc-s1-ai-workspace-coach {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .pc-s1-ai-workspace-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .pc-s1-ai-workspace-footer {
+    display: block;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  }
+
+  .pc-s1-ai-workspace-footer > p {
+    display: none;
+  }
+
+  .pc-s1-ai-workspace-footer > div {
+    display: grid;
+    grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr);
+    width: 100%;
+  }
+
+  .pc-s1-ai-workspace-footer button {
+    width: 100%;
+    min-width: 0;
+    padding-inline: 10px;
+  }
+}
+
+@media (min-width: 641px) and (max-height: 620px) {
+  .pc-s1-ai-workspace {
+    padding: 0;
+  }
+
+  .pc-s1-ai-workspace-shell {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .pc-s1-ai-workspace-header {
+    padding-block: 10px;
+  }
+
+  .pc-s1-ai-workspace-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    font-size: 24px;
+  }
+
+  .pc-s1-ai-workspace-progress li {
+    padding-block: 8px;
+  }
+
+  .pc-s1-ai-workspace-handoff {
+    grid-template-columns: minmax(150px, .55fr) minmax(0, 2.45fr);
+    padding-block: 7px;
+  }
+
+  .pc-s1-ai-workspace-handoff li {
+    padding-block: 6px;
+  }
+
+  .pc-s1-ai-workspace-content {
+    padding-block: 18px 24px;
+  }
+
+  .pc-s1-ai-workspace-footer {
+    padding-block: 9px;
+  }
+}
+
+/* S1 Canvas Rescue: the applied player activity after the four formative case
+   files. Babbage drafts; the player controls the evidence and review boundary. */
+.pc-s1-rescue {
+  width: min(1480px, calc(100% - 24px));
+  margin: 18px auto 36px;
+  color: #172334;
+}
+
+.pc-s1-rescue-hero {
+  overflow: hidden;
+  border: 2px solid #0a3d62;
+  border-radius: 20px 20px 0 0;
+  background: linear-gradient(135deg, #102b52 0%, #075e8a 100%);
+  color: #fff;
+  box-shadow: 0 14px 32px rgba(8, 38, 72, .15);
+}
+
+.pc-s1-rescue-hero > span {
+  display: block;
+  padding: 9px clamp(20px, 3vw, 38px);
+  background: #f2c14e;
+  color: #2c2a20;
+  font-family: "Source Code Pro", monospace;
+  font-size: var(--pc-type-xs);
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.pc-s1-rescue-hero > div {
+  padding: clamp(24px, 4vw, 48px);
+}
+
+.pc-s1-rescue-hero > div > p:first-child {
+  margin: 0 0 7px;
+  color: #bfe8f8;
+  font-family: "Source Code Pro", monospace;
+  font-size: var(--pc-type-xs);
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.pc-s1-rescue-hero h2 {
+  max-width: 1050px;
+  margin: 0 0 12px;
+  color: #fff;
+  font-family: "Lora", Georgia, serif;
+  font-size: var(--pc-type-mission-title);
+  line-height: 1.1;
+}
+
+.pc-s1-rescue-hero > div > p:last-child {
+  max-width: 1100px;
+  margin: 0;
+  color: #eaf6fb;
+  font-size: var(--pc-type-body);
+  line-height: var(--pc-leading-body);
+}
+
+.pc-s1-rescue-hero ol {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, .3);
+  background: rgba(0, 0, 0, .14);
+}
+
+.pc-s1-rescue-hero li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 52px;
+  border-right: 1px solid rgba(255, 255, 255, .22);
+  color: #cfe4ee;
+  font-weight: 800;
+}
+
+.pc-s1-rescue-hero li:last-child { border-right: 0; }
+.pc-s1-rescue-hero li.is-active { background: rgba(255, 255, 255, .12); color: #fff; }
+.pc-s1-rescue-hero li.is-complete { color: #ffe08a; }
+.pc-s1-rescue-hero li b {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.pc-s1-rescue-brief,
+.pc-s1-rescue-review,
+.pc-s1-rescue-result {
+  border: 1px solid #9eacb7;
+  border-top: 0;
+  border-radius: 0 0 20px 20px;
+  background: #fff;
+  box-shadow: 0 14px 30px rgba(8, 38, 72, .1);
+}
+
+.pc-s1-rescue-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, .8fr);
+  gap: 22px;
+  align-items: center;
+  padding: clamp(22px, 3vw, 36px);
+  border-bottom: 1px solid #aab8c3;
+  background: #f5f9fb;
+}
+
+.pc-s1-rescue-intro span,
+.pc-s1-rescue-result article > span,
+.pc-s1-rescue-principle > span {
+  color: #7b4e05;
+  font-family: "Source Code Pro", monospace;
+  font-size: var(--pc-type-xs);
+  font-weight: 850;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.pc-s1-rescue-intro h3 {
+  margin: 6px 0 0;
+  color: #102b52;
+  font-family: "Lora", Georgia, serif;
+  font-size: var(--pc-type-card-title);
+  line-height: 1.2;
+}
+
+.pc-s1-rescue-intro > p {
+  margin: 0;
+  color: #415767;
+  font-size: var(--pc-type-small);
+  line-height: 1.55;
+}
+
+.pc-s1-rescue-brief-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  padding: clamp(20px, 3vw, 34px);
+}
+
+.pc-s1-rescue-brief-card {
+  min-width: 0;
+  margin: 0;
+  padding: 18px;
+  border: 1.5px solid #9eb0bc;
+  border-radius: 14px;
+  background: #fbfcfd;
+}
+
+.pc-s1-rescue-brief-card legend {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 8px;
+  color: #102b52;
+  font-weight: 900;
+}
+
+.pc-s1-rescue-brief-card legend b {
+  color: #c27617;
+  font-family: "Source Code Pro", monospace;
+}
+
+.pc-s1-rescue-brief-card > p {
+  margin: 4px 0 14px;
+  color: #415767;
+  font-size: var(--pc-type-small);
+}
+
+.pc-s1-rescue-brief-choices {
+  display: grid;
+  gap: 9px;
+}
+
+.pc-s1-rescue-brief-choices label,
+.pc-s1-rescue-proposal-actions label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 13px;
+  border: 1px solid #b5c2cb;
+  border-radius: 9px;
+  background: #fff;
+  color: #263b4b;
+  font-size: var(--pc-type-small);
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.pc-s1-rescue-brief-choices label:has(input:checked),
+.pc-s1-rescue-proposal-actions label:has(input:checked) {
+  border-color: #0b76a5;
+  background: #eaf6fb;
+  box-shadow: inset 4px 0 #0b76a5;
+}
+
+.pc-s1-rescue-brief-choices input,
+.pc-s1-rescue-proposal-actions input {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  accent-color: #075e8a;
+}
+
+.pc-s1-rescue-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 18px clamp(20px, 3vw, 34px);
+  border-top: 1px solid #aab8c3;
+  background: #f4f7f9;
+}
+
+.pc-s1-rescue-actions > p {
+  margin: 0 auto 0 0;
+  color: #526674;
+  font-size: var(--pc-type-small);
+  font-weight: 800;
+}
+
+.pc-s1-rescue-actions button:disabled { opacity: .45; cursor: not-allowed; }
+
+.pc-s1-rescue-loading {
+  display: grid;
+  min-height: min(680px, 74vh);
+  place-content: center;
+  justify-items: center;
+  padding: 40px;
+  border: 2px solid #0a3d62;
+  border-radius: 20px;
+  background: radial-gradient(circle at 50% 30%, #114f76 0%, #102b52 48%, #081a35 100%);
+  color: #fff;
+  text-align: center;
+}
+
+.pc-s1-rescue-loading > span {
+  margin-top: 24px;
+  color: #f2c14e;
+  font-family: "Source Code Pro", monospace;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.pc-s1-rescue-loading h2 {
+  max-width: 820px;
+  margin: 12px 0;
+  font-family: "Lora", Georgia, serif;
+  font-size: var(--pc-type-mission-title);
+}
+
+.pc-s1-rescue-loading p { color: #cde4ef; }
+
+.pc-s1-rescue-orbit {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border: 2px solid rgba(255, 255, 255, .25);
+  border-radius: 50%;
+  animation: pc-s1-rescue-spin 1.6s linear infinite;
+}
+
+.pc-s1-rescue-orbit span {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #f2c14e;
+  box-shadow: 0 0 18px rgba(242, 193, 78, .8);
+}
+.pc-s1-rescue-orbit span:nth-child(1) { top: -8px; left: 35px; }
+.pc-s1-rescue-orbit span:nth-child(2) { right: -6px; bottom: 15px; background: #69c3eb; }
+.pc-s1-rescue-orbit span:nth-child(3) { left: -6px; bottom: 15px; background: #fff; }
+
+@keyframes pc-s1-rescue-spin { to { transform: rotate(360deg); } }
+
+.pc-s1-rescue-proposals {
+  display: grid;
+  gap: 14px;
+  padding: clamp(20px, 3vw, 34px);
+}
+
+.pc-s1-rescue-proposal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(330px, .65fr);
+  gap: 18px;
+  align-items: center;
+  padding: 18px;
+  border: 1px solid #aab8c3;
+  border-radius: 12px;
+  background: #fbfcfd;
+}
+
+.pc-s1-rescue-proposal-copy > span {
+  color: #075e8a;
+  font-family: "Source Code Pro", monospace;
+  font-size: var(--pc-type-xs);
+  font-weight: 850;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.pc-s1-rescue-proposal-copy h3 {
+  margin: 5px 0 6px;
+  color: #102b52;
+  font-size: var(--pc-type-label);
+}
+
+.pc-s1-rescue-proposal-copy p { margin: 0; color: #415767; line-height: 1.5; }
+.pc-s1-rescue-proposal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pc-s1-rescue-proposal-actions label { align-items: center; font-weight: 850; }
+
+.pc-s1-rescue-score-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  padding: clamp(22px, 3vw, 38px);
+  background: #f5f9fb;
+}
+
+.pc-s1-rescue-score-row article {
+  padding: 22px;
+  border: 1px solid #94a9b7;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.pc-s1-rescue-score-row strong {
+  display: block;
+  margin: 8px 0;
+  color: #075e8a;
+  font-family: "Lora", Georgia, serif;
+  font-size: clamp(34px, 4vw, 58px);
+}
+
+.pc-s1-rescue-score-row p,
+.pc-s1-rescue-result-list p,
+.pc-s1-rescue-principle p { margin: 0; color: #415767; line-height: 1.5; }
+
+.pc-s1-rescue-result-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0 clamp(22px, 3vw, 38px) clamp(22px, 3vw, 38px);
+}
+
+.pc-s1-rescue-result-list article {
+  padding: 18px;
+  border: 1px solid #7bad91;
+  border-left: 6px solid #2b7a4b;
+  border-radius: 10px;
+  background: #f0f8f3;
+}
+
+.pc-s1-rescue-result-list article.needs-review {
+  border-color: #d2a43f;
+  border-left-color: #c27617;
+  background: #fff7df;
+}
+
+.pc-s1-rescue-result-list h3 { margin: 5px 0 7px; color: #102b52; font-size: var(--pc-type-label); }
+
+.pc-s1-rescue-principle {
+  margin: 0 clamp(22px, 3vw, 38px) clamp(22px, 3vw, 38px);
+  padding: 22px;
+  border: 2px solid #0b76a5;
+  border-radius: 14px;
+  background: #eaf6fb;
+}
+
+.pc-s1-rescue-principle p { margin-top: 8px; font-size: var(--pc-type-body); }
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active .vn-screen::before,
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active .vn-screen::after {
+  display: none !important;
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active :is(.vn-board-label, .vn-board-text, .vn-board-loading) {
+  display: none !important;
+}
+
+/* Jordan is introduced before joining the two-character scene. Animate the
+   portrait inside its resolved left slot so the shared slot geometry remains
+   stable while the character visibly enters. */
+.pc-vn-enter-slide-left {
+  animation: pc-s1-character-slide-left 720ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+@keyframes pc-s1-character-slide-left {
+  from { opacity: 0; transform: translateX(-110px); }
+  70% { opacity: 1; }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* The S1 diagnosis is part of the visual-novel exchange. Choices use the same
+   dialogue surface as the original S1 decisions instead of becoming a form in
+   the evidence station underneath the scene. */
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-dialogue-choice #vnDialogue.pc-s1-diagnosis-dialogue {
+  min-height: clamp(250px, 30vh, 310px) !important;
+  max-height: min(42vh, 360px) !important;
+  padding: 20px clamp(20px, 3vw, 48px) 24px !important;
+  overflow-y: auto !important;
+  cursor: default !important;
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay.vn-overlay.active.pc-s1-dialogue-choice .vn-skip,
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay.vn-overlay.active.pc-s1-dialogue-choice #vnAdvanceHint {
+  display: none !important;
+}
+
+.pc-s1-dialogue-kicker,
+.pc-s1-dialogue-question,
+.pc-s1-dialogue-instruction {
+  display: block;
+}
+
+.pc-s1-dialogue-kicker {
+  margin-bottom: 3px;
+  color: #79cdf2;
+  font-family: "Source Code Pro", monospace;
+  font-size: var(--pc-type-xs);
+  font-weight: 850;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.pc-s1-dialogue-question {
+  color: #fff;
+  font-family: "Lora", Georgia, serif;
+  font-size: clamp(18px, 1.45vw, 25px);
+  line-height: 1.2;
+}
+
+.pc-s1-dialogue-instruction {
+  margin-top: 4px;
+  color: #d8e8f2;
+  font-size: var(--pc-type-xs);
+}
+
+html body #vnOverlay.vn-overlay.active.pc-s1-dialogue-choice
+.vn-dialogue .vn-choice-list.pc-s1-dialogue-choice-list {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(9px, 1vw, 14px) !important;
+  margin: 14px 0 0 !important;
+}
+
+.pc-s1-dialogue-choice-btn {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 9px;
+  align-items: start;
+  min-height: 76px;
+  padding: 12px 13px;
+  border: 2px solid #78b9d8;
+  border-radius: 11px;
+  background: #f8fbfd;
+  color: #112650;
+  font: inherit;
+  font-size: clamp(13px, .9vw, 16px);
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, .18);
+}
+
+.pc-s1-dialogue-choice-btn > span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #112650;
+  color: #f3bc3f;
+  font-family: "Source Code Pro", monospace;
+  font-weight: 900;
+}
+
+.pc-s1-dialogue-choice-btn > b { font-weight: 800; }
+
+.pc-s1-dialogue-choice-btn:is(:hover, :focus-visible) {
+  border-color: #f3bc3f;
+  outline: 3px solid rgba(243, 188, 63, .38);
+  outline-offset: 2px;
+  background: #fff7df;
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-vn-enter-slide-left { animation: none; }
+  .pc-s1-dialogue-choice-btn { transition: none; }
+  .pc-s1-rescue-orbit { animation: none; }
+  .pc-s1-ai-workspace { animation: none; }
+}
+
+/* Lock the S1 dual cast to the same left/right stage grammar used by the other
+   two-character intros. The smartboard remains centered between them. */
+@media screen and (min-width: 701px) {
+  html body.pc-s1-canvas-smartboard-active[data-pc-viewport-family]
+  #vnOverlay#vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter) {
+    display: flex !important;
+    visibility: visible !important;
+    position: absolute !important;
+    top: auto !important;
+    bottom: var(--pc-vn-character-bottom) !important;
+    width: auto !important;
+    height: var(--pc-vn-character-height) !important;
+    max-width: var(--pc-vn-character-max-width) !important;
+    transform: none !important;
+    align-items: flex-end !important;
+    z-index: 17 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active[data-pc-viewport-family]
+  #vnOverlay#vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter)[data-pc-cast-side="left"] {
+    left: clamp(12px, 2.5vw, 48px) !important;
+    right: auto !important;
+    justify-content: flex-start !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active[data-pc-viewport-family]
+  #vnOverlay#vnOverlay#vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter)[data-pc-cast-side="right"] {
+    left: auto !important;
+    right: clamp(12px, 2.5vw, 48px) !important;
+    justify-content: flex-end !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .pc-s1-preview {
+    width: min(100% - 12px, 1480px);
+    margin-top: 8px;
+  }
+
+  .pc-s1-preview-loop,
+  .pc-s1-preview-intro,
+  .pc-s1-evidence-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-s1-preview-loop {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pc-s1-preview-next {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pc-s1-preview-next .pc-shell-primary {
+    width: 100%;
+  }
+
+  .pc-s1-preview-task,
+  .pc-s1-inspection-panel,
+  .pc-s1-case-handoff,
+  .pc-s1-rescue-intro,
+  .pc-s1-rescue-brief-grid,
+  .pc-s1-rescue-proposal,
+  .pc-s1-rescue-score-row,
+  .pc-s1-rescue-result-list {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-s1-handoff-step + .pc-s1-handoff-step {
+    border-left: 0;
+    border-top-width: 4px;
+  }
+
+  .pc-s1-rescue { width: min(100% - 12px, 1480px); margin-top: 8px; }
+  .pc-s1-rescue-hero ol { grid-template-columns: 1fr; }
+  .pc-s1-rescue-hero li { justify-content: flex-start; padding-left: 20px; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.18); }
+  .pc-s1-rescue-proposal-actions { grid-template-columns: 1fr; }
+  .pc-s1-rescue-actions { align-items: stretch; flex-direction: column; }
+  .pc-s1-rescue-actions > p { margin: 0 0 4px; }
+
+  html body #vnOverlay.vn-overlay.active.pc-s1-dialogue-choice
+  .vn-dialogue .vn-choice-list.pc-s1-dialogue-choice-list {
+    grid-template-columns: 1fr !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-dialogue-choice #vnDialogue.pc-s1-diagnosis-dialogue {
+    min-height: min(52vh, 430px) !important;
+    max-height: 56vh !important;
+    padding: 17px 14px 20px !important;
+  }
+
+  .pc-s1-case-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pc-s1-evidence-heading,
+  .pc-s1-evidence-actions {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .pc-s1-evidence-heading {
+    flex-direction: column;
+  }
+
+  .pc-s1-state-switch {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pc-s1-evidence-actions p {
+    order: -1;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active .vn-smartboard-wrap {
+    top: 28px !important;
+    left: 50% !important;
+    width: min(90vw, 720px) !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9.8 !important;
+    transform: translateX(-50%) !important;
+  }
 }
 
 /* S1 uses a specialized activity, but it consumes the same type tokens. */
@@ -17628,6 +19920,840 @@ body[data-pc-scenario="metacognition"] .pc-s2-diagnosis-layout .pc-choice-body >
   .pc-transfer-actions { justify-content:stretch; }
   .pc-transfer-actions .pc-button { flex:1 1 100%; }
 }
+
+
+/* v460 — S2/S3 shared scenario-shell alignment.
+   Scenario 2 now inherits the same centered stage, Student Evidence proportions,
+   and context-card rhythm used by S3. S2 keeps its metacognition mechanics; only
+   the scenario shell is shared. This also prevents the Diagnose context from
+   displaying the missing-link answer before the player chooses it. */
+body[data-pc-scenario="metacognition"] .pc-scenario-stage {
+  position: static !important;
+  left: auto !important;
+  width: min(100%, 1500px) !important;
+  max-width: 1500px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: var(--pc-stage-pad-block) var(--pc-stage-pad-inline) clamp(28px, 4vw, 44px) !important;
+  transform: none !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-case-brief {
+  padding: 0 !important;
+  background: linear-gradient(135deg, #fffdfa 0%, var(--parchment) 100%) !important;
+  box-shadow: 0 10px 24px rgba(8, 26, 54, .07) !important;
+}
+
+/* The mission briefing already names the case. S3 does not repeat a second case
+   title between Student Evidence and context, so S2 now follows the same shell. */
+body[data-pc-scenario="metacognition"] .pc-s2-case-header {
+  display: none !important;
+}
+
+body[data-pc-scenario="metacognition"] .pc-s2-case-brief .pc-case-brief-copy {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(12px, 2vw, 22px) !important;
+  padding: clamp(18px, 2.4vw, 28px) clamp(18px, 2.8vw, 34px) !important;
+}
+
+/* Decision 1 asks the player to identify this missing link. Keep it out of the
+   pre-decision context rather than quietly displaying the answer first. */
+body[data-pc-scenario="metacognition"] .pc-s2-case-brief .pc-case-brief-copy > div:nth-child(3) {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  body[data-pc-scenario="metacognition"] .pc-s2-case-brief .pc-case-brief-copy {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* V484 — S1 After-view explanation and Babbage feedback loop.
+   The player writes from the visible Before/After evidence inside the dialogue
+   pane, then receives one full-screen analysis instead of the retired
+   task/draft/review presentation. */
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-after-reflection-entry
+#vnDialogue.pc-s1-after-reflection-dialogue { cursor: default !important; }
+
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-after-reflection-entry
+#vnDialogue.pc-s1-after-reflection-dialogue #vnText {
+  display: grid !important;
+  gap: 7px !important;
+}
+
+.pc-s1-after-reflection-form { display:grid; gap:8px; width:100%; margin-top:10px; }
+.pc-s1-after-reflection-form label {
+  color:#ccebdd;
+  font:800 .73rem/1.1 "Source Code Pro",monospace;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.pc-s1-after-reflection-form textarea {
+  width:100%; min-height:112px; resize:vertical; padding:12px 14px;
+  border:1px solid #69cfe8; border-radius:7px; background:rgba(255,255,255,.97);
+  color:#102a43; font:600 1rem/1.45 "Source Sans 3","Source Sans Pro",Arial,sans-serif;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.12);
+}
+.pc-s1-after-reflection-form textarea:focus { outline:3px solid rgba(244,179,0,.42); outline-offset:1px; }
+.pc-s1-after-reflection-actions { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.pc-s1-after-reflection-actions > span { color:#b8cfda; font:700 .75rem/1.2 "Source Code Pro",monospace; }
+.pc-s1-after-reflection-actions button { min-height:42px; }
+
+body.pc-s1-reflection-analysis-active { overflow:hidden !important; }
+.pc-s1-reflection-analysis {
+  position:fixed; inset:0; z-index:12050; display:grid; place-items:center;
+  padding:clamp(14px,3vw,34px);
+  background:radial-gradient(circle at 50% 0,#174d75 0,#0b2a49 46%,#061b32 100%);
+  animation:pc-s1-ai-workspace-enter 300ms ease-out both;
+}
+.pc-s1-reflection-analysis-shell {
+  width:min(1120px,100%); max-height:min(880px,calc(100dvh - 28px));
+  display:grid; grid-template-rows:auto minmax(0,1fr) auto; overflow:hidden;
+  border:2px solid #69cfe8; border-radius:18px; background:#fff;
+  box-shadow:0 28px 70px rgba(0,0,0,.4);
+}
+.pc-s1-reflection-analysis-header {
+  display:grid; grid-template-columns:64px minmax(0,1fr) auto; align-items:center; gap:16px;
+  padding:16px 20px; border-bottom:3px solid #69cfe8; background:#15557e; color:#fff;
+}
+.pc-s1-reflection-analysis-mark {
+  display:grid; place-items:center; width:62px; height:62px;
+  border:2px solid #f4b300; border-radius:16px; color:#ffe27a;
+  font:800 2.2rem/1 Georgia,serif;
+}
+.pc-s1-reflection-analysis-header p,.pc-s1-reflection-analysis-header h2 { margin:0; }
+.pc-s1-reflection-analysis-header p {
+  color:#bdeeff; font:800 .78rem/1.25 "Source Code Pro",monospace;
+  letter-spacing:.06em; text-transform:uppercase;
+}
+.pc-s1-reflection-analysis-header h2 {
+  margin-top:4px; color:#fff; font:800 clamp(1.7rem,3vw,2.45rem)/1.05 "Lora",Georgia,serif;
+}
+.pc-s1-reflection-analysis-header h2:focus { outline:none; }
+.pc-s1-reflection-analysis-verdict {
+  padding:10px 14px; border:1px solid rgba(255,255,255,.75); border-radius:999px;
+  background:rgba(0,0,0,.13); color:#fff; font-weight:800; white-space:nowrap;
+}
+.pc-s1-reflection-analysis--score-3 .pc-s1-reflection-analysis-verdict { border-color:#90e4b7; background:#0f6c49; }
+.pc-s1-reflection-analysis--score-2 .pc-s1-reflection-analysis-verdict { border-color:#ffe08a; background:#805a00; }
+.pc-s1-reflection-analysis--score-0 .pc-s1-reflection-analysis-verdict,
+.pc-s1-reflection-analysis--score-1 .pc-s1-reflection-analysis-verdict { border-color:#ffc7b4; background:#8a3824; }
+.pc-s1-reflection-analysis-content {
+  min-height:0; overflow-y:auto; overscroll-behavior:contain;
+  padding:clamp(18px,3vw,32px); background:#f7fafc;
+}
+.pc-s1-reflection-response {
+  padding:16px 18px; border-left:5px solid #69cfe8; border-radius:10px;
+  background:#fff; box-shadow:0 4px 14px rgba(16,42,67,.08);
+}
+.pc-s1-reflection-response > span,.pc-s1-reflection-analysis-kicker,.pc-s1-reflection-teaching-point > span {
+  display:block; margin:0 0 7px; color:#8a5700;
+  font:800 .74rem/1.2 "Source Code Pro",monospace; letter-spacing:.08em; text-transform:uppercase;
+}
+.pc-s1-reflection-response blockquote {
+  margin:0; color:#183b56; font:650 clamp(1rem,1.7vw,1.18rem)/1.5 "Lora",Georgia,serif;
+}
+.pc-s1-reflection-feedback { margin-top:22px; }
+.pc-s1-reflection-feedback h3 {
+  max-width:820px; margin:0; color:#102a43;
+  font:750 clamp(1.35rem,2.6vw,2rem)/1.18 "Lora",Georgia,serif;
+}
+.pc-s1-reflection-feedback ol {
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px;
+  margin:18px 0 0; padding:0; list-style:none;
+}
+.pc-s1-reflection-feedback li {
+  display:grid; grid-template-columns:34px minmax(0,1fr); gap:10px; align-items:start;
+  min-height:132px; padding:15px; border:1px solid #c5d4df; border-radius:11px; background:#fff;
+}
+.pc-s1-reflection-feedback li > span {
+  display:grid; place-items:center; width:32px; height:32px; border-radius:50%; color:#fff; font-weight:900;
+}
+.pc-s1-reflection-feedback li.is-met > span { background:#078447; }
+.pc-s1-reflection-feedback li.is-missing > span { background:#b24b2f; }
+.pc-s1-reflection-feedback li.is-met { border-color:#8bc8a8; background:#f0faf5; }
+.pc-s1-reflection-feedback li.is-missing { border-color:#e2aa99; background:#fff7f3; }
+.pc-s1-reflection-feedback li strong { color:#102a43; font-size:1rem; }
+.pc-s1-reflection-feedback li p { margin:5px 0 0; color:#486581; line-height:1.38; }
+.pc-s1-reflection-teaching-point {
+  margin-top:18px; padding:16px 18px; border:1px solid #e3b74d;
+  border-radius:10px; background:#fff7df;
+}
+.pc-s1-reflection-teaching-point p { margin:0; color:#4b3a13; font-size:1.02rem; line-height:1.45; }
+.pc-s1-reflection-analysis-footer {
+  display:flex; align-items:center; justify-content:space-between; gap:18px;
+  padding:13px 20px; border-top:1px solid #c7d7e2; background:#edf4f7;
+}
+.pc-s1-reflection-analysis-footer > p { margin:0; color:#526d82; font-size:.86rem; }
+.pc-s1-reflection-analysis-footer > div { display:flex; gap:10px; flex:0 0 auto; }
+
+@media (max-width:700px) {
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-after-reflection-entry
+  #vnDialogue.pc-s1-after-reflection-dialogue { max-height:52dvh !important; overflow-y:auto !important; }
+  .pc-s1-after-reflection-actions,.pc-s1-reflection-analysis-footer { align-items:stretch; flex-direction:column; }
+  .pc-s1-after-reflection-actions button,.pc-s1-reflection-analysis-footer button { width:100%; }
+  .pc-s1-reflection-analysis { padding:0; }
+  .pc-s1-reflection-analysis-shell { width:100%; height:100dvh; max-height:none; border:0; border-radius:0; }
+  .pc-s1-reflection-analysis-header { grid-template-columns:46px minmax(0,1fr); gap:10px; padding:12px 14px; }
+  .pc-s1-reflection-analysis-mark { width:44px; height:44px; border-radius:10px; font-size:1.55rem; }
+  .pc-s1-reflection-analysis-verdict { grid-column:1/-1; justify-self:start; padding:7px 10px; font-size:.82rem; }
+  .pc-s1-reflection-analysis-content { padding:16px 14px; }
+  .pc-s1-reflection-feedback ol { grid-template-columns:1fr; }
+  .pc-s1-reflection-feedback li { min-height:0; }
+  .pc-s1-reflection-analysis-footer { padding:11px 14px; }
+  .pc-s1-reflection-analysis-footer > div { display:grid; grid-template-columns:1fr 1.25fr; width:100%; }
+}
+
+@media (max-width:430px) {
+  .pc-s1-reflection-analysis-header p { font-size:.64rem; }
+  .pc-s1-reflection-analysis-header h2 { font-size:1.45rem; }
+  .pc-s1-reflection-analysis-footer > p { display:none; }
+  .pc-s1-reflection-analysis-footer > div { grid-template-columns:1fr; }
+}
+
+/* V486 — continuous case comparison, CRT analysis, and course-week transfer. */
+.pc-s1-case-reflection{display:grid;gap:14px;width:100%;padding:clamp(18px,2.5vw,28px);border:2px solid #315b78;border-radius:14px;background:#f8fbfd}
+.pc-s1-case-reflection-head{display:flex;align-items:end;justify-content:space-between;gap:24px}.pc-s1-case-reflection-head>div:first-child{min-width:0}
+.pc-s1-case-reflection-head span,.pc-s1-case-reflection>label{color:#7b4e05;font:800 .78rem/1.3 "Source Code Pro",monospace;letter-spacing:.08em;text-transform:uppercase}
+.pc-s1-case-reflection-head h4{margin:6px 0 0;color:#112650;font:800 clamp(1.2rem,2vw,1.65rem)/1.25 "Lora",Georgia,serif}.pc-s1-case-reflection-status{margin:0;color:#526778}
+.pc-s1-case-reflection textarea{width:100%;min-height:130px;resize:vertical;padding:14px 16px;border:1px solid #8fa2b0;border-radius:10px;background:#fff;color:#172334;font:500 1rem/1.55 "Atkinson Hyperlegible",Arial,sans-serif}
+.pc-s1-case-reflection textarea:disabled{background:#edf2f5;color:#607382;cursor:not-allowed}.pc-s1-case-reflection textarea:focus{outline:4px solid rgba(201,147,36,.28);border-color:#087aa9}
+.pc-s1-case-reflection-actions{display:flex;align-items:center;justify-content:space-between;gap:16px}.pc-s1-case-reflection-actions>span{color:#526778;font:700 .8rem/1.3 "Source Code Pro",monospace}
+
+.pc-s1-reflection-analysis--terminal{background:radial-gradient(circle at center,#173126 0,#07120d 68%,#020604 100%);font-family:"Source Code Pro",monospace}
+.pc-s1-reflection-analysis--terminal:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:2;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 2px,transparent 4px)}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-shell{position:relative;z-index:3;border:2px solid #55e79f;border-radius:4px;background:#020b07;color:#a8ffc9;box-shadow:0 0 32px rgba(85,231,159,.2),inset 0 0 42px rgba(24,107,67,.18)}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-header{background:#06170f;border-color:#2b9e65}.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-mark{width:auto;min-width:64px;border-color:#55e79f;background:#03120b;color:#7dffb2;font:800 1.2rem/1 "Source Code Pro",monospace}
+.pc-s1-reflection-analysis--terminal :is(.pc-s1-reflection-analysis-header p,.pc-s1-reflection-analysis-header h2,.pc-s1-reflection-analysis-content h3,.pc-s1-reflection-analysis-content strong){color:#baffd3;font-family:"Source Code Pro",monospace}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-verdict{border-color:#d4a83f;background:#261d04;color:#ffd96c}.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-content{background:#020b07}
+.pc-s1-reflection-analysis--terminal :is(.pc-s1-reflection-response,.pc-s1-reflection-feedback,.pc-s1-reflection-teaching-point){border-color:#286c4b;background:#04120c;color:#b8d9c5}.pc-s1-reflection-analysis--terminal :is(blockquote,p){color:#b8d9c5}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li{border-color:#214d38;background:#020d08}.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li>span{width:auto;min-width:72px;border-radius:3px;background:transparent;color:#ffd96c;font-family:"Source Code Pro",monospace}.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li.is-met>span{color:#73ffad}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-footer{border-color:#286c4b;background:#06170f}.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-footer>p{color:#8bc7a4}
+
+.pc-s1-week-planner{width:min(1420px,calc(100% - 24px));margin:20px auto 36px;color:#172334}.pc-s1-week-planner-hero{padding:clamp(24px,4vw,46px);border-radius:18px 18px 0 0;background:linear-gradient(135deg,#102b52,#075e8a);color:#fff}
+.pc-s1-week-planner-hero>span{color:#f7d77e;font:800 .75rem/1.3 "Source Code Pro",monospace;letter-spacing:.08em;text-transform:uppercase}.pc-s1-week-planner-hero h2{margin:8px 0 12px;color:#fff;font:800 clamp(1.8rem,4vw,3rem)/1.12 "Lora",Georgia,serif}.pc-s1-week-planner-hero p{max-width:1000px;margin:0;color:#eef8fc;font-size:1.05rem;line-height:1.55}
+.pc-s1-week-planner-form,.pc-s1-week-plan-result{padding:clamp(20px,3vw,34px);border:2px solid #315b78;border-top:0;background:#fff}.pc-s1-week-planner-basics{display:grid;grid-template-columns:.7fr 1.3fr;gap:16px;margin-bottom:18px}.pc-s1-week-planner label{display:grid;gap:7px}.pc-s1-week-planner label>span{color:#112650;font-weight:850}
+.pc-s1-week-planner input,.pc-s1-week-planner textarea{width:100%;padding:12px 14px;border:1px solid #93a7b5;border-radius:9px;font:inherit;color:#172334}.pc-s1-week-planner :is(input,textarea):focus{outline:4px solid rgba(201,147,36,.25);border-color:#087aa9}
+.pc-s1-week-planner-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.pc-s1-week-category{align-content:start;padding:15px;border:1px solid #9fb1bd;border-top:5px solid #087aa9;border-radius:12px;background:#f8fbfd}.pc-s1-week-category>span{display:flex;gap:8px;align-items:center;font-family:"Source Code Pro",monospace}.pc-s1-week-category>span b{color:#a46b06}.pc-s1-week-category small{min-height:54px;color:#526778;line-height:1.4}.pc-s1-week-category textarea{min-height:128px;resize:vertical;background:#fff}
+.pc-s1-week-planner-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:18px clamp(20px,3vw,34px);border:2px solid #315b78;border-top:0;border-radius:0 0 18px 18px;background:#eef4f7}.pc-s1-week-planner-form>.pc-s1-week-planner-actions{margin:24px 0 0;border:1px solid #aebdc7;border-radius:12px}.pc-s1-week-planner-actions p{margin:0 auto 0 0;color:#526778}
+.pc-s1-week-plan-result{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.pc-s1-week-canvas-preview{border:1px solid #aebdc7;background:#fff}.pc-s1-week-canvas-head{display:flex;justify-content:space-between;padding:13px 16px;background:#f0f2f3}.pc-s1-week-canvas-head b{color:#087b42}.pc-s1-week-canvas-preview>h3{margin:0;padding:18px;border-bottom:1px solid #d7e0e5;color:#112650}.pc-s1-week-canvas-preview article{padding:15px 18px;border-left:5px solid #008a4b;border-bottom:1px solid #d7e0e5}.pc-s1-week-canvas-preview article p{margin:6px 0 0;white-space:pre-wrap;color:#405564}
+.pc-s1-week-terminal{padding:20px;border:2px solid #55e79f;background:#020b07;color:#a8ffc9;font-family:"Source Code Pro",monospace;box-shadow:inset 0 0 28px rgba(24,107,67,.2)}.pc-s1-week-terminal>span,.pc-s1-week-terminal .is-check{color:#ffd96c}.pc-s1-week-terminal h3,.pc-s1-week-terminal .is-pass{color:#73ffad}.pc-s1-week-terminal p{color:#b8d9c5}.pc-s1-week-terminal hr{border:0;border-top:1px dashed #2b8055}
+@media(max-width:900px){.pc-s1-case-reflection-head,.pc-s1-case-reflection-actions,.pc-s1-week-planner-actions{align-items:stretch;flex-direction:column}.pc-s1-case-reflection-head .pc-s1-state-switch{width:100%}.pc-s1-case-reflection-actions button,.pc-s1-week-planner-actions button{width:100%}.pc-s1-week-planner-basics,.pc-s1-week-plan-result{grid-template-columns:1fr}.pc-s1-week-planner-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.pc-s1-case-reflection{padding:15px;border-radius:0}.pc-s1-state-switch{min-width:0}.pc-s1-week-planner{width:100%;margin:0}.pc-s1-week-planner-hero,.pc-s1-week-planner-form,.pc-s1-week-plan-result,.pc-s1-week-planner-actions{border-radius:0}.pc-s1-week-planner-grid{grid-template-columns:1fr}.pc-s1-week-category small{min-height:0}.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li{align-items:start;flex-direction:column}}
+
+/* V494 — variable-length comparison analysis.
+   The report body is the only scroll owner; criteria grow in normal flow and
+   terminal status tokens occupy their own column instead of covering labels. */
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-shell {
+  min-height: 0;
+}
+
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-header {
+  grid-template-columns: minmax(64px, auto) minmax(0, 1fr) minmax(0, auto);
+}
+
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-header > div,
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li > div {
+  min-width: 0;
+}
+
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-verdict {
+  max-width: min(100%, 32ch);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-content {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+.pc-s1-reflection-analysis--terminal :is(
+  .pc-s1-reflection-response blockquote,
+  .pc-s1-reflection-feedback h3,
+  .pc-s1-reflection-feedback strong,
+  .pc-s1-reflection-feedback p,
+  .pc-s1-reflection-teaching-point p
+) {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback ol {
+  grid-auto-rows: max-content;
+  align-items: start;
+}
+
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li {
+  grid-template-columns: minmax(72px, max-content) minmax(0, 1fr);
+  min-height: 0;
+  height: auto;
+  align-self: start;
+}
+
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li > span {
+  width: auto;
+  min-width: 72px;
+  max-width: 100%;
+  height: auto;
+  min-height: 32px;
+  padding: 6px 8px;
+  justify-self: start;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-footer {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+  .pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-header {
+    grid-template-columns: 46px minmax(0, 1fr);
+  }
+
+  .pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-footer {
+    max-height: 42dvh;
+    overflow-y: auto;
+  }
+}
+
+/* V488 — the case file is now the only S1 comparison surface. After the
+   on-page response is submitted, Babbage boots through a deliberately retro
+   loading terminal before the full analysis terminal replaces it. */
+body.pc-s1-reflection-loading-active { overflow:hidden !important; }
+.pc-s1-reflection-loading {
+  position:fixed; inset:0; z-index:12060; display:grid; place-items:center;
+  padding:clamp(18px,4vw,48px); color:#91ffb9;
+  background:radial-gradient(circle at 50% 38%,#153b28 0,#07140d 52%,#010503 100%);
+  font-family:"Source Code Pro",monospace;
+}
+.pc-s1-reflection-loading::after {
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(to bottom,rgba(190,255,212,.04) 0,rgba(190,255,212,.04) 1px,transparent 2px,transparent 5px);
+  animation:pc-s1-terminal-flicker 1.2s steps(2,end) infinite;
+}
+.pc-s1-reflection-loading-shell {
+  position:relative; z-index:1; width:min(820px,100%); padding:clamp(24px,5vw,54px);
+  border:2px solid #55e79f; border-radius:4px; background:rgba(1,10,6,.94);
+  box-shadow:0 0 42px rgba(85,231,159,.23),inset 0 0 48px rgba(33,126,77,.2);
+}
+.pc-s1-reflection-loading-brand {
+  margin:0 0 18px; color:#ffd96c; font-size:clamp(.72rem,1.5vw,.9rem);
+  font-weight:800; letter-spacing:.09em;
+}
+.pc-s1-reflection-loading h2 {
+  margin:0 0 28px; color:#baffd3;
+  font:800 clamp(1.45rem,4vw,2.6rem)/1.15 "Source Code Pro",monospace;
+}
+.pc-s1-reflection-loading-log { display:grid; gap:9px; }
+.pc-s1-reflection-loading-log p { margin:0; color:#91ffb9; font-size:clamp(.82rem,2vw,1.05rem); line-height:1.45; }
+.pc-s1-reflection-loading-log p:nth-child(1){animation:pc-s1-log-in .15s .08s both}
+.pc-s1-reflection-loading-log p:nth-child(2){animation:pc-s1-log-in .15s .25s both}
+.pc-s1-reflection-loading-log p:nth-child(3){animation:pc-s1-log-in .15s .42s both}
+.pc-s1-reflection-loading-log p:nth-child(4){animation:pc-s1-log-in .15s .59s both}
+.pc-s1-reflection-loading-log p:nth-child(5){animation:pc-s1-log-in .15s .76s both}
+.pc-s1-terminal-cursor { display:inline-block; animation:pc-s1-cursor-blink .55s steps(1,end) infinite; }
+.pc-s1-reflection-loading-track { height:9px; margin-top:30px; overflow:hidden; border:1px solid #2f9e65; background:#020805; }
+.pc-s1-reflection-loading-track span { display:block; width:100%; height:100%; transform-origin:left; background:#55e79f; animation:pc-s1-loading-progress 1.25s linear both; }
+@keyframes pc-s1-log-in { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+@keyframes pc-s1-cursor-blink { 50%{opacity:0} }
+@keyframes pc-s1-loading-progress { from{transform:scaleX(.02)} to{transform:scaleX(1)} }
+@keyframes pc-s1-terminal-flicker { 50%{opacity:.72} }
+@media(max-width:560px){
+  .pc-s1-reflection-loading{padding:0;place-items:stretch}
+  .pc-s1-reflection-loading-shell{display:flex;min-height:100dvh;width:100%;flex-direction:column;justify-content:center;border:0;border-radius:0;padding:28px 22px}
+}
+@media(prefers-reduced-motion:reduce){
+  .pc-s1-reflection-loading::after,.pc-s1-terminal-cursor,.pc-s1-reflection-loading-log p,.pc-s1-reflection-loading-track span{animation:none!important}
+}
+
+/* V490 — readable case response and in-app full-size Canvas evidence. */
+.pc-s1-case-handoff.pc-s1-case-reflection {
+  grid-template-columns:minmax(0,1fr) !important;
+  align-items:stretch;
+  gap:16px;
+  margin-top:14px;
+  overflow:visible;
+  background:linear-gradient(180deg,#f8fbfd 0,#eef5f8 100%);
+}
+.pc-s1-case-reflection-head {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:clamp(18px,3vw,42px);
+}
+.pc-s1-case-reflection-head h4 { max-width:760px; }
+.pc-s1-case-reflection-status {
+  padding:11px 14px;
+  border-left:4px solid #087aa9;
+  border-radius:4px;
+  background:#e8f3f8;
+  line-height:1.5;
+}
+.pc-s1-case-reflection > label { margin:2px 0 -6px; }
+.pc-s1-case-reflection textarea {
+  min-height:clamp(145px,18vh,210px);
+  border-width:2px;
+  box-shadow:inset 0 1px 2px rgba(17,38,80,.06);
+}
+.pc-s1-case-reflection-actions {
+  padding-top:14px;
+  border-top:1px solid #c4d3dc;
+}
+.pc-s1-full-size-trigger {
+  appearance:none;
+  padding:2px 0;
+  border:0;
+  background:transparent;
+  color:#075e8a;
+  font:800 inherit;
+  cursor:pointer;
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+.pc-s1-full-size-trigger:focus-visible { outline:3px solid #c99324; outline-offset:3px; }
+.pc-s1-evidence-image-link {
+  appearance:none;
+  width:100%;
+  padding:0;
+  border:0;
+  text-align:inherit;
+}
+body.pc-s1-evidence-modal-active { overflow:hidden !important; }
+.pc-s1-evidence-modal {
+  position:fixed;
+  inset:0;
+  z-index:12100;
+  display:grid;
+  place-items:center;
+  padding:clamp(12px,3vw,32px);
+  background:rgba(3,15,29,.82);
+  backdrop-filter:blur(5px);
+}
+.pc-s1-evidence-modal-shell {
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto;
+  width:min(1500px,100%);
+  height:min(94dvh,1050px);
+  overflow:hidden;
+  border:2px solid #6ca8c8;
+  border-radius:16px;
+  background:#f7f9fa;
+  box-shadow:0 28px 90px rgba(0,0,0,.42);
+}
+.pc-s1-evidence-modal-shell > header,
+.pc-s1-evidence-modal-shell > footer {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:14px clamp(16px,3vw,28px);
+  background:#102b52;
+  color:#fff;
+}
+.pc-s1-evidence-modal-shell > header {
+  position:relative;
+  padding-right:clamp(76px,8vw,96px);
+}
+.pc-s1-evidence-modal-shell header span {
+  color:#9edcf4;
+  font:800 .72rem/1.25 "Source Code Pro",monospace;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.pc-s1-evidence-modal-shell header h2 {
+  margin:3px 0 0;
+  color:#fff;
+  font-size:clamp(1.1rem,2.5vw,1.65rem);
+}
+.pc-s1-evidence-modal-close {
+  position:absolute;
+  top:12px;
+  right:clamp(12px,2vw,22px);
+  z-index:2;
+  flex:0 0 auto;
+  width:48px;
+  height:48px;
+  border:2px solid #fff;
+  border-radius:50%;
+  background:#fff;
+  color:#102b52;
+  font:900 1.8rem/1 Arial,sans-serif;
+  cursor:pointer;
+}
+.pc-s1-evidence-modal-close:focus-visible { outline:4px solid #f1b82d; outline-offset:3px; }
+.pc-s1-evidence-modal-scroll {
+  overflow:auto;
+  overscroll-behavior:contain;
+  padding:clamp(8px,2vw,20px);
+  background:#dfe6ea;
+  text-align:center;
+}
+.pc-s1-evidence-modal-scroll img {
+  display:block;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  height:auto;
+  margin:0 auto;
+  object-fit:contain;
+  object-position:top center;
+  background:#fff;
+}
+.pc-s1-evidence-modal-shell > footer { background:#eaf1f5; color:#304555; }
+.pc-s1-evidence-modal-shell > footer p { margin:0; color:#304555; }
+@media(max-width:900px) {
+  .pc-s1-case-reflection-head { grid-template-columns:1fr; }
+  .pc-s1-case-reflection-head .pc-s1-state-switch { width:100%; }
+  .pc-s1-case-reflection-actions { align-items:stretch; flex-direction:column; }
+  .pc-s1-case-reflection-actions button { width:100%; }
+}
+@media(max-width:560px) {
+  .pc-s1-evidence-modal { padding:0; }
+  .pc-s1-evidence-modal-shell { width:100%; height:100dvh; border:0; border-radius:0; }
+  .pc-s1-evidence-modal-shell > header {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 40px;
+    align-items:start;
+    gap:8px;
+    min-height:74px;
+    padding:10px 62px 10px 12px;
+  }
+  .pc-s1-evidence-modal-shell header span { font-size:.62rem; }
+  .pc-s1-evidence-modal-shell header h2 { margin-top:4px; font-size:1rem; line-height:1.25; }
+  .pc-s1-evidence-modal-close {
+    top:10px;
+    right:10px;
+    width:40px;
+    height:40px;
+    font-size:1.5rem;
+  }
+  .pc-s1-evidence-modal-scroll {
+    min-height:0;
+    overflow:auto;
+    padding:0;
+    background:#fff;
+    text-align:left;
+    touch-action:pan-x pan-y pinch-zoom;
+    -webkit-overflow-scrolling:touch;
+  }
+  .pc-s1-evidence-modal--phone-capture .pc-s1-evidence-modal-scroll img,
+  .pc-s1-evidence-modal--compact-capture .pc-s1-evidence-modal-scroll img {
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    margin:0;
+  }
+  .pc-s1-evidence-modal--desktop-capture .pc-s1-evidence-modal-scroll img {
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    margin:0;
+  }
+  .pc-s1-evidence-modal-shell > footer { align-items:stretch; padding:8px 12px; }
+  .pc-s1-evidence-modal-shell > footer p { display:none; }
+  .pc-s1-evidence-modal-shell > footer button { width:100%; }
+}
+
+@media(min-width:561px) and (max-width:1100px) {
+  .pc-s1-evidence-modal--compact-capture .pc-s1-evidence-modal-scroll img {
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    margin:0;
+  }
+}
+
+/* V505 — S1 dialogue now reuses the S2 classroom/smartboard composition.
+   Evidence displayed during dialogue is a smartboard background, never the
+   compact full-screen reader; the shared dual-cast rules therefore own the
+   lower stage position and active/inactive speaker treatment at every size. */
+body.pc-s1-canvas-smartboard-active
+#vnOverlay.vn-overlay.active:not(.pc-s1-mobile-evidence-reader) .vn-board-img.loaded {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  object-position:center !important;
+}
+
+/* The three analysis checks are sequential criteria, not competing columns.
+   Rows expand naturally with AI output and the report body remains the only
+   scroll owner. */
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback ol {
+  grid-template-columns:minmax(0,1fr) !important;
+  grid-auto-rows:max-content !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li {
+  width:100% !important;
+  min-height:0 !important;
+  height:auto !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-footer > div {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-tts {
+  border-color:#55e79f;
+  background:#03120b;
+  color:#8fffb9;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-tts:is(:hover,:focus-visible) {
+  background:#8fffb9;
+  color:#03120b;
+}
+@media(max-width:700px) {
+  .pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-footer > div {
+    display:grid;
+    grid-template-columns:1fr;
+  }
+}
+
+/* V491 — compact, readable case response. */
+.pc-s1-case-handoff.pc-s1-case-reflection {
+  display:block !important;
+  width:100% !important;
+  padding:clamp(18px,2.2vw,30px) !important;
+  background:#f8fbfd !important;
+}
+.pc-s1-case-reflection-head {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(240px,360px) !important;
+  align-items:end !important;
+  gap:24px !important;
+}
+.pc-s1-case-reflection-head h4 {
+  max-width:34ch !important;
+  font-size:clamp(1.35rem,2vw,1.85rem) !important;
+}
+.pc-s1-case-reflection-status {
+  margin:18px 0 !important;
+  padding:10px 13px !important;
+}
+.pc-s1-case-reflection > label {
+  display:block !important;
+  margin:0 0 8px !important;
+}
+.pc-s1-case-reflection textarea {
+  display:block !important;
+  width:100% !important;
+  min-height:150px !important;
+  margin:0 !important;
+  pointer-events:auto !important;
+  opacity:1 !important;
+  background:#fff !important;
+}
+.pc-s1-case-reflection-actions {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:18px !important;
+  margin-top:14px !important;
+  padding-top:14px !important;
+}
+@media(max-width:760px) {
+  .pc-s1-case-reflection-head { grid-template-columns:1fr !important; align-items:stretch !important; }
+  .pc-s1-case-reflection-head .pc-s1-state-switch { width:100% !important; }
+  .pc-s1-case-reflection textarea { min-height:170px !important; }
+  .pc-s1-case-reflection-actions { align-items:stretch !important; flex-direction:column !important; }
+  .pc-s1-case-reflection-actions button { width:100% !important; }
+}
+
+/* V506 — the ordinary VN cast and dialogue remain untouched while the existing
+   focused Canvas artwork replaces only the classroom background. This avoids
+   shrinking evidence inside a second smartboard frame and prevents responsive
+   smartboard rules from resizing the cast during a dialogue handoff. */
+html body.pc-s1-canvas-backdrop-active #vnOverlay.vn-overlay.active .vn-scene {
+  background:#fff !important;
+}
+html body.pc-s1-canvas-backdrop-active #vnOverlay.vn-overlay.active .vn-scene::before {
+  display:none !important;
+}
+html body.pc-s1-canvas-backdrop-active #vnOverlay.vn-overlay.active #vnSceneBg.vn-bg {
+  display:block !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  object-position:center top !important;
+  opacity:1 !important;
+  filter:none !important;
+  background:#fff !important;
+}
+html body.pc-s1-canvas-backdrop-active #vnOverlay.vn-overlay.active .vn-smartboard-wrap {
+  display:none !important;
+  visibility:hidden !important;
+}
+@media(max-width:700px) {
+  html body.pc-s1-canvas-backdrop-active #vnOverlay.vn-overlay.active #vnSceneBg.vn-bg {
+    width:100% !important;
+    height:100% !important;
+    object-fit:cover !important;
+    object-position:left top !important;
+  }
+}
+
+/* The practice report has one reading order: Babbage finding, evidence rows,
+   design takeaway, then the optional original response. */
+.pc-s1-reflection-analysis--terminal:before { opacity:.22 !important; }
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-shell {
+  width:min(980px,calc(100% - 28px)) !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-header {
+  grid-template-columns:76px minmax(0,1fr) auto !important;
+  gap:18px !important;
+  padding:16px 20px !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-mark {
+  display:grid !important;
+  place-items:center !important;
+  width:72px !important;
+  height:72px !important;
+  min-width:72px !important;
+  padding:5px !important;
+  overflow:hidden !important;
+  border:1px solid #2f9f68 !important;
+  border-radius:50% !important;
+  background:#020b07 !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-mark img {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-content {
+  display:grid !important;
+  gap:0 !important;
+  padding:clamp(18px,3vw,30px) !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-focus {
+  padding:4px 0 24px !important;
+  border-bottom:1px solid #245b40 !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-focus > span {
+  display:block;
+  margin-bottom:8px;
+  color:#ffd96c;
+  font:800 .75rem/1.2 "Source Code Pro",monospace;
+  letter-spacing:.08em;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-focus h3 {
+  max-width:34ch !important;
+  margin:0 !important;
+  color:#baffd3 !important;
+  font:750 clamp(1.45rem,3vw,2.15rem)/1.18 "Source Code Pro",monospace !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback {
+  margin:0 !important;
+  padding:24px 0 10px !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback ol {
+  margin:10px 0 0 !important;
+  gap:0 !important;
+  border-top:1px solid #1d4632 !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li {
+  display:grid !important;
+  grid-template-columns:minmax(72px,max-content) minmax(0,1fr) !important;
+  gap:14px !important;
+  align-items:center !important;
+  padding:13px 4px !important;
+  border:0 !important;
+  border-bottom:1px solid #1d4632 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li > span {
+  min-height:0 !important;
+  padding:0 !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li p {
+  margin:3px 0 0 !important;
+  color:#7fa58f !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-teaching-point {
+  margin:16px 0 0 !important;
+  padding:16px 18px !important;
+  border:0 !important;
+  border-left:3px solid #d4a83f !important;
+  border-radius:0 !important;
+  background:#07150e !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-response {
+  margin:16px 0 0 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-response summary {
+  cursor:pointer;
+  color:#8bc7a4;
+  font:700 .82rem/1.4 "Source Code Pro",monospace;
+}
+.pc-s1-reflection-analysis--terminal .pc-s1-reflection-response blockquote {
+  margin:12px 0 0 !important;
+  padding:14px 16px !important;
+  border-left:3px solid #286c4b !important;
+  color:#a9c7b5 !important;
+}
+
+/* Both planning prompts occupy equal boxes. The activity explicitly accepts
+   invented examples and supplies category-specific examples as memory aids. */
+.pc-s1-week-planner-basics {
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  align-items:stretch !important;
+}
+.pc-s1-week-planner-basics label { grid-template-rows:auto 72px !important; }
+.pc-s1-week-planner-basics :is(input,textarea) {
+  height:72px !important;
+  min-height:72px !important;
+  max-height:72px !important;
+  resize:none !important;
+  box-sizing:border-box !important;
+  overflow-wrap:anywhere !important;
+  white-space:pre-wrap !important;
+}
+@media(max-width:700px) {
+  .pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-shell {
+    width:100% !important;
+  }
+  .pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-header {
+    grid-template-columns:58px minmax(0,1fr) !important;
+    gap:12px !important;
+  }
+  .pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-mark {
+    width:56px !important;
+    height:56px !important;
+    min-width:56px !important;
+  }
+  .pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-verdict {
+    grid-column:1/-1 !important;
+  }
+  .pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback li {
+    grid-template-columns:1fr !important;
+    gap:5px !important;
+  }
+  .pc-s1-week-planner-basics { grid-template-columns:1fr !important; }
+}
+
 /* SOURCE: src/css/responsive/intro.css */
 /* ══════════════════════════════════════════════════════
    INTRO RESPONSIVE LAYOUT
@@ -17915,9 +21041,6 @@ body[data-pc-viewport-family="compact-desktop"] {
   --pc-vn-character-transform: none;
   --pc-vn-character-origin: right bottom;
   --pc-vn-character-justify: flex-end;
-  --pc-character-maya-vn-bottom-offset: -18px;
-  --pc-character-maya-portrait-offset: 0px;
-  --pc-character-maya-evidence-offset-y: 12px;
 }
 
 body[data-pc-viewport-family="portrait-tablet"] {
@@ -17960,9 +21083,6 @@ body[data-pc-viewport-family="short-landscape"] {
   --pc-vn-character-transform: none;
   --pc-vn-character-origin: right bottom;
   --pc-vn-character-justify: flex-end;
-  --pc-character-maya-vn-bottom-offset: -18px;
-  --pc-character-maya-portrait-offset: 0px;
-  --pc-character-maya-evidence-offset-y: 12px;
 }
 
 body[data-pc-viewport-family="standard-phone"] {
@@ -21174,6 +24294,909 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
   
   
 }
+
+/* V479 — full-screen S1 Canvas evidence reader on compact viewports.
+   A desktop Canvas screenshot cannot serve as readable evidence inside a
+   miniature classroom prop. In S1 Canvas scenes only, phone and compact-tablet
+   layouts stop staging the smartboard as scenery: the scene becomes the scroll
+   owner, evidence becomes a full-width document, and narration remains in a
+   separate lower pane. Wide desktop classroom compositions are unchanged. */
+@media screen and (max-width: 1100px) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    overflow: hidden !important;
+    background: #071321 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnScene {
+    position: relative !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: max(14px, env(safe-area-inset-top)) 0 24px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    scrollbar-gutter: stable !important;
+    background: #0a2137 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnScene::before {
+    position: fixed !important;
+    background:
+      linear-gradient(to bottom, rgba(5, 20, 38, .62), rgba(5, 20, 38, .88)),
+      radial-gradient(circle at 50% 8%, rgba(89, 183, 227, .16), transparent 44%) !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnSceneBg {
+    position: fixed !important;
+    opacity: .16 !important;
+    filter: brightness(.42) saturate(.78) !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-smartboard-wrap {
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    padding: 14px !important;
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+    z-index: 11 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-smartboard-wrap::after {
+    display: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-smartboard {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(.vn-screw, .vn-sensor-left, .vn-sensor-right, .vn-control-rail,
+      .vn-screen-inner-border, .vn-board-label, .vn-board-text, .vn-board-loading) {
+    display: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-smartboard::before,
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-smartboard::after,
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-screen::before,
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-screen::after {
+    display: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-screen {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    border: 1px solid rgba(121, 198, 235, .9) !important;
+    border-radius: 15px !important;
+    background: #fff !important;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, .34) !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-board-img {
+    display: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-mobile-evidence-lens {
+    position: relative !important;
+    inset: auto !important;
+    z-index: 6 !important;
+    display: grid !important;
+    grid-template-rows: auto auto auto auto auto !important;
+    gap: 15px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 20px 18px 22px !important;
+    overflow: visible !important;
+    border-radius: 14px !important;
+    background:
+      linear-gradient(90deg, rgba(9, 122, 73, .96) 0 6px, transparent 6px),
+      #fff !important;
+    color: #122c44 !important;
+    text-align: left !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--after {
+    background:
+      linear-gradient(90deg, rgba(0, 112, 163, .96) 0 6px, transparent 6px),
+      #f6fcff !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-reader-head {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    min-width: 0 !important;
+    padding-bottom: 11px !important;
+    border-bottom: 1px solid #d8e4eb !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-state {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 30px !important;
+    padding: 7px 10px !important;
+    border: 1px solid rgba(255, 255, 255, .68) !important;
+    border-radius: 999px !important;
+    background: #112650 !important;
+    color: #fff !important;
+    font: 800 10px/1.1 "Source Code Pro", monospace !important;
+    letter-spacing: .045em !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-context {
+    min-width: 0 !important;
+    overflow: visible !important;
+    color: #50677b !important;
+    font-size: clamp(11px, 1.7vw, 14px) !important;
+    line-height: 1.3 !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-scroll-hint {
+    flex: 0 0 auto !important;
+    color: #006f9f !important;
+    font: 800 clamp(10px, 1.45vw, 13px)/1.2 "Source Code Pro", monospace !important;
+    letter-spacing: .02em !important;
+    white-space: nowrap !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-title {
+    color: #112650 !important;
+    font-size: clamp(23px, 4.2vw, 34px) !important;
+    line-height: 1.12 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-rows {
+    display: grid !important;
+    align-content: start !important;
+    gap: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-rows li {
+    grid-template-columns: 18px minmax(0, 1fr) !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+    padding: 11px 7px !important;
+    border-bottom: 1px solid #d8e3e9 !important;
+    font-size: clamp(15.5px, 2.35vw, 20px) !important;
+    line-height: 1.32 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-finding {
+    overflow: visible !important;
+    padding: 11px 12px !important;
+    border-radius: 8px !important;
+    font-size: clamp(14px, 1.9vw, 17px) !important;
+    line-height: 1.35 !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(#vnCharacter, #vnStudentCharacter, .vn-character, .vn-student-character,
+      .babbage-shelf, .babbage-terminal-scene) {
+    display: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-brand-menu {
+    display: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnDialogue {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: clamp(218px, 30dvh, 278px) !important;
+    max-height: 44dvh !important;
+    margin: 0 !important;
+    padding: 18px 20px calc(18px + env(safe-area-inset-bottom)) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    border-top: 2px solid #59b7e3 !important;
+    background: linear-gradient(180deg, #020a12 0%, #000 100%) !important;
+    z-index: 30 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnSpeaker {
+    margin: 0 0 8px !important;
+    font-size: clamp(18px, 5.2vw, 22px) !important;
+    line-height: 1.2 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnText {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    font-size: clamp(16px, 4.4vw, 18px) !important;
+    line-height: 1.5 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnAdvanceHint {
+    position: static !important;
+    margin: 16px 0 0 !important;
+    padding: 0 !important;
+    text-align: right !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  #vnDialogue.pc-s1-diagnosis-dialogue {
+    min-height: 42dvh !important;
+    max-height: 54dvh !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-skip {
+    top: 12px !important;
+    right: 12px !important;
+  }
+}
+
+/* V481 — the compact evidence lens is a Canvas surface, not a generic game
+   card. Full-body cast art is intentionally absent here; speaker identity stays
+   in the narration pane so the interface being inspected remains unobstructed. */
+@media screen and (max-width: 1100px) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-screen {
+    border-color: #c7cdd1 !important;
+    border-radius: 4px !important;
+    background: #fff !important;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, .3) !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-mobile-evidence-lens {
+    display: block !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    border-radius: 3px !important;
+    background: #fff !important;
+    font-family: "Source Sans 3", "Source Sans Pro", Arial, sans-serif !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-reader-head {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    gap: 10px !important;
+    min-height: 48px !important;
+    padding: 9px 14px !important;
+    border-bottom: 1px solid #c7cdd1 !important;
+    background: #fff !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-canvas-wordmark {
+    color: #b91c2b !important;
+    font-size: 17px !important;
+    font-weight: 850 !important;
+    letter-spacing: -.03em !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-mobile-evidence-context {
+    align-self: center !important;
+    overflow: hidden !important;
+    color: #465663 !important;
+    font-size: clamp(11px, 1.55vw, 14px) !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-mobile-evidence-state {
+    min-height: 0 !important;
+    padding: 5px 8px !important;
+    border: 1px solid #9db7c7 !important;
+    border-radius: 3px !important;
+    background: #eef5f8 !important;
+    color: #173a52 !important;
+    font: 800 10px/1 "Source Sans 3", Arial, sans-serif !important;
+    letter-spacing: .04em !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-canvas-breadcrumb {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    padding: 9px 14px !important;
+    border-bottom: 1px solid #c7cdd1 !important;
+    background: #f5f5f5 !important;
+    color: #455866 !important;
+    font-size: clamp(11px, 1.55vw, 14px) !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-mobile-evidence-scroll-hint {
+    margin-left: auto !important;
+    color: #0875a5 !important;
+    font-size: clamp(10px, 1.4vw, 12px) !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-canvas-pagehead {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 14px !important;
+    border-bottom: 1px solid #c7cdd1 !important;
+    background: #fff !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-mobile-evidence-title {
+    min-width: 0 !important;
+    color: #27384a !important;
+    font-size: clamp(20px, 3.3vw, 29px) !important;
+    line-height: 1.12 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-canvas-published {
+    display: inline-flex !important;
+    gap: 5px !important;
+    align-items: center !important;
+    flex: 0 0 auto !important;
+    color: #087a45 !important;
+    font-size: 11px !important;
+    font-weight: 750 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-canvas-published b,
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-canvas-row-status {
+    display: grid !important;
+    place-items: center !important;
+    width: 19px !important;
+    height: 19px !important;
+    border-radius: 50% !important;
+    background: #078447 !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 900 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-mobile-evidence-rows {
+    display: block !important;
+    background: #fff !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-mobile-evidence-rows li {
+    display: grid !important;
+    grid-template-columns: 14px 22px minmax(0, 1fr) 20px !important;
+    gap: 8px !important;
+    align-items: center !important;
+    padding: 11px 14px !important;
+    border-bottom: 1px solid #d5dadd !important;
+    background: #fff !important;
+    color: #243746 !important;
+    font-size: clamp(14px, 2.05vw, 18px) !important;
+    font-weight: 650 !important;
+    line-height: 1.28 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-canvas-drag {
+    color: #6c7d87 !important;
+    font-size: 15px !important;
+    line-height: 1 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-canvas-item-icon {
+    width: 15px !important;
+    height: 18px !important;
+    border: 1.5px solid #0875a5 !important;
+    border-radius: 1px !important;
+    background: linear-gradient(135deg, transparent 0 6px, #dff1f8 6px) !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-mobile-evidence-rows li.is-module-heading {
+    grid-template-columns: minmax(0, 1fr) !important;
+    padding: 9px 14px !important;
+    background: #f2f3f4 !important;
+    color: #334653 !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-rows li.is-module-heading :is(.pc-s1-canvas-drag, .pc-s1-canvas-item-icon) {
+    display: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-mobile-evidence-finding {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    gap: 9px !important;
+    padding: 10px 14px !important;
+    border-top: 1px solid #e4c980 !important;
+    border-radius: 0 !important;
+    background: #fff7df !important;
+    color: #59430f !important;
+    font-size: clamp(12px, 1.7vw, 15px) !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(#vnCharacter, #vnStudentCharacter, .vn-character, .vn-student-character, [data-pc-character]) {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(#vnScene, #vnDialogue, #vnText, .pc-s1-mobile-evidence-lens) {
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnText {
+    color: #f2f4f2 !important;
+    background: transparent !important;
+  }
+}
+
+/* V482 — compact Canvas evidence fills the entire evidence pane. The classroom
+   smartboard frame, card margin, rounded corners, shadow, and dark surround are
+   desktop metaphors that waste scarce phone and tablet reading space. */
+@media screen and (max-width: 1100px) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnScene {
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnScene::before,
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnSceneBg {
+    display: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-smartboard-wrap {
+    min-height: 100% !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-smartboard,
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .vn-screen,
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader .pc-s1-mobile-evidence-lens {
+    width: 100% !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+}
+
+/* V483 — Canvas-faithful mobile Modules evidence.
+   The real Canvas phone interface is a stacked module manager rather than a
+   generic document card: gray module group, blue section header, green module
+   rail, content-type icons, accessibility indicators, publish states, and
+   overflow menus. Preserve that hierarchy in the readable evidence lens. */
+@media screen and (max-width: 1100px) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--modules {
+    border-left: 4px solid #079447 !important;
+    color: #243746 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(.pc-s1-canvas-module-group-head, .pc-s1-canvas-module-section-head) {
+    display: grid !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    border-bottom: 1px solid #c7cdd1 !important;
+    color: #243746 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-canvas-module-group-head {
+    grid-template-columns: 14px 12px minmax(0, 1fr) 22px 22px 18px !important;
+    gap: 7px !important;
+    min-height: 64px !important;
+    padding: 10px 9px !important;
+    background: #f1f3f4 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-canvas-module-section-head {
+    grid-template-columns: 14px minmax(0, 1fr) 22px 18px !important;
+    gap: 9px !important;
+    min-height: 60px !important;
+    padding: 10px 9px !important;
+    background: #e5f3fc !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(.pc-s1-canvas-module-group-head, .pc-s1-canvas-module-section-head) strong {
+    min-width: 0 !important;
+    color: #243746 !important;
+    font: 700 clamp(14px, 2.2vw, 18px)/1.25 "Source Sans 3", "Source Sans Pro", Arial, sans-serif !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(.pc-s1-canvas-caret, .pc-s1-canvas-add, .pc-s1-canvas-kebab) {
+    color: #0c4a68 !important;
+    font-family: Arial, sans-serif !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    text-align: center !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-canvas-add {
+    color: #6f8c9c !important;
+    font-size: 19px !important;
+    font-weight: 400 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--modules .pc-s1-mobile-evidence-rows li {
+    grid-template-columns: 14px 24px minmax(0, 1fr) 25px 22px 18px !important;
+    gap: 8px !important;
+    min-height: 68px !important;
+    padding: 9px !important;
+    border-bottom: 1px solid #d5dadd !important;
+    background: #fff !important;
+    font-size: clamp(14px, 2.05vw, 17px) !important;
+    line-height: 1.28 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--modules .pc-s1-canvas-item-copy {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--modules .pc-s1-canvas-item-icon {
+    display: grid !important;
+    place-items: center !important;
+    width: 22px !important;
+    height: 24px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #0086a8 !important;
+    font: 800 18px/1 Arial, sans-serif !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--modules .pc-s1-canvas-item-icon::before {
+    content: "▤";
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--modules li[data-canvas-item-type="attachment"] .pc-s1-canvas-item-icon::before {
+    content: "⌕";
+    transform: rotate(-35deg) !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--modules li[data-canvas-item-type="assignment"] .pc-s1-canvas-item-icon::before {
+    content: "☷";
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--modules li[data-canvas-item-type="quiz"] .pc-s1-canvas-item-icon::before {
+    content: "◆";
+    font-size: 13px !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-canvas-accessibility {
+    color: #087a45 !important;
+    font: 700 18px/1 Arial, sans-serif !important;
+    text-align: center !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-canvas-row-status.is-unpublished {
+    border: 1.5px solid #748690 !important;
+    background: transparent !important;
+    color: #748690 !important;
+    font-size: 0 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-canvas-row-status.is-unpublished::before {
+    content: "";
+    width: 1px !important;
+    height: 17px !important;
+    background: #748690 !important;
+    transform: rotate(-45deg) !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--modules .pc-s1-mobile-evidence-rows li.is-module-heading {
+    display: block !important;
+    min-height: 54px !important;
+    padding: 16px 10px !important;
+    background: #fff !important;
+    color: #334653 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--modules .pc-s1-mobile-evidence-rows li.is-module-heading
+  :not(.pc-s1-canvas-item-copy) {
+    display: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--modules .pc-s1-mobile-evidence-finding {
+    border-top: 0 !important;
+    border-bottom: 1px solid #e4c980 !important;
+  }
+}
+
+@media screen and (max-width: 430px) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-canvas-module-group-head {
+    grid-template-columns: 12px 10px minmax(0, 1fr) 20px 17px !important;
+    gap: 5px !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-canvas-module-group-head .pc-s1-canvas-add {
+    display: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--modules .pc-s1-mobile-evidence-rows li {
+    grid-template-columns: 12px 22px minmax(0, 1fr) 22px 20px 15px !important;
+    gap: 6px !important;
+    min-height: 70px !important;
+    padding: 9px 7px !important;
+  }
+}
+
+/* V485 — use the real Canvas responsive captures for the Before module views.
+   These images preserve the actual instructor/student controls, wrapping,
+   spacing, and accessibility indicators instead of approximating them in CSS. */
+@media screen and (max-width: 1100px) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-mobile-evidence-lens--real-capture {
+    display: block !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    border: 0 !important;
+    background: #fff !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    background: #fff !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    object-fit: contain !important;
+    object-position: top center !important;
+    background: #fff !important;
+  }
+
+  /* V487 — visually crop the blank gutters captured around the real Canvas UI.
+     The source screenshots remain untouched and available at full size. */
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture {
+    overflow-x: hidden !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture--instructor-before-module img {
+    width: 112% !important;
+    margin-left: -7.25% !important;
+    margin-top: -22px !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture--student-before-module img {
+    width: 106% !important;
+    margin-left: -4% !important;
+    margin-top: -16px !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture--instructor-before-module img {
+    width: 122% !important;
+    margin-left: -11.5% !important;
+    margin-top: -28px !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture--student-before-module img {
+    width: 108% !important;
+    margin-left: -4.5% !important;
+    margin-top: -28px !important;
+  }
+}
+
+/* V491 — one predictable crop for the two real module captures.
+   Device-specific transforms made the Canvas header, left rail, and row labels
+   disappear at different widths. The capture now stays top-aligned, uses the
+   full evidence width, and leaves vertical navigation to the evidence reader. */
+@media screen and (max-width: 1100px) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  #pcS1MobileEvidenceLens.pc-s1-mobile-evidence-lens--real-capture {
+    overflow: hidden !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  #pcS1MobileEvidenceLens.pc-s1-mobile-evidence-lens--real-capture
+  :is(.pc-s1-real-canvas-capture--instructor-before-module,
+      .pc-s1-real-canvas-capture--student-before-module) img {
+    transform: none !important;
+    transform-origin: top center !important;
+    object-fit: contain !important;
+    object-position: top center !important;
+  }
+}
+
 @media (max-width: 600px) {
   
   
@@ -25102,6 +29125,495 @@ html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode.pc-analysis-rep
   }
 }
 
+/* V493 cascade lock — intentionally last in this bundle. */
+@media screen and (max-width: 1100px) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnScene {
+    display: block !important;
+    padding: 0 0 max(190px, 25dvh) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-padding-bottom: max(190px, 25dvh) !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(.vn-smartboard-wrap, .vn-smartboard, .vn-screen,
+      #pcS1MobileEvidenceLens.pc-s1-mobile-evidence-lens--real-capture,
+      .pc-s1-real-canvas-capture) {
+    position: static !important;
+    inset: auto !important;
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    overflow: visible !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  #pcS1MobileEvidenceLens.pc-s1-mobile-evidence-lens--real-capture {
+    overflow-x: hidden !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(.pc-s1-real-canvas-capture--instructor-before-module,
+      .pc-s1-real-canvas-capture--student-before-module) img {
+    display: block !important;
+    width: 112% !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: -28px 0 0 -6% !important;
+    object-fit: contain !important;
+    object-position: top center !important;
+    transform: none !important;
+  }
+}
+
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture--instructor-before-module img {
+    width: 122% !important;
+    margin: -30px 0 0 -11% !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture--student-before-module img {
+    width: 110% !important;
+    margin: -24px 0 0 -5% !important;
+  }
+}
+
+@media screen and (min-width: 700px) and (max-width: 1100px) and (orientation: landscape) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnScene {
+    padding-bottom: 172px !important;
+    scroll-padding-bottom: 172px !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(.pc-s1-real-canvas-capture--instructor-before-module,
+      .pc-s1-real-canvas-capture--student-before-module) img {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+}
+
+/* V494 — only the device profiles documented in the Aug. 27 screenshots.
+   Other phone, tablet, foldable, and landscape layouts retain V493 exactly. */
+@media screen and (max-width: 390px) and (max-height: 700px) and (orientation: portrait) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(#vnScene, .vn-smartboard-wrap, .vn-smartboard, .vn-screen,
+      #pcS1MobileEvidenceLens.pc-s1-mobile-evidence-lens--real-capture,
+      .pc-s1-real-canvas-capture) {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture--instructor-before-module img {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    margin: -18px 0 0 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture--student-before-module img {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    margin: -18px 0 0 !important;
+  }
+}
+
+@media screen and (min-width: 740px) and (max-width: 1040px) and (min-height: 1000px) and (orientation: portrait) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(#vnScene, .vn-smartboard-wrap, .vn-smartboard, .vn-screen,
+      #pcS1MobileEvidenceLens.pc-s1-mobile-evidence-lens--real-capture,
+      .pc-s1-real-canvas-capture) {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(.pc-s1-real-canvas-capture--instructor-before-module,
+      .pc-s1-real-canvas-capture--student-before-module) img {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    margin: -20px 0 0 !important;
+  }
+}
+
+@media screen and (min-width: 980px) and (max-width: 1060px) and (max-height: 650px) and (orientation: landscape) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(#vnScene, .vn-smartboard-wrap, .vn-smartboard, .vn-screen,
+      #pcS1MobileEvidenceLens.pc-s1-mobile-evidence-lens--real-capture,
+      .pc-s1-real-canvas-capture) {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  :is(.pc-s1-real-canvas-capture--instructor-before-module,
+      .pc-s1-real-canvas-capture--student-before-module) img {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    margin: -20px 0 0 !important;
+  }
+}
+
+/* V496 — preserve the established visual-novel dialogue in S1 evidence scenes.
+   The evidence reader may change the Canvas surface above it, but it must not
+   turn the existing advance hint into a second full-width dialogue row. */
+@media screen and (max-width: 1100px) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader #vnAdvanceHint {
+    position: absolute !important;
+    right: clamp(18px, 4vw, 30px) !important;
+    bottom: max(18px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-width: calc(100% - 36px) !important;
+    margin: 0 !important;
+    padding: 10px 4px 4px !important;
+    border: 0 !important;
+    background: transparent !important;
+    text-align: right !important;
+    z-index: 34 !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture--documented-fit,
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture--documented-fit img {
+    display: block !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: none !important;
+    height: auto !important;
+    margin: 0 !important;
+    transform: none !important;
+    object-fit: contain !important;
+    object-position: top left !important;
+  }
+}
+
+/* V497 — center only the photographed tablet/short-landscape Canvas captures.
+   The complete evidence remains scrollable; no crop or dialogue geometry is
+   changed. Tall phones may use their otherwise empty evidence space for the
+   existing Pixel/Jordan cast while the established dialogue remains below. */
+@media screen and (min-width: 740px) and (max-width: 1040px) and (min-height: 1000px) and (orientation: portrait) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture--documented-fit.pc-s1-real-canvas-capture--centered img {
+    width: min(88vw, 820px) !important;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    object-position: top center !important;
+  }
+}
+
+@media screen and (min-width: 980px) and (max-width: 1060px) and (max-height: 650px) and (orientation: landscape) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader
+  .pc-s1-real-canvas-capture--documented-fit.pc-s1-real-canvas-capture--centered img {
+    width: min(90vw, 920px) !important;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    object-position: top center !important;
+  }
+}
+
+@media screen and (max-width: 420px) and (min-height: 850px) and (orientation: portrait) {
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-phone-cast-room
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter) {
+    display: flex !important;
+    visibility: visible !important;
+    position: fixed !important;
+    top: auto !important;
+    bottom: clamp(218px, 30dvh, 278px) !important;
+    width: 48vw !important;
+    min-width: 0 !important;
+    height: clamp(145px, 19dvh, 178px) !important;
+    max-width: 48vw !important;
+    max-height: 20dvh !important;
+    align-items: flex-end !important;
+    z-index: 22 !important;
+    pointer-events: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-phone-cast-room
+  #vnStudentCharacter#vnStudentCharacter {
+    left: 2vw !important;
+    right: auto !important;
+    justify-content: flex-start !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-phone-cast-room
+  #vnCharacter#vnCharacter {
+    left: auto !important;
+    right: 2vw !important;
+    justify-content: flex-end !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-phone-cast-room
+  :is(#vnCharacter, #vnStudentCharacter) > :is(#vnPortrait, #vnStudentPortrait) {
+    display: block !important;
+    width: auto !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    object-position: center bottom !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-phone-cast-room
+  :is(#vnCharacter, #vnStudentCharacter).is-inactive {
+    display: flex !important;
+    filter: saturate(.72) brightness(.68) !important;
+  }
+
+  html body.pc-s1-canvas-smartboard-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-phone-cast-room
+  :is(#vnCharacter, #vnStudentCharacter).is-active {
+    display: flex !important;
+    filter: none !important;
+  }
+}
+
+/* V499 — the seven remaining emulated-device outliers are identified in JS.
+   Their Canvas image was already viewport-sized, but an older smartboard
+   ancestor still clipped it to roughly half the stage. This class owns the
+   complete evidence chain without changing the established dialogue or any
+   device that was not documented. */
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-documented-device-stage
+:is(#vnScene, .vn-smartboard-wrap, .vn-smartboard, .vn-screen,
+    #pcS1MobileEvidenceLens.pc-s1-mobile-evidence-lens--real-capture,
+    .pc-s1-real-canvas-capture) {
+  width: 100vw !important;
+  min-width: 100vw !important;
+  max-width: 100vw !important;
+  margin-inline: 0 !important;
+  transform: none !important;
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-documented-device-stage
+:is(.vn-smartboard-wrap, .vn-smartboard, .vn-screen) {
+  overflow: visible !important;
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-documented-device-stage
+#pcS1MobileEvidenceLens.pc-s1-mobile-evidence-lens--real-capture {
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-documented-device-stage
+.pc-s1-real-canvas-capture--documented-fit.pc-s1-real-canvas-capture--centered {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-documented-device-stage
+.pc-s1-real-canvas-capture--documented-fit img {
+  flex: 0 0 auto !important;
+}
+
+/* V500 — restore the established Pixel/Eli cast only inside measured blank
+   space between a complete Canvas capture and the existing dialogue box. JS
+   adds this class after measuring at least 112px of genuine room, so the cast
+   cannot cover evidence on shorter layouts. */
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-phone-cast-room
+:is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter) {
+  display: flex !important;
+  visibility: visible !important;
+  position: absolute !important;
+  top: var(--pc-s1-cast-top) !important;
+  bottom: auto !important;
+  width: min(45vw, 310px) !important;
+  min-width: 0 !important;
+  height: var(--pc-s1-cast-height) !important;
+  min-height: 0 !important;
+  max-width: 45vw !important;
+  max-height: var(--pc-s1-cast-height) !important;
+  align-items: flex-end !important;
+  z-index: 22 !important;
+  pointer-events: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: drop-shadow(0 8px 8px rgba(0, 0, 0, .28)) !important;
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-phone-cast-room
+#vnStudentCharacter#vnStudentCharacter {
+  left: clamp(4px, 2.5vw, 24px) !important;
+  right: auto !important;
+  justify-content: flex-start !important;
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-phone-cast-room
+#vnCharacter#vnCharacter {
+  left: auto !important;
+  right: clamp(4px, 2.5vw, 24px) !important;
+  justify-content: flex-end !important;
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-phone-cast-room
+:is(#vnCharacter, #vnStudentCharacter) > :is(#vnPortrait, #vnStudentPortrait) {
+  display: block !important;
+  visibility: visible !important;
+  width: auto !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+}
+
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-phone-cast-room
+:is(#vnCharacter, #vnStudentCharacter).is-inactive {
+  display: flex !important;
+  opacity: .72 !important;
+  filter: saturate(.72) brightness(.72) drop-shadow(0 8px 8px rgba(0, 0, 0, .24)) !important;
+}
+
+/* V502 — anchor the optional cast to the dialogue boundary instead of a
+   transformed scene-space top coordinate. This keeps sprites entirely inside
+   the verified blank gap on the four remaining tablet/foldable outliers. */
+html body.pc-s1-canvas-smartboard-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-s1-mobile-evidence-reader.pc-s1-phone-cast-room
+:is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter) {
+  position: fixed !important;
+  top: auto !important;
+  bottom: var(--pc-s1-cast-bottom) !important;
+  width: min(36vw, 245px) !important;
+  max-width: 36vw !important;
+  height: var(--pc-s1-cast-height) !important;
+  max-height: 150px !important;
+}
+/* V508 - S1 mission and Canvas-dialogue ownership.
+   Mission briefings keep the established classroom composition and place the
+   case's Before capture behind the challenge. Evidence discussions use that
+   capture as a contained upper stage, while the existing dialogue remains an
+   opaque foreground surface. */
+html body
+#vnOverlay.vn-overlay.active.pc-s1-mission-board-image .vn-board-img.loaded {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  opacity: .34 !important;
+  filter: saturate(.72) brightness(.66) contrast(.92) !important;
+  background: #061626 !important;
+}
+
+html body
+#vnOverlay.vn-overlay.active.pc-s1-mission-board-image .vn-screen::before {
+  background: rgba(2, 13, 23, .48) !important;
+}
+
+html body.pc-s1-canvas-backdrop-active
+#vnOverlay#vnOverlay.vn-overlay.active #vnSceneBg.vn-bg {
+  inset: 0 0 var(--pc-vn-dialogue-min-height, 220px) !important;
+  width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+  object-position: center top !important;
+  background: #fff !important;
+}
+
+html body.pc-s1-canvas-backdrop-active
+#vnOverlay#vnOverlay.vn-overlay.active #vnDialogue.vn-dialogue {
+  background: #010609 !important;
+  border-top: 2px solid rgba(89, 183, 227, .88) !important;
+  box-shadow: 0 -10px 22px rgba(0, 0, 0, .28) !important;
+  opacity: 1 !important;
+}
+
+html body.pc-s1-canvas-backdrop-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+:is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter) {
+  bottom: calc(var(--pc-vn-dialogue-min-height, 220px) - 2px) !important;
+  height: clamp(180px, 31dvh, 340px) !important;
+  max-height: calc(100dvh - var(--pc-vn-dialogue-min-height, 220px) - 28px) !important;
+  z-index: 4 !important;
+}
+
+html body.pc-s1-canvas-backdrop-active
+#vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+:is(#vnCharacter, #vnStudentCharacter)[data-pc-character="eli"] {
+  height: clamp(170px, 29dvh, 315px) !important;
+}
+
+@media screen and (max-width: 700px) {
+  html body.pc-s1-canvas-backdrop-active
+  #vnOverlay#vnOverlay.vn-overlay.active #vnSceneBg.vn-bg {
+    inset: 0 0 var(--pc-vn-dialogue-min-height, 232px) !important;
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+    object-position: center top !important;
+  }
+
+  html body.pc-s1-canvas-backdrop-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter) {
+    bottom: calc(var(--pc-vn-dialogue-min-height, 232px) - 2px) !important;
+    height: clamp(128px, 22dvh, 190px) !important;
+    max-width: 54vw !important;
+    max-height: calc(100dvh - var(--pc-vn-dialogue-min-height, 232px) - 18px) !important;
+  }
+
+  html body.pc-s1-canvas-backdrop-active
+  #vnOverlay#vnOverlay.vn-overlay.active.pc-dual-character
+  :is(#vnCharacter, #vnStudentCharacter)[data-pc-character="eli"] {
+    height: clamp(122px, 21dvh, 180px) !important;
+  }
+}
+
 /* SOURCE: src/css/ui/gfc-theme.css */
 /* ══════════════════════════════════════════════════════
    PROMPTCRAFT · GREAT FALLS COLLEGE VISUAL THEME
@@ -26357,207 +30869,5 @@ html body .pc-app-header .pc-progress-menu .level-tag {
   html body .pc-app-header .pc-progress-menu .level-tag {
     top: 4px !important;
     font-size: 1.08rem !important;
-  }
-}
-
-
-/* v454 — S2 diagnosis shell aligned to the newer S3 presentation system.
-   Keep the Scenario 2 learning mechanic, but present Jordan with the shared
-   student-evidence and case-brief language used by the updated S3 shell. */
-body[data-pc-scenario="metacognition"] .pc-s2-diagnosis-layout {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(14px, 1.35vw, 20px);
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-case-brief {
-  padding: clamp(18px, 2vw, 24px);
-  border: 1.5px solid var(--border-strong);
-  border-radius: 16px;
-  background: #fffdf9;
-  box-shadow: 0 8px 22px rgba(45,34,20,.06);
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-case-header {
-  display: grid;
-  gap: 6px;
-  margin-bottom: 14px;
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-case-header h2 {
-  margin: 0;
-  color: var(--gfc-navy-deep);
-  font-size: clamp(26px, 1.9vw, 34px);
-  line-height: 1.18;
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-case-brief .pc-case-brief-copy {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(14px, 1.3vw, 18px);
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-diagnosis-layout > .pc-activity-task {
-  margin: 0;
-  padding: clamp(22px, 2vw, 30px);
-  border: 1.5px solid var(--border-strong);
-  border-radius: 16px;
-  background: #fffdf9;
-  box-shadow: 0 8px 22px rgba(45,34,20,.06);
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-diagnosis-layout > .pc-activity-task h2 {
-  font-size: clamp(24px, 1.75vw, 31px);
-  line-height: 1.2;
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-diagnosis-layout > .pc-activity-task .pc-activity-instruction {
-  font-size: clamp(15px, 1vw, 17px);
-  line-height: 1.48;
-  color: #4b4037;
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-diagnosis-layout .pc-choice-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(12px, 1vw, 16px);
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-diagnosis-layout .pc-choice-body strong {
-  font-size: clamp(15px, 1vw, 17px);
-  line-height: 1.3;
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-diagnosis-layout .pc-choice-body > span {
-  font-size: clamp(13px, .92vw, 15px);
-  line-height: 1.45;
-}
-
-@media (max-width: 1280px) {
-  body[data-pc-scenario="metacognition"] .pc-s2-diagnosis-layout .pc-choice-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 900px) {
-  body[data-pc-scenario="metacognition"] .pc-s2-case-brief .pc-case-brief-copy {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 600px) {
-  body[data-pc-scenario="metacognition"] .pc-s2-case-brief,
-  body[data-pc-scenario="metacognition"] .pc-s2-diagnosis-layout > .pc-activity-task {
-    padding: 16px;
-    border-radius: 14px;
-  }
-
-  body[data-pc-scenario="metacognition"] .pc-s2-case-header h2 {
-    font-size: 24px;
-  }
-
-  body[data-pc-scenario="metacognition"] .pc-s2-diagnosis-layout .pc-choice-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-
-/* v455 — shared drag-board completion feedback.
-   Controls remain responsive while incomplete and become visually ready when
-   every required card/slot has been populated. */
-.pc-drag-activity .pc-selection-bar .pc-button.is-not-ready {
-  opacity: .78;
-  filter: saturate(.72);
-  cursor: pointer;
-}
-.pc-drag-board.needs-more + .pc-selection-bar,
-.pc-drag-slot-workbench.needs-more + .pc-selection-bar {
-  border-color: rgba(183, 111, 16, .48);
-}
-.pc-drag-board.needs-more + .pc-selection-bar [role="status"],
-.pc-drag-slot-workbench.needs-more + .pc-selection-bar [role="status"] {
-  color: #8a4d0a;
-  font-weight: 800;
-}
-.pc-drag-board.is-complete + .pc-selection-bar .pc-button,
-.pc-drag-slot-workbench.is-complete + .pc-selection-bar .pc-button {
-  opacity: 1;
-  filter: none;
-}
-
-
-/* v456 — progressive evidence sorting. Correct cards persist between checks so
-   the board itself communicates what the player has already established. */
-.pc-drag-card.is-correct[data-pc-card-locked="true"] {
-  padding-right: 82px;
-  border-color: rgba(47,113,86,.78);
-  background: #edf8f1;
-  box-shadow: inset 0 0 0 1px rgba(47,113,86,.08);
-  cursor: default;
-}
-.pc-drag-card.is-correct[data-pc-card-locked="true"]::after {
-  content: "✓ Correct";
-  position: absolute;
-  top: 9px;
-  right: 9px;
-  padding: 3px 6px;
-  border-radius: 999px;
-  background: rgba(47,113,86,.12);
-  color: #246246;
-  font-family: "Source Code Pro", monospace;
-  font-size: 9.5px;
-  line-height: 1.2;
-  font-weight: 850;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-.pc-drag-card.is-correct[data-pc-card-locked="true"]:hover {
-  transform: none;
-  box-shadow: inset 0 0 0 1px rgba(47,113,86,.08);
-}
-
-
-/* v460 — S2/S3 shared scenario-shell alignment.
-   Scenario 2 now inherits the same centered stage, Student Evidence proportions,
-   and context-card rhythm used by S3. S2 keeps its metacognition mechanics; only
-   the scenario shell is shared. This also prevents the Diagnose context from
-   displaying the missing-link answer before the player chooses it. */
-body[data-pc-scenario="metacognition"] .pc-scenario-stage {
-  position: static !important;
-  left: auto !important;
-  width: min(100%, 1500px) !important;
-  max-width: 1500px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  padding: var(--pc-stage-pad-block) var(--pc-stage-pad-inline) clamp(28px, 4vw, 44px) !important;
-  transform: none !important;
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-case-brief {
-  padding: 0 !important;
-  background: linear-gradient(135deg, #fffdfa 0%, var(--parchment) 100%) !important;
-  box-shadow: 0 10px 24px rgba(8, 26, 54, .07) !important;
-}
-
-/* The mission briefing already names the case. S3 does not repeat a second case
-   title between Student Evidence and context, so S2 now follows the same shell. */
-body[data-pc-scenario="metacognition"] .pc-s2-case-header {
-  display: none !important;
-}
-
-body[data-pc-scenario="metacognition"] .pc-s2-case-brief .pc-case-brief-copy {
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: clamp(12px, 2vw, 22px) !important;
-  padding: clamp(18px, 2.4vw, 28px) clamp(18px, 2.8vw, 34px) !important;
-}
-
-/* Decision 1 asks the player to identify this missing link. Keep it out of the
-   pre-decision context rather than quietly displaying the answer first. */
-body[data-pc-scenario="metacognition"] .pc-s2-case-brief .pc-case-brief-copy > div:nth-child(3) {
-  display: none !important;
-}
-
-@media (max-width: 900px) {
-  body[data-pc-scenario="metacognition"] .pc-s2-case-brief .pc-case-brief-copy {
-    grid-template-columns: 1fr !important;
   }
 }

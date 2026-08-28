@@ -1,7 +1,16 @@
 /* ══════════════════════════════════════════════════════
    PromptCraft active dialogue data
-   Active runtime dialogue for shared systems and the playable Scenario 1–3 experiences.
+   Active runtime dialogue for shared systems and current Scenario 1–4 experiences.
    ══════════════════════════════════════════════════════ */
+
+const PC_S1_CANVAS_DIALOGUE_CAST = Object.freeze([
+  Object.freeze({ id: 'pixel', slot: 'right' }),
+  Object.freeze({ id: 'eli', slot: 'left' })
+]);
+
+const PC_S1_PIXEL_ONLY_CAST = Object.freeze([
+  Object.freeze({ id: 'pixel', slot: 'right' })
+]);
 
 window.pixelDialogue = {
   "welcome": [
@@ -20,6 +29,142 @@ window.pixelDialogue = {
       "text": "Babbage can analyze the information you provide, but the final judgment stays with you.",
       "id": "p3"
     }
+  ],
+  "scenarioStart_content-avalanche": [
+    {
+      "speaker": "Professor Pixel",
+      "character": "pixel",
+      "expr": "neutral",
+      "text": "Before we open Canvas, here is the situation. An instructor has taught this topic for years and built Week 4 gradually as the course evolved.",
+      "id": "p-s1-ca-01"
+    },
+    {
+      "speaker": "Professor Pixel",
+      "character": "pixel",
+      "expr": "thinking",
+      "text": "Every addition had a reason: notes, a transcript, readings, models, examples, a quiz, and a written comparison. This course does not lack content, expertise, or instructor effort.",
+      "id": "p-s1-ca-02"
+    },
+    {
+      "speaker": "Professor Pixel",
+      "character": "pixel",
+      "expr": "thinking",
+      "text": "But students kept asking where to begin, which version to use, and what the comparison required. We are not judging the instructor—we are tracing where expert knowledge never became visible course design.",
+      "id": "p-s1-ca-03"
+    }
+  ],
+  "s1_canvas_evidence_intro": [
+    {
+      "speaker": "Professor Pixel",
+      "character": "pixel",
+      "cast": PC_S1_CANVAS_DIALOGUE_CAST,
+      "expr": "neutral",
+      "text": "Now let us open the actual Week 4 module. Eli will help us examine the difference between having access to the content and having a visible path through it.",
+      "id": "p-s1-ca-04"
+    },
+    {
+      "speaker": "Eli",
+      "character": "eli",
+      "cast": PC_S1_CANVAS_DIALOGUE_CAST,
+      "entrance": "slide-left",
+      "expr": "uncertain",
+      "text": "There's no shortage of material here. What's missing is the order of operations — what to do first, what the assignment actually needs, or where the real instructions are hiding.",
+      "id": "e-s1-ca-05"
+    },
+    {
+      "speaker": "Professor Pixel",
+      "character": "pixel",
+      "cast": PC_S1_CANVAS_DIALOGUE_CAST,
+      "expr": "encouraging",
+      "text": "Each case begins with a Before screen. Eli will describe the learner experience, and I will focus your inspection before you reveal the redesign.",
+      "id": "p-s1-ca-06"
+    },
+    {
+      "speaker": "Professor Pixel",
+      "character": "pixel",
+      "cast": PC_S1_CANVAS_DIALOGUE_CAST,
+      "expr": "thinking",
+      "text": "Look for what students must infer, remember, or hunt down. AI can help reorganize the content, but you decide whether the visible learning path actually works.",
+      "id": "p-s1-ca-07"
+    }
+  ],
+  "s1_case_module_briefing": [
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "Start with the module structure. Eli, where would you begin, and what tells you which materials prepare you for the assignment?", "id": "p-s1-case-01a" },
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "uncertain", "text": "I can see the files, notes, examples, quiz, and comparison — all of it's here. But nothing shows me the sequence. It's a parts list with no assembly order.", "id": "e-s1-case-01b" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "Your inspection: find every place the module makes Eli infer the starting point, priority, or next step. Then reveal the redesigned path.", "id": "p-s1-case-01c" }
+  ],
+  "s1_case_module_explanation": [
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "So it's not a content problem. It's that I can't see the end state, or how any of these pieces connect into a sequence.", "id": "e-s1-case-01d" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "Exactly. The priority is to make the learning path visible. Before we reveal the After view, let us hand that diagnosed problem to Babbage, review its first-pass sequence, and decide what the instructor should keep.", "id": "p-s1-case-01e" }
+  ],
+  "s1_case_module_ai_demo": [
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "Here is a useful AI task: inventory the existing items, group them by learner action, and propose a first-pass sequence without deleting anything.", "id": "p-s1-case-01ai-a" },
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "The draft gets us a map fast. But the labels alone can't tell Babbage what I actually need to understand before I reach the assignment.", "id": "e-s1-case-01ai-b" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "Exactly. AI supplies the inventory and draft organization. The instructor verifies the purpose, prerequisites, and teachable order.", "id": "p-s1-case-01ai-c" }
+  ],
+  "s1_case_module_reveal": [
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "confident", "text": "Now there's a Start Here point and a route — Learn, Submit, Continue. I know where I'm headed before I open a single file.", "id": "e-s1-case-01f" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "Notice that the course did not need to lose its substance. The redesign made the instructor’s intended sequence visible to the learner.", "id": "p-s1-case-01g" }
+  ],
+  "s1_case_student_path_briefing": [
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "Case file 2 of 4: the student view. A course can look organized to its instructor while giving students a very different experience.", "id": "p-s1-case-02a" },
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "frustrated", "text": "I've got plenty to open. Nothing tells me what I'm actually trying to accomplish, what comes first, or when Week 4 is even done.", "id": "e-s1-case-02b" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "Your inspection: identify what Eli must open, remember, or guess before he can follow the intended learning path.", "id": "p-s1-case-02c" }
+  ],
+  "s1_case_student_path_explanation": [
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "The instructor might know the right order. Doesn't help me if that order only exists in someone else's head.", "id": "e-s1-case-02d" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "Right. Before we reveal the After view, we will ask Babbage to audit only the student-visible signals, review what it flags, and decide what the instructor should change.", "id": "p-s1-case-02e" }
+  ],
+  "s1_case_student_path_ai_demo": [
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "For this case, Babbage audits only what is visible in the student view: destination, starting point, action labels, and a clear completion point.", "id": "p-s1-case-02ai-a" },
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "It'll flag the missing signals every time, consistently. What it can't do is sit in the course like I do, or know which gap actually stops a student cold.", "id": "e-s1-case-02ai-b" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "Use AI as a rapid inspection partner, then validate its findings with student-view testing and real learner feedback.", "id": "p-s1-case-02ai-c" }
+  ],
+  "s1_case_student_path_reveal": [
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "confident", "text": "The action labels tell me what kind of work I'm doing now. And the order shows me exactly when Week 4 is actually done.", "id": "e-s1-case-02f" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "That is the student-view test: can the learner follow the intended path without extra explanation from the instructor?", "id": "p-s1-case-02g" }
+  ],
+  "s1_case_assignment_briefing": [
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "Case file 3 of 4: the assignment at the point of submission. Can Eli see what a successful comparison must include before he begins writing?", "id": "p-s1-case-03a" },
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "uncertain", "text": "I know the readings and examples are supposed to be in play. But the actual requirements — what counts as evidence, what success looks like — that's buried somewhere else in the module.", "id": "e-s1-case-03b" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "Your inspection: list the requirements missing from this page and notice how much reconstruction the learner must do before submitting.", "id": "p-s1-case-03c" }
+  ],
+  "s1_case_assignment_explanation": [
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "If the requirements live somewhere else, I'm building this from memory while I'm trying to write it. That's backwards.", "id": "e-s1-case-03d" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "That hunt is avoidable. Before the After view, we will ask Babbage to extract the scattered requirements, verify every item against the source, and decide what belongs at the point of need.", "id": "p-s1-case-03e" }
+  ],
+  "s1_case_assignment_ai_demo": [
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "We can give Babbage the assignment page and related module directions with a narrow instruction: extract the requirements, cite where each one appears, and do not invent missing criteria.", "id": "p-s1-case-03ai-a" },
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "That turns scattered directions into a checklist I can work off of, instead of reconstructing it from memory every time.", "id": "e-s1-case-03ai-b" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "The instructor must compare every extracted requirement to the source and decide what counts as successful evidence before publishing the revision.", "id": "p-s1-case-03ai-c" }
+  ],
+  "s1_case_assignment_reveal": [
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "confident", "text": "Now the four required parts, the length, the due date, and what success looks like — it's all right there next to the submission.", "id": "e-s1-case-03f" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "The After view reduces reconstruction. Students can spend their effort on the comparison instead of searching for the assignment.", "id": "p-s1-case-03g" }
+  ],
+  "s1_case_expectations_briefing": [
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "Case file 4 of 4: expectations at the point of need. The directions exist, but how quickly can Eli find the purpose, workload, deadline, evidence, and required sequence?", "id": "p-s1-case-04a" },
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "frustrated", "text": "The details are buried in a paragraph near the bottom. By the time I find out what the work actually requires, I've usually already started it wrong.", "id": "e-s1-case-04b" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "Your inspection: find which expectations arrive too late, then reveal how a Start Here page changes the planning experience.", "id": "p-s1-case-04c" }
+  ],
+  "s1_case_expectations_explanation": [
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "The directions are there. I just find them too late to plan my time or line up the right evidence while I'm working.", "id": "e-s1-case-04d" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "Exactly. Before we reveal the Start Here repair, we will give Babbage the verified details, review its draft organizer, and decide what the instructor can safely publish.", "id": "p-s1-case-04e" }
+  ],
+  "s1_case_expectations_ai_demo": [
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "Once the details are verified, AI can convert them into a first-draft Start Here page with the destination, sequence, workload, due point, and next action.", "id": "p-s1-case-04ai-a" },
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "That's useful for a first draft. But the instructor still owns the workload estimate, the outcome, the dates, accessibility, and tone — all of it.", "id": "e-s1-case-04ai-b" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "Exactly. Babbage accelerates the first pass. Instructor review turns that draft into trustworthy course design.", "id": "p-s1-case-04ai-c" }
+  ],
+  "s1_case_expectations_reveal": [
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "confident", "text": "This Start Here page gives me the purpose, the workload, the deadline, the outcome, and the next action — before I commit any time to it.", "id": "e-s1-case-04f" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "thinking", "text": "The redesign moves expectations forward. That small shift makes the whole module easier to plan and navigate.", "id": "p-s1-case-04g" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "You have now inspected all four repairs. Return to the evidence station and start the Canvas Rescue to build the brief Babbage will actually use.", "id": "p-s1-case-04h" }
+  ],
+  "s1_canvas_rescue_complete": [
+    { "speaker": "Eli", "character": "eli", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "confident", "text": "From the student side, the repaired path tells me where to start, what I'm working toward, what to submit, and what happens next.", "id": "e-s1-rescue-01" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "encouraging", "text": "And from the instructor side, AI accelerated the inventory, extraction, and first draft without receiving authority to publish or invent course decisions.", "id": "p-s1-rescue-02" },
+    { "speaker": "Professor Pixel", "character": "pixel", "cast": PC_S1_CANVAS_DIALOGUE_CAST, "expr": "proud", "text": "That is the PromptCraft principle: use AI to move the work forward, then use human judgment to make the work trustworthy.", "id": "p-s1-rescue-03" }
   ],
   // The old vague/decent/strong prompt-quality loop was retired before S3.
   "scenarioStart_engagement": [

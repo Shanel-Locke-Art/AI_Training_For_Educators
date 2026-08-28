@@ -5,67 +5,63 @@
 // ══════════════════════════════════════════════════════
 const scenarios = [
   {
-    desc: "Mission: Fix a dead discussion board by giving Babbage enough evidence to diagnose what is failing and what meaningful peer interaction should look like.",
-    testPrompt: "My online learners in a first-year general education course are submitting one-line discussion posts that don't build on each other. I need a weekly discussion prompt that encourages deeper thinking and at least two substantive peer replies. The course is fully asynchronous, 8 weeks long.",
-    oscqr: [
-      { id:"obj", label:"Clear Objectives" },
-      { id:"int", label:"Student Interaction" },
-      { id:"rwc", label:"Real-World Context" },
-      { id:"inc", label:"Inclusive Design" },
-      { id:"out", label:"Measurable Outcomes" },
-    ],
-    system: `You are Babbage, the live instructional-design analysis engine inside PromptCraft Scenario 1. The faculty member is repairing a weak asynchronous discussion design.
-
-Evaluate the faculty member's ACTUAL choices. Refer to concrete details they supplied about learners/course, the failure they diagnosed, the interaction move, constraints, and success criteria. If they invent an unexpected repair, evaluate it on its own instructional merits. Never pretend they supplied information they did not.
-
-Be a demanding but useful evaluator. Explicitly identify vague, irrelevant, contradictory, demeaning, unserious, or instructionally unusable input. A field does not earn credit merely because it contains course-related words. If an answer is ridiculous, hostile, or unrelated, say what is wrong with it professionally and explain what usable instructional information is missing. Do not quietly sanitize bad input into a polished activity and then praise the input.
-
-Produce a course-ready revised discussion prompt only after diagnosing the input. Follow faculty choices when they are instructionally sound. When you replace or reinterpret a weak choice, explain why.
-
-The revised prompt itself must also be evaluated. Identify its strongest improvement, one remaining limitation or tradeoff even when the revision is strong, and explain why the specific changes were made. The final feedback should teach the faculty member something about design decisions, not simply deliver a finished artifact.
-
-Be specific enough that materially different faculty input produces materially different feedback. Avoid generic praise and stock advice.`
+    desc: "A Canvas module has plenty of content but no visible path. Inspect what students actually see, uncover the hidden requirements, and use AI to reorganize the experience without replacing instructor judgment.",
+    oscqr: [], system: ""
   },
-  { desc: "Mission: Listen to Jordan and diagnose what is missing from his learning process.", oscqr: [], system: "" },
-  { desc: "Mission: Investigate what Maya’s 96% actually proves, build an assessment from evidence, stress-test it against her performance, audit Babbage, and repair the inference gap.", oscqr: [], system: "" },
-  { desc: "Mission: Separate the learning value of live interaction from the assumption that everyone must be present at the same time.", oscqr: [], system: "" },
-  { desc: "Mission: Verify a polished AI research brief against a controlled evidence packet before deciding what is safe to use.", oscqr: [], system: "" },
-  { desc: "Scenario 6 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
-  { desc: "Scenario 7 is being rebuilt from a clean development shell.", oscqr: [], system: "" },
-  { desc: "Scenario 8 is being rebuilt from a clean development shell.", oscqr: [], system: "" }
+  { desc: "A polished Canvas course still creates barriers. Find the accessibility problems, connect them to current standards, and use AI to support—but not replace—an informed accessibility review.", oscqr: [], system: "" },
+  { desc: "A student is earning good grades but cannot explain what helped, what failed, or what to try next. Use Canvas evidence and AI to build a stronger learning-reflection loop.", oscqr: [], system: "" },
+  { desc: "A high Canvas score may prove recall without proving transferable learning. Examine the evidence, strengthen the assessment, and audit what AI claims the score means.", oscqr: [], system: "" },
+  { desc: "An AI-generated course resource looks ready to publish in Canvas. Verify its claims, citations, and usefulness before students encounter it.", oscqr: [], system: "" },
+  { desc: "A vague request can produce a polished but unusable Canvas item. Predict what AI will misunderstand, test the request, and revise it deliberately.", oscqr: [], system: "" },
+  { desc: "Decide which course-design tasks AI can accelerate and which decisions still require faculty expertise, context, and responsibility.", oscqr: [], system: "" },
+  { desc: "Apply what you have learned to a real Canvas item, evaluate the result, and create a reusable process for thoughtful AI-assisted design.", oscqr: [], system: "" }
 ];
 
 // ══════════════════════════════════════════════════════
 //  SCENARIO UI CONFIGURATION
-//  Scenario 1 is the shared structural template: every scenario gets the
+//  Every scenario gets the
 //  same mission briefing anatomy, VN introduction orchestration, reset path,
 //  and explicit input ownership. Scenario-specific activities stay separate.
 // ══════════════════════════════════════════════════════
 const SCENARIO_UI = [
   {
-    key: 'engagement',
-    dataLabel: 'S1: Engagement',
-    tabLabel: 'S1: Engagement',
-    missionTitle: 'Fix the dead discussion board.',
-    missionCopy: 'Students are participating, but the conversation dies after one exchange. Diagnose the problem and use Babbage to redesign the discussion so students extend, challenge, and build on ideas.',
-    boardText: null,
-    rendererKey: 'guided-builder',
-    workspaceMode: 'guided',
+    key: 'content-avalanche',
+    dataLabel: 'S1: The Content Avalanche',
+    tabLabel: 'S1: The Content Avalanche',
+    missionTitle: 'Turn a content pile into a visible learning path.',
+    missionCopy: 'A Canvas module has plenty of content but no visible path. Inspect what students actually see, uncover the hidden requirements, and use AI to reorganize the experience without replacing instructor judgment.',
+    boardText: 'Week 4 has plenty of content but no clear path. Find what students must guess.',
+    rendererKey: 'content-avalanche-preview',
+    workspaceMode: 'development',
     introLayout: 'standard',
-    introCast: 'single',
-    inputMode: 'scenario-1',
-    inputVisible: true,
-    supportsPrompt: true,
-    implemented: true,
-    developmentStatus: 'Playable'
+    introCast: 'dual',
+    introCharacters: [{ id: 'pixel', slot: 'right' }, { id: 'eli', slot: 'left' }],
+    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    implemented: false,
+    previewAvailable: true,
+    previewIntroduction: true,
+    developmentStatus: 'Preview available · In development',
+    plannedLoop: ['Inspect the Canvas evidence', 'Find the hidden requirements', 'Rebuild the learning path', 'Check the student view']
+  },
+  {
+    key: 'accessibility',
+    dataLabel: 'S2: Access Is Part of the Design',
+    tabLabel: 'S2: Access Is Part of the Design',
+    missionTitle: 'Find the barriers a polished course can hide.',
+    missionCopy: 'A polished Canvas course still creates barriers. Find the accessibility problems, connect them to current standards, and use AI to support—but not replace—an informed accessibility review.',
+    boardText: 'Scenario 2 is in development.',
+    rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
+    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    implemented: false, developmentStatus: 'Planned · In development',
+    plannedLoop: ['Inspect the Canvas experience', 'Connect barriers to standards', 'Repair with AI support', 'Verify with human review']
   },
   {
     key: 'metacognition',
-    dataLabel: 'S2: Metacognition',
-    tabLabel: 'S2: Metacognition',
-    missionTitle: 'Find the metacognitive thinker.',
-    missionCopy: 'Listen to a student, identify the missing thinking move, audit Babbage\'s reflection activity, repair it, and hear how the student\'s thinking changes.',
-    boardText: 'Jordan is completing the work, but he cannot explain what helped, what failed, or what he should try next.',
+    dataLabel: 'S3: The Confident Student Problem',
+    tabLabel: 'S3: The Confident Student Problem',
+    missionTitle: 'Help a successful student learn from the process.',
+    missionCopy: 'A student is earning good grades but cannot explain what helped, what failed, or what to try next. Use Canvas evidence and AI to build a stronger learning-reflection loop.',
+    boardText: 'Jordan is completing the Canvas work, but he cannot explain what helped, what failed, or what he should try next.',
     rendererKey: 'metacognition-opening',
     workspaceMode: 'activity',
     introLayout: 'standard',
@@ -78,15 +74,12 @@ const SCENARIO_UI = [
   },
   {
     key: 'assessment',
-    dataLabel: 'S3: Authentic Assessment',
-    tabLabel: 'S3: Assessment',
-    missionTitle: 'The 96% Problem',
-    missionCopy: 'Maya earned an excellent score, but the assessment mostly asked her to reproduce information. Sort the evidence, build a stronger assessment, stress-test what it proves, audit Babbage, repair the inference gap, then apply the framework to one of your own assessments.',
-    boardText: 'A high score can be accurate while the learning claim attached to it is too large.',
-    rendererKey: 'assessment-opening',
-    workspaceMode: 'activity',
-    introLayout: 'standard',
-    introCast: 'dual',
+    dataLabel: 'S4: The 96% Problem',
+    tabLabel: 'S4: The 96% Problem',
+    missionTitle: 'Decide what a high Canvas score actually proves.',
+    missionCopy: 'A high Canvas score may prove recall without proving transferable learning. Examine the evidence, strengthen the assessment, and audit what AI claims the score means.',
+    boardText: 'A high Canvas score can be accurate while the learning claim attached to it is too large.',
+    rendererKey: 'assessment-opening', workspaceMode: 'activity', introLayout: 'standard', introCast: 'dual',
     introCharacters: [{ id: 'pixel', slot: 'right' }, { id: 'maya', slot: 'left' }],
     afterIntroAction: 's3-diagnosis',
     inputMode: 'scenario-3', inputVisible: true, supportsPrompt: false,
@@ -94,58 +87,43 @@ const SCENARIO_UI = [
     plannedLoop: ['Sort evidence', 'Build assessment', 'Stress-test evidence', 'Audit Babbage', 'Repair the inference', 'Apply to your teaching']
   },
   {
-    key: 'sync-bias',
-    dataLabel: 'S4: Sync Bias',
-    tabLabel: 'S4: Sync Bias',
-    missionTitle: 'Sync Bias is being rebuilt.',
-    missionCopy: 'This scenario is intentionally unavailable while its gameplay and instructional design are rebuilt from the ground up.',
-    boardText: 'Scenario 4 is in development.',
-    rendererKey: 'development-shell',
-    workspaceMode: 'development',
-    introLayout: 'none',
-    introCast: 'single',
-    inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Locked · In development',
-    plannedLoop: ['Diagnose', 'Compare', 'Design', 'Revise']
-  },
-  {
     key: 'hallucination',
     dataLabel: 'S5: Hallucination Hunt',
     tabLabel: 'S5: Hallucination Hunt',
-    missionTitle: 'Hallucination Hunt is being rebuilt.',
-    missionCopy: 'This scenario is intentionally unavailable while its gameplay and instructional design are rebuilt from the ground up.',
+    missionTitle: 'Verify before you publish.',
+    missionCopy: 'An AI-generated course resource looks ready to publish in Canvas. Verify its claims, citations, and usefulness before students encounter it.',
     boardText: 'Scenario 5 is in development.',
     rendererKey: 'development-shell',
     workspaceMode: 'development',
     introLayout: 'none',
     introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Locked · In development',
+    implemented: false, developmentStatus: 'Planned',
     plannedLoop: ['Inspect', 'Verify', 'Correct', 'Decide']
   },
   {
     key: 'prediction', dataLabel: 'S6: Predict the Output', tabLabel: 'S6: Predict the Output',
-    missionTitle: 'Predict what a vague prompt produces.',
-    missionCopy: 'This scenario will be rebuilt around forecasting AI behavior, testing the prediction, and revising the request.',
+    missionTitle: 'Predict what AI will misunderstand.',
+    missionCopy: 'A vague request can produce a polished but unusable Canvas item. Predict what AI will misunderstand, test the request, and revise it deliberately.',
     boardText: 'Scenario 6 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
     implemented: false, developmentStatus: 'Planned', plannedLoop: ['Forecast', 'Test', 'Compare', 'Revise']
   },
   {
-    key: 'overreliance', dataLabel: 'S7: Overreliance', tabLabel: 'S7: Overreliance',
+    key: 'human-judgment', dataLabel: 'S7: The Human Judgment Line', tabLabel: 'S7: The Human Judgment Line',
     missionTitle: 'Decide where human judgment belongs.',
-    missionCopy: 'This scenario will be rebuilt around classifying AI output and defending where instructor judgment is irreplaceable.',
+    missionCopy: 'Decide which course-design tasks AI can accelerate and which decisions still require faculty expertise, context, and responsibility.',
     boardText: 'Scenario 7 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
     implemented: false, developmentStatus: 'Planned', plannedLoop: ['Classify', 'Justify', 'Revise the boundary']
   },
   {
-    key: 'reflect-revise', dataLabel: 'S8: Reflect & Revise', tabLabel: 'S8: Reflect and Revise',
-    missionTitle: 'Build, reflect, and revise.',
-    missionCopy: 'The final scenario will synthesize the game by asking learners to examine their own choices and improve a prompt deliberately.',
+    key: 'reflect-revise-reuse', dataLabel: 'S8: Reflect, Revise, Reuse', tabLabel: 'S8: Reflect, Revise, Reuse',
+    missionTitle: 'Turn one revision into a reusable practice.',
+    missionCopy: 'Apply what you have learned to a real Canvas item, evaluate the result, and create a reusable process for thoughtful AI-assisted design.',
     boardText: 'Scenario 8 is in redesign.', rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Build', 'Explain your choice', 'Evaluate the output', 'Revise']
+    implemented: false, developmentStatus: 'Planned', plannedLoop: ['Choose a Canvas item', 'Revise with AI support', 'Evaluate the result', 'Save a reusable process']
   }
 ];
 
@@ -185,6 +163,7 @@ function pcUnlockScenarioTab(index) {
 
 const PC_SCENARIO_RENDERERS = Object.freeze({
   'guided-builder': ({ container }) => renderGuidedBuilder(container),
+  'content-avalanche-preview': () => renderS1ContentAvalanchePreview(),
   'metacognition-opening': ({ container }) => renderS2Standby(container),
   'assessment-opening': ({ container }) => renderS3Standby(container),
   'development-shell': ({ index }) => renderScenarioPlaceholder(index)
@@ -444,18 +423,12 @@ function launchScenarioFromMenu(index, options = {}) {
   // behavior. The menu merely routes into that established path.
   switchScenario(index, tab);
 
-  // Preserve S1's existing opening sequence: its scenario introduction is
-  // followed by Professor Pixel's welcome the first time the game begins.
-  if (firstLaunch && index === SCENARIO_INDEX.ENGAGEMENT) {
-    setTimeout(() => playPixelSequence('welcome', null), 500);
-  }
-
   window.scenarioIntroEnabled = true;
   return false;
 }
 
 function continueFromMainMenu() {
-  if (!pcScenarioHasLaunched) return launchScenarioFromMenu(SCENARIO_INDEX.ENGAGEMENT);
+  if (!pcScenarioHasLaunched) return launchScenarioFromMenu(SCENARIO_INDEX.CONTENT_AVALANCHE);
   return closeMainMenu({ force: true });
 }
 

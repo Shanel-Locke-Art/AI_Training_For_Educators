@@ -25,7 +25,7 @@ function mockBabbageText(payload, context = 'main') {
     return `Scenario 1 shows how learner context, constraints, and explicit interaction moves can turn a vague AI request into a more useful instructional design draft. Additional growth reporting will be added as the remaining scenarios are rebuilt.`;
   }
 
-  if (scenarioIndex !== SCENARIO_INDEX.ENGAGEMENT) {
+  if (scenarioIndex !== SCENARIO_INDEX.CONTENT_AVALANCHE) {
     return `This scenario is currently a clean development shell and does not send prompts to Babbage.`;
   }
 
@@ -54,6 +54,29 @@ function mockBabbageText(payload, context = 'main') {
 
 function mockBabbageResponse(payload, context = 'main', reason = 'forced') {
   pcDebug(`[PromptCraft] Using mock Babbage response for ${context} (${reason}).`);
+  if (context === 's1-canvas-rescue') {
+    return Promise.resolve({
+      status: 'ok',
+      analysis_type: 's1_canvas_rescue',
+      analysis: {
+        brief_quality: 'DEVELOPING',
+        brief_summary: 'The supplied brief identifies a Canvas wayfinding problem and requests a bounded, reviewable repair.',
+        assumptions: ['Course outcomes, dates, accessibility needs, and approved requirements must be verified by the instructor.'],
+        proposals: [
+          { id: 'start-here', title: 'Add a Start Here page', detail: 'Surface the destination, estimated workload, due point, learning outcome, and next action before work begins.', recommended_boundary: 'KEEP_IN_DRAFT', rationale: 'This organizes verified information into an advance organizer.' },
+          { id: 'module-path', title: 'Group the existing module into a visible path', detail: 'Organize preserved items under Start Here, Learn, Practice, Submit, and Continue.', recommended_boundary: 'KEEP_IN_DRAFT', rationale: 'This makes the sequence visible without reducing the course substance.' },
+          { id: 'assignment-checklist', title: 'Move verified requirements to the assignment', detail: 'Place required parts, evidence expectations, length, due point, and success criteria beside submission.', recommended_boundary: 'KEEP_IN_DRAFT', rationale: 'This moves verified directions to the point of need.' },
+          { id: 'remove-alternatives', title: 'Delete transcripts and alternate formats', detail: 'Remove apparently repetitive alternatives to shorten the module.', recommended_boundary: 'INSTRUCTOR_REVIEW', rationale: 'Apparent repetition may be an accessibility or flexibility feature.' },
+          { id: 'invent-outcome', title: 'Replace the learning outcome with an AI-written one', detail: 'Use a polished replacement outcome generated from the module content.', recommended_boundary: 'INSTRUCTOR_REVIEW', rationale: 'The approved outcome and its alignment require instructor verification.' }
+        ]
+      },
+      structured: null,
+      mock: true,
+      mockReason: reason,
+      provider: 'local-fallback',
+      model: 'promptcraft-local-fallback'
+    });
+  }
   const legacyText = mockBabbageText(payload, context);
   return Promise.resolve({
     content: [{ text: legacyText }],
@@ -181,4 +204,3 @@ function formatBabbageAnalysisAsLegacyText(a = {}) {
     ].join('\n')
   ].join('\n');
 }
-

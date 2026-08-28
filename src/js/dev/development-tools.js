@@ -4,15 +4,21 @@
 // ══════════════════════════════════════════════════════
 (function exposePromptCraftDevTools(){
   function devGoScenario(index) {
-    const target = pcNormalizeScenarioIndex(index, SCENARIO_INDEX.ENGAGEMENT);
+    const target = pcNormalizeScenarioIndex(index, SCENARIO_INDEX.CONTENT_AVALANCHE);
     const tab = pcUnlockScenarioTab(target);
     pcScenarioHasLaunched = true;
     return switchScenario(target, tab);
   }
 
   function devFillScenario(index) {
-    const target = pcNormalizeScenarioIndex(index, SCENARIO_INDEX.ENGAGEMENT);
-    if (target === SCENARIO_INDEX.ENGAGEMENT) return resetS1Dev();
+    const target = pcNormalizeScenarioIndex(index, SCENARIO_INDEX.CONTENT_AVALANCHE);
+    if (target === SCENARIO_INDEX.CONTENT_AVALANCHE) {
+      // Preserve the active case. resetS1Dev() rebuilds the preview at case 1,
+      // so it is only appropriate when S1 is not already open.
+      const activeS1Case = scenarioIndex === SCENARIO_INDEX.CONTENT_AVALANCHE
+        && document.getElementById('pcS1CaseReflectionText');
+      return activeS1Case ? pcFillS1DevFields() : resetS1Dev();
+    }
     if (target === SCENARIO_INDEX.METACOGNITION) return resetS2Dev();
     return devGoScenario(target);
   }
@@ -21,9 +27,22 @@
     return devGoScenario(Math.min(scenarioIndex + 1, SCENARIO_COUNT - 1));
   }
 
+  function devFillS1TransferTask() {
+    if (scenarioIndex !== SCENARIO_INDEX.CONTENT_AVALANCHE) {
+      devGoScenario(SCENARIO_INDEX.CONTENT_AVALANCHE);
+      return pcScheduleScenarioTask(
+        () => window.pcFillS1TransferDevTask?.(),
+        150,
+        SCENARIO_INDEX.CONTENT_AVALANCHE
+      );
+    }
+    return window.pcFillS1TransferDevTask?.();
+  }
+
   pcExposeGlobals({
     devGoScenario,
     devFillScenario,
+    devFillS1TransferTask,
     devTestScenario: devFillScenario,
     navigateToNext: devGoScenario,
     devNextScenario,

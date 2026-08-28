@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,8 +25,14 @@ for stale_id in ('"p4": {', '"p5": {', '"p6": {', '"p7": {', '"p8": {', '"p9": {
 assert "I'm Professor Pixel. I'll guide you through each teaching challenge." in dialogue
 assert "Babbage can analyze the information you provide, but the final judgment stays with you." in dialogue
 assert "I'm Professor Pixel. I'll guide you through each teaching challenge." in runtime
-assert "patch=451" in index
-assert "runtime/js/dialogue-data.js?v=143&amp;patch=451" in index
+
+# Read the live cache-buster patch/version numbers instead of hardcoding them,
+# since they advance on every release.
+dialogue_script_match = re.search(r'dialogue-data\.js\?v=(\d+)&amp;patch=(\d+)', index)
+assert dialogue_script_match, "Could not find dialogue-data.js version/patch marker in index.html"
+dialogue_version, dialogue_patch = dialogue_script_match.groups()
+assert f"patch={dialogue_patch}" in index
+assert f"runtime/js/dialogue-data.js?v={dialogue_version}&amp;patch={dialogue_patch}" in index
 
 assert "ASSETS.audio.professorPixel.vague" not in (ROOT / "src/js/audio/audio-engine.js").read_text(encoding="utf-8")
 assert "ASSETS.audio.professorPixel.welcome" not in (ROOT / "src/js/audio/audio-engine.js").read_text(encoding="utf-8")

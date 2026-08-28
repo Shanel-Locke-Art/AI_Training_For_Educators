@@ -12,7 +12,8 @@ async function run() {
     assert.equal(health.statusCode, 200);
     const healthBody = JSON.parse(health.body);
     assert.equal(healthBody.provider, 'openai');
-    assert.equal(healthBody.proxy_version, 'V370');
+    assert.equal(healthBody.proxy_version, 'V371');
+    assert.ok(healthBody.supported_contracts.includes('s1_canvas_rescue'));
     assert.ok(healthBody.supported_contracts.includes('s5_review'));
     assert.ok(healthBody.supported_contracts.includes('s3_evidence_analysis'));
     assert.ok(healthBody.supported_contracts.includes('s3_transfer_assessment'));
@@ -25,6 +26,17 @@ async function run() {
         revision_review:{strongest_improvement:'A',remaining_limitation:'B',why_these_changes:'C'},
         course_quality_check:{clear_objectives:'A',student_interaction:'B',real_world_context:'C',inclusive_design:'D',measurable_outcomes:'E'},
         input_quality:{usable:true,concerns:[]}
+      },
+      promptcraft_s1_canvas_rescue: {
+        brief_quality:'STRONG', brief_summary:'Bounded Canvas repair brief',
+        assumptions:['Verify outcomes and accessibility decisions'],
+        proposals:[
+          {id:'start-here',title:'Start Here',detail:'Add advance organizer',recommended_boundary:'KEEP_IN_DRAFT',rationale:'Uses verified details'},
+          {id:'module-path',title:'Module path',detail:'Group existing items',recommended_boundary:'KEEP_IN_DRAFT',rationale:'Makes order visible'},
+          {id:'assignment-checklist',title:'Assignment checklist',detail:'Move verified requirements',recommended_boundary:'KEEP_IN_DRAFT',rationale:'Point of need'},
+          {id:'remove-alternatives',title:'Remove alternatives',detail:'Delete transcripts',recommended_boundary:'INSTRUCTOR_REVIEW',rationale:'Accessibility decision'},
+          {id:'invent-outcome',title:'Replace outcome',detail:'Use generated outcome',recommended_boundary:'INSTRUCTOR_REVIEW',rationale:'Alignment decision'}
+        ]
       },
       promptcraft_s2_babbage_draft: {
         activity_title:'Reflect', activity_prompt:'Prompt', design_rationale:'Why',
@@ -117,6 +129,7 @@ async function run() {
 
     const cases = [
       ['scenario1', 'promptcraft_s1_babbage_analysis', 'promptcraft_s1_babbage_analysis_v1'],
+      ['s1_canvas_rescue', 'promptcraft_s1_canvas_rescue', 'promptcraft_s1_canvas_rescue_v1'],
       ['s2_draft', 'promptcraft_s2_babbage_draft', 'promptcraft_s2_babbage_draft_v1'],
       ['s2_review', 'promptcraft_s2_babbage_review', 'promptcraft_s2_babbage_review_v1'],
       ['s3_draft', 'promptcraft_s3_babbage_draft', 'promptcraft_s3_babbage_draft_v1'],
@@ -143,13 +156,13 @@ async function run() {
       assert.equal(result.statusCode, 200);
       const body = JSON.parse(result.body);
       assert.equal(body.analysis_schema, expectedSchema);
-      assert.equal(body.proxy_version, 'V370');
+      assert.equal(body.proxy_version, 'V371');
       assert.equal(lastPayload.text.format.name, expectedName);
       assert.equal(lastPayload.text.format.strict, true);
       assert.equal(lastPayload.model, 'gpt-5.6-terra');
     }
 
-    console.log('PromptCraft Babbage structured proxy tests passed, including the S3 evidence-analysis and Transfer Lab contracts.');
+    console.log('PromptCraft Babbage structured proxy tests passed, including the S1 Canvas Rescue and S3 evidence-analysis contracts.');
   } finally {
     if (originalKey === undefined) delete process.env.OPENAI_API_KEY;
     else process.env.OPENAI_API_KEY = originalKey;

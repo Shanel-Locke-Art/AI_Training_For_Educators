@@ -44,6 +44,11 @@ pcRegisterVNCharacter('jordan', {
   expressions: () => ASSETS.images.students.jordan,
   legacyExpressions: () => LEGACY_ASSETS.images.students.jordan
 });
+pcRegisterVNCharacter('eli', {
+  label: 'Eli',
+  expressions: () => ASSETS.images.students.eli,
+  legacyExpressions: () => LEGACY_ASSETS.images.students.eli
+});
 pcRegisterVNCharacter('maya', {
   label: 'Maya',
   expressions: () => ASSETS.images.students.maya,
@@ -220,10 +225,97 @@ function pcRenderVNCast({ cast = [], speaker = 'pixel', expression = 'neutral' }
     });
   });
 
+  // Compact S1 evidence scenes give the Canvas interface the full visual stage.
+  // Reapply this after every dialogue line because cast rendering intentionally
+  // clears earlier inline layout state when expressions or speakers change.
+  const compactS1Evidence = Boolean(
+    overlay?.classList.contains('pc-s1-mobile-evidence-reader')
+    && window.matchMedia?.('(max-width: 1100px)').matches
+  );
+  const compactS1HasCastRoom = Boolean(
+    compactS1Evidence && overlay?.classList.contains('pc-s1-phone-cast-room')
+  );
+  overlay?.classList.toggle('pc-s1-phone-cast-room', compactS1HasCastRoom);
+  if (compactS1Evidence && !compactS1HasCastRoom) {
+    PC_VN_CAST_SLOTS.forEach((_, slotIndex) => {
+      const slot = pcGetVNSlot(slotIndex);
+      slot?.container?.style.setProperty('display', 'none', 'important');
+      slot?.container?.setAttribute('aria-hidden', 'true');
+    });
+  } else {
+    PC_VN_CAST_SLOTS.forEach((_, slotIndex) => {
+      pcGetVNSlot(slotIndex)?.container?.removeAttribute('aria-hidden');
+    });
+  }
+
   window.pcCurrentVNCast = normalizedCast.map(entry => String(entry.id).trim().toLowerCase());
   window.pcCurrentVNSpeaker = speakerId;
   return true;
 }
+
+function pcUpdateS1PhoneCastRoom() {
+  const overlay = document.getElementById('vnOverlay');
+  const screenWidth = Math.min(
+    window.innerWidth,
+    window.screen?.width || window.innerWidth
+  );
+  const eligible = Boolean(
+    overlay?.classList.contains('pc-s1-mobile-evidence-reader')
+    && screenWidth <= 1100
+  );
+  const image = overlay?.querySelector('.pc-s1-real-canvas-capture img');
+  const dialogue = document.getElementById('vnDialogue');
+  const scene = document.getElementById('vnScene');
+  const availableRoom = eligible && image && dialogue
+    ? dialogue.getBoundingClientRect().top - image.getBoundingClientRect().bottom
+    : 0;
+  const hasRoom = availableRoom >= 140;
+  overlay?.classList.toggle('pc-s1-phone-cast-room', hasRoom);
+
+  if (hasRoom && scene) {
+    const dialogueRect = dialogue.getBoundingClientRect();
+    const castHeight = Math.max(112, Math.min(150, availableRoom - 18));
+    overlay.style.removeProperty('--pc-s1-cast-top');
+    overlay.style.setProperty(
+      '--pc-s1-cast-bottom',
+      `${Math.max(0, window.innerHeight - dialogueRect.top + 4)}px`
+    );
+    overlay.style.setProperty('--pc-s1-cast-height', `${castHeight}px`);
+  } else {
+    overlay?.style.removeProperty('--pc-s1-cast-top');
+    overlay?.style.removeProperty('--pc-s1-cast-bottom');
+    overlay?.style.removeProperty('--pc-s1-cast-height');
+  }
+
+  PC_VN_CAST_SLOTS.forEach((_, slotIndex) => {
+    const slot = pcGetVNSlot(slotIndex);
+    if (!slot?.container) return;
+    if (hasRoom) {
+      slot.container.style.removeProperty('display');
+      slot.container.removeAttribute('aria-hidden');
+    } else if (eligible) {
+      slot.container.style.setProperty('display', 'none', 'important');
+      slot.container.setAttribute('aria-hidden', 'true');
+    } else {
+      slot.container.style.removeProperty('display');
+      slot.container.removeAttribute('aria-hidden');
+    }
+  });
+  return hasRoom;
+}
+
+let pcS1CastRoomFrame = 0;
+function pcScheduleS1CastRoomUpdate() {
+  cancelAnimationFrame(pcS1CastRoomFrame);
+  pcS1CastRoomFrame = requestAnimationFrame(() => {
+    if (typeof window.pcRefreshS1CanvasEvidenceLayout === 'function'
+        && window.pcRefreshS1CanvasEvidenceLayout()) return;
+    pcUpdateS1PhoneCastRoom();
+  });
+}
+
+window.addEventListener('resize', pcScheduleS1CastRoomUpdate, { passive: true });
+window.visualViewport?.addEventListener('resize', pcScheduleS1CastRoomUpdate, { passive: true });
 
 
 
@@ -243,10 +335,30 @@ function vnSetDialogueCharacter(character = 'pixel', expression = 'neutral', spe
   }
 }
 
+function pcAnimateVNCharacterEntrance(characterId = '', entrance = '') {
+  if (entrance !== 'slide-left') return false;
+  const id = String(characterId || '').trim().toLowerCase();
+  const slot = [...document.querySelectorAll('#vnCharacter, #vnStudentCharacter')]
+    .find(element => element.dataset.pcCharacter === id);
+  const portrait = slot?.querySelector('img');
+  if (!portrait) return false;
+
+  if (portrait._pcEntranceTimer) clearTimeout(portrait._pcEntranceTimer);
+  portrait.classList.remove('pc-vn-enter-slide-left');
+  void portrait.offsetWidth;
+  portrait.classList.add('pc-vn-enter-slide-left');
+  portrait._pcEntranceTimer = setTimeout(() => {
+    portrait.classList.remove('pc-vn-enter-slide-left');
+    portrait._pcEntranceTimer = null;
+  }, 760);
+  return true;
+}
+
 
 window.pcRegisterVNCharacter = pcRegisterVNCharacter;
 window.pcRenderVNCast = pcRenderVNCast;
 window.pcGetVNCharacterDefinition = pcGetVNCharacterDefinition;
+window.pcUpdateS1PhoneCastRoom = pcUpdateS1PhoneCastRoom;
 
 function vnTypeWriter(text) {
   const el = document.getElementById('vnText');
@@ -293,7 +405,8 @@ function pcVNHasActiveHandoff() {
       overlay.classList.contains('babbage-prediction') ||
       overlay.classList.contains('pc-clean-prediction') ||
       overlay.classList.contains('pc-prediction-question') ||
-      overlay.classList.contains('pc-clean-output')
+      overlay.classList.contains('pc-clean-output') ||
+      overlay.classList.contains('pc-s1-dialogue-choice')
     )
   );
 }
@@ -407,8 +520,8 @@ function playPixelSequence(key, onDone) {
     const i = getScenarioIndexFromDialogueKey(key);
     if (i >= 0 && scenarios[i]) {
       const boardText = document.getElementById('vnBoardText');
-      if (boardText) boardText.textContent = scenarios[i].desc;
       const ui = getScenarioUI(i);
+      if (boardText) boardText.textContent = ui?.boardText || scenarios[i].desc;
       if (ui?.introCast === 'dual' && Array.isArray(ui.introCharacters)) {
         introCharacters = ui.introCharacters;
       }
@@ -427,6 +540,7 @@ function playPixelSequence(key, onDone) {
       speaker: line.speaker || 'Professor Pixel',
       character: line.character || 'pixel',
       cast: line.cast || introCharacters,
+      entrance: line.entrance || '',
       id: line.id || ''
     });
   });

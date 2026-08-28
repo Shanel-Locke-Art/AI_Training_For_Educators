@@ -27,7 +27,7 @@ checks={
  'research stores transfer metadata': 's3_transfer_metadata_json' in tracking,
  'research note excludes raw transfer text': 'Raw faculty text deliberately stays out of research saves.' in s3,
  'shared transfer CSS': '.pc-transfer-lab' in css and '.pc-s3-transfer' not in css,
- 'cache patch 461': 'patch=461' in idx,
+ 'cache patch 461 or later': bool(re.search(r'patch=(\d+)', idx)) and int(re.search(r'patch=(\d+)', idx).group(1)) >= 461,
  'receiver unchanged': 'receiver=82' in idx,
 }
 

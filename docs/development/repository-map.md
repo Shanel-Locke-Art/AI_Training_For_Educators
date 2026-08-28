@@ -1,6 +1,6 @@
 # PromptCraft repository architecture
 
-This is the canonical repository map for `PROMPTCRAFT_V429` as represented by the current V429 / cache revision 446 development baseline. Older flat/numeric layouts should not be reconstructed from memory.
+This is the canonical repository map for `PROMPTCRAFT_V429` as represented by the current V429 / patch 474 development baseline. Older flat/numeric layouts should not be reconstructed from memory.
 
 ## Runtime entry points
 
@@ -42,8 +42,10 @@ src/js/
 ├── scenarios/
 │   ├── shared-components.js
 │   ├── registry.js
-│   ├── s1-engagement.js
-│   └── s2-metacognition.js
+│   ├── s1-course-design.js       # unreachable from the current registry — see s1-unreachable-modules.md
+│   ├── s1-engagement.js          # partially unreachable from the current registry — see s1-unreachable-modules.md
+│   ├── s2-metacognition.js
+│   └── s3-authentic-assessment.js
 └── ui/
     ├── visual-novel.js
     ├── workstation-layout.js
@@ -76,7 +78,7 @@ src/css/
 
 ## Assets
 
-`assets/asset-manifest.json` is the canonical asset classification map. Current manifest version: `144`.
+`assets/asset-manifest.json` is the canonical asset classification map. Current manifest version: `147`.
 
 Major current asset groups:
 
@@ -88,6 +90,7 @@ Major current asset groups:
 - Babbage mark, Charles Babbage portrait, Babbage engine
 - Great Falls College print/logo asset
 - PromptCraft QR code
+- S1 Content Avalanche Canvas evidence, paired across instructor/student and before/after views, plus eight dedicated smartboard-focused views
 - current runtime audio
 - planned line-by-line audio
 - development-only character references
@@ -106,7 +109,11 @@ Current browser regression coverage also includes teaching progression, Ideas Wa
 
 ## Scenario boundary
 
-Only S1 and S2 have active browser implementations in this baseline. S3-S8 are development shells. Old S3-S5 browser prototype code and styling were removed so new scenario development starts from shared architecture rather than inherited dormant behavior.
+The approved Canvas-oriented roadmap is S1 Content Avalanche, S2 Access Is Part of the Design, S3 Confident Student Problem, S4 The 96% Problem, S5 Hallucination Hunt, S6 Predict the Output, S7 Human Judgment Line, and S8 Reflect, Revise, Reuse.
+
+S1 now has an unlocked Content Avalanche evidence station built from its structured Canvas screenshots. Professor Pixel first establishes the course history and faculty context in the classroom; the flow then opens the actual Canvas evidence on the classroom smartboard and automatically continues into the first case briefing without requiring a separate replay button. Pixel begins the Canvas introduction alone. Jordan is not rendered until Pixel introduces him; Jordan’s first line activates the dual cast and slides him into the left slot while Pixel remains on the right. The scene-level owner then preserves both characters and the current Before or After screenshot across queued dialogue handoffs. Smartboard dialogue uses eight board-specific focused views that remove unused Canvas margins and enlarge the relevant module, assignment, or directions content; the assignment Before view uses a safe-fit composition so the complete direction line and right-side Canvas controls remain visible inside the board. At phone and compact-tablet widths through 1100 CSS pixels, Canvas case dialogue leaves the miniature prop composition and becomes a full-screen evidence reader: the complete transcribed evidence list scrolls in the upper scene, narration and diagnosis choices remain readable in an independently scrollable lower pane, and decorative portraits, smartboard hardware, and the redundant overlay menu are suppressed so they cannot cover evidence. The Canvas Focus Before/After state now sits inside the evidence toolbar instead of overlapping the evidence context or title. Wider screens retain the dual-character classroom and focused Canvas screenshot, while the evidence station retains unchanged full screenshots and full-size links. Each case now follows a formative diagnose–explain–AI-assist–reveal loop: inspect Before, choose one of three dialogue responses, hear the explanation, zoom into a dedicated full-screen Babbage workspace, reveal the approved After, and hear Pixel and Jordan compare what changed. The workspace presents one readable step at a time—instructor task, AI draft, and human review—reuses the existing Pixel/Jordan AI dialogue as inline coaching, owns a true scrollable grid row, and keeps Back/Continue controls outside that scrolling region. It fills short-landscape and narrow mobile viewports instead of scaling itself inside the decorative smartboard. Completing human review returns the player to the classroom before the Canvas After reveal. The static After state uses a compact three-step case handoff—teaching lens, Babbage contribution, instructor verification—instead of competing summary cards. After all four cases, Start Canvas Rescue opens the applied player activity. The player selects four design-brief ingredients, sends the bounded brief through the provider-neutral Babbage client to the `s1_canvas_rescue` structured backend contract, reviews five proposed Canvas repairs, and decides what to keep or return for human review. When the backend is unavailable, the same interaction uses an explicitly labeled bounded test fallback. The final student-view debrief reports brief specificity and instructor-review judgment while reinforcing that AI can inventory, extract, reorganize, compare, and draft, but the instructor owns purpose, accuracy, accessibility, alignment, and student experience. The full-width station remains available for close inspection. S1 remains excluded from implemented-scenario completion calculations until final acceptance and progression activation. S2 currently uses a development shell. S3 and S4 are the two active browser implementations. Their source filenames and internal action keys retain the earlier `s2`/`s3` names for receiver and saved-data compatibility while their registry positions, labels, progress state, and generic tracking identify them as Scenarios 3 and 4. S5-S8 remain development shells.
+
+Each S1 case now follows one connected formative loop: inspect the Before view, diagnose the learner problem, reveal the instructor-approved After view, write a 2–4 sentence explanation of why the redesign helps students, and review Babbage’s analysis. The writing prompt is embedded in the dialogue pane while the After evidence remains visible. Babbage’s single full-screen feedback report checks whether the explanation names the original problem, cites a visible Canvas change, and connects that change to the student experience; players can revise before continuing. This replaces the former three-screen task/draft/decision detour. The instructor and student Before-module scenes now use direct responsive Canvas captures supplied from the live course rather than HTML reconstructions. A responsive `<picture>` selects the phone capture below 480 CSS pixels and the wider compact capture for small tablets and short desktop test viewports, preserving Canvas’s real wrapping, item icons, accessibility indicators, publication controls, point metadata, and perspective-specific controls. Other evidence surfaces retain their readable Canvas-styled transcription until equivalent responsive source captures are available. Full-body character art remains suppressed in compact evidence mode so Pixel and Jordan cannot cover the source; their names and narration preserve speaker identity in the dedicated dialogue pane. On phone and compact-tablet evidence scenes, the Canvas surface reaches every edge of the upper pane with no smartboard hardware, dark surround, card margin, rounded corner, border, or shadow. The scenario-start dialogue owner preserves the short S1 `boardText` instead of replacing it with the longer menu description.
 
 The server-side Babbage proxy keeps S3-S5 structured response contracts because those are future-facing integration contracts, not playable browser implementations.
 
@@ -128,8 +135,8 @@ The retained `claude_response` tokens exist only for V121 receiver compatibility
 
 Canonical workbooks:
 
-- `docs/asset-management/master-asset-tracker.xlsx`
-- `docs/asset-management/visual-asset-tracker.xlsx`
-- `docs/asset-management/dialogue-voiceover-tracker.xlsx`
+- `docs/asset-management/PromptCraft_Production_Overview_Simplified.xlsx`
+- `docs/asset-management/PromptCraft_Visual_Asset_Tracker_Simplified.xlsx`
+- `docs/asset-management/PromptCraft_Voice_Recording_Tracker.xlsx`
 
 Do not create version-number duplicates of these workbooks for routine updates. Version history belongs in source control/research records.

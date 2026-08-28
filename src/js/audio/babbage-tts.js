@@ -19,7 +19,8 @@ function toggleBabbageTTS() {
       return;
     }
 
-    const output = document.getElementById('babbageTerminalOutput');
+    const output = document.querySelector('#pcS1ReflectionAnalysis .pc-s1-reflection-analysis-content')
+      || document.getElementById('babbageTerminalOutput');
     const text = cleanBabbageSpeechText(output?.textContent || '');
 
     if (!text) return;

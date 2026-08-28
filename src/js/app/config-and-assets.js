@@ -99,7 +99,7 @@ const ASSETS = Object.freeze({
       classroom: pcProjectUrl('assets/images/backgrounds/classroom.png'),
       scenarios: Object.freeze({
         0: pcProjectUrl('assets/images/backgrounds/gfc/s1-science-wing.jpg'),
-        1: pcProjectUrl('assets/images/backgrounds/gfc/s2-study-lounge.jpg')
+        2: pcProjectUrl('assets/images/backgrounds/gfc/s2-study-lounge.jpg')
       })
     }),
     professorPixel: Object.freeze({
@@ -118,6 +118,13 @@ const ASSETS = Object.freeze({
         thinking: pcProjectUrl('assets/images/characters/students/jordan/thinking.png'),
         confident: pcProjectUrl('assets/images/characters/students/jordan/confident.png')
       }),
+      eli: Object.freeze({
+        neutral: pcProjectUrl('assets/images/characters/students/eli/neutral.png'),
+        uncertain: pcProjectUrl('assets/images/characters/students/eli/uncertain.png'),
+        frustrated: pcProjectUrl('assets/images/characters/students/eli/frustrated.png'),
+        thinking: pcProjectUrl('assets/images/characters/students/eli/thinking.png'),
+        confident: pcProjectUrl('assets/images/characters/students/eli/confident.png')
+      }),
       maya: Object.freeze({
         neutral: pcProjectUrl('assets/images/characters/students/maya/neutral.png'),
         thinking: pcProjectUrl('assets/images/characters/students/maya/thinking.png'),
@@ -128,12 +135,44 @@ const ASSETS = Object.freeze({
     }),
     scenes: Object.freeze({
       0: pcProjectUrl('assets/images/scenes/scenario-01-engagement/scene.png'),
-      1: pcProjectUrl('assets/images/scenes/scenario-02-metacognition/scene.png'),
-      2: pcProjectUrl('assets/images/backgrounds/classroom.png'),
-      3: pcProjectUrl('assets/images/scenes/scenario-04-sync-bias/scene.png'),
+      1: pcProjectUrl('assets/images/backgrounds/classroom.png'),
+      2: pcProjectUrl('assets/images/scenes/scenario-02-metacognition/scene.png'),
+      3: pcProjectUrl('assets/images/backgrounds/classroom.png'),
       4: pcProjectUrl('assets/images/scenes/scenario-05-hallucination-hunt/scene.png'),
       5: pcProjectUrl('assets/images/scenes/scenario-06-predict-output/scene.png'),
       complete: pcProjectUrl('assets/images/scenes/completion/all-scenarios-complete.png')
+    }),
+    canvasContentAvalanche: Object.freeze({
+      instructor: Object.freeze({
+        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-module.png'),
+        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-module-mobile-wide.png'),
+        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-module-mobile-phone.png'),
+        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-module.png'),
+        beforeWeek4Notes: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-week-4-notes.png'),
+        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-comparison-assignment.png'),
+        beforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-buried-directions.png'),
+        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-start-here.png'),
+        afterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-submit-assignment.png'),
+        afterReadPage: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-read-page.png')
+      }),
+      student: Object.freeze({
+        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-module.png'),
+        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-module-mobile-wide.png'),
+        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-module-mobile-phone.png'),
+        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-after-module.png'),
+        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-comparison-assignment.png'),
+        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-after-start-here.png')
+      }),
+      smartboard: Object.freeze({
+        instructorBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-module-focus.png'),
+        instructorAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-after-module-focus.png'),
+        studentBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/student-before-module-focus.png'),
+        studentAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/student-after-module-focus.png'),
+        instructorBeforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-comparison-assignment-safe-focus.png'),
+        instructorAfterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-after-submit-assignment-focus.png'),
+        instructorBeforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-buried-directions-focus.png'),
+        instructorAfterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-after-start-here-focus.png')
+      })
     })
   }),
   audio: Object.freeze({
@@ -146,6 +185,30 @@ const ASSETS = Object.freeze({
     })
   })
 });
+
+// Scenario 1 Canvas evidence is kept as structured data so a gallery, card-sort,
+// or before/after comparison can reuse the same assets without duplicating paths
+// or losing the perspective and instructional purpose of each screenshot.
+const PC_S1_CANVAS_EVIDENCE = Object.freeze([
+  Object.freeze({ id: 'instructor-before-module', perspective: 'instructor', state: 'before', surface: 'module', src: ASSETS.images.canvasContentAvalanche.instructor.beforeModule, compactSrc: ASSETS.images.canvasContentAvalanche.instructor.beforeModuleMobileWide, mobileSrc: ASSETS.images.canvasContentAvalanche.instructor.beforeModuleMobilePhone, smartboardSrc: ASSETS.images.canvasContentAvalanche.smartboard.instructorBeforeModule, alt: 'Actual Canvas mobile instructor view of the expanded BEFORE Week 4 Content Avalanche module with content-type icons, accessibility indicators, publication controls, a quiz, and a comparison assignment.' }),
+  Object.freeze({ id: 'instructor-after-module', perspective: 'instructor', state: 'after', surface: 'module', src: ASSETS.images.canvasContentAvalanche.instructor.afterModule, smartboardSrc: ASSETS.images.canvasContentAvalanche.smartboard.instructorAfterModule, alt: 'Instructor view of the expanded AFTER Week 4 Visible Learning Path module organized into Start Here, Learn, Submit, and Continue sections.' }),
+  Object.freeze({ id: 'instructor-before-week-4-notes', perspective: 'instructor', state: 'before', surface: 'page', src: ASSETS.images.canvasContentAvalanche.instructor.beforeWeek4Notes, alt: 'Instructor view of the Week 4 Notes page where directions appear in a dense paragraph and refer learners to several other module items.' }),
+  Object.freeze({ id: 'instructor-before-comparison-assignment', perspective: 'instructor', state: 'before', surface: 'assignment', src: ASSETS.images.canvasContentAvalanche.instructor.beforeComparisonAssignment, smartboardSrc: ASSETS.images.canvasContentAvalanche.smartboard.instructorBeforeComparisonAssignment, alt: 'Instructor view of the vague Comparison assignment, which tells learners to find additional directions elsewhere in the module.' }),
+  Object.freeze({ id: 'instructor-before-buried-directions', perspective: 'instructor', state: 'before', surface: 'page', src: ASSETS.images.canvasContentAvalanche.instructor.beforeBuriedDirections, smartboardSrc: ASSETS.images.canvasContentAvalanche.smartboard.instructorBeforeBuriedDirections, alt: 'Instructor view of the What to do next page where the 400-word requirement, evidence expectations, case, deadline, and quiz sequence are finally revealed.' }),
+  Object.freeze({ id: 'instructor-after-start-here', perspective: 'instructor', state: 'after', surface: 'page', src: ASSETS.images.canvasContentAvalanche.instructor.afterStartHere, smartboardSrc: ASSETS.images.canvasContentAvalanche.smartboard.instructorAfterStartHere, alt: 'Instructor view of the redesigned Start Here page showing the destination, ordered learning path, estimated workload, due point, value, and learning outcome.' }),
+  Object.freeze({ id: 'instructor-after-submit-assignment', perspective: 'instructor', state: 'after', surface: 'assignment', src: ASSETS.images.canvasContentAvalanche.instructor.afterSubmitAssignment, smartboardSrc: ASSETS.images.canvasContentAvalanche.smartboard.instructorAfterSubmitAssignment, alt: 'Instructor view of the redesigned submission assignment with the task, four required parts, success criteria, length, due point, and point value visible together.' }),
+  Object.freeze({ id: 'instructor-after-read-page', perspective: 'instructor', state: 'after', surface: 'page', src: ASSETS.images.canvasContentAvalanche.instructor.afterReadPage, alt: 'Instructor view of the redesigned reading page with purpose, estimated time, two planning models, direct reading links, an evidence-capture task, and a clear next step.' }),
+  Object.freeze({ id: 'student-before-module', perspective: 'student', state: 'before', surface: 'module', src: ASSETS.images.canvasContentAvalanche.student.beforeModule, compactSrc: ASSETS.images.canvasContentAvalanche.student.beforeModuleMobileWide, mobileSrc: ASSETS.images.canvasContentAvalanche.student.beforeModuleMobilePhone, smartboardSrc: ASSETS.images.canvasContentAvalanche.smartboard.studentBeforeModule, alt: 'Actual Canvas mobile student view of the BEFORE module showing a long flat list of files and pages with no visible learning sequence or instructor-only publication controls.' }),
+  Object.freeze({ id: 'student-after-module', perspective: 'student', state: 'after', surface: 'module', src: ASSETS.images.canvasContentAvalanche.student.afterModule, smartboardSrc: ASSETS.images.canvasContentAvalanche.smartboard.studentAfterModule, alt: 'Student view of the AFTER module showing a visible path from Start Here through Learn and Submit to Continue.' }),
+  Object.freeze({ id: 'student-before-comparison-assignment', perspective: 'student', state: 'before', surface: 'assignment', src: ASSETS.images.canvasContentAvalanche.student.beforeComparisonAssignment, alt: 'Student submission view of the vague Comparison assignment with a large text editor but no visible length, evidence, case, or success requirements.' }),
+  Object.freeze({ id: 'student-after-start-here', perspective: 'student', state: 'after', surface: 'page', src: ASSETS.images.canvasContentAvalanche.student.afterStartHere, alt: 'Student view of the redesigned Start Here page with the purpose, sequence, workload, due point, point value, learning outcome, and next step visible before work begins.' })
+]);
+
+function pcGetS1CanvasEvidence(id) {
+  return PC_S1_CANVAS_EVIDENCE.find(item => item.id === id) || null;
+}
+
+pcExposeGlobals({ PC_S1_CANVAS_EVIDENCE, pcGetS1CanvasEvidence });
 
 function pcGetScenarioBackgroundAsset(index) {
   const normalized = Number(index);
@@ -175,6 +238,13 @@ const LEGACY_ASSETS = Object.freeze({
         frustrated: 'images/characters/students/jordan/frustrated.png',
         thinking: 'images/characters/students/jordan/thinking.png',
         confident: 'images/characters/students/jordan/confident.png'
+      }),
+      eli: Object.freeze({
+        neutral: 'images/characters/students/eli/neutral.png',
+        uncertain: 'images/characters/students/eli/uncertain.png',
+        frustrated: 'images/characters/students/eli/frustrated.png',
+        thinking: 'images/characters/students/eli/thinking.png',
+        confident: 'images/characters/students/eli/confident.png'
       }),
       maya: Object.freeze({
         neutral: 'images/characters/students/maya/neutral.png',

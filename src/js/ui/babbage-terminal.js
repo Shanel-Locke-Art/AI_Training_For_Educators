@@ -423,9 +423,9 @@ ${terminalizeBabbageText(feedback)}`;
 
 // NOTE: Terminal diagnosis copy is still inline. Candidate for dialogue.js or scenario-data.js.
 function showBabbageFinalResponseInTerminal(responseText, mock = false, onClose = null, scoreTotal = null, mockReason = '', structuredAnalysis = null) {
-  // Scenario-specific result handoff: S2 currently uses the shared terminal flow.
+  // Scenario-specific result handoff: the metacognition scenario uses the shared terminal flow.
   let effectiveClose = onClose;
-  if (scenarioIndex === 1) {
+  if (scenarioIndex === SCENARIO_INDEX.METACOGNITION) {
     effectiveClose = function() {
       addS2BabbageResultCard(responseText);
       if (typeof onClose === 'function') onClose();
@@ -445,7 +445,7 @@ function showBabbageFinalResponseInTerminal(responseText, mock = false, onClose 
   const resultScenario = scenarioIndex;
   pcScheduleScenarioTask(() => {
     pcCompleteBabbageAnalysisProgress();
-    const terminalOutput = scenarioIndex === 0 && typeof scoreTotal === 'number'
+    const terminalOutput = scenarioIndex === SCENARIO_INDEX.CONTENT_AVALANCHE && typeof scoreTotal === 'number'
       ? buildS1TerminalDiagnosis(scoreTotal, responseText, structuredAnalysis)
       : responseText;
     pcScheduleScenarioTask(() => {
@@ -517,6 +517,10 @@ function vnShow(expression, text, onComplete, meta = {}) {
 function vnPlayNext() {
   if (vnQueue.length === 0) {
     pcScheduleScenarioTask(() => {
+      // A dialogue completion callback can launch Babbage or another explicit
+      // VN handoff before this delayed cleanup fires. Never close that newer
+      // state just because the old dialogue queue is empty.
+      if (typeof pcVNHasActiveHandoff === 'function' && pcVNHasActiveHandoff()) return;
       pcSetVNOverlayState({ active: false });
       pcResetVNCharacters();
       pcResetVNDialogueState();
@@ -529,7 +533,7 @@ function vnPlayNext() {
     return;
   }
 
-  const { expression, text, onComplete, speaker = 'Professor Pixel', character = 'pixel', cast = null } = vnQueue.shift();
+  const { expression, text, onComplete, speaker = 'Professor Pixel', character = 'pixel', cast = null, entrance = '' } = vnQueue.shift();
   vnOnComplete = onComplete || null;
   vnTyping = true;
 
@@ -546,7 +550,18 @@ function vnPlayNext() {
   musicStartVN();
   setBabbageShelfState('idle', 'idle');
 
-  vnSetDialogueCharacter(character, expression, speaker, cast);
+  // S1 chains several dialogue sequences across the same Canvas evidence scene.
+  // A queue handoff must not collapse the dual cast or restore the generic
+  // challenge card. Reassert both pieces after the shared VN mode reset.
+  const sceneCast = typeof pcGetS1CanvasDialogueCast === 'function' &&
+    pcS1CanvasDialogueMode && scenarioIndex === SCENARIO_INDEX.CONTENT_AVALANCHE
+    ? (Array.isArray(cast) && cast.length ? cast : pcGetS1CanvasDialogueCast())
+    : cast;
+  vnSetDialogueCharacter(character, expression, speaker, sceneCast);
+  if (entrance && typeof pcAnimateVNCharacterEntrance === 'function') {
+    pcAnimateVNCharacterEntrance(character, entrance);
+  }
+  if (typeof pcRestoreS1CanvasDialogueScene === 'function') pcRestoreS1CanvasDialogueScene();
   requestAnimationFrame(() => {
     // Responsive geometry remains owned by the shared S1 VN layout. The cast
     // renderer only decides which character art occupies each reusable slot.

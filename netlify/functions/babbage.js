@@ -1,6 +1,6 @@
 const DEFAULT_OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5.6-terra';
 const OPENAI_BASE_URL = String(process.env.OPENAI_BASE_URL || 'https://api.openai.com').replace(/\/+$/, '');
-const PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V370';
+const PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V371';
 
 const CORS_HEADERS = Object.freeze({
   'Access-Control-Allow-Origin': '*',
@@ -52,6 +52,34 @@ const S1_SCHEMA = {
       properties: {
         usable: { type: 'boolean' },
         concerns: { type: 'array', maxItems: 6, items: { type: 'string' } }
+      }
+    }
+  }
+};
+
+const S1_CANVAS_RESCUE_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['brief_quality', 'brief_summary', 'assumptions', 'proposals'],
+  properties: {
+    brief_quality: { type: 'string', enum: ['STRONG', 'DEVELOPING', 'WEAK'] },
+    brief_summary: { type: 'string' },
+    assumptions: { type: 'array', minItems: 1, maxItems: 6, items: { type: 'string' } },
+    proposals: {
+      type: 'array',
+      minItems: 5,
+      maxItems: 5,
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['id', 'title', 'detail', 'recommended_boundary', 'rationale'],
+        properties: {
+          id: { type: 'string', enum: ['start-here', 'module-path', 'assignment-checklist', 'remove-alternatives', 'invent-outcome'] },
+          title: { type: 'string' },
+          detail: { type: 'string' },
+          recommended_boundary: { type: 'string', enum: ['KEEP_IN_DRAFT', 'INSTRUCTOR_REVIEW'] },
+          rationale: { type: 'string' }
+        }
       }
     }
   }
@@ -300,6 +328,14 @@ const S5_REVIEW_SCHEMA = {
 
 function getAnalysisContract_(incoming) {
   const analysisType = String(incoming?.analysis_type || 'scenario1');
+  if (analysisType === 's1_canvas_rescue') {
+    return {
+      analysisType,
+      schemaName: 'promptcraft_s1_canvas_rescue',
+      schemaVersion: 'promptcraft_s1_canvas_rescue_v1',
+      schema: S1_CANVAS_RESCUE_SCHEMA
+    };
+  }
   if (analysisType === 's2_draft') {
     return {
       analysisType,
@@ -427,6 +463,7 @@ exports.handler = async (event = {}) => {
       model: DEFAULT_OPENAI_MODEL,
       supported_contracts: [
         'scenario1',
+        's1_canvas_rescue',
         's2_draft', 's2_review',
         's3_draft', 's3_review', 's3_evidence_analysis', 's3_transfer_assessment',
         's4_draft', 's4_review',

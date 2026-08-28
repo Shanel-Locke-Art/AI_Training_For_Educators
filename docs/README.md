@@ -7,8 +7,8 @@ Current compatibility baseline:
 - Application build: `PROMPTCRAFT_V429`
 - Research schema: `V121`
 - Apps Script receiver: `V82`
-- Asset manifest: `v144`
-- Current browser/cache revision represented by this documentation pass: `446`
+- Asset manifest: `v148`
+- Current browser/cache revision represented by this documentation pass: `489`
 
 Cache/query revisions are not application build numbers. Do not rename the app build when a cache marker changes.
 
@@ -18,9 +18,9 @@ Cache/query revisions are not application build numbers. Do not rename the app b
 
 | File | Use it for | Relationship to the others |
 |---|---|---|
-| `asset-management/master-asset-tracker.xlsx` | High-level production inventory across visual assets and audio | Main overview workbook. Use this when you want one place to see production status. |
-| `asset-management/visual-asset-tracker.xlsx` | Detailed image production: backgrounds, scene art, character portraits, Babbage/brand UI assets, and references | Visual-only working tracker. More detailed than the master workbook for art production. |
-| `asset-management/dialogue-voiceover-tracker.xlsx` | Dialogue wording, speaker/expression, voice filenames, recording status, and archived lines | Dialogue/recording source for voice production. It is not an image/audio-file inventory. |
+| `asset-management/PromptCraft_Production_Overview_Simplified.xlsx` | High-level production inventory across visual assets and audio | Main overview workbook. Use this when you want one place to see production status. |
+| `asset-management/PromptCraft_Visual_Asset_Tracker_Simplified.xlsx` | Detailed image production: backgrounds, scene art, character portraits, Babbage/brand UI assets, and references | Visual-only working tracker. More detailed than the master workbook for art production. |
+| `asset-management/PromptCraft_Voice_Recording_Tracker.xlsx` | Dialogue wording, speaker/expression, voice filenames, recording status, and archived lines | Dialogue/recording source for voice production. It is not an image/audio-file inventory. |
 
 The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte-for-byte duplicates of the three canonical workbooks above. They are intentionally removed from this cleaned documentation package. Version history belongs in source control and the Process Log, not in duplicate filenames.
 
@@ -33,6 +33,7 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 | `development/css-architecture.md` | CSS ownership and cascade order. Use before adding or moving styling. |
 | `development/gfc-visual-theme.md` | Current Great Falls College / PromptCraft visual direction and shared branding rules. |
 | `development/pre-s3-refactor.md` | Historical stabilization record explaining what was removed before S3 development and what must not be reconstructed. |
+| `development/s1-unreachable-modules.md` | Findings record: two complete prior S1 implementations still build into the bundle but aren't reachable from the current registry. Read before assuming either is live or safe to delete. |
 
 ## Source-of-truth hierarchy
 

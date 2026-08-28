@@ -606,9 +606,9 @@ function pcFitWideAnalysisReport(screen) {
     ]);
     cards.forEach((card) => pcSetImportantStyles(card, [
       ['height', 'auto'],
-      ['min-height', 'max-content'],
+      ['min-height', '0'],
       ['align-self', 'stretch'],
-      ['overflow', 'hidden'],
+      ['overflow', 'visible'],
       ['overflow-wrap', 'anywhere'],
       ['word-break', 'normal']
     ]));
@@ -814,9 +814,9 @@ function pcFitWideAnalysisReport(screen) {
     ]);
     cards.forEach((card) => pcSetImportantStyles(card, [
       ['height', 'auto'],
-      ['min-height', 'max-content'],
+      ['min-height', '0'],
       ['align-self', 'start'],
-      ['overflow', 'hidden'],
+      ['overflow', 'visible'],
       ['overflow-wrap', 'anywhere']
     ]));
     output.scrollTop = 0;

@@ -71,7 +71,7 @@ window.addEventListener('DOMContentLoaded', () => {
       console.warn('[PromptCraft] Startup watchdog repaired empty initial scenario render.');
       try {
         window.scenarioIntroEnabled = false;
-        loadScenario(SCENARIO_INDEX.ENGAGEMENT);
+        loadScenario(SCENARIO_INDEX.CONTENT_AVALANCHE);
         window.pcInitialScenarioRendered = true;
       } catch (err) {
         console.error('[PromptCraft] Startup watchdog could not render S1:', err);

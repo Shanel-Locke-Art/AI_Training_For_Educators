@@ -521,7 +521,7 @@ function submitS3StressTest() {
 }
 
 function buildS3BabbageSystemPrompt(data) {
-  return `You are Babbage, PromptCraft's fictional analysis system in Scenario 3: Authentic Assessment. The faculty learner must evaluate your conclusions rather than treat you as an answer key.
+  return `You are Babbage, PromptCraft's fictional analysis system in Scenario 4: The 96% Problem. The faculty learner must evaluate your conclusions rather than treat you as an answer key.
 
 Course outcome:
 ${S3_LEARNING_OUTCOME}
@@ -1163,8 +1163,8 @@ async function submitS3TransferIdea() {
       timestamp: new Date().toISOString(),
       participant_id: participantId,
       session_id: pcSessionId,
-      scenario_index: 3,
-      scenario_label: 'S3: Authentic Assessment',
+      scenario_index: 4,
+      scenario_label: 'S4: The 96% Problem',
       score: Number(getS3Data().bestScore || getS3Data().revisedScore || 0),
       idea: `${title}\n\n${summary}`,
       candidate_reason: 'Explicit S3 Transfer Lab submission',
