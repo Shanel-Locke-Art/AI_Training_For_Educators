@@ -34,7 +34,7 @@ def main():
         "browser cache marker advanced":
             "connections=510" in index,
         "receiver marker synchronized":
-            "receiver=84" in index,
+            "receiver=85" in index,
     }
 
     failures = [name for name, passed in checks.items() if not passed]

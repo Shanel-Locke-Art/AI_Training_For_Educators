@@ -1185,7 +1185,7 @@ function buildSessionPayload(formData) {
   };
 }
 
-async function saveIncrementalData(scenarioIdx) {
+async function saveIncrementalData(scenarioIdx, eventType = 'scenario_complete') {
   // Don't save if no attempts were made — avoids phantom rows from dev navigation.
   if ((scenarioData[scenarioIdx]?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 6) return;
   if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
@@ -1275,7 +1275,7 @@ async function saveIncrementalData(scenarioIdx) {
       prediction: latestPredictionChoice,
       time_since_last_attempt_sec: timeSinceLastAttemptSec,
       screen_width: getPromptCraftViewportWidth(),
-      event_type: 'scenario_complete',
+      event_type: eventType,
       notes_coding_memo: [
         location.pathname,
         getPromptCraftScenarioLabel(scenarioIdx),
@@ -5337,6 +5337,10 @@ function submitS1CoursePath() {
   data.bestScore = Math.max(Number(data.bestScore || 0), total);
   data.prompts.push(`S1 pathway: ${summarizeS1CoursePath(selections)}`);
   awardScenarioScoreXP(SCENARIO_INDEX.CONTENT_AVALANCHE, total, 5);
+  // Persist a meaningful checkpoint as soon as the learner completes the
+  // pathway decision. Previously S1 wrote only at the final comparison screen,
+  // so partial but valid gameplay never appeared in the research workbook.
+  saveIncrementalData(SCENARIO_INDEX.CONTENT_AVALANCHE, 's1_pathway_complete');
   lockDragBoard('s1CoursePathWorkbench');
   const submit = document.getElementById('s1CoursePathSubmit');
   if (submit) submit.disabled = true;
@@ -5419,6 +5423,10 @@ async function generateS1CourseBabbageDraft() {
   data.babbageDraft = draft;
   data.structuredAnalysis = { course_design_draft: draft };
   data.finalResponse = `${draft.module_title}\n${draft.proposed_sequence.join(' → ')}`;
+  saveIncrementalData(
+    SCENARIO_INDEX.CONTENT_AVALANCHE,
+    fallback ? 's1_babbage_fallback_complete' : 's1_babbage_analysis_complete'
+  );
   try { pcMarkBabbageResponseParsed(); } catch (error) {}
   try { pcCompleteBabbageAnalysisProgress(); } catch (error) {}
   pcScheduleScenarioTask(() => showBabbageTerminalReport({
@@ -5488,6 +5496,7 @@ function submitS1CourseAudit() {
   data.auditAttempts.push({ selection: selected, exact, weakness, timestamp: new Date().toISOString() });
   data.auditFinal = selected;
   data.prompts.push(`S1 Babbage audit: ${selected}`);
+  saveIncrementalData(SCENARIO_INDEX.CONTENT_AVALANCHE, 's1_babbage_audit_complete');
   disableScenarioChoices('s1-course-audit', 's1CourseAuditSubmit');
   renderScenarioFeedback({
     panelId: 's1CourseAuditFeedback',

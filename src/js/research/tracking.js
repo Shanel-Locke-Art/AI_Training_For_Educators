@@ -300,7 +300,7 @@ function buildSessionPayload(formData) {
   };
 }
 
-async function saveIncrementalData(scenarioIdx) {
+async function saveIncrementalData(scenarioIdx, eventType = 'scenario_complete') {
   // Don't save if no attempts were made — avoids phantom rows from dev navigation.
   if ((scenarioData[scenarioIdx]?.attempts || 0) === 0 && scenarioIdx !== 3 && scenarioIdx !== 6) return;
   if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
@@ -390,7 +390,7 @@ async function saveIncrementalData(scenarioIdx) {
       prediction: latestPredictionChoice,
       time_since_last_attempt_sec: timeSinceLastAttemptSec,
       screen_width: getPromptCraftViewportWidth(),
-      event_type: 'scenario_complete',
+      event_type: eventType,
       notes_coding_memo: [
         location.pathname,
         getPromptCraftScenarioLabel(scenarioIdx),
