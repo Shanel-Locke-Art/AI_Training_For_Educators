@@ -1,6 +1,6 @@
 const DEFAULT_OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5.6-terra';
 const OPENAI_BASE_URL = String(process.env.OPENAI_BASE_URL || 'https://api.openai.com').replace(/\/+$/, '');
-const PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V371';
+const PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V372';
 
 const CORS_HEADERS = Object.freeze({
   'Access-Control-Allow-Origin': '*',
@@ -54,6 +54,29 @@ const S1_SCHEMA = {
         concerns: { type: 'array', maxItems: 6, items: { type: 'string' } }
       }
     }
+  }
+};
+
+const S1_EVIDENCE_ANALYSIS_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['verdict', 'summary', 'learner_problem', 'visible_change', 'student_benefit', 'design_takeaway'],
+  properties: {
+    verdict: { type: 'string', enum: ['STRONG', 'DEVELOPING', 'REVISE'] },
+    summary: { type: 'string' },
+    learner_problem: {
+      type: 'object', additionalProperties: false, required: ['met', 'feedback'],
+      properties: { met: { type: 'boolean' }, feedback: { type: 'string' } }
+    },
+    visible_change: {
+      type: 'object', additionalProperties: false, required: ['met', 'feedback'],
+      properties: { met: { type: 'boolean' }, feedback: { type: 'string' } }
+    },
+    student_benefit: {
+      type: 'object', additionalProperties: false, required: ['met', 'feedback'],
+      properties: { met: { type: 'boolean' }, feedback: { type: 'string' } }
+    },
+    design_takeaway: { type: 'string' }
   }
 };
 
@@ -328,6 +351,14 @@ const S5_REVIEW_SCHEMA = {
 
 function getAnalysisContract_(incoming) {
   const analysisType = String(incoming?.analysis_type || 'scenario1');
+  if (analysisType === 's1_evidence_analysis') {
+    return {
+      analysisType,
+      schemaName: 'promptcraft_s1_evidence_analysis',
+      schemaVersion: 'promptcraft_s1_evidence_analysis_v1',
+      schema: S1_EVIDENCE_ANALYSIS_SCHEMA
+    };
+  }
   if (analysisType === 's1_canvas_rescue') {
     return {
       analysisType,

@@ -32,7 +32,7 @@ async function main() {
   assert.equal(health.status, 'ok');
   assert.equal(health.service, 'PromptCraft Babbage proxy');
   assert.equal(health.provider, 'openai');
-  assert.equal(health.proxy_version, 'V371');
+  assert.equal(health.proxy_version, 'V372');
   assert.equal(health.configured, true, 'OPENAI_API_KEY is not available to the deployed function.');
   assert.ok(Array.isArray(health.supported_contracts));
   console.log(`Health OK: ${health.proxy_version} / ${health.model}`);

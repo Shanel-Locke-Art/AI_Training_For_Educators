@@ -2465,18 +2465,85 @@ function pcShowS1ReflectionLoading() {
   document.body.appendChild(loading);
   document.body.classList.add('pc-s1-reflection-loading-active');
   pcScheduleScenarioTask(() => {
-    pcClearS1ReflectionLoading();
     pcShowS1ReflectionAnalysis();
   }, 1350, SCENARIO_INDEX.CONTENT_AVALANCHE);
   return true;
 }
 
-function pcShowS1ReflectionAnalysis() {
+function pcNormalizeS1EvidenceAnalysis(remote, fallback) {
+  if (!remote || typeof remote !== 'object') return fallback;
+  const fields = [
+    ['problem', 'Names the learner problem', 'learner_problem'],
+    ['change', 'Cites a visible Canvas change', 'visible_change'],
+    ['benefit', 'Connects the change to students', 'student_benefit']
+  ];
+  const criteria = fields.map(([id, label, key]) => ({
+    id,
+    label,
+    met: Boolean(remote[key]?.met),
+    feedback: String(remote[key]?.feedback || fallback.criteria.find(item => item.id === id)?.feedback || '')
+  }));
+  const score = criteria.filter(criterion => criterion.met).length;
+  return {
+    score,
+    criteria,
+    verdict: String(remote.verdict || fallback.verdict).replace(/_/g, ' '),
+    summary: String(remote.summary || fallback.summary),
+    designTakeaway: String(remote.design_takeaway || '')
+  };
+}
+
+function pcRecordS1EvidenceAnalysis(state, item, analysis, response) {
+  const data = scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE];
+  if (!data) return false;
+  const playerResponse = String(state.response || '').trim();
+  data.attempts = Number(data.attempts || 0) + 1;
+  data.prompts = Array.isArray(data.prompts) ? data.prompts : [];
+  data.prompts.push(`S1 evidence case ${state.caseIndex + 1} (${item.label}): ${playerResponse}`);
+  data.currentScore = Number(analysis.score || 0);
+  data.bestScore = Math.max(Number(data.bestScore || 0), data.currentScore);
+  data.finalResponse = analysis.summary || '';
+  data.structuredAnalysis = {
+    analysis_type: 's1_evidence_analysis',
+    case_index: state.caseIndex + 1,
+    case_label: item.label,
+    player_response: playerResponse,
+    ...analysis
+  };
+  data.aiProvider = response?.provider || 'local-fallback';
+  data.aiModel = response?.model || 'promptcraft-local-evaluator';
+  data.aiRequestId = response?.request_id || '';
+  data.aiElapsedMs = response?.elapsed_ms ?? '';
+  data.aiUsage = response?.usage || null;
+  saveIncrementalData(SCENARIO_INDEX.CONTENT_AVALANCHE, 's1_evidence_analysis_complete');
+  return true;
+}
+
+async function pcShowS1ReflectionAnalysis() {
   const state = pcS1AIWorkspaceState;
   const item = state ? PC_S1_PREVIEW_CASES[state.caseIndex] : null;
   if (!state || !item) return false;
-  const analysis = pcEvaluateS1AfterReflection(item, state.response);
+  const fallbackAnalysis = pcEvaluateS1AfterReflection(item, state.response);
+  let response = null;
+  let analysis = fallbackAnalysis;
+  try {
+    response = await requestBabbageAnalysis({
+      analysis_type: 's1_evidence_analysis',
+      max_output_tokens: 1200,
+      system: `You are Babbage, PromptCraft's Canvas evidence-analysis assistant. Evaluate only whether the faculty learner's comparison (1) names the learner problem in the Before view, (2) cites a visible design change in the After view, and (3) explains the student benefit. Do not invent course facts. Case: ${item.label}. Before cue: ${item.beforeCue}. After cue: ${item.afterCue}.`,
+      messages: [{ role: 'user', content: state.response }]
+    }, 's1-evidence-analysis');
+    if (response?.analysis && !response.mock && response.provider !== 'local-fallback') {
+      analysis = pcNormalizeS1EvidenceAnalysis(response.analysis, fallbackAnalysis);
+    }
+  } catch (error) {
+    console.warn('[PromptCraft] Live S1 evidence analysis unavailable; using the labeled local evaluator.', error);
+  }
+  if (state !== pcS1AIWorkspaceState || scenarioIndex !== SCENARIO_INDEX.CONTENT_AVALANCHE) return false;
+  pcClearS1ReflectionLoading();
   state.analysis = analysis;
+  state.analysisSource = response?.analysis && !response.mock && response.provider !== 'local-fallback' ? 'live' : 'local-fallback';
+  pcRecordS1EvidenceAnalysis(state, item, analysis, response);
   const overlay = document.getElementById('vnOverlay');
   const returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   if (overlay) {
@@ -2506,7 +2573,7 @@ function pcShowS1ReflectionAnalysis() {
           <img src="${pcProjectUrl('assets/images/ui/babbage-mark.svg')}" alt="Babbage">
         </span>
         <div>
-          <p>BABBAGE // CASE_${state.caseIndex + 1} // ${esc(item.label).toUpperCase()}</p>
+          <p>BABBAGE // CASE_${state.caseIndex + 1} // ${esc(item.label).toUpperCase()} // ${state.analysisSource === 'live' ? 'LIVE' : 'LOCAL FALLBACK'}</p>
           <h2 id="pcS1ReflectionAnalysisTitle">Practice Analysis</h2>
         </div>
         <span class="pc-s1-reflection-analysis-verdict">STATUS: ${esc(analysis.verdict).toUpperCase()}</span>
@@ -2528,7 +2595,7 @@ function pcShowS1ReflectionAnalysis() {
         </section>
         <aside class="pc-s1-reflection-teaching-point">
           <span>DESIGN TAKEAWAY</span>
-          <p>${esc(item.insight)}</p>
+          <p>${esc(analysis.designTakeaway || item.insight)}</p>
         </aside>
         <details class="pc-s1-reflection-response">
           <summary>View your practice response</summary>

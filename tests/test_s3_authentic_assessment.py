@@ -56,7 +56,7 @@ def main():
 
     assert "'s3_evidence_analysis'" in babbage
     assert "promptcraft_s3_evidence_analysis_v1" in babbage
-    assert "PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V371'" in babbage
+    assert "PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V372'" in babbage
 
     assert '/* SOURCE: src/js/scenarios/s3-authentic-assessment.js */' in bundle
     assert "analysis_type: 's3_evidence_analysis'" in bundle
