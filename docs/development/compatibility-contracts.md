@@ -6,7 +6,7 @@ These contracts are intentionally preserved while PromptCraft is refactored and 
 
 - App build: `PROMPTCRAFT_V429`
 - Research schema: `V121`
-- Apps Script receiver: `V82`
+- Apps Script receiver: `V84`
 - Apps Script deployment: existing configured deployment URL
 - Current asset manifest: `v148`
 - Current documentation/cache revision: `489`

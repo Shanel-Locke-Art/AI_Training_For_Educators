@@ -499,6 +499,15 @@ const SURVEY_MODE   = 'sheets';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzAtqwPWbS-5BZQ3LyTjgDIkABoMM8KeL-OrzErb64SAipeu6gbxGFSjfHV_GVcH5ZU/exec';
 const QUALTRICS_URL = 'YOUR_QUALTRICS_SURVEY_URL_HERE';
 
+// Keep live Babbage available when this build is opened from a copied folder,
+// localhost, GitHub Pages, or another static host. The previous root-relative URL
+// only worked when the page itself was served by the Netlify deployment.
+const PC_CANONICAL_DEPLOYMENT_ORIGIN = 'https://promptcraft-test.netlify.app';
+const PC_BABBAGE_ENDPOINT = String(
+  window.PC_BABBAGE_ENDPOINT
+  || `${PC_CANONICAL_DEPLOYMENT_ORIGIN}/.netlify/functions/babbage`
+).trim();
+
 // ══════════════════════════════════════════════════════
 //  BUILD + DATA SCHEMA VERSIONING
 //  The app version is read from the active bundle's cache-busting query in index.html.
@@ -764,8 +773,9 @@ document.documentElement.style.setProperty('--pc-app-background-legacy', 'none')
 
 
 // Robust Google Sheets poster.
-// Uses text/plain so browser no-cors requests are not silently mangled by preflight/CORS rules.
-// Apps Script still receives the JSON string in e.postData.contents.
+// text/plain keeps this a CORS-simple request while normal CORS mode lets the app
+// read the V84 receiver response. The old no-cors request always returned an opaque
+// response, so the app reported success even when Apps Script returned an error.
 const PC_SHEETS_DEBUG = PC_RUNTIME_DEBUG;
 
 async function postToSheets(payload, label = 'PromptCraft data') {
@@ -779,14 +789,21 @@ async function postToSheets(payload, label = 'PromptCraft data') {
   try {
     if (PC_SHEETS_DEBUG) pcDebug(`[PromptCraft] Sending ${label} to Sheets:`, payload);
 
-    await fetch(SHEETS_URL, {
+    const response = await fetch(SHEETS_URL, {
       method: 'POST',
-      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body
     });
 
-    if (PC_SHEETS_DEBUG) pcDebug(`[PromptCraft] Sheets request dispatched: ${label}`);
+    const responseText = await response.text();
+    let result = {};
+    try { result = responseText ? JSON.parse(responseText) : {}; } catch (_error) {}
+    if (!response.ok || result.status !== 'ok') {
+      const message = result.message || responseText || `HTTP ${response.status}`;
+      throw new Error(`Sheets receiver rejected ${label}: ${message}`);
+    }
+
+    if (PC_SHEETS_DEBUG) pcDebug(`[PromptCraft] Sheets write confirmed: ${label}`, result);
     return true;
   } catch (err) {
     console.warn(`[PromptCraft] fetch failed for ${label}:`, err);
@@ -808,6 +825,7 @@ async function postToSheets(payload, label = 'PromptCraft data') {
 }
 
 // Run from DevTools console: testSheetsPing()
+// This deliberately creates a visible, clearly labeled S1 connection-test row.
 window.testSheetsPing = function testSheetsPing() {
   return postToSheets({
     type: 'incremental',
@@ -815,12 +833,12 @@ window.testSheetsPing = function testSheetsPing() {
     app_build: PC_APP_BUILD_LABEL,
     timestamp: new Date().toISOString(),
     participant_id: 'browser-test',
-    scenario_index: 'TEST',
-    scenario_label: 'Browser ping',
+    scenario_index: 1,
+    scenario_label: 'S1: The Content Avalanche',
     session_duration_min: 0,
-    attempts: 0,
-    current_score: '',
-    best_score: '',
+    attempts: 1,
+    current_score: 1,
+    best_score: 1,
     score_delta: '',
     prompt_text: 'Browser-to-Apps-Script test ping',
     claude_response: 'If this row appears, the deployed site can write to Sheets.',
@@ -831,10 +849,37 @@ window.testSheetsPing = function testSheetsPing() {
     self_report_prediction: '',
     time_since_last_attempt_sec: '',
     screen_width: window.innerWidth || window.screen.width,
-    event_type: 'browser_test_ping',
+    event_type: 'browser_connection_test_complete',
     session_id: pcSessionId,
     notes_coding_memo: location.href
   }, 'browser test ping');
+};
+
+// Read-only connection check for both external services. Run from DevTools with:
+// await testPromptCraftConnections()
+window.testPromptCraftConnections = async function testPromptCraftConnections() {
+  async function check(url) {
+    try {
+      const response = await fetch(`${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`, { cache: 'no-store' });
+      const text = await response.text();
+      let body = {};
+      try { body = text ? JSON.parse(text) : {}; } catch (_error) {}
+      return { ok: response.ok, status: response.status, body };
+    } catch (error) {
+      return { ok: false, status: 0, error: String(error && error.message ? error.message : error) };
+    }
+  }
+
+  const [sheets, babbage] = await Promise.all([
+    check(SHEETS_URL),
+    check(PC_BABBAGE_ENDPOINT)
+  ]);
+  const result = { sheets, babbage };
+  console.table({
+    sheets: { ok: sheets.ok, status: sheets.status, version: sheets.body?.receiver_version || '', configured: sheets.body?.workbook_accessible ?? '' },
+    babbage: { ok: babbage.ok, status: babbage.status, version: babbage.body?.proxy_version || '', configured: babbage.body?.configured ?? '' }
+  });
+  return result;
 };
 ;
 /* SOURCE: src/js/research/tracking.js */
@@ -1536,7 +1581,7 @@ async function requestBabbageAnalysis(payload, context = 'main') {
   }, BABBAGE_REQUEST_TIMEOUT_MS) : null;
 
   try {
-    const res = await fetch('/.netlify/functions/babbage', {
+    const res = await fetch(PC_BABBAGE_ENDPOINT, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: controller ? controller.signal : undefined
     });
 
@@ -12295,7 +12340,7 @@ function pcClearVNStateForScenarioSwitch() {
   // Scenario state may add semantic markers, but presentation teardown is shared.
   overlay?.classList.remove('pc-s2-jordan-recording', 'pc-s2-two-character', 'pc-s2-narrow-jordan');
   try { pcClearS1CanvasDialogueScene(); } catch (e) {
-    document.body.classList.remove('pc-s1-canvas-dialogue-active', 'pc-s1-canvas-smartboard-active', 'pc-s1-canvas-backdrop-active');
+    document.body.classList.remove('pc-s1-canvas-dialogue-active', 'pc-s1-canvas-smartboard-active');
   }
   dialogue?.classList.remove('pc-s2-recorded-dialogue', 'prediction-question', 'prediction-result');
   document.getElementById('s2JordanVNControls')?.remove();

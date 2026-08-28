@@ -6,7 +6,7 @@ Current compatibility baseline:
 
 - Application build: `PROMPTCRAFT_V429`
 - Research schema: `V121`
-- Apps Script receiver: `V82`
+- Apps Script receiver: `V84`
 - Asset manifest: `v148`
 - Current browser/cache revision represented by this documentation pass: `489`
 
@@ -28,7 +28,7 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 
 | File | Purpose |
 |---|---|
-| `development/compatibility-contracts.md` | Things that must remain compatible: V429, V121, receiver V82, Babbage endpoint, Ideas Wall moderation, and versioning rules. |
+| `development/compatibility-contracts.md` | Things that must remain compatible: V429, V121, receiver V84, Babbage endpoint, Ideas Wall moderation, and versioning rules. |
 | `development/repository-map.md` | Where source/runtime files live and which files own each subsystem. Start here when locating code. |
 | `development/css-architecture.md` | CSS ownership and cascade order. Use before adding or moving styling. |
 | `development/gfc-visual-theme.md` | Current Great Falls College / PromptCraft visual direction and shared branding rules. |

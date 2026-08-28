@@ -142,7 +142,7 @@ async function requestBabbageAnalysis(payload, context = 'main') {
   }, BABBAGE_REQUEST_TIMEOUT_MS) : null;
 
   try {
-    const res = await fetch('/.netlify/functions/babbage', {
+    const res = await fetch(PC_BABBAGE_ENDPOINT, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: controller ? controller.signal : undefined
     });
 

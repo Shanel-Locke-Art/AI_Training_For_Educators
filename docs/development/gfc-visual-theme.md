@@ -64,4 +64,4 @@ Print/Save PDF is document-first, not a printed imitation of the CRT monitor. Th
 
 ## Versioning
 
-This remains a `PROMPTCRAFT_V429` application. Visual/cache revisions may change independently. Receiver compatibility remains V82 / schema V121.
+This remains a `PROMPTCRAFT_V429` application. Visual/cache revisions may change independently. Receiver compatibility is V84 / schema V121.
