@@ -495,6 +495,7 @@ pcRegisterUIActions({
   'dev-go-scenario': target => window.devGoScenario?.(target.dataset.pcScenarioIndex),
   'dev-fill-scenario': target => window.devFillScenario?.(target.dataset.pcScenarioIndex),
   'dev-fill-s1-transfer': () => window.devFillS1TransferTask?.(),
+  'dev-reset-progress': () => window.devResetProgress?.(),
   'dev-next-scenario': () => window.devNextScenario?.(),
   'navigate-next': target => window.navigateToNext?.(target.dataset.pcScenarioIndex)
 });

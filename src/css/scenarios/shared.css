@@ -4751,8 +4751,13 @@ body.pc-s1-evidence-modal-active { overflow:hidden !important; }
 }
 .pc-s1-evidence-modal-close:focus-visible { outline:4px solid #f1b82d; outline-offset:3px; }
 .pc-s1-evidence-modal-scroll {
+  min-height:0;
+  max-height:100%;
   overflow:auto;
   overscroll-behavior:contain;
+  touch-action:pan-x pan-y pinch-zoom;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-gutter:stable both-edges;
   padding:clamp(8px,2vw,20px);
   background:#dfe6ea;
   text-align:center;
@@ -4762,12 +4767,45 @@ body.pc-s1-evidence-modal-active { overflow:hidden !important; }
   width:100%;
   max-width:100%;
   min-width:0;
-  height:auto;
+  height:auto !important;
+  max-height:none !important;
+  flex:none;
   margin:0 auto;
   object-fit:contain;
   object-position:top center;
   background:#fff;
 }
+.pc-s1-evidence-modal[data-pc-evidence-zoom="read"] .pc-s1-evidence-modal-scroll img {
+  width:max(100%, 1400px);
+  min-width:1400px;
+  max-width:none;
+}
+.pc-s1-evidence-modal[data-pc-evidence-zoom="fit"] .pc-s1-evidence-modal-scroll img {
+  width:100%;
+  min-width:0;
+  max-width:100%;
+}
+.pc-s1-evidence-modal-zoom {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-left:auto;
+}
+.pc-s1-evidence-modal-zoom button {
+  min-height:42px;
+  padding:8px 14px;
+  border:2px solid #174734;
+  border-radius:9px;
+  background:#fff;
+  color:#143d2e;
+  font:800 .86rem/1.1 "Atkinson Hyperlegible",system-ui,sans-serif;
+  cursor:pointer;
+}
+.pc-s1-evidence-modal-zoom button.is-active {
+  background:#174734;
+  color:#fff;
+}
+.pc-s1-evidence-modal-zoom button:focus-visible { outline:3px solid #f1b82d; outline-offset:2px; }
 .pc-s1-evidence-modal-shell > footer { background:#eaf1f5; color:#304555; }
 .pc-s1-evidence-modal-shell > footer p { margin:0; color:#304555; }
 @media(max-width:900px) {
@@ -4812,15 +4850,22 @@ body.pc-s1-evidence-modal-active { overflow:hidden !important; }
     max-width:100%;
     margin:0;
   }
+  .pc-s1-evidence-modal--phone-capture[data-pc-evidence-zoom="read"] .pc-s1-evidence-modal-scroll img {
+    width:720px;
+    min-width:720px;
+    max-width:none;
+  }
   .pc-s1-evidence-modal--desktop-capture .pc-s1-evidence-modal-scroll img {
     width:100%;
     min-width:0;
     max-width:100%;
     margin:0;
   }
-  .pc-s1-evidence-modal-shell > footer { align-items:stretch; padding:8px 12px; }
+  .pc-s1-evidence-modal-shell > footer { align-items:stretch; flex-wrap:wrap; padding:8px 12px; }
   .pc-s1-evidence-modal-shell > footer p { display:none; }
-  .pc-s1-evidence-modal-shell > footer button { width:100%; }
+  .pc-s1-evidence-modal-zoom { width:100%; margin:0; }
+  .pc-s1-evidence-modal-zoom button { flex:1 1 0; }
+  .pc-s1-evidence-modal-shell > footer > .pc-shell-primary { width:100%; }
 }
 
 @media(min-width:561px) and (max-width:1100px) {

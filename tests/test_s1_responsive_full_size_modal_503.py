@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""V503 contract: full-size evidence selects a readable responsive capture."""
+"""V503 contract: full-size evidence selects a complete, scrollable capture."""
 
 from pathlib import Path
 
@@ -20,9 +20,8 @@ def main() -> None:
     for token in (
         "function pcRefreshS1EvidenceModalLayout()",
         "width <= 560",
-        "width <= 1100",
         "evidence.mobileSrc",
-        "evidence.compactSrc",
+        ": evidence.src;",
         "pc-s1-evidence-modal--${mode}-capture",
         "image.dataset.pcModalSource",
         "modal._pcS1Evidence = evidence",
@@ -38,6 +37,8 @@ def main() -> None:
         ".pc-s1-evidence-modal--desktop-capture .pc-s1-evidence-modal-scroll img",
         "grid-template-columns:minmax(0,1fr) 40px",
         "touch-action:pan-x pan-y pinch-zoom",
+        "scrollbar-gutter:stable both-edges",
+        "max-height:none !important",
         "object-fit:contain",
         ".pc-s1-evidence-modal-shell > footer p { display:none; }",
     ):
@@ -46,8 +47,8 @@ def main() -> None:
 
     assert "data-pc-action=\"s1-close-evidence-modal\"" in shared
     assert "pcHandleS1EvidenceModalKeydown" in shared
-    assert "patch=509" in index
-    assert "DEV · 509" in index
+    assert "patch=522" in index
+    assert "DEV · 522" in index
     print("V503 responsive full-size Canvas-evidence modal contract passed.")
 
 

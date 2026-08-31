@@ -15,7 +15,7 @@ def main() -> None:
     registry = read("src/js/scenarios/registry.js")
     runtime_app = read("src/js/app/scenario-runtime.js")
     tts = read("src/js/audio/babbage-tts.js")
-    css = read("src/css/scenarios/shared.css")
+    css = read("src/css/scenarios/shared.css") + read("src/css/responsive/final-overrides.css")
     runtime = read("runtime/js/promptcraft.bundle.js")
     runtime_css = read("runtime/css/promptcraft.css")
     index = read("index.html")
@@ -31,7 +31,7 @@ def main() -> None:
         "pcPrepareS1CanvasDialogueScene(normalized, 'before');",
         "queueLine(lines[0], queueCanvasDiscussion);",
         "overlay?.classList.remove('pc-s1-mobile-evidence-reader', 'pc-s1-mission-board-image');",
-        "Canvas evidence background with Professor Pixel and Eli dialogue",
+        "Framed Canvas evidence with Professor Pixel and Eli dialogue",
         "id=\"babbageTTSBtn\"",
         "data-pc-action=\"toggle-babbage-tts\"",
     ):
@@ -46,14 +46,14 @@ def main() -> None:
         ".pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback ol",
         "grid-template-columns:minmax(0,1fr) !important;",
         ".pc-s1-reflection-analysis--terminal .pc-s1-reflection-tts",
-        "body.pc-s1-canvas-backdrop-active",
-        "#vnSceneBg.vn-bg",
+        ".pc-s1-intro-evidence-card",
+        ".pc-s1-intro-evidence-picture img",
     ):
         assert token in css
         assert token in runtime_css
 
-    assert "patch=509" in index
-    assert "DEV · 509" in index
+    assert "patch=522" in index
+    assert "DEV · 522" in index
     print("V505 S2-staged Canvas dialogue and analysis-row contract passed.")
 
 

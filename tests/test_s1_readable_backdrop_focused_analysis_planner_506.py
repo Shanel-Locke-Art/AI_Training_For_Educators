@@ -12,31 +12,31 @@ def read(relative: str) -> str:
 
 def main() -> None:
     shared = read("src/js/scenarios/shared-components.js")
-    css = read("src/css/scenarios/shared.css")
+    css = read("src/css/scenarios/shared.css") + read("src/css/responsive/final-overrides.css")
     runtime = read("runtime/js/promptcraft.bundle.js")
     runtime_css = read("runtime/css/promptcraft.css")
     index = read("index.html")
 
     for token in (
-        "pc-s1-canvas-backdrop-active",
-        "pcSetImageSource(sceneBackground, evidence.smartboardSrc || evidence.src, evidence.src)",
-        "Canvas evidence background with Professor Pixel and Eli dialogue",
+        "pc-s1-intro-evidence-active",
+        "pcRenderS1IntroEvidenceCard(item, evidence, pcS1CanvasDialogueCaseIndex)",
+        "Framed Canvas evidence with Professor Pixel and Eli dialogue",
         "document.querySelector('#vnOverlay .vn-smartboard')?.setAttribute('aria-hidden', 'true')",
         "assets/images/ui/babbage-mark.svg",
         "BABBAGE FINDING",
         "EVIDENCE CONNECTIONS",
         "DESIGN TAKEAWAY",
         "View your practice response",
-        "Plan an example learning path.",
-        "Choose a real week, module, or topic, or invent a simple example.",
-        "Example: discussion, knowledge check, or worked example",
+        "Describe what each part of the path should do.",
+        "Choose a real or invented week, module, or topic.",
+        "Example: Let students rehearse with a discussion, knowledge check, worked example, or draft.",
     ):
         assert token in shared
         assert token in runtime
 
     for token in (
-        "body.pc-s1-canvas-backdrop-active",
-        "object-fit:cover !important",
+        ".pc-s1-intro-evidence-card",
+        ".pc-s1-intro-evidence-picture img",
         ".pc-s1-reflection-analysis-mark img",
         ".pc-s1-reflection-focus",
         ".pc-s1-week-planner-basics",
@@ -47,8 +47,8 @@ def main() -> None:
         assert token in runtime_css
 
     assert "← Revise response" not in shared
-    assert "patch=509" in index
-    assert "DEV · 509" in index
+    assert "patch=522" in index
+    assert "DEV · 522" in index
     print("V506 readable Canvas backdrop, focused analysis, and example planner contract passed.")
 
 

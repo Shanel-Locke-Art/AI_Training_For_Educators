@@ -39,10 +39,15 @@
     return window.pcFillS1TransferDevTask?.();
   }
 
+  function devResetProgress() {
+    return resetS1Dev();
+  }
+
   pcExposeGlobals({
     devGoScenario,
     devFillScenario,
     devFillS1TransferTask,
+    devResetProgress,
     devTestScenario: devFillScenario,
     navigateToNext: devGoScenario,
     devNextScenario,

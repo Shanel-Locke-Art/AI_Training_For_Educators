@@ -5422,3 +5422,236 @@ html body.pc-s1-canvas-backdrop-active
     height: clamp(122px, 21dvh, 180px) !important;
   }
 }
+
+/* V515 - the case introduction now uses the same framed evidence language as
+   the analysis popup. The classroom remains the scene background, the real
+   Canvas capture sits inside a labeled card, and the shared dialogue/cast
+   system keeps speaker emphasis and character scale consistent. */
+html body #vnOverlay.vn-overlay.active.pc-s1-mission-board-image .vn-board-img.loaded {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: .84 !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  filter: saturate(.9) brightness(.76) contrast(1.08) !important;
+  background: #061626 !important;
+}
+
+/* V520 - apply the challenge image to the board surface itself. This keeps the
+   Canvas evidence visible even when the shared dialogue image loader is still
+   settling during the first introduction frame. */
+html body #vnOverlay.vn-overlay.active.pc-s1-mission-board-image .vn-screen {
+  background-color: #eef3f5 !important;
+  background-image:
+    linear-gradient(rgba(2, 13, 23, .22), rgba(2, 13, 23, .22)),
+    var(--pc-s1-mission-board-image, linear-gradient(#eef3f5, #eef3f5)) !important;
+  background-position: center, center !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-size: 100% 100%, contain !important;
+}
+
+/* V521 - the five documented portrait tablet/foldable profiles open at the
+   established 1400px reading width. This rule keeps older tablet-fit rules
+   from visually overriding the active Read Size state. */
+@media screen and (min-width: 740px) and (max-width: 1050px) and (min-height: 1000px) and (orientation: portrait) {
+  .pc-s1-evidence-modal[data-pc-evidence-zoom="read"] .pc-s1-evidence-modal-scroll img {
+    width: 1400px !important;
+    min-width: 1400px !important;
+    max-width: none !important;
+  }
+}
+
+html body #vnOverlay.vn-overlay.active.pc-s1-mission-board-image .vn-screen::before {
+  background: rgba(2, 13, 23, .22) !important;
+}
+
+#vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active .vn-smartboard-wrap {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+#vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active .pc-s1-intro-evidence-card {
+  position: absolute;
+  top: clamp(18px, 3.5dvh, 42px);
+  left: 50%;
+  bottom: auto;
+  z-index: 3;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: min(78vw, 1050px);
+  max-height: calc(100dvh - var(--pc-vn-dialogue-min-height, 220px) - 58px);
+  overflow: hidden;
+  transform: translateX(-50%);
+  border: 2px solid #69bce4;
+  border-radius: 16px;
+  background: #dfe8ed;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, .38);
+}
+
+.pc-s1-intro-evidence-card > header {
+  display: grid;
+  gap: 5px;
+  padding: 12px 18px;
+  background: #112f5b;
+  color: #fff;
+}
+
+.pc-s1-intro-evidence-card > header span {
+  color: #8edcff;
+  font: 800 clamp(.58rem, .75vw, .76rem)/1.2 "Source Code Pro", monospace;
+  letter-spacing: .09em;
+}
+
+.pc-s1-intro-evidence-card > header strong {
+  font: 800 clamp(.9rem, 1.35vw, 1.25rem)/1.25 "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+
+.pc-s1-intro-evidence-picture {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  background: #fff;
+}
+
+.pc-s1-intro-evidence-picture img {
+  display: block;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  max-width: 100%;
+  max-height: calc(100dvh - var(--pc-vn-dialogue-min-height, 220px) - 118px);
+  object-fit: contain;
+  object-position: center top;
+  background: #fff;
+}
+
+html body.pc-s1-canvas-dialogue-active
+#vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active #vnDialogue.vn-dialogue {
+  z-index: 12 !important;
+  opacity: 1 !important;
+  background: #010609 !important;
+  border-top: 2px solid rgba(89, 183, 227, .88) !important;
+  box-shadow: 0 -10px 22px rgba(0, 0, 0, .3) !important;
+}
+
+html body.pc-s1-canvas-dialogue-active
+#vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active.pc-dual-character
+:is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter) {
+  bottom: calc(var(--pc-vn-dialogue-min-height, 220px) - 2px) !important;
+  height: clamp(180px, 30dvh, 320px) !important;
+  max-height: calc(100dvh - var(--pc-vn-dialogue-min-height, 220px) - 30px) !important;
+  z-index: 7 !important;
+}
+
+html body.pc-s1-canvas-dialogue-active
+#vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active.pc-dual-character
+:is(#vnCharacter, #vnStudentCharacter)[data-pc-character="eli"] {
+  height: clamp(170px, 28dvh, 300px) !important;
+}
+
+@media screen and (max-width: 700px) {
+  #vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active .pc-s1-intro-evidence-card {
+    top: 8px;
+    bottom: auto;
+    width: calc(100vw - 16px);
+    height: calc(100dvh - var(--pc-vn-dialogue-min-height, 232px) - 24px);
+    max-height: calc(100dvh - var(--pc-vn-dialogue-min-height, 232px) - 24px);
+    border-radius: 11px;
+  }
+
+  .pc-s1-intro-evidence-picture {
+    height: 100%;
+  }
+
+  .pc-s1-intro-evidence-picture img {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  .pc-s1-intro-evidence-card > header { padding: 9px 11px; }
+  .pc-s1-intro-evidence-card > header strong { font-size: .88rem; }
+
+  html body.pc-s1-canvas-dialogue-active
+  #vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter) {
+    bottom: calc(var(--pc-vn-dialogue-min-height, 232px) - 2px) !important;
+    width: min(38vw, 160px) !important;
+    max-width: 38vw !important;
+    height: clamp(106px, 17dvh, 150px) !important;
+    max-height: calc(100dvh - var(--pc-vn-dialogue-min-height, 232px) - 20px) !important;
+  }
+
+  html body.pc-s1-canvas-dialogue-active
+  #vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active.pc-dual-character
+  :is(#vnCharacter, #vnStudentCharacter)[data-pc-character="eli"] {
+    height: clamp(100px, 16dvh, 142px) !important;
+  }
+}
+
+@media screen and (min-width: 701px) and (orientation: portrait) {
+  #vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active .pc-s1-intro-evidence-card {
+    top: clamp(20px, 3dvh, 46px);
+    width: min(88vw, 860px);
+    height: calc(100dvh - var(--pc-vn-dialogue-min-height, 220px) - 56px);
+    max-height: calc(100dvh - var(--pc-vn-dialogue-min-height, 220px) - 56px);
+  }
+
+  #vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active .pc-s1-intro-evidence-picture {
+    height: 100%;
+  }
+
+  #vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active .pc-s1-intro-evidence-picture img {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  html body.pc-s1-canvas-dialogue-active
+  #vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter) {
+    height: clamp(165px, 25dvh, 270px) !important;
+  }
+
+  html body.pc-s1-canvas-dialogue-active
+  #vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active.pc-dual-character
+  :is(#vnCharacter, #vnStudentCharacter)[data-pc-character="eli"] {
+    height: clamp(155px, 23dvh, 250px) !important;
+  }
+}
+
+@media screen and (min-width: 701px) and (orientation: landscape) {
+  #vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active .pc-s1-intro-evidence-card {
+    top: clamp(14px, 3dvh, 34px);
+    width: min(72vw, 980px);
+    max-height: calc(100dvh - var(--pc-vn-dialogue-min-height, 220px) - 42px);
+  }
+
+  #vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active .pc-s1-intro-evidence-picture img {
+    max-height: calc(100dvh - var(--pc-vn-dialogue-min-height, 220px) - 102px);
+  }
+
+  html body.pc-s1-canvas-dialogue-active
+  #vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active.pc-dual-character
+  :is(#vnCharacter#vnCharacter, #vnStudentCharacter#vnStudentCharacter) {
+    width: min(18vw, 230px) !important;
+    max-width: 18vw !important;
+    height: clamp(150px, 27dvh, 230px) !important;
+  }
+
+  html body.pc-s1-canvas-dialogue-active
+  #vnOverlay.vn-overlay.active.pc-s1-intro-evidence-active.pc-dual-character
+  :is(#vnCharacter, #vnStudentCharacter)[data-pc-character="eli"] {
+    height: clamp(145px, 26dvh, 220px) !important;
+  }
+}

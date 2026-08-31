@@ -51,8 +51,8 @@ def main() -> None:
 
     assert "pcGetS1AIWorkspaceStepHTML" not in source
     assert "pcRenderS1AIWorkspaceStep" not in source
-    assert "patch=509" in index
-    assert "DEV · 509" in index
+    assert "patch=522" in index
+    assert "DEV · 522" in index
     print("S1 responsive Babbage reflection analysis contract passed through patch 484.")
 
 

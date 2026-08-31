@@ -28,7 +28,7 @@ checks={
  'research note excludes raw transfer text': 'Raw faculty text deliberately stays out of research saves.' in s3,
  'shared transfer CSS': '.pc-transfer-lab' in css and '.pc-s3-transfer' not in css,
  'cache patch 461 or later': bool(re.search(r'patch=(\d+)', idx)) and int(re.search(r'patch=(\d+)', idx).group(1)) >= 461,
- 'receiver current': 'receiver=84' in idx,
+ 'receiver current': 'receiver=85' in idx,
 }
 
 def js_source_block(text, rel):

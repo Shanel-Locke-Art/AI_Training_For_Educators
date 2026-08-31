@@ -37,8 +37,8 @@ def main() -> None:
 
     assert "pcPlayS1PreviewBriefing(nextCaseIndex, null, { classroom: true })" in runtime
     assert "width: 100vw !important" in runtime_css
-    assert "patch=509" in index
-    assert "DEV · 509" in index
+    assert "patch=522" in index
+    assert "DEV · 522" in index
 
     print("V495 complete evidence and narrated next-case contract passed.")
 

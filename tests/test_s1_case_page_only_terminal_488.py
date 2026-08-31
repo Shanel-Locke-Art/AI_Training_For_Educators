@@ -47,8 +47,8 @@ def main() -> None:
         assert marker in css
         assert marker in runtime_css
 
-    assert "patch=509" in index
-    assert "DEV · 509" in index
+    assert "patch=522" in index
+    assert "DEV · 522" in index
     print("S1 case-page-only terminal 488 contract passed.")
 
 

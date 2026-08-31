@@ -41,7 +41,9 @@ const PC_EDUCATOR_LEVELS = Object.freeze([
 let pcProgressState = {
   xp: 0,
   bestScores: Array(SCENARIO_COUNT).fill(0),
-  completedAwards: Array(SCENARIO_COUNT).fill(false)
+  completedAwards: Array(SCENARIO_COUNT).fill(false),
+  s1PracticeScores: Array(4).fill(0),
+  s1TransferScore: 0
 };
 let attempts = 0;
 let lastPromptText = ''; // tracks last prompt for pre-filling on next attempt

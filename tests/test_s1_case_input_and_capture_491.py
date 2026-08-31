@@ -46,5 +46,5 @@ def test_module_capture_has_no_device_specific_transform_matrix():
     assert "V491 — one predictable crop" in RESPONSIVE_CSS
     assert "transform: none !important" in RESPONSIVE_CSS
     assert "translateY(-50px) scale(1.75)" not in RESPONSIVE_CSS
-    assert "patch=509" in INDEX
-    assert "DEV · 509" in INDEX
+    assert "patch=522" in INDEX
+    assert "DEV · 522" in INDEX

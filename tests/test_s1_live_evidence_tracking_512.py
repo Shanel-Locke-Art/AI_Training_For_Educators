@@ -16,9 +16,9 @@ def main():
         "active S1 flow writes a checkpoint": "'s1_evidence_analysis_complete'" in shared,
         "loading remains until the async response": "async function pcShowS1ReflectionAnalysis()" in shared,
         "proxy has a dedicated evidence contract": "promptcraft_s1_evidence_analysis_v1" in proxy,
-        "proxy version advanced": "PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V372'" in proxy,
+        "proxy version advanced": "PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V373'" in proxy,
         "runtime bundle synchronized": "s1_evidence_analysis_complete" in bundle,
-        "deployment marker advanced": "patch=513" in index and "DEV · 513" in index,
+        "deployment marker advanced": "patch=522" in index and "DEV · 522" in index,
     }
     failures = [name for name, passed in checks.items() if not passed]
     if failures:

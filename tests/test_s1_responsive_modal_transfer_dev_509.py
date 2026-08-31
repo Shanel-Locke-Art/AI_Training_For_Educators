@@ -22,9 +22,8 @@ def main() -> None:
 
     for token in (
         "evidence.mobileSrc || evidence.compactSrc || evidence.smartboardSrc || evidence.src",
-        "evidence.compactSrc || evidence.mobileSrc || evidence.smartboardSrc || evidence.src",
+        ": evidence.src;",
         "const usePhoneLayout = width <= 560",
-        "const useCompactLayout = !usePhoneLayout && width <= 1100",
         '<textarea name="week" rows="2" maxlength="120"',
         "function pcFillS1TransferDevTask()",
         "DEV example added. Review or edit it, then analyze the path.",
@@ -47,8 +46,8 @@ def main() -> None:
     assert "dev-fill-s1-transfer" in actions
     assert index.count('data-pc-action="dev-fill-s1-transfer"') == 2
     assert "S1 Path ✏️" in index
-    assert "patch=509" in index
-    assert "DEV · 509" in index
+    assert "patch=522" in index
+    assert "DEV · 522" in index
     print("V509 responsive evidence and transfer DEV-fill contract passed.")
 
 

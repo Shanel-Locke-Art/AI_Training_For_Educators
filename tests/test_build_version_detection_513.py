@@ -13,7 +13,7 @@ def main():
         "current bundle URL is preferred": "document.currentScript?.src" in config,
         "PromptCraft bundle filename is recognized": "runtime\\/js\\/promptcraft\\.bundle" in config,
         "V429 remains the public build": "promptcraft.bundle.js?v=429" in index,
-        "deployment marker advanced": "patch=513" in index and "DEV · 513" in index,
+        "deployment marker advanced": "patch=522" in index and "DEV · 522" in index,
         "runtime synchronized": "document.currentScript?.src" in bundle,
     }
     failures = [name for name, passed in checks.items() if not passed]

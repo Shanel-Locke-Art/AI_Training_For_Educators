@@ -44,8 +44,8 @@ def main() -> None:
         assert token in runtime
 
     assert "activeS1Case ? pcFillS1DevFields() : resetS1Dev()" in dev
-    assert "patch=509" in index
-    assert "DEV · 509" in index
+    assert "patch=522" in index
+    assert "DEV · 522" in index
     print("V501 order-independent Canvas viewport contract passed.")
 
 

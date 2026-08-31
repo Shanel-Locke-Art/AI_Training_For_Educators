@@ -23,7 +23,7 @@ def main() -> None:
         "Analyze with Babbage →",
         "Practice Analysis",
         "function pcRenderS1WeekPlanner",
-        "Plan an example learning path",
+        "Describe what each part of the path should do.",
         "START HERE",
         "PRACTICE",
         "Analyze my module path →",
@@ -41,8 +41,8 @@ def main() -> None:
         assert marker in css
         assert marker in runtime_css
 
-    assert "patch=509" in index
-    assert "DEV · 509" in index
+    assert "patch=522" in index
+    assert "DEV · 522" in index
     print("S1 case-page reflection and week planner 486 contract passed.")
 
 

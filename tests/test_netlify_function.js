@@ -12,7 +12,7 @@ async function run() {
     assert.equal(health.statusCode, 200);
     const healthBody = JSON.parse(health.body);
     assert.equal(healthBody.provider, 'openai');
-    assert.equal(healthBody.proxy_version, 'V372');
+    assert.equal(healthBody.proxy_version, 'V373');
     assert.ok(healthBody.supported_contracts.includes('s1_canvas_rescue'));
     assert.ok(healthBody.supported_contracts.includes('s5_review'));
     assert.ok(healthBody.supported_contracts.includes('s3_evidence_analysis'));
@@ -33,6 +33,13 @@ async function run() {
         visible_change:{met:true,feedback:'The response cites the visible module path.'},
         student_benefit:{met:true,feedback:'The response explains how the path helps students act.'},
         design_takeaway:'Make the intended learning path visible at the point of need.'
+      },
+      promptcraft_s1_transfer_plan_analysis: {
+        status:'STRONG', summary:'The instructor supplied a visible learning path.',
+        quality_indicators:['CLEAR_DESTINATION','VISIBLE_START','LEARNING_SEQUENCE','VISIBLE_SUBMISSION','CONTINUATION_CUE'],
+        strengths:['The destination and sequence are visible.'], gaps:[],
+        recommended_next_step:'Verify the plan in Canvas student view.',
+        human_review_note:'The instructor must verify alignment, workload, accessibility, dates, and accuracy.'
       },
       promptcraft_s1_canvas_rescue: {
         brief_quality:'STRONG', brief_summary:'Bounded Canvas repair brief',
@@ -137,6 +144,7 @@ async function run() {
     const cases = [
       ['scenario1', 'promptcraft_s1_babbage_analysis', 'promptcraft_s1_babbage_analysis_v1'],
       ['s1_evidence_analysis', 'promptcraft_s1_evidence_analysis', 'promptcraft_s1_evidence_analysis_v1'],
+      ['s1_transfer_plan_analysis', 'promptcraft_s1_transfer_plan_analysis', 'promptcraft_s1_transfer_plan_analysis_v1'],
       ['s1_canvas_rescue', 'promptcraft_s1_canvas_rescue', 'promptcraft_s1_canvas_rescue_v1'],
       ['s2_draft', 'promptcraft_s2_babbage_draft', 'promptcraft_s2_babbage_draft_v1'],
       ['s2_review', 'promptcraft_s2_babbage_review', 'promptcraft_s2_babbage_review_v1'],
@@ -164,7 +172,7 @@ async function run() {
       assert.equal(result.statusCode, 200);
       const body = JSON.parse(result.body);
       assert.equal(body.analysis_schema, expectedSchema);
-      assert.equal(body.proxy_version, 'V372');
+      assert.equal(body.proxy_version, 'V373');
       assert.equal(lastPayload.text.format.name, expectedName);
       assert.equal(lastPayload.text.format.strict, true);
       assert.equal(lastPayload.model, 'gpt-5.6-terra');

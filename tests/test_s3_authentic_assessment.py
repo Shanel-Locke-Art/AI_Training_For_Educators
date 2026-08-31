@@ -56,7 +56,7 @@ def main():
 
     assert "'s3_evidence_analysis'" in babbage
     assert "promptcraft_s3_evidence_analysis_v1" in babbage
-    assert "PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V372'" in babbage
+    assert "PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V373'" in babbage
 
     assert '/* SOURCE: src/js/scenarios/s3-authentic-assessment.js */' in bundle
     assert "analysis_type: 's3_evidence_analysis'" in bundle
@@ -69,7 +69,7 @@ def main():
     assert dialogue_match, "Could not find dialogue-data.js version marker in index.html"
     dialogue_version = dialogue_match.group(1)
     assert f'runtime/css/promptcraft.css?v=429&patch={patch}' in index
-    assert f'runtime/js/promptcraft.bundle.js?v=429&amp;patch={patch}&amp;receiver=84' in index
+    assert f'runtime/js/promptcraft.bundle.js?v=429&amp;patch={patch}&amp;receiver=85' in index
     assert f'runtime/js/dialogue-data.js?v={dialogue_version}' in index
 
     print('Scenario 3 Authentic Assessment contract passed.')

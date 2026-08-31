@@ -27,7 +27,7 @@ def test_deployed_bundle_contains_s1_checkpoint_saves():
     assert "s1_pathway_complete" in bundle
     assert "s1_babbage_analysis_complete" in bundle
     assert "s1_babbage_audit_complete" in bundle
-    assert "patch=513" in index
+    assert "patch=522" in index
 
 
 if __name__ == "__main__":

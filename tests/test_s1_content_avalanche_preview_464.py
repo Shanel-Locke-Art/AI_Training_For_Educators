@@ -120,8 +120,8 @@ def main() -> None:
     assert "pcGetS1CanvasDialogueCast" in shared
     assert "sceneCast" in runtime_js
     assert "pcRestoreS1CanvasDialogueScene" in runtime_js
-    assert "pcSetImageSource(sceneBackground, evidence.smartboardSrc || evidence.src, evidence.src)" in shared
-    assert "pc-s1-canvas-backdrop-active" in shared
+    assert "pcRenderS1IntroEvidenceCard(item, evidence, pcS1CanvasDialogueCaseIndex)" in shared
+    assert "pc-s1-intro-evidence-active" in shared
     assert "smartboard: Object.freeze({" in config
     assert config.count("smartboardSrc:") == 8
     assert 'content: "Canvas focus · Before"' in css
@@ -142,9 +142,9 @@ def main() -> None:
     assert "aspect-ratio: 16 / 9.8 !important" in css
     assert ".vn-board-img.loaded" in css
     assert "object-fit: contain !important" in css
-    assert "patch=509" in index
-    assert "DEV · 509" in index
-    assert "runtime/js/dialogue-data.js?v=149&amp;patch=509" in index
+    assert "patch=522" in index
+    assert "DEV · 522" in index
+    assert "runtime/js/dialogue-data.js?v=149&amp;patch=522" in index
     print("S1 Content Avalanche edge-to-edge Canvas reader 482 contract passed.")
 
 

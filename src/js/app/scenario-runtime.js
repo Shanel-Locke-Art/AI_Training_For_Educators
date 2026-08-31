@@ -40,10 +40,11 @@ function playScenarioIntroduction(index) {
   const useSpecialIntroLayout = ui.introLayout === 'special';
   overlay?.classList.toggle('scenario-intro-active', useSpecialIntroLayout);
   const onDone = () => {
-    if (useSpecialIntroLayout) overlay?.classList.remove('scenario-intro-active');
     // Every scenario uses the same cast cleanup when its VN introduction hands
-    // control to the workbench. No character-specific teardown belongs here.
+    // control to the workbench. Hide the cast before releasing the special
+    // layout so a secondary character cannot flash at intrinsic size.
     pcResetVNCharacters();
+    if (useSpecialIntroLayout) overlay?.classList.remove('scenario-intro-active');
     pcRunScenarioAfterIntroAction(ui.afterIntroAction);
     if (index === SCENARIO_INDEX.CONTENT_AVALANCHE) {
       pcScheduleS1CanvasDialogueSceneCleanup();
@@ -60,6 +61,7 @@ function playScenarioIntroduction(index) {
   pcApplyIpadLayout();
   if (index === SCENARIO_INDEX.CONTENT_AVALANCHE) {
     pcPrepareS1ClassroomDialogueScene();
+    pcPrepareS1MissionBoardImage(0, 'before');
     playPixelSequence(getScenarioStartDialogueKey(index), () => {
       pcPlayS1PreviewBriefing(0, onDone);
     });
@@ -79,6 +81,7 @@ function pcActivateScenario(index, { explicitButton = null, playIntroduction = t
 
   pcBeginScenarioRun();
   pcClearVNStateForScenarioSwitch();
+  pcResetScenarioTeachingProgress(normalized);
   resetScenarioRunState(normalized);
   selectScenarioTab(normalized, explicitButton);
   window.scenarioIntroEnabled = true;
@@ -125,7 +128,7 @@ function pcClearVNStateForScenarioSwitch() {
   // Scenario state may add semantic markers, but presentation teardown is shared.
   overlay?.classList.remove('pc-s2-jordan-recording', 'pc-s2-two-character', 'pc-s2-narrow-jordan');
   try { pcClearS1CanvasDialogueScene(); } catch (e) {
-    document.body.classList.remove('pc-s1-canvas-dialogue-active', 'pc-s1-canvas-smartboard-active');
+    document.body.classList.remove('pc-s1-canvas-dialogue-active', 'pc-s1-canvas-smartboard-active', 'pc-s1-canvas-backdrop-active');
   }
   dialogue?.classList.remove('pc-s2-recorded-dialogue', 'prediction-question', 'prediction-result');
   document.getElementById('s2JordanVNControls')?.remove();
@@ -253,6 +256,7 @@ function resetS2Dev() {
 
 function resetS1Dev() {
     resetScenarioRunState(SCENARIO_INDEX.CONTENT_AVALANCHE);
+    pcResetTeachingProgress();
 
     if (window.scenarioIntroTimer) {
       clearTimeout(window.scenarioIntroTimer);
@@ -659,10 +663,24 @@ function pcNormalizeProgressState(raw = {}) {
     return Math.max(0, Math.min(5, Number.isFinite(value) ? value : 0));
   });
   const completedAwards = Array.from({ length: SCENARIO_COUNT }, (_, index) => Boolean(raw?.completedAwards?.[index]));
-  const scoreXP = bestScores.reduce((total, score) => total + (score * PC_SCORE_XP_PER_POINT), 0);
+  const s1PracticeScores = Array.from({ length: 4 }, (_, index) => {
+    const value = Number(raw?.s1PracticeScores?.[index] || 0);
+    return Math.max(0, Math.min(3, Number.isFinite(value) ? value : 0));
+  });
+  const s1TransferScore = Math.max(0, Math.min(5, Number(raw?.s1TransferScore) || 0));
+  const hasS1GranularProgress = s1PracticeScores.some(score => score > 0) || s1TransferScore > 0;
+  const s1RawScore = s1PracticeScores.reduce((total, score) => total + score, 0) + s1TransferScore;
+  const s1ScoreXP = hasS1GranularProgress
+    ? Math.round((s1RawScore / 17) * 50)
+    : bestScores[SCENARIO_INDEX.CONTENT_AVALANCHE] * PC_SCORE_XP_PER_POINT;
+  if (hasS1GranularProgress) bestScores[SCENARIO_INDEX.CONTENT_AVALANCHE] = Math.round((s1RawScore / 17) * 5);
+  const otherScoreXP = bestScores.reduce((total, score, index) => (
+    index === SCENARIO_INDEX.CONTENT_AVALANCHE ? total : total + (score * PC_SCORE_XP_PER_POINT)
+  ), 0);
+  const scoreXP = s1ScoreXP + otherScoreXP;
   const completionXP = completedAwards.filter(Boolean).length * PC_COMPLETION_XP;
   const computedXP = Math.min(PC_MAX_XP, scoreXP + completionXP);
-  return { xp: computedXP, bestScores, completedAwards };
+  return { xp: computedXP, bestScores, completedAwards, s1PracticeScores, s1TransferScore };
 }
 
 function pcSaveProgressState() {
@@ -749,6 +767,39 @@ function pcInitializeProgressSystem() {
   pcRenderProgressHUD();
 }
 
+function pcResetTeachingProgress() {
+  try { localStorage.removeItem(PC_PROGRESS_STORAGE_KEY); } catch (error) {}
+  xp = 0;
+  pcProgressState = {
+    xp: 0,
+    bestScores: Array(SCENARIO_COUNT).fill(0),
+    completedAwards: Array(SCENARIO_COUNT).fill(false),
+    s1PracticeScores: Array(4).fill(0),
+    s1TransferScore: 0
+  };
+  scenarioCompleted = Array(SCENARIO_COUNT).fill(false);
+  pcSaveProgressState();
+  pcRenderProgressHUD();
+  return true;
+}
+
+function pcResetScenarioTeachingProgress(index) {
+  const normalizedIndex = Math.max(0, Math.min(SCENARIO_COUNT - 1, Number(index) || 0));
+  const progress = pcNormalizeProgressState(pcProgressState);
+  progress.bestScores[normalizedIndex] = 0;
+  progress.completedAwards[normalizedIndex] = false;
+  if (normalizedIndex === SCENARIO_INDEX.CONTENT_AVALANCHE) {
+    progress.s1PracticeScores = Array(4).fill(0);
+    progress.s1TransferScore = 0;
+  }
+  pcProgressState = pcNormalizeProgressState(progress);
+  scenarioCompleted[normalizedIndex] = false;
+  xp = pcProgressState.xp;
+  pcSaveProgressState();
+  pcRenderProgressHUD();
+  return true;
+}
+
 function awardScenarioScoreXP(index, score, maxScore = 5) {
   const normalizedIndex = Math.max(0, Math.min(SCENARIO_COUNT - 1, Number(index) || 0));
   const normalizedMax = Math.max(1, Number(maxScore) || 5);
@@ -776,12 +827,58 @@ function awardScenarioCompletionXP(index) {
   return PC_COMPLETION_XP;
 }
 
+function pcAwardS1GranularXP(updateProgress) {
+  const beforeXP = pcNormalizeProgressState(pcProgressState).xp;
+  updateProgress();
+  pcProgressState = pcNormalizeProgressState(pcProgressState);
+  xp = pcProgressState.xp;
+  pcSaveProgressState();
+  pcRenderProgressHUD();
+  return Math.max(0, pcProgressState.xp - beforeXP);
+}
+
+function awardS1PracticeXP(caseIndex, score) {
+  const normalizedCase = Math.max(0, Math.min(3, Number(caseIndex) || 0));
+  const normalizedScore = Math.max(0, Math.min(3, Number(score) || 0));
+  return pcAwardS1GranularXP(() => {
+    pcProgressState.s1PracticeScores = Array.from({ length: 4 }, (_, index) => (
+      index === normalizedCase
+        ? Math.max(Number(pcProgressState.s1PracticeScores?.[index] || 0), normalizedScore)
+        : Number(pcProgressState.s1PracticeScores?.[index] || 0)
+    ));
+  });
+}
+
+function awardS1TransferXP(score) {
+  const normalizedScore = Math.max(0, Math.min(5, Number(score) || 0));
+  return pcAwardS1GranularXP(() => {
+    pcProgressState.s1TransferScore = Math.max(Number(pcProgressState.s1TransferScore || 0), normalizedScore);
+  });
+}
+
+function pcGetLevelProgressSnapshot() {
+  const progress = pcNormalizeProgressState(pcProgressState);
+  const level = pcGetEducatorLevel(progress.xp);
+  const levelEnd = level.next ? Number(level.next.threshold) : PC_MAX_XP;
+  return {
+    progress,
+    level,
+    levelXP: Math.max(0, progress.xp - Number(level.threshold || 0)),
+    levelSpan: Math.max(1, levelEnd - Number(level.threshold || 0))
+  };
+}
+
 pcExposeGlobals({
   pcInitializeProgressSystem,
   pcRenderProgressHUD,
   pcGetEducatorLevel,
+  pcResetTeachingProgress,
+  pcResetScenarioTeachingProgress,
   awardScenarioScoreXP,
-  awardScenarioCompletionXP
+  awardScenarioCompletionXP,
+  awardS1PracticeXP,
+  awardS1TransferXP,
+  pcGetLevelProgressSnapshot
 });
 
 // ══════════════════════════════════════════════════════

@@ -489,6 +489,7 @@ let pcS1RescueAIAnalysis = null;
 let pcS1RescueAISource = 'local-fallback';
 let pcS1AIWorkspaceState = null;
 let pcS1WeekPlanState = null;
+let pcS1WeekPlanReward = null;
 
 function pcClearS1MobileEvidenceLens() {
   document.getElementById('pcS1MobileEvidenceLens')?.remove();
@@ -502,6 +503,37 @@ function pcClearS1MobileEvidenceLens() {
   const boardWrap = document.querySelector('#vnOverlay .vn-smartboard-wrap');
   if (boardWrap) boardWrap.setAttribute('aria-label', 'Smartboard challenge display');
   document.querySelector('#vnOverlay .vn-smartboard')?.setAttribute('aria-hidden', 'true');
+}
+
+function pcClearS1IntroEvidenceCard() {
+  document.getElementById('pcS1IntroEvidenceCard')?.remove();
+  document.getElementById('vnOverlay')?.classList.remove('pc-s1-intro-evidence-active');
+}
+
+function pcRenderS1IntroEvidenceCard(item, evidence, caseIndex = 0) {
+  const scene = document.getElementById('vnScene');
+  const overlay = document.getElementById('vnOverlay');
+  if (!scene || !overlay || !item || !evidence) return false;
+
+  pcClearS1IntroEvidenceCard();
+  const card = document.createElement('section');
+  card.id = 'pcS1IntroEvidenceCard';
+  card.className = 'pc-s1-intro-evidence-card';
+  card.setAttribute('role', 'img');
+  card.setAttribute('aria-label', `${item.title} ${evidence.alt}`);
+  card.innerHTML = `
+    <header>
+      <span>CASE ${Number(caseIndex) + 1} · ${evidence.state.toUpperCase()} CANVAS EVIDENCE</span>
+      <strong>${esc(item.title)}</strong>
+    </header>
+    <picture class="pc-s1-intro-evidence-picture">
+      ${evidence.mobileSrc ? `<source media="(max-width: 520px)" srcset="${esc(evidence.mobileSrc)}">` : ''}
+      ${evidence.compactSrc ? `<source media="(max-width: 1100px) and (orientation: portrait)" srcset="${esc(evidence.compactSrc)}">` : ''}
+      <img src="${esc(evidence.smartboardSrc || evidence.src)}" alt="${esc(evidence.alt)}" draggable="false" loading="eager" decoding="async">
+    </picture>`;
+  scene.appendChild(card);
+  overlay.classList.add('pc-s1-intro-evidence-active');
+  return true;
 }
 
 function pcRestoreS1ResponsiveCapture(panel, evidence) {
@@ -850,10 +882,13 @@ function pcRecordS1EvidenceAnalysis(state, item, analysis, response) {
   const data = scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE];
   if (!data) return false;
   const playerResponse = String(state.response || '').trim();
-  data.attempts = Number(data.attempts || 0) + 1;
+  const previousAttempts = Number(data.attempts || 0);
+  data.attempts = previousAttempts + 1;
   data.prompts = Array.isArray(data.prompts) ? data.prompts : [];
   data.prompts.push(`S1 evidence case ${state.caseIndex + 1} (${item.label}): ${playerResponse}`);
   data.currentScore = Number(analysis.score || 0);
+  if (previousAttempts === 0) data.initialScore = data.currentScore;
+  data.scoreDelta = data.currentScore - Number(data.initialScore || 0);
   data.bestScore = Math.max(Number(data.bestScore || 0), data.currentScore);
   data.finalResponse = analysis.summary || '';
   data.structuredAnalysis = {
@@ -863,6 +898,15 @@ function pcRecordS1EvidenceAnalysis(state, item, analysis, response) {
     player_response: playerResponse,
     ...analysis
   };
+  const indicatorLabels = {
+    problem: 'Learner problem identified',
+    change: 'Visible Canvas change cited',
+    benefit: 'Student benefit explained'
+  };
+  data.oscqrLit = analysis.criteria
+    .filter(criterion => criterion.met)
+    .map(criterion => indicatorLabels[criterion.id] || criterion.label)
+    .join('; ');
   data.aiProvider = response?.provider || 'local-fallback';
   data.aiModel = response?.model || 'promptcraft-local-evaluator';
   data.aiRequestId = response?.request_id || '';
@@ -1009,12 +1053,41 @@ function pcCompleteS1AfterReflection() {
   const checkState = pcS1PreviewChecks[caseIndex];
   checkState.answered = true;
   checkState.analysis = state.analysis;
+  const score = Math.max(0, Math.min(3, Number(state.analysis?.score) || 0));
+  const earnedXP = awardS1PracticeXP(caseIndex, score);
   pcClearS1ReflectionAnalysis({ restoreFocus: false, clearState: true });
   const nextCaseIndex = caseIndex + 1;
-  if (nextCaseIndex < PC_S1_PREVIEW_CASES.length) {
-    return pcPlayS1PreviewBriefing(nextCaseIndex, null, { classroom: true });
-  }
-  return pcRenderS1WeekPlanner();
+  pcPrepareS1ClassroomDialogueScene();
+  pcPrepareS1MissionBoardImage(caseIndex, 'after');
+  const boardText = document.getElementById('vnBoardText');
+  const item = PC_S1_PREVIEW_CASES[caseIndex];
+  if (boardText && item) boardText.textContent = `What changed: ${item.afterCue}`;
+  const feedback = pcBuildS1PixelProgressFeedback(score, 3, earnedXP, `Case ${caseIndex + 1}`, checkState.analysis);
+  vnShow(score >= 3 ? 'proud' : score >= 2 ? 'encouraging' : 'thinking', feedback, () => {
+    if (nextCaseIndex < PC_S1_PREVIEW_CASES.length) {
+      pcPlayS1PreviewBriefing(nextCaseIndex, null, { classroom: true });
+      return;
+    }
+    pcRenderS1WeekPlanner();
+  }, {
+    id: `p-s1-case-progress-${caseIndex + 1}`,
+    speaker: 'Professor Pixel',
+    character: 'pixel',
+    cast: [{ id: 'pixel', slot: 'right' }]
+  });
+  return true;
+}
+
+function pcBuildS1PixelProgressFeedback(score, maxScore, earnedXP, activityLabel, analysis = null) {
+  void earnedXP;
+  void activityLabel;
+  const missingCriterion = analysis?.criteria?.find(criterion => !criterion.met);
+  const quality = score >= maxScore
+    ? 'That explanation works because you named what students had to figure out, pointed to the visible Canvas change, and explained what the change helps students do.'
+    : score >= Math.ceil(maxScore / 2)
+      ? `You made most of the connection. Before the next case, make this part explicit: ${missingCriterion?.feedback || 'connect the visible design choice to what students can now understand or do.'}`
+      : 'Babbage found only part of the comparison. Use the Before view to name what students had to guess, the After view to name the change, and then explain why that change matters.';
+  return quality;
 }
 
 function pcClearS1ReflectionExperience() {
@@ -1031,21 +1104,16 @@ function pcRestoreS1CanvasDialogueScene() {
   if (!item || !evidence) return false;
 
   pcClearS1MobileEvidenceLens();
-  document.body.classList.remove('pc-s1-canvas-dialogue-active');
-  document.body.classList.remove('pc-s1-canvas-smartboard-active');
-  document.body.classList.add('pc-s1-canvas-backdrop-active');
+  document.body.classList.add('pc-s1-canvas-dialogue-active');
+  document.body.classList.remove('pc-s1-canvas-smartboard-active', 'pc-s1-canvas-backdrop-active');
   document.body.dataset.pcS1CanvasState = pcS1CanvasDialogueState;
   const overlay = document.getElementById('vnOverlay');
   overlay?.classList.remove('pc-s1-mobile-evidence-reader', 'pc-s1-mission-board-image');
-  overlay?.setAttribute('aria-label', 'Canvas evidence background with Professor Pixel and Eli dialogue');
+  overlay?.setAttribute('aria-label', 'Framed Canvas evidence with Professor Pixel and Eli dialogue');
   const boardImage = document.getElementById('vnBoardImg');
   if (boardImage) boardImage.dataset.pcS1Evidence = evidence.id;
   loadSceneImage('', '');
-  const sceneBackground = document.getElementById('vnSceneBg');
-  if (sceneBackground?.dataset.pcS1Evidence !== evidence.id || !sceneBackground.getAttribute('src')) {
-    if (sceneBackground) sceneBackground.dataset.pcS1Evidence = evidence.id;
-    pcSetImageSource(sceneBackground, evidence.smartboardSrc || evidence.src, evidence.src);
-  }
+  pcRenderS1IntroEvidenceCard(item, evidence, pcS1CanvasDialogueCaseIndex);
   const boardText = document.getElementById('vnBoardText');
   if (boardText) boardText.textContent = pcS1CanvasDialogueState === 'after' ? item.afterCue : item.beforeCue;
   document.querySelector('#vnOverlay .vn-smartboard')?.setAttribute('aria-hidden', 'true');
@@ -1056,12 +1124,14 @@ function pcPrepareS1ClassroomDialogueScene() {
   pcClearS1ReflectionExperience();
   pcClearS1DialogueDiagnosisUI();
   pcClearS1MobileEvidenceLens();
+  pcClearS1IntroEvidenceCard();
   pcS1CanvasDialogueMode = false;
   document.body.classList.remove('pc-s1-canvas-dialogue-active', 'pc-s1-canvas-smartboard-active', 'pc-s1-canvas-backdrop-active');
   delete document.body.dataset.pcS1CanvasState;
   const overlay = document.getElementById('vnOverlay');
   overlay?.classList.remove('pc-s1-mobile-evidence-reader', 'pc-s1-mission-board-image');
   overlay?.setAttribute('aria-label', 'PromptCraft character dialogue');
+  overlay?.querySelector('.vn-screen')?.style.removeProperty('--pc-s1-mission-board-image');
   const sceneBackground = document.getElementById('vnSceneBg');
   if (sceneBackground) {
     delete sceneBackground.dataset.pcS1Evidence;
@@ -1075,14 +1145,22 @@ function pcPrepareS1ClassroomDialogueScene() {
   return true;
 }
 
-function pcPrepareS1MissionBoardImage(caseIndex = pcS1PreviewCaseIndex) {
+function pcPrepareS1MissionBoardImage(caseIndex = pcS1PreviewCaseIndex, state = 'before') {
   const normalized = Math.max(0, Math.min(PC_S1_PREVIEW_CASES.length - 1, Number(caseIndex) || 0));
   const item = PC_S1_PREVIEW_CASES[normalized];
-  const evidence = item ? pcGetS1CanvasEvidence(item.before) : null;
+  const evidenceKey = state === 'after' ? item?.after : item?.before;
+  const evidence = item ? pcGetS1CanvasEvidence(evidenceKey) : null;
   const overlay = document.getElementById('vnOverlay');
   if (!item || !evidence || !overlay) return false;
 
+  const source = evidence.smartboardSrc || evidence.src;
+  const cssSource = String(source).replace(/["\\\n\r]/g, match => `\\${match}`);
   overlay.classList.add('pc-s1-mission-board-image');
+  overlay.querySelector('.vn-screen')?.style.setProperty(
+    '--pc-s1-mission-board-image',
+    `url("${cssSource}")`
+  );
+  pcClearS1IntroEvidenceCard();
   loadSceneImage(evidence.smartboardSrc || evidence.src, evidence.src);
   document.querySelector('#vnOverlay .vn-smartboard')?.setAttribute('aria-hidden', 'false');
   return true;
@@ -1106,12 +1184,14 @@ function pcClearS1CanvasDialogueScene() {
   pcClearS1ReflectionExperience();
   pcClearS1DialogueDiagnosisUI();
   pcClearS1MobileEvidenceLens();
+  pcClearS1IntroEvidenceCard();
   pcS1CanvasDialogueMode = false;
   document.body.classList.remove('pc-s1-canvas-dialogue-active', 'pc-s1-canvas-smartboard-active', 'pc-s1-canvas-backdrop-active');
   delete document.body.dataset.pcS1CanvasState;
   const overlay = document.getElementById('vnOverlay');
   overlay?.classList.remove('pc-s1-mobile-evidence-reader', 'pc-s1-mission-board-image');
   overlay?.setAttribute('aria-label', 'PromptCraft character dialogue');
+  overlay?.querySelector('.vn-screen')?.style.removeProperty('--pc-s1-mission-board-image');
   const boardImage = document.getElementById('vnBoardImg');
   if (boardImage) delete boardImage.dataset.pcS1Evidence;
   const sceneBackground = document.getElementById('vnSceneBg');
@@ -1144,6 +1224,9 @@ function pcRouteS1ReflectionToCasePage(
 
   pcClearS1AfterReflectionUI();
   pcClearS1DialogueDiagnosisUI();
+  // Clear the cast while the constrained S1 geometry still applies. Removing
+  // the scene classes first can expose Eli at intrinsic size for one frame.
+  pcResetVNCharacters();
   pcS1CanvasDialogueMode = false;
   document.body.classList.remove('pc-s1-canvas-dialogue-active', 'pc-s1-canvas-smartboard-active', 'pc-s1-canvas-backdrop-active');
   delete document.body.dataset.pcS1CanvasState;
@@ -1228,6 +1311,20 @@ function pcClearS1DialogueDiagnosisUI() {
 
 let pcS1EvidenceModalReturnFocus = null;
 
+const PC_S1_READ_SIZE_VIEWPORTS = Object.freeze([
+  '(width: 853px) and (height: 1280px)',
+  '(width: 912px) and (height: 1368px)',
+  '(width: 1024px) and (height: 1366px)',
+  '(width: 820px) and (height: 1180px)',
+  '(width: 768px) and (height: 1024px)',
+]);
+
+function pcGetS1EvidenceDefaultZoom() {
+  return PC_S1_READ_SIZE_VIEWPORTS.some((query) => window.matchMedia(query).matches)
+    ? 'read'
+    : 'fit';
+}
+
 function pcCloseS1EvidenceModal({ restoreFocus = true } = {}) {
   const modal = document.getElementById('pcS1EvidenceModal');
   if (!modal) return false;
@@ -1252,15 +1349,21 @@ function pcRefreshS1EvidenceModalLayout() {
   const image = document.getElementById('pcS1EvidenceModalImage');
   if (!modal || !evidence || !image) return false;
 
-  const width = Math.min(window.innerWidth, window.visualViewport?.width || window.innerWidth);
+  const width = Math.min(
+    window.innerWidth,
+    window.visualViewport?.width || window.innerWidth,
+    window.screen?.width || window.innerWidth
+  );
+  const height = Math.min(
+    window.innerHeight,
+    window.visualViewport?.height || window.innerHeight,
+    window.screen?.height || window.innerHeight
+  );
   const usePhoneLayout = width <= 560;
-  const useCompactLayout = !usePhoneLayout && width <= 1100;
   const source = usePhoneLayout
     ? (evidence.mobileSrc || evidence.compactSrc || evidence.smartboardSrc || evidence.src)
-    : useCompactLayout
-      ? (evidence.compactSrc || evidence.mobileSrc || evidence.smartboardSrc || evidence.src)
-      : evidence.src;
-  const mode = usePhoneLayout ? 'phone' : useCompactLayout ? 'compact' : 'desktop';
+    : evidence.src;
+  const mode = usePhoneLayout ? 'phone' : 'desktop';
 
   modal.classList.remove(
     'pc-s1-evidence-modal--phone-capture',
@@ -1268,6 +1371,10 @@ function pcRefreshS1EvidenceModalLayout() {
     'pc-s1-evidence-modal--desktop-capture'
   );
   modal.classList.add(`pc-s1-evidence-modal--${mode}-capture`);
+
+  if (!modal.dataset.pcEvidenceZoom) {
+    pcSetS1EvidenceModalZoom(pcGetS1EvidenceDefaultZoom(), { userSelected: false });
+  }
 
   if (image.dataset.pcModalSource !== source) {
     image.dataset.pcModalSource = source;
@@ -1278,6 +1385,23 @@ function pcRefreshS1EvidenceModalLayout() {
       scroll.scrollLeft = 0;
     }
   }
+  return true;
+}
+
+function pcSetS1EvidenceModalZoom(mode = 'read', { userSelected = true } = {}) {
+  const modal = document.getElementById('pcS1EvidenceModal');
+  const scroll = modal?.querySelector('.pc-s1-evidence-modal-scroll');
+  if (!modal || !scroll) return false;
+  const normalized = mode === 'fit' ? 'fit' : 'read';
+  modal.dataset.pcEvidenceZoom = normalized;
+  if (userSelected) modal.dataset.pcEvidenceZoomSelected = 'true';
+  modal.querySelectorAll('[data-pc-evidence-zoom]').forEach(button => {
+    const active = button.dataset.pcEvidenceZoom === normalized;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+  scroll.scrollTop = 0;
+  scroll.scrollLeft = 0;
   return true;
 }
 
@@ -1319,6 +1443,10 @@ function pcOpenS1EvidenceModal() {
       </div>
       <footer>
         <p>Scroll to inspect the Canvas screen. On a phone, pinch to zoom if needed.</p>
+        <div class="pc-s1-evidence-modal-zoom" role="group" aria-label="Canvas evidence size">
+          <button type="button" data-pc-action="s1-evidence-zoom" data-pc-evidence-zoom="read" aria-pressed="false">Read size</button>
+          <button type="button" data-pc-action="s1-evidence-zoom" data-pc-evidence-zoom="fit" aria-pressed="false">Fit image</button>
+        </div>
         <button type="button" class="pc-shell-primary" data-pc-action="s1-close-evidence-modal">Close evidence</button>
       </footer>
     </div>`;
@@ -1327,6 +1455,7 @@ function pcOpenS1EvidenceModal() {
   });
   document.body.appendChild(modal);
   document.body.classList.add('pc-s1-evidence-modal-active');
+  pcSetS1EvidenceModalZoom(pcGetS1EvidenceDefaultZoom(), { userSelected: false });
   pcRefreshS1EvidenceModalLayout();
   document.addEventListener('keydown', pcHandleS1EvidenceModalKeydown);
   modal.querySelector('.pc-s1-evidence-modal-close')?.focus();
@@ -1533,24 +1662,25 @@ function pcRenderS1WeekPlanner() {
   const container = document.getElementById('inputContainer');
   if (!area || !pcS1PreviewChecks.every(check => check.answered)) return false;
   pcS1WeekPlanState = null;
+  pcS1WeekPlanReward = null;
   if (container) {
     container.className = 'pc-s1-week-planner-host';
     container.innerHTML = '';
     container.style.display = 'none';
   }
   const categories = [
-    ['start', 'START HERE', 'Purpose, destination, workload, dates, and what to do first'],
-    ['learn', 'LEARN', 'Readings, videos, demonstrations, examples, or reference material'],
-    ['practice', 'PRACTICE', 'A low-stakes check, discussion, rehearsal, or guided attempt'],
-    ['submit', 'SUBMIT', 'The assessed work, evidence, directions, and success criteria'],
-    ['continue', 'CONTINUE', 'Wrap-up, feedback, reflection, or a bridge to the next week']
+    ['start', 'START HERE', 'How will this section orient students to the week, the goal, and what they will accomplish?'],
+    ['learn', 'LEARN', 'What will students use to build the knowledge or skills they need?'],
+    ['practice', 'PRACTICE', 'How will students try the skill and check understanding before submitting?'],
+    ['submit', 'SUBMIT', 'What will students produce, and where will directions and success criteria appear?'],
+    ['continue', 'CONTINUE', 'How will students reflect, use feedback, and know what comes next?']
   ];
   area.innerHTML = `
     <section class="pc-s1-week-planner" role="region" aria-labelledby="pcS1WeekPlannerTitle">
       <header class="pc-s1-week-planner-hero">
         <span>Case files complete · Transfer task</span>
-        <h2 id="pcS1WeekPlannerTitle">Plan an example learning path.</h2>
-        <p>Choose a real week, module, or topic, or invent a simple example. Add examples of what could belong in each part of the path. You are not building the final Canvas module.</p>
+        <h2 id="pcS1WeekPlannerTitle">Describe what each part of the path should do.</h2>
+        <p>Choose a real or invented week, module, or topic. For each header, explain its purpose for students. You may include example materials, but focus on what students should understand or do in that section.</p>
       </header>
       <form id="pcS1WeekPlannerForm" class="pc-s1-week-planner-form">
         <div class="pc-s1-week-planner-basics">
@@ -1563,11 +1693,11 @@ function pcRenderS1WeekPlanner() {
               <span><b>${String(index + 1).padStart(2, '0')}</b>${label}</span>
               <small>${hint}</small>
               <textarea name="${id}" rows="4" maxlength="500" placeholder="${esc({
-                start: 'Example: overview, due dates, and the first action',
-                learn: 'Example: short video, reading, or demonstration',
-                practice: 'Example: discussion, knowledge check, or worked example',
-                submit: 'Example: quiz, project draft, or reflection',
-                continue: 'Example: feedback, preview, or next step'
+                start: 'Example: Give an overview of the week, name the goal, show due dates, and identify the first action.',
+                learn: 'Example: Introduce key ideas through a short reading, video, demonstration, or example.',
+                practice: 'Example: Let students rehearse with a discussion, knowledge check, worked example, or draft.',
+                submit: 'Example: Explain the final product, evidence, deadline, and success criteria at the point of submission.',
+                continue: 'Example: Close with feedback, reflection, completion cues, and a bridge to the next week.'
               }[id])}"></textarea>
             </label>`).join('')}
         </div>
@@ -1589,11 +1719,11 @@ function pcFillS1TransferDevTask() {
     const values = {
       week: 'Week 4 · Comparing community planning models',
       destination: 'Students will compare two planning models and recommend one for a neighborhood transit case.',
-      start: 'A short overview, the learning destination, the due date, and the first action.',
-      learn: 'A brief video, two planning-model readings, and one worked comparison.',
-      practice: 'A low-stakes knowledge check and a discussion comparing the two models.',
-      submit: 'A 400-word recommendation using evidence from both readings.',
-      continue: 'Feedback, a short reflection, and a preview of the next week.'
+      start: 'Orient students with a short overview of the week, the learning goal, the due date, and the first action.',
+      learn: 'Build the needed knowledge through a brief video, two planning-model readings, and one worked comparison.',
+      practice: 'Let students rehearse the comparison with a low-stakes knowledge check and discussion before submitting.',
+      submit: 'Place the 400-word recommendation, evidence requirements, deadline, and success criteria beside submission.',
+      continue: 'Close the week with feedback, reflection, a clear completion cue, and a preview of what comes next.'
     };
     Object.entries(values).forEach(([name, value]) => {
       const field = form.elements.namedItem(name);
@@ -1617,9 +1747,304 @@ function pcFillS1TransferDevTask() {
   return fill();
 }
 
+function pcBuildS1WeekPlanFallback(data, completed) {
+  const signals = [
+    {
+      id: 'CLEAR_DESTINATION',
+      met: Boolean(String(data.destination || '').trim()),
+      strength: 'The destination tells students what they should understand, produce, or decide by the end of the week.',
+      gap: 'State a student-facing destination that describes what learners will understand or do.'
+    },
+    {
+      id: 'VISIBLE_START',
+      met: Boolean(String(data.start || '').trim()),
+      strength: 'START HERE gives students an overview, a purpose, and a clear first action.',
+      gap: 'Use START HERE to orient students to the week, its purpose, and what they should do first.'
+    },
+    {
+      id: 'LEARNING_SEQUENCE',
+      met: Boolean(String(data.learn || '').trim()) && Boolean(String(data.practice || '').trim()),
+      strength: 'LEARN and PRACTICE create a visible progression from building knowledge to trying the skill before submission.',
+      gap: 'Include both a LEARN step and a low-stakes PRACTICE step so students can prepare before submission.'
+    },
+    {
+      id: 'VISIBLE_SUBMISSION',
+      met: Boolean(String(data.submit || '').trim()),
+      strength: 'SUBMIT identifies the assessed work and places expectations at the point where students need them.',
+      gap: 'Explain what students will submit, where they will submit it, and what evidence or criteria will be used.'
+    },
+    {
+      id: 'CONTINUATION_CUE',
+      met: Boolean(String(data.continue || '').trim()),
+      strength: 'CONTINUE gives students a completion cue and shows what happens after the assessed work.',
+      gap: 'Add a completion, feedback, reflection, or next-week cue so students know when the path is finished.'
+    }
+  ];
+  const indicators = signals.filter(signal => signal.met).map(signal => signal.id);
+  const missing = signals.filter(signal => !signal.met);
+  return {
+    status: indicators.length >= 5 ? 'STRONG' : indicators.length >= 3 ? 'DEVELOPING' : 'REVISE',
+    summary: indicators.length >= 5
+      ? 'This pathway gives students a clear destination and a complete sequence from orientation through continuation. The structure makes it easier to see what to do first, how to prepare, what to submit, and when the week is complete.'
+      : `This pathway makes ${indicators.length} of 5 student-facing signals visible. The foundation is usable, but the missing signals still require students to infer part of the learning path.`,
+    quality_indicators: indicators,
+    strengths: signals.filter(signal => signal.met).map(signal => signal.strength),
+    gaps: missing.map(signal => signal.gap),
+    recommended_next_step: missing.length
+      ? `Revise the ${missing.length} missing pathway signal${missing.length === 1 ? '' : 's'}, then read the module once from a student's starting point.`
+      : 'Preview the pathway in Canvas Student View and verify dates, workload, accessibility, alignment, and submission directions before publishing.',
+    human_review_note: 'The instructor must verify course alignment, workload, accessibility, dates, policies, and accuracy before publishing.'
+  };
+}
+
+function pcNormalizeS1WeekPlanAnalysis(remote, fallback) {
+  if (!remote || typeof remote !== 'object') return fallback;
+  const usefulText = (value, minimum, fallbackValue) => {
+    const text = String(value || '').trim();
+    return text.length >= minimum ? text : fallbackValue;
+  };
+  const usefulList = (value, fallbackValue) => {
+    const list = Array.isArray(value)
+      ? value.map(item => String(item || '').trim()).filter(item => item.length >= 24)
+      : [];
+    return list.length ? list : fallbackValue;
+  };
+  return {
+    status: fallback.status,
+    summary: usefulText(remote.summary, 60, fallback.summary),
+    quality_indicators: [...fallback.quality_indicators],
+    strengths: usefulList(remote.strengths, fallback.strengths),
+    gaps: usefulList(remote.gaps, fallback.gaps),
+    recommended_next_step: usefulText(remote.recommended_next_step, 35, fallback.recommended_next_step),
+    human_review_note: usefulText(remote.human_review_note, 35, fallback.human_review_note)
+  };
+}
+
+function pcRecordS1WeekPlanAnalysis(instructorAnswers, analysis, response) {
+  const scenario = scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE];
+  if (!scenario) return false;
+  const labels = {
+    CLEAR_DESTINATION: 'Clear destination or purpose',
+    VISIBLE_START: 'Visible starting point',
+    LEARNING_SEQUENCE: 'Visible learning sequence',
+    VISIBLE_SUBMISSION: 'Visible submission and evidence',
+    CONTINUATION_CUE: 'Visible continuation cue'
+  };
+  const previousAttempts = Number(scenario.attempts || 0);
+  scenario.attempts = previousAttempts + 1;
+  scenario.prompts = Array.isArray(scenario.prompts) ? scenario.prompts : [];
+  scenario.prompts.push([
+    `Instructor week/module: ${instructorAnswers.week}`,
+    `Destination: ${instructorAnswers.destination}`,
+    `START HERE: ${instructorAnswers.start || ''}`,
+    `LEARN: ${instructorAnswers.learn || ''}`,
+    `PRACTICE: ${instructorAnswers.practice || ''}`,
+    `SUBMIT: ${instructorAnswers.submit || ''}`,
+    `CONTINUE: ${instructorAnswers.continue || ''}`
+  ].join(' | '));
+  scenario.currentScore = Array.isArray(analysis.quality_indicators) ? analysis.quality_indicators.length : 0;
+  if (previousAttempts === 0) scenario.initialScore = scenario.currentScore;
+  scenario.scoreDelta = scenario.currentScore - Number(scenario.initialScore || 0);
+  scenario.bestScore = Math.max(Number(scenario.bestScore || 0), scenario.currentScore);
+  scenario.finalResponse = analysis.summary || '';
+  scenario.oscqrLit = (analysis.quality_indicators || []).map(id => labels[id] || id).join('; ');
+  scenario.structuredAnalysis = {
+    analysis_type: 's1_transfer_plan_analysis',
+    instructor_answers: { ...instructorAnswers },
+    analysis: { ...analysis }
+  };
+  scenario.aiProvider = response?.provider || 'local-fallback';
+  scenario.aiModel = response?.model || 'promptcraft-local-evaluator';
+  scenario.aiRequestId = response?.request_id || '';
+  scenario.aiElapsedMs = response?.elapsed_ms ?? '';
+  scenario.aiUsage = response?.usage || null;
+  saveIncrementalData(SCENARIO_INDEX.CONTENT_AVALANCHE, 's1_instructor_plan_analysis_complete');
+  return true;
+}
+
+function pcBuildS1WeekPlanCriteria(analysis) {
+  const indicators = new Set(Array.isArray(analysis.quality_indicators) ? analysis.quality_indicators : []);
+  return [
+    {
+      id: 'CLEAR_DESTINATION',
+      label: 'Clear student destination',
+      met: indicators.has('CLEAR_DESTINATION'),
+      pass: 'Students can see what they should understand, produce, or decide by the end of the week.',
+      check: 'State the destination as something students will understand or do.'
+    },
+    {
+      id: 'VISIBLE_START',
+      label: 'Visible starting point',
+      met: indicators.has('VISIBLE_START'),
+      pass: 'START HERE gives students the purpose of the week and a clear first action.',
+      check: 'Use START HERE to explain the week, its purpose, and what students should do first.'
+    },
+    {
+      id: 'LEARNING_SEQUENCE',
+      label: 'Preparation before submission',
+      met: indicators.has('LEARNING_SEQUENCE'),
+      pass: 'LEARN and PRACTICE show how students build knowledge and rehearse before submitting assessed work.',
+      check: 'Include both preparation and a low-stakes opportunity to practice before submission.'
+    },
+    {
+      id: 'VISIBLE_SUBMISSION',
+      label: 'Visible submission expectations',
+      met: indicators.has('VISIBLE_SUBMISSION'),
+      pass: 'SUBMIT places the assessed work, evidence expectations, and directions at the point of need.',
+      check: 'Explain what students submit, where it goes, and what evidence or criteria matter.'
+    },
+    {
+      id: 'CONTINUATION_CUE',
+      label: 'Clear completion and continuation cue',
+      met: indicators.has('CONTINUATION_CUE'),
+      pass: 'CONTINUE tells students how the week closes and what happens next.',
+      check: 'Add a completion, feedback, reflection, or next-week cue.'
+    }
+  ];
+}
+
+function pcClearS1WeekPlanAnalysis() {
+  document.getElementById('pcS1WeekPlanAnalysis')?.remove();
+  document.body.classList.remove('pc-s1-reflection-analysis-active');
+  return true;
+}
+
+function pcRenderS1WeekPlanAnalysis(data, analysis, analysisSource) {
+  pcClearS1ReflectionLoading();
+  pcClearS1WeekPlanAnalysis();
+  const criteria = pcBuildS1WeekPlanCriteria(analysis);
+  const score = criteria.filter(criterion => criterion.met).length;
+  const displayScore = score >= 5 ? 3 : score >= 3 ? 2 : 1;
+  const verdict = score >= 5 ? 'Strong learning path' : score >= 3 ? 'Developing learning path' : 'Path needs revision';
+  const workspace = document.createElement('section');
+  workspace.id = 'pcS1WeekPlanAnalysis';
+  workspace.className = `pc-s1-reflection-analysis pc-s1-reflection-analysis--terminal pc-s1-reflection-analysis--score-${displayScore}`;
+  workspace.setAttribute('role', 'dialog');
+  workspace.setAttribute('aria-modal', 'true');
+  workspace.setAttribute('aria-labelledby', 'pcS1WeekPlanAnalysisTitle');
+  workspace.innerHTML = `
+    <div class="pc-s1-reflection-analysis-shell">
+      <header class="pc-s1-reflection-analysis-header">
+        <span class="pc-s1-reflection-analysis-mark">
+          <img src="${pcProjectUrl('assets/images/ui/babbage-mark.svg')}" alt="Babbage">
+        </span>
+        <div>
+          <p>BABBAGE // TRANSFER_TASK // PATH_CHECK // ${esc(analysisSource)}</p>
+          <h2 id="pcS1WeekPlanAnalysisTitle" tabindex="-1">Module Path Analysis</h2>
+        </div>
+        <span class="pc-s1-reflection-analysis-verdict">STATUS: ${esc(verdict).toUpperCase()}</span>
+      </header>
+      <div class="pc-s1-reflection-analysis-content">
+        <section class="pc-s1-reflection-focus" aria-labelledby="pcS1WeekPlanFinding">
+          <span>BABBAGE FINDING</span>
+          <h3 id="pcS1WeekPlanFinding">${esc(analysis.summary)}</h3>
+        </section>
+        <section class="pc-s1-reflection-feedback" aria-labelledby="pcS1WeekPlanSignals">
+          <p id="pcS1WeekPlanSignals" class="pc-s1-reflection-analysis-kicker">LEARNING PATH SIGNALS · ${score} OF 5 VISIBLE</p>
+          <ol>
+            ${criteria.map(criterion => `
+              <li class="${criterion.met ? 'is-met' : 'is-missing'}">
+                <span aria-hidden="true">${criterion.met ? '[PASS]' : '[CHECK]'}</span>
+                <div>
+                  <strong>${esc(criterion.label)}</strong>
+                  <p>${esc(criterion.met ? criterion.pass : criterion.check)}</p>
+                </div>
+              </li>`).join('')}
+          </ol>
+        </section>
+        <aside class="pc-s1-reflection-teaching-point">
+          <span>NEXT DESIGN MOVE</span>
+          <p>${esc(analysis.recommended_next_step)}</p>
+          <p><strong>Instructor review:</strong> ${esc(analysis.human_review_note)}</p>
+        </aside>
+        <details class="pc-s1-reflection-response">
+          <summary>View the module path you submitted</summary>
+          <blockquote>
+            <strong>${esc(data.week)}</strong><br>
+            <strong>Destination:</strong> ${esc(data.destination)}<br><br>
+            <strong>START HERE:</strong> ${esc(data.start || 'Not supplied')}<br>
+            <strong>LEARN:</strong> ${esc(data.learn || 'Not supplied')}<br>
+            <strong>PRACTICE:</strong> ${esc(data.practice || 'Not supplied')}<br>
+            <strong>SUBMIT:</strong> ${esc(data.submit || 'Not supplied')}<br>
+            <strong>CONTINUE:</strong> ${esc(data.continue || 'Not supplied')}
+          </blockquote>
+        </details>
+      </div>
+      <footer class="pc-s1-reflection-analysis-footer">
+        <p>Babbage can identify visible pathway signals. You still verify alignment, workload, accessibility, dates, and accuracy.</p>
+        <div>
+          <button id="babbageTTSBtn" type="button" class="pc-shell-secondary pc-s1-reflection-tts" data-pc-action="toggle-babbage-tts" data-pc-stop-propagation="true">🔊 Read Analysis</button>
+          <button type="button" class="pc-shell-secondary" data-pc-action="s1-week-plan-restart">← Revise my week</button>
+          <button type="button" class="pc-shell-primary" data-pc-action="s1-complete-week-plan">Complete Scenario 1</button>
+        </div>
+      </footer>
+    </div>`;
+  document.body.appendChild(workspace);
+  document.body.classList.add('pc-s1-reflection-analysis-active');
+  pcScheduleScenarioTask(() => pcFocusWithoutScroll(workspace.querySelector('#pcS1WeekPlanAnalysisTitle')), 50, SCENARIO_INDEX.CONTENT_AVALANCHE);
+  return true;
+}
+
+function pcShowS1WeekPlanLoading(data) {
+  pcClearS1ReflectionLoading();
+  const loading = document.createElement('section');
+  loading.id = 'pcS1ReflectionLoading';
+  loading.className = 'pc-s1-reflection-loading';
+  loading.setAttribute('role', 'status');
+  loading.setAttribute('aria-live', 'polite');
+  loading.innerHTML = `
+    <div class="pc-s1-reflection-loading-shell">
+      <p class="pc-s1-reflection-loading-brand">PROMPTCRAFT // BABBAGE TRANSFER ANALYSIS BOOT</p>
+      <h2>Checking the pathway for ${esc(data.week)}</h2>
+      <div class="pc-s1-reflection-loading-log" aria-label="Analysis progress">
+        <p>&gt; reading INSTRUCTOR_MODULE_PATH.LOG</p>
+        <p>&gt; checking student destination and starting point</p>
+        <p>&gt; checking preparation and practice sequence</p>
+        <p>&gt; checking submission directions</p>
+        <p>&gt; checking completion and continuation cue<span class="pc-s1-terminal-cursor" aria-hidden="true">_</span></p>
+      </div>
+      <div class="pc-s1-reflection-loading-track" aria-hidden="true"><span></span></div>
+    </div>`;
+  document.body.appendChild(loading);
+  document.body.classList.add('pc-s1-reflection-loading-active');
+  pcScheduleScenarioTask(() => pcRunS1WeekPlanAnalysis(data), 900, SCENARIO_INDEX.CONTENT_AVALANCHE);
+  return true;
+}
+
+async function pcRunS1WeekPlanAnalysis(data) {
+  const categoryIds = ['start', 'learn', 'practice', 'submit', 'continue'];
+  const completed = categoryIds.filter(id => String(data[id] || '').trim().length >= 4);
+  const root = document.querySelector('.pc-s1-week-planner');
+  const fallbackAnalysis = pcBuildS1WeekPlanFallback(data, completed);
+  let response = null;
+  let analysis = fallbackAnalysis;
+  try {
+    response = await requestBabbageAnalysis({
+      analysis_type: 's1_transfer_plan_analysis',
+      max_output_tokens: 1400,
+      system: `You are Babbage, PromptCraft's Canvas learning-path analyst. Analyze only the instructor-supplied fields. Check for a clear destination, visible starting point, LEARN plus PRACTICE preparation, visible submission and evidence expectations, and a continuation cue. Do not invent course requirements. Return a complete JSON analysis with: status (STRONG, DEVELOPING, or REVISE); a specific two- or three-sentence summary; quality_indicators using only CLEAR_DESTINATION, VISIBLE_START, LEARNING_SEQUENCE, VISIBLE_SUBMISSION, and CONTINUATION_CUE; strengths with specific references to the supplied pathway; gaps with actionable revisions; recommended_next_step; and human_review_note. Never return only a status or an empty next step.`,
+      messages: [{ role: 'user', content: JSON.stringify(data, null, 2) }]
+    }, 's1-transfer-plan-analysis');
+    if (response?.analysis && !response.mock && response.provider !== 'local-fallback') {
+      analysis = pcNormalizeS1WeekPlanAnalysis(response.analysis, fallbackAnalysis);
+    }
+  } catch (error) {
+    console.warn('[PromptCraft] Live transfer-plan analysis unavailable; using the labeled local evaluator.', error);
+  }
+  if (!root?.isConnected || scenarioIndex !== SCENARIO_INDEX.CONTENT_AVALANCHE) {
+    pcClearS1ReflectionLoading();
+    return false;
+  }
+  pcRecordS1WeekPlanAnalysis(data, analysis, response);
+  const transferScore = Math.max(0, Math.min(5, Array.isArray(analysis.quality_indicators) ? analysis.quality_indicators.length : 0));
+  pcS1WeekPlanReward = { score: transferScore, earnedXP: awardS1TransferXP(transferScore) };
+  const analysisSource = response?.analysis && !response.mock && response.provider !== 'local-fallback'
+    ? 'LIVE + LOCAL VALIDATION'
+    : 'LOCAL FALLBACK';
+  return pcRenderS1WeekPlanAnalysis(data, analysis, analysisSource);
+}
+
 function pcAnalyzeS1WeekPlan() {
-  const area = document.getElementById('chat');
-  const container = document.getElementById('inputContainer');
   const form = document.getElementById('pcS1WeekPlannerForm');
   if (!form) return false;
   const data = Object.fromEntries(new FormData(form).entries());
@@ -1631,44 +2056,37 @@ function pcAnalyzeS1WeekPlan() {
     return false;
   }
   pcS1WeekPlanState = data;
-  const missing = categoryIds.filter(id => !completed.includes(id));
-  const root = document.querySelector('.pc-s1-week-planner');
-  const labels = { start: 'START HERE', learn: 'LEARN', practice: 'PRACTICE', submit: 'SUBMIT', continue: 'CONTINUE' };
-  root.innerHTML = `
-    <header class="pc-s1-week-planner-hero pc-s1-week-planner-hero--complete">
-      <span>Babbage path analysis complete · Instructor review required</span>
-      <h2>${esc(data.week)}</h2>
-      <p><strong>Destination:</strong> ${esc(data.destination)}</p>
-    </header>
-    <div class="pc-s1-week-plan-result">
-      <section class="pc-s1-week-canvas-preview" aria-labelledby="pcS1WeekPreviewTitle">
-        <div class="pc-s1-week-canvas-head"><span>Canvas · Module draft</span><b>Not published</b></div>
-        <h3 id="pcS1WeekPreviewTitle">${esc(data.week)}</h3>
-        ${categoryIds.map(id => String(data[id] || '').trim() ? `
-          <article><strong>${labels[id]}</strong><p>${esc(data[id])}</p></article>` : '').join('')}
-      </section>
-      <aside class="pc-s1-week-terminal">
-        <span>BABBAGE // PATH_CHECK</span>
-        <h3>&gt; MODULE SIGNAL REPORT</h3>
-        <p class="is-pass">[PASS] Destination supplied</p>
-        <p class="is-pass">[PASS] ${completed.length} of 5 path categories supplied</p>
-        <p class="${data.submit ? 'is-pass' : 'is-check'}">[${data.submit ? 'PASS' : 'CHECK'}] Submission point ${data.submit ? 'is visible' : 'needs definition'}</p>
-        <p class="${data.start ? 'is-pass' : 'is-check'}">[${data.start ? 'PASS' : 'CHECK'}] Starting point ${data.start ? 'is visible' : 'needs definition'}</p>
-        ${missing.length ? `<p class="is-check">[CHECK] Consider adding: ${missing.map(id => labels[id]).join(', ')}</p>` : '<p class="is-pass">[PASS] Full Start → Learn → Practice → Submit → Continue path</p>'}
-        <hr>
-        <p>AI organized the supplied ideas. The instructor must verify workload, alignment, accessibility, accuracy, and the actual teaching sequence.</p>
-      </aside>
-    </div>
-    <footer class="pc-s1-week-planner-actions">
-      <button type="button" class="pc-shell-secondary" data-pc-action="s1-week-plan-restart">← Revise my week</button>
-      <button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="scenarios">Complete Scenario 1</button>
-    </footer>`;
-  resetSectionScroll(area, container);
+  const submitButton = document.getElementById('pcS1AnalyzeWeekPlan');
+  if (submitButton) submitButton.disabled = true;
+  if (status) status.textContent = 'Babbage is analyzing the instructor-supplied module path…';
+  return pcShowS1WeekPlanLoading(data);
+}
+
+function pcCompleteS1WeekPlan() {
+  const reward = pcS1WeekPlanReward || { score: 0, earnedXP: 0 };
+  pcClearS1WeekPlanAnalysis();
+  markScenarioComplete();
+  pcPrepareS1ClassroomDialogueScene();
+  pcPrepareS1MissionBoardImage(PC_S1_PREVIEW_CASES.length - 1, 'after');
+  const boardText = document.getElementById('vnBoardText');
+  if (boardText) boardText.textContent = 'Your module path: destination, preparation, practice, submission, and continuation.';
+  const feedback = reward.score >= 5
+    ? 'Your pathway gives students a visible destination, a place to begin, preparation and practice before submission, and a clear ending. That is a complete learning path, not just a list of materials.'
+    : `Your pathway has ${reward.score} of 5 student-facing signals. Use Babbage's checked rows to revise the missing parts before publishing in Canvas.`;
+  vnShow(reward.score >= 5 ? 'proud' : reward.score >= 3 ? 'encouraging' : 'thinking', feedback, () => {
+    openMainMenu('scenarios');
+  }, {
+    id: 'p-s1-transfer-progress',
+    speaker: 'Professor Pixel',
+    character: 'pixel',
+    cast: [{ id: 'pixel', slot: 'right' }]
+  });
   return true;
 }
 
 function pcRestartS1WeekPlan() {
   const saved = pcS1WeekPlanState;
+  pcClearS1WeekPlanAnalysis();
   pcRenderS1WeekPlanner();
   const form = document.getElementById('pcS1WeekPlannerForm');
   if (form && saved) Object.entries(saved).forEach(([name, value]) => {
@@ -2019,6 +2437,7 @@ pcRegisterUIActions({
   's1-preview-toggle-state': target => pcSetS1PreviewState(target.dataset.pcState),
   's1-open-evidence-modal': () => pcOpenS1EvidenceModal(),
   's1-close-evidence-modal': () => pcCloseS1EvidenceModal(),
+  's1-evidence-zoom': target => pcSetS1EvidenceModalZoom(target.dataset.pcEvidenceZoom),
   's1-submit-case-reflection': () => pcSubmitS1CaseReflection(),
   's1-complete-after-reflection': () => pcCompleteS1AfterReflection(),
   's1-preview-previous-case': () => pcSelectS1PreviewCase(pcS1PreviewCaseIndex - 1),
@@ -2030,7 +2449,8 @@ pcRegisterUIActions({
   's1-rescue-restart': () => pcRenderS1CanvasRescue(),
   's1-rescue-return-cases': () => renderS1ContentAvalanchePreview({ preserveProgress: true }),
   's1-week-plan-analyze': () => pcAnalyzeS1WeekPlan(),
-  's1-week-plan-restart': () => pcRestartS1WeekPlan()
+  's1-week-plan-restart': () => pcRestartS1WeekPlan(),
+  's1-complete-week-plan': () => pcCompleteS1WeekPlan()
 });
 
 pcExposeGlobals({ pcFillS1TransferDevTask });

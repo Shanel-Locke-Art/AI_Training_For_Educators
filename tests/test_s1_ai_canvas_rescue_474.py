@@ -55,7 +55,7 @@ def main() -> None:
     assert "context === 's1-canvas-rescue'" in babbage
     assert "S1_CANVAS_RESCUE_SCHEMA" in proxy
     assert "promptcraft_s1_canvas_rescue_v1" in proxy
-    assert "PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V372'" in proxy
+    assert "PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V373'" in proxy
 
     for token in (
         "s1_case_module_ai_demo",
