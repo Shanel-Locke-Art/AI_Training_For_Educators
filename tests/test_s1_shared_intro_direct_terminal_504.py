@@ -44,8 +44,8 @@ def main() -> None:
         assert token in css
         assert token in runtime_css
 
-    assert "patch=522" in index
-    assert "DEV · 522" in index
+    assert "patch=523" in index
+    assert "DEV · 523" in index
     print("V504 shared case-introduction and terminal-continuation contract passed.")
 
 

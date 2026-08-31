@@ -40,8 +40,8 @@ def main() -> None:
 
     assert "document.getElementById('pcS1CaseReflectionText')" in dev
     assert "activeS1Case ? pcFillS1DevFields() : resetS1Dev()" in dev
-    assert "patch=522" in index
-    assert "DEV · 522" in index
+    assert "patch=523" in index
+    assert "DEV · 523" in index
     print("V499 full-width documented Canvas-stage contract passed.")
 
 

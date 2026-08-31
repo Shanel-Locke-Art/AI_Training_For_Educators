@@ -42,8 +42,8 @@ def main() -> None:
     ):
         assert marker in css
         assert marker in runtime_css
-    assert "patch=522" in index
-    assert "DEV · 522" in index
+    assert "patch=523" in index
+    assert "DEV · 523" in index
     print("S1 stable module capture contract passed.")
 
 

@@ -63,7 +63,7 @@ QUICK_CHECKS = (
     ("S1 responsive evidence and transfer DEV fill 509", [sys.executable, "tests/test_s1_responsive_modal_transfer_dev_509.py"]),
     ("S1 scrollable evidence and Pixel progress feedback 517", [sys.executable, "tests/test_s1_scrollable_modal_pixel_xp_517.py"]),
     ("S1 reset and responsive evidence inspection 518", [sys.executable, "tests/test_s1_reset_intro_modal_518.py"]),
-    ("S1 validated transfer analysis and device defaults 522", [sys.executable, "tests/test_s1_validated_transfer_analysis_522.py"]),
+    ("S1 validated transfer analysis and device defaults 523", [sys.executable, "tests/test_s1_validated_transfer_analysis_523.py"]),
     ("S1 visual handoff 475", [sys.executable, "tests/test_s1_visual_handoff_475.py"]),
     ("S3 Authentic Assessment contract", [sys.executable, "tests/test_s3_authentic_assessment.py"]),
     ("S3 Transfer Lab contract", [sys.executable, "tests/test_s3_transfer_lab.py"]),

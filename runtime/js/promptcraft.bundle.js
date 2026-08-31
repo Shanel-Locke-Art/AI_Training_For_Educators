@@ -2965,17 +2965,23 @@ function pcClearS1DialogueDiagnosisUI() {
 let pcS1EvidenceModalReturnFocus = null;
 
 const PC_S1_READ_SIZE_VIEWPORTS = Object.freeze([
-  '(width: 853px) and (height: 1280px)',
-  '(width: 912px) and (height: 1368px)',
-  '(width: 1024px) and (height: 1366px)',
-  '(width: 820px) and (height: 1180px)',
-  '(width: 768px) and (height: 1024px)',
+  Object.freeze([853, 1280]),
+  Object.freeze([912, 1368]),
+  Object.freeze([1024, 1366]),
+  Object.freeze([820, 1180]),
+  Object.freeze([768, 1024]),
 ]);
 
 function pcGetS1EvidenceDefaultZoom() {
-  return PC_S1_READ_SIZE_VIEWPORTS.some((query) => window.matchMedia(query).matches)
-    ? 'read'
-    : 'fit';
+  const viewportSizes = [
+    [window.screen?.width, window.screen?.height],
+    [window.innerWidth, window.innerHeight],
+    [document.documentElement?.clientWidth, document.documentElement?.clientHeight],
+  ].map(([width, height]) => [Math.round(Number(width)), Math.round(Number(height))]);
+  const useReadSize = PC_S1_READ_SIZE_VIEWPORTS.some(([profileWidth, profileHeight]) =>
+    viewportSizes.some(([width, height]) => width === profileWidth && height === profileHeight)
+  );
+  return useReadSize ? 'read' : 'fit';
 }
 
 function pcCloseS1EvidenceModal({ restoreFocus = true } = {}) {
@@ -3095,7 +3101,7 @@ function pcOpenS1EvidenceModal() {
         <img id="pcS1EvidenceModalImage" alt="${esc(evidence.alt)}" />
       </div>
       <footer>
-        <p>Scroll to inspect the Canvas screen. On a phone, pinch to zoom if needed.</p>
+        <p>Choose Read size to zoom in, then scroll to inspect the Canvas screen.</p>
         <div class="pc-s1-evidence-modal-zoom" role="group" aria-label="Canvas evidence size">
           <button type="button" data-pc-action="s1-evidence-zoom" data-pc-evidence-zoom="read" aria-pressed="false">Read size</button>
           <button type="button" data-pc-action="s1-evidence-zoom" data-pc-evidence-zoom="fit" aria-pressed="false">Fit image</button>

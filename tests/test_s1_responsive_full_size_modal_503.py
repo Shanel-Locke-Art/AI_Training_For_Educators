@@ -47,8 +47,8 @@ def main() -> None:
 
     assert "data-pc-action=\"s1-close-evidence-modal\"" in shared
     assert "pcHandleS1EvidenceModalKeydown" in shared
-    assert "patch=522" in index
-    assert "DEV · 522" in index
+    assert "patch=523" in index
+    assert "DEV · 523" in index
     print("V503 responsive full-size Canvas-evidence modal contract passed.")
 
 

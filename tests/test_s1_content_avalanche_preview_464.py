@@ -142,9 +142,9 @@ def main() -> None:
     assert "aspect-ratio: 16 / 9.8 !important" in css
     assert ".vn-board-img.loaded" in css
     assert "object-fit: contain !important" in css
-    assert "patch=522" in index
-    assert "DEV · 522" in index
-    assert "runtime/js/dialogue-data.js?v=149&amp;patch=522" in index
+    assert "patch=523" in index
+    assert "DEV · 523" in index
+    assert "runtime/js/dialogue-data.js?v=149&amp;patch=523" in index
     print("S1 Content Avalanche edge-to-edge Canvas reader 482 contract passed.")
 
 
