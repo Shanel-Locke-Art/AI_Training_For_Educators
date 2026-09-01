@@ -230,7 +230,7 @@ function pcRenderVNCast({ cast = [], speaker = 'pixel', expression = 'neutral' }
   // clears earlier inline layout state when expressions or speakers change.
   const compactS1Evidence = Boolean(
     overlay?.classList.contains('pc-s1-mobile-evidence-reader')
-    && window.matchMedia?.('(max-width: 1100px)').matches
+    && pcGetViewportWidth() <= 1100
   );
   const compactS1HasCastRoom = Boolean(
     compactS1Evidence && overlay?.classList.contains('pc-s1-phone-cast-room')
@@ -253,12 +253,9 @@ function pcRenderVNCast({ cast = [], speaker = 'pixel', expression = 'neutral' }
   return true;
 }
 
-function pcUpdateS1PhoneCastRoom() {
+function pcUpdateS1PhoneCastRoom(metrics = pcGetViewportMetrics()) {
   const overlay = document.getElementById('vnOverlay');
-  const screenWidth = Math.min(
-    window.innerWidth,
-    window.screen?.width || window.innerWidth
-  );
+  const screenWidth = metrics.emulatedWidth;
   const eligible = Boolean(
     overlay?.classList.contains('pc-s1-mobile-evidence-reader')
     && screenWidth <= 1100
@@ -278,7 +275,7 @@ function pcUpdateS1PhoneCastRoom() {
     overlay.style.removeProperty('--pc-s1-cast-top');
     overlay.style.setProperty(
       '--pc-s1-cast-bottom',
-      `${Math.max(0, window.innerHeight - dialogueRect.top + 4)}px`
+      `${Math.max(0, (metrics.innerHeight || metrics.layoutHeight) - dialogueRect.top + 4)}px`
     );
     overlay.style.setProperty('--pc-s1-cast-height', `${castHeight}px`);
   } else {
@@ -314,8 +311,11 @@ function pcScheduleS1CastRoomUpdate() {
   });
 }
 
-window.addEventListener('resize', pcScheduleS1CastRoomUpdate, { passive: true });
-window.visualViewport?.addEventListener('resize', pcScheduleS1CastRoomUpdate, { passive: true });
+pcSubscribeViewport('s1-cast-room', metrics => {
+  if (typeof window.pcRefreshS1CanvasEvidenceLayout === 'function'
+      && window.pcRefreshS1CanvasEvidenceLayout({ metrics, deferCastUpdate: false })) return;
+  pcUpdateS1PhoneCastRoom(metrics);
+});
 
 
 

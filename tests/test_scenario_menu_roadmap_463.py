@@ -78,7 +78,7 @@ def main() -> None:
     assert "scenarioIndex === SCENARIO_INDEX.CONTENT_AVALANCHE" in terminal
     assert "scenario_index: 4" in assessment
     assert "scenario_label: 'S4: The 96% Problem'" in assessment
-    assert "patch=525" in index
+    assert "patch=526" in index
 
     retired = (
         "S1: Engagement",

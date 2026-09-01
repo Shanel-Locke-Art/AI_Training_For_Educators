@@ -1,0 +1,60 @@
+{
+  "manifest_version": 1,
+  "recorded_at_utc": "2026-09-01T21:55:32Z",
+  "release_id": "PROMPTCRAFT_V429_PHASE3_P526",
+  "application": {
+    "build": "PROMPTCRAFT_V429",
+    "research_schema": "V121",
+    "browser_cache_patch": 526,
+    "dialogue_asset_version": 149
+  },
+  "receiver": {
+    "version": "V83",
+    "source_changed": false,
+    "source_sha256": "f20107b3faa3f28794c9631bfa75e0834c84d96b6eaae2149095be0fb11bba58"
+  },
+  "babbage_proxy": {
+    "version": "V373",
+    "source_changed": false
+  },
+  "assets": {
+    "manifest_version": 149,
+    "manifest_changed": false,
+    "asset_files_added": 0,
+    "asset_files_removed": 0
+  },
+  "phase_3": {
+    "browser_patch": 526,
+    "focus": "Viewport and device-profile ownership consolidation",
+    "runtime_modules_before": 25,
+    "runtime_modules_after": 26,
+    "application_viewport_listener_owners_before": 7,
+    "application_viewport_listener_owners_after": 1,
+    "standalone_page_listener_owners": [
+      "pages/ideas-wall.js"
+    ],
+    "css_files_changed": 0
+  },
+  "regression_gate": {
+    "quick": {
+      "passed": 63,
+      "total": 63
+    },
+    "browser": {
+      "status": "environment_blocked",
+      "blocked": 17,
+      "reason": "The Python Playwright module is unavailable, so no browser executable or product assertion could run",
+      "product_failures_observed": 0
+    }
+  },
+  "preservation": {
+    "gameplay_changed": false,
+    "dialogue_changed": false,
+    "responsive_css_changed": false,
+    "responsive_policy_changed": false,
+    "tracking_schema_changed": false,
+    "receiver_logic_changed": false,
+    "ai_contract_changed": false,
+    "accessibility_behavior_changed": false
+  }
+}

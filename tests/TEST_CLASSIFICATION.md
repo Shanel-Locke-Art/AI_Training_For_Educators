@@ -11,6 +11,11 @@ guards the current S1 registry route, module load order, shared/S1 ownership,
 application navigation ownership, development-action ownership, and the
 explicit retained-dormant list.
 
+Patch 526 adds `test_viewport_controller_526.js` to the mandatory gate. It
+guards metric fallbacks, six viewport families, emulated-device behavior,
+exact Read Size profiles, centralized listener ownership, and all registered
+responsive subscribers.
+
 ## Superseded patch assertions
 
 These files describe mutually exclusive intermediate states and are retained only as patch history:

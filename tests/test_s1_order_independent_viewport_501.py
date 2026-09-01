@@ -24,7 +24,7 @@ def main() -> None:
         "picture.insertBefore(source, image)",
         "addSource('(max-width: 480px)', evidence.mobileSrc)",
         "panel._pcS1Evidence = evidence",
-        "function pcRefreshS1CanvasEvidenceLayout()",
+        "function pcRefreshS1CanvasEvidenceLayout({",
         "window.pcRefreshS1CanvasEvidenceLayout = pcRefreshS1CanvasEvidenceLayout",
         "captureImage?.addEventListener('load', updatePhoneCastRoom)",
     ):
@@ -33,22 +33,21 @@ def main() -> None:
 
     apply_start = shared.index("function pcApplyS1DocumentedCaptureFit")
     apply = shared[apply_start:shared.index("function pcRefreshS1CanvasEvidenceLayout", apply_start)]
-    assert apply.index("pcRestoreS1ResponsiveCapture(panel, evidence)") < apply.index("const width = Math.min")
+    assert apply.index("pcRestoreS1ResponsiveCapture(panel, evidence)") < apply.index("const width = metrics.emulatedWidth")
 
     for token in (
-        "window.pcRefreshS1CanvasEvidenceLayout()",
+        "window.pcRefreshS1CanvasEvidenceLayout({ metrics, deferCastUpdate: false })",
         "slot.container.style.removeProperty('display')",
-        "window.visualViewport?.addEventListener('resize', pcScheduleS1CastRoomUpdate",
+        "pcSubscribeViewport('s1-cast-room'",
     ):
         assert token in vn
         assert token in runtime
 
     assert "activeS1Case ? pcFillS1DevFields() : resetS1Dev()" in dev
-    assert "patch=525" in index
-    assert "DEV · 525" in index
+    assert "patch=526" in index
+    assert "DEV · 526" in index
     print("V501 order-independent Canvas viewport contract passed.")
 
 
 if __name__ == "__main__":
     main()
-

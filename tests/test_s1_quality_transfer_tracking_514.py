@@ -23,7 +23,7 @@ def main():
         "transfer completion writes a row": "s1_instructor_plan_analysis_complete" in shared,
         "dedicated proxy contract exists": "promptcraft_s1_transfer_plan_analysis_v1" in proxy,
         "runtime synchronized": "s1_instructor_plan_analysis_complete" in bundle,
-        "deployment marker advanced": "patch=525" in index and "DEV · 525" in index,
+        "deployment marker advanced": "patch=526" in index and "DEV · 526" in index,
     }
     failures = [name for name, passed in checks.items() if not passed]
     if failures:

@@ -14,19 +14,9 @@ let pcAnalysisLayoutSettleTimer = 0;
 let pcAnalysisLayoutFontTimer = 0;
 let pcAnalysisLayoutGeneration = 0;
 
-function pcAnalysisViewportWidth() {
-  const values = [
-    window.innerWidth,
-    document.documentElement ? document.documentElement.clientWidth : null,
-    window.visualViewport ? window.visualViewport.width : null
-  ].filter((value) => Number.isFinite(value) && value > 0);
-
-  return values.length ? Math.min(...values) : 9999;
-}
-
 // [COMPLETED ANALYSIS: BREAKPOINT OWNER]
 function pcGetAnalysisLayout() {
-  const width = pcAnalysisViewportWidth();
+  const width = pcGetViewportWidth();
   const height = pcViewportHeight();
   // v336: Keep phones on the framed panel, but let tablet and fold portrait
   // screens graduate to the photographed workstation so the completed
@@ -236,7 +226,5 @@ function pcClearAnalysisLayout() {
 
 if (!window.pcAnalysisLayoutInstalled) {
   window.pcAnalysisLayoutInstalled = true;
-  window.addEventListener('resize', pcScheduleAnalysisLayout, { passive: true });
-  window.addEventListener('orientationchange', pcScheduleAnalysisLayout, { passive: true });
-  window.visualViewport?.addEventListener('resize', pcScheduleAnalysisLayout, { passive: true });
+  pcSubscribeViewport('completed-analysis', () => pcApplyAnalysisLayout());
 }

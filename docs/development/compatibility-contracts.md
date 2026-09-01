@@ -9,7 +9,7 @@ These contracts are intentionally preserved while PromptCraft is refactored and 
 - Apps Script receiver: `V83` (supplied source preserved unchanged)
 - Apps Script deployment: existing configured deployment URL
 - Current asset manifest: `v149`
-- Current browser/cache revision: `525`
+- Current browser/cache revision: `526`
 - Current repository baseline revision: `524`
 - Scenario result tabs retain full narrative text; Process Log remains abbreviated by design
 
@@ -51,6 +51,14 @@ S5+ development begins.
 - Babbage report exits explicitly distinguish VN handoffs from application/workspace handoffs.
 - Completed Babbage analysis retains the CRT visual identity; surrounding controls use the current PromptCraft/GFC UI system.
 - Source and generated runtime files must remain synchronized through `tools/build.py`.
+
+## Viewport ownership
+
+- `src/js/ui/viewport-controller.js` is the application-wide owner of viewport dimensions, viewport families, resize/orientation listeners, and subscriber notification.
+- Responsive consumers subscribe by behavior name and retain ownership of their own DOM changes.
+- Device emulation keeps the prior minimum-of-inner-and-screen sizing policy for S1 Canvas evidence and cast placement.
+- The S1 Read Size defaults keep the exact documented device-profile table.
+- The standalone Ideas Wall page retains its page-local resize listener because it does not load the main application bundle.
 
 ## Teaching progression
 

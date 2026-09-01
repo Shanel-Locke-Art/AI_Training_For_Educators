@@ -53,7 +53,7 @@ function positionBabbageAnalyzingReadout() {
   const cursors = outputEl?.querySelectorAll('.babbage-terminal-cursor') || [];
   if (!terminal || !outputEl || !screen || !readout || !panel) return false;
 
-  const viewportWidth = pcAnalysisViewportWidth();
+  const viewportWidth = pcGetViewportWidth();
   const mode = pcGetLiveAnalysisMode(viewportWidth);
   const screenRect = screen.getBoundingClientRect();
   const screenPixelWidth = Math.max(1, screenRect.width || 320);
@@ -587,7 +587,7 @@ function pcApplyLiveAnalyzingLayout() {
     return false;
   }
 
-  const viewportWidth = pcAnalysisViewportWidth();
+  const viewportWidth = pcGetViewportWidth();
   const mode = pcGetLiveAnalysisMode(viewportWidth);
   if (mode !== pcLiveAnalysisMode) {
     overlay.classList.remove(...PC_LIVE_ANALYSIS_CLASSES);
@@ -641,9 +641,7 @@ function pcScheduleLiveAnalyzingLayout({ immediate = false } = {}) {
 
 if (!window.pcLiveAnalyzingLayoutInstalled) {
   window.pcLiveAnalyzingLayoutInstalled = true;
-  window.addEventListener('resize', pcScheduleLiveAnalyzingLayout, { passive: true });
-  window.addEventListener('orientationchange', pcScheduleLiveAnalyzingLayout, { passive: true });
-  window.visualViewport?.addEventListener('resize', pcScheduleLiveAnalyzingLayout, { passive: true });
+  pcSubscribeViewport('live-analysis', () => pcApplyLiveAnalyzingLayout());
   document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.getElementById('vnOverlay');
     const terminal = document.getElementById('babbageTerminalScene');
@@ -819,4 +817,3 @@ window.pcMarkBabbageResponseReceived = pcMarkBabbageResponseReceived;
 window.pcMarkBabbageResponseParsed = pcMarkBabbageResponseParsed;
 window.pcCompleteBabbageAnalysisProgress = pcCompleteBabbageAnalysisProgress;
 window.pcFailBabbageAnalysisProgress = pcFailBabbageAnalysisProgress;
-

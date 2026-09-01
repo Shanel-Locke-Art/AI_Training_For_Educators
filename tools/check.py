@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 QUICK_CHECKS = (
     ("Source/runtime synchronization", [sys.executable, "tools/build.py", "--check"]),
     ("Phase 2 module ownership and current S1 route", [sys.executable, "tests/test_phase2_module_ownership.py"]),
+    ("Viewport controller 526 metrics and subscribers", ["node", "tests/test_viewport_controller_526.js"]),
     ("Apps Script receiver V83 characterization fixtures", ["node", "tests/test_receiver_v83_fixture.js"]),
     ("Structural hardening", [sys.executable, "tools/validate.py"]),
     ("S1 Canvas evidence assets", [sys.executable, "tests/test_s1_canvas_evidence_assets.py"]),

@@ -58,8 +58,8 @@ def main() -> None:
     ):
         assert token in responsive
 
-    assert "patch=525" in index
-    assert "DEV · 525" in index
+    assert "patch=526" in index
+    assert "DEV · 526" in index
     print("V518 reset, introduction evidence, and modal readability contract passed.")
 
 

@@ -491,6 +491,183 @@ function startGame() {
   openMainMenu('home', { initial: true });
 }
 ;
+/* SOURCE: src/js/ui/viewport-controller.js */
+/* PROMPTCRAFT VIEWPORT CONTROLLER
+   Owns viewport measurements, viewport-family classification, exact device
+   profile matching, and the application's single resize/orientation pipeline. */
+
+const PC_VIEWPORT_SUBSCRIBERS = new Map();
+let pcViewportUpdateFrame = 0;
+let pcViewportRevision = 0;
+
+function pcPositiveViewportValue(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 ? number : null;
+}
+
+function pcSmallestViewportValue(values, fallback = 0) {
+  const usable = values.map(pcPositiveViewportValue).filter(value => value !== null);
+  return usable.length ? Math.min(...usable) : fallback;
+}
+
+function pcGetViewportMetrics() {
+  const innerWidth = pcPositiveViewportValue(window.innerWidth);
+  const innerHeight = pcPositiveViewportValue(window.innerHeight);
+  const clientWidth = pcPositiveViewportValue(document.documentElement?.clientWidth);
+  const clientHeight = pcPositiveViewportValue(document.documentElement?.clientHeight);
+  const visualWidth = pcPositiveViewportValue(window.visualViewport?.width);
+  const visualHeight = pcPositiveViewportValue(window.visualViewport?.height);
+  const screenWidth = pcPositiveViewportValue(window.screen?.width);
+  const screenHeight = pcPositiveViewportValue(window.screen?.height);
+
+  const fallbackWidth = innerWidth || clientWidth || visualWidth || screenWidth || 0;
+  const fallbackHeight = innerHeight || clientHeight || visualHeight || screenHeight || 0;
+  const layoutWidth = pcSmallestViewportValue(
+    [innerWidth, clientWidth, visualWidth],
+    fallbackWidth
+  );
+  const layoutHeight = pcSmallestViewportValue(
+    [innerHeight, clientHeight, visualHeight],
+    fallbackHeight
+  );
+
+  // DevTools device emulation can report a scaled inner viewport that is
+  // larger than the selected screen. Preserve the smaller emulated dimension.
+  const emulatedWidth = pcSmallestViewportValue(
+    [innerWidth, screenWidth || innerWidth],
+    fallbackWidth
+  );
+  const emulatedHeight = pcSmallestViewportValue(
+    [innerHeight, screenHeight || innerHeight],
+    fallbackHeight
+  );
+
+  // Full-size evidence previously bounded itself by inner, visual, and screen
+  // dimensions. Keep that exact policy named rather than re-deriving it.
+  const modalWidth = pcSmallestViewportValue(
+    [innerWidth, visualWidth || innerWidth, screenWidth || innerWidth],
+    fallbackWidth
+  );
+  const modalHeight = pcSmallestViewportValue(
+    [innerHeight, visualHeight || innerHeight, screenHeight || innerHeight],
+    fallbackHeight
+  );
+
+  return Object.freeze({
+    revision: pcViewportRevision,
+    innerWidth,
+    innerHeight,
+    clientWidth,
+    clientHeight,
+    visualWidth,
+    visualHeight,
+    screenWidth,
+    screenHeight,
+    layoutWidth,
+    layoutHeight,
+    emulatedWidth,
+    emulatedHeight,
+    modalWidth,
+    modalHeight,
+    maxDocumentWidth: Math.max(innerWidth || 0, clientWidth || 0) || layoutWidth,
+    maxDocumentHeight: Math.max(innerHeight || 0, clientHeight || 0) || layoutHeight,
+    preferredWidth: visualWidth || clientWidth || innerWidth || 1920,
+    preferredHeight: visualHeight || clientHeight || innerHeight || 1080,
+    screenReportWidth: innerWidth || screenWidth,
+    reportedWidth: innerWidth || clientWidth || screenWidth || '',
+    exactSizeCandidates: Object.freeze([
+      Object.freeze([screenWidth, screenHeight]),
+      Object.freeze([innerWidth, innerHeight]),
+      Object.freeze([clientWidth, clientHeight])
+    ])
+  });
+}
+
+function pcViewportHeight(metrics = pcGetViewportMetrics()) {
+  return metrics.layoutHeight || window.innerHeight;
+}
+
+function pcGetViewportWidth(metrics = pcGetViewportMetrics()) {
+  return metrics.layoutWidth || window.innerWidth;
+}
+
+function pcGetViewportFamily(metrics = pcGetViewportMetrics()) {
+  const width = pcGetViewportWidth(metrics);
+  const height = pcViewportHeight(metrics);
+  const aspectRatio = width / Math.max(height, 1);
+
+  // Width participates before height so a 1024 × 600 display is not treated
+  // as a phone and given phone smartboard geometry.
+  if (width >= 760 && height <= 720) return 'short-landscape';
+  if (width <= 380 || (width <= 560 && height <= 720)) return 'compact-phone';
+  if (width <= 560) return 'standard-phone';
+  if (width <= 1100 && aspectRatio < 0.9) return 'portrait-tablet';
+  if (width <= 1400 && height <= 950) return 'compact-desktop';
+  return 'desktop';
+}
+
+function pcApplyViewportFamily(metrics = pcGetViewportMetrics()) {
+  const family = pcGetViewportFamily(metrics);
+  const html = document.documentElement;
+  const body = document.body;
+  const overlay = document.getElementById('vnOverlay');
+
+  if (html) html.dataset.pcViewportFamily = family;
+  if (body) body.dataset.pcViewportFamily = family;
+  if (overlay) overlay.dataset.pcViewportFamily = family;
+  return family;
+}
+
+function pcViewportMatchesExactProfiles(profiles = [], metrics = pcGetViewportMetrics()) {
+  return profiles.some(([profileWidth, profileHeight]) =>
+    metrics.exactSizeCandidates.some(([width, height]) =>
+      Math.round(Number(width)) === profileWidth && Math.round(Number(height)) === profileHeight
+    )
+  );
+}
+
+function pcSubscribeViewport(name, callback, { immediate = false } = {}) {
+  const key = String(name || '').trim();
+  if (!key || typeof callback !== 'function') return () => {};
+  PC_VIEWPORT_SUBSCRIBERS.set(key, callback);
+  if (immediate) pcScheduleViewportUpdate();
+  return () => PC_VIEWPORT_SUBSCRIBERS.delete(key);
+}
+
+function pcDispatchViewportUpdate() {
+  pcViewportRevision += 1;
+  const metrics = pcGetViewportMetrics();
+  pcApplyViewportFamily(metrics);
+  PC_VIEWPORT_SUBSCRIBERS.forEach((callback, name) => {
+    try {
+      callback(metrics);
+    } catch (error) {
+      console.error(`[PromptCraft] viewport subscriber failed: ${name}`, error);
+    }
+  });
+  return metrics;
+}
+
+function pcScheduleViewportUpdate() {
+  if (pcViewportUpdateFrame) cancelAnimationFrame(pcViewportUpdateFrame);
+  pcViewportUpdateFrame = requestAnimationFrame(() => {
+    pcViewportUpdateFrame = 0;
+    pcDispatchViewportUpdate();
+  });
+}
+
+if (!window.pcViewportControllerInstalled) {
+  window.pcViewportControllerInstalled = true;
+  window.addEventListener('resize', pcScheduleViewportUpdate, { passive: true });
+  window.addEventListener('orientationchange', pcScheduleViewportUpdate, { passive: true });
+  window.visualViewport?.addEventListener('resize', pcScheduleViewportUpdate, { passive: true });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', pcScheduleViewportUpdate, { once: true });
+  } else {
+    pcScheduleViewportUpdate();
+  }
+}
+;
 /* SOURCE: src/js/app/config-and-assets.js */
 // ══════════════════════════════════════════════════════
 //  SURVEY CONFIGURATION
@@ -854,7 +1031,7 @@ window.testSheetsPing = function testSheetsPing() {
     quality_indicators_lit: '',
     self_report_prediction: '',
     time_since_last_attempt_sec: '',
-    screen_width: window.innerWidth || window.screen.width,
+    screen_width: pcGetViewportMetrics().screenReportWidth,
     event_type: 'browser_connection_test_complete',
     session_id: pcSessionId,
     notes_coding_memo: location.href
@@ -1027,7 +1204,7 @@ function getPromptCraftScenarioLabel(scenarioIdx) {
 }
 
 function getPromptCraftViewportWidth() {
-  return window.innerWidth || document.documentElement.clientWidth || window.screen.width || '';
+  return pcGetViewportMetrics().reportedWidth;
 }
 
 
@@ -2235,13 +2412,13 @@ function pcRestoreS1ResponsiveCapture(panel, evidence) {
   return true;
 }
 
-function pcApplyS1DocumentedCaptureFit(panel, evidence) {
+function pcApplyS1DocumentedCaptureFit(panel, evidence, metrics = pcGetViewportMetrics()) {
   if (!pcRestoreS1ResponsiveCapture(panel, evidence)) return false;
   // Device emulation may scale the page to 50%/75%, which can make innerWidth
   // larger than the selected device profile. Use the smaller emulated-screen
   // dimension so these documented fits remain stable at every preview scale.
-  const width = Math.min(window.innerWidth, window.screen?.width || window.innerWidth);
-  const height = Math.min(window.innerHeight, window.screen?.height || window.innerHeight);
+  const width = metrics.emulatedWidth;
+  const height = metrics.emulatedHeight;
   const isShortPhone = width <= 390 && height <= 700 && height > width;
   const isPortraitTablet = width >= 740 && width <= 1040 && height >= 1000 && height > width;
   const isNestHub = width >= 980 && width <= 1060 && height <= 650 && width > height;
@@ -2287,16 +2464,21 @@ function pcApplyS1DocumentedCaptureFit(panel, evidence) {
   return true;
 }
 
-function pcRefreshS1CanvasEvidenceLayout() {
+function pcRefreshS1CanvasEvidenceLayout({
+  metrics = pcGetViewportMetrics(),
+  deferCastUpdate = true
+} = {}) {
   const panel = document.getElementById('pcS1MobileEvidenceLens');
   const evidence = panel?._pcS1Evidence;
   if (!panel || !evidence || !panel.classList.contains('pc-s1-mobile-evidence-lens--real-capture')) {
     return false;
   }
-  pcApplyS1DocumentedCaptureFit(panel, evidence);
-  requestAnimationFrame(() => {
-    if (typeof pcUpdateS1PhoneCastRoom === 'function') pcUpdateS1PhoneCastRoom();
-  });
+  pcApplyS1DocumentedCaptureFit(panel, evidence, metrics);
+  const updateCastRoom = () => {
+    if (typeof pcUpdateS1PhoneCastRoom === 'function') pcUpdateS1PhoneCastRoom(metrics);
+  };
+  if (deferCastUpdate) requestAnimationFrame(updateCastRoom);
+  else updateCastRoom();
   return true;
 }
 
@@ -2977,14 +3159,7 @@ const PC_S1_READ_SIZE_VIEWPORTS = Object.freeze([
 ]);
 
 function pcGetS1EvidenceDefaultZoom() {
-  const viewportSizes = [
-    [window.screen?.width, window.screen?.height],
-    [window.innerWidth, window.innerHeight],
-    [document.documentElement?.clientWidth, document.documentElement?.clientHeight],
-  ].map(([width, height]) => [Math.round(Number(width)), Math.round(Number(height))]);
-  const useReadSize = PC_S1_READ_SIZE_VIEWPORTS.some(([profileWidth, profileHeight]) =>
-    viewportSizes.some(([width, height]) => width === profileWidth && height === profileHeight)
-  );
+  const useReadSize = pcViewportMatchesExactProfiles(PC_S1_READ_SIZE_VIEWPORTS);
   return useReadSize ? 'read' : 'fit';
 }
 
@@ -3006,22 +3181,13 @@ function pcHandleS1EvidenceModalKeydown(event) {
   }
 }
 
-function pcRefreshS1EvidenceModalLayout() {
+function pcRefreshS1EvidenceModalLayout(metrics = pcGetViewportMetrics()) {
   const modal = document.getElementById('pcS1EvidenceModal');
   const evidence = modal?._pcS1Evidence;
   const image = document.getElementById('pcS1EvidenceModalImage');
   if (!modal || !evidence || !image) return false;
 
-  const width = Math.min(
-    window.innerWidth,
-    window.visualViewport?.width || window.innerWidth,
-    window.screen?.width || window.innerWidth
-  );
-  const height = Math.min(
-    window.innerHeight,
-    window.visualViewport?.height || window.innerHeight,
-    window.screen?.height || window.innerHeight
-  );
+  const width = metrics.modalWidth;
   const usePhoneLayout = width <= 560;
   const source = usePhoneLayout
     ? (evidence.mobileSrc || evidence.compactSrc || evidence.smartboardSrc || evidence.src)
@@ -3068,14 +3234,7 @@ function pcSetS1EvidenceModalZoom(mode = 'read', { userSelected = true } = {}) {
   return true;
 }
 
-let pcS1EvidenceModalResizeFrame = 0;
-function pcScheduleS1EvidenceModalLayout() {
-  cancelAnimationFrame(pcS1EvidenceModalResizeFrame);
-  pcS1EvidenceModalResizeFrame = requestAnimationFrame(pcRefreshS1EvidenceModalLayout);
-}
-
-window.addEventListener('resize', pcScheduleS1EvidenceModalLayout, { passive: true });
-window.visualViewport?.addEventListener('resize', pcScheduleS1EvidenceModalLayout, { passive: true });
+pcSubscribeViewport('s1-evidence-modal', metrics => pcRefreshS1EvidenceModalLayout(metrics));
 
 function pcOpenS1EvidenceModal() {
   const item = PC_S1_PREVIEW_CASES[pcS1PreviewCaseIndex];
@@ -8777,53 +8936,6 @@ pcRegisterUIActions({
 //  several contradictory opinions about its own dimensions.
 // ══════════════════════════════════════════════════════
 
-// [LAYOUT METRICS]
-function pcViewportHeight() {
-  const values = [
-    window.innerHeight,
-    document.documentElement?.clientHeight,
-    window.visualViewport?.height
-  ].filter((value) => Number.isFinite(value) && value > 0);
-
-  return values.length ? Math.min(...values) : window.innerHeight;
-}
-
-function pcGetViewportWidth() {
-  const values = [
-    window.innerWidth,
-    document.documentElement?.clientWidth,
-    window.visualViewport?.width
-  ].filter((value) => Number.isFinite(value) && value > 0);
-
-  return values.length ? Math.min(...values) : window.innerWidth;
-}
-
-function pcGetViewportFamily() {
-  const width = pcGetViewportWidth();
-  const height = pcViewportHeight();
-  const aspectRatio = width / Math.max(height, 1);
-
-  // Width has to participate before height. Otherwise a 1024 × 600 display
-  // is mistaken for a phone and receives a nearly 100vw smartboard.
-  if (width >= 760 && height <= 720) return 'short-landscape';
-  if (width <= 380 || (width <= 560 && height <= 720)) return 'compact-phone';
-  if (width <= 560) return 'standard-phone';
-  if (width <= 1100 && aspectRatio < 0.9) return 'portrait-tablet';
-  if (width <= 1400 && height <= 950) return 'compact-desktop';
-  return 'desktop';
-}
-
-function pcApplyViewportFamily() {
-  const family = pcGetViewportFamily();
-  const html = document.documentElement;
-  const body = document.body;
-  const overlay = document.getElementById('vnOverlay');
-
-  if (html) html.dataset.pcViewportFamily = family;
-  if (body) body.dataset.pcViewportFamily = family;
-  if (overlay) overlay.dataset.pcViewportFamily = family;
-}
-
 // [WORKSTATION FRAME]
 // v159: Capture the prediction computer relative to the VN scene, not the
 // browser viewport. The terminal is absolutely positioned inside #vnScene, so
@@ -8945,11 +9057,11 @@ function pcResetVNDialogueState() {
   dialogue.setAttribute('aria-label', `${speaker} is speaking. Press Space or Enter to continue.`);
 }
 
-function pcApplyIpadLayout(){
+function pcApplyIpadLayout(metrics = pcGetViewportMetrics()){
   if (typeof pcIsAnalysisReportActive === 'function' && pcIsAnalysisReportActive()) return;
 
-  const viewportWidth = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0);
-  const viewportHeight = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+  const viewportWidth = metrics.maxDocumentWidth;
+  const viewportHeight = metrics.maxDocumentHeight;
   const isIpadViewport = viewportWidth >= 768 && viewportWidth <= 1180 && viewportHeight >= 900;
   const menuOverlay = document.getElementById('mainMenuOverlay');
   const menuShell = menuOverlay?.querySelector('.pc-main-menu-shell');
@@ -9085,16 +9197,15 @@ function pcScheduleResponsiveChrome() {
   if (pcResponsiveChromeFrame) cancelAnimationFrame(pcResponsiveChromeFrame);
   pcResponsiveChromeFrame = requestAnimationFrame(() => {
     pcResponsiveChromeFrame = 0;
-    pcApplyViewportFamily();
-    pcApplyIpadLayout();
+    const metrics = pcGetViewportMetrics();
+    pcApplyViewportFamily(metrics);
+    pcApplyIpadLayout(metrics);
   });
 }
 
 if (!window.pcIpadLayoutInstalled) {
   window.pcIpadLayoutInstalled = true;
-  window.addEventListener('resize', pcScheduleResponsiveChrome, { passive: true });
-  window.addEventListener('orientationchange', pcScheduleResponsiveChrome, { passive: true });
-  window.visualViewport?.addEventListener('resize', pcScheduleResponsiveChrome, { passive: true });
+  pcSubscribeViewport('responsive-chrome', metrics => pcApplyIpadLayout(metrics));
   document.addEventListener('DOMContentLoaded', () => {
     pcScheduleResponsiveChrome();
     const overlay = document.getElementById('vnOverlay');
@@ -9484,7 +9595,7 @@ function pcFitWideAnalysisReport(screen) {
 
   const screenRect = screen.getBoundingClientRect();
   const clampNumber = (min, value, max) => Math.max(min, Math.min(max, value));
-  const viewportWidth = pcAnalysisViewportWidth();
+  const viewportWidth = pcGetViewportWidth();
   const viewportHeight = pcViewportHeight();
   // v329: Short landscape workstation displays (notably Nest Hub Max) have a
   // physically wide monitor even though the measured glass can land just below
@@ -10266,7 +10377,7 @@ function pcApplyWideAnalysisReportComputer(terminal, photo, screen, viewportHeig
   const overlay = document.getElementById('vnOverlay');
   const scene = document.getElementById('vnScene');
   const sceneBg = document.getElementById('vnSceneBg');
-  const viewportWidth = pcAnalysisViewportWidth();
+  const viewportWidth = pcGetViewportWidth();
   const safeViewportHeight = Number.isFinite(viewportHeight) && viewportHeight > 0
     ? viewportHeight
     : pcViewportHeight();
@@ -10421,7 +10532,7 @@ function pcAlignModernTerminalScreen() {
     !overlay.classList.contains('babbage-terminal-textmode');
   const analysisOpen = overlay.classList.contains('babbage-terminal-textmode') &&
     output?.classList.contains('babbage-analysis-layout');
-  const viewportWidth = pcAnalysisViewportWidth();
+  const viewportWidth = pcGetViewportWidth();
   const viewportHeight = pcViewportHeight();
   const isIpadConsultThinking = consultThinking &&
     viewportWidth >= 768 && viewportWidth <= 1180 && viewportHeight >= 900;
@@ -10523,9 +10634,7 @@ function pcQueueModernTerminalAlignment() {
 
 if (!window.pcModernTerminalAlignmentInstalled) {
   window.pcModernTerminalAlignmentInstalled = true;
-  window.addEventListener('resize', pcQueueModernTerminalAlignment, { passive: true });
-  window.addEventListener('orientationchange', pcQueueModernTerminalAlignment, { passive: true });
-  window.visualViewport?.addEventListener('resize', pcQueueModernTerminalAlignment, { passive: true });
+  pcSubscribeViewport('modern-terminal-alignment', () => pcAlignModernTerminalScreen());
 }
 ;
 /* SOURCE: src/js/ui/live-analysis-layout.js */
@@ -10584,7 +10693,7 @@ function positionBabbageAnalyzingReadout() {
   const cursors = outputEl?.querySelectorAll('.babbage-terminal-cursor') || [];
   if (!terminal || !outputEl || !screen || !readout || !panel) return false;
 
-  const viewportWidth = pcAnalysisViewportWidth();
+  const viewportWidth = pcGetViewportWidth();
   const mode = pcGetLiveAnalysisMode(viewportWidth);
   const screenRect = screen.getBoundingClientRect();
   const screenPixelWidth = Math.max(1, screenRect.width || 320);
@@ -11118,7 +11227,7 @@ function pcApplyLiveAnalyzingLayout() {
     return false;
   }
 
-  const viewportWidth = pcAnalysisViewportWidth();
+  const viewportWidth = pcGetViewportWidth();
   const mode = pcGetLiveAnalysisMode(viewportWidth);
   if (mode !== pcLiveAnalysisMode) {
     overlay.classList.remove(...PC_LIVE_ANALYSIS_CLASSES);
@@ -11172,9 +11281,7 @@ function pcScheduleLiveAnalyzingLayout({ immediate = false } = {}) {
 
 if (!window.pcLiveAnalyzingLayoutInstalled) {
   window.pcLiveAnalyzingLayoutInstalled = true;
-  window.addEventListener('resize', pcScheduleLiveAnalyzingLayout, { passive: true });
-  window.addEventListener('orientationchange', pcScheduleLiveAnalyzingLayout, { passive: true });
-  window.visualViewport?.addEventListener('resize', pcScheduleLiveAnalyzingLayout, { passive: true });
+  pcSubscribeViewport('live-analysis', () => pcApplyLiveAnalyzingLayout());
   document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.getElementById('vnOverlay');
     const terminal = document.getElementById('babbageTerminalScene');
@@ -11368,19 +11475,9 @@ let pcAnalysisLayoutSettleTimer = 0;
 let pcAnalysisLayoutFontTimer = 0;
 let pcAnalysisLayoutGeneration = 0;
 
-function pcAnalysisViewportWidth() {
-  const values = [
-    window.innerWidth,
-    document.documentElement ? document.documentElement.clientWidth : null,
-    window.visualViewport ? window.visualViewport.width : null
-  ].filter((value) => Number.isFinite(value) && value > 0);
-
-  return values.length ? Math.min(...values) : 9999;
-}
-
 // [COMPLETED ANALYSIS: BREAKPOINT OWNER]
 function pcGetAnalysisLayout() {
-  const width = pcAnalysisViewportWidth();
+  const width = pcGetViewportWidth();
   const height = pcViewportHeight();
   // v336: Keep phones on the framed panel, but let tablet and fold portrait
   // screens graduate to the photographed workstation so the completed
@@ -11590,9 +11687,7 @@ function pcClearAnalysisLayout() {
 
 if (!window.pcAnalysisLayoutInstalled) {
   window.pcAnalysisLayoutInstalled = true;
-  window.addEventListener('resize', pcScheduleAnalysisLayout, { passive: true });
-  window.addEventListener('orientationchange', pcScheduleAnalysisLayout, { passive: true });
-  window.visualViewport?.addEventListener('resize', pcScheduleAnalysisLayout, { passive: true });
+  pcSubscribeViewport('completed-analysis', () => pcApplyAnalysisLayout());
 }
 ;
 /* SOURCE: src/js/ui/babbage-terminal.js */
@@ -12406,7 +12501,7 @@ function pcRenderVNCast({ cast = [], speaker = 'pixel', expression = 'neutral' }
   // clears earlier inline layout state when expressions or speakers change.
   const compactS1Evidence = Boolean(
     overlay?.classList.contains('pc-s1-mobile-evidence-reader')
-    && window.matchMedia?.('(max-width: 1100px)').matches
+    && pcGetViewportWidth() <= 1100
   );
   const compactS1HasCastRoom = Boolean(
     compactS1Evidence && overlay?.classList.contains('pc-s1-phone-cast-room')
@@ -12429,12 +12524,9 @@ function pcRenderVNCast({ cast = [], speaker = 'pixel', expression = 'neutral' }
   return true;
 }
 
-function pcUpdateS1PhoneCastRoom() {
+function pcUpdateS1PhoneCastRoom(metrics = pcGetViewportMetrics()) {
   const overlay = document.getElementById('vnOverlay');
-  const screenWidth = Math.min(
-    window.innerWidth,
-    window.screen?.width || window.innerWidth
-  );
+  const screenWidth = metrics.emulatedWidth;
   const eligible = Boolean(
     overlay?.classList.contains('pc-s1-mobile-evidence-reader')
     && screenWidth <= 1100
@@ -12454,7 +12546,7 @@ function pcUpdateS1PhoneCastRoom() {
     overlay.style.removeProperty('--pc-s1-cast-top');
     overlay.style.setProperty(
       '--pc-s1-cast-bottom',
-      `${Math.max(0, window.innerHeight - dialogueRect.top + 4)}px`
+      `${Math.max(0, (metrics.innerHeight || metrics.layoutHeight) - dialogueRect.top + 4)}px`
     );
     overlay.style.setProperty('--pc-s1-cast-height', `${castHeight}px`);
   } else {
@@ -12490,8 +12582,11 @@ function pcScheduleS1CastRoomUpdate() {
   });
 }
 
-window.addEventListener('resize', pcScheduleS1CastRoomUpdate, { passive: true });
-window.visualViewport?.addEventListener('resize', pcScheduleS1CastRoomUpdate, { passive: true });
+pcSubscribeViewport('s1-cast-room', metrics => {
+  if (typeof window.pcRefreshS1CanvasEvidenceLayout === 'function'
+      && window.pcRefreshS1CanvasEvidenceLayout({ metrics, deferCastUpdate: false })) return;
+  pcUpdateS1PhoneCastRoom(metrics);
+});
 
 
 
@@ -14291,22 +14386,12 @@ function pcPredictionIsOpen(){
 // v191: Authoritative prediction presentation. The responsive prediction
 // layout is rebuilt dynamically, so the JavaScript that creates it also owns
 // the final grid width, spacing, portrait offset, and hidden expression badge.
-function pcPredictionViewportWidth(){
-  return Math.round(
-    window.visualViewport?.width ||
-    document.documentElement?.clientWidth ||
-    window.innerWidth ||
-    1920
-  );
+function pcPredictionViewportWidth(metrics = pcGetViewportMetrics()){
+  return Math.round(metrics.preferredWidth);
 }
 
-function pcPredictionViewportHeight(){
-  return Math.round(
-    window.visualViewport?.height ||
-    document.documentElement?.clientHeight ||
-    window.innerHeight ||
-    1080
-  );
+function pcPredictionViewportHeight(metrics = pcGetViewportMetrics()){
+  return Math.round(metrics.preferredHeight);
 }
 
 function pcClearPredictionPresentation(){
@@ -14454,10 +14539,10 @@ function pcFitPredictionDialogue(viewportWidth){
 }
 
 // [PREDICTION DIALOGUE: RESPONSIVE PRESENTATION]
-function pcApplyPredictionPresentation(){
+function pcApplyPredictionPresentation(metrics = pcGetViewportMetrics()){
   if (!pcPredictionIsOpen()) return false;
 
-  const viewportWidth = pcPredictionViewportWidth();
+  const viewportWidth = pcPredictionViewportWidth(metrics);
   const overlay = document.getElementById('vnOverlay');
   const isPredictionResult = !!overlay?.classList.contains('pc-prediction-result');
   const output = document.getElementById('babbageTerminalOutput');
@@ -14473,7 +14558,7 @@ function pcApplyPredictionPresentation(){
   const terminal = document.getElementById('babbageTerminalScene');
   const terminalPhoto = terminal?.querySelector('.babbage-terminal-photo');
   const terminalScreen = terminal?.querySelector('.babbage-terminal-screen');
-  const viewportHeight = pcPredictionViewportHeight();
+  const viewportHeight = pcPredictionViewportHeight(metrics);
   const isPhonePrediction = viewportWidth <= 700;
   const isCompactPrediction = viewportWidth > 700 && viewportWidth <= 1510;
   const isLargePortraitPrediction = Boolean(
@@ -15158,9 +15243,7 @@ function pcSchedulePredictionPresentation(){
 
 if (!window.pcPredictionPresentationInstalled) {
   window.pcPredictionPresentationInstalled = true;
-  window.addEventListener('resize', pcSchedulePredictionPresentation, { passive: true });
-  window.addEventListener('orientationchange', pcSchedulePredictionPresentation, { passive: true });
-  window.visualViewport?.addEventListener('resize', pcSchedulePredictionPresentation, { passive: true });
+  pcSubscribeViewport('prediction-presentation', metrics => pcApplyPredictionPresentation(metrics));
 }
 
 window.pcApplyPredictionPresentation = pcApplyPredictionPresentation;

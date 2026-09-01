@@ -18,14 +18,14 @@ def main() -> None:
     index = read("index.html")
 
     for token in (
-        "function pcRefreshS1EvidenceModalLayout()",
+        "function pcRefreshS1EvidenceModalLayout(metrics = pcGetViewportMetrics())",
         "width <= 560",
         "evidence.mobileSrc",
         ": evidence.src;",
         "pc-s1-evidence-modal--${mode}-capture",
         "image.dataset.pcModalSource",
         "modal._pcS1Evidence = evidence",
-        "window.visualViewport?.addEventListener('resize', pcScheduleS1EvidenceModalLayout",
+        "pcSubscribeViewport('s1-evidence-modal'",
         "pcRefreshS1EvidenceModalLayout();",
     ):
         assert token in shared
@@ -47,8 +47,8 @@ def main() -> None:
 
     assert "data-pc-action=\"s1-close-evidence-modal\"" in shared
     assert "pcHandleS1EvidenceModalKeydown" in shared
-    assert "patch=525" in index
-    assert "DEV · 525" in index
+    assert "patch=526" in index
+    assert "DEV · 526" in index
     print("V503 responsive full-size Canvas-evidence modal contract passed.")
 
 

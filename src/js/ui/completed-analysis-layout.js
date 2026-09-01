@@ -159,7 +159,7 @@ function pcFitWideAnalysisReport(screen) {
 
   const screenRect = screen.getBoundingClientRect();
   const clampNumber = (min, value, max) => Math.max(min, Math.min(max, value));
-  const viewportWidth = pcAnalysisViewportWidth();
+  const viewportWidth = pcGetViewportWidth();
   const viewportHeight = pcViewportHeight();
   // v329: Short landscape workstation displays (notably Nest Hub Max) have a
   // physically wide monitor even though the measured glass can land just below
@@ -941,7 +941,7 @@ function pcApplyWideAnalysisReportComputer(terminal, photo, screen, viewportHeig
   const overlay = document.getElementById('vnOverlay');
   const scene = document.getElementById('vnScene');
   const sceneBg = document.getElementById('vnSceneBg');
-  const viewportWidth = pcAnalysisViewportWidth();
+  const viewportWidth = pcGetViewportWidth();
   const safeViewportHeight = Number.isFinite(viewportHeight) && viewportHeight > 0
     ? viewportHeight
     : pcViewportHeight();
@@ -1096,7 +1096,7 @@ function pcAlignModernTerminalScreen() {
     !overlay.classList.contains('babbage-terminal-textmode');
   const analysisOpen = overlay.classList.contains('babbage-terminal-textmode') &&
     output?.classList.contains('babbage-analysis-layout');
-  const viewportWidth = pcAnalysisViewportWidth();
+  const viewportWidth = pcGetViewportWidth();
   const viewportHeight = pcViewportHeight();
   const isIpadConsultThinking = consultThinking &&
     viewportWidth >= 768 && viewportWidth <= 1180 && viewportHeight >= 900;
@@ -1198,7 +1198,5 @@ function pcQueueModernTerminalAlignment() {
 
 if (!window.pcModernTerminalAlignmentInstalled) {
   window.pcModernTerminalAlignmentInstalled = true;
-  window.addEventListener('resize', pcQueueModernTerminalAlignment, { passive: true });
-  window.addEventListener('orientationchange', pcQueueModernTerminalAlignment, { passive: true });
-  window.visualViewport?.addEventListener('resize', pcQueueModernTerminalAlignment, { passive: true });
+  pcSubscribeViewport('modern-terminal-alignment', () => pcAlignModernTerminalScreen());
 }

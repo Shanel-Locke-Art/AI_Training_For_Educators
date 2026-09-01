@@ -1,6 +1,6 @@
 # PromptCraft repository architecture
 
-This is the canonical repository map for `PROMPTCRAFT_V429` as represented by browser/cache patch 525 and Phase 0 repository baseline revision 524. Older flat/numeric layouts should not be reconstructed from memory.
+This is the canonical repository map for `PROMPTCRAFT_V429` as represented by browser/cache patch 526 and Phase 0 repository baseline revision 524. Older flat/numeric layouts should not be reconstructed from memory.
 
 ## Receiver and release ownership
 
@@ -62,6 +62,7 @@ src/js/
 │   ├── s2-metacognition.js
 │   └── s3-authentic-assessment.js
 └── ui/
+    ├── viewport-controller.js     # viewport metrics, families, listeners, and subscribers
     ├── visual-novel.js
     ├── workstation-layout.js
     ├── completed-analysis-layout.js
@@ -71,7 +72,7 @@ src/js/
     └── prediction-gate.js
 ```
 
-`src/js/manifest.json` defines bundle order and standalone source/runtime mappings. `tools/build.py` fails if a JavaScript source owner exists but is not declared in the manifest.
+`src/js/manifest.json` defines bundle order and standalone source/runtime mappings. `tools/build.py` fails if a JavaScript source owner exists but is not declared in the manifest. `ui/viewport-controller.js` loads before viewport consumers and is the sole application owner of window, screen, document, and visual viewport dimensions and resize/orientation listeners. The standalone Ideas Wall page retains its own resize behavior because it does not load the application bundle.
 
 Phase 2 separates the former 3,339-line mixed `shared-components.js` owner into three files without changing the executable statements: `shared-shell.js` owns the application-facing scenario shell, `s1-canvas-evidence.js` owns current S1 behavior, and `shared-components.js` contains only reusable activity builders. Shared navigation actions formerly appended to `s1-engagement.js` now belong to `app/action-routing.js`; development-only actions belong to `dev/development-tools.js`.
 

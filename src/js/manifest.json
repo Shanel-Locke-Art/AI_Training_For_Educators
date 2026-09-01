@@ -1,6 +1,7 @@
 {
   "bundle": [
     "app/runtime-state.js",
+    "ui/viewport-controller.js",
     "app/config-and-assets.js",
     "research/tracking.js",
     "audio/audio-engine.js",

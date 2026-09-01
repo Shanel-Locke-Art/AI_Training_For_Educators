@@ -136,7 +136,7 @@ function getPromptCraftScenarioLabel(scenarioIdx) {
 }
 
 function getPromptCraftViewportWidth() {
-  return window.innerWidth || document.documentElement.clientWidth || window.screen.width || '';
+  return pcGetViewportMetrics().reportedWidth;
 }
 
 

@@ -28,7 +28,7 @@ def main() -> None:
         assert token in runtime
 
     for token in (
-        "function pcUpdateS1PhoneCastRoom()",
+        "function pcUpdateS1PhoneCastRoom(metrics = pcGetViewportMetrics())",
         "dialogue.getBoundingClientRect().top - image.getBoundingClientRect().bottom",
         "const hasRoom = availableRoom >= 140",
         "pc-s1-phone-cast-room",
@@ -46,8 +46,8 @@ def main() -> None:
     assert "#vnCharacter#vnCharacter" in v497
     assert "/* V497" in runtime_css
 
-    assert "patch=525" in index
-    assert "DEV · 525" in index
+    assert "patch=526" in index
+    assert "DEV · 526" in index
     print("V497 centered-tablet and adaptive-phone-cast contract passed.")
 
 

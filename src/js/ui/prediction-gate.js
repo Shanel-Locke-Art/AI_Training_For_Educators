@@ -39,22 +39,12 @@ function pcPredictionIsOpen(){
 // v191: Authoritative prediction presentation. The responsive prediction
 // layout is rebuilt dynamically, so the JavaScript that creates it also owns
 // the final grid width, spacing, portrait offset, and hidden expression badge.
-function pcPredictionViewportWidth(){
-  return Math.round(
-    window.visualViewport?.width ||
-    document.documentElement?.clientWidth ||
-    window.innerWidth ||
-    1920
-  );
+function pcPredictionViewportWidth(metrics = pcGetViewportMetrics()){
+  return Math.round(metrics.preferredWidth);
 }
 
-function pcPredictionViewportHeight(){
-  return Math.round(
-    window.visualViewport?.height ||
-    document.documentElement?.clientHeight ||
-    window.innerHeight ||
-    1080
-  );
+function pcPredictionViewportHeight(metrics = pcGetViewportMetrics()){
+  return Math.round(metrics.preferredHeight);
 }
 
 function pcClearPredictionPresentation(){
@@ -202,10 +192,10 @@ function pcFitPredictionDialogue(viewportWidth){
 }
 
 // [PREDICTION DIALOGUE: RESPONSIVE PRESENTATION]
-function pcApplyPredictionPresentation(){
+function pcApplyPredictionPresentation(metrics = pcGetViewportMetrics()){
   if (!pcPredictionIsOpen()) return false;
 
-  const viewportWidth = pcPredictionViewportWidth();
+  const viewportWidth = pcPredictionViewportWidth(metrics);
   const overlay = document.getElementById('vnOverlay');
   const isPredictionResult = !!overlay?.classList.contains('pc-prediction-result');
   const output = document.getElementById('babbageTerminalOutput');
@@ -221,7 +211,7 @@ function pcApplyPredictionPresentation(){
   const terminal = document.getElementById('babbageTerminalScene');
   const terminalPhoto = terminal?.querySelector('.babbage-terminal-photo');
   const terminalScreen = terminal?.querySelector('.babbage-terminal-screen');
-  const viewportHeight = pcPredictionViewportHeight();
+  const viewportHeight = pcPredictionViewportHeight(metrics);
   const isPhonePrediction = viewportWidth <= 700;
   const isCompactPrediction = viewportWidth > 700 && viewportWidth <= 1510;
   const isLargePortraitPrediction = Boolean(
@@ -906,9 +896,7 @@ function pcSchedulePredictionPresentation(){
 
 if (!window.pcPredictionPresentationInstalled) {
   window.pcPredictionPresentationInstalled = true;
-  window.addEventListener('resize', pcSchedulePredictionPresentation, { passive: true });
-  window.addEventListener('orientationchange', pcSchedulePredictionPresentation, { passive: true });
-  window.visualViewport?.addEventListener('resize', pcSchedulePredictionPresentation, { passive: true });
+  pcSubscribeViewport('prediction-presentation', metrics => pcApplyPredictionPresentation(metrics));
 }
 
 window.pcApplyPredictionPresentation = pcApplyPredictionPresentation;

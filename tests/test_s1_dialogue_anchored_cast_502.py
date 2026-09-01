@@ -22,7 +22,7 @@ def main() -> None:
         "const hasRoom = availableRoom >= 140",
         "Math.min(150, availableRoom - 18)",
         "--pc-s1-cast-bottom",
-        "window.innerHeight - dialogueRect.top + 4",
+        "(metrics.innerHeight || metrics.layoutHeight) - dialogueRect.top + 4",
         "style.removeProperty('--pc-s1-cast-top')",
     ):
         assert token in vn
@@ -41,11 +41,10 @@ def main() -> None:
 
     assert "style.removeProperty('--pc-s1-cast-bottom')" in shared
     assert "function pcRestoreS1ResponsiveCapture(panel, evidence)" in shared
-    assert "patch=525" in index
-    assert "DEV · 525" in index
+    assert "patch=526" in index
+    assert "DEV · 526" in index
     print("V502 dialogue-anchored adaptive-cast contract passed.")
 
 
 if __name__ == "__main__":
     main()
-

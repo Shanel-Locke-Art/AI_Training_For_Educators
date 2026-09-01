@@ -22,14 +22,14 @@ def main() -> None:
     index = read("index.html")
 
     for token in (
-        "window.screen?.width || window.innerWidth",
+        "const screenWidth = metrics.emulatedWidth",
         "screenWidth <= 1100",
         "dialogue.getBoundingClientRect().top - image.getBoundingClientRect().bottom",
         "availableRoom >= 140",
         "--pc-s1-cast-top",
         "--pc-s1-cast-height",
         "pcScheduleS1CastRoomUpdate",
-        "window.visualViewport?.addEventListener('resize'",
+        "pcSubscribeViewport('s1-cast-room'",
     ):
         assert token in vn
         assert token in runtime
@@ -52,8 +52,8 @@ def main() -> None:
     assert "style.removeProperty('--pc-s1-cast-top')" in shared
     assert "pc-s1-documented-device-stage" in shared
     assert "activeS1Case ? pcFillS1DevFields() : resetS1Dev()" in dev
-    assert "patch=525" in index
-    assert "DEV · 525" in index
+    assert "patch=526" in index
+    assert "DEV · 526" in index
     print("V500 adaptive Canvas dialogue-cast contract passed.")
 
 

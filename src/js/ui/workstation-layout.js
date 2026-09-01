@@ -15,53 +15,6 @@
 //  several contradictory opinions about its own dimensions.
 // ══════════════════════════════════════════════════════
 
-// [LAYOUT METRICS]
-function pcViewportHeight() {
-  const values = [
-    window.innerHeight,
-    document.documentElement?.clientHeight,
-    window.visualViewport?.height
-  ].filter((value) => Number.isFinite(value) && value > 0);
-
-  return values.length ? Math.min(...values) : window.innerHeight;
-}
-
-function pcGetViewportWidth() {
-  const values = [
-    window.innerWidth,
-    document.documentElement?.clientWidth,
-    window.visualViewport?.width
-  ].filter((value) => Number.isFinite(value) && value > 0);
-
-  return values.length ? Math.min(...values) : window.innerWidth;
-}
-
-function pcGetViewportFamily() {
-  const width = pcGetViewportWidth();
-  const height = pcViewportHeight();
-  const aspectRatio = width / Math.max(height, 1);
-
-  // Width has to participate before height. Otherwise a 1024 × 600 display
-  // is mistaken for a phone and receives a nearly 100vw smartboard.
-  if (width >= 760 && height <= 720) return 'short-landscape';
-  if (width <= 380 || (width <= 560 && height <= 720)) return 'compact-phone';
-  if (width <= 560) return 'standard-phone';
-  if (width <= 1100 && aspectRatio < 0.9) return 'portrait-tablet';
-  if (width <= 1400 && height <= 950) return 'compact-desktop';
-  return 'desktop';
-}
-
-function pcApplyViewportFamily() {
-  const family = pcGetViewportFamily();
-  const html = document.documentElement;
-  const body = document.body;
-  const overlay = document.getElementById('vnOverlay');
-
-  if (html) html.dataset.pcViewportFamily = family;
-  if (body) body.dataset.pcViewportFamily = family;
-  if (overlay) overlay.dataset.pcViewportFamily = family;
-}
-
 // [WORKSTATION FRAME]
 // v159: Capture the prediction computer relative to the VN scene, not the
 // browser viewport. The terminal is absolutely positioned inside #vnScene, so
@@ -183,11 +136,11 @@ function pcResetVNDialogueState() {
   dialogue.setAttribute('aria-label', `${speaker} is speaking. Press Space or Enter to continue.`);
 }
 
-function pcApplyIpadLayout(){
+function pcApplyIpadLayout(metrics = pcGetViewportMetrics()){
   if (typeof pcIsAnalysisReportActive === 'function' && pcIsAnalysisReportActive()) return;
 
-  const viewportWidth = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0);
-  const viewportHeight = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+  const viewportWidth = metrics.maxDocumentWidth;
+  const viewportHeight = metrics.maxDocumentHeight;
   const isIpadViewport = viewportWidth >= 768 && viewportWidth <= 1180 && viewportHeight >= 900;
   const menuOverlay = document.getElementById('mainMenuOverlay');
   const menuShell = menuOverlay?.querySelector('.pc-main-menu-shell');
@@ -323,16 +276,15 @@ function pcScheduleResponsiveChrome() {
   if (pcResponsiveChromeFrame) cancelAnimationFrame(pcResponsiveChromeFrame);
   pcResponsiveChromeFrame = requestAnimationFrame(() => {
     pcResponsiveChromeFrame = 0;
-    pcApplyViewportFamily();
-    pcApplyIpadLayout();
+    const metrics = pcGetViewportMetrics();
+    pcApplyViewportFamily(metrics);
+    pcApplyIpadLayout(metrics);
   });
 }
 
 if (!window.pcIpadLayoutInstalled) {
   window.pcIpadLayoutInstalled = true;
-  window.addEventListener('resize', pcScheduleResponsiveChrome, { passive: true });
-  window.addEventListener('orientationchange', pcScheduleResponsiveChrome, { passive: true });
-  window.visualViewport?.addEventListener('resize', pcScheduleResponsiveChrome, { passive: true });
+  pcSubscribeViewport('responsive-chrome', metrics => pcApplyIpadLayout(metrics));
   document.addEventListener('DOMContentLoaded', () => {
     pcScheduleResponsiveChrome();
     const overlay = document.getElementById('vnOverlay');

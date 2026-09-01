@@ -12,18 +12,28 @@ def read(relative: str) -> str:
 
 def main() -> None:
     shared = read("src/js/scenarios/s1-canvas-evidence.js")
+    viewport = read("src/js/ui/viewport-controller.js")
     dev = read("src/js/dev/development-tools.js")
     runtime = read("runtime/js/promptcraft.bundle.js")
     index = read("index.html")
 
     for token in (
-        "Math.min(window.innerWidth, window.screen?.width || window.innerWidth)",
-        "Math.min(window.innerHeight, window.screen?.height || window.innerHeight)",
+        "const width = metrics.emulatedWidth",
+        "const height = metrics.emulatedHeight",
         "const isShortPhone = width <= 390 && height <= 700",
         "const isPortraitTablet = width >= 740 && width <= 1040",
         "const isNestHub = width >= 980 && width <= 1060",
     ):
         assert token in shared
+        assert token in runtime
+
+    for token in (
+        "const emulatedWidth = pcSmallestViewportValue(",
+        "[innerWidth, screenWidth || innerWidth]",
+        "const emulatedHeight = pcSmallestViewportValue(",
+        "[innerHeight, screenHeight || innerHeight]",
+    ):
+        assert token in viewport
         assert token in runtime
 
     fill = dev[dev.index("function devFillScenario"):dev.index("function devNextScenario")]
@@ -32,11 +42,10 @@ def main() -> None:
     assert "activeS1Case ? pcFillS1DevFields() : resetS1Dev()" in fill
     assert fill in runtime
 
-    assert "patch=525" in index
-    assert "DEV · 525" in index
+    assert "patch=526" in index
+    assert "DEV · 526" in index
     print("V498 emulated-device fit and current-case DEV-fill contract passed.")
 
 
 if __name__ == "__main__":
     main()
-

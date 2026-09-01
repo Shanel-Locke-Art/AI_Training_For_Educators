@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """V523 contract: emulated-screen Read Size defaults and usable zoom guidance."""
 
-import json
 from pathlib import Path
-import subprocess
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,6 +17,7 @@ def main() -> None:
     runtime = read("runtime/js/promptcraft.bundle.js")
     runtime_css = read("runtime/css/promptcraft.css")
     scenario_runtime = read("src/js/app/scenario-runtime.js")
+    viewport = read("src/js/ui/viewport-controller.js")
     index = read("index.html")
 
     for token in (
@@ -28,7 +27,7 @@ def main() -> None:
         "Object.freeze([1024, 1366])",
         "Object.freeze([820, 1180])",
         "Object.freeze([768, 1024])",
-        "[window.screen?.width, window.screen?.height]",
+        "pcViewportMatchesExactProfiles(PC_S1_READ_SIZE_VIEWPORTS)",
         "Choose Read size to zoom in, then scroll to inspect the Canvas screen.",
         "pcSetS1EvidenceModalZoom(pcGetS1EvidenceDefaultZoom()",
         "function pcPrepareS1MissionBoardImage(caseIndex = pcS1PreviewCaseIndex, state = 'before')",
@@ -82,28 +81,11 @@ def main() -> None:
     assert "max-width" not in default_zoom
     assert "min-height" not in default_zoom
 
-    js_probe = f"""
-const window = {{ screen: {{ width: 0, height: 0 }}, innerWidth: 700, innerHeight: 900 }};
-const document = {{ documentElement: {{ clientWidth: 700, clientHeight: 900 }} }};
-{default_zoom}
-const profiles = [[853,1280],[912,1368],[1024,1366],[820,1180],[768,1024]];
-const results = profiles.map(([width,height]) => {{
-  window.screen.width = width;
-  window.screen.height = height;
-  return pcGetS1EvidenceDefaultZoom();
-}});
-window.screen.width = 900;
-window.screen.height = 1200;
-results.push(pcGetS1EvidenceDefaultZoom());
-process.stdout.write(JSON.stringify(results));
-"""
-    result = subprocess.run(
-        ["node", "-e", js_probe], check=True, capture_output=True, text=True
-    )
-    assert json.loads(result.stdout) == ["read", "read", "read", "read", "read", "fit"]
+    assert "function pcViewportMatchesExactProfiles" in viewport
+    assert "metrics.exactSizeCandidates.some" in viewport
 
-    assert "patch=525" in index
-    assert "DEV · 525" in index
+    assert "patch=526" in index
+    assert "DEV · 526" in index
     print("V523 emulated-screen Read Size and zoom-guidance contract passed.")
 
 

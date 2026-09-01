@@ -18,8 +18,8 @@ def main() -> None:
     css = read("src/css/scenarios/shared.css")
     index = read("index.html")
 
-    modal = shared[shared.index("function pcRefreshS1EvidenceModalLayout()"):
-                   shared.index("let pcS1EvidenceModalResizeFrame")]
+    modal = shared[shared.index("function pcRefreshS1EvidenceModalLayout(metrics = pcGetViewportMetrics())"):
+                   shared.index("pcSubscribeViewport('s1-evidence-modal'")]
     assert "const usePhoneLayout = width <= 560" in modal
     assert ": evidence.src;" in modal
     assert "useCompactLayout" not in modal
@@ -51,8 +51,8 @@ def main() -> None:
     assert "Your Level bar is now" not in shared
     assert "You earned ${" not in shared
 
-    assert "patch=525" in index
-    assert "DEV · 525" in index
+    assert "patch=526" in index
+    assert "DEV · 526" in index
     print("V517 scrollable evidence and Pixel progress feedback contract passed.")
 
 

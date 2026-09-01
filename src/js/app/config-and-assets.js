@@ -360,7 +360,7 @@ window.testSheetsPing = function testSheetsPing() {
     quality_indicators_lit: '',
     self_report_prediction: '',
     time_since_last_attempt_sec: '',
-    screen_width: window.innerWidth || window.screen.width,
+    screen_width: pcGetViewportMetrics().screenReportWidth,
     event_type: 'browser_connection_test_complete',
     session_id: pcSessionId,
     notes_coding_memo: location.href

@@ -490,13 +490,13 @@ function pcRestoreS1ResponsiveCapture(panel, evidence) {
   return true;
 }
 
-function pcApplyS1DocumentedCaptureFit(panel, evidence) {
+function pcApplyS1DocumentedCaptureFit(panel, evidence, metrics = pcGetViewportMetrics()) {
   if (!pcRestoreS1ResponsiveCapture(panel, evidence)) return false;
   // Device emulation may scale the page to 50%/75%, which can make innerWidth
   // larger than the selected device profile. Use the smaller emulated-screen
   // dimension so these documented fits remain stable at every preview scale.
-  const width = Math.min(window.innerWidth, window.screen?.width || window.innerWidth);
-  const height = Math.min(window.innerHeight, window.screen?.height || window.innerHeight);
+  const width = metrics.emulatedWidth;
+  const height = metrics.emulatedHeight;
   const isShortPhone = width <= 390 && height <= 700 && height > width;
   const isPortraitTablet = width >= 740 && width <= 1040 && height >= 1000 && height > width;
   const isNestHub = width >= 980 && width <= 1060 && height <= 650 && width > height;
@@ -542,16 +542,21 @@ function pcApplyS1DocumentedCaptureFit(panel, evidence) {
   return true;
 }
 
-function pcRefreshS1CanvasEvidenceLayout() {
+function pcRefreshS1CanvasEvidenceLayout({
+  metrics = pcGetViewportMetrics(),
+  deferCastUpdate = true
+} = {}) {
   const panel = document.getElementById('pcS1MobileEvidenceLens');
   const evidence = panel?._pcS1Evidence;
   if (!panel || !evidence || !panel.classList.contains('pc-s1-mobile-evidence-lens--real-capture')) {
     return false;
   }
-  pcApplyS1DocumentedCaptureFit(panel, evidence);
-  requestAnimationFrame(() => {
-    if (typeof pcUpdateS1PhoneCastRoom === 'function') pcUpdateS1PhoneCastRoom();
-  });
+  pcApplyS1DocumentedCaptureFit(panel, evidence, metrics);
+  const updateCastRoom = () => {
+    if (typeof pcUpdateS1PhoneCastRoom === 'function') pcUpdateS1PhoneCastRoom(metrics);
+  };
+  if (deferCastUpdate) requestAnimationFrame(updateCastRoom);
+  else updateCastRoom();
   return true;
 }
 
@@ -1232,14 +1237,7 @@ const PC_S1_READ_SIZE_VIEWPORTS = Object.freeze([
 ]);
 
 function pcGetS1EvidenceDefaultZoom() {
-  const viewportSizes = [
-    [window.screen?.width, window.screen?.height],
-    [window.innerWidth, window.innerHeight],
-    [document.documentElement?.clientWidth, document.documentElement?.clientHeight],
-  ].map(([width, height]) => [Math.round(Number(width)), Math.round(Number(height))]);
-  const useReadSize = PC_S1_READ_SIZE_VIEWPORTS.some(([profileWidth, profileHeight]) =>
-    viewportSizes.some(([width, height]) => width === profileWidth && height === profileHeight)
-  );
+  const useReadSize = pcViewportMatchesExactProfiles(PC_S1_READ_SIZE_VIEWPORTS);
   return useReadSize ? 'read' : 'fit';
 }
 
@@ -1261,22 +1259,13 @@ function pcHandleS1EvidenceModalKeydown(event) {
   }
 }
 
-function pcRefreshS1EvidenceModalLayout() {
+function pcRefreshS1EvidenceModalLayout(metrics = pcGetViewportMetrics()) {
   const modal = document.getElementById('pcS1EvidenceModal');
   const evidence = modal?._pcS1Evidence;
   const image = document.getElementById('pcS1EvidenceModalImage');
   if (!modal || !evidence || !image) return false;
 
-  const width = Math.min(
-    window.innerWidth,
-    window.visualViewport?.width || window.innerWidth,
-    window.screen?.width || window.innerWidth
-  );
-  const height = Math.min(
-    window.innerHeight,
-    window.visualViewport?.height || window.innerHeight,
-    window.screen?.height || window.innerHeight
-  );
+  const width = metrics.modalWidth;
   const usePhoneLayout = width <= 560;
   const source = usePhoneLayout
     ? (evidence.mobileSrc || evidence.compactSrc || evidence.smartboardSrc || evidence.src)
@@ -1323,14 +1312,7 @@ function pcSetS1EvidenceModalZoom(mode = 'read', { userSelected = true } = {}) {
   return true;
 }
 
-let pcS1EvidenceModalResizeFrame = 0;
-function pcScheduleS1EvidenceModalLayout() {
-  cancelAnimationFrame(pcS1EvidenceModalResizeFrame);
-  pcS1EvidenceModalResizeFrame = requestAnimationFrame(pcRefreshS1EvidenceModalLayout);
-}
-
-window.addEventListener('resize', pcScheduleS1EvidenceModalLayout, { passive: true });
-window.visualViewport?.addEventListener('resize', pcScheduleS1EvidenceModalLayout, { passive: true });
+pcSubscribeViewport('s1-evidence-modal', metrics => pcRefreshS1EvidenceModalLayout(metrics));
 
 function pcOpenS1EvidenceModal() {
   const item = PC_S1_PREVIEW_CASES[pcS1PreviewCaseIndex];
@@ -2372,4 +2354,3 @@ pcRegisterUIActions({
 });
 
 pcExposeGlobals({ pcFillS1TransferDevTask });
-
