@@ -8,8 +8,8 @@ These contracts are intentionally preserved while PromptCraft is refactored and 
 - Research schema: `V121`
 - Apps Script receiver: `V83` (supplied source preserved unchanged)
 - Apps Script deployment: existing configured deployment URL
-- Current asset manifest: `v148`
-- Current browser/cache revision: `523`
+- Current asset manifest: `v149`
+- Current browser/cache revision: `524`
 - Current repository baseline revision: `524`
 - Scenario result tabs retain full narrative text; Process Log remains abbreviated by design
 
@@ -22,8 +22,10 @@ The V121 payload still sends both `babbage_response` and the historical `claude_
 ## Babbage proxy
 
 - Active endpoint: `netlify/functions/babbage.js`
+- Current source version: `V373`
 - Retired endpoint: `netlify/functions/claude.js` must remain absent
 - Existing S1-S5 structured proxy contracts remain testable
+- Active S1 evidence, Canvas Rescue, and transfer-plan requests have dedicated strict schemas
 - S3-S5 browser implementations are intentionally absent until rebuilt against the shared architecture
 
 ## Scenario availability

@@ -1,5 +1,5 @@
 {
-  "version": 148,
+  "version": 149,
   "runtime_images": {
     "background.png": "assets/images/backgrounds/app-background.png",
     "classroom-bg.png": "assets/images/backgrounds/classroom.png",
@@ -30,7 +30,6 @@
     "babbage-mark.svg": "assets/images/ui/babbage-mark.svg",
     "charles-babbage.png": "assets/images/ui/charles-babbage.png",
     "promptcraft-qr.png": "assets/ui/promptcraft-qr.png",
-    "gfc-print-logo.jpg": "assets/images/brand/great-falls-college-logo.jpg",
     "babbage-engine.webp": "assets/images/ui/babbage-engine.webp",
     "maya-neutral.png": "assets/images/characters/students/maya/neutral.png",
     "maya-thinking.png": "assets/images/characters/students/maya/thinking.png",
@@ -71,11 +70,11 @@
     "assets/images/characters/students/student-cast-concept-sheet.png",
     "assets/images/characters/students/devon/references/concept-sheet.png",
     "assets/images/characters/students/eli/references/concept-sheet.png",
-    "assets/images/characters/students/jordan/references/concept-sheet.png",
+    "assets/images/characters/students/jordan/dryly-amused.png",
     "assets/images/characters/students/lena/references/concept-sheet.png",
-    "assets/images/characters/students/maya/references/concept-sheet.png",
     "assets/images/characters/students/samira/references/concept-sheet.png",
     "assets/images/ui/babbage-engine-plate.svg",
+    "assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-comparison-assignment-focus.png",
     "assets/images/scenes/scenario-03-authentic-assessment/scene.png"
   ],
   "runtime_audio": {

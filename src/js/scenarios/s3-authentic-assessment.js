@@ -1195,8 +1195,8 @@ function pcPrintS3TransferLabReport() {
   const printWindow = window.open('', '_blank');
   if (!printWindow) return false;
   try { printWindow.opener = null; } catch (e) {}
-  let logo = '';
-  try { logo = new URL('assets/images/brand/great-falls-college-logo.jpg', window.location.href).href; } catch (e) {}
+  // Preserve the text brand without requesting the missing baseline logo file.
+  const logo = '';
   const section = (title, content) => content ? `<section><h2>${esc(title)}</h2><div class="box">${esc(content).replace(/\n/g,'<br>')}</div></section>` : '';
   printWindow.document.open();
   printWindow.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>PromptCraft Assessment Design Analysis</title><style>

@@ -52,8 +52,8 @@ def main() -> None:
     assert "style.removeProperty('--pc-s1-cast-top')" in shared
     assert "pc-s1-documented-device-stage" in shared
     assert "activeS1Case ? pcFillS1DevFields() : resetS1Dev()" in dev
-    assert "patch=523" in index
-    assert "DEV · 523" in index
+    assert "patch=524" in index
+    assert "DEV · 524" in index
     print("V500 adaptive Canvas dialogue-cast contract passed.")
 
 

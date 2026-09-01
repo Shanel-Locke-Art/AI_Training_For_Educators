@@ -42,8 +42,8 @@ def main() -> None:
     assert '"speaker": "Jordan"' in dialogue
     assert "ASSETS.images.students.jordan" in runtime
     assert '"speaker": "Eli"' in runtime_dialogue
-    assert "patch=523" in index
-    assert "DEV · 523" in index
+    assert "patch=524" in index
+    assert "DEV · 524" in index
     print("V507 Eli character and dialogue integration contract passed.")
 
 

@@ -14,6 +14,7 @@ async function run() {
     assert.equal(healthBody.provider, 'openai');
     assert.equal(healthBody.proxy_version, 'V373');
     assert.ok(healthBody.supported_contracts.includes('s1_canvas_rescue'));
+    assert.ok(healthBody.supported_contracts.includes('s1_transfer_plan_analysis'));
     assert.ok(healthBody.supported_contracts.includes('s5_review'));
     assert.ok(healthBody.supported_contracts.includes('s3_evidence_analysis'));
     assert.ok(healthBody.supported_contracts.includes('s3_transfer_assessment'));
@@ -178,7 +179,7 @@ async function run() {
       assert.equal(lastPayload.model, 'gpt-5.6-terra');
     }
 
-    console.log('PromptCraft Babbage structured proxy tests passed, including the active S1 evidence-analysis contract.');
+    console.log('PromptCraft Babbage structured proxy tests passed, including active S1 evidence and transfer-plan contracts.');
   } finally {
     if (originalKey === undefined) delete process.env.OPENAI_API_KEY;
     else process.env.OPENAI_API_KEY = originalKey;

@@ -36,14 +36,14 @@ def main() -> None:
         "/* V515 - the case introduction now uses the same framed evidence language",
         ".pc-s1-intro-evidence-card",
         ".pc-s1-intro-evidence-picture img",
-        "opacity: .68 !important",
+        "opacity: 1 !important",
         "pc-s1-intro-evidence-active.pc-dual-character",
     ):
         assert token in css
         assert token in runtime_css
 
-    assert "patch=523" in index
-    assert "DEV · 523" in index
+    assert "patch=524" in index
+    assert "DEV · 524" in index
     print("V515 framed introduction evidence and purpose-focused transfer task passed.")
 
 

@@ -7,9 +7,10 @@ Current compatibility baseline:
 - Application build: `PROMPTCRAFT_V429`
 - Research schema: `V121`
 - Apps Script receiver: `V83`
-- Asset manifest: `v148`
-- Current browser/cache revision: `523`
-- Repository baseline revision: `524` (documentation, receiver ownership, and fixtures only)
+- Babbage proxy: `V373`
+- Asset manifest: `v149`
+- Current browser/cache revision: `524`
+- Phase 0 repository baseline revision: `524` (documentation, receiver ownership, and fixtures only)
 
 Cache/query revisions are not application build numbers. Do not rename the app build when a cache marker changes.
 

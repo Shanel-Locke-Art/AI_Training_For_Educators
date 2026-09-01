@@ -39,8 +39,8 @@ def main() -> None:
 
     # The next-case bridge remains narrated by the established cast.
     assert "pcPlayS1PreviewBriefing(nextCaseIndex, null, { classroom: true })" in shared
-    assert "patch=523" in index
-    assert "DEV · 523" in index
+    assert "patch=524" in index
+    assert "DEV · 524" in index
 
     print("V496 reused-dialogue and documented Canvas-fit contract passed.")
 

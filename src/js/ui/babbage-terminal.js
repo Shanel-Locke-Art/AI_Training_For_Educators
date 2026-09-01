@@ -209,11 +209,6 @@ function pcPrintCurrentBabbageReport() {
   if (!printWindow) return false;
   try { printWindow.opener = null; } catch (e) {}
 
-  let printLogoUrl = '';
-  try {
-    printLogoUrl = new URL('assets/images/brand/great-falls-college-logo.jpg', window.location.href).href;
-  } catch (e) {}
-
   const workBlocks = String(submittedWork || '')
     .split(/\n+/)
     .map(line => line.trim())
@@ -234,9 +229,9 @@ function pcPrintCurrentBabbageReport() {
       </section>`
     : '';
 
-  const logoHTML = printLogoUrl
-    ? `<img class="pc-print-logo" src="${esc(printLogoUrl)}" alt="" onerror="this.style.display='none'">`
-    : '';
+  // The uploaded baseline does not contain a licensed GFC image file. Keep the
+  // existing text affiliation and omit the formerly broken image dependency.
+  const logoHTML = '';
 
   const finding = (label, value, className = '') => value
     ? `<section class="pc-print-finding ${className}"><h3>${esc(label)}</h3><p>${esc(value)}</p></section>`

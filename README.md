@@ -1,13 +1,22 @@
-PromptCraft V429 — Teaching Progress HUD redesign (patch 445)
+# PromptCraft V429
 
-Changes:
-- Removes the unexplained gear icon from the header progression control.
-- Replaces it with a clear LEVEL N badge and TEACHING PROGRESS label.
-- Progress bar now tracks XP within the current education level rather than lifetime 0–880 XP.
-- XP bar is thicker with a dimensional gold fill and darker inset track.
-- Adds an explicit View Progress affordance on wide layouts.
-- Rebuilds the expanded progress panel in the GFC navy/blue/gold visual system.
-- Keeps the historic Babbage engine image in the expanded panel only, where its role is clear.
-- Shows next teaching level, XP to next level, scenario completions, and lifetime XP without the previous beige dashboard treatment.
+This repository includes the Phase 1 regression-gate stabilization for PromptCraft.
 
-App remains PROMPTCRAFT_V429. Cache/query marker advances to 445.
+Stable compatibility identifiers:
+
+- Application build: `PROMPTCRAFT_V429`
+- Research schema: `V121`
+- Browser/cache patch: `524`
+- Apps Script receiver: `V83`
+- Babbage proxy: `V373`
+- Asset manifest: `v149`
+
+Start with:
+
+- `docs/README.md` for the documentation map
+- `docs/development/phase-0-baseline.md` for baseline status and production safety boundaries
+- `release/baseline-manifest.json` for machine-readable versions and archive hashes
+- `release/phase1-manifest.json` for Phase 1 versions and validation status
+- `docs/development/repository-map.md` for source ownership
+
+Editable browser source lives under `src/`; generated browser output lives under `runtime/`. The exact supplied V83 receiver is preserved under `apps-script/`. Do not run V83's `initializeWorkbookNow()` or `resetResearchDataNow()` against the production research workbook during refactoring.

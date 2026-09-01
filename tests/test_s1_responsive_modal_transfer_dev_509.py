@@ -46,8 +46,8 @@ def main() -> None:
     assert "dev-fill-s1-transfer" in actions
     assert index.count('data-pc-action="dev-fill-s1-transfer"') == 2
     assert "S1 Path ✏️" in index
-    assert "patch=523" in index
-    assert "DEV · 523" in index
+    assert "patch=524" in index
+    assert "DEV · 524" in index
     print("V509 responsive evidence and transfer DEV-fill contract passed.")
 
 

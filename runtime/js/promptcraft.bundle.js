@@ -8662,8 +8662,8 @@ function pcPrintS3TransferLabReport() {
   const printWindow = window.open('', '_blank');
   if (!printWindow) return false;
   try { printWindow.opener = null; } catch (e) {}
-  let logo = '';
-  try { logo = new URL('assets/images/brand/great-falls-college-logo.jpg', window.location.href).href; } catch (e) {}
+  // Preserve the text brand without requesting the missing baseline logo file.
+  const logo = '';
   const section = (title, content) => content ? `<section><h2>${esc(title)}</h2><div class="box">${esc(content).replace(/\n/g,'<br>')}</div></section>` : '';
   printWindow.document.open();
   printWindow.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>PromptCraft Assessment Design Analysis</title><style>
@@ -11799,11 +11799,6 @@ function pcPrintCurrentBabbageReport() {
   if (!printWindow) return false;
   try { printWindow.opener = null; } catch (e) {}
 
-  let printLogoUrl = '';
-  try {
-    printLogoUrl = new URL('assets/images/brand/great-falls-college-logo.jpg', window.location.href).href;
-  } catch (e) {}
-
   const workBlocks = String(submittedWork || '')
     .split(/\n+/)
     .map(line => line.trim())
@@ -11824,9 +11819,9 @@ function pcPrintCurrentBabbageReport() {
       </section>`
     : '';
 
-  const logoHTML = printLogoUrl
-    ? `<img class="pc-print-logo" src="${esc(printLogoUrl)}" alt="" onerror="this.style.display='none'">`
-    : '';
+  // The uploaded baseline does not contain a licensed GFC image file. Keep the
+  // existing text affiliation and omit the formerly broken image dependency.
+  const logoHTML = '';
 
   const finding = (label, value, className = '') => value
     ? `<section class="pc-print-finding ${className}"><h3>${esc(label)}</h3><p>${esc(value)}</p></section>`

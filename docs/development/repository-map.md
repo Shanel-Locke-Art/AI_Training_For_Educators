@@ -1,6 +1,6 @@
 # PromptCraft repository architecture
 
-This is the canonical repository map for `PROMPTCRAFT_V429` as represented by browser/cache patch 523 and Phase 0 repository baseline revision 524. Older flat/numeric layouts should not be reconstructed from memory.
+This is the canonical repository map for `PROMPTCRAFT_V429` as represented by browser/cache patch 524 and Phase 0 repository baseline revision 524. Older flat/numeric layouts should not be reconstructed from memory.
 
 ## Receiver and release ownership
 
@@ -90,7 +90,7 @@ src/css/
 
 ## Assets
 
-`assets/asset-manifest.json` is the canonical asset classification map. Current manifest version: `148`.
+`assets/asset-manifest.json` is the canonical asset classification map. Current manifest version: `149`.
 
 Major current asset groups:
 

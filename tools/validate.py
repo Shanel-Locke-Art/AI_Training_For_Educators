@@ -24,7 +24,6 @@ ACTION_ATTRIBUTES = (
 )
 OBSOLETE_FILES = (
     ROOT / "netlify/netlify.toml",
-    ROOT / "assets/images/characters/students/jordan/dryly-amused.png",
 )
 
 

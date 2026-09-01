@@ -28,8 +28,8 @@ def main() -> None:
         "overflow-x: hidden !important",
     ):
         assert token in css and token in runtime_css
-    assert "patch=523" in index
-    assert "DEV · 523" in index
+    assert "patch=524" in index
+    assert "DEV · 524" in index
     print("S1 real Canvas edge crop 487 contract passed.")
 
 

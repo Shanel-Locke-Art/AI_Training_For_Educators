@@ -1,6 +1,6 @@
 const DEFAULT_OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5.6-terra';
 const OPENAI_BASE_URL = String(process.env.OPENAI_BASE_URL || 'https://api.openai.com').replace(/\/+$/, '');
-const PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V372';
+const PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V373';
 
 const CORS_HEADERS = Object.freeze({
   'Access-Control-Allow-Origin': '*',
@@ -77,6 +77,32 @@ const S1_EVIDENCE_ANALYSIS_SCHEMA = {
       properties: { met: { type: 'boolean' }, feedback: { type: 'string' } }
     },
     design_takeaway: { type: 'string' }
+  }
+};
+
+const S1_TRANSFER_PLAN_ANALYSIS_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: [
+    'status', 'summary', 'quality_indicators', 'strengths', 'gaps',
+    'recommended_next_step', 'human_review_note'
+  ],
+  properties: {
+    status: { type: 'string', enum: ['STRONG', 'DEVELOPING', 'REVISE'] },
+    summary: { type: 'string' },
+    quality_indicators: {
+      type: 'array',
+      minItems: 0,
+      maxItems: 5,
+      items: {
+        type: 'string',
+        enum: ['CLEAR_DESTINATION', 'VISIBLE_START', 'LEARNING_SEQUENCE', 'VISIBLE_SUBMISSION', 'CONTINUATION_CUE']
+      }
+    },
+    strengths: { type: 'array', minItems: 0, maxItems: 5, items: { type: 'string' } },
+    gaps: { type: 'array', minItems: 0, maxItems: 5, items: { type: 'string' } },
+    recommended_next_step: { type: 'string' },
+    human_review_note: { type: 'string' }
   }
 };
 
@@ -359,6 +385,14 @@ function getAnalysisContract_(incoming) {
       schema: S1_EVIDENCE_ANALYSIS_SCHEMA
     };
   }
+  if (analysisType === 's1_transfer_plan_analysis') {
+    return {
+      analysisType,
+      schemaName: 'promptcraft_s1_transfer_plan_analysis',
+      schemaVersion: 'promptcraft_s1_transfer_plan_analysis_v1',
+      schema: S1_TRANSFER_PLAN_ANALYSIS_SCHEMA
+    };
+  }
   if (analysisType === 's1_canvas_rescue') {
     return {
       analysisType,
@@ -495,6 +529,7 @@ exports.handler = async (event = {}) => {
       supported_contracts: [
         'scenario1',
         's1_evidence_analysis',
+        's1_transfer_plan_analysis',
         's1_canvas_rescue',
         's2_draft', 's2_review',
         's3_draft', 's3_review', 's3_evidence_analysis', 's3_transfer_assessment',
