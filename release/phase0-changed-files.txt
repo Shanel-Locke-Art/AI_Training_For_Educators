@@ -1,0 +1,17 @@
+README.md
+apps-script/PromptCraft_Receiver_V83_Readable_Prompt_Data.js
+docs/README.md
+docs/development/compatibility-contracts.md
+docs/development/gfc-visual-theme.md
+docs/development/phase-0-baseline.md
+docs/development/repository-map.md
+release/baseline-manifest.json
+release/phase0-changed-files.txt
+release/phase0-checksums.sha256
+release/phase0-test-results.md
+tests/fixtures/receiver/v121_s1_content_avalanche_incremental.json
+tests/fixtures/receiver/v121_s3_metacognition_incremental.json
+tests/fixtures/receiver/v121_s4_assessment_incremental.json
+tests/test_receiver_v83_fixture.js
+tools/check.py
+tools/receiver/workbook_inventory_read_only.gs

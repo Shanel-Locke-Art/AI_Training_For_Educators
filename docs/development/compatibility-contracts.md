@@ -6,11 +6,14 @@ These contracts are intentionally preserved while PromptCraft is refactored and 
 
 - App build: `PROMPTCRAFT_V429`
 - Research schema: `V121`
-- Apps Script receiver: `V84`
+- Apps Script receiver: `V83` (supplied source preserved unchanged)
 - Apps Script deployment: existing configured deployment URL
 - Current asset manifest: `v148`
-- Current documentation/cache revision: `489`
+- Current browser/cache revision: `523`
+- Current repository baseline revision: `524`
 - Scenario result tabs retain full narrative text; Process Log remains abbreviated by design
+
+The authoritative Phase 0 version record is `release/baseline-manifest.json`. The receiver query marker currently embedded in `index.html` is not an authoritative receiver version.
 
 The V121 payload still sends both `babbage_response` and the historical `claude_response` key. `claude_response` exists only because the current receiver/schema expects it. It is not permission to restore Claude terminology in browser UI, DOM selectors, actions, function names, or the Netlify endpoint.
 
@@ -69,6 +72,14 @@ Moderation contract:
 - only Review Status `Publish` appears publicly
 
 The public card displays the complete descriptive paragraph. The public wall uses its own page stylesheet and current PromptCraft/GFC header/menu treatment; do not mix its moderation logic with visual-theme changes.
+
+## Receiver and research workbook
+
+- The immutable V83 baseline source is `apps-script/PromptCraft_Receiver_V83_Readable_Prompt_Data.js`.
+- V83 may be characterized and replayed against memory-only fixtures or a copied workbook; it must not be edited in place.
+- Do not run `initializeWorkbookNow()` or `resetResearchDataNow()` against production during refactoring.
+- Preserve all existing raw response, event, and audit rows and the V121 column layout.
+- Corrected readable projections require a new receiver version, copied-workbook migration tests, and explicit row-count/hash verification.
 
 ## Versioning
 

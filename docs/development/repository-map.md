@@ -1,6 +1,18 @@
 # PromptCraft repository architecture
 
-This is the canonical repository map for `PROMPTCRAFT_V429` as represented by the current V429 / patch 474 development baseline. Older flat/numeric layouts should not be reconstructed from memory.
+This is the canonical repository map for `PROMPTCRAFT_V429` as represented by browser/cache patch 523 and Phase 0 repository baseline revision 524. Older flat/numeric layouts should not be reconstructed from memory.
+
+## Receiver and release ownership
+
+| Path | Ownership |
+|---|---|
+| `apps-script/PromptCraft_Receiver_V83_Readable_Prompt_Data.js` | Exact, unchanged V83 Apps Script baseline |
+| `release/baseline-manifest.json` | Machine-readable build/schema/patch/receiver/proxy/archive identity |
+| `tools/receiver/workbook_inventory_read_only.gs` | Read-only production workbook shape/header inventory helper |
+| `tests/test_receiver_v83_fixture.js` | Memory-only V83 characterization harness |
+| `tests/fixtures/receiver/` | Named V121 payload fixtures; no production research data |
+
+Receiver V83 is a preserved baseline, not an editable rolling file. A behavior change creates V84 and must retain V83 for migration comparison.
 
 ## Runtime entry points
 
@@ -78,7 +90,7 @@ src/css/
 
 ## Assets
 
-`assets/asset-manifest.json` is the canonical asset classification map. Current manifest version: `147`.
+`assets/asset-manifest.json` is the canonical asset classification map. Current manifest version: `148`.
 
 Major current asset groups:
 

@@ -1,0 +1,84 @@
+{
+  "manifest_version": 1,
+  "recorded_at_utc": "2026-09-01T13:54:41Z",
+  "baseline_id": "PROMPTCRAFT_V429_PHASE0_R524",
+  "repository_revision": 524,
+  "application": {
+    "build": "PROMPTCRAFT_V429",
+    "research_schema": "V121",
+    "browser_cache_patch": 523,
+    "dialogue_asset_version": 149,
+    "runtime_changed_in_phase_0": false
+  },
+  "receiver": {
+    "version": "V83",
+    "source_path": "apps-script/PromptCraft_Receiver_V83_Readable_Prompt_Data.js",
+    "source_sha256": "f20107b3faa3f28794c9631bfa75e0834c84d96b6eaae2149095be0fb11bba58",
+    "source_changed_in_phase_0": false,
+    "deployed_source_match": "pending_owner_verification",
+    "production_admin_functions_prohibited_during_refactor": [
+      "initializeWorkbookNow",
+      "resetResearchDataNow"
+    ]
+  },
+  "babbage_proxy": {
+    "source_version": "V372",
+    "live_health_version_at_audit": "V372",
+    "tests_expect_version": "V373",
+    "known_missing_contract": "s1_transfer_plan_analysis"
+  },
+  "assets": {
+    "manifest_version": 148,
+    "changed_in_phase_0": false
+  },
+  "source_archives": {
+    "application": {
+      "name": "AI_Training_For_Educators - Copy(20260901-132607).zip",
+      "sha256": "3925cf91923169ad95058f26dc4d0bf200ad5383028af21b73b32c9b2908888e",
+      "integrity": "unzip_test_passed",
+      "file_count": 264,
+      "uncompressed_bytes": 91760074
+    },
+    "receiver": {
+      "name": "PromptCraft_Receiver_V83_Readable_Prompt_Data(1).zip",
+      "sha256": "a99b65cc72ab5aca39582eb6d70c6a313b1d3f26f89ef1c1521001c55a993ace",
+      "source_sha256": "f20107b3faa3f28794c9631bfa75e0834c84d96b6eaae2149095be0fb11bba58"
+    }
+  },
+  "baseline_tests": {
+    "source_runtime_synchronized": true,
+    "receiver_syntax": "passed",
+    "receiver_characterization_fixtures": "added_in_phase_0",
+    "quick_suite_before_phase_0": {
+      "passed": 48,
+      "total": 52,
+      "known_failures": [
+        "Structural hardening",
+        "S1 AI Canvas Rescue contract",
+        "S3 Authentic Assessment contract",
+        "Netlify Babbage proxy unit tests"
+      ]
+    },
+    "quick_suite_after_phase_0": {
+      "passed": 49,
+      "total": 53,
+      "new_receiver_fixture": "passed",
+      "known_failures_unchanged": [
+        "Structural hardening",
+        "S1 AI Canvas Rescue contract",
+        "S3 Authentic Assessment contract",
+        "Netlify Babbage proxy unit tests"
+      ]
+    }
+  },
+  "production_workbook_inventory": {
+    "status": "pending_owner_run",
+    "tool": "tools/receiver/workbook_inventory_read_only.gs",
+    "writes_to_workbook": false
+  },
+  "known_version_markers": {
+    "index_receiver_query_marker": 85,
+    "marker_is_authoritative_receiver_version": false,
+    "documentation_was_stale_at_audit": true
+  }
+}

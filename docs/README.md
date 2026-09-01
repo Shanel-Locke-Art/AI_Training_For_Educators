@@ -6,9 +6,10 @@ Current compatibility baseline:
 
 - Application build: `PROMPTCRAFT_V429`
 - Research schema: `V121`
-- Apps Script receiver: `V84`
+- Apps Script receiver: `V83`
 - Asset manifest: `v148`
-- Current browser/cache revision represented by this documentation pass: `489`
+- Current browser/cache revision: `523`
+- Repository baseline revision: `524` (documentation, receiver ownership, and fixtures only)
 
 Cache/query revisions are not application build numbers. Do not rename the app build when a cache marker changes.
 
@@ -28,7 +29,8 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 
 | File | Purpose |
 |---|---|
-| `development/compatibility-contracts.md` | Things that must remain compatible: V429, V121, receiver V84, Babbage endpoint, Ideas Wall moderation, and versioning rules. |
+| `development/phase-0-baseline.md` | Recorded archive hashes, version ownership, V83 source identity, production workbook safety boundary, fixture instructions, and Phase 0 exit status. |
+| `development/compatibility-contracts.md` | Things that must remain compatible: V429, V121, receiver V83, Babbage endpoint, Ideas Wall moderation, and versioning rules. |
 | `development/repository-map.md` | Where source/runtime files live and which files own each subsystem. Start here when locating code. |
 | `development/css-architecture.md` | CSS ownership and cascade order. Use before adding or moving styling. |
 | `development/gfc-visual-theme.md` | Current Great Falls College / PromptCraft visual direction and shared branding rules. |
@@ -40,7 +42,8 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 1. Current source code under `src/`
 2. `assets/asset-manifest.json` for asset classification and current paths
 3. Compatibility contracts in `development/compatibility-contracts.md`
-4. These production trackers
-5. Historical notes and archived dialogue
+4. `../release/baseline-manifest.json` for recorded release/deployment identifiers
+5. These production trackers
+6. Historical notes and archived dialogue
 
 If a tracker conflicts with current source code, update the tracker. Do not change working runtime code merely to make an old spreadsheet true again.

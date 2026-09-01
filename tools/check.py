@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 QUICK_CHECKS = (
     ("Source/runtime synchronization", [sys.executable, "tools/build.py", "--check"]),
+    ("Apps Script receiver V83 characterization fixtures", ["node", "tests/test_receiver_v83_fixture.js"]),
     ("Structural hardening", [sys.executable, "tools/validate.py"]),
     ("S1 Canvas evidence assets", [sys.executable, "tests/test_s1_canvas_evidence_assets.py"]),
     ("Canvas scenario menu roadmap", [sys.executable, "tests/test_scenario_menu_roadmap_463.py"]),
