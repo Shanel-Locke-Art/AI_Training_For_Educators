@@ -9,7 +9,7 @@ These contracts are intentionally preserved while PromptCraft is refactored and 
 - Apps Script receiver: `V83` (supplied source preserved unchanged)
 - Apps Script deployment: existing configured deployment URL
 - Current asset manifest: `v149`
-- Current browser/cache revision: `524`
+- Current browser/cache revision: `525`
 - Current repository baseline revision: `524`
 - Scenario result tabs retain full narrative text; Process Log remains abbreviated by design
 

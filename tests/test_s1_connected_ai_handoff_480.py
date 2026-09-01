@@ -12,7 +12,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    source = read("src/js/scenarios/shared-components.js")
+    source = read("src/js/scenarios/s1-canvas-evidence.js")
     runtime = read("runtime/js/promptcraft.bundle.js")
     css = read("src/css/scenarios/shared.css")
     runtime_css = read("runtime/css/promptcraft.css")
@@ -39,8 +39,8 @@ def main() -> None:
         assert marker in css
         assert marker in runtime_css
 
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("S1 evidence-to-written-reflection handoff contract passed through patch 484.")
 
 

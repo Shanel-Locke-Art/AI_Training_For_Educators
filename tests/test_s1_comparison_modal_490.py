@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-JS = (ROOT / "src/js/scenarios/shared-components.js").read_text(encoding="utf-8")
+JS = (ROOT / "src/js/scenarios/s1-canvas-evidence.js").read_text(encoding="utf-8")
 CSS = (ROOT / "src/css/scenarios/shared.css").read_text(encoding="utf-8")
 INDEX = (ROOT / "index.html").read_text(encoding="utf-8")
 
@@ -32,5 +32,5 @@ def test_desktop_grid_override_and_phone_modal_exist():
 
 
 def test_patch_marker_is_491():
-    assert "DEV · 524" in INDEX
-    assert "patch=524" in INDEX
+    assert "DEV · 525" in INDEX
+    assert "patch=525" in INDEX

@@ -13,7 +13,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    source = read("src/js/scenarios/shared-components.js")
+    source = read("src/js/scenarios/s1-canvas-evidence.js")
     css = read("src/css/responsive/final-overrides.css")
     runtime = read("runtime/js/promptcraft.bundle.js")
     runtime_css = read("runtime/css/promptcraft.css")

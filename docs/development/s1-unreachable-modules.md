@@ -1,15 +1,14 @@
-# Unreachable S1 modules (found during the patch-489 orphaned-test audit)
+# Dormant S1 modules after Phase 2 ownership separation
 
-This is a findings record, not a cleanup record. Nothing described here has
-been changed. It exists so the next person who opens `s1-course-design.js`
-or `s1-engagement.js` understands what they're looking at before assuming
-either one is the live S1 implementation, or safe to delete outright.
+This record explains what remains dormant after patch 525. Phase 2 separated
+live ownership, but did not delete either prototype because the required
+browser executable was unavailable in the refactor workspace.
 
 ## Background
 
 The live S1 scenario (`registry.js`, `key: 'content-avalanche'`) uses
 `rendererKey: 'content-avalanche-preview'`, which routes into the Canvas
-evidence-station flow implemented in `shared-components.js`
+evidence-station flow implemented in `s1-canvas-evidence.js`
 (`renderS1ContentAvalanchePreview`, `pcRouteS1ReflectionToCasePage`, the
 `pcS1CaseReflectionText` / `s1-submit-case-reflection` case page). That is
 the only S1 implementation reachable through normal play.
@@ -22,7 +21,7 @@ current registry.
 
 ## `src/js/scenarios/s1-course-design.js` — fully unreachable
 
-545 lines, plus a dedicated 160-line `src/css/scenarios/s1-course-design.css`.
+554 lines, plus a dedicated 160-line `src/css/scenarios/s1-course-design.css`.
 
 Its header comment: *"PROMPTCRAFT SCENARIO 1 — THE CONTENT AVALANCHE /
 Diagnose → Build a Canvas path → Audit Babbage → Repair and compare."* This
@@ -46,9 +45,10 @@ own unreachable HTML output, never in live markup.
 This module appears to be a full prototype that lost out to the current
 evidence-station design and was never removed.
 
-## `src/js/scenarios/s1-engagement.js` — mixed: mostly unreachable, but owns live shared code
+## `src/js/scenarios/s1-engagement.js` — dormant guided-builder implementation
 
-499 lines, plus a dedicated 582-line `src/css/scenarios/s1-engagement.css`.
+491 lines after navigation extraction, plus a dedicated 582-line
+`src/css/scenarios/s1-engagement.css`.
 
 Its header comment: *"SCENARIO 1 — ENGAGEMENT WORKBENCH / Guided repair
 builder, analysis handoff, score reflection, and revision."* This looks
@@ -62,13 +62,10 @@ review, revise).
 no scenario's `rendererKey` is `'guided-builder'`, so that entry point is
 unreachable the same way `s1-course-design.js` is.
 
-**Unlike `s1-course-design.js`, this file is not cleanly self-contained.**
-It also defines the shared scenario-navigation actions used across the
-whole app: `switch-scenario`, `dev-go-scenario`, `dev-fill-scenario`,
-`dev-next-scenario`, and `navigate-next`. These are genuinely live,
-`switch-scenario` drives the main menu and scenario tabs in `index.html`,
-and `navigate-next` is also used by S2's own "Next scenario" button
-(`s2-metacognition.js`). Any cleanup of this file has to preserve those.
+Patch 525 moved shared scenario-navigation actions to
+`src/js/app/action-routing.js` and development-only actions to
+`src/js/dev/development-tools.js`. `s1-engagement.js` now owns only its older
+guided-builder implementation and related S1 actions.
 
 It's also not certain every guided-builder function in this file is fully
 dead. A few, `sendGuided`, `getS1GuidedValues`, `analyzeS1Guided`, are
@@ -86,15 +83,14 @@ submits through `s1-submit-case-reflection` / `pcSubmitS1CaseReflection()`
 instead) wasn't traced further. Confirming it would need real browser
 testing, not just source grep.
 
-## Status
+## Status after patch 525
 
-No changes made. Both modules keep building and shipping as-is. If either
-is revisited:
+Both dormant modules still build and ship as-is. Phase 2 deliberately makes
+no deletion claim. If either is revisited:
 
 - `s1-course-design.js` and its CSS file can likely be archived as a unit
   with the same confidence as the S1 reflection cleanup in
   `archive/s1-legacy-dialogue-diagnosis-v489/`.
-- `s1-engagement.js` needs the live shared-navigation code separated from
-  the dead guided-builder code first, and the `scenario-runtime.js`
-  conditional branches above verified in an actual browser before removing
-  anything, not just grepped.
+- `s1-engagement.js` no longer owns shared navigation, but the
+  `scenario-runtime.js` conditional branches above still require verification
+  in an actual browser before the guided builder is removed.

@@ -1,0 +1,57 @@
+{
+  "manifest_version": 1,
+  "recorded_at_utc": "2026-09-01T21:30:23Z",
+  "release_id": "PROMPTCRAFT_V429_PHASE2_P525",
+  "application": {
+    "build": "PROMPTCRAFT_V429",
+    "research_schema": "V121",
+    "browser_cache_patch": 525,
+    "dialogue_asset_version": 149
+  },
+  "receiver": {
+    "version": "V83",
+    "source_changed": false,
+    "source_sha256": "f20107b3faa3f28794c9631bfa75e0834c84d96b6eaae2149095be0fb11bba58"
+  },
+  "babbage_proxy": {
+    "version": "V373",
+    "source_changed": false
+  },
+  "assets": {
+    "manifest_version": 149,
+    "manifest_changed": false,
+    "asset_files_added": 0,
+    "asset_files_removed": 0
+  },
+  "phase_2": {
+    "browser_patch": 525,
+    "focus": "JavaScript ownership separation",
+    "runtime_modules_before": 22,
+    "runtime_modules_after": 25,
+    "dormant_modules_deleted": 0,
+    "dormant_modules_retained": [
+      "scenarios/s1-course-design.js",
+      "scenarios/s1-engagement.js"
+    ]
+  },
+  "regression_gate": {
+    "quick": {
+      "passed": 62,
+      "total": 62
+    },
+    "browser": {
+      "status": "environment_blocked",
+      "reason": "Python Playwright and a browser executable are unavailable in the refactor workspace",
+      "product_failures_observed": 0
+    }
+  },
+  "preservation": {
+    "gameplay_changed": false,
+    "dialogue_changed": false,
+    "responsive_layout_changed": false,
+    "tracking_schema_changed": false,
+    "receiver_logic_changed": false,
+    "ai_contract_changed": false,
+    "accessibility_behavior_changed": false
+  }
+}

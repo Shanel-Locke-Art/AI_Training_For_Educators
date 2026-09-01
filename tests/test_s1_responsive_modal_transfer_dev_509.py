@@ -12,10 +12,10 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     css = read("src/css/scenarios/shared.css")
     dev = read("src/js/dev/development-tools.js")
-    actions = read("src/js/scenarios/s1-engagement.js")
+    actions = read("src/js/dev/development-tools.js")
     runtime = read("runtime/js/promptcraft.bundle.js")
     runtime_css = read("runtime/css/promptcraft.css")
     index = read("index.html")
@@ -46,8 +46,8 @@ def main() -> None:
     assert "dev-fill-s1-transfer" in actions
     assert index.count('data-pc-action="dev-fill-s1-transfer"') == 2
     assert "S1 Path ✏️" in index
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("V509 responsive evidence and transfer DEV-fill contract passed.")
 
 

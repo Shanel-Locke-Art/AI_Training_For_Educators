@@ -5,6 +5,8 @@
     "research/tracking.js",
     "audio/audio-engine.js",
     "ai/babbage-client.js",
+    "scenarios/shared-shell.js",
+    "scenarios/s1-canvas-evidence.js",
     "scenarios/shared-components.js",
     "scenarios/registry.js",
     "scenarios/s1-course-design.js",
@@ -21,6 +23,7 @@
     "ui/prediction-gate.js",
     "dev/development-tools.js",
     "audio/babbage-tts.js",
+    "app/action-routing.js",
     "app/bootstrap.js"
   ],
   "standalone": [
@@ -31,6 +34,16 @@
     {
       "source": "pages/ideas-wall.js",
       "runtime": "runtime/js/ideas-wall.js"
+    }
+  ],
+  "retained_dormant_modules": [
+    {
+      "source": "scenarios/s1-course-design.js",
+      "reason": "Legacy prototype retained until live-path browser coverage is available."
+    },
+    {
+      "source": "scenarios/s1-engagement.js",
+      "reason": "Legacy guided builder retained until scenario-runtime fallback branches are browser-verified."
     }
   ]
 }

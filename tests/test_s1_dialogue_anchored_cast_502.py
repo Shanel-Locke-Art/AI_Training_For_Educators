@@ -12,7 +12,7 @@ def read(relative: str) -> str:
 
 def main() -> None:
     vn = read("src/js/ui/visual-novel.js")
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     css = read("src/css/responsive/final-overrides.css")
     runtime = read("runtime/js/promptcraft.bundle.js")
     runtime_css = read("runtime/css/promptcraft.css")
@@ -41,8 +41,8 @@ def main() -> None:
 
     assert "style.removeProperty('--pc-s1-cast-bottom')" in shared
     assert "function pcRestoreS1ResponsiveCapture(panel, evidence)" in shared
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("V502 dialogue-anchored adaptive-cast contract passed.")
 
 

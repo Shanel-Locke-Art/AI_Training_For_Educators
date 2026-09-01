@@ -9,8 +9,9 @@ Current compatibility baseline:
 - Apps Script receiver: `V83`
 - Babbage proxy: `V373`
 - Asset manifest: `v149`
-- Current browser/cache revision: `524`
+- Current browser/cache revision: `525`
 - Phase 0 repository baseline revision: `524` (documentation, receiver ownership, and fixtures only)
+- Phase 2 refactor patch: `525` (JavaScript ownership only; no design or gameplay changes)
 
 Cache/query revisions are not application build numbers. Do not rename the app build when a cache marker changes.
 
@@ -31,6 +32,7 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 | File | Purpose |
 |---|---|
 | `development/phase-0-baseline.md` | Recorded archive hashes, version ownership, V83 source identity, production workbook safety boundary, fixture instructions, and Phase 0 exit status. |
+| `development/phase-2-javascript-ownership.md` | Patch 525 JavaScript ownership split, live S1 route, retained dormant modules, and deletion gate. |
 | `development/compatibility-contracts.md` | Things that must remain compatible: V429, V121, receiver V83, Babbage endpoint, Ideas Wall moderation, and versioning rules. |
 | `development/repository-map.md` | Where source/runtime files live and which files own each subsystem. Start here when locating code. |
 | `development/css-architecture.md` | CSS ownership and cascade order. Use before adding or moving styling. |

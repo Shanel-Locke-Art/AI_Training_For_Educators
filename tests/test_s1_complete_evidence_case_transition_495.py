@@ -11,7 +11,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     dialogue = read("src/js/content/dialogue-data.js")
     responsive = read("src/css/responsive/final-overrides.css")
     runtime = read("runtime/js/promptcraft.bundle.js")
@@ -37,8 +37,8 @@ def main() -> None:
 
     assert "pcPlayS1PreviewBriefing(nextCaseIndex, null, { classroom: true })" in runtime
     assert "width: 100vw !important" in runtime_css
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
 
     print("V495 complete evidence and narrated next-case contract passed.")
 

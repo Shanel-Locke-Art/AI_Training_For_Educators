@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SHARED_JS = (ROOT / "src/js/scenarios/shared-components.js").read_text(encoding="utf-8")
+SHARED_JS = (ROOT / "src/js/scenarios/s1-canvas-evidence.js").read_text(encoding="utf-8")
 DEV_JS = (ROOT / "src/js/app/scenario-runtime.js").read_text(encoding="utf-8")
 SHARED_CSS = (ROOT / "src/css/scenarios/shared.css").read_text(encoding="utf-8")
 RESPONSIVE_CSS = (ROOT / "src/css/responsive/final-overrides.css").read_text(encoding="utf-8")
@@ -46,5 +46,5 @@ def test_module_capture_has_no_device_specific_transform_matrix():
     assert "V491 — one predictable crop" in RESPONSIVE_CSS
     assert "transform: none !important" in RESPONSIVE_CSS
     assert "translateY(-50px) scale(1.75)" not in RESPONSIVE_CSS
-    assert "patch=524" in INDEX
-    assert "DEV · 524" in INDEX
+    assert "patch=525" in INDEX
+    assert "DEV · 525" in INDEX

@@ -11,7 +11,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     registry = read("src/js/scenarios/registry.js")
     runtime_app = read("src/js/app/scenario-runtime.js")
     tts = read("src/js/audio/babbage-tts.js")
@@ -52,8 +52,8 @@ def main() -> None:
         assert token in css
         assert token in runtime_css
 
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("V505 S2-staged Canvas dialogue and analysis-row contract passed.")
 
 

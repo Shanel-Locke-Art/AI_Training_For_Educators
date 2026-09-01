@@ -11,7 +11,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     dev = read("src/js/dev/development-tools.js")
     runtime = read("runtime/js/promptcraft.bundle.js")
     index = read("index.html")
@@ -32,8 +32,8 @@ def main() -> None:
     assert "activeS1Case ? pcFillS1DevFields() : resetS1Dev()" in fill
     assert fill in runtime
 
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("V498 emulated-device fit and current-case DEV-fill contract passed.")
 
 

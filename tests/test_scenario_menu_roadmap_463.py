@@ -20,7 +20,7 @@ def ui_object(registry: str, key: str) -> str:
 def main() -> None:
     state = read("src/js/app/runtime-state.js")
     registry = read("src/js/scenarios/registry.js")
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/shared-shell.js")
     terminal = read("src/js/ui/babbage-terminal.js")
     assessment = read("src/js/scenarios/s3-authentic-assessment.js")
     index = read("index.html")
@@ -78,7 +78,7 @@ def main() -> None:
     assert "scenarioIndex === SCENARIO_INDEX.CONTENT_AVALANCHE" in terminal
     assert "scenario_index: 4" in assessment
     assert "scenario_label: 'S4: The 96% Problem'" in assessment
-    assert "patch=524" in index
+    assert "patch=525" in index
 
     retired = (
         "S1: Engagement",

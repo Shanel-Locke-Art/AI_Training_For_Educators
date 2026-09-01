@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> None:
-    shared = (ROOT / "src/js/scenarios/shared-components.js").read_text(encoding="utf-8")
+    shared = (ROOT / "src/js/scenarios/s1-canvas-evidence.js").read_text(encoding="utf-8")
     css = (ROOT / "src/css/responsive/final-overrides.css").read_text(encoding="utf-8")
     index = (ROOT / "index.html").read_text(encoding="utf-8")
 
@@ -24,7 +24,7 @@ def main() -> None:
     assert '[data-pc-character="eli"]' in css
     assert "object-fit: cover !important" not in css[css.index("/* V508"):]
 
-    assert "patch=524" in index
+    assert "patch=525" in index
     print("V508 S1 mission image and contained Canvas dialogue contract passed.")
 
 

@@ -12,7 +12,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     progress = read("src/js/app/scenario-runtime.js")
     state = read("src/js/app/runtime-state.js")
     css = read("src/css/scenarios/shared.css")
@@ -51,8 +51,8 @@ def main() -> None:
     assert "Your Level bar is now" not in shared
     assert "You earned ${" not in shared
 
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("V517 scrollable evidence and Pixel progress feedback contract passed.")
 
 

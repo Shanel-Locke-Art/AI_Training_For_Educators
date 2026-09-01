@@ -14,7 +14,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     responsive = read("src/css/responsive/final-overrides.css")
     runtime = read("runtime/js/promptcraft.bundle.js")
     runtime_css = read("runtime/css/promptcraft.css")
@@ -102,8 +102,8 @@ process.stdout.write(JSON.stringify(results));
     )
     assert json.loads(result.stdout) == ["read", "read", "read", "read", "read", "fit"]
 
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("V523 emulated-screen Read Size and zoom-guidance contract passed.")
 
 

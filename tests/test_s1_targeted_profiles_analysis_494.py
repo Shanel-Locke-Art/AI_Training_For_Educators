@@ -11,7 +11,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    shared_js = read("src/js/scenarios/shared-components.js")
+    shared_js = read("src/js/scenarios/s1-canvas-evidence.js")
     responsive_css = read("src/css/responsive/final-overrides.css")
     shared_css = read("src/css/scenarios/shared.css")
     runtime_js = read("runtime/js/promptcraft.bundle.js")
@@ -36,8 +36,8 @@ def main() -> None:
 
     assert 'max-width: 1060px' in runtime_js
     assert 'minmax(72px, max-content)' in runtime_css
-    assert 'patch=524' in index
-    assert 'DEV · 524' in index
+    assert 'patch=525' in index
+    assert 'DEV · 525' in index
 
     print("V494 targeted device and variable analysis contract passed.")
 

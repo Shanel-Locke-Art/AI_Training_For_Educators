@@ -487,15 +487,5 @@ if (!window.pcGuidedInputDelegationInstalled) {
 pcRegisterUIActions({
   'send-guided': () => sendGuided(),
   'revise-s1': () => reviseS1(),
-  'show-s1-reflection': target => showS1PostAnalysisReflection(Number(target.dataset.pcScore) || 0),
-  'switch-scenario': target => {
-    const index = pcNormalizeScenarioIndex(target.dataset.pcScenarioIndex);
-    return index === null ? false : switchScenario(index, target);
-  },
-  'dev-go-scenario': target => window.devGoScenario?.(target.dataset.pcScenarioIndex),
-  'dev-fill-scenario': target => window.devFillScenario?.(target.dataset.pcScenarioIndex),
-  'dev-fill-s1-transfer': () => window.devFillS1TransferTask?.(),
-  'dev-reset-progress': () => window.devResetProgress?.(),
-  'dev-next-scenario': () => window.devNextScenario?.(),
-  'navigate-next': target => window.navigateToNext?.(target.dataset.pcScenarioIndex)
+  'show-s1-reflection': target => showS1PostAnalysisReflection(Number(target.dataset.pcScore) || 0)
 });

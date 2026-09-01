@@ -1,6 +1,6 @@
 # PromptCraft repository architecture
 
-This is the canonical repository map for `PROMPTCRAFT_V429` as represented by browser/cache patch 524 and Phase 0 repository baseline revision 524. Older flat/numeric layouts should not be reconstructed from memory.
+This is the canonical repository map for `PROMPTCRAFT_V429` as represented by browser/cache patch 525 and Phase 0 repository baseline revision 524. Older flat/numeric layouts should not be reconstructed from memory.
 
 ## Receiver and release ownership
 
@@ -39,6 +39,7 @@ src/js/
 │   ├── runtime-state.js          # global runtime + teaching progress state
 │   ├── config-and-assets.js      # ASSETS registry + receiver configuration
 │   ├── scenario-runtime.js
+│   ├── action-routing.js         # shared navigation + development UI actions
 │   └── bootstrap.js
 ├── audio/
 │   ├── audio-engine.js
@@ -52,10 +53,12 @@ src/js/
 ├── research/
 │   └── tracking.js
 ├── scenarios/
-│   ├── shared-components.js
+│   ├── shared-shell.js            # mission, scroll, input, and locked-shell helpers
+│   ├── s1-canvas-evidence.js      # current S1 Canvas evidence + transfer flow
+│   ├── shared-components.js       # scenario-neutral activity builders
 │   ├── registry.js
 │   ├── s1-course-design.js       # unreachable from the current registry — see s1-unreachable-modules.md
-│   ├── s1-engagement.js          # partially unreachable from the current registry — see s1-unreachable-modules.md
+│   ├── s1-engagement.js          # dormant guided builder; retained pending browser proof
 │   ├── s2-metacognition.js
 │   └── s3-authentic-assessment.js
 └── ui/
@@ -69,6 +72,8 @@ src/js/
 ```
 
 `src/js/manifest.json` defines bundle order and standalone source/runtime mappings. `tools/build.py` fails if a JavaScript source owner exists but is not declared in the manifest.
+
+Phase 2 separates the former 3,339-line mixed `shared-components.js` owner into three files without changing the executable statements: `shared-shell.js` owns the application-facing scenario shell, `s1-canvas-evidence.js` owns current S1 behavior, and `shared-components.js` contains only reusable activity builders. Shared navigation actions formerly appended to `s1-engagement.js` now belong to `app/action-routing.js`; development-only actions belong to `dev/development-tools.js`.
 
 ## CSS source ownership
 

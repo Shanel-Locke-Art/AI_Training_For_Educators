@@ -13,7 +13,7 @@ def read(relative: str) -> str:
 
 def main() -> None:
     registry = read("src/js/scenarios/registry.js")
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     scenario_runtime = read("src/js/app/scenario-runtime.js")
     dialogue = read("src/js/content/dialogue-data.js")
     runtime_dialogue = read("runtime/js/dialogue-data.js")
@@ -142,9 +142,9 @@ def main() -> None:
     assert "aspect-ratio: 16 / 9.8 !important" in css
     assert ".vn-board-img.loaded" in css
     assert "object-fit: contain !important" in css
-    assert "patch=524" in index
-    assert "DEV · 524" in index
-    assert "runtime/js/dialogue-data.js?v=149&amp;patch=524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
+    assert "runtime/js/dialogue-data.js?v=149&amp;patch=525" in index
     print("S1 Content Avalanche edge-to-edge Canvas reader 482 contract passed.")
 
 

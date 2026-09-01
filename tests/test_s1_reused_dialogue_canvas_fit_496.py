@@ -11,7 +11,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     css = read("src/css/responsive/final-overrides.css")
     runtime = read("runtime/js/promptcraft.bundle.js")
     runtime_css = read("runtime/css/promptcraft.css")
@@ -39,8 +39,8 @@ def main() -> None:
 
     # The next-case bridge remains narrated by the established cast.
     assert "pcPlayS1PreviewBriefing(nextCaseIndex, null, { classroom: true })" in shared
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
 
     print("V496 reused-dialogue and documented Canvas-fit contract passed.")
 

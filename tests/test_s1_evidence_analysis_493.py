@@ -11,7 +11,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     evidence_css = read("src/css/responsive/final-overrides.css")
     analysis_css = read("src/css/ui/completed-analysis.css")
     analysis_js = read("src/js/ui/analysis-layout-controller.js")

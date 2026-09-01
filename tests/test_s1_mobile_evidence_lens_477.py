@@ -12,7 +12,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    source = read("src/js/scenarios/shared-components.js")
+    source = read("src/js/scenarios/s1-canvas-evidence.js")
     css = read("src/css/scenarios/shared.css")
     runtime = read("runtime/js/promptcraft.bundle.js")
     runtime_css = read("runtime/css/promptcraft.css")
@@ -53,8 +53,8 @@ def main() -> None:
 
     assert "overflow-y: auto" not in css[css.index(".pc-s1-mobile-evidence-lens {"):css.index("/* Babbage is a workspace")]
     assert 'object-fit: contain !important' in css, "Desktop focused captures must remain intact."
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("S1 readable mobile Canvas evidence lens remains intact through patch 482.")
 
 

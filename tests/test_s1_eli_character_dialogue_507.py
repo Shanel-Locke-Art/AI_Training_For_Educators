@@ -14,7 +14,7 @@ def main() -> None:
     config = read("src/js/app/config-and-assets.js")
     vn = read("src/js/ui/visual-novel.js")
     registry = read("src/js/scenarios/registry.js")
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     dialogue = read("src/js/content/dialogue-data.js")
     manifest = read("assets/asset-manifest.json")
     runtime = read("runtime/js/promptcraft.bundle.js")
@@ -42,8 +42,8 @@ def main() -> None:
     assert '"speaker": "Jordan"' in dialogue
     assert "ASSETS.images.students.jordan" in runtime
     assert '"speaker": "Eli"' in runtime_dialogue
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("V507 Eli character and dialogue integration contract passed.")
 
 

@@ -13,7 +13,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     dialogue = read("src/js/content/dialogue-data.js")
     css = read("src/css/scenarios/shared.css")
     registry = read("src/js/scenarios/registry.js")

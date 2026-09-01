@@ -6,6 +6,11 @@ The authoritative release gate is `tools/check.py`. Tests are classified by beha
 
 All tests referenced by `QUICK_CHECKS` or `BROWSER_CHECKS` in `tools/check.py` are mandatory current contracts. Phase 1 adds the previously omitted active checks for patches 490, 491, and 510–516, except for the dormant prototype test described below.
 
+Patch 525 adds `test_phase2_module_ownership.py` to the mandatory gate. It
+guards the current S1 registry route, module load order, shared/S1 ownership,
+application navigation ownership, development-action ownership, and the
+explicit retained-dormant list.
+
 ## Superseded patch assertions
 
 These files describe mutually exclusive intermediate states and are retained only as patch history:
@@ -19,13 +24,14 @@ Their current replacement is `test_s1_validated_transfer_analysis_523.py`.
 
 ## Dormant prototype tests
 
-These files exercise the unreachable `s1-course-design.js` prototype and are excluded from the current release gate:
+These files exercise the dormant `s1-course-design.js` prototype and are excluded from the current release gate:
 
 - `test_s1_course_design.js`
 - `test_s1_course_design_runtime.js`
 - `test_s1_spreadsheet_checkpoints_511.py`
 
-They remain available until Phase 2 verifies and archives/removes the prototype. They must not be interpreted as proof that the prototype is live.
+They remain available until browser verification permits a later archival or
+removal. They must not be interpreted as proof that the prototype is live.
 
 ## Environment-specific diagnostic
 

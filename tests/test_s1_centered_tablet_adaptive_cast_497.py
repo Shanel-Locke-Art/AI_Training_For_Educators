@@ -11,7 +11,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     visual_novel = read("src/js/ui/visual-novel.js")
     css = read("src/css/responsive/final-overrides.css")
     runtime = read("runtime/js/promptcraft.bundle.js")
@@ -46,8 +46,8 @@ def main() -> None:
     assert "#vnCharacter#vnCharacter" in v497
     assert "/* V497" in runtime_css
 
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("V497 centered-tablet and adaptive-phone-cast contract passed.")
 
 

@@ -11,7 +11,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     vn = read("src/js/ui/visual-novel.js")
     runtime = read("runtime/js/promptcraft.bundle.js")
     dev = read("src/js/dev/development-tools.js")
@@ -44,8 +44,8 @@ def main() -> None:
         assert token in runtime
 
     assert "activeS1Case ? pcFillS1DevFields() : resetS1Dev()" in dev
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("V501 order-independent Canvas viewport contract passed.")
 
 

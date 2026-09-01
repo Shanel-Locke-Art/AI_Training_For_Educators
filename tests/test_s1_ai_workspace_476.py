@@ -12,7 +12,7 @@ def read(relative: str) -> str:
 
 
 def main() -> None:
-    source = read("src/js/scenarios/shared-components.js")
+    source = read("src/js/scenarios/s1-canvas-evidence.js")
     css = read("src/css/scenarios/shared.css")
     runtime = read("runtime/js/promptcraft.bundle.js")
     runtime_css = read("runtime/css/promptcraft.css")
@@ -51,8 +51,8 @@ def main() -> None:
 
     assert "pcGetS1AIWorkspaceStepHTML" not in source
     assert "pcRenderS1AIWorkspaceStep" not in source
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("S1 responsive Babbage reflection analysis contract passed through patch 484.")
 
 

@@ -1650,10 +1650,10 @@ function formatBabbageAnalysisAsLegacyText(a = {}) {
   ].join('\n');
 }
 ;
-/* SOURCE: src/js/scenarios/shared-components.js */
-/* PROMPTCRAFT SHARED SCENARIO FRAMEWORK
-   Reusable mission, progress, choice, feedback, and activity-shell helpers.
-   Scenario 1 remains the visual/behavioral regression reference. */
+/* SOURCE: src/js/scenarios/shared-shell.js */
+/* PROMPTCRAFT SHARED SCENARIO SHELL
+   Scenario lookup, mission briefing, scroll reset, input visibility, and the
+   locked-scenario placeholder. */
 
 // ── SHARED SCENARIO STRUCTURE ─────────────────────────
 // Scenario 1 established the clean mission-briefing pattern. The remaining
@@ -1741,7 +1741,11 @@ function renderScenarioPlaceholder(index) {
     </section>`;
   resetSectionScroll(area, container);
 }
-
+;
+/* SOURCE: src/js/scenarios/s1-canvas-evidence.js */
+/* PROMPTCRAFT SCENARIO 1 — CANVAS EVIDENCE AND TRANSFER
+   Current Content Avalanche case files, evidence viewer, AI reflection,
+   Canvas Rescue, and course-week transfer activity. */
 
 const PC_S1_PREVIEW_CASES = Object.freeze([
   Object.freeze({
@@ -4113,7 +4117,11 @@ pcRegisterUIActions({
 });
 
 pcExposeGlobals({ pcFillS1TransferDevTask });
-
+;
+/* SOURCE: src/js/scenarios/shared-components.js */
+/* PROMPTCRAFT SHARED SCENARIO ACTIVITY COMPONENTS
+   Scenario-neutral progress, choice, evidence, manipulation, transfer,
+   guided-repair, result, and activity-shell builders. */
 
 // ══════════════════════════════════════════════════════
 //  SHARED SCENARIO ACTIVITY COMPONENTS
@@ -14238,17 +14246,7 @@ if (!window.pcGuidedInputDelegationInstalled) {
 pcRegisterUIActions({
   'send-guided': () => sendGuided(),
   'revise-s1': () => reviseS1(),
-  'show-s1-reflection': target => showS1PostAnalysisReflection(Number(target.dataset.pcScore) || 0),
-  'switch-scenario': target => {
-    const index = pcNormalizeScenarioIndex(target.dataset.pcScenarioIndex);
-    return index === null ? false : switchScenario(index, target);
-  },
-  'dev-go-scenario': target => window.devGoScenario?.(target.dataset.pcScenarioIndex),
-  'dev-fill-scenario': target => window.devFillScenario?.(target.dataset.pcScenarioIndex),
-  'dev-fill-s1-transfer': () => window.devFillS1TransferTask?.(),
-  'dev-reset-progress': () => window.devResetProgress?.(),
-  'dev-next-scenario': () => window.devNextScenario?.(),
-  'navigate-next': target => window.navigateToNext?.(target.dataset.pcScenarioIndex)
+  'show-s1-reflection': target => showS1PostAnalysisReflection(Number(target.dataset.pcScore) || 0)
 });
 ;
 /* SOURCE: src/js/ui/prediction-gate.js */
@@ -15455,6 +15453,14 @@ if (!window.__pcPredictionWatchdogBound) {
     })
   });
 })();;
+
+pcRegisterUIActions({
+  'dev-go-scenario': target => window.devGoScenario?.(target.dataset.pcScenarioIndex),
+  'dev-fill-scenario': target => window.devFillScenario?.(target.dataset.pcScenarioIndex),
+  'dev-fill-s1-transfer': () => window.devFillS1TransferTask?.(),
+  'dev-reset-progress': () => window.devResetProgress?.(),
+  'dev-next-scenario': () => window.devNextScenario?.()
+});
 ;
 /* SOURCE: src/js/audio/babbage-tts.js */
 /* Babbage analysis text-to-speech. DOM IDs retain babbage* names for CSS/markup compatibility. */
@@ -15499,6 +15505,19 @@ function toggleBabbageTTS() {
     if (btn) btn.textContent = '⏹ Stop Reading';
     window.speechSynthesis.speak(babbageSpeechUtterance);
   }
+;
+/* SOURCE: src/js/app/action-routing.js */
+/* PROMPTCRAFT APPLICATION ACTION ROUTING
+   Scenario switching and forward navigation shared by the application shell.
+   Scenario gameplay and development controls stay with their own owners. */
+
+pcRegisterUIActions({
+  'switch-scenario': target => {
+    const index = pcNormalizeScenarioIndex(target.dataset.pcScenarioIndex);
+    return index === null ? false : switchScenario(index, target);
+  },
+  'navigate-next': target => window.navigateToNext?.(target.dataset.pcScenarioIndex)
+});
 ;
 /* SOURCE: src/js/app/bootstrap.js */
 // ══════════════════════════════════════════════════════

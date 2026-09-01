@@ -14,7 +14,7 @@ def read(relative: str) -> str:
 def main() -> None:
     runtime = read("src/js/app/scenario-runtime.js")
     dev = read("src/js/dev/development-tools.js")
-    shared = read("src/js/scenarios/shared-components.js")
+    shared = read("src/js/scenarios/s1-canvas-evidence.js")
     css = read("src/css/scenarios/shared.css")
     responsive = read("src/css/responsive/final-overrides.css")
     index = read("index.html")
@@ -58,8 +58,8 @@ def main() -> None:
     ):
         assert token in responsive
 
-    assert "patch=524" in index
-    assert "DEV · 524" in index
+    assert "patch=525" in index
+    assert "DEV · 525" in index
     print("V518 reset, introduction evidence, and modal readability contract passed.")
 
 
