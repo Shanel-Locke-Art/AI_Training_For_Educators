@@ -28,6 +28,11 @@ metadata, V121 compatibility, V83 source identity, V84 duplicate suppression,
 formula-safe cells, lossless chunked raw payloads, corrected readable labels,
 non-destructive tab handling, and the copied-workbook fingerprint function.
 
+The Phase 6 checkpoint adds `test_phase6_release_contract.py` without advancing
+the browser patch. It guards version taxonomy, final ownership documentation,
+unchanged product-source hashes, sorted changed-file manifests, debris exclusion,
+generated-runtime ownership, and reproducible manifest-only ZIP creation.
+
 ## Superseded patch assertions
 
 These files describe mutually exclusive intermediate states and are retained only as patch history:

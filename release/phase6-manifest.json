@@ -1,0 +1,73 @@
+{
+  "manifest_version": 1,
+  "recorded_at_utc": "2026-09-02T14:15:00Z",
+  "release_id": "PROMPTCRAFT_V429_PHASE6_P527",
+  "application": {
+    "build": "PROMPTCRAFT_V429",
+    "research_schema": "V121",
+    "browser_cache_patch": 527,
+    "dialogue_asset_version": 149
+  },
+  "receiver": {
+    "live_baseline_version": "V83",
+    "candidate_version": "V84",
+    "deployed": false,
+    "copied_workbook_verification_required": true,
+    "production_workbook_modified": false
+  },
+  "babbage_proxy": {
+    "version": "V373",
+    "source_changed": false
+  },
+  "assets": {
+    "manifest_version": 149,
+    "manifest_changed": false,
+    "packaged_files": 0
+  },
+  "phase_6": {
+    "focus": "Final architecture, ownership, and changed-file packaging",
+    "browser_patch_advanced": false,
+    "receiver_version_advanced": false,
+    "source_files_changed": 0,
+    "runtime_files_changed": 0,
+    "css_files_changed": 0,
+    "dialogue_files_changed": 0,
+    "asset_files_changed": 0,
+    "changed_file_count": 12,
+    "reproducible_packaging": true
+  },
+  "protected_sha256": {
+    "index.html": "22cfd2cc535f0a562236b1281c2a1279b40aba2802b8eac3b1ea2620094d2489",
+    "runtime/js/promptcraft.bundle.js": "99f825763e1038f95f89ce65deed13ae2f971095238aa5b5e5feb651e19a348a",
+    "runtime/css/promptcraft.css": "1380f5be86c099f3eafd5a5dbac8e3130c059c19c57ef7ba5fb954285ce42628",
+    "src/js/manifest.json": "4a39ded3486672d688946663a24edab6df4e4b233ae94ae4ea032fad5b500516",
+    "src/css/manifest.css": "e1a0ec085f4a6a8a1734b8aa265960a3f147911e444b44086eb4365e9c34344c",
+    "apps-script/PromptCraft_Receiver_V83_Readable_Prompt_Data.js": "f20107b3faa3f28794c9631bfa75e0834c84d96b6eaae2149095be0fb11bba58",
+    "apps-script/PromptCraft_Receiver_V84_Readable_Raw_Separation.js": "6057f5bfa28e3a8866ad95e4b76716cf8f1a68587d1662908cf93f7e7e6a50cc",
+    "netlify/functions/babbage.js": "07f0c61eed19df7b2a87f2e9a027753f8b835a30b3ea6625e5876799bd84ea28",
+    "assets/asset-manifest.json": "62e33256e480ae384dd513e25d8418e706b2e416ac03ae416b9f7bd1b5d6ebe1"
+  },
+  "regression_gate": {
+    "quick": {
+      "passed": 67,
+      "total": 67
+    },
+    "browser": {
+      "status": "environment_blocked",
+      "blocked": 17,
+      "reason": "Python Playwright and all Playwright or system browser executables are unavailable",
+      "product_failures_observed": 0
+    }
+  },
+  "preservation": {
+    "gameplay_changed": false,
+    "dialogue_changed": false,
+    "responsive_css_changed": false,
+    "tracking_changed": false,
+    "receiver_logic_changed": false,
+    "ai_contract_changed": false,
+    "accessibility_behavior_changed": false,
+    "spreadsheet_structure_changed": false,
+    "raw_archives_changed": false
+  }
+}

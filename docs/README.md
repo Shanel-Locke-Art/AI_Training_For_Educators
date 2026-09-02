@@ -15,6 +15,7 @@ Current compatibility baseline:
 - Phase 3 refactor patch: `526` (viewport JavaScript ownership only; no design, gameplay, or CSS changes)
 - Phase 4 readiness checkpoint: patch remains `526` (CSS ownership inventory and deletion gate only; runtime CSS unchanged)
 - Phase 5 refactor patch: `527` (tracking identity and additive V84 readable/raw receiver separation)
+- Phase 6 release checkpoint: patch remains `527` (final ownership documentation and changed-file packaging only)
 
 Cache/query revisions are not application build numbers. Do not rename the app build when a cache marker changes.
 
@@ -39,6 +40,7 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 | `development/phase-3-viewport-controller.md` | Patch 526 viewport metrics policy, centralized listener ownership, subscriber boundaries, and preservation checks. |
 | `development/phase-4-css-readiness.md` | Final-cascade inventory findings, ordered component migration plan, and visual proof required before CSS movement or deletion. |
 | `development/phase-5-tracking-receiver.md` | V84 event identity, score-scale ownership, readable projections, lossless raw archive, and copied-workbook deployment gate. |
+| `development/phase-6-architecture-release.md` | Final subsystem ownership, version taxonomy, release gate, and changed-file-only packaging procedure. |
 | `development/compatibility-contracts.md` | Things that must remain compatible: V429, V121, receiver V83, Babbage endpoint, Ideas Wall moderation, and versioning rules. |
 | `development/repository-map.md` | Where source/runtime files live and which files own each subsystem. Start here when locating code. |
 | `development/css-architecture.md` | CSS ownership, exact cascade order, and Phase 4 consolidation gate. Use before adding or moving styling. |

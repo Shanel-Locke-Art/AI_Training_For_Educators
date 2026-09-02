@@ -23,6 +23,7 @@ QUICK_CHECKS = (
     ("Viewport controller 526 metrics and subscribers", ["node", "tests/test_viewport_controller_526.js"]),
     ("Phase 4 CSS ownership and visual deletion boundary", [sys.executable, "tests/test_phase4_css_ownership.py"]),
     ("Phase 5 tracking identity, activity, and score scale", ["node", "tests/test_phase5_tracking_contract.js"]),
+    ("Phase 6 architecture and changed-file packaging", [sys.executable, "tests/test_phase6_release_contract.py"]),
     ("Apps Script receiver V83 characterization fixtures", ["node", "tests/test_receiver_v83_fixture.js"]),
     ("Apps Script receiver V84 additive readability fixtures", ["node", "tests/test_receiver_v84_fixture.js"]),
     ("Structural hardening", [sys.executable, "tools/validate.py"]),

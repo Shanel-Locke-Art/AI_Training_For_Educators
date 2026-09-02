@@ -1,6 +1,27 @@
 # PromptCraft repository architecture
 
-This is the canonical repository map for `PROMPTCRAFT_V429` as represented by browser/cache patch 526 and Phase 0 repository baseline revision 524. Older flat/numeric layouts should not be reconstructed from memory.
+This is the canonical repository map for `PROMPTCRAFT_V429` after Phase 6, represented by browser/cache patch 527 and research schema V121. Older flat/numeric layouts should not be reconstructed from memory.
+
+## Major subsystem ownership
+
+| Area | Authoritative owner |
+|---|---|
+| App identity, service URLs, asset registry | `src/js/app/config-and-assets.js` |
+| Runtime, session, and teaching-progression state | `src/js/app/runtime-state.js` |
+| Scenario registry and current roadmap labels | `src/js/scenarios/registry.js` |
+| Shared navigation and action dispatch | `src/js/app/action-routing.js` |
+| Shared scenario shell and activity primitives | `src/js/scenarios/shared-shell.js` and `src/js/scenarios/shared-components.js` |
+| Current S1 Canvas evidence/gameplay | `src/js/scenarios/s1-canvas-evidence.js` |
+| Current S2/S3-compatible scenario modules | `src/js/scenarios/s2-metacognition.js` and `src/js/scenarios/s3-authentic-assessment.js` |
+| Viewport metrics and responsive notifications | `src/js/ui/viewport-controller.js` |
+| VN/cast/dialogue presentation | `src/js/ui/visual-novel.js` and `src/js/content/dialogue-data.js` |
+| Babbage browser requests and presentation | `src/js/ai/babbage-client.js`, `src/js/ui/babbage-terminal.js`, and analysis layout modules |
+| Babbage server contracts | `netlify/functions/babbage.js` |
+| Browser research events | `src/js/research/tracking.js` |
+| Receiver ingestion, raw data, and readable views | Versioned sources under `apps-script/` |
+| CSS cascade and component ownership | `src/css/manifest.css` and its imported semantic owners |
+| Generated browser output | `runtime/`, generated only by `tools/build.py` |
+| Regression and packaging gate | `tools/check.py` and `tools/package_changed.py` |
 
 ## Receiver and release ownership
 
@@ -124,6 +145,7 @@ Major current asset groups:
 | `tools/css_ownership_inventory.py` | Final-cascade selector ownership, component-family, conflict, and visual-gate inventory |
 | `tools/audit_assets.py` | Asset classification/reference audit |
 | `tools/check.py` | One-command regression runner; `--full` includes browser tests |
+| `tools/package_changed.py` | Reproducible ZIP builder from a sorted changed-file manifest; rejects debris and unowned generated runtime |
 
 Current browser regression coverage also includes teaching progression, Ideas Wall header/theme, GFC action borders, Babbage print/save, S1/S2 guided repair, terminal handoffs, and analysis overflow.
 
@@ -131,6 +153,16 @@ Phase 4 CSS ownership data is generated at `release/phase4-css-ownership.json`.
 It is an audit artifact, not a browser stylesheet. Structural CSS consolidation
 remains blocked until the slice-specific visual and computed-style baseline can
 run.
+
+## Release packaging
+
+Every update ZIP is generated from the phase's sorted
+`release/phaseN-changed-files.txt`. A file not named there is not packaged.
+`desktop.ini`, `__pycache__`, Python bytecode, and other generated debris are
+forbidden. Unchanged assets are omitted. Generated files under `runtime/` are
+allowed only when their source owner is also in the changed-file manifest and
+`tools/build.py --check` confirms synchronization. Phase 6 itself has no source,
+runtime, asset, dialogue, receiver, proxy, CSS, design, or gameplay change.
 
 ## Scenario boundary
 
