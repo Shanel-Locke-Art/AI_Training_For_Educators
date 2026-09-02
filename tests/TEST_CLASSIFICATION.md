@@ -16,6 +16,18 @@ guards metric fallbacks, six viewport families, emulated-device behavior,
 exact Read Size profiles, centralized listener ownership, and all registered
 responsive subscribers.
 
+The Phase 4 readiness checkpoint adds `test_phase4_css_ownership.py` without
+advancing the browser patch. It guards the complete cascade inventory, ordered
+component migration plan, unchanged runtime-CSS marker, and the rule that
+structural CSS deletion is forbidden while visual baselines are unavailable.
+
+Patch 527 adds `test_phase5_tracking_contract.js` and
+`test_receiver_v84_fixture.js` to the mandatory gate while retaining the V83
+characterization test. They guard stable event identity, activity/score-scale
+metadata, V121 compatibility, V83 source identity, V84 duplicate suppression,
+formula-safe cells, lossless chunked raw payloads, corrected readable labels,
+non-destructive tab handling, and the copied-workbook fingerprint function.
+
 ## Superseded patch assertions
 
 These files describe mutually exclusive intermediate states and are retained only as patch history:

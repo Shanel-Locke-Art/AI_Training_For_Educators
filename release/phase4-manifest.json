@@ -1,0 +1,63 @@
+{
+  "manifest_version": 1,
+  "recorded_at_utc": "2026-09-01T22:04:53Z",
+  "release_id": "PROMPTCRAFT_V429_PHASE4_CSS_READINESS_P526",
+  "application": {
+    "build": "PROMPTCRAFT_V429",
+    "research_schema": "V121",
+    "browser_cache_patch": 526,
+    "dialogue_asset_version": 149
+  },
+  "receiver": {
+    "version": "V83",
+    "source_changed": false,
+    "source_sha256": "f20107b3faa3f28794c9631bfa75e0834c84d96b6eaae2149095be0fb11bba58"
+  },
+  "babbage_proxy": {
+    "version": "V373",
+    "source_changed": false
+  },
+  "assets": {
+    "manifest_version": 149,
+    "manifest_changed": false,
+    "asset_files_added": 0,
+    "asset_files_removed": 0
+  },
+  "phase_4": {
+    "checkpoint": "CSS ownership readiness",
+    "browser_patch_advanced": false,
+    "css_source_changed": false,
+    "runtime_css_changed": false,
+    "application_css_owner_files": 20,
+    "active_rules": 4642,
+    "normalized_selector_headers": 2721,
+    "multi_owner_selector_headers": 192,
+    "important_declarations": 11512,
+    "final_overrides_lines": 5657,
+    "final_overrides_rules": 886,
+    "final_overrides_important_declarations": 1737,
+    "structural_css_deletion_allowed": false,
+    "next_slice": "onboarding-menu"
+  },
+  "regression_gate": {
+    "quick": {
+      "passed": 64,
+      "total": 64
+    },
+    "browser": {
+      "status": "environment_blocked",
+      "blocked": 17,
+      "reason": "Python Playwright and all Playwright or system browser executables are unavailable; a bounded Chromium install attempt produced no executable",
+      "product_failures_observed": 0
+    }
+  },
+  "preservation": {
+    "gameplay_changed": false,
+    "dialogue_changed": false,
+    "responsive_css_changed": false,
+    "tracking_schema_changed": false,
+    "receiver_logic_changed": false,
+    "ai_contract_changed": false,
+    "accessibility_behavior_changed": false
+  }
+}

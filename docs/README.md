@@ -6,13 +6,15 @@ Current compatibility baseline:
 
 - Application build: `PROMPTCRAFT_V429`
 - Research schema: `V121`
-- Apps Script receiver: `V83`
+- Apps Script receiver candidate: `V84`; immutable/live baseline: `V83`
 - Babbage proxy: `V373`
 - Asset manifest: `v149`
-- Current browser/cache revision: `526`
+- Current browser/cache revision: `527`
 - Phase 0 repository baseline revision: `524` (documentation, receiver ownership, and fixtures only)
 - Phase 2 refactor patch: `525` (JavaScript ownership only; no design or gameplay changes)
 - Phase 3 refactor patch: `526` (viewport JavaScript ownership only; no design, gameplay, or CSS changes)
+- Phase 4 readiness checkpoint: patch remains `526` (CSS ownership inventory and deletion gate only; runtime CSS unchanged)
+- Phase 5 refactor patch: `527` (tracking identity and additive V84 readable/raw receiver separation)
 
 Cache/query revisions are not application build numbers. Do not rename the app build when a cache marker changes.
 
@@ -35,9 +37,11 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 | `development/phase-0-baseline.md` | Recorded archive hashes, version ownership, V83 source identity, production workbook safety boundary, fixture instructions, and Phase 0 exit status. |
 | `development/phase-2-javascript-ownership.md` | Patch 525 JavaScript ownership split, live S1 route, retained dormant modules, and deletion gate. |
 | `development/phase-3-viewport-controller.md` | Patch 526 viewport metrics policy, centralized listener ownership, subscriber boundaries, and preservation checks. |
+| `development/phase-4-css-readiness.md` | Final-cascade inventory findings, ordered component migration plan, and visual proof required before CSS movement or deletion. |
+| `development/phase-5-tracking-receiver.md` | V84 event identity, score-scale ownership, readable projections, lossless raw archive, and copied-workbook deployment gate. |
 | `development/compatibility-contracts.md` | Things that must remain compatible: V429, V121, receiver V83, Babbage endpoint, Ideas Wall moderation, and versioning rules. |
 | `development/repository-map.md` | Where source/runtime files live and which files own each subsystem. Start here when locating code. |
-| `development/css-architecture.md` | CSS ownership and cascade order. Use before adding or moving styling. |
+| `development/css-architecture.md` | CSS ownership, exact cascade order, and Phase 4 consolidation gate. Use before adding or moving styling. |
 | `development/gfc-visual-theme.md` | Current Great Falls College / PromptCraft visual direction and shared branding rules. |
 | `development/pre-s3-refactor.md` | Historical stabilization record explaining what was removed before S3 development and what must not be reconstructed. |
 | `development/s1-unreachable-modules.md` | Findings record: two complete prior S1 implementations still build into the bundle but aren't reachable from the current registry. Read before assuming either is live or safe to delete. |

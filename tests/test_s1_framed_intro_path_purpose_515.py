@@ -42,8 +42,8 @@ def main() -> None:
         assert token in css
         assert token in runtime_css
 
-    assert "patch=526" in index
-    assert "DEV · 526" in index
+    assert "patch=527" in index
+    assert "DEV · 527" in index
     print("V515 framed introduction evidence and purpose-focused transfer task passed.")
 
 

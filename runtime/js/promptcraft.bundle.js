@@ -1014,6 +1014,9 @@ window.testSheetsPing = function testSheetsPing() {
     type: 'incremental',
     schema_version: PC_APP_SCHEMA_VERSION,
     app_build: PC_APP_BUILD_LABEL,
+    event_id: pcCreateTrackingEventId('receiver-connection-test'),
+    activity_id: 'receiver-connection-test',
+    score_scale_max: 5,
     timestamp: new Date().toISOString(),
     participant_id: 'browser-test',
     scenario_index: 1,
@@ -1157,6 +1160,36 @@ const scenarioData = Array.from({ length: SCENARIO_COUNT }, (_, index) => {
 });
 
 const pcLastIncrementalSaveAt = {};
+let pcTrackingEventSequence = 0;
+
+function pcCreateTrackingEventId(kind = 'event') {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  pcTrackingEventSequence += 1;
+  return [
+    'pc',
+    String(kind || 'event').replace(/[^a-z0-9_-]/gi, '_'),
+    pcSessionId,
+    Date.now(),
+    pcTrackingEventSequence
+  ].join('-');
+}
+
+function pcTrackingActivityId(scenarioIdx, eventType, data = {}) {
+  const analysisType = String(data?.structuredAnalysis?.analysis_type || '');
+  if (analysisType === 's1_evidence_analysis') {
+    const caseIndex = Number(data?.structuredAnalysis?.case_index || 0);
+    return caseIndex > 0 ? `s1-evidence-case-${caseIndex}` : 's1-evidence-analysis';
+  }
+  if (analysisType === 's1_transfer_plan_analysis') return 's1-instructor-plan';
+  const event = String(eventType || '').replace(/_complete(?:d)?$/i, '').replace(/_/g, '-');
+  return event || `scenario-${Number(scenarioIdx) + 1}`;
+}
+
+function pcTrackingScoreScaleMax(_scenarioIdx, eventType, data = {}) {
+  const analysisType = String(data?.structuredAnalysis?.analysis_type || '');
+  if (eventType === 's1_evidence_analysis_complete' || analysisType === 's1_evidence_analysis') return 3;
+  return 5;
+}
 
 function pcFormatPredictionChoice(choice) {
   if (!choice) return '';
@@ -1279,6 +1312,8 @@ function buildSessionPayload(formData) {
     type: 'full_response',
     schema_version: PC_APP_SCHEMA_VERSION,
     app_build: PC_APP_BUILD_LABEL,
+    event_id: pcCreateTrackingEventId('full-response'),
+    payload_shape: 'named_full_response_v121',
 
     // Session
     timestamp:            new Date().toISOString(),
@@ -1390,11 +1425,16 @@ async function saveIncrementalData(scenarioIdx, eventType = 'scenario_complete')
     const scoreDelta = (typeof s.scoreDelta === 'number') ? s.scoreDelta : 0;
     const selfReportPrediction = pcFormatPredictionsForSave(s, scenarioIdx);
     const latestPredictionChoice = pcGetLatestPredictionChoice(s);
+    const activityId = pcTrackingActivityId(scenarioIdx, eventType, s);
+    const scoreScaleMax = pcTrackingScoreScaleMax(scenarioIdx, eventType, s);
 
     const payload = {
       type: 'incremental',
       schema_version: PC_APP_SCHEMA_VERSION,
       app_build: PC_APP_BUILD_LABEL,
+      event_id: pcCreateTrackingEventId(eventType),
+      activity_id: activityId,
+      score_scale_max: scoreScaleMax,
       payload_shape: 'named_current_incremental_v121',
       timestamp: new Date().toISOString(),
       participant_id: participantId,

@@ -41,8 +41,8 @@ def main() -> None:
 
     assert "style.removeProperty('--pc-s1-cast-bottom')" in shared
     assert "function pcRestoreS1ResponsiveCapture(panel, evidence)" in shared
-    assert "patch=526" in index
-    assert "DEV · 526" in index
+    assert "patch=527" in index
+    assert "DEV · 527" in index
     print("V502 dialogue-anchored adaptive-cast contract passed.")
 
 

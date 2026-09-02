@@ -1,0 +1,74 @@
+{
+  "manifest_version": 1,
+  "recorded_at_utc": "2026-09-02T13:40:35Z",
+  "release_id": "PROMPTCRAFT_V429_PHASE5_P527_RECEIVER_V84_CANDIDATE",
+  "application": {
+    "build": "PROMPTCRAFT_V429",
+    "research_schema": "V121",
+    "browser_cache_patch": 527,
+    "dialogue_asset_version": 149
+  },
+  "receiver": {
+    "live_baseline_version": "V83",
+    "candidate_version": "V84",
+    "deployed": false,
+    "v83_source_changed": false,
+    "v83_source_sha256": "f20107b3faa3f28794c9631bfa75e0834c84d96b6eaae2149095be0fb11bba58",
+    "v84_source_sha256": "6057f5bfa28e3a8866ad95e4b76716cf8f1a68587d1662908cf93f7e7e6a50cc",
+    "copied_workbook_verification_required": true,
+    "production_workbook_modified": false
+  },
+  "babbage_proxy": {
+    "version": "V373",
+    "source_changed": false
+  },
+  "assets": {
+    "manifest_version": 149,
+    "manifest_changed": false,
+    "asset_files_added": 0,
+    "asset_files_removed": 0
+  },
+  "phase_5": {
+    "focus": "Tracking identity and readable/raw receiver separation",
+    "stable_event_ids": true,
+    "duplicate_suppression": true,
+    "activity_specific_score_scales": true,
+    "formula_safe_research_cells": true,
+    "lossless_raw_payload_archive": "96 - Raw Payload Archive",
+    "additive_readable_views": [
+      "12 - Research Responses",
+      "13 - Process Events"
+    ],
+    "existing_tabs_renamed_or_deleted": false,
+    "v121_raw_columns_changed": false,
+    "destructive_reset_disabled": true,
+    "fixed_row_formula_limit_removed": true
+  },
+  "raw_contracts": {
+    "97 - Raw Responses": 75,
+    "98 - Raw Events": 32,
+    "99 - Raw Audit": 9
+  },
+  "regression_gate": {
+    "quick": {
+      "passed": 66,
+      "total": 66
+    },
+    "browser": {
+      "status": "environment_blocked",
+      "blocked": 17,
+      "reason": "Python Playwright and all Playwright or system browser executables are unavailable",
+      "product_failures_observed": 0
+    }
+  },
+  "preservation": {
+    "gameplay_changed": false,
+    "dialogue_changed": false,
+    "responsive_css_changed": false,
+    "tracking_schema_changed": false,
+    "receiver_logic_changed": true,
+    "receiver_change_type": "additive V84 candidate beside immutable V83",
+    "ai_contract_changed": false,
+    "accessibility_behavior_changed": false
+  }
+}

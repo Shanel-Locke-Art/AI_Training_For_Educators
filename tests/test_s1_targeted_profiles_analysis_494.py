@@ -36,8 +36,8 @@ def main() -> None:
 
     assert 'max-width: 1060px' in runtime_js
     assert 'minmax(72px, max-content)' in runtime_css
-    assert 'patch=526' in index
-    assert 'DEV · 526' in index
+    assert 'patch=527' in index
+    assert 'DEV · 527' in index
 
     print("V494 targeted device and variable analysis contract passed.")
 

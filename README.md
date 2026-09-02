@@ -1,13 +1,13 @@
 # PromptCraft V429
 
-This repository includes the Phase 3 viewport ownership refactor for PromptCraft.
+This repository includes the Phase 5 tracking and receiver-readability refactor for PromptCraft.
 
 Stable compatibility identifiers:
 
 - Application build: `PROMPTCRAFT_V429`
 - Research schema: `V121`
-- Browser/cache patch: `526`
-- Apps Script receiver: `V83`
+- Browser/cache patch: `527`
+- Apps Script receiver candidate: `V84` (`V83` preserved unchanged and remains the live baseline until deployment)
 - Babbage proxy: `V373`
 - Asset manifest: `v149`
 
@@ -19,8 +19,12 @@ Start with:
 - `release/phase1-manifest.json` for Phase 1 versions and validation status
 - `release/phase2-manifest.json` for Phase 2 versions, ownership scope, and validation status
 - `release/phase3-manifest.json` for Phase 3 viewport ownership and validation status
+- `release/phase4-manifest.json` for Phase 4 CSS inventory status and the visual validation boundary
+- `release/phase5-manifest.json` for Phase 5 tracking, V84 receiver, and deployment-gate status
 - `docs/development/repository-map.md` for source ownership
 - `docs/development/phase-2-javascript-ownership.md` for the patch 525 ownership split and retained-code boundary
 - `docs/development/phase-3-viewport-controller.md` for the patch 526 viewport policy and subscriber ownership
+- `docs/development/phase-4-css-readiness.md` for the ordered CSS migration plan and current blocker
+- `docs/development/phase-5-tracking-receiver.md` for readable/raw sheet ownership, V84 changes, and copied-workbook verification
 
-Editable browser source lives under `src/`; generated browser output lives under `runtime/`. The exact supplied V83 receiver is preserved under `apps-script/`. Do not run V83's `initializeWorkbookNow()` or `resetResearchDataNow()` against the production research workbook during refactoring.
+Editable browser source lives under `src/`; generated browser output lives under `runtime/`. The exact supplied V83 receiver and additive V84 candidate are both under `apps-script/`. Do not deploy or initialize V84 against production until its read-only inventory has been recorded on a recovery copy. V84 disables destructive reset.

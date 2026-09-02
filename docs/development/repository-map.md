@@ -7,12 +7,13 @@ This is the canonical repository map for `PROMPTCRAFT_V429` as represented by br
 | Path | Ownership |
 |---|---|
 | `apps-script/PromptCraft_Receiver_V83_Readable_Prompt_Data.js` | Exact, unchanged V83 Apps Script baseline |
+| `apps-script/PromptCraft_Receiver_V84_Readable_Raw_Separation.js` | Additive V84 candidate: idempotency, readable projections, lossless raw archive, and copied-workbook verification |
 | `release/baseline-manifest.json` | Machine-readable build/schema/patch/receiver/proxy/archive identity |
 | `tools/receiver/workbook_inventory_read_only.gs` | Read-only production workbook shape/header inventory helper |
 | `tests/test_receiver_v83_fixture.js` | Memory-only V83 characterization harness |
 | `tests/fixtures/receiver/` | Named V121 payload fixtures; no production research data |
 
-Receiver V83 is a preserved baseline, not an editable rolling file. A behavior change creates V84 and must retain V83 for migration comparison.
+Receiver V83 is a preserved baseline, not an editable rolling file. Phase 5 creates V84 beside it and retains V83 for migration comparison. V84 is not considered live until copied-workbook fingerprints pass and the Apps Script deployment is explicitly updated.
 
 ## Runtime entry points
 
@@ -120,10 +121,16 @@ Major current asset groups:
 | `tools/build.py` | Generate/synchronize runtime output and syntax-check JavaScript |
 | `tools/validate.py` | Structural, compatibility, action-registration, and hardening guards |
 | `tools/audit_css.py` | CSS duplicate/retired-selector audit |
+| `tools/css_ownership_inventory.py` | Final-cascade selector ownership, component-family, conflict, and visual-gate inventory |
 | `tools/audit_assets.py` | Asset classification/reference audit |
 | `tools/check.py` | One-command regression runner; `--full` includes browser tests |
 
 Current browser regression coverage also includes teaching progression, Ideas Wall header/theme, GFC action borders, Babbage print/save, S1/S2 guided repair, terminal handoffs, and analysis overflow.
+
+Phase 4 CSS ownership data is generated at `release/phase4-css-ownership.json`.
+It is an audit artifact, not a browser stylesheet. Structural CSS consolidation
+remains blocked until the slice-specific visual and computed-style baseline can
+run.
 
 ## Scenario boundary
 

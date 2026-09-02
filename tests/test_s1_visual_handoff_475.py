@@ -56,8 +56,8 @@ def main() -> None:
 
     assert "pc-s1-ai-summary" not in shared
     assert "pcS1Takeaway" not in shared
-    assert "patch=526" in index
-    assert "DEV · 526" in index
+    assert "patch=527" in index
+    assert "DEV · 527" in index
     print("S1 smartboard and compact case handoff contract passed through patch 482.")
 
 

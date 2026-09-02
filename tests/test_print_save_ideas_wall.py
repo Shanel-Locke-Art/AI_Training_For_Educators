@@ -34,7 +34,7 @@ checks={
  'print is document-first not CRT clone': 'Babbage Analysis Report' in terminal and 'Diagnostic findings' in terminal and 'reportClone.outerHTML' not in terminal,
  'print waits for embedded images before print': 'Promise.all(images.map' in terminal,
  'print replaces about:blank URL': "printUrl.hash = 'babbage-analysis-report'" in terminal,
- 'app build stays receiver-compatible V429': f'runtime/js/promptcraft.bundle.js?v=429&amp;patch={_patch}&amp;receiver=85' in idx,
+ 'app build stays receiver-compatible V429': f'runtime/js/promptcraft.bundle.js?v=429&amp;patch={_patch}&amp;receiver=84' in idx,
  'compiled JS contains print feature': 'function pcPrintCurrentBabbageReport()' in bundle,
  'compiled CSS contains print control rule': ':has(.babbage-print-btn)' in cssb,
 }

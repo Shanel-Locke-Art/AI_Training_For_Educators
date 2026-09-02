@@ -6,10 +6,10 @@ These contracts are intentionally preserved while PromptCraft is refactored and 
 
 - App build: `PROMPTCRAFT_V429`
 - Research schema: `V121`
-- Apps Script receiver: `V83` (supplied source preserved unchanged)
+- Apps Script receiver candidate: `V84`; supplied `V83` source preserved unchanged
 - Apps Script deployment: existing configured deployment URL
 - Current asset manifest: `v149`
-- Current browser/cache revision: `526`
+- Current browser/cache revision: `527`
 - Current repository baseline revision: `524`
 - Scenario result tabs retain full narrative text; Process Log remains abbreviated by design
 
@@ -86,10 +86,15 @@ The public card displays the complete descriptive paragraph. The public wall use
 ## Receiver and research workbook
 
 - The immutable V83 baseline source is `apps-script/PromptCraft_Receiver_V83_Readable_Prompt_Data.js`.
+- The additive V84 candidate is `apps-script/PromptCraft_Receiver_V84_Readable_Raw_Separation.js`. V83 remains the live baseline until V84 passes copied-workbook verification and is deliberately deployed.
 - V83 may be characterized and replayed against memory-only fixtures or a copied workbook; it must not be edited in place.
-- Do not run `initializeWorkbookNow()` or `resetResearchDataNow()` against production during refactoring.
+- V84 must first run on a recovery copy. Record `verifyV84MigrationNow()` before and after initialization and compare every raw-sheet row count and SHA-256 fingerprint.
+- Do not run V83 `initializeWorkbookNow()` or `resetResearchDataNow()` against production during refactoring. V84 disables `resetResearchDataNow()`.
 - Preserve all existing raw response, event, and audit rows and the V121 column layout.
-- Corrected readable projections require a new receiver version, copied-workbook migration tests, and explicit row-count/hash verification.
+- V84 retains the 75-column `97 - Raw Responses`, 32-column `98 - Raw Events`, and 9-column `99 - Raw Audit` contracts without renaming columns.
+- `96 - Raw Payload Archive` is additive, hidden, append-only, and lossless. Payloads longer than one Google Sheets cell are stored in ordered 45,000-character chunks.
+- `12 - Research Responses` and `13 - Process Events` are additive readable projections. `11 - Ideas Wall` remains isolated from research projections.
+- Existing scenario tab names remain unchanged for spreadsheet compatibility. V84's verified mapping supplies the current roadmap labels in readable rows and documentation.
 
 ## Versioning
 

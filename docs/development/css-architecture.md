@@ -17,14 +17,15 @@ PromptCraft keeps editable CSS in `src/css/` and browser-loaded output in `runti
 9. `ui/live-analysis.css`
 10. `ui/completed-analysis.css`
 11. `scenarios/s1-engagement.css`
-12. `scenarios/shared.css`
-13. `responsive/intro.css`
-14. `responsive/workbench.css`
-15. `ui/brand-menu.css`
-16. `responsive/large-tablet.css`
-17. `responsive/prediction.css`
-18. `responsive/final-overrides.css`
-19. `ui/gfc-theme.css`
+12. `scenarios/s1-course-design.css`
+13. `scenarios/shared.css`
+14. `responsive/intro.css`
+15. `responsive/workbench.css`
+16. `ui/brand-menu.css`
+17. `responsive/large-tablet.css`
+18. `responsive/prediction.css`
+19. `responsive/final-overrides.css`
+20. `ui/gfc-theme.css`
 
 `tools/build.py` concatenates those owners into `runtime/css/promptcraft.css` without changing their cascade order.
 
@@ -69,10 +70,26 @@ A retired selector failing the audit is intentional friction. Reuse the current 
 
 ## Validation
 
+`release/phase4-css-ownership.json` is the machine-readable final-cascade
+inventory. It records every normalized selector header, its owner and cascade
+position, media context, repeated ownership, component-family distribution,
+rule totals, and `!important` totals. Regenerate it with:
+
+```bash
+python tools/css_ownership_inventory.py
+```
+
+Phase 4 structural moves and deletions require a browser executable plus
+computed-style, screenshot, overflow, keyboard, focus, reduced-motion, and
+announcement baselines for the component slice being moved. When that visual
+environment is unavailable, inventory and regression-gate work may continue,
+but `final-overrides.css` and compatibility rules must not be moved or deleted.
+
 Run:
 
 ```bash
 python tools/audit_css.py
+python tools/css_ownership_inventory.py --check
 python tools/build.py --check
 ```
 

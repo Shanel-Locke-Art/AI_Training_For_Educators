@@ -30,7 +30,7 @@ def main():
     index_html = (ROOT / "index.html").read_text(encoding="utf-8")
     patch = current_patch(index_html)
     require("index.html", f"runtime/css/promptcraft.css?v=429&patch={patch}")
-    require("index.html", f"runtime/js/promptcraft.bundle.js?v=429&amp;patch={patch}&amp;receiver=85")
+    require("index.html", f"runtime/js/promptcraft.bundle.js?v=429&amp;patch={patch}&amp;receiver=84")
     require("wall.html", "GFC MSU")
     require("wall.html", "runtime/css/ideas-wall.css?v=443")
     require("src/css/pages/ideas-wall.css", "--forest-950: #071a36")
