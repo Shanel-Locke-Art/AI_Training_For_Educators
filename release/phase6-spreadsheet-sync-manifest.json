@@ -1,0 +1,66 @@
+{
+  "manifest_version": 1,
+  "recorded_at_utc": "2026-09-02T14:30:00Z",
+  "release_id": "PROMPTCRAFT_V429_PHASE6_SPREADSHEET_SYNC_P527",
+  "application": {
+    "build": "PROMPTCRAFT_V429",
+    "research_schema": "V121",
+    "browser_cache_patch": 527,
+    "source_changed": false,
+    "runtime_changed": false
+  },
+  "receiver": {
+    "live_baseline_version": "V83",
+    "candidate_version": "V84",
+    "deployed": false,
+    "source_changed": false
+  },
+  "babbage_proxy": {
+    "version": "V373",
+    "source_changed": false
+  },
+  "assets": {
+    "manifest_version": 149,
+    "asset_files_changed": 0,
+    "manifest_changed": false
+  },
+  "spreadsheet_sync": {
+    "workbooks_changed": 3,
+    "changed_file_count": 11,
+    "visuals_in_use": 59,
+    "visuals_planned": 3,
+    "visuals_not_started": 18,
+    "visuals_reference_only": 9,
+    "visuals_archived": 10,
+    "voice_lines_ready": 68,
+    "runtime_audio_in_use": 3,
+    "rows_deleted": 0,
+    "raw_archives_changed": false
+  },
+  "workbook_sha256": {
+    "docs/asset-management/PromptCraft_Production_Overview_Simplified.xlsx": "38b55fa3a30c79e23d0b302e2e0adfbd3f9916e9160c8331c77df7934815cc98",
+    "docs/asset-management/PromptCraft_Visual_Asset_Tracker_Simplified.xlsx": "60d28d970bc8b91ffe2fd9d25ca15ea73f1de808e7a7eb9eade40b0e19c7a996",
+    "docs/asset-management/PromptCraft_Voice_Recording_Tracker.xlsx": "9ae4aba78038a172a3ad37663449e98c678f27e8369aa5131699a19b3d6579c6"
+  },
+  "regression_gate": {
+    "quick": {
+      "passed": 68,
+      "total": 68
+    },
+    "browser": {
+      "status": "unchanged_from_phase6_environment_blocked",
+      "blocked": 17,
+      "product_failures_observed": 0
+    }
+  },
+  "preservation": {
+    "gameplay_changed": false,
+    "dialogue_source_changed": false,
+    "responsive_layout_changed": false,
+    "tracking_changed": false,
+    "receiver_logic_changed": false,
+    "ai_contract_changed": false,
+    "accessibility_behavior_changed": false,
+    "spreadsheet_structure_removed": false
+  }
+}

@@ -33,6 +33,12 @@ the browser patch. It guards version taxonomy, final ownership documentation,
 unchanged product-source hashes, sorted changed-file manifests, debris exclusion,
 generated-runtime ownership, and reproducible manifest-only ZIP creation.
 
+The Phase 6 spreadsheet synchronization adds
+`test_phase6_spreadsheet_sync.py` without advancing the browser patch. It guards
+the three canonical production workbooks, current V429/V121/V83/V84/v149 labels,
+manifest-backed visual and audio counts, current roadmap labels, retained legacy
+path compatibility, bounded formulas, workbook hashes, and stale-label removal.
+
 ## Superseded patch assertions
 
 These files describe mutually exclusive intermediate states and are retained only as patch history:

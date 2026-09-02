@@ -24,6 +24,7 @@ QUICK_CHECKS = (
     ("Phase 4 CSS ownership and visual deletion boundary", [sys.executable, "tests/test_phase4_css_ownership.py"]),
     ("Phase 5 tracking identity, activity, and score scale", ["node", "tests/test_phase5_tracking_contract.js"]),
     ("Phase 6 architecture and changed-file packaging", [sys.executable, "tests/test_phase6_release_contract.py"]),
+    ("Phase 6 canonical spreadsheet synchronization", [sys.executable, "tests/test_phase6_spreadsheet_sync.py"]),
     ("Apps Script receiver V83 characterization fixtures", ["node", "tests/test_receiver_v83_fixture.js"]),
     ("Apps Script receiver V84 additive readability fixtures", ["node", "tests/test_receiver_v84_fixture.js"]),
     ("Structural hardening", [sys.executable, "tools/validate.py"]),

@@ -1,0 +1,11 @@
+docs/asset-management/PromptCraft_Production_Overview_Simplified.xlsx
+docs/asset-management/PromptCraft_Visual_Asset_Tracker_Simplified.xlsx
+docs/asset-management/PromptCraft_Voice_Recording_Tracker.xlsx
+release/phase6-spreadsheet-sync-changed-files.txt
+release/phase6-spreadsheet-sync-checksums.sha256
+release/phase6-spreadsheet-sync-manifest.json
+release/phase6-spreadsheet-sync-test-results.md
+tests/TEST_CLASSIFICATION.md
+tests/test_phase6_release_contract.py
+tests/test_phase6_spreadsheet_sync.py
+tools/check.py
