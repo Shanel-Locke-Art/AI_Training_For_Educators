@@ -1,0 +1,56 @@
+{
+  "manifest_version": 1,
+  "recorded_at_utc": "2026-09-08T17:00:00Z",
+  "release_id": "PROMPTCRAFT_V429_STRUCTURED_PRINT_P529",
+  "application": {
+    "build": "PROMPTCRAFT_V429",
+    "research_schema": "V121",
+    "browser_cache_patch": 529,
+    "dialogue_asset_version": 149
+  },
+  "receiver": {
+    "live_baseline_version": "V83",
+    "candidate_version": "V84",
+    "deployed": false,
+    "source_changed": false
+  },
+  "babbage_proxy": {
+    "version": "V373",
+    "source_changed": false
+  },
+  "assets": {
+    "manifest_version": 149,
+    "manifest_changed": false,
+    "asset_files_packaged": 0
+  },
+  "patch_529": {
+    "focus": "Scannable final-analysis findings and visual Canvas module-path example",
+    "changed_file_count": 55,
+    "what_worked_uses_criterion_rows": true,
+    "issue_detected_uses_criterion_rows": true,
+    "accessible_module_path_example": true,
+    "standard_report_findings_preserved": true
+  },
+  "regression_gate": {
+    "quick": {
+      "passed": 70,
+      "total": 70
+    },
+    "browser": {
+      "status": "environment_blocked",
+      "blocked": 17,
+      "reason": "Python Playwright is unavailable",
+      "product_failures_observed": 0
+    }
+  },
+  "preservation": {
+    "gameplay_changed": false,
+    "dialogue_changed": false,
+    "tracking_schema_changed": false,
+    "receiver_logic_changed": false,
+    "ai_contract_changed": false,
+    "device_profile_logic_changed": false,
+    "spreadsheet_structure_changed": false,
+    "accessibility_behavior_removed": false
+  }
+}

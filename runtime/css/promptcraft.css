@@ -20699,10 +20699,10 @@ html body.pc-s1-canvas-backdrop-active #vnOverlay.vn-overlay.active .vn-smartboa
   letter-spacing:.08em;
 }
 .pc-s1-reflection-analysis--terminal .pc-s1-reflection-focus h3 {
-  max-width:34ch !important;
+  max-width:none !important;
   margin:0 !important;
   color:#baffd3 !important;
-  font:750 clamp(1.45rem,3vw,2.15rem)/1.18 "Source Code Pro",monospace !important;
+  font:750 clamp(1.25rem,2.25vw,1.8rem)/1.22 "Source Code Pro",monospace !important;
 }
 .pc-s1-reflection-analysis--terminal .pc-s1-reflection-feedback {
   margin:0 !important;

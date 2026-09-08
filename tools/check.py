@@ -34,6 +34,8 @@ QUICK_CHECKS = (
     ("Great Falls College theme contract", [sys.executable, "tests/test_gfc_theme.py"]),
     ("Babbage-to-VN transition handoff", [sys.executable, "tests/test_transition_handoff.py"]),
     ("Print, Save PDF, and Ideas Wall", [sys.executable, "tests/test_print_save_ideas_wall.py"]),
+    ("Current final-analysis print and version labels", [sys.executable, "tests/test_final_analysis_print_version_528.py"]),
+    ("Patch 529 structured findings and module-path example", [sys.executable, "tests/test_final_analysis_print_layout_529.py"]),
     ("S2 repair terminal contract", [sys.executable, "tests/test_s2_repair_terminal_flow.py"]),
     ("Dialogue cleanup", [sys.executable, "tests/test_dialogue_cleanup.py"]),
     ("GFC action borders", [sys.executable, "tests/test_gfc_action_borders.py"]),

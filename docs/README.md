@@ -9,13 +9,15 @@ Current compatibility baseline:
 - Apps Script receiver candidate: `V84`; immutable/live baseline: `V83`
 - Babbage proxy: `V373`
 - Asset manifest: `v149`
-- Current browser/cache revision: `527`
+- Current browser/cache revision: `529`
 - Phase 0 repository baseline revision: `524` (documentation, receiver ownership, and fixtures only)
 - Phase 2 refactor patch: `525` (JavaScript ownership only; no design or gameplay changes)
 - Phase 3 refactor patch: `526` (viewport JavaScript ownership only; no design, gameplay, or CSS changes)
 - Phase 4 readiness checkpoint: patch remains `526` (CSS ownership inventory and deletion gate only; runtime CSS unchanged)
 - Phase 5 refactor patch: `527` (tracking identity and additive V84 readable/raw receiver separation)
 - Phase 6 release checkpoint: patch remains `527` (final ownership documentation and changed-file packaging only)
+- Final analysis readability and printing patch: `528` (wider/smaller Module Path finding, restored print action, synchronized menu build/patch label)
+- Structured print-report patch: `529` (scannable criterion rows and a visual Canvas module-path example)
 
 Cache/query revisions are not application build numbers. Do not rename the app build when a cache marker changes.
 

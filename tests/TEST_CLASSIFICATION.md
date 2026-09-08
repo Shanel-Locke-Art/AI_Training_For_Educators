@@ -39,6 +39,17 @@ the three canonical production workbooks, current V429/V121/V83/V84/v149 labels,
 manifest-backed visual and audio counts, current roadmap labels, retained legacy
 path compatibility, bounded formulas, workbook hashes, and stale-label removal.
 
+Patch 528 added `test_final_analysis_print_version_528.py`. Its active deployment
+markers advance with the current browser patch while it continues to guard the
+wider, smaller final Module Path heading, the restored shared Print / Save PDF
+action, the V429 and V121 compatibility boundary, and a main-menu label that
+displays both the stable application build and the advancing browser patch.
+
+Patch 529 adds `test_final_analysis_print_layout_529.py`. It guards scannable
+criterion rows in the printed What Worked and Issue Detected findings, plus the
+accessible five-step Canvas module-path example. It does not alter gameplay,
+tracking, AI requests, or the V121 research schema.
+
 ## Superseded patch assertions
 
 These files describe mutually exclusive intermediate states and are retained only as patch history:

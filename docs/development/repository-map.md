@@ -1,6 +1,6 @@
 # PromptCraft repository architecture
 
-This is the canonical repository map for `PROMPTCRAFT_V429` after Phase 6, represented by browser/cache patch 527 and research schema V121. Older flat/numeric layouts should not be reconstructed from memory.
+This is the canonical repository map for `PROMPTCRAFT_V429` after Phase 6, represented by browser/cache patch 529 and research schema V121. Older flat/numeric layouts should not be reconstructed from memory.
 
 ## Major subsystem ownership
 

@@ -34,11 +34,13 @@ const PC_APP_SCRIPT_URL = (() => {
   return script?.src || new URL('runtime/js/promptcraft.bundle.js', document.baseURI).href;
 })();
 const PC_APP_VERSION = new URL(PC_APP_SCRIPT_URL).searchParams.get('v') || 'DEV';
+const PC_BROWSER_PATCH = new URL(PC_APP_SCRIPT_URL).searchParams.get('patch') || 'DEV';
 const PC_APP_SCHEMA_VERSION = 'V121';
 const PC_APP_BUILD_LABEL = `PROMPTCRAFT_V${PC_APP_VERSION}`;
 
 function pcSyncAppVersionLabels() {
-  const versionText = `Version ${PC_APP_VERSION}`;
+  const patchText = PC_BROWSER_PATCH === 'DEV' ? '' : ` · Patch ${PC_BROWSER_PATCH}`;
+  const versionText = `Version ${PC_APP_VERSION}${patchText}`;
   document.querySelectorAll('[data-pc-app-version], #mainMenuVersion').forEach((element) => {
     element.textContent = versionText;
   });

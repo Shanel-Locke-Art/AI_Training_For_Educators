@@ -1874,6 +1874,7 @@ function pcRenderS1WeekPlanAnalysis(data, analysis, analysisSource) {
         <p>Babbage can identify visible pathway signals. You still verify alignment, workload, accessibility, dates, and accuracy.</p>
         <div>
           <button id="babbageTTSBtn" type="button" class="pc-shell-secondary pc-s1-reflection-tts" data-pc-action="toggle-babbage-tts" data-pc-stop-propagation="true">🔊 Read Analysis</button>
+          <button type="button" class="pc-shell-secondary pc-s1-reflection-print" data-pc-action="print-babbage-report" data-pc-stop-propagation="true">Print / Save PDF</button>
           <button type="button" class="pc-shell-secondary" data-pc-action="s1-week-plan-restart">← Revise my week</button>
           <button type="button" class="pc-shell-primary" data-pc-action="s1-complete-week-plan">Complete Scenario 1</button>
         </div>

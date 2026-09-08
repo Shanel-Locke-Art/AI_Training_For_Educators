@@ -188,22 +188,62 @@ function pcGetBabbagePrintContext() {
 
 function pcPrintCurrentBabbageReport() {
   const report = document.querySelector('#babbageTerminalOutput .analysis-report');
-  if (!report) return false;
+  const pathReport = document.getElementById('pcS1WeekPlanAnalysis');
+  if (!report && !pathReport) return false;
 
-  const { scenarioLabel, submittedWork } = pcGetBabbagePrintContext();
+  let { scenarioLabel, submittedWork } = pcGetBabbagePrintContext();
   const printedAt = new Date().toLocaleString();
-  const textOf = selector => String(report.querySelector(selector)?.textContent || '').trim();
+  const activeReport = report || pathReport;
+  const textOf = selector => String(activeReport.querySelector(selector)?.textContent || '').trim();
   const cardValue = selector => String(report.querySelector(`${selector} .analysis-value`)?.textContent || '').trim();
   const cardNote = selector => String(report.querySelector(`${selector} .analysis-note`)?.textContent || '').trim();
 
-  const summary = textOf('.analysis-summary');
-  const status = cardValue('.analysis-status-card');
-  const confidence = cardValue('.analysis-confidence-card');
-  const confidenceNote = cardNote('.analysis-confidence-card');
-  const whatWorked = cardValue('.analysis-worked-card');
-  const issue = cardValue('.analysis-issue-card');
-  const repair = cardValue('.analysis-repair-card');
-  const impact = cardValue('.analysis-impact-card');
+  let reportTitle = 'Babbage Analysis Report';
+  let inputTitle = 'Repair brief submitted';
+  let summary = '';
+  let status = '';
+  let confidence = '';
+  let confidenceNote = '';
+  let whatWorked = '';
+  let whatWorkedItems = [];
+  let issue = '';
+  let issueItems = [];
+  let repair = '';
+  let impact = '';
+
+  if (report) {
+    summary = textOf('.analysis-summary');
+    status = cardValue('.analysis-status-card');
+    confidence = cardValue('.analysis-confidence-card');
+    confidenceNote = cardNote('.analysis-confidence-card');
+    whatWorked = cardValue('.analysis-worked-card');
+    issue = cardValue('.analysis-issue-card');
+    repair = cardValue('.analysis-repair-card');
+    impact = cardValue('.analysis-impact-card');
+  } else {
+    const criterionItems = selector => [...pathReport.querySelectorAll(selector)]
+      .map(item => ({
+        label: String(item.querySelector('strong')?.textContent || '').trim(),
+        detail: String(item.querySelector('p')?.textContent || '').trim()
+      }))
+      .filter(item => item.label || item.detail);
+    const teachingPoints = [...pathReport.querySelectorAll('.pc-s1-reflection-teaching-point p')]
+      .map(item => String(item.textContent || '').trim())
+      .filter(Boolean);
+
+    reportTitle = textOf('.pc-s1-reflection-analysis-header h2') || 'Module Path Analysis';
+    inputTitle = 'Module path submitted';
+    scenarioLabel = 'Scenario 1 · Module Path';
+    const submittedPath = pathReport.querySelector('.pc-s1-reflection-response blockquote');
+    submittedWork = String(submittedPath?.innerText || submittedPath?.textContent || '').trim() || submittedWork;
+    summary = textOf('.pc-s1-reflection-focus h3');
+    status = textOf('.pc-s1-reflection-analysis-verdict').replace(/^STATUS:\s*/i, '');
+    confidence = textOf('.pc-s1-reflection-analysis-kicker').replace(/^LEARNING PATH SIGNALS\s*·\s*/i, '');
+    whatWorkedItems = criterionItems('.pc-s1-reflection-feedback li.is-met');
+    issueItems = criterionItems('.pc-s1-reflection-feedback li.is-missing');
+    repair = teachingPoints[0] || '';
+    impact = teachingPoints[1] || '';
+  }
 
   const printWindow = window.open('', '_blank');
   if (!printWindow) return false;
@@ -224,7 +264,7 @@ function pcPrintCurrentBabbageReport() {
 
   const inputSection = workBlocks
     ? `<section class="pc-print-section pc-print-input">
-        <h2>Repair brief submitted</h2>
+        <h2>${esc(inputTitle)}</h2>
         <div class="pc-print-work">${workBlocks}</div>
       </section>`
     : '';
@@ -233,9 +273,31 @@ function pcPrintCurrentBabbageReport() {
   // existing text affiliation and omit the formerly broken image dependency.
   const logoHTML = '';
 
-  const finding = (label, value, className = '') => value
-    ? `<section class="pc-print-finding ${className}"><h3>${esc(label)}</h3><p>${esc(value)}</p></section>`
-    : '';
+  const finding = (label, value, className = '', items = []) => {
+    const validItems = Array.isArray(items) ? items.filter(item => item?.label || item?.detail) : [];
+    if (!value && !validItems.length) return '';
+    const content = validItems.length
+      ? `<div class="pc-print-finding-list">${validItems.map(item => `
+          <div class="pc-print-finding-row">
+            <span class="pc-print-finding-status">${className === 'issue' ? 'CHECK' : 'PASS'}</span>
+            <div><strong>${esc(item.label)}</strong>${item.detail ? `<p>${esc(item.detail)}</p>` : ''}</div>
+          </div>`).join('')}</div>`
+      : `<p>${esc(value)}</p>`;
+    return `<section class="pc-print-finding ${className}"><h3>${esc(label)}</h3>${content}</section>`;
+  };
+
+  const pathExampleSection = pathReport ? `
+    <section class="pc-print-section pc-print-path-example">
+      <h2>Suggested Canvas module layout</h2>
+      <p class="pc-print-path-intro">Use one visible sequence so students can tell where to begin, how to prepare, what to submit, and what happens next.</p>
+      <div class="pc-print-path-grid" role="list" aria-label="Suggested Canvas module sequence">
+        <div class="pc-print-path-step" role="listitem"><span>1</span><strong>START HERE</strong><small>Overview + first action</small></div>
+        <div class="pc-print-path-step" role="listitem"><span>2</span><strong>LEARN</strong><small>Readings + media</small></div>
+        <div class="pc-print-path-step" role="listitem"><span>3</span><strong>PRACTICE</strong><small>Worked example + low-stakes check</small></div>
+        <div class="pc-print-path-step" role="listitem"><span>4</span><strong>SUBMIT</strong><small>Task + criteria + submission location</small></div>
+        <div class="pc-print-path-step" role="listitem"><span>5</span><strong>CONTINUE</strong><small>Feedback + reflection + next step</small></div>
+      </div>
+    </section>` : '';
 
   printWindow.document.open();
   printWindow.document.write(`<!doctype html>
@@ -254,11 +316,13 @@ function pcPrintCurrentBabbageReport() {
     .pc-print-title{margin:0;font-family:Georgia,'Times New Roman',serif;font-size:34px;line-height:1.05;color:var(--navy)}.pc-print-meta{margin:8px 0 0;color:var(--muted);font-size:12.5px}
     .pc-print-body{padding:27px 34px 30px}.pc-print-section{margin:0 0 26px}.pc-print-section>h2{margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid var(--navy);font-family:Georgia,'Times New Roman',serif;font-size:20px;line-height:1.2;color:var(--navy)}
     .pc-print-summary{margin:0 0 17px;font-size:14.5px;line-height:1.55;color:#28384b}.pc-print-glance{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;padding:14px 16px;border:1px solid var(--line);border-left:5px solid var(--blue);background:#f8fbfd}.pc-print-glance-item{min-width:0}.pc-print-label{display:block;margin-bottom:4px;font-size:9.5px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}.pc-print-glance strong{display:block;font-size:14.5px;line-height:1.3;color:var(--navy)}.pc-print-glance small{display:block;margin-top:4px;color:var(--muted);font-size:11.5px;line-height:1.4}
-    .pc-print-findings{margin-top:4px}.pc-print-finding{padding:0 0 15px;margin:0 0 15px;border-bottom:1px solid var(--line);break-inside:avoid;page-break-inside:avoid}.pc-print-finding:last-child{margin-bottom:0;border-bottom:0}.pc-print-finding h3{margin:0 0 5px;font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--blue)}.pc-print-finding p{margin:0;font-size:13.5px;line-height:1.52;color:#263548}.pc-print-finding.issue h3{color:#a34d27}.pc-print-finding.repair h3{color:#8a5d08}.pc-print-finding.impact h3{color:var(--navy)}
+    .pc-print-findings{margin-top:4px}.pc-print-finding{padding:0 0 15px;margin:0 0 15px;border-bottom:1px solid var(--line);break-inside:avoid;page-break-inside:avoid}.pc-print-finding:last-child{margin-bottom:0;border-bottom:0}.pc-print-finding h3{margin:0 0 7px;font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--blue)}.pc-print-finding>p{margin:0;font-size:13.5px;line-height:1.52;color:#263548}.pc-print-finding.issue h3{color:#a34d27}.pc-print-finding.repair h3{color:#8a5d08}.pc-print-finding.impact h3{color:var(--navy)}
+    .pc-print-finding-list{display:grid;gap:6px}.pc-print-finding-row{display:grid;grid-template-columns:52px minmax(0,1fr);gap:10px;align-items:start;padding:8px 10px;border:1px solid #cfe0e9;border-left:4px solid var(--blue);background:#f8fbfd;break-inside:avoid;page-break-inside:avoid}.pc-print-finding-status{display:inline-grid;place-items:center;min-height:22px;padding:3px 5px;border-radius:3px;background:#e5f4eb;color:#087542;font-size:8.5px;font-weight:900;letter-spacing:.08em}.pc-print-finding-row strong{display:block;color:var(--navy);font-size:12.5px;line-height:1.3}.pc-print-finding-row p{margin:2px 0 0;color:#405166;font-size:12px;line-height:1.4}.pc-print-finding.issue .pc-print-finding-row{border-left-color:#a34d27;background:#fff8f4}.pc-print-finding.issue .pc-print-finding-status{background:#f8e5dc;color:#94401e}
+    .pc-print-path-example{break-inside:avoid;page-break-inside:avoid}.pc-print-path-intro{margin:0 0 12px;color:#405166;font-size:12.5px}.pc-print-path-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.pc-print-path-step{position:relative;min-width:0;padding:10px 8px;border:1px solid #b9d5e4;border-top:4px solid var(--blue);background:var(--sky-pale);text-align:center;break-inside:avoid}.pc-print-path-step span{display:grid;place-items:center;width:22px;height:22px;margin:0 auto 6px;border-radius:50%;background:var(--navy);color:#fff;font-size:10px;font-weight:900}.pc-print-path-step strong{display:block;color:var(--navy);font-size:10px;letter-spacing:.04em}.pc-print-path-step small{display:block;margin-top:4px;color:#4d6074;font-size:9.5px;line-height:1.3}
     .pc-print-input{margin-top:29px;padding-top:2px}.pc-print-work{padding:14px 16px;border:1px solid #b9d5e4;border-left:5px solid var(--sky);background:var(--sky-pale);color:#263548;font-size:12.5px;line-height:1.5}.pc-print-work-line{margin:0 0 8px;break-inside:avoid;page-break-inside:avoid}.pc-print-work-line:last-child{margin-bottom:0}.pc-print-work-line strong{color:var(--navy)}.pc-print-work-opening{font-weight:600}
     .pc-print-footer{margin-top:30px;padding:12px 0 0;border-top:2px solid var(--gold);color:#5d6a79;font-size:10.5px;line-height:1.4}.pc-print-footer strong{color:var(--navy)}
-    @media(max-width:680px){.pc-print-header,.pc-print-body{padding-left:22px;padding-right:22px}.pc-print-title{font-size:29px}.pc-print-glance{grid-template-columns:1fr}.pc-print-brand-row{align-items:flex-start}.pc-print-logo{width:54px;height:54px}}
-    @media print{body{background:#fff;font-size:11.5pt}.pc-print-toolbar{display:none}.pc-print-shell{max-width:none;margin:0;box-shadow:none}.pc-print-header{padding:0 0 16px;border-top:0;border-bottom:2.5px solid var(--gold)}.pc-print-brand-row{margin-bottom:13px}.pc-print-logo{width:58px;height:58px}.pc-print-title{font-size:27pt}.pc-print-meta{font-size:9pt}.pc-print-body{padding:18px 0 0}.pc-print-section{margin-bottom:19px}.pc-print-section>h2{font-size:15pt}.pc-print-summary{font-size:10.5pt}.pc-print-glance{padding:10px 12px;gap:12px}.pc-print-glance strong{font-size:10.5pt}.pc-print-finding{padding-bottom:10px;margin-bottom:10px}.pc-print-finding p{font-size:10pt;line-height:1.43}.pc-print-input{margin-top:18px}.pc-print-work{padding:10px 12px;font-size:9.5pt}.pc-print-footer{margin-top:20px;font-size:8pt}@page{size:auto;margin:.58in .62in}}
+    @media(max-width:680px){.pc-print-header,.pc-print-body{padding-left:22px;padding-right:22px}.pc-print-title{font-size:29px}.pc-print-glance{grid-template-columns:1fr}.pc-print-path-grid{grid-template-columns:1fr}.pc-print-path-step{text-align:left}.pc-print-path-step span{display:inline-grid;margin:0 8px 0 0;vertical-align:middle}.pc-print-path-step strong{display:inline}.pc-print-brand-row{align-items:flex-start}.pc-print-logo{width:54px;height:54px}}
+    @media print{body{background:#fff;font-size:11.5pt}.pc-print-toolbar{display:none}.pc-print-shell{max-width:none;margin:0;box-shadow:none}.pc-print-header{padding:0 0 16px;border-top:0;border-bottom:2.5px solid var(--gold)}.pc-print-brand-row{margin-bottom:13px}.pc-print-logo{width:58px;height:58px}.pc-print-title{font-size:27pt}.pc-print-meta{font-size:9pt}.pc-print-body{padding:18px 0 0}.pc-print-section{margin-bottom:19px}.pc-print-section>h2{font-size:15pt}.pc-print-summary{font-size:10.5pt}.pc-print-glance{padding:10px 12px;gap:12px}.pc-print-glance strong{font-size:10.5pt}.pc-print-finding{padding-bottom:10px;margin-bottom:10px}.pc-print-finding>p{font-size:10pt;line-height:1.43}.pc-print-finding-row{padding:6px 8px}.pc-print-finding-row strong{font-size:9.5pt}.pc-print-finding-row p{font-size:9pt}.pc-print-path-intro{font-size:9pt}.pc-print-input{margin-top:18px}.pc-print-work{padding:10px 12px;font-size:9.5pt}.pc-print-footer{margin-top:20px;font-size:8pt}@page{size:auto;margin:.58in .62in}}
   </style>
 </head>
 <body>
@@ -272,7 +336,7 @@ function pcPrintCurrentBabbageReport() {
           <div class="pc-print-affiliation">Great Falls College Montana State University</div>
         </div>
       </div>
-      <h1 class="pc-print-title">Babbage Analysis Report</h1>
+      <h1 class="pc-print-title">${esc(reportTitle)}</h1>
       <p class="pc-print-meta">${esc(scenarioLabel)} · Generated ${esc(printedAt)}</p>
     </header>
     <div class="pc-print-body">
@@ -286,11 +350,12 @@ function pcPrintCurrentBabbageReport() {
       </section>
       <section class="pc-print-section pc-print-findings">
         <h2>Diagnostic findings</h2>
-        ${finding('What worked', whatWorked)}
-        ${finding('Issue detected', issue, 'issue')}
+        ${finding('What worked', whatWorked, 'worked', whatWorkedItems)}
+        ${finding('Issue detected', issue, 'issue', issueItems)}
         ${finding('Recommended repair', repair, 'repair')}
         ${finding('Expected impact', impact, 'impact')}
       </section>
+      ${pathExampleSection}
       ${inputSection}
       <footer class="pc-print-footer"><strong>Instructional judgment still matters.</strong> Babbage feedback is an AI-supported diagnostic aid. Review recommendations using your course context, student needs, and professional judgment.</footer>
     </div>

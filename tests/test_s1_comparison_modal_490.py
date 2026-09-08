@@ -32,5 +32,5 @@ def test_desktop_grid_override_and_phone_modal_exist():
 
 
 def test_patch_marker_is_491():
-    assert "DEV · 527" in INDEX
-    assert "patch=527" in INDEX
+    assert "DEV · 529" in INDEX
+    assert "patch=529" in INDEX

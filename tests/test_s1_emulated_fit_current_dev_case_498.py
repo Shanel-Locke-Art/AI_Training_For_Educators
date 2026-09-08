@@ -42,8 +42,8 @@ def main() -> None:
     assert "activeS1Case ? pcFillS1DevFields() : resetS1Dev()" in fill
     assert fill in runtime
 
-    assert "patch=527" in index
-    assert "DEV · 527" in index
+    assert "patch=529" in index
+    assert "DEV · 529" in index
     print("V498 emulated-device fit and current-case DEV-fill contract passed.")
 
 
