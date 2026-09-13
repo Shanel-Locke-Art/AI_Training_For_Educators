@@ -106,10 +106,76 @@ function parseBabbageDiagnosticSections(text) {
   };
 }
 
-function buildBabbageAnalysisHTML(feedback, mock = false, mockReason = '') {
+function pcNormalizeBabbageFindingItems(items = []) {
+  if (!Array.isArray(items)) return [];
+  return items
+    .map(item => {
+      if (typeof item === 'string') return { label: item.trim(), detail: '' };
+      return {
+        label: String(item?.label || item?.title || '').trim(),
+        detail: String(item?.detail || item?.value || item?.evidence || '').trim()
+      };
+    })
+    .filter(item => item.label || item.detail);
+}
+
+function pcBuildBabbageFindingHTML(value, items = [], statusLabel = 'PASS') {
+  const normalized = pcNormalizeBabbageFindingItems(items);
+  if (!normalized.length) return `<div class="analysis-value">${esc(value)}</div>`;
+  return `
+    <div class="analysis-value analysis-value-structured">
+      <div class="analysis-finding-list" role="list">
+        ${normalized.map(item => `
+          <div class="analysis-finding-row" role="listitem">
+            <span class="analysis-finding-status">${esc(statusLabel)}</span>
+            <div class="analysis-finding-copy">${item.label ? `<strong>${esc(item.label)}</strong>` : ''}${item.detail ? `<p>${esc(item.detail)}</p>` : ''}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function pcBuildBabbageProcessExampleHTML(example = null) {
+  if (!example || !Array.isArray(example.steps)) return '';
+  const steps = example.steps
+    .map(step => ({
+      label: String(step?.label || step?.title || '').trim(),
+      detail: String(step?.detail || step?.value || '').trim()
+    }))
+    .filter(step => step.label || step.detail);
+  if (!steps.length) return '';
+
+  const title = String(example.title || 'Application example').trim();
+  const intro = String(example.intro || '').trim();
+  const ariaLabel = String(example.ariaLabel || title || 'Application example sequence').trim();
+  return `
+    <section class="analysis-process-example" aria-labelledby="analysisProcessExampleTitle">
+      <h3 id="analysisProcessExampleTitle">${esc(title)}</h3>
+      ${intro ? `<p class="analysis-process-intro">${esc(intro)}</p>` : ''}
+      <div class="analysis-process-grid" role="list" aria-label="${esc(ariaLabel)}">
+        ${steps.map((step, index) => `
+          <div class="analysis-process-step" role="listitem">
+            <span class="analysis-process-number" aria-hidden="true">${index + 1}</span>
+            ${step.label ? `<strong>${esc(step.label)}</strong>` : ''}
+            ${step.detail ? `<small>${esc(step.detail)}</small>` : ''}
+          </div>`).join('')}
+      </div>
+    </section>`;
+}
+
+function buildBabbageAnalysisHTML(feedback, mock = false, mockReason = '', presentation = {}) {
   const d = parseBabbageDiagnosticSections(feedback);
   const badge = mock ? (mockReason === 'backend-unavailable' ? 'BACKEND FALLBACK ANALYSIS' : 'MOCK ANALYSIS COMPLETE') : 'ANALYSIS COMPLETE';
-  const totalCharacters = [d.status, d.confidence, d.summary, d.worked, d.issue, d.repair, d.impact]
+  const workedItems = pcNormalizeBabbageFindingItems(presentation?.workedItems);
+  const issueItems = pcNormalizeBabbageFindingItems(presentation?.issueItems);
+  const processExampleHTML = pcBuildBabbageProcessExampleHTML(presentation?.processExample);
+  const title = String(presentation?.title || 'Scenario Diagnostic').trim();
+  const reportTitle = String(presentation?.reportTitle || 'Babbage Analysis Report').trim();
+  const inputTitle = String(presentation?.inputTitle || 'Repair brief submitted').trim();
+  const submittedWork = String(presentation?.submittedWork || '').trim();
+  const structuredCharacters = [...workedItems, ...issueItems]
+    .map(item => `${item.label} ${item.detail}`)
+    .join(' ');
+  const totalCharacters = [d.status, d.confidence, d.summary, d.worked, d.issue, d.repair, d.impact, structuredCharacters]
     .join(' ')
     .length;
   const densityClass = totalCharacters > 1100
@@ -119,10 +185,10 @@ function buildBabbageAnalysisHTML(feedback, mock = false, mockReason = '') {
       : '';
 
   return `
-    <div class="analysis-report ${densityClass}" data-analysis-characters="${totalCharacters}" role="document" aria-label="Babbage scenario diagnostic report">
+    <div class="analysis-report ${densityClass}" data-analysis-characters="${totalCharacters}" data-print-report-title="${esc(reportTitle)}" data-print-input-title="${esc(inputTitle)}" data-print-submitted-work="${esc(submittedWork)}" role="document" aria-label="Babbage scenario diagnostic report">
       <header class="analysis-header">
         <div class="analysis-badge">${esc(badge)}</div>
-        <h2 class="analysis-title">Scenario Diagnostic</h2>
+        <h2 class="analysis-title">${esc(title)}</h2>
         <p class="analysis-summary">${esc(d.summary)}</p>
       </header>
 
@@ -140,12 +206,12 @@ function buildBabbageAnalysisHTML(feedback, mock = false, mockReason = '') {
 
         <section class="analysis-card analysis-worked-card">
           <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">+</span><span>What Worked</span></span>
-          <div class="analysis-value">${esc(d.worked)}</div>
+          ${pcBuildBabbageFindingHTML(d.worked, workedItems, 'PASS')}
         </section>
 
         <section class="analysis-card analysis-issue-card">
           <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">!</span><span>Issue Detected</span></span>
-          <div class="analysis-value">${esc(d.issue)}</div>
+          ${pcBuildBabbageFindingHTML(d.issue, issueItems, 'CHECK')}
         </section>
 
         <section class="analysis-card analysis-repair-card">
@@ -158,6 +224,7 @@ function buildBabbageAnalysisHTML(feedback, mock = false, mockReason = '') {
           <div class="analysis-value">${esc(d.impact)}</div>
         </section>
       </div>
+      ${processExampleHTML}
     </div>
   `;
 }
@@ -210,16 +277,53 @@ function pcPrintCurrentBabbageReport() {
   let issueItems = [];
   let repair = '';
   let impact = '';
+  let sharedProcessExampleSection = '';
 
   if (report) {
+    const renderedFindingItems = selector => [...report.querySelectorAll(`${selector} .analysis-finding-row`)]
+      .map(item => ({
+        label: String(item.querySelector('.analysis-finding-copy strong')?.textContent || '').trim(),
+        detail: String(item.querySelector('.analysis-finding-copy p')?.textContent || '').trim()
+      }))
+      .filter(item => item.label || item.detail);
+    const renderedProcessExample = report?.querySelector('.analysis-process-example');
+
+    reportTitle = String(report.dataset.printReportTitle || reportTitle).trim();
+    inputTitle = String(report.dataset.printInputTitle || inputTitle).trim();
+    submittedWork = String(report.dataset.printSubmittedWork || submittedWork).trim();
     summary = textOf('.analysis-summary');
     status = cardValue('.analysis-status-card');
     confidence = cardValue('.analysis-confidence-card');
     confidenceNote = cardNote('.analysis-confidence-card');
     whatWorked = cardValue('.analysis-worked-card');
+    whatWorkedItems = renderedFindingItems('.analysis-worked-card');
     issue = cardValue('.analysis-issue-card');
+    issueItems = renderedFindingItems('.analysis-issue-card');
     repair = cardValue('.analysis-repair-card');
     impact = cardValue('.analysis-impact-card');
+
+    if (renderedProcessExample) {
+      const processTitle = String(renderedProcessExample.querySelector('h3')?.textContent || 'Application example').trim();
+      const processIntro = String(renderedProcessExample.querySelector('.analysis-process-intro')?.textContent || '').trim();
+      const processLabel = String(renderedProcessExample.querySelector('.analysis-process-grid')?.getAttribute('aria-label') || processTitle).trim();
+      const processSteps = [...renderedProcessExample.querySelectorAll('.analysis-process-step')]
+        .map((step, index) => ({
+          number: String(step.querySelector('.analysis-process-number')?.textContent || index + 1).trim(),
+          label: String(step.querySelector('strong')?.textContent || '').trim(),
+          detail: String(step.querySelector('small')?.textContent || '').trim()
+        }))
+        .filter(step => step.label || step.detail);
+      if (processSteps.length) {
+        sharedProcessExampleSection = `
+          <section class="pc-print-section pc-print-path-example">
+            <h2>${esc(processTitle)}</h2>
+            ${processIntro ? `<p class="pc-print-path-intro">${esc(processIntro)}</p>` : ''}
+            <div class="pc-print-path-grid" role="list" aria-label="${esc(processLabel)}">
+              ${processSteps.map(step => `<div class="pc-print-path-step" role="listitem"><span>${esc(step.number)}</span><strong>${esc(step.label)}</strong>${step.detail ? `<small>${esc(step.detail)}</small>` : ''}</div>`).join('')}
+            </div>
+          </section>`;
+      }
+    }
   } else {
     const criterionItems = selector => [...pathReport.querySelectorAll(selector)]
       .map(item => ({
@@ -356,6 +460,7 @@ function pcPrintCurrentBabbageReport() {
         ${finding('Expected impact', impact, 'impact')}
       </section>
       ${pathExampleSection}
+      ${sharedProcessExampleSection}
       ${inputSection}
       <footer class="pc-print-footer"><strong>Instructional judgment still matters.</strong> Babbage feedback is an AI-supported diagnostic aid. Review recommendations using your course context, student needs, and professional judgment.</footer>
     </div>

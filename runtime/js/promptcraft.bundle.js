@@ -6401,6 +6401,7 @@ pcExposeGlobals({
 //  Vertical slice implemented with the shared activity component system.
 // ══════════════════════════════════════════════════════
 const S2_PROGRESS_STEPS = ['1 Diagnose', '2 Intervene', '3 Observe', '4 Audit Babbage', '5 Repair & compare'];
+const S2_CANVAS_CONTEXT = 'Week 4 Canvas module · Practice check and reflection assignment';
 
 const S2_DIAGNOSIS_OPTIONS = [
   { id: 'evidence', tag: 'MISSING LINK', title: 'Evidence of what the strategy actually did', text: 'Connect Jordan’s study approach to specific signs of what he understood, where understanding broke down, and what changed.' },
@@ -6410,10 +6411,10 @@ const S2_DIAGNOSIS_OPTIONS = [
 ];
 
 const S2_EVIDENCE_RESPONSES = [
-  { id: 'confidence', tag: 'CONFIDENCE', title: 'Ask for a confidence rating', text: 'After studying, Jordan rates how confident he feels about the material from 1–5.' },
-  { id: 'strategy_name', tag: 'REFLECT', title: 'Ask what strategy he used', text: 'After studying, Jordan names the study strategy he used and briefly describes it.' },
-  { id: 'grade_compare', tag: 'RESULT', title: 'Compare the new grade', text: 'Jordan compares this assignment score with his previous score to decide whether the strategy worked.' },
-  { id: 'evidence_check', tag: 'TEST', title: 'Make the strategy produce evidence', text: 'Jordan tries to explain the concepts without notes, identifies where understanding breaks down, and decides whether to keep or change his strategy.' }
+  { id: 'confidence', tag: 'CONFIDENCE', title: 'Add a Canvas confidence poll', text: 'After the Canvas practice check, Jordan rates how confident he feels about the material from 1–5.' },
+  { id: 'strategy_name', tag: 'REFLECT', title: 'Add a strategy note in Canvas', text: 'In the module reflection, Jordan names the study strategy he used and briefly describes it.' },
+  { id: 'grade_compare', tag: 'RESULT', title: 'Compare Canvas grades', text: 'Jordan compares this Canvas grade with his previous score to decide whether the strategy worked.' },
+  { id: 'evidence_check', tag: 'TEST', title: 'Add a Canvas practice check', text: 'Before the graded quiz, Jordan explains the concepts without notes, uses the feedback to identify where understanding breaks down, and records whether to keep or change his strategy.' }
 ];
 
 const S2_THINKING_MOVES = [
@@ -6431,8 +6432,8 @@ const S2_AUDIT_OPTIONS = [
 ];
 
 const S2_LOCAL_DRAFT_FALLBACK = {
-  activity_title: 'What Worked This Time?',
-  activity_prompt: 'After you receive your grade, describe whether you think your study strategy worked. Explain how you feel about your result and what you might do next time.',
+  activity_title: 'Canvas Reflection: What Worked This Time?',
+  activity_prompt: 'After Canvas posts your quiz grade, describe whether you think your study strategy worked. Explain how you feel about your result and what you might do next time.',
   design_rationale: 'This prompt asks Jordan to reflect after completing the assignment and gives him an opportunity to think about his strategy.',
   deliberate_weakness: 'no_evidence',
   likely_student_response: 'I think rereading worked because my grade was better. I felt relieved, so I will probably reread again.',
@@ -6445,7 +6446,7 @@ const S2_LOCAL_REVIEW_FALLBACK = {
   feedback_summary: 'The repair makes the reflection more useful by asking Jordan to connect a strategy to evidence from his learning process.',
   what_improved: ['The prompt asks Jordan to identify what he actually did.', 'The repair makes the judgment about effectiveness more explicit.'],
   remaining_issue: 'The next refinement would be to make the future decision equally explicit so Jordan names when he will reuse, modify, or abandon the strategy.',
-  revised_activity: 'Name the strategy you used while learning this material. Identify one specific sign that it helped or failed to help your understanding. Based on that evidence, explain what you will keep, change, or try differently on the next assignment.',
+  revised_activity: 'In the Canvas reflection assignment, name the strategy you used while learning this material. Cite one specific sign from the practice check or its feedback that it helped or failed to help your understanding. Based on that evidence, explain what you will keep, change, or try differently in the next module.',
   student_response_after: 'Rereading helped me recognize the terms, but I still could not compare them. Making my own examples was the point where I could finally explain the difference. Next time I will test myself with examples before I reread everything.',
   why_student_thinking_changed: 'The revised prompt requires Jordan to connect a strategy to evidence and then turn that evaluation into a future decision.'
 };
@@ -6470,7 +6471,7 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     activeIndex: 0,
     focusSelector: 'input[name="s2-diagnosis"]',
     onSubmit: submitS2Diagnosis,
-    wrapContent: taskHTML => `<section class="pc-s2-diagnosis-layout" aria-labelledby="s2CaseContextTitle">${buildStudentEvidencePanelHTML({ title: 'Student Evidence', portraitSrc: ASSETS.images.students.jordan.uncertain, portraitAlt: 'Jordan, an adult online learner, looking uncertain', characterId: 'jordan', quote: 'I guess something worked.', resultLabel: 'Result', resultValue: '84% ↑', resultNote: 'Improved from last time' })}${buildS2CaseContextHTML()}${taskHTML}</section>`
+    wrapContent: taskHTML => `<section class="pc-s2-diagnosis-layout" aria-labelledby="s2CaseContextTitle">${buildStudentEvidencePanelHTML({ title: 'Canvas Student Evidence', portraitSrc: ASSETS.images.students.jordan.uncertain, portraitAlt: 'Jordan, an adult online learner, looking uncertain', characterId: 'jordan', quote: 'Canvas says I improved, but I still do not know what actually helped.', resultLabel: 'Module quiz', resultValue: '84% ↑', resultNote: 'Previous quiz: 76%' })}${buildS2CaseContextHTML()}${taskHTML}</section>`
   }),
   evidence: Object.freeze({
     items: S2_EVIDENCE_RESPONSES,
@@ -6541,8 +6542,12 @@ function buildS2CaseContextHTML() {
       </div>
       <div class="pc-case-brief-copy">
         <div>
+          <span>Canvas location</span>
+          <p>${esc(S2_CANVAS_CONTEXT)}</p>
+        </div>
+        <div>
           <span>Observed strategy</span>
-          <p>Jordan reread the chapter three times and treated a better grade as proof that the strategy worked.</p>
+          <p>Jordan reread the module reading three times, completed the Canvas quiz, and treated a better grade as proof that the strategy worked.</p>
         </div>
         <div>
           <span>Current problem</span>
@@ -6617,7 +6622,7 @@ function renderS2SelectionActivity(config) {
     progressHTML: buildScenarioProgressHTML({
       steps: S2_PROGRESS_STEPS,
       activeIndex: config.activeIndex,
-      ariaLabel: 'Scenario 2 progress'
+      ariaLabel: 'Scenario 3 progress'
     }),
     contentHTML,
     focusSelector: config.focusSelector
@@ -6765,22 +6770,22 @@ function pcGetS2JordanInterventionDialogue(choice) {
     confidence: {
       voiceId: 'jordan-s2-intervention-confidence',
       expression: 'confident',
-      quote: 'I’d say I’m a four out of five. I feel better about it this time.'
+      quote: 'In the Canvas reflection, I’d rate my confidence four out of five. I feel better, but I still can\'t explain what the rereading changed.'
     },
     strategy_name: {
       voiceId: 'jordan-s2-intervention-strategy',
       expression: 'thinking',
-      quote: 'I reread the chapter three times and highlighted the parts that seemed important.'
+      quote: 'I reread the module page three times and highlighted the parts that seemed important.'
     },
     grade_compare: {
       voiceId: 'jordan-s2-intervention-grade',
       expression: 'confident',
-      quote: 'I got an 84 instead of a 76, so rereading must have worked.'
+      quote: 'My Canvas grade went from 76% to 84%, so rereading must have worked.'
     },
     evidence_check: {
       voiceId: 'jordan-s2-intervention-evidence',
       expression: 'thinking',
-      quote: 'I could define both concepts, but without my notes I still couldn’t explain the difference. Rereading helped me recognize them, but it didn’t help me compare them. I need to try examples next.'
+      quote: 'On the Canvas practice check, I could define both concepts, but without my notes I still couldn’t explain the difference. Rereading helped me recognize them, but it didn’t help me compare them. I need to try examples next.'
     }
   };
   const registered = window.s2JordanInterventionDialogue?.[choice];
@@ -6934,10 +6939,10 @@ function submitS2Evidence() {
   const data = getS2Data();
   const option = S2_EVIDENCE_RESPONSES.find(item => item.id === choice);
   const consequences = {
-    confidence: { tone: 'developing', heading: 'Jordan feels informed, but still cannot test the strategy.', copy: 'Confidence is useful information, but Jordan can still answer without showing what he understands or whether rereading caused the improvement.' },
-    strategy_name: { tone: 'developing', heading: 'The strategy is visible. Its effectiveness is not.', copy: 'Jordan can now name what he did, but he still has no evidence for deciding whether it helped.' },
-    grade_compare: { tone: 'developing', heading: 'Outcome bias just got stronger.', copy: 'The intervention encourages Jordan to treat the grade as proof of the strategy. The result changed, but the learning process is still invisible.' },
-    evidence_check: { tone: 'strong', heading: 'Now Jordan has evidence he can act on.', copy: 'Jordan is no longer guessing from a feeling or grade. He monitored understanding, connected evidence to the strategy, and made a decision.' }
+    confidence: { tone: 'developing', heading: 'The Canvas reflection records confidence, not learning evidence.', copy: 'Confidence is useful information, but Jordan can still answer without showing what he understands or whether rereading caused the improvement.' },
+    strategy_name: { tone: 'developing', heading: 'Canvas now records the strategy. Its effectiveness is still unclear.', copy: 'Jordan can name what he did in the module, but he still has no evidence for deciding whether it helped.' },
+    grade_compare: { tone: 'developing', heading: 'The Canvas grade strengthens the same outcome bias.', copy: 'The intervention encourages Jordan to treat the higher score as proof of the strategy. The result changed, but the learning process is still invisible.' },
+    evidence_check: { tone: 'strong', heading: 'The Canvas practice check creates evidence Jordan can use.', copy: 'Jordan is no longer guessing from a feeling or grade. He used the practice response and feedback to connect evidence to the strategy and make a decision.' }
   };
   const result = consequences[choice] || consequences.strategy_name;
   data.attempts += 1;
@@ -6980,8 +6985,13 @@ function pcS2GetDraftIngredients(data = getS2Data()) {
 function pcS2BuildDraftSystemPrompt(ingredients) {
   return `You are Babbage, PromptCraft's instructional-design analysis engine.
 
-SCENARIO 2: METACOGNITION
-Jordan completes assignments and sometimes earns better grades, but he cannot identify which learning strategy helped, evaluate why it helped, or decide what to do next.
+SCENARIO 3: METACOGNITION IN CANVAS
+Jordan completes the Week 4 Canvas module and sometimes earns better grades, but he cannot identify which learning strategy helped, evaluate why it helped, or decide what to do next.
+
+Canvas context:
+${S2_CANVAS_CONTEXT}
+
+Canvas is the learning environment, not the subject of the activity. Design a student-facing reflection that fits naturally after a Canvas practice check or quiz. Do not turn the response into instructions for clicking through Canvas.
 
 The participant is building a reflection activity from these learner-selected ingredients:
 - Diagnosis: ${ingredients.diagnosisTitle}
@@ -7327,7 +7337,7 @@ function pcS2BuildRepairedReflectionPrompt(parts = {}) {
   if (![evidence, evaluation, nextMove, success].some(Boolean)) return '';
 
   const lines = [
-    'After completing the assignment, reflect on how your study strategy affected your learning.'
+    'In the Canvas reflection assignment, reflect on how your study strategy affected your learning during this module.'
   ];
   if (evidence) lines.push(`1. Evidence — ${evidence}`);
   if (evaluation) lines.push(`2. Evaluation — ${evaluation}`);
@@ -7439,7 +7449,12 @@ function pcS2BuildReviewSystemPrompt(data, repair) {
 Review a faculty member's repair to a metacognitive reflection activity for Jordan.
 
 Jordan's problem:
-He completes work but cannot identify what learning strategy helped, evaluate why it helped, or decide what he should try next.
+He completes the Week 4 Canvas module but cannot identify what learning strategy helped, evaluate why it helped, or decide what he should try next.
+
+Canvas context:
+${S2_CANVAS_CONTEXT}
+
+Canvas is the learning environment, not the subject of the activity. Keep the revision suitable for a Canvas reflection assignment after a practice check or quiz, without writing a Canvas navigation tutorial.
 
 Original Babbage draft:
 ${draft.activity_prompt}
@@ -7499,6 +7514,50 @@ function pcS2BuildRepairReviewDiagnosticText(review = {}) {
   ].join('\n');
 }
 
+function pcS2BuildImprovementItems(review = {}) {
+  const values = Array.isArray(review.what_improved)
+    ? review.what_improved.filter(Boolean).map(value => String(value).trim()).filter(Boolean)
+    : [String(review.what_improved || '').trim()].filter(Boolean);
+  const improvements = values.length
+    ? values
+    : ['The repair makes the intended thinking more visible.'];
+
+  return improvements.map((detail, index) => {
+    const lower = detail.toLowerCase();
+    let label = `Repair improvement ${index + 1}`;
+    if (/success|criter/.test(lower)) label = 'Success criteria';
+    else if (/next|future|transfer|try again|change/.test(lower)) label = 'Next move';
+    else if (/evaluat|effect|why|judg/.test(lower)) label = 'Strategy evaluation';
+    else if (/evidence|identify|what (he|jordan) (did|tried)|strategy/.test(lower)) label = 'Evidence connection';
+    return { label, detail };
+  });
+}
+
+function pcS2BuildRepairReviewPresentation(review = {}) {
+  const remainingIssue = String(review.remaining_issue || 'No major remaining issue was identified in the repaired reflection.').trim();
+  return {
+    title: 'Canvas Reflection Repair Analysis',
+    reportTitle: 'Canvas Reflection Activity Analysis',
+    inputTitle: 'Repaired Canvas reflection submitted',
+    workedItems: pcS2BuildImprovementItems(review),
+    issueItems: [{
+      label: 'Remaining limitation',
+      detail: remainingIssue
+    }],
+    processExample: {
+      title: 'Canvas module reflection sequence',
+      intro: 'The Canvas module places a low-stakes check and its feedback before a short reflection, so the learner can connect strategy, evidence, and the next decision.',
+      ariaLabel: 'Four-step Canvas module reflection sequence',
+      steps: [
+        { label: 'OPEN MODULE', detail: 'Study the Week 4 material using a chosen strategy.' },
+        { label: 'TRY THE CHECK', detail: 'Attempt the Canvas practice check without notes.' },
+        { label: 'USE FEEDBACK', detail: 'Cite what the response and feedback reveal about understanding.' },
+        { label: 'CHOOSE NEXT MOVE', detail: 'Decide what to repeat or change.' }
+      ]
+    }
+  };
+}
+
 function pcS2ShowRepairReviewAnalysis(data, review, runToken) {
   if (!pcIsScenarioRunCurrent(runToken)) return false;
 
@@ -7511,7 +7570,12 @@ function pcS2ShowRepairReviewAnalysis(data, review, runToken) {
   const reveal = () => {
     if (!pcIsScenarioRunCurrent(runToken)) return false;
     return showBabbageTerminalReport({
-      reportHTML: buildBabbageAnalysisHTML(diagnosticText, isFallback, isFallback ? 'backend-unavailable' : ''),
+      reportHTML: buildBabbageAnalysisHTML(
+        diagnosticText,
+        isFallback,
+        isFallback ? 'backend-unavailable' : '',
+        pcS2BuildRepairReviewPresentation(review)
+      ),
       terminalStateText: `${isFallback ? 'BACKEND FALLBACK ANALYSIS' : 'ANALYSIS COMPLETE'}\n\n${diagnosticText}`,
       engineLabel: isFallback ? 'DEMONSTRATION BABBAGE ENGINE' : 'BABBAGE ENGINE',
       speakerName: 'Professor Pixel',
@@ -7614,9 +7678,7 @@ function renderS2FinalComparison() {
   const data = getS2Data();
   const draft = data.babbageDraft || S2_LOCAL_DRAFT_FALLBACK;
   const review = data.babbageReview || S2_LOCAL_REVIEW_FALLBACK;
-  const improvedItems = Array.isArray(review.what_improved)
-    ? review.what_improved.filter(Boolean)
-    : [String(review.what_improved || '')].filter(Boolean);
+  const improvedItems = pcS2BuildImprovementItems(review);
 
   awardScenarioScoreXP(SCENARIO_INDEX.METACOGNITION, data.currentScore || data.bestScore || 5, 5);
   markScenarioComplete();
@@ -7624,22 +7686,19 @@ function renderS2FinalComparison() {
 
   const reviewIsFallback = data.s2ReviewSource === 'fallback' || data.aiProvider === 'local-fallback';
   const reviewEyebrow = reviewIsFallback
-    ? 'Demonstration fallback review · Scenario 2 complete'
-    : `Live Babbage review${data.aiModel ? ` · ${data.aiModel}` : ''} · Scenario 2 complete`;
+    ? 'Demonstration fallback review · Scenario 3 complete'
+    : `Live Babbage review${data.aiModel ? ` · ${data.aiModel}` : ''} · Scenario 3 complete`;
   const reviewTitle = reviewIsFallback
     ? 'Demonstration Review · Babbage unavailable'
     : "Babbage's Live Review of the Revision";
 
   pcRenderSharedScenarioResult({
     eyebrow: reviewEyebrow,
-    title: 'Repaired Reflection Activity',
+    title: 'Repaired Canvas Reflection Activity',
     bodyHTML: fmt(review.revised_activity || ''),
     reviewTitle,
     reviewItems: [
-      {
-        label: 'Strongest improvement',
-        value: improvedItems.join(' ') || 'The repair makes the intended thinking more visible.'
-      },
+      ...improvedItems.map(item => ({ label: item.label, value: item.detail })),
       { label: 'Remaining limitation', value: review.remaining_issue || '' },
       { label: "Why Jordan's thinking changed", value: review.why_student_thinking_changed || '' }
     ],
@@ -7649,14 +7708,33 @@ function renderS2FinalComparison() {
       { label: 'Jordan before', value: draft.likely_student_response || '' },
       { label: 'Jordan after', value: review.student_response_after || '' }
     ],
-    controlsTitle: 'Scenario 2 result',
+    controlsTitle: 'Scenario 3 result',
     controlsSub: reviewIsFallback ? 'Live Babbage was unavailable. This result uses the labeled demonstration fallback.' : 'Babbage reviewed your repair live. Choose the next step.',
     controlsActionsHTML: `
-      <button class="s1-secondary-btn" type="button" data-pc-action="s2-repair-draft">Revise S2</button>
+      <button class="s1-secondary-btn" type="button" data-pc-action="s2-print-final-analysis">Print / Save PDF</button>
+      <button class="s1-secondary-btn" type="button" data-pc-action="s2-repair-draft">Revise reflection</button>
       <button class="continue-btn" type="button" data-pc-action="navigate-next" data-pc-scenario-index="2">Next scenario →</button>`
   });
   document.querySelector('#inputContainer button')?.focus();
   return true;
+}
+
+function pcS2PrintFinalAnalysis() {
+  if (scenarioIndex !== SCENARIO_INDEX.METACOGNITION) return false;
+  const data = getS2Data();
+  const review = data.babbageReview || S2_LOCAL_REVIEW_FALLBACK;
+  const diagnosticText = pcS2BuildRepairReviewDiagnosticText(review);
+  const isFallback = data.s2ReviewSource === 'fallback' || data.aiProvider === 'local-fallback';
+  const output = document.getElementById('babbageTerminalOutput');
+  if (!output) return false;
+  output.classList.add('babbage-analysis-layout');
+  output.innerHTML = buildBabbageAnalysisHTML(
+    diagnosticText,
+    isFallback,
+    isFallback ? 'backend-unavailable' : '',
+    pcS2BuildRepairReviewPresentation(review)
+  );
+  return pcPrintCurrentBabbageReport();
 }
 
 function pcGetLatestS2Selection(attemptKey) {
@@ -7671,7 +7749,8 @@ pcRegisterUIActions({
     renderS2EvidenceActivity();
   },
   's2-generate-draft': () => generateS2BabbageDraft(),
-  's2-repair-draft': () => renderS2RepairActivity()
+  's2-repair-draft': () => renderS2RepairActivity(),
+  's2-print-final-analysis': () => pcS2PrintFinalAnalysis()
 });
 ;
 /* SOURCE: src/js/scenarios/s3-authentic-assessment.js */
@@ -7690,13 +7769,14 @@ const S3_PROGRESS_STEPS = [
 ];
 
 const S3_LEARNING_OUTCOME = 'Given a rural community planning problem, analyze stakeholder needs and local evidence, recommend a feasible response, and justify the trade-offs behind the decision.';
-const S3_ORIGINAL_ASSESSMENT = 'Define land use, infrastructure, stakeholder engagement, and zoning. Explain the four stages of the planning cycle and identify the best answer in one short planning example.';
+const S3_CANVAS_CONTEXT = 'Week 4 Canvas module · Planning concepts and community decision-making';
+const S3_ORIGINAL_ASSESSMENT = 'A 20-question Canvas quiz asks students to define land use, infrastructure, stakeholder engagement, and zoning; explain the planning cycle; and identify the best answer in one short planning example.';
 const S3_MAYA_SCORE = '96%';
 
 const S3_DIAGNOSIS_CARDS = [
-  { id: 'define_zoning', tag: 'QUIZ ITEM', title: 'Define zoning', text: 'Maya accurately defines zoning and gives the textbook example.' },
-  { id: 'name_cycle', tag: 'QUIZ ITEM', title: 'Name the planning cycle', text: 'Maya lists the four planning stages in the correct order.' },
-  { id: 'match_terms', tag: 'QUIZ ITEM', title: 'Match key terms', text: 'Maya matches six planning terms to their definitions.' },
+  { id: 'define_zoning', tag: 'CANVAS QUIZ', title: 'Define zoning', text: 'In the Canvas quiz, Maya accurately defines zoning and gives the course example.' },
+  { id: 'name_cycle', tag: 'CANVAS QUIZ', title: 'Name the planning cycle', text: 'In the Canvas quiz, Maya lists the four planning stages in the correct order.' },
+  { id: 'match_terms', tag: 'CANVAS QUIZ', title: 'Match key terms', text: 'In the Canvas quiz, Maya matches six planning terms to their definitions.' },
   { id: 'explain_stakeholders', tag: 'SHORT ANSWER', title: 'Explain stakeholder engagement', text: 'Maya explains why community input matters during planning.' },
   { id: 'summarize_example', tag: 'SHORT ANSWER', title: 'Summarize a sample plan', text: 'Maya summarizes how a textbook town responded to a planning problem.' },
   { id: 'choose_example', tag: 'APPLICATION', title: 'Choose a response from a provided example', text: 'Maya selects the response that best fits a short, highly structured example.' }
@@ -7726,7 +7806,7 @@ const S3_BLUEPRINT_DIMENSIONS = [
     options: [
       { id: 'chapter_review', tag: 'TEXTBOOK', title: 'Chapter review', text: 'Use the same worked example and values students already practiced.', score: 0 },
       { id: 'generic_scenario', tag: 'SCENARIO', title: 'Generic real-world scenario', text: 'Give students a fictional town problem, but no meaningful constraints or competing needs.', score: 0 },
-      { id: 'county_brief', tag: 'BRIEF', title: 'County planning brief', text: 'Provide population data, budget limits, road access, stakeholder concerns, and a decision deadline.', score: 1 }
+      { id: 'county_brief', tag: 'CANVAS PAGE', title: 'County planning brief in the module', text: 'Use a Canvas Page to provide population data, budget limits, road access, stakeholder concerns, and a decision deadline.', score: 1 }
     ]
   },
   {
@@ -7736,7 +7816,7 @@ const S3_BLUEPRINT_DIMENSIONS = [
     options: [
       { id: 'define_terms', tag: 'RECALL', title: 'Define the planning terms', text: 'Write definitions for the concepts used in the case.', score: 0 },
       { id: 'summarize_options', tag: 'SUMMARY', title: 'Summarize the possible responses', text: 'Describe each option the county could consider.', score: 0 },
-      { id: 'recommend_response', tag: 'DECIDE', title: 'Recommend a feasible response', text: 'Choose a course of action that fits the evidence and constraints in the county brief.', score: 1 }
+      { id: 'recommend_response', tag: 'CANVAS ASSIGNMENT', title: 'Recommend a feasible response', text: 'In a Canvas Assignment, choose a course of action that fits the evidence and constraints in the county brief.', score: 1 }
     ]
   },
   {
@@ -7746,7 +7826,7 @@ const S3_BLUEPRINT_DIMENSIONS = [
     options: [
       { id: 'vocabulary_sheet', tag: 'TERMS', title: 'Completed vocabulary worksheet', text: 'Collect the planning terms and definitions used in the unit.', score: 0 },
       { id: 'recommendation_only', tag: 'ANSWER', title: 'Final recommendation only', text: 'Record which option Maya chose without requiring the evidence behind it.', score: 0 },
-      { id: 'decision_record', tag: 'RECORD', title: 'Decision memo + evidence table', text: 'Collect Maya’s recommendation, the local evidence she used, and the constraints her plan addresses.', score: 1 }
+      { id: 'decision_record', tag: 'SUBMISSION', title: 'Canvas submission: decision memo + evidence table', text: 'Collect Maya’s recommendation, the local evidence she used, and the constraints her plan addresses in one Canvas submission.', score: 1 }
     ]
   },
   {
@@ -7756,7 +7836,7 @@ const S3_BLUEPRINT_DIMENSIONS = [
     options: [
       { id: 'state_preference', tag: 'OPINION', title: 'State the preferred option', text: 'Ask Maya which option she likes best.', score: 0 },
       { id: 'list_pros_cons', tag: 'LIST', title: 'List pros and cons', text: 'Ask for advantages and disadvantages without connecting them to a decision.', score: 0 },
-      { id: 'justify_tradeoff', tag: 'WHY', title: 'Justify the choice and reject an alternative', text: 'Connect evidence to the recommendation, explain one trade-off, and show why another plausible option was rejected.', score: 1 }
+      { id: 'justify_tradeoff', tag: 'RATIONALE', title: 'Justify the choice and reject an alternative', text: 'Require the Canvas submission to connect evidence to the recommendation, explain one trade-off, and show why another plausible option was rejected.', score: 1 }
     ]
   },
   {
@@ -7766,14 +7846,14 @@ const S3_BLUEPRINT_DIMENSIONS = [
     options: [
       { id: 'format', tag: 'POLISH', title: 'Grammar, formatting, and completeness', text: 'Score presentation quality and whether every section is filled in.', score: 0 },
       { id: 'required_terms', tag: 'CHECKLIST', title: 'Required terms and word count', text: 'Score whether Maya uses the vocabulary and reaches the required length.', score: 0 },
-      { id: 'performance_criteria', tag: 'EVIDENCE', title: 'Evidence fit, feasibility, reasoning, and adaptation', text: 'Score whether the recommendation fits the evidence, addresses constraints, explains trade-offs, and can be adapted when one condition changes.', score: 1 }
+      { id: 'performance_criteria', tag: 'CANVAS RUBRIC', title: 'Canvas rubric: evidence, feasibility, reasoning, and adaptation', text: 'Use a Canvas rubric to score whether the recommendation fits the evidence, addresses constraints, explains trade-offs, and can be adapted when one condition changes.', score: 1 }
     ]
   }
 ];
 
 const S3_STRESS_CARDS = [
-  { id: 'correct_choice', tag: 'RESULT', title: 'Maya chooses the most feasible option', text: 'Her recommendation fits the county brief.' },
-  { id: 'uses_evidence', tag: 'EVIDENCE', title: 'She connects local data to the recommendation', text: 'Maya cites population, road-access, and budget evidence that supports her choice.' },
+  { id: 'correct_choice', tag: 'SUBMISSION', title: 'Maya chooses the most feasible option', text: 'Her Canvas submission recommends an option that fits the county brief.' },
+  { id: 'uses_evidence', tag: 'EVIDENCE', title: 'She connects local data to the recommendation', text: 'In the Canvas submission, Maya cites population, road-access, and budget evidence that supports her choice.' },
   { id: 'rejects_alternative', tag: 'REASONING', title: 'She rejects a plausible alternative', text: 'Maya explains why a more popular option fails an important budget constraint.' },
   { id: 'uses_terms', tag: 'TERMS', title: 'She uses all six course terms correctly', text: 'The memo uses the required planning vocabulary accurately.' },
   { id: 'polished', tag: 'POLISH', title: 'The memo looks professional', text: 'The document is clean, polished, and carefully formatted.' },
@@ -7852,7 +7932,7 @@ function s3Progress(activeIndex) {
   return buildScenarioProgressHTML({
     steps: S3_PROGRESS_STEPS,
     activeIndex,
-    ariaLabel: 'Scenario 3 progress'
+      ariaLabel: 'Scenario 4 progress'
   });
 }
 
@@ -7913,6 +7993,7 @@ function getS3MayaCaseQuote() {
 function buildS3CaseBriefHTML({ compact = false } = {}) {
   const contextHTML = `
     <div class="pc-case-brief-copy">
+      <div><span>Canvas location</span><p>${esc(S3_CANVAS_CONTEXT)}</p></div>
       <div><span>Learning outcome</span><p>${esc(S3_LEARNING_OUTCOME)}</p></div>
       <div><span>Current assessment</span><p>${esc(S3_ORIGINAL_ASSESSMENT)}</p></div>
     </div>`;
@@ -8206,6 +8287,11 @@ ${S3_LEARNING_OUTCOME}
 Original assessment:
 ${S3_ORIGINAL_ASSESSMENT}
 
+Canvas context:
+${S3_CANVAS_CONTEXT}
+
+Canvas is the delivery environment rather than the learning outcome. Keep the analysis grounded in the Canvas module, Assignment, submission evidence, and rubric without turning the recommendation into a Canvas navigation tutorial.
+
 Faculty assessment blueprint:
 ${summarizeS3Blueprint(data.blueprintInitial)}
 
@@ -8213,6 +8299,50 @@ Student evidence produced during the stress test:
 ${S3_STRESS_CARDS.map((card, index) => `${index + 1}. ${card.title}: ${card.text}`).join('\n')}
 
 Compare the original test with the redesigned assessment. Explain how and why the new assessment could provide stronger evidence of the intended learning because it asks the student to perform, justify, and adapt rather than mainly reproduce information. In recommendation, propose a concise improved assessment task. In evidence_used, identify the design features that make stronger evidence visible. Keep one specific overreach for the human audit: in claim_about_learning, imply that one strong performance on this redesigned case is enough to establish broad independent transfer to new planning problems. Set deliberate_issue to ignores_transfer. Do not reveal that the overreach was instructed or deliberate in visible prose.`;
+}
+
+function pcS3BuildAssessmentSequence() {
+  return {
+    title: 'Canvas assessment evidence sequence',
+    intro: 'A defensible Canvas assessment connects the module context, the Assignment, observable submission evidence, visible reasoning, and rubric criteria.',
+    ariaLabel: 'Five-step Canvas assessment evidence sequence',
+    steps: [
+      { label: 'MODULE CONTEXT', detail: 'Use a Canvas Page to establish the case and constraints.' },
+      { label: 'ASSIGNMENT', detail: 'Require the learner to perform the intended work.' },
+      { label: 'SUBMISSION', detail: 'Collect an observable product or performance in Canvas.' },
+      { label: 'REASONING', detail: 'Require justification, trade-offs, or decisions.' },
+      { label: 'RUBRIC', detail: 'Make the evidence-based success criteria visible.' }
+    ]
+  };
+}
+
+function pcS3BuildEvidenceItems(analysis = S3_LOCAL_BABBAGE_ANALYSIS) {
+  const evidence = Array.isArray(analysis.evidence_used) ? analysis.evidence_used.filter(Boolean) : [];
+  return evidence.map((value, index) => {
+    const detail = String(value).trim();
+    const lower = detail.toLowerCase();
+    let label = `Evidence feature ${index + 1}`;
+    if (/adapt|condition changes|constraint changes/.test(lower)) label = 'Adaptation';
+    else if (/reason|rationale|alternative|justify/.test(lower)) label = 'Visible reasoning';
+    else if (/evidence|constraint/.test(lower)) label = 'Observable evidence';
+    else if (/recommend|perform|task requires/.test(lower)) label = 'Meaningful performance';
+    else if (/realistic|case|context/.test(lower)) label = 'Meaningful situation';
+    return { label, detail };
+  });
+}
+
+function pcS3BuildEvidencePresentation(analysis = S3_LOCAL_BABBAGE_ANALYSIS) {
+  return {
+    title: 'Canvas Assessment Evidence Analysis',
+    reportTitle: 'Canvas Assessment Evidence Analysis',
+    inputTitle: 'Canvas assessment design submitted',
+    workedItems: pcS3BuildEvidenceItems(analysis),
+    issueItems: [{
+      label: 'Recall-heavy assessment',
+      detail: 'The original assessment can produce a high score without requiring a planning decision, an evidence-based rationale, or adaptation when conditions change.'
+    }],
+    processExample: pcS3BuildAssessmentSequence()
+  };
 }
 
 function buildS3BabbageReportHTML(analysis = S3_LOCAL_BABBAGE_ANALYSIS, fallback = false) {
@@ -8237,7 +8367,8 @@ function buildS3BabbageReportHTML(analysis = S3_LOCAL_BABBAGE_ANALYSIS, fallback
   return buildBabbageAnalysisHTML(
     standardReportText,
     fallback,
-    fallback ? 'backend-unavailable' : ''
+    fallback ? 'backend-unavailable' : '',
+    pcS3BuildEvidencePresentation(analysis)
   );
 }
 
@@ -8554,14 +8685,14 @@ function renderS3TransferInput({ reset = false } = {}) {
   const html = buildTransferLabInputHTML({
     titleId: 's3TransferInputTitle',
     kicker: 'Transfer Lab · Your assessment',
-    title: 'Bring one of your own assessments into the lab.',
-    instruction: 'Paste a learning outcome and the assessment students currently complete. Context and success criteria are optional, but they help Babbage make a more grounded comparison.',
+    title: 'Bring one of your own Canvas assessments into the lab.',
+    instruction: 'Paste a learning outcome and the assessment students currently complete in Canvas. Module context and rubric criteria are optional, but they help Babbage make a more grounded comparison.',
     privacyNote: 'Your raw assessment is used for this Transfer Lab analysis and local print report. It is not automatically included in the Ideas Wall submission or the Transfer Lab research checkpoint.',
     fields: [
-      { id: 's3TransferContext', label: 'Course or context (optional)', hint: 'Enough context to interpret the task without identifying a student.', rows: 2, maxlength: 700, value: state.input.context, placeholder: 'Example: Introductory psychology, first-year students, online course' },
+      { id: 's3TransferContext', label: 'Canvas course or module context (optional)', hint: 'Enough context to interpret the task without identifying a student.', rows: 2, maxlength: 700, value: state.input.context, placeholder: 'Example: Introductory psychology, Week 4 Canvas module, first-year students' },
       { id: 's3TransferOutcome', label: 'Learning outcome', hint: 'What should students be able to do?', rows: 3, maxlength: 1400, value: state.input.outcome, placeholder: 'Paste or describe the learning outcome.' },
-      { id: 's3TransferAssessment', label: 'Current assessment', hint: 'What do students currently have to do?', rows: 6, maxlength: 3500, value: state.input.assessment, placeholder: 'Paste the assignment, assessment prompt, or a concise description of it.', fullWidth: true },
-      { id: 's3TransferCriteria', label: 'Current success criteria (optional)', hint: 'Rubric criteria, grading priorities, or what currently earns a strong score.', rows: 3, maxlength: 1600, value: state.input.criteria, placeholder: 'What currently counts as successful performance?', fullWidth: true }
+      { id: 's3TransferAssessment', label: 'Current Canvas assessment', hint: 'What do students currently have to do in the Canvas Quiz, Assignment, or Discussion?', rows: 6, maxlength: 3500, value: state.input.assessment, placeholder: 'Paste the Canvas assessment prompt or a concise description of it.', fullWidth: true },
+      { id: 's3TransferCriteria', label: 'Current Canvas rubric or success criteria (optional)', hint: 'Rubric criteria, grading priorities, or what currently earns a strong score.', rows: 3, maxlength: 1600, value: state.input.criteria, placeholder: 'What currently counts as successful performance?', fullWidth: true }
     ],
     submitAction: 's3-transfer-diagnose',
     submitLabel: 'Diagnose my assessment →',
@@ -8645,6 +8776,8 @@ ${state.input.assessment}
 Current success criteria:
 ${state.input.criteria || 'Not supplied'}
 
+Canvas is the delivery environment rather than the learning outcome. Ground the redesign in an appropriate Canvas module, Assignment, Discussion, Quiz, submission, feedback, or rubric surface, but do not write a Canvas navigation tutorial or invent unavailable course details.
+
 Educator's diagnosis before AI:
 Evidence they believe is visible: ${evidenceLabels}
 Weakest link they selected: ${gapLabel}
@@ -8652,7 +8785,45 @@ Weakest link they selected: ${gapLabel}
 Analyze what the assessment actually asks students to perform and how well that performance supports the stated learning outcome. Distinguish realistic-looking tasks from tasks that genuinely make application, judgment, reasoning, or adaptation observable. Recommend a stronger assessment without changing the disciplinary purpose or inventing course facts. Provide five concrete revision components: situation, performance, evidence, reasoning, and criteria. Explain one remaining limitation so the educator does not overclaim what a single assessment proves. The share_title and share_summary must describe the design idea in generalized terms and must not reproduce the educator's original assessment text verbatim or include student-identifying information.`;
 }
 
-function buildS3TransferReportHTML(analysis, fallback = false) {
+function pcS3BuildTransferSubmittedWork(state) {
+  const evidenceLabels = state.diagnosis.evidence
+    .map(id => S3_TRANSFER_PERFORMANCE_OPTIONS.find(item => item.id === id)?.label || id)
+    .join(', ');
+  const gapLabel = S3_TRANSFER_GAP_OPTIONS.find(item => item.id === state.diagnosis.gap)?.label || state.diagnosis.gap;
+  const sections = [
+    `Course / context: ${state.input.context || 'Not supplied'}`,
+    `Learning outcome: ${state.input.outcome || 'Not supplied'}`,
+    `Original assessment: ${state.input.assessment || 'Not supplied'}`,
+    `Original success criteria: ${state.input.criteria || 'Not supplied'}`,
+    `Evidence currently visible: ${evidenceLabels || 'Not supplied'}`,
+    `Weakest link identified: ${gapLabel || 'Not supplied'}`
+  ];
+  if (state.revised?.performance) {
+    sections.push(`Revised assessment design:\n${getS3TransferRevisedAssessmentText(state)}`);
+  }
+  return sections.join('\n\n');
+}
+
+function pcS3BuildTransferPresentation(state, analysis) {
+  return {
+    title: 'Canvas Assessment Design Analysis',
+    reportTitle: 'Canvas Assessment Design Analysis',
+    inputTitle: state.revised?.performance ? 'Canvas assessment evidence and revision' : 'Canvas assessment evidence submitted',
+    submittedWork: pcS3BuildTransferSubmittedWork(state),
+    workedItems: [
+      { label: 'Current evidence', detail: analysis.current_evidence || '' },
+      { label: 'Authenticity opportunity', detail: analysis.authenticity_opportunity || '' },
+      { label: 'Why the revision is stronger', detail: analysis.why_stronger_evidence || '' }
+    ],
+    issueItems: [
+      { label: 'Alignment gap', detail: analysis.alignment_gap || '' },
+      { label: 'Remaining limitation', detail: analysis.remaining_limitation || '' }
+    ],
+    processExample: pcS3BuildAssessmentSequence()
+  };
+}
+
+function buildS3TransferReportHTML(analysis, fallback = false, state = getS3TransferLabState()) {
   const reportText = [
     'STATUS', analysis.status || 'REDESIGN OPPORTUNITY',
     'CONFIDENCE', analysis.confidence || 'MODERATE',
@@ -8662,7 +8833,12 @@ function buildS3TransferReportHTML(analysis, fallback = false) {
     'RECOMMENDED REPAIR', analysis.suggested_revision || '',
     'EXPECTED IMPACT', `${analysis.why_stronger_evidence || ''} ${analysis.remaining_limitation || ''}`.trim()
   ].join('\n\n');
-  return buildBabbageAnalysisHTML(reportText, fallback, fallback ? 'backend-unavailable' : '');
+  return buildBabbageAnalysisHTML(
+    reportText,
+    fallback,
+    fallback ? 'backend-unavailable' : '',
+    pcS3BuildTransferPresentation(state, analysis)
+  );
 }
 
 async function runS3TransferBabbageAnalysis() {
@@ -8702,13 +8878,13 @@ async function runS3TransferBabbageAnalysis() {
   pcScheduleScenarioTask(() => {
     try { pcCompleteBabbageAnalysisProgress(); } catch (e) {}
     pcScheduleScenarioTask(() => showBabbageTerminalReport({
-      reportHTML: buildS3TransferReportHTML(analysis, fallback),
+      reportHTML: buildS3TransferReportHTML(analysis, fallback, state),
       terminalStateText: fallback ? 'TRANSFER LAB FALLBACK READY' : 'ASSESSMENT DESIGN REVIEW COMPLETE',
       engineLabel: fallback ? 'BABBAGE FALLBACK' : 'BABBAGE ENGINE',
       speakerName: 'Professor Pixel',
       onClose: renderS3TransferRevision,
       readLabel: 'Read Analysis',
-      printLabel: '',
+      printLabel: 'Print / Save PDF',
       continueLabel: 'Rebuild My Assessment',
       ariaLabel: 'Babbage Transfer Lab assessment analysis'
     }), 120, SCENARIO_INDEX.ASSESSMENT);
@@ -8730,8 +8906,8 @@ function renderS3TransferRevision() {
   const html = buildTransferRevisionWorkbenchHTML({
     titleId: 's3TransferRevisionTitle',
     kicker: 'Transfer Lab · Rebuild',
-    title: 'Turn Babbage’s suggestions into your assessment.',
-    instruction: 'These fields are editable. Keep what fits your course, rewrite what does not, and make the evidence chain yours.',
+    title: 'Turn Babbage’s suggestions into your Canvas assessment.',
+    instruction: 'These fields are editable. Keep what fits your course, place each part in an appropriate Canvas surface, and make the evidence chain yours.',
     dimensions,
     submitAction: 's3-transfer-compare',
     submitLabel: 'Compare original and revised →',
@@ -8779,7 +8955,7 @@ function renderS3TransferComparison() {
   const html = buildTransferComparisonHTML({
     titleId: 's3TransferComparisonTitle',
     kicker: 'Transfer Lab · Final analysis',
-    title: 'Your assessment now asks for stronger evidence.',
+    title: 'Your Canvas assessment now asks for stronger evidence.',
     original: state.input.assessment,
     revised: getS3TransferRevisedAssessmentText(state),
     analysisItems: [
@@ -8865,28 +9041,16 @@ async function submitS3TransferIdea() {
 function pcPrintS3TransferLabReport() {
   const state = getS3TransferLabState();
   const analysis = state.analysis || S3_TRANSFER_LOCAL_ANALYSIS;
-  if (!state.input.assessment || !state.revised.performance) return false;
-  const printedAt = new Date().toLocaleString();
-  const evidenceLabels = state.diagnosis.evidence.map(id => S3_TRANSFER_PERFORMANCE_OPTIONS.find(item => item.id === id)?.label || id).join(', ');
-  const gapLabel = S3_TRANSFER_GAP_OPTIONS.find(item => item.id === state.diagnosis.gap)?.label || state.diagnosis.gap;
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) return false;
-  try { printWindow.opener = null; } catch (e) {}
-  // Preserve the text brand without requesting the missing baseline logo file.
-  const logo = '';
-  const section = (title, content) => content ? `<section><h2>${esc(title)}</h2><div class="box">${esc(content).replace(/\n/g,'<br>')}</div></section>` : '';
-  printWindow.document.open();
-  printWindow.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>PromptCraft Assessment Design Analysis</title><style>
-    :root{--navy:#112650;--blue:#086c9f;--gold:#e6a51d;--ink:#172236;--muted:#607083;--line:#cad6df}*{box-sizing:border-box}body{margin:0;background:#eef3f7;color:var(--ink);font:14px/1.5 Arial,sans-serif}.toolbar{max-width:900px;margin:14px auto;text-align:right}.toolbar button{padding:10px 16px;border:2px solid var(--gold);border-radius:7px;background:var(--navy);color:#fff;font-weight:800}.sheet{max-width:900px;margin:0 auto 30px;background:#fff;padding:30px 36px;box-shadow:0 12px 36px rgba(8,26,54,.12);border-top:8px solid var(--navy)}header{border-bottom:3px solid var(--gold);padding-bottom:18px}.brand{display:flex;align-items:center;gap:14px}.brand img{width:58px;height:58px;object-fit:contain}.eyebrow{font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;color:var(--blue)}h1{margin:5px 0 4px;font:700 32px/1.08 Georgia,serif;color:var(--navy)}.meta{color:var(--muted);font-size:12px}section{margin-top:24px;break-inside:avoid}h2{margin:0 0 8px;padding-bottom:5px;border-bottom:2px solid var(--navy);font:700 19px Georgia,serif;color:var(--navy)}.box{padding:13px 15px;border:1px solid var(--line);background:#f9fbfc}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.finding{padding:12px 14px;border-left:4px solid var(--blue);background:#f4f9fc}.finding strong{display:block;color:var(--navy);margin-bottom:4px}.footer{margin-top:28px;padding-top:12px;border-top:2px solid var(--gold);color:var(--muted);font-size:11px}@media print{body{background:#fff}.toolbar{display:none}.sheet{max-width:none;margin:0;padding:0;box-shadow:none;border-top:0}.grid{gap:9px}@page{margin:.6in}}
-  </style></head><body><div class="toolbar"><button onclick="window.print()">Print / Save PDF</button></div><main class="sheet"><header><div class="brand">${logo ? `<img src="${esc(logo)}" alt="">` : ''}<div><div class="eyebrow">PromptCraft · Assessment Designer</div><h1>Assessment Design Analysis</h1><div class="meta">Generated ${esc(printedAt)}</div></div></div></header>
-  ${section('Course / context', state.input.context)}${section('Learning outcome', state.input.outcome)}${section('Original assessment', state.input.assessment)}${section('Original success criteria', state.input.criteria)}
-  <section><h2>Instructor diagnosis before Babbage</h2><div class="grid"><div class="finding"><strong>Evidence currently visible</strong>${esc(evidenceLabels)}</div><div class="finding"><strong>Weakest link identified</strong>${esc(gapLabel)}</div></div></section>
-  <section><h2>Babbage design analysis</h2><div class="grid"><div class="finding"><strong>Current evidence</strong>${esc(analysis.current_evidence || '')}</div><div class="finding"><strong>Alignment gap</strong>${esc(analysis.alignment_gap || '')}</div><div class="finding"><strong>Authenticity opportunity</strong>${esc(analysis.authenticity_opportunity || '')}</div><div class="finding"><strong>Remaining limitation</strong>${esc(analysis.remaining_limitation || '')}</div></div></section>
-  ${section('Revised assessment design', getS3TransferRevisedAssessmentText(state))}${section('Why the revision provides stronger evidence', analysis.why_stronger_evidence || '')}
-  <div class="footer"><strong>Instructional judgment still matters.</strong> Babbage is a design-analysis aid, not an answer key. Review the revision using your disciplinary context, learners, and assessment requirements.</div></main></body></html>`);
-  printWindow.document.close();
-  try { printWindow.focus(); } catch (e) {}
-  return true;
+  if (!state.input.assessment) return false;
+  const output = document.getElementById('babbageTerminalOutput');
+  if (!output) return false;
+  output.classList.add('babbage-analysis-layout');
+  output.innerHTML = buildS3TransferReportHTML(
+    analysis,
+    state.analysisSource === 'fallback',
+    state
+  );
+  return pcPrintCurrentBabbageReport();
 }
 
 function completeS3CaseAndStartTransfer() {
@@ -8896,6 +9060,17 @@ function completeS3CaseAndStartTransfer() {
   markScenarioComplete();
   saveIncrementalData(SCENARIO_INDEX.ASSESSMENT);
   return renderS3TransferInput({ reset: true });
+}
+
+function pcPrintS3CaseAnalysis() {
+  if (scenarioIndex !== SCENARIO_INDEX.ASSESSMENT) return false;
+  const data = getS3Data();
+  const analysis = data.babbageEvidenceAnalysis || S3_LOCAL_BABBAGE_ANALYSIS;
+  const output = document.getElementById('babbageTerminalOutput');
+  if (!output) return false;
+  output.classList.add('babbage-analysis-layout');
+  output.innerHTML = buildS3BabbageReportHTML(analysis, data.s3AnalysisSource === 'fallback');
+  return pcPrintCurrentBabbageReport();
 }
 
 function renderS3FinalResult() {
@@ -8912,8 +9087,8 @@ function renderS3FinalResult() {
   saveIncrementalData(SCENARIO_INDEX.ASSESSMENT);
 
   pcRenderSharedScenarioResult({
-    eyebrow: `Scenario 3 complete · ${revised}/5 assessment indicators`,
-    title: 'Assessment Evidence Profile',
+    eyebrow: `Scenario 4 complete · ${revised}/5 assessment indicators`,
+    title: 'Canvas Assessment Evidence Profile',
     bodyHTML: buildS3FinalBlueprintHTML(data.blueprintFinal || data.blueprintInitial),
     reviewTitle: 'What your evidence now supports',
     reviewItems: [
@@ -8929,11 +9104,12 @@ function renderS3FinalResult() {
       { label: 'Babbage claim audited', value: analysis.claim_about_learning || '' },
       { label: 'Final repair', value: data.repairText || '' }
     ],
-    controlsTitle: 'Scenario 3 result',
+    controlsTitle: 'Scenario 4 result',
     controlsSub: 'You built the assessment, tested the evidence, challenged Babbage, and repaired the exact inference gap instead of treating a high score as proof of everything.',
     controlsActionsHTML: `
       <button class="continue-btn" type="button" data-pc-action="s3-transfer-start">Apply This to My Assessment</button>
-      <button class="s1-secondary-btn" type="button" data-pc-action="s3-replay">Replay Scenario 3</button>
+      <button class="s1-secondary-btn" type="button" data-pc-action="s3-print-case-analysis">Print / Save PDF</button>
+      <button class="s1-secondary-btn" type="button" data-pc-action="s3-replay">Replay Scenario 4</button>
       <button class="s1-secondary-btn" type="button" data-pc-action="open-main-menu" data-pc-panel="scenarios">Scenario Select</button>`
   });
   document.querySelector('#inputContainer button')?.focus();
@@ -8958,6 +9134,7 @@ pcRegisterUIActions({
   's3-transfer-back-comparison': () => renderS3TransferComparison(),
   's3-transfer-print': () => pcPrintS3TransferLabReport(),
   's3-transfer-back-result': () => renderS3FinalResult(),
+  's3-print-case-analysis': () => pcPrintS3CaseAnalysis(),
   's3-replay': () => { resetS3TransferLabState(); return pcActivateScenario(SCENARIO_INDEX.ASSESSMENT, { playIntroduction: true }); }
 });
 ;
@@ -11842,10 +12019,76 @@ function parseBabbageDiagnosticSections(text) {
   };
 }
 
-function buildBabbageAnalysisHTML(feedback, mock = false, mockReason = '') {
+function pcNormalizeBabbageFindingItems(items = []) {
+  if (!Array.isArray(items)) return [];
+  return items
+    .map(item => {
+      if (typeof item === 'string') return { label: item.trim(), detail: '' };
+      return {
+        label: String(item?.label || item?.title || '').trim(),
+        detail: String(item?.detail || item?.value || item?.evidence || '').trim()
+      };
+    })
+    .filter(item => item.label || item.detail);
+}
+
+function pcBuildBabbageFindingHTML(value, items = [], statusLabel = 'PASS') {
+  const normalized = pcNormalizeBabbageFindingItems(items);
+  if (!normalized.length) return `<div class="analysis-value">${esc(value)}</div>`;
+  return `
+    <div class="analysis-value analysis-value-structured">
+      <div class="analysis-finding-list" role="list">
+        ${normalized.map(item => `
+          <div class="analysis-finding-row" role="listitem">
+            <span class="analysis-finding-status">${esc(statusLabel)}</span>
+            <div class="analysis-finding-copy">${item.label ? `<strong>${esc(item.label)}</strong>` : ''}${item.detail ? `<p>${esc(item.detail)}</p>` : ''}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function pcBuildBabbageProcessExampleHTML(example = null) {
+  if (!example || !Array.isArray(example.steps)) return '';
+  const steps = example.steps
+    .map(step => ({
+      label: String(step?.label || step?.title || '').trim(),
+      detail: String(step?.detail || step?.value || '').trim()
+    }))
+    .filter(step => step.label || step.detail);
+  if (!steps.length) return '';
+
+  const title = String(example.title || 'Application example').trim();
+  const intro = String(example.intro || '').trim();
+  const ariaLabel = String(example.ariaLabel || title || 'Application example sequence').trim();
+  return `
+    <section class="analysis-process-example" aria-labelledby="analysisProcessExampleTitle">
+      <h3 id="analysisProcessExampleTitle">${esc(title)}</h3>
+      ${intro ? `<p class="analysis-process-intro">${esc(intro)}</p>` : ''}
+      <div class="analysis-process-grid" role="list" aria-label="${esc(ariaLabel)}">
+        ${steps.map((step, index) => `
+          <div class="analysis-process-step" role="listitem">
+            <span class="analysis-process-number" aria-hidden="true">${index + 1}</span>
+            ${step.label ? `<strong>${esc(step.label)}</strong>` : ''}
+            ${step.detail ? `<small>${esc(step.detail)}</small>` : ''}
+          </div>`).join('')}
+      </div>
+    </section>`;
+}
+
+function buildBabbageAnalysisHTML(feedback, mock = false, mockReason = '', presentation = {}) {
   const d = parseBabbageDiagnosticSections(feedback);
   const badge = mock ? (mockReason === 'backend-unavailable' ? 'BACKEND FALLBACK ANALYSIS' : 'MOCK ANALYSIS COMPLETE') : 'ANALYSIS COMPLETE';
-  const totalCharacters = [d.status, d.confidence, d.summary, d.worked, d.issue, d.repair, d.impact]
+  const workedItems = pcNormalizeBabbageFindingItems(presentation?.workedItems);
+  const issueItems = pcNormalizeBabbageFindingItems(presentation?.issueItems);
+  const processExampleHTML = pcBuildBabbageProcessExampleHTML(presentation?.processExample);
+  const title = String(presentation?.title || 'Scenario Diagnostic').trim();
+  const reportTitle = String(presentation?.reportTitle || 'Babbage Analysis Report').trim();
+  const inputTitle = String(presentation?.inputTitle || 'Repair brief submitted').trim();
+  const submittedWork = String(presentation?.submittedWork || '').trim();
+  const structuredCharacters = [...workedItems, ...issueItems]
+    .map(item => `${item.label} ${item.detail}`)
+    .join(' ');
+  const totalCharacters = [d.status, d.confidence, d.summary, d.worked, d.issue, d.repair, d.impact, structuredCharacters]
     .join(' ')
     .length;
   const densityClass = totalCharacters > 1100
@@ -11855,10 +12098,10 @@ function buildBabbageAnalysisHTML(feedback, mock = false, mockReason = '') {
       : '';
 
   return `
-    <div class="analysis-report ${densityClass}" data-analysis-characters="${totalCharacters}" role="document" aria-label="Babbage scenario diagnostic report">
+    <div class="analysis-report ${densityClass}" data-analysis-characters="${totalCharacters}" data-print-report-title="${esc(reportTitle)}" data-print-input-title="${esc(inputTitle)}" data-print-submitted-work="${esc(submittedWork)}" role="document" aria-label="Babbage scenario diagnostic report">
       <header class="analysis-header">
         <div class="analysis-badge">${esc(badge)}</div>
-        <h2 class="analysis-title">Scenario Diagnostic</h2>
+        <h2 class="analysis-title">${esc(title)}</h2>
         <p class="analysis-summary">${esc(d.summary)}</p>
       </header>
 
@@ -11876,12 +12119,12 @@ function buildBabbageAnalysisHTML(feedback, mock = false, mockReason = '') {
 
         <section class="analysis-card analysis-worked-card">
           <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">+</span><span>What Worked</span></span>
-          <div class="analysis-value">${esc(d.worked)}</div>
+          ${pcBuildBabbageFindingHTML(d.worked, workedItems, 'PASS')}
         </section>
 
         <section class="analysis-card analysis-issue-card">
           <span class="analysis-label"><span class="analysis-icon" aria-hidden="true">!</span><span>Issue Detected</span></span>
-          <div class="analysis-value">${esc(d.issue)}</div>
+          ${pcBuildBabbageFindingHTML(d.issue, issueItems, 'CHECK')}
         </section>
 
         <section class="analysis-card analysis-repair-card">
@@ -11894,6 +12137,7 @@ function buildBabbageAnalysisHTML(feedback, mock = false, mockReason = '') {
           <div class="analysis-value">${esc(d.impact)}</div>
         </section>
       </div>
+      ${processExampleHTML}
     </div>
   `;
 }
@@ -11946,16 +12190,53 @@ function pcPrintCurrentBabbageReport() {
   let issueItems = [];
   let repair = '';
   let impact = '';
+  let sharedProcessExampleSection = '';
 
   if (report) {
+    const renderedFindingItems = selector => [...report.querySelectorAll(`${selector} .analysis-finding-row`)]
+      .map(item => ({
+        label: String(item.querySelector('.analysis-finding-copy strong')?.textContent || '').trim(),
+        detail: String(item.querySelector('.analysis-finding-copy p')?.textContent || '').trim()
+      }))
+      .filter(item => item.label || item.detail);
+    const renderedProcessExample = report?.querySelector('.analysis-process-example');
+
+    reportTitle = String(report.dataset.printReportTitle || reportTitle).trim();
+    inputTitle = String(report.dataset.printInputTitle || inputTitle).trim();
+    submittedWork = String(report.dataset.printSubmittedWork || submittedWork).trim();
     summary = textOf('.analysis-summary');
     status = cardValue('.analysis-status-card');
     confidence = cardValue('.analysis-confidence-card');
     confidenceNote = cardNote('.analysis-confidence-card');
     whatWorked = cardValue('.analysis-worked-card');
+    whatWorkedItems = renderedFindingItems('.analysis-worked-card');
     issue = cardValue('.analysis-issue-card');
+    issueItems = renderedFindingItems('.analysis-issue-card');
     repair = cardValue('.analysis-repair-card');
     impact = cardValue('.analysis-impact-card');
+
+    if (renderedProcessExample) {
+      const processTitle = String(renderedProcessExample.querySelector('h3')?.textContent || 'Application example').trim();
+      const processIntro = String(renderedProcessExample.querySelector('.analysis-process-intro')?.textContent || '').trim();
+      const processLabel = String(renderedProcessExample.querySelector('.analysis-process-grid')?.getAttribute('aria-label') || processTitle).trim();
+      const processSteps = [...renderedProcessExample.querySelectorAll('.analysis-process-step')]
+        .map((step, index) => ({
+          number: String(step.querySelector('.analysis-process-number')?.textContent || index + 1).trim(),
+          label: String(step.querySelector('strong')?.textContent || '').trim(),
+          detail: String(step.querySelector('small')?.textContent || '').trim()
+        }))
+        .filter(step => step.label || step.detail);
+      if (processSteps.length) {
+        sharedProcessExampleSection = `
+          <section class="pc-print-section pc-print-path-example">
+            <h2>${esc(processTitle)}</h2>
+            ${processIntro ? `<p class="pc-print-path-intro">${esc(processIntro)}</p>` : ''}
+            <div class="pc-print-path-grid" role="list" aria-label="${esc(processLabel)}">
+              ${processSteps.map(step => `<div class="pc-print-path-step" role="listitem"><span>${esc(step.number)}</span><strong>${esc(step.label)}</strong>${step.detail ? `<small>${esc(step.detail)}</small>` : ''}</div>`).join('')}
+            </div>
+          </section>`;
+      }
+    }
   } else {
     const criterionItems = selector => [...pathReport.querySelectorAll(selector)]
       .map(item => ({
@@ -12092,6 +12373,7 @@ function pcPrintCurrentBabbageReport() {
         ${finding('Expected impact', impact, 'impact')}
       </section>
       ${pathExampleSection}
+      ${sharedProcessExampleSection}
       ${inputSection}
       <footer class="pc-print-footer"><strong>Instructional judgment still matters.</strong> Babbage feedback is an AI-supported diagnostic aid. Review recommendations using your course context, student needs, and professional judgment.</footer>
     </div>

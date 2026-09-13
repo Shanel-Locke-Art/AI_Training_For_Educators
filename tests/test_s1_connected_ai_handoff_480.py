@@ -39,8 +39,8 @@ def main() -> None:
         assert marker in css
         assert marker in runtime_css
 
-    assert "patch=529" in index
-    assert "DEV · 529" in index
+    assert "patch=534" in index
+    assert "DEV · 534" in index
     print("S1 evidence-to-written-reflection handoff contract passed through patch 484.")
 
 

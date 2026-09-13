@@ -52,8 +52,8 @@ def main() -> None:
         assert token in css
         assert token in runtime_css
 
-    assert "patch=529" in index
-    assert "DEV · 529" in index
+    assert "patch=534" in index
+    assert "DEV · 534" in index
     print("V505 S2-staged Canvas dialogue and analysis-row contract passed.")
 
 

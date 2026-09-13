@@ -7,6 +7,7 @@
 //  Vertical slice implemented with the shared activity component system.
 // ══════════════════════════════════════════════════════
 const S2_PROGRESS_STEPS = ['1 Diagnose', '2 Intervene', '3 Observe', '4 Audit Babbage', '5 Repair & compare'];
+const S2_CANVAS_CONTEXT = 'Week 4 Canvas module · Practice check and reflection assignment';
 
 const S2_DIAGNOSIS_OPTIONS = [
   { id: 'evidence', tag: 'MISSING LINK', title: 'Evidence of what the strategy actually did', text: 'Connect Jordan’s study approach to specific signs of what he understood, where understanding broke down, and what changed.' },
@@ -16,10 +17,10 @@ const S2_DIAGNOSIS_OPTIONS = [
 ];
 
 const S2_EVIDENCE_RESPONSES = [
-  { id: 'confidence', tag: 'CONFIDENCE', title: 'Ask for a confidence rating', text: 'After studying, Jordan rates how confident he feels about the material from 1–5.' },
-  { id: 'strategy_name', tag: 'REFLECT', title: 'Ask what strategy he used', text: 'After studying, Jordan names the study strategy he used and briefly describes it.' },
-  { id: 'grade_compare', tag: 'RESULT', title: 'Compare the new grade', text: 'Jordan compares this assignment score with his previous score to decide whether the strategy worked.' },
-  { id: 'evidence_check', tag: 'TEST', title: 'Make the strategy produce evidence', text: 'Jordan tries to explain the concepts without notes, identifies where understanding breaks down, and decides whether to keep or change his strategy.' }
+  { id: 'confidence', tag: 'CONFIDENCE', title: 'Add a Canvas confidence poll', text: 'After the Canvas practice check, Jordan rates how confident he feels about the material from 1–5.' },
+  { id: 'strategy_name', tag: 'REFLECT', title: 'Add a strategy note in Canvas', text: 'In the module reflection, Jordan names the study strategy he used and briefly describes it.' },
+  { id: 'grade_compare', tag: 'RESULT', title: 'Compare Canvas grades', text: 'Jordan compares this Canvas grade with his previous score to decide whether the strategy worked.' },
+  { id: 'evidence_check', tag: 'TEST', title: 'Add a Canvas practice check', text: 'Before the graded quiz, Jordan explains the concepts without notes, uses the feedback to identify where understanding breaks down, and records whether to keep or change his strategy.' }
 ];
 
 const S2_THINKING_MOVES = [
@@ -37,8 +38,8 @@ const S2_AUDIT_OPTIONS = [
 ];
 
 const S2_LOCAL_DRAFT_FALLBACK = {
-  activity_title: 'What Worked This Time?',
-  activity_prompt: 'After you receive your grade, describe whether you think your study strategy worked. Explain how you feel about your result and what you might do next time.',
+  activity_title: 'Canvas Reflection: What Worked This Time?',
+  activity_prompt: 'After Canvas posts your quiz grade, describe whether you think your study strategy worked. Explain how you feel about your result and what you might do next time.',
   design_rationale: 'This prompt asks Jordan to reflect after completing the assignment and gives him an opportunity to think about his strategy.',
   deliberate_weakness: 'no_evidence',
   likely_student_response: 'I think rereading worked because my grade was better. I felt relieved, so I will probably reread again.',
@@ -51,7 +52,7 @@ const S2_LOCAL_REVIEW_FALLBACK = {
   feedback_summary: 'The repair makes the reflection more useful by asking Jordan to connect a strategy to evidence from his learning process.',
   what_improved: ['The prompt asks Jordan to identify what he actually did.', 'The repair makes the judgment about effectiveness more explicit.'],
   remaining_issue: 'The next refinement would be to make the future decision equally explicit so Jordan names when he will reuse, modify, or abandon the strategy.',
-  revised_activity: 'Name the strategy you used while learning this material. Identify one specific sign that it helped or failed to help your understanding. Based on that evidence, explain what you will keep, change, or try differently on the next assignment.',
+  revised_activity: 'In the Canvas reflection assignment, name the strategy you used while learning this material. Cite one specific sign from the practice check or its feedback that it helped or failed to help your understanding. Based on that evidence, explain what you will keep, change, or try differently in the next module.',
   student_response_after: 'Rereading helped me recognize the terms, but I still could not compare them. Making my own examples was the point where I could finally explain the difference. Next time I will test myself with examples before I reread everything.',
   why_student_thinking_changed: 'The revised prompt requires Jordan to connect a strategy to evidence and then turn that evaluation into a future decision.'
 };
@@ -76,7 +77,7 @@ const S2_ACTIVITY_CONFIG = Object.freeze({
     activeIndex: 0,
     focusSelector: 'input[name="s2-diagnosis"]',
     onSubmit: submitS2Diagnosis,
-    wrapContent: taskHTML => `<section class="pc-s2-diagnosis-layout" aria-labelledby="s2CaseContextTitle">${buildStudentEvidencePanelHTML({ title: 'Student Evidence', portraitSrc: ASSETS.images.students.jordan.uncertain, portraitAlt: 'Jordan, an adult online learner, looking uncertain', characterId: 'jordan', quote: 'I guess something worked.', resultLabel: 'Result', resultValue: '84% ↑', resultNote: 'Improved from last time' })}${buildS2CaseContextHTML()}${taskHTML}</section>`
+    wrapContent: taskHTML => `<section class="pc-s2-diagnosis-layout" aria-labelledby="s2CaseContextTitle">${buildStudentEvidencePanelHTML({ title: 'Canvas Student Evidence', portraitSrc: ASSETS.images.students.jordan.uncertain, portraitAlt: 'Jordan, an adult online learner, looking uncertain', characterId: 'jordan', quote: 'Canvas says I improved, but I still do not know what actually helped.', resultLabel: 'Module quiz', resultValue: '84% ↑', resultNote: 'Previous quiz: 76%' })}${buildS2CaseContextHTML()}${taskHTML}</section>`
   }),
   evidence: Object.freeze({
     items: S2_EVIDENCE_RESPONSES,
@@ -147,8 +148,12 @@ function buildS2CaseContextHTML() {
       </div>
       <div class="pc-case-brief-copy">
         <div>
+          <span>Canvas location</span>
+          <p>${esc(S2_CANVAS_CONTEXT)}</p>
+        </div>
+        <div>
           <span>Observed strategy</span>
-          <p>Jordan reread the chapter three times and treated a better grade as proof that the strategy worked.</p>
+          <p>Jordan reread the module reading three times, completed the Canvas quiz, and treated a better grade as proof that the strategy worked.</p>
         </div>
         <div>
           <span>Current problem</span>
@@ -223,7 +228,7 @@ function renderS2SelectionActivity(config) {
     progressHTML: buildScenarioProgressHTML({
       steps: S2_PROGRESS_STEPS,
       activeIndex: config.activeIndex,
-      ariaLabel: 'Scenario 2 progress'
+      ariaLabel: 'Scenario 3 progress'
     }),
     contentHTML,
     focusSelector: config.focusSelector
@@ -371,22 +376,22 @@ function pcGetS2JordanInterventionDialogue(choice) {
     confidence: {
       voiceId: 'jordan-s2-intervention-confidence',
       expression: 'confident',
-      quote: 'I’d say I’m a four out of five. I feel better about it this time.'
+      quote: 'In the Canvas reflection, I’d rate my confidence four out of five. I feel better, but I still can\'t explain what the rereading changed.'
     },
     strategy_name: {
       voiceId: 'jordan-s2-intervention-strategy',
       expression: 'thinking',
-      quote: 'I reread the chapter three times and highlighted the parts that seemed important.'
+      quote: 'I reread the module page three times and highlighted the parts that seemed important.'
     },
     grade_compare: {
       voiceId: 'jordan-s2-intervention-grade',
       expression: 'confident',
-      quote: 'I got an 84 instead of a 76, so rereading must have worked.'
+      quote: 'My Canvas grade went from 76% to 84%, so rereading must have worked.'
     },
     evidence_check: {
       voiceId: 'jordan-s2-intervention-evidence',
       expression: 'thinking',
-      quote: 'I could define both concepts, but without my notes I still couldn’t explain the difference. Rereading helped me recognize them, but it didn’t help me compare them. I need to try examples next.'
+      quote: 'On the Canvas practice check, I could define both concepts, but without my notes I still couldn’t explain the difference. Rereading helped me recognize them, but it didn’t help me compare them. I need to try examples next.'
     }
   };
   const registered = window.s2JordanInterventionDialogue?.[choice];
@@ -540,10 +545,10 @@ function submitS2Evidence() {
   const data = getS2Data();
   const option = S2_EVIDENCE_RESPONSES.find(item => item.id === choice);
   const consequences = {
-    confidence: { tone: 'developing', heading: 'Jordan feels informed, but still cannot test the strategy.', copy: 'Confidence is useful information, but Jordan can still answer without showing what he understands or whether rereading caused the improvement.' },
-    strategy_name: { tone: 'developing', heading: 'The strategy is visible. Its effectiveness is not.', copy: 'Jordan can now name what he did, but he still has no evidence for deciding whether it helped.' },
-    grade_compare: { tone: 'developing', heading: 'Outcome bias just got stronger.', copy: 'The intervention encourages Jordan to treat the grade as proof of the strategy. The result changed, but the learning process is still invisible.' },
-    evidence_check: { tone: 'strong', heading: 'Now Jordan has evidence he can act on.', copy: 'Jordan is no longer guessing from a feeling or grade. He monitored understanding, connected evidence to the strategy, and made a decision.' }
+    confidence: { tone: 'developing', heading: 'The Canvas reflection records confidence, not learning evidence.', copy: 'Confidence is useful information, but Jordan can still answer without showing what he understands or whether rereading caused the improvement.' },
+    strategy_name: { tone: 'developing', heading: 'Canvas now records the strategy. Its effectiveness is still unclear.', copy: 'Jordan can name what he did in the module, but he still has no evidence for deciding whether it helped.' },
+    grade_compare: { tone: 'developing', heading: 'The Canvas grade strengthens the same outcome bias.', copy: 'The intervention encourages Jordan to treat the higher score as proof of the strategy. The result changed, but the learning process is still invisible.' },
+    evidence_check: { tone: 'strong', heading: 'The Canvas practice check creates evidence Jordan can use.', copy: 'Jordan is no longer guessing from a feeling or grade. He used the practice response and feedback to connect evidence to the strategy and make a decision.' }
   };
   const result = consequences[choice] || consequences.strategy_name;
   data.attempts += 1;
@@ -586,8 +591,13 @@ function pcS2GetDraftIngredients(data = getS2Data()) {
 function pcS2BuildDraftSystemPrompt(ingredients) {
   return `You are Babbage, PromptCraft's instructional-design analysis engine.
 
-SCENARIO 2: METACOGNITION
-Jordan completes assignments and sometimes earns better grades, but he cannot identify which learning strategy helped, evaluate why it helped, or decide what to do next.
+SCENARIO 3: METACOGNITION IN CANVAS
+Jordan completes the Week 4 Canvas module and sometimes earns better grades, but he cannot identify which learning strategy helped, evaluate why it helped, or decide what to do next.
+
+Canvas context:
+${S2_CANVAS_CONTEXT}
+
+Canvas is the learning environment, not the subject of the activity. Design a student-facing reflection that fits naturally after a Canvas practice check or quiz. Do not turn the response into instructions for clicking through Canvas.
 
 The participant is building a reflection activity from these learner-selected ingredients:
 - Diagnosis: ${ingredients.diagnosisTitle}
@@ -933,7 +943,7 @@ function pcS2BuildRepairedReflectionPrompt(parts = {}) {
   if (![evidence, evaluation, nextMove, success].some(Boolean)) return '';
 
   const lines = [
-    'After completing the assignment, reflect on how your study strategy affected your learning.'
+    'In the Canvas reflection assignment, reflect on how your study strategy affected your learning during this module.'
   ];
   if (evidence) lines.push(`1. Evidence — ${evidence}`);
   if (evaluation) lines.push(`2. Evaluation — ${evaluation}`);
@@ -1045,7 +1055,12 @@ function pcS2BuildReviewSystemPrompt(data, repair) {
 Review a faculty member's repair to a metacognitive reflection activity for Jordan.
 
 Jordan's problem:
-He completes work but cannot identify what learning strategy helped, evaluate why it helped, or decide what he should try next.
+He completes the Week 4 Canvas module but cannot identify what learning strategy helped, evaluate why it helped, or decide what he should try next.
+
+Canvas context:
+${S2_CANVAS_CONTEXT}
+
+Canvas is the learning environment, not the subject of the activity. Keep the revision suitable for a Canvas reflection assignment after a practice check or quiz, without writing a Canvas navigation tutorial.
 
 Original Babbage draft:
 ${draft.activity_prompt}
@@ -1105,6 +1120,50 @@ function pcS2BuildRepairReviewDiagnosticText(review = {}) {
   ].join('\n');
 }
 
+function pcS2BuildImprovementItems(review = {}) {
+  const values = Array.isArray(review.what_improved)
+    ? review.what_improved.filter(Boolean).map(value => String(value).trim()).filter(Boolean)
+    : [String(review.what_improved || '').trim()].filter(Boolean);
+  const improvements = values.length
+    ? values
+    : ['The repair makes the intended thinking more visible.'];
+
+  return improvements.map((detail, index) => {
+    const lower = detail.toLowerCase();
+    let label = `Repair improvement ${index + 1}`;
+    if (/success|criter/.test(lower)) label = 'Success criteria';
+    else if (/next|future|transfer|try again|change/.test(lower)) label = 'Next move';
+    else if (/evaluat|effect|why|judg/.test(lower)) label = 'Strategy evaluation';
+    else if (/evidence|identify|what (he|jordan) (did|tried)|strategy/.test(lower)) label = 'Evidence connection';
+    return { label, detail };
+  });
+}
+
+function pcS2BuildRepairReviewPresentation(review = {}) {
+  const remainingIssue = String(review.remaining_issue || 'No major remaining issue was identified in the repaired reflection.').trim();
+  return {
+    title: 'Canvas Reflection Repair Analysis',
+    reportTitle: 'Canvas Reflection Activity Analysis',
+    inputTitle: 'Repaired Canvas reflection submitted',
+    workedItems: pcS2BuildImprovementItems(review),
+    issueItems: [{
+      label: 'Remaining limitation',
+      detail: remainingIssue
+    }],
+    processExample: {
+      title: 'Canvas module reflection sequence',
+      intro: 'The Canvas module places a low-stakes check and its feedback before a short reflection, so the learner can connect strategy, evidence, and the next decision.',
+      ariaLabel: 'Four-step Canvas module reflection sequence',
+      steps: [
+        { label: 'OPEN MODULE', detail: 'Study the Week 4 material using a chosen strategy.' },
+        { label: 'TRY THE CHECK', detail: 'Attempt the Canvas practice check without notes.' },
+        { label: 'USE FEEDBACK', detail: 'Cite what the response and feedback reveal about understanding.' },
+        { label: 'CHOOSE NEXT MOVE', detail: 'Decide what to repeat or change.' }
+      ]
+    }
+  };
+}
+
 function pcS2ShowRepairReviewAnalysis(data, review, runToken) {
   if (!pcIsScenarioRunCurrent(runToken)) return false;
 
@@ -1117,7 +1176,12 @@ function pcS2ShowRepairReviewAnalysis(data, review, runToken) {
   const reveal = () => {
     if (!pcIsScenarioRunCurrent(runToken)) return false;
     return showBabbageTerminalReport({
-      reportHTML: buildBabbageAnalysisHTML(diagnosticText, isFallback, isFallback ? 'backend-unavailable' : ''),
+      reportHTML: buildBabbageAnalysisHTML(
+        diagnosticText,
+        isFallback,
+        isFallback ? 'backend-unavailable' : '',
+        pcS2BuildRepairReviewPresentation(review)
+      ),
       terminalStateText: `${isFallback ? 'BACKEND FALLBACK ANALYSIS' : 'ANALYSIS COMPLETE'}\n\n${diagnosticText}`,
       engineLabel: isFallback ? 'DEMONSTRATION BABBAGE ENGINE' : 'BABBAGE ENGINE',
       speakerName: 'Professor Pixel',
@@ -1220,9 +1284,7 @@ function renderS2FinalComparison() {
   const data = getS2Data();
   const draft = data.babbageDraft || S2_LOCAL_DRAFT_FALLBACK;
   const review = data.babbageReview || S2_LOCAL_REVIEW_FALLBACK;
-  const improvedItems = Array.isArray(review.what_improved)
-    ? review.what_improved.filter(Boolean)
-    : [String(review.what_improved || '')].filter(Boolean);
+  const improvedItems = pcS2BuildImprovementItems(review);
 
   awardScenarioScoreXP(SCENARIO_INDEX.METACOGNITION, data.currentScore || data.bestScore || 5, 5);
   markScenarioComplete();
@@ -1230,22 +1292,19 @@ function renderS2FinalComparison() {
 
   const reviewIsFallback = data.s2ReviewSource === 'fallback' || data.aiProvider === 'local-fallback';
   const reviewEyebrow = reviewIsFallback
-    ? 'Demonstration fallback review · Scenario 2 complete'
-    : `Live Babbage review${data.aiModel ? ` · ${data.aiModel}` : ''} · Scenario 2 complete`;
+    ? 'Demonstration fallback review · Scenario 3 complete'
+    : `Live Babbage review${data.aiModel ? ` · ${data.aiModel}` : ''} · Scenario 3 complete`;
   const reviewTitle = reviewIsFallback
     ? 'Demonstration Review · Babbage unavailable'
     : "Babbage's Live Review of the Revision";
 
   pcRenderSharedScenarioResult({
     eyebrow: reviewEyebrow,
-    title: 'Repaired Reflection Activity',
+    title: 'Repaired Canvas Reflection Activity',
     bodyHTML: fmt(review.revised_activity || ''),
     reviewTitle,
     reviewItems: [
-      {
-        label: 'Strongest improvement',
-        value: improvedItems.join(' ') || 'The repair makes the intended thinking more visible.'
-      },
+      ...improvedItems.map(item => ({ label: item.label, value: item.detail })),
       { label: 'Remaining limitation', value: review.remaining_issue || '' },
       { label: "Why Jordan's thinking changed", value: review.why_student_thinking_changed || '' }
     ],
@@ -1255,14 +1314,33 @@ function renderS2FinalComparison() {
       { label: 'Jordan before', value: draft.likely_student_response || '' },
       { label: 'Jordan after', value: review.student_response_after || '' }
     ],
-    controlsTitle: 'Scenario 2 result',
+    controlsTitle: 'Scenario 3 result',
     controlsSub: reviewIsFallback ? 'Live Babbage was unavailable. This result uses the labeled demonstration fallback.' : 'Babbage reviewed your repair live. Choose the next step.',
     controlsActionsHTML: `
-      <button class="s1-secondary-btn" type="button" data-pc-action="s2-repair-draft">Revise S2</button>
+      <button class="s1-secondary-btn" type="button" data-pc-action="s2-print-final-analysis">Print / Save PDF</button>
+      <button class="s1-secondary-btn" type="button" data-pc-action="s2-repair-draft">Revise reflection</button>
       <button class="continue-btn" type="button" data-pc-action="navigate-next" data-pc-scenario-index="2">Next scenario →</button>`
   });
   document.querySelector('#inputContainer button')?.focus();
   return true;
+}
+
+function pcS2PrintFinalAnalysis() {
+  if (scenarioIndex !== SCENARIO_INDEX.METACOGNITION) return false;
+  const data = getS2Data();
+  const review = data.babbageReview || S2_LOCAL_REVIEW_FALLBACK;
+  const diagnosticText = pcS2BuildRepairReviewDiagnosticText(review);
+  const isFallback = data.s2ReviewSource === 'fallback' || data.aiProvider === 'local-fallback';
+  const output = document.getElementById('babbageTerminalOutput');
+  if (!output) return false;
+  output.classList.add('babbage-analysis-layout');
+  output.innerHTML = buildBabbageAnalysisHTML(
+    diagnosticText,
+    isFallback,
+    isFallback ? 'backend-unavailable' : '',
+    pcS2BuildRepairReviewPresentation(review)
+  );
+  return pcPrintCurrentBabbageReport();
 }
 
 function pcGetLatestS2Selection(attemptKey) {
@@ -1277,5 +1355,6 @@ pcRegisterUIActions({
     renderS2EvidenceActivity();
   },
   's2-generate-draft': () => generateS2BabbageDraft(),
-  's2-repair-draft': () => renderS2RepairActivity()
+  's2-repair-draft': () => renderS2RepairActivity(),
+  's2-print-final-analysis': () => pcS2PrintFinalAnalysis()
 });

@@ -1,0 +1,60 @@
+{
+  "manifest_version": 1,
+  "recorded_at_utc": "2026-09-13T00:00:00Z",
+  "release_id": "PROMPTCRAFT_V429_SCENARIO3_ANALYSIS_P531",
+  "application": {
+    "build": "PROMPTCRAFT_V429",
+    "research_schema": "V121",
+    "browser_cache_patch": 531,
+    "dialogue_asset_version": 149
+  },
+  "receiver": {
+    "live_baseline_version": "V83",
+    "candidate_version": "V84",
+    "deployed": false,
+    "source_changed": false
+  },
+  "babbage_proxy": {
+    "version": "V373",
+    "source_changed": false
+  },
+  "assets": {
+    "manifest_version": 149,
+    "manifest_changed": false,
+    "asset_files_packaged": 0
+  },
+  "patch_531": {
+    "focus": "Displayed Scenario 3 shared final-analysis migration",
+    "changed_file_count": 58,
+    "displayed_scenario": 3,
+    "internal_source": "src/js/scenarios/s2-metacognition.js",
+    "structured_what_worked": true,
+    "structured_remaining_limitation": true,
+    "accessible_reflection_sequence": true,
+    "final_result_print_restored": true,
+    "internal_compatibility_names_preserved": true
+  },
+  "regression_gate": {
+    "quick": {
+      "passed": 72,
+      "total": 72
+    },
+    "browser": {
+      "status": "environment_blocked",
+      "blocked": 17,
+      "reason": "Python Playwright is unavailable; Node Playwright browser executable is not installed",
+      "product_failures_observed": 0
+    }
+  },
+  "preservation": {
+    "gameplay_changed": false,
+    "dialogue_changed": false,
+    "tracking_schema_changed": false,
+    "receiver_logic_changed": false,
+    "ai_contract_changed": false,
+    "device_profile_logic_changed": false,
+    "spreadsheet_structure_changed": false,
+    "scoring_or_progression_changed": false,
+    "accessibility_behavior_removed": false
+  }
+}

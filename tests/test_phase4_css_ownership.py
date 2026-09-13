@@ -28,7 +28,7 @@ def main() -> int:
     assert data["cascade"][0]["path"] == "foundation/base.css"
     assert data["cascade"][-1]["path"] == "ui/gfc-theme.css"
     assert data["totals"]["owner_files"] == 20
-    assert data["totals"]["active_rules"] == 4642
+    assert data["totals"]["active_rules"] == 4665
     assert data["totals"]["important_declarations"] > 11000
     assert data["final_overrides"]["path"] == "responsive/final-overrides.css"
     assert data["final_overrides"]["line_count"] == 5657

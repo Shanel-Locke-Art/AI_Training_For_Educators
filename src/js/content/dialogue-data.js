@@ -186,12 +186,12 @@ window.pixelDialogue = {
   ],
 
   "scenarioStart_metacognition": [
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "Meet Jordan. He completes his assignments, earns passing grades, and seems to be doing fine.", "id": "p86" },
-    { "speaker": "Jordan", "character": "jordan", "expr": "neutral", "text": "I got an 84 on this assignment. That's better than last time, so I guess something worked.", "id": "jordan-s2-01" },
-    { "speaker": "Jordan", "character": "jordan", "expr": "uncertain", "text": "I reread the chapter a few times. Some parts eventually made more sense, but I couldn't tell you what actually helped.", "id": "jordan-s2-02" },
-    { "speaker": "Jordan", "character": "jordan", "expr": "frustrated", "text": "Next time I'll probably reread everything again and hope it works.", "id": "jordan-s2-03" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "His performance improved. His strategy might have worked. But listen carefully to what Jordan actually knows about his learning.", "id": "p88" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Let's figure out what's missing.", "id": "p89" }
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "Meet Jordan. He finished the Week 4 Canvas module and earned 84% on the module quiz. From the gradebook, everything looks fine.", "id": "p86" },
+    { "speaker": "Jordan", "character": "jordan", "expr": "neutral", "text": "Canvas shows my score improved, but I don't know why. I got an 84% on the module quiz after getting 76% last time.", "id": "jordan-s2-01" },
+    { "speaker": "Jordan", "character": "jordan", "expr": "uncertain", "text": "I reread the module page three times before the quiz. Some parts felt familiar, but I still couldn't explain the difference between the two concepts without my notes.", "id": "jordan-s2-02" },
+    { "speaker": "Jordan", "character": "jordan", "expr": "frustrated", "text": "The next module opens Monday. I'll probably reread everything again and hope the score keeps improving.", "id": "jordan-s2-03" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "The module shows what Jordan opened and what he scored. It does not show which strategy changed his understanding or where that understanding still breaks down.", "id": "p88" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Inspect the Canvas path and find the missing link between Jordan's strategy, the quiz result, and his next decision.", "id": "p89" }
   ],
   "scenarioStart_assessment": [
     { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "Maya brought us a strange case: a 96 percent.", "id": "p-s3-01" },
@@ -246,16 +246,16 @@ window.pixelDialogue = {
     { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "That's the point. A score is a summary. The evidence is the argument.", "id": "p-s3-14" }
   ],
   "s2_diagnosis_correct": [
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "That's the hidden problem. Jordan has an outcome and a strategy, but no evidence connecting the two. He cannot judge what helped or use that judgment to make his next decision.", "id": "p90" }
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "That's the hidden problem. Canvas shows Jordan's module activity and grade, but not evidence connecting his study strategy to what he actually understood. He cannot make an informed next decision yet.", "id": "p90" }
   ],
   "s2_diagnosis_strategy": [
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "Rereading may not be his best strategy, but replacing it does not solve the deeper problem. Jordan still needs a way to tell why a strategy worked or failed.", "id": "p91" }
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "Rereading may not be his best strategy, but replacing it inside the next Canvas module does not solve the deeper problem. Jordan still needs evidence showing why a strategy worked or failed.", "id": "p91" }
   ],
   "s2_diagnosis_motivation": [
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "skeptical", "text": "Jordan completed the work and is trying to understand the result. The evidence points somewhere other than motivation.", "id": "p92" }
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "skeptical", "text": "Jordan completed the Canvas module and is trying to understand the result. The evidence points to a missing learning check, not a motivation problem.", "id": "p92" }
   ],
   "s2_diagnosis_performance": [
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "The grade tells us how Jordan performed. It does not tell Jordan what produced the learning or what he should do next.", "id": "p93" }
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "The Canvas grade already tells us how Jordan performed. A higher score still does not tell him what produced the learning or what he should do next.", "id": "p93" }
   ],
   "scoreReflection_0": [
     {
@@ -652,21 +652,21 @@ window.s2JordanInterventionDialogue = {
   confidence: {
     voiceId: "jordan-s2-intervention-confidence",
     expression: "confident",
-    text: "I’d say I’m a four out of five. I feel better about it this time."
+    text: "In the Canvas reflection, I’d rate my confidence four out of five. I feel better, but I still can't explain what the rereading changed."
   },
   strategy_name: {
     voiceId: "jordan-s2-intervention-strategy",
     expression: "thinking",
-    text: "I reread the chapter three times and highlighted the parts that seemed important."
+    text: "I reread the module page three times and highlighted the parts that seemed important."
   },
   grade_compare: {
     voiceId: "jordan-s2-intervention-grade",
     expression: "confident",
-    text: "I got an 84 instead of a 76, so rereading must have worked."
+    text: "My Canvas grade went from 76% to 84%, so rereading must have worked."
   },
   evidence_check: {
     voiceId: "jordan-s2-intervention-evidence",
     expression: "thinking",
-    text: "I could define both concepts, but without my notes I still couldn’t explain the difference. Rereading helped me recognize them, but it didn’t help me compare them. I need to try examples next."
+    text: "On the Canvas practice check, I could define both concepts, but without my notes I still couldn’t explain the difference. Rereading helped me recognize them, but it didn’t help me compare them. I need to try examples next."
   }
 };

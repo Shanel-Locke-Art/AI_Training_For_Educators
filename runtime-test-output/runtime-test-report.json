@@ -1,0 +1,399 @@
+{
+  "passed": false,
+  "failures": [
+    "desktop scenario 1: implemented workspace is empty.",
+    "desktop scenario 2: implemented workspace is empty.",
+    "tablet: Enter key did not advance name onboarding.",
+    "tablet scenario 1: implemented workspace is empty.",
+    "tablet scenario 2: implemented workspace is empty.",
+    "phone scenario 1: implemented workspace is empty.",
+    "phone scenario 2: implemented workspace is empty."
+  ],
+  "results": [
+    {
+      "viewport": "desktop",
+      "scenario": 1,
+      "state": {
+        "activeScenario": 1,
+        "selectedTab": 0,
+        "boardText": "Week 4 has plenty of content but no clear path. Find what students must guess.",
+        "inputText": "",
+        "bodyWidth": 1600,
+        "viewportWidth": 1600
+      }
+    },
+    {
+      "viewport": "desktop",
+      "scenario": 2,
+      "state": {
+        "activeScenario": 2,
+        "selectedTab": 1,
+        "boardText": "Scenario 2 is in development.",
+        "inputText": "",
+        "bodyWidth": 1600,
+        "viewportWidth": 1600
+      }
+    },
+    {
+      "viewport": "desktop",
+      "scenario": 3,
+      "state": {
+        "activeScenario": 3,
+        "selectedTab": 2,
+        "boardText": "Jordan is completing the Canvas work, but he cannot explain what helped, what failed, or what he should try next.",
+        "inputText": "MISSION BRIEFING\nHelp a successful student learn from the process.\nA student is earning good grades but cannot explain what helped, what failed, or what to try next. Use Canvas evidence and AI to build a stronger learning-reflection loop.\nCASE FILE LOADING\nListen before you diagnose.\n\nPixel and Jordan will introduce the case. The first decision appears when their conversation ends.",
+        "bodyWidth": 1600,
+        "viewportWidth": 1600
+      }
+    },
+    {
+      "viewport": "desktop",
+      "scenario": 4,
+      "state": {
+        "activeScenario": 4,
+        "selectedTab": 3,
+        "boardText": "A high Canvas score can be accurate while the learning claim attached to it is too large.",
+        "inputText": "MISSION BRIEFING\nDecide what a high Canvas score actually proves.\nA high Canvas score may prove recall without proving transferable learning. Examine the evidence, strengthen the assessment, and audit what AI claims the score means.\nCASE FILE LOADING\nThe 96% Problem\n\nPixel and Maya will introduce the case. Start by listening to what the grade does and does not tell you.",
+        "bodyWidth": 1600,
+        "viewportWidth": 1600
+      }
+    },
+    {
+      "viewport": "desktop",
+      "scenario": 5,
+      "state": {
+        "activeScenario": 5,
+        "selectedTab": 4,
+        "boardText": "Scenario 5 is in development.",
+        "inputText": "",
+        "bodyWidth": 1600,
+        "viewportWidth": 1600
+      }
+    },
+    {
+      "viewport": "desktop",
+      "scenario": 6,
+      "state": {
+        "activeScenario": 6,
+        "selectedTab": 5,
+        "boardText": "Scenario 6 is in redesign.",
+        "inputText": "",
+        "bodyWidth": 1600,
+        "viewportWidth": 1600
+      }
+    },
+    {
+      "viewport": "desktop",
+      "scenario": 7,
+      "state": {
+        "activeScenario": 7,
+        "selectedTab": 6,
+        "boardText": "Scenario 7 is in redesign.",
+        "inputText": "",
+        "bodyWidth": 1600,
+        "viewportWidth": 1600
+      }
+    },
+    {
+      "viewport": "desktop",
+      "scenario": 8,
+      "state": {
+        "activeScenario": 8,
+        "selectedTab": 7,
+        "boardText": "Scenario 8 is in redesign.",
+        "inputText": "",
+        "bodyWidth": 1600,
+        "viewportWidth": 1600
+      }
+    },
+    {
+      "viewport": "desktop",
+      "analysis": {
+        "photo": {
+          "left": -48,
+          "top": 12,
+          "right": 1936,
+          "bottom": 1004,
+          "width": 1984,
+          "height": 992
+        },
+        "screen": {
+          "left": 392.4375,
+          "top": 139.46875,
+          "right": 1191.984375,
+          "bottom": 590.328125,
+          "width": 799.546875,
+          "height": 450.859375
+        },
+        "output": {
+          "left": 392.4375,
+          "top": 139.46875,
+          "right": 1191.984375,
+          "bottom": 590.328125,
+          "width": 799.546875,
+          "height": 450.859375
+        },
+        "analyzing": true
+      }
+    },
+    {
+      "viewport": "tablet",
+      "scenario": 1,
+      "state": {
+        "activeScenario": 1,
+        "selectedTab": 0,
+        "boardText": "Week 4 has plenty of content but no clear path. Find what students must guess.",
+        "inputText": "",
+        "bodyWidth": 1024,
+        "viewportWidth": 1024
+      }
+    },
+    {
+      "viewport": "tablet",
+      "scenario": 2,
+      "state": {
+        "activeScenario": 2,
+        "selectedTab": 1,
+        "boardText": "Scenario 2 is in development.",
+        "inputText": "",
+        "bodyWidth": 1024,
+        "viewportWidth": 1024
+      }
+    },
+    {
+      "viewport": "tablet",
+      "scenario": 3,
+      "state": {
+        "activeScenario": 3,
+        "selectedTab": 2,
+        "boardText": "Jordan is completing the Canvas work, but he cannot explain what helped, what failed, or what he should try next.",
+        "inputText": "MISSION BRIEFING\nHelp a successful student learn from the process.\nA student is earning good grades but cannot explain what helped, what failed, or what to try next. Use Canvas evidence and AI to build a stronger learning-reflection loop.\nCASE FILE LOADING\nListen before you diagnose.\n\nPixel and Jordan will introduce the case. The first decision appears when their conversation ends.",
+        "bodyWidth": 1024,
+        "viewportWidth": 1024
+      }
+    },
+    {
+      "viewport": "tablet",
+      "scenario": 4,
+      "state": {
+        "activeScenario": 4,
+        "selectedTab": 3,
+        "boardText": "A high Canvas score can be accurate while the learning claim attached to it is too large.",
+        "inputText": "MISSION BRIEFING\nDecide what a high Canvas score actually proves.\nA high Canvas score may prove recall without proving transferable learning. Examine the evidence, strengthen the assessment, and audit what AI claims the score means.\nCASE FILE LOADING\nThe 96% Problem\n\nPixel and Maya will introduce the case. Start by listening to what the grade does and does not tell you.",
+        "bodyWidth": 1024,
+        "viewportWidth": 1024
+      }
+    },
+    {
+      "viewport": "tablet",
+      "scenario": 5,
+      "state": {
+        "activeScenario": 5,
+        "selectedTab": 4,
+        "boardText": "Scenario 5 is in development.",
+        "inputText": "",
+        "bodyWidth": 1024,
+        "viewportWidth": 1024
+      }
+    },
+    {
+      "viewport": "tablet",
+      "scenario": 6,
+      "state": {
+        "activeScenario": 6,
+        "selectedTab": 5,
+        "boardText": "Scenario 6 is in redesign.",
+        "inputText": "",
+        "bodyWidth": 1024,
+        "viewportWidth": 1024
+      }
+    },
+    {
+      "viewport": "tablet",
+      "scenario": 7,
+      "state": {
+        "activeScenario": 7,
+        "selectedTab": 6,
+        "boardText": "Scenario 7 is in redesign.",
+        "inputText": "",
+        "bodyWidth": 1024,
+        "viewportWidth": 1024
+      }
+    },
+    {
+      "viewport": "tablet",
+      "scenario": 8,
+      "state": {
+        "activeScenario": 8,
+        "selectedTab": 7,
+        "boardText": "Scenario 8 is in redesign.",
+        "inputText": "",
+        "bodyWidth": 1024,
+        "viewportWidth": 1024
+      }
+    },
+    {
+      "viewport": "tablet",
+      "analysis": {
+        "photo": {
+          "left": -44.5,
+          "top": 28,
+          "right": 1270.5,
+          "bottom": 685,
+          "width": 1315,
+          "height": 657
+        },
+        "screen": {
+          "left": 247.421875,
+          "top": 112.421875,
+          "right": 777.359375,
+          "bottom": 411.015625,
+          "width": 529.9375,
+          "height": 298.59375
+        },
+        "output": {
+          "left": 247.421875,
+          "top": 112.421875,
+          "right": 777.359375,
+          "bottom": 411.015625,
+          "width": 529.9375,
+          "height": 298.59375
+        },
+        "analyzing": true
+      }
+    },
+    {
+      "viewport": "phone",
+      "scenario": 1,
+      "state": {
+        "activeScenario": 1,
+        "selectedTab": 0,
+        "boardText": "Week 4 has plenty of content but no clear path. Find what students must guess.",
+        "inputText": "",
+        "bodyWidth": 390,
+        "viewportWidth": 390
+      }
+    },
+    {
+      "viewport": "phone",
+      "scenario": 2,
+      "state": {
+        "activeScenario": 2,
+        "selectedTab": 1,
+        "boardText": "Scenario 2 is in development.",
+        "inputText": "",
+        "bodyWidth": 390,
+        "viewportWidth": 390
+      }
+    },
+    {
+      "viewport": "phone",
+      "scenario": 3,
+      "state": {
+        "activeScenario": 3,
+        "selectedTab": 2,
+        "boardText": "Jordan is completing the Canvas work, but he cannot explain what helped, what failed, or what he should try next.",
+        "inputText": "MISSION BRIEFING\nHelp a successful student learn from the process.\nA student is earning good grades but cannot explain what helped, what failed, or what to try next. Use Canvas evidence and AI to build a stronger learning-reflection loop.\nCASE FILE LOADING\nListen before you diagnose.\n\nPixel and Jordan will introduce the case. The first decision appears when their conversation ends.",
+        "bodyWidth": 390,
+        "viewportWidth": 390
+      }
+    },
+    {
+      "viewport": "phone",
+      "scenario": 4,
+      "state": {
+        "activeScenario": 4,
+        "selectedTab": 3,
+        "boardText": "A high Canvas score can be accurate while the learning claim attached to it is too large.",
+        "inputText": "MISSION BRIEFING\nDecide what a high Canvas score actually proves.\nA high Canvas score may prove recall without proving transferable learning. Examine the evidence, strengthen the assessment, and audit what AI claims the score means.\nCASE FILE LOADING\nThe 96% Problem\n\nPixel and Maya will introduce the case. Start by listening to what the grade does and does not tell you.",
+        "bodyWidth": 390,
+        "viewportWidth": 390
+      }
+    },
+    {
+      "viewport": "phone",
+      "scenario": 5,
+      "state": {
+        "activeScenario": 5,
+        "selectedTab": 4,
+        "boardText": "Scenario 5 is in development.",
+        "inputText": "",
+        "bodyWidth": 390,
+        "viewportWidth": 390
+      }
+    },
+    {
+      "viewport": "phone",
+      "scenario": 6,
+      "state": {
+        "activeScenario": 6,
+        "selectedTab": 5,
+        "boardText": "Scenario 6 is in redesign.",
+        "inputText": "",
+        "bodyWidth": 390,
+        "viewportWidth": 390
+      }
+    },
+    {
+      "viewport": "phone",
+      "scenario": 7,
+      "state": {
+        "activeScenario": 7,
+        "selectedTab": 6,
+        "boardText": "Scenario 7 is in redesign.",
+        "inputText": "",
+        "bodyWidth": 390,
+        "viewportWidth": 390
+      }
+    },
+    {
+      "viewport": "phone",
+      "scenario": 8,
+      "state": {
+        "activeScenario": 8,
+        "selectedTab": 7,
+        "boardText": "Scenario 8 is in redesign.",
+        "inputText": "",
+        "bodyWidth": 390,
+        "viewportWidth": 390
+      }
+    },
+    {
+      "viewport": "phone",
+      "analysis": {
+        "photo": {
+          "left": 0,
+          "top": 0,
+          "right": 390,
+          "bottom": 844,
+          "width": 390,
+          "height": 844
+        },
+        "screen": {
+          "left": 0,
+          "top": 0,
+          "right": 390,
+          "bottom": 844,
+          "width": 390,
+          "height": 844
+        },
+        "output": {
+          "left": 0,
+          "top": 0,
+          "right": 390,
+          "bottom": 844,
+          "width": 390,
+          "height": 844
+        },
+        "analyzing": true
+      }
+    },
+    {
+      "ideasWall": {
+        "activeFilter": "2",
+        "cards": 1,
+        "backHref": "index.html"
+      }
+    }
+  ]
+}

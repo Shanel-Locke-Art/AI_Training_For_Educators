@@ -11,6 +11,7 @@ from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = json.loads((ROOT / "release/phase6-spreadsheet-sync-manifest.json").read_text(encoding="utf-8"))
+AMENDMENT = json.loads((ROOT / "release/patch534-spreadsheet-amendment.json").read_text(encoding="utf-8"))
 
 
 def sha256(path: Path) -> str:
@@ -34,7 +35,17 @@ assert MANIFEST["receiver"]["live_baseline_version"] == "V83"
 assert MANIFEST["receiver"]["candidate_version"] == "V84"
 assert MANIFEST["assets"]["manifest_version"] == 149
 
-for relative, expected in MANIFEST["workbook_sha256"].items():
+assert AMENDMENT["release_id"] == "PROMPTCRAFT_V429_SCENARIO3_CANVAS_DIALOGUE_P534"
+assert AMENDMENT["browser_cache_patch"] == 534
+assert AMENDMENT["workbook"] == "docs/asset-management/PromptCraft_Voice_Recording_Tracker.xlsx"
+assert AMENDMENT["previous_sha256"] == MANIFEST["workbook_sha256"][AMENDMENT["workbook"]]
+assert AMENDMENT["structure_removed"] is False
+assert AMENDMENT["raw_archives_changed"] is False
+
+current_workbook_sha256 = dict(MANIFEST["workbook_sha256"])
+current_workbook_sha256[AMENDMENT["workbook"]] = AMENDMENT["current_sha256"]
+
+for relative, expected in current_workbook_sha256.items():
     assert sha256(ROOT / relative) == expected, f"workbook hash mismatch: {relative}"
 
 overview = workbook_xml("docs/asset-management/PromptCraft_Production_Overview_Simplified.xlsx")
@@ -61,7 +72,7 @@ for token in (
     assert token in visual, f"visual tracker missing {token}"
 for token in (
     "dialogue asset 149",
-    "Phase 6 / patch 527",
+    "Dialogue draft through patch 534",
     "S3: The Confident Student Problem",
     "legacy recording filenames preserved",
 ):

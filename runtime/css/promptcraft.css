@@ -14897,6 +14897,171 @@ html body #vnOverlay#vnOverlay.vn-overlay.active.pc-analysis-report-active
   word-break: normal !important;
 }
 
+/* Patch 530 shared presentation primitives. Scenario owners may provide
+   structured findings and one content-native process example without adding
+   scenario-specific report markup or responsive overrides. */
+.analysis-finding-list {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.analysis-finding-row {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid rgba(116, 255, 137, 0.34);
+  border-left: 4px solid rgba(116, 255, 137, 0.78);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.analysis-issue-card .analysis-finding-row {
+  border-color: rgba(255, 190, 92, 0.36);
+  border-left-color: rgba(255, 190, 92, 0.82);
+}
+
+.analysis-finding-status {
+  display: inline-grid;
+  place-items: center;
+  min-height: 24px;
+  padding: 4px 5px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  color: #bfffc9;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  line-height: 1;
+}
+
+.analysis-issue-card .analysis-finding-status {
+  color: #ffd79b;
+}
+
+.analysis-finding-copy {
+  min-width: 0;
+}
+
+.analysis-finding-copy strong,
+.analysis-finding-copy p {
+  display: block;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.analysis-finding-copy strong {
+  color: #f3fff6;
+  font-size: 0.94em;
+  line-height: 1.3;
+}
+
+.analysis-finding-copy p {
+  margin-top: 3px;
+  color: #d6ffde;
+  font-size: 0.9em;
+  line-height: 1.38;
+}
+
+.analysis-process-example {
+  width: 100%;
+  min-width: 0;
+  margin-top: 12px;
+  padding: 13px;
+  border: 1px solid rgba(116, 255, 137, 0.48);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.analysis-process-example h3 {
+  margin: 0 0 5px;
+  color: #f1fff4;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.analysis-process-intro {
+  margin: 0 0 10px;
+  color: #d6ffde;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.analysis-process-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
+  gap: 7px;
+  width: 100%;
+}
+
+.analysis-process-step {
+  min-width: 0;
+  padding: 9px 8px;
+  border: 1px solid rgba(116, 255, 137, 0.34);
+  border-top: 4px solid rgba(116, 255, 137, 0.78);
+  background: rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.analysis-process-number {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto 6px;
+  border-radius: 50%;
+  background: #bfffc9;
+  color: #061109;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.analysis-process-step strong,
+.analysis-process-step small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.analysis-process-step strong {
+  color: #f3fff6;
+  font-size: 0.76rem;
+  letter-spacing: 0.035em;
+  line-height: 1.25;
+}
+
+.analysis-process-step small {
+  margin-top: 4px;
+  color: #d6ffde;
+  font-size: 0.7rem;
+  line-height: 1.3;
+}
+
+@media (max-width: 540px) {
+  .analysis-finding-row {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+
+  .analysis-process-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analysis-process-step {
+    text-align: left;
+  }
+
+  .analysis-process-number {
+    display: inline-grid;
+    margin: 0 8px 0 0;
+    vertical-align: middle;
+  }
+
+  .analysis-process-step strong {
+    display: inline;
+  }
+}
+
 /* SOURCE: src/css/scenarios/s1-engagement.css */
 /* PromptCraft Scenario 1 workbench.
    Stage 7 consolidates the active Scenario 1 repair workspace while keeping

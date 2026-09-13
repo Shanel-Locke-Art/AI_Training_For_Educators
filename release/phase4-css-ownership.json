@@ -63,7 +63,7 @@
     {
       "cascade_index": 9,
       "path": "ui/completed-analysis.css",
-      "rule_count": 103,
+      "rule_count": 126,
       "important_declarations": 750
     },
     {
@@ -129,9 +129,9 @@
   ],
   "totals": {
     "owner_files": 20,
-    "active_rules": 4642,
+    "active_rules": 4665,
     "important_declarations": 11512,
-    "normalized_selector_headers": 2721,
+    "normalized_selector_headers": 2739,
     "multi_owner_selector_headers": 192
   },
   "final_overrides": {
@@ -223,7 +223,7 @@
       "ui/intro-scenes.css": 11,
       "ui/prediction-scenes.css": 14,
       "ui/live-analysis.css": 42,
-      "ui/completed-analysis.css": 103,
+      "ui/completed-analysis.css": 126,
       "scenarios/s1-engagement.css": 6,
       "scenarios/s1-course-design.css": 5,
       "scenarios/shared.css": 126,
@@ -25943,6 +25943,285 @@
           "rule_index": 102,
           "context": [],
           "important_declarations": 8
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-finding-list",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 103,
+          "context": [],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-finding-row",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 104,
+          "context": [],
+          "important_declarations": 0
+        },
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 121,
+          "context": [
+            "@media (max-width:540px)"
+          ],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-issue-card .analysis-finding-row",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 105,
+          "context": [],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-finding-status",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 106,
+          "context": [],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-issue-card .analysis-finding-status",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 107,
+          "context": [],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-finding-copy",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 108,
+          "context": [],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-finding-copy strong,.analysis-finding-copy p",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 109,
+          "context": [],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-finding-copy strong",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 110,
+          "context": [],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-finding-copy p",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 111,
+          "context": [],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-process-example",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 112,
+          "context": [],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-process-example h3",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 113,
+          "context": [],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-process-intro",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 114,
+          "context": [],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-process-grid",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 115,
+          "context": [],
+          "important_declarations": 0
+        },
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 122,
+          "context": [
+            "@media (max-width:540px)"
+          ],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-process-step",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 116,
+          "context": [],
+          "important_declarations": 0
+        },
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 123,
+          "context": [
+            "@media (max-width:540px)"
+          ],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-process-number",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 117,
+          "context": [],
+          "important_declarations": 0
+        },
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 124,
+          "context": [
+            "@media (max-width:540px)"
+          ],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-process-step strong,.analysis-process-step small",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 118,
+          "context": [],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-process-step strong",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 119,
+          "context": [],
+          "important_declarations": 0
+        },
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 125,
+          "context": [
+            "@media (max-width:540px)"
+          ],
+          "important_declarations": 0
+        }
+      ],
+      "owner_count": 1
+    },
+    {
+      "selector": ".analysis-process-step small",
+      "occurrences": [
+        {
+          "path": "ui/completed-analysis.css",
+          "cascade_index": 9,
+          "rule_index": 120,
+          "context": [],
+          "important_declarations": 0
         }
       ],
       "owner_count": 1

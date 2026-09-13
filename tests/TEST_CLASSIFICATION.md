@@ -50,6 +50,33 @@ criterion rows in the printed What Worked and Issue Detected findings, plus the
 accessible five-step Canvas module-path example. It does not alter gameplay,
 tracking, AI requests, or the V121 research schema.
 
+Patch 530 adds `test_shared_analysis_presentation_530.py`. It guards the
+optional shared presentation argument, structured PASS and CHECK rows,
+accessible process-example lists, responsive ownership, screen-to-print
+extraction, legacy paragraph fallback, and unchanged Scenario 3 and Scenario 4
+call sites.
+
+Patch 531 adds `test_s3_shared_analysis_migration_531.py`. It guards the
+displayed Scenario 3 presentation mapper, separate improvement rows, remaining
+limitation row, four-step reflection example, corrected visible numbering,
+final-result print action, shared printer reuse, and preservation of internal
+`s2` compatibility identifiers.
+
+Patch 532 adds `test_s4_shared_analysis_migration_532.py`. It guards structured
+case and Transfer Lab findings, the five-step assessment evidence sequence,
+restored print actions, parity with every field from the retired custom print
+document, shared printer delegation, corrected visible Scenario 4 numbering,
+and preservation of internal `s3` compatibility identifiers.
+
+Patch 533 adds `test_s3_s4_canvas_orientation_533.py`. It protects the Canvas
+teaching context in displayed Scenarios 3 and 4 while keeping internal scenario
+identities, AI analysis contracts, receiver V83, V429, and V121 unchanged.
+
+Patch 534 adds `test_s3_canvas_dialogue_534.py`. It protects the Scenario 3
+Canvas evidence wording, stable dialogue IDs, synchronized intervention
+fallbacks, draft-only recording status, and the separated V429/V121/patch
+version contract.
+
 ## Superseded patch assertions
 
 These files describe mutually exclusive intermediate states and are retained only as patch history:

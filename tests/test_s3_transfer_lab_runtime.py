@@ -59,6 +59,10 @@ def main():
         page.evaluate('window.PC_BABBAGE_MIN_VISIBLE_ANALYSIS_MS=0')
         page.evaluate('submitS3TransferDiagnosis()'); page.wait_for_timeout(500)
         if page.locator('#babbageTerminalOutput .analysis-report').count()!=1: failures.append('Transfer Babbage report did not render.')
+        if page.locator('.analysis-worked-card .analysis-finding-row').count()<2: failures.append('Transfer analysis did not render structured What Worked rows.')
+        if page.locator('.analysis-issue-card .analysis-finding-row').count()!=2: failures.append('Transfer analysis did not render both structured review points.')
+        if page.locator('.analysis-process-step').count()!=5: failures.append('Transfer analysis did not render the five-step assessment evidence sequence.')
+        if page.locator('.babbage-print-btn').count()!=1: failures.append('Transfer analysis print option is missing.')
         if page.locator('.vn-return-btn.terminal-return').count():
             page.evaluate("document.querySelector('.vn-return-btn.terminal-return')?.click()"); page.wait_for_timeout(120)
         if page.locator('#s3TransferSituation').count()!=1: failures.append('Transfer revision workbench did not render after Babbage.')

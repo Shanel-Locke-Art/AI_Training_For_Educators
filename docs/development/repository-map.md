@@ -174,6 +174,43 @@ Each S1 case now follows one connected formative loop: inspect the Before view, 
 
 The server-side Babbage proxy keeps S3-S5 structured response contracts because those are future-facing integration contracts, not playable browser implementations.
 
+## Shared final-analysis presentation
+
+`src/js/ui/babbage-terminal.js` owns the common Babbage analysis document and
+print transformation. Patch 530 adds an optional presentation argument for
+structured What Worked and Issue Detected rows, report-specific titles, and one
+accessible ordered process example. `src/css/ui/completed-analysis.css` owns
+those shared responsive primitives. Scenario modules supply scenario-specific
+content only when they opt in. Existing callers continue to render their
+original paragraph findings, so later scenario migrations can be tested and
+released independently.
+
+Patch 531 opts the displayed Scenario 3 into this interface through
+`pcS2BuildRepairReviewPresentation()` in `s2-metacognition.js`. That scenario
+module owns the reflection-specific finding labels and four-step metacognitive
+sequence. The shared terminal continues to own their markup, responsive
+behavior, and print transformation. The legacy `s2` name remains part of the
+saved-data and receiver compatibility boundary, not the user-facing numbering.
+
+Patch 532 opts the displayed Scenario 4 case analysis and Transfer Lab into the
+same interface through `pcS3BuildEvidencePresentation()` and
+`pcS3BuildTransferPresentation()` in `s3-authentic-assessment.js`. The scenario
+module owns its evidence labels, five-step assessment sequence, and assembly of
+printable assessment context. The shared terminal owns the report markup and
+print document. `pcPrintS3TransferLabReport()` now delegates to that owner and
+no longer contains a separate document template or print stylesheet.
+
+Patch 533 keeps those owners intact while grounding displayed Scenarios 3 and
+4 in Canvas module, assessment, feedback, submission, and rubric surfaces. The
+scenario files own that Canvas teaching context; shared UI files continue to
+own presentation mechanics.
+
+Patch 534 revises displayed Scenario 3 dialogue against a two-capture Canvas
+evidence contract. `dialogue-data.js` owns fixed spoken text,
+`s2-metacognition.js` owns local response fallbacks and consequences, and the
+voice tracker owns recording readiness. Screenshot files remain pending and are
+not referenced as runtime assets until they exist and pass responsive review.
+
 ## Retired layout/naming patterns
 
 Do not restore:

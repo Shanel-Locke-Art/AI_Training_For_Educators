@@ -9,7 +9,7 @@ These contracts are intentionally preserved while PromptCraft is refactored and 
 - Apps Script receiver candidate: `V84`; supplied `V83` source preserved unchanged
 - Apps Script deployment: existing configured deployment URL
 - Current asset manifest: `v149`
-- Current browser/cache revision: `529`
+- Current browser/cache revision: `534`
 - Current repository baseline revision: `524`
 - Scenario result tabs retain full narrative text; Process Log remains abbreviated by design
 
@@ -44,6 +44,15 @@ and dataLabel identify the current scenario order:
 Do not restore old S3-S5 prototype browser implementations as a shortcut when
 S5+ development begins.
 
+The displayed Scenario 3 final analysis uses the shared structured presentation
+model. Its visible completion labels use Scenario 3, while its internal `s2`
+action names, save fields, tracking mapping, and AI contract remain unchanged.
+
+The displayed Scenario 4 case analysis and Transfer Lab use the shared
+structured presentation and document-first printer. The retained
+`pcPrintS3TransferLabReport` action name is a compatibility bridge, not a second
+print-template owner. Internal `s3` names and research mappings remain unchanged.
+
 ## Shared gameplay and lifecycle
 
 - S1 and S2 use the shared VN/character-slot architecture.
@@ -51,6 +60,9 @@ S5+ development begins.
 - Babbage report exits explicitly distinguish VN handoffs from application/workspace handoffs.
 - Completed Babbage analysis retains the CRT visual identity; surrounding controls use the current PromptCraft/GFC UI system.
 - Source and generated runtime files must remain synchronized through `tools/build.py`.
+- Shared Babbage reports may accept optional structured findings and one
+  accessible process example. Existing three-argument callers and paragraph
+  findings remain supported until each scenario is migrated and verified.
 
 ## Viewport ownership
 

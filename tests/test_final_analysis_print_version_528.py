@@ -20,10 +20,10 @@ def main() -> None:
     bundle = read("runtime/js/promptcraft.bundle.js")
     runtime_css = read("runtime/css/promptcraft.css")
 
-    assert 'runtime/css/promptcraft.css?v=429&patch=529' in index
-    assert 'promptcraft.bundle.js?v=429&amp;patch=529&amp;receiver=84' in index
-    assert 'Version 429 · Patch 529' in index
-    assert 'DEV · 529' in index
+    assert 'runtime/css/promptcraft.css?v=429&patch=534' in index
+    assert 'promptcraft.bundle.js?v=429&amp;patch=534&amp;receiver=84' in index
+    assert 'Version 429 · Patch 534' in index
+    assert 'DEV · 534' in index
 
     assert "const PC_BROWSER_PATCH" in config
     assert "searchParams.get('patch')" in config

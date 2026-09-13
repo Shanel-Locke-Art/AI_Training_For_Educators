@@ -84,8 +84,8 @@ def main() -> None:
     assert "function pcViewportMatchesExactProfiles" in viewport
     assert "metrics.exactSizeCandidates.some" in viewport
 
-    assert "patch=529" in index
-    assert "DEV · 529" in index
+    assert "patch=534" in index
+    assert "DEV · 534" in index
     print("V523 emulated-screen Read Size and zoom-guidance contract passed.")
 
 

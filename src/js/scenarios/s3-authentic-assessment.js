@@ -13,13 +13,14 @@ const S3_PROGRESS_STEPS = [
 ];
 
 const S3_LEARNING_OUTCOME = 'Given a rural community planning problem, analyze stakeholder needs and local evidence, recommend a feasible response, and justify the trade-offs behind the decision.';
-const S3_ORIGINAL_ASSESSMENT = 'Define land use, infrastructure, stakeholder engagement, and zoning. Explain the four stages of the planning cycle and identify the best answer in one short planning example.';
+const S3_CANVAS_CONTEXT = 'Week 4 Canvas module · Planning concepts and community decision-making';
+const S3_ORIGINAL_ASSESSMENT = 'A 20-question Canvas quiz asks students to define land use, infrastructure, stakeholder engagement, and zoning; explain the planning cycle; and identify the best answer in one short planning example.';
 const S3_MAYA_SCORE = '96%';
 
 const S3_DIAGNOSIS_CARDS = [
-  { id: 'define_zoning', tag: 'QUIZ ITEM', title: 'Define zoning', text: 'Maya accurately defines zoning and gives the textbook example.' },
-  { id: 'name_cycle', tag: 'QUIZ ITEM', title: 'Name the planning cycle', text: 'Maya lists the four planning stages in the correct order.' },
-  { id: 'match_terms', tag: 'QUIZ ITEM', title: 'Match key terms', text: 'Maya matches six planning terms to their definitions.' },
+  { id: 'define_zoning', tag: 'CANVAS QUIZ', title: 'Define zoning', text: 'In the Canvas quiz, Maya accurately defines zoning and gives the course example.' },
+  { id: 'name_cycle', tag: 'CANVAS QUIZ', title: 'Name the planning cycle', text: 'In the Canvas quiz, Maya lists the four planning stages in the correct order.' },
+  { id: 'match_terms', tag: 'CANVAS QUIZ', title: 'Match key terms', text: 'In the Canvas quiz, Maya matches six planning terms to their definitions.' },
   { id: 'explain_stakeholders', tag: 'SHORT ANSWER', title: 'Explain stakeholder engagement', text: 'Maya explains why community input matters during planning.' },
   { id: 'summarize_example', tag: 'SHORT ANSWER', title: 'Summarize a sample plan', text: 'Maya summarizes how a textbook town responded to a planning problem.' },
   { id: 'choose_example', tag: 'APPLICATION', title: 'Choose a response from a provided example', text: 'Maya selects the response that best fits a short, highly structured example.' }
@@ -49,7 +50,7 @@ const S3_BLUEPRINT_DIMENSIONS = [
     options: [
       { id: 'chapter_review', tag: 'TEXTBOOK', title: 'Chapter review', text: 'Use the same worked example and values students already practiced.', score: 0 },
       { id: 'generic_scenario', tag: 'SCENARIO', title: 'Generic real-world scenario', text: 'Give students a fictional town problem, but no meaningful constraints or competing needs.', score: 0 },
-      { id: 'county_brief', tag: 'BRIEF', title: 'County planning brief', text: 'Provide population data, budget limits, road access, stakeholder concerns, and a decision deadline.', score: 1 }
+      { id: 'county_brief', tag: 'CANVAS PAGE', title: 'County planning brief in the module', text: 'Use a Canvas Page to provide population data, budget limits, road access, stakeholder concerns, and a decision deadline.', score: 1 }
     ]
   },
   {
@@ -59,7 +60,7 @@ const S3_BLUEPRINT_DIMENSIONS = [
     options: [
       { id: 'define_terms', tag: 'RECALL', title: 'Define the planning terms', text: 'Write definitions for the concepts used in the case.', score: 0 },
       { id: 'summarize_options', tag: 'SUMMARY', title: 'Summarize the possible responses', text: 'Describe each option the county could consider.', score: 0 },
-      { id: 'recommend_response', tag: 'DECIDE', title: 'Recommend a feasible response', text: 'Choose a course of action that fits the evidence and constraints in the county brief.', score: 1 }
+      { id: 'recommend_response', tag: 'CANVAS ASSIGNMENT', title: 'Recommend a feasible response', text: 'In a Canvas Assignment, choose a course of action that fits the evidence and constraints in the county brief.', score: 1 }
     ]
   },
   {
@@ -69,7 +70,7 @@ const S3_BLUEPRINT_DIMENSIONS = [
     options: [
       { id: 'vocabulary_sheet', tag: 'TERMS', title: 'Completed vocabulary worksheet', text: 'Collect the planning terms and definitions used in the unit.', score: 0 },
       { id: 'recommendation_only', tag: 'ANSWER', title: 'Final recommendation only', text: 'Record which option Maya chose without requiring the evidence behind it.', score: 0 },
-      { id: 'decision_record', tag: 'RECORD', title: 'Decision memo + evidence table', text: 'Collect Maya’s recommendation, the local evidence she used, and the constraints her plan addresses.', score: 1 }
+      { id: 'decision_record', tag: 'SUBMISSION', title: 'Canvas submission: decision memo + evidence table', text: 'Collect Maya’s recommendation, the local evidence she used, and the constraints her plan addresses in one Canvas submission.', score: 1 }
     ]
   },
   {
@@ -79,7 +80,7 @@ const S3_BLUEPRINT_DIMENSIONS = [
     options: [
       { id: 'state_preference', tag: 'OPINION', title: 'State the preferred option', text: 'Ask Maya which option she likes best.', score: 0 },
       { id: 'list_pros_cons', tag: 'LIST', title: 'List pros and cons', text: 'Ask for advantages and disadvantages without connecting them to a decision.', score: 0 },
-      { id: 'justify_tradeoff', tag: 'WHY', title: 'Justify the choice and reject an alternative', text: 'Connect evidence to the recommendation, explain one trade-off, and show why another plausible option was rejected.', score: 1 }
+      { id: 'justify_tradeoff', tag: 'RATIONALE', title: 'Justify the choice and reject an alternative', text: 'Require the Canvas submission to connect evidence to the recommendation, explain one trade-off, and show why another plausible option was rejected.', score: 1 }
     ]
   },
   {
@@ -89,14 +90,14 @@ const S3_BLUEPRINT_DIMENSIONS = [
     options: [
       { id: 'format', tag: 'POLISH', title: 'Grammar, formatting, and completeness', text: 'Score presentation quality and whether every section is filled in.', score: 0 },
       { id: 'required_terms', tag: 'CHECKLIST', title: 'Required terms and word count', text: 'Score whether Maya uses the vocabulary and reaches the required length.', score: 0 },
-      { id: 'performance_criteria', tag: 'EVIDENCE', title: 'Evidence fit, feasibility, reasoning, and adaptation', text: 'Score whether the recommendation fits the evidence, addresses constraints, explains trade-offs, and can be adapted when one condition changes.', score: 1 }
+      { id: 'performance_criteria', tag: 'CANVAS RUBRIC', title: 'Canvas rubric: evidence, feasibility, reasoning, and adaptation', text: 'Use a Canvas rubric to score whether the recommendation fits the evidence, addresses constraints, explains trade-offs, and can be adapted when one condition changes.', score: 1 }
     ]
   }
 ];
 
 const S3_STRESS_CARDS = [
-  { id: 'correct_choice', tag: 'RESULT', title: 'Maya chooses the most feasible option', text: 'Her recommendation fits the county brief.' },
-  { id: 'uses_evidence', tag: 'EVIDENCE', title: 'She connects local data to the recommendation', text: 'Maya cites population, road-access, and budget evidence that supports her choice.' },
+  { id: 'correct_choice', tag: 'SUBMISSION', title: 'Maya chooses the most feasible option', text: 'Her Canvas submission recommends an option that fits the county brief.' },
+  { id: 'uses_evidence', tag: 'EVIDENCE', title: 'She connects local data to the recommendation', text: 'In the Canvas submission, Maya cites population, road-access, and budget evidence that supports her choice.' },
   { id: 'rejects_alternative', tag: 'REASONING', title: 'She rejects a plausible alternative', text: 'Maya explains why a more popular option fails an important budget constraint.' },
   { id: 'uses_terms', tag: 'TERMS', title: 'She uses all six course terms correctly', text: 'The memo uses the required planning vocabulary accurately.' },
   { id: 'polished', tag: 'POLISH', title: 'The memo looks professional', text: 'The document is clean, polished, and carefully formatted.' },
@@ -175,7 +176,7 @@ function s3Progress(activeIndex) {
   return buildScenarioProgressHTML({
     steps: S3_PROGRESS_STEPS,
     activeIndex,
-    ariaLabel: 'Scenario 3 progress'
+      ariaLabel: 'Scenario 4 progress'
   });
 }
 
@@ -236,6 +237,7 @@ function getS3MayaCaseQuote() {
 function buildS3CaseBriefHTML({ compact = false } = {}) {
   const contextHTML = `
     <div class="pc-case-brief-copy">
+      <div><span>Canvas location</span><p>${esc(S3_CANVAS_CONTEXT)}</p></div>
       <div><span>Learning outcome</span><p>${esc(S3_LEARNING_OUTCOME)}</p></div>
       <div><span>Current assessment</span><p>${esc(S3_ORIGINAL_ASSESSMENT)}</p></div>
     </div>`;
@@ -529,6 +531,11 @@ ${S3_LEARNING_OUTCOME}
 Original assessment:
 ${S3_ORIGINAL_ASSESSMENT}
 
+Canvas context:
+${S3_CANVAS_CONTEXT}
+
+Canvas is the delivery environment rather than the learning outcome. Keep the analysis grounded in the Canvas module, Assignment, submission evidence, and rubric without turning the recommendation into a Canvas navigation tutorial.
+
 Faculty assessment blueprint:
 ${summarizeS3Blueprint(data.blueprintInitial)}
 
@@ -536,6 +543,50 @@ Student evidence produced during the stress test:
 ${S3_STRESS_CARDS.map((card, index) => `${index + 1}. ${card.title}: ${card.text}`).join('\n')}
 
 Compare the original test with the redesigned assessment. Explain how and why the new assessment could provide stronger evidence of the intended learning because it asks the student to perform, justify, and adapt rather than mainly reproduce information. In recommendation, propose a concise improved assessment task. In evidence_used, identify the design features that make stronger evidence visible. Keep one specific overreach for the human audit: in claim_about_learning, imply that one strong performance on this redesigned case is enough to establish broad independent transfer to new planning problems. Set deliberate_issue to ignores_transfer. Do not reveal that the overreach was instructed or deliberate in visible prose.`;
+}
+
+function pcS3BuildAssessmentSequence() {
+  return {
+    title: 'Canvas assessment evidence sequence',
+    intro: 'A defensible Canvas assessment connects the module context, the Assignment, observable submission evidence, visible reasoning, and rubric criteria.',
+    ariaLabel: 'Five-step Canvas assessment evidence sequence',
+    steps: [
+      { label: 'MODULE CONTEXT', detail: 'Use a Canvas Page to establish the case and constraints.' },
+      { label: 'ASSIGNMENT', detail: 'Require the learner to perform the intended work.' },
+      { label: 'SUBMISSION', detail: 'Collect an observable product or performance in Canvas.' },
+      { label: 'REASONING', detail: 'Require justification, trade-offs, or decisions.' },
+      { label: 'RUBRIC', detail: 'Make the evidence-based success criteria visible.' }
+    ]
+  };
+}
+
+function pcS3BuildEvidenceItems(analysis = S3_LOCAL_BABBAGE_ANALYSIS) {
+  const evidence = Array.isArray(analysis.evidence_used) ? analysis.evidence_used.filter(Boolean) : [];
+  return evidence.map((value, index) => {
+    const detail = String(value).trim();
+    const lower = detail.toLowerCase();
+    let label = `Evidence feature ${index + 1}`;
+    if (/adapt|condition changes|constraint changes/.test(lower)) label = 'Adaptation';
+    else if (/reason|rationale|alternative|justify/.test(lower)) label = 'Visible reasoning';
+    else if (/evidence|constraint/.test(lower)) label = 'Observable evidence';
+    else if (/recommend|perform|task requires/.test(lower)) label = 'Meaningful performance';
+    else if (/realistic|case|context/.test(lower)) label = 'Meaningful situation';
+    return { label, detail };
+  });
+}
+
+function pcS3BuildEvidencePresentation(analysis = S3_LOCAL_BABBAGE_ANALYSIS) {
+  return {
+    title: 'Canvas Assessment Evidence Analysis',
+    reportTitle: 'Canvas Assessment Evidence Analysis',
+    inputTitle: 'Canvas assessment design submitted',
+    workedItems: pcS3BuildEvidenceItems(analysis),
+    issueItems: [{
+      label: 'Recall-heavy assessment',
+      detail: 'The original assessment can produce a high score without requiring a planning decision, an evidence-based rationale, or adaptation when conditions change.'
+    }],
+    processExample: pcS3BuildAssessmentSequence()
+  };
 }
 
 function buildS3BabbageReportHTML(analysis = S3_LOCAL_BABBAGE_ANALYSIS, fallback = false) {
@@ -560,7 +611,8 @@ function buildS3BabbageReportHTML(analysis = S3_LOCAL_BABBAGE_ANALYSIS, fallback
   return buildBabbageAnalysisHTML(
     standardReportText,
     fallback,
-    fallback ? 'backend-unavailable' : ''
+    fallback ? 'backend-unavailable' : '',
+    pcS3BuildEvidencePresentation(analysis)
   );
 }
 
@@ -877,14 +929,14 @@ function renderS3TransferInput({ reset = false } = {}) {
   const html = buildTransferLabInputHTML({
     titleId: 's3TransferInputTitle',
     kicker: 'Transfer Lab · Your assessment',
-    title: 'Bring one of your own assessments into the lab.',
-    instruction: 'Paste a learning outcome and the assessment students currently complete. Context and success criteria are optional, but they help Babbage make a more grounded comparison.',
+    title: 'Bring one of your own Canvas assessments into the lab.',
+    instruction: 'Paste a learning outcome and the assessment students currently complete in Canvas. Module context and rubric criteria are optional, but they help Babbage make a more grounded comparison.',
     privacyNote: 'Your raw assessment is used for this Transfer Lab analysis and local print report. It is not automatically included in the Ideas Wall submission or the Transfer Lab research checkpoint.',
     fields: [
-      { id: 's3TransferContext', label: 'Course or context (optional)', hint: 'Enough context to interpret the task without identifying a student.', rows: 2, maxlength: 700, value: state.input.context, placeholder: 'Example: Introductory psychology, first-year students, online course' },
+      { id: 's3TransferContext', label: 'Canvas course or module context (optional)', hint: 'Enough context to interpret the task without identifying a student.', rows: 2, maxlength: 700, value: state.input.context, placeholder: 'Example: Introductory psychology, Week 4 Canvas module, first-year students' },
       { id: 's3TransferOutcome', label: 'Learning outcome', hint: 'What should students be able to do?', rows: 3, maxlength: 1400, value: state.input.outcome, placeholder: 'Paste or describe the learning outcome.' },
-      { id: 's3TransferAssessment', label: 'Current assessment', hint: 'What do students currently have to do?', rows: 6, maxlength: 3500, value: state.input.assessment, placeholder: 'Paste the assignment, assessment prompt, or a concise description of it.', fullWidth: true },
-      { id: 's3TransferCriteria', label: 'Current success criteria (optional)', hint: 'Rubric criteria, grading priorities, or what currently earns a strong score.', rows: 3, maxlength: 1600, value: state.input.criteria, placeholder: 'What currently counts as successful performance?', fullWidth: true }
+      { id: 's3TransferAssessment', label: 'Current Canvas assessment', hint: 'What do students currently have to do in the Canvas Quiz, Assignment, or Discussion?', rows: 6, maxlength: 3500, value: state.input.assessment, placeholder: 'Paste the Canvas assessment prompt or a concise description of it.', fullWidth: true },
+      { id: 's3TransferCriteria', label: 'Current Canvas rubric or success criteria (optional)', hint: 'Rubric criteria, grading priorities, or what currently earns a strong score.', rows: 3, maxlength: 1600, value: state.input.criteria, placeholder: 'What currently counts as successful performance?', fullWidth: true }
     ],
     submitAction: 's3-transfer-diagnose',
     submitLabel: 'Diagnose my assessment →',
@@ -968,6 +1020,8 @@ ${state.input.assessment}
 Current success criteria:
 ${state.input.criteria || 'Not supplied'}
 
+Canvas is the delivery environment rather than the learning outcome. Ground the redesign in an appropriate Canvas module, Assignment, Discussion, Quiz, submission, feedback, or rubric surface, but do not write a Canvas navigation tutorial or invent unavailable course details.
+
 Educator's diagnosis before AI:
 Evidence they believe is visible: ${evidenceLabels}
 Weakest link they selected: ${gapLabel}
@@ -975,7 +1029,45 @@ Weakest link they selected: ${gapLabel}
 Analyze what the assessment actually asks students to perform and how well that performance supports the stated learning outcome. Distinguish realistic-looking tasks from tasks that genuinely make application, judgment, reasoning, or adaptation observable. Recommend a stronger assessment without changing the disciplinary purpose or inventing course facts. Provide five concrete revision components: situation, performance, evidence, reasoning, and criteria. Explain one remaining limitation so the educator does not overclaim what a single assessment proves. The share_title and share_summary must describe the design idea in generalized terms and must not reproduce the educator's original assessment text verbatim or include student-identifying information.`;
 }
 
-function buildS3TransferReportHTML(analysis, fallback = false) {
+function pcS3BuildTransferSubmittedWork(state) {
+  const evidenceLabels = state.diagnosis.evidence
+    .map(id => S3_TRANSFER_PERFORMANCE_OPTIONS.find(item => item.id === id)?.label || id)
+    .join(', ');
+  const gapLabel = S3_TRANSFER_GAP_OPTIONS.find(item => item.id === state.diagnosis.gap)?.label || state.diagnosis.gap;
+  const sections = [
+    `Course / context: ${state.input.context || 'Not supplied'}`,
+    `Learning outcome: ${state.input.outcome || 'Not supplied'}`,
+    `Original assessment: ${state.input.assessment || 'Not supplied'}`,
+    `Original success criteria: ${state.input.criteria || 'Not supplied'}`,
+    `Evidence currently visible: ${evidenceLabels || 'Not supplied'}`,
+    `Weakest link identified: ${gapLabel || 'Not supplied'}`
+  ];
+  if (state.revised?.performance) {
+    sections.push(`Revised assessment design:\n${getS3TransferRevisedAssessmentText(state)}`);
+  }
+  return sections.join('\n\n');
+}
+
+function pcS3BuildTransferPresentation(state, analysis) {
+  return {
+    title: 'Canvas Assessment Design Analysis',
+    reportTitle: 'Canvas Assessment Design Analysis',
+    inputTitle: state.revised?.performance ? 'Canvas assessment evidence and revision' : 'Canvas assessment evidence submitted',
+    submittedWork: pcS3BuildTransferSubmittedWork(state),
+    workedItems: [
+      { label: 'Current evidence', detail: analysis.current_evidence || '' },
+      { label: 'Authenticity opportunity', detail: analysis.authenticity_opportunity || '' },
+      { label: 'Why the revision is stronger', detail: analysis.why_stronger_evidence || '' }
+    ],
+    issueItems: [
+      { label: 'Alignment gap', detail: analysis.alignment_gap || '' },
+      { label: 'Remaining limitation', detail: analysis.remaining_limitation || '' }
+    ],
+    processExample: pcS3BuildAssessmentSequence()
+  };
+}
+
+function buildS3TransferReportHTML(analysis, fallback = false, state = getS3TransferLabState()) {
   const reportText = [
     'STATUS', analysis.status || 'REDESIGN OPPORTUNITY',
     'CONFIDENCE', analysis.confidence || 'MODERATE',
@@ -985,7 +1077,12 @@ function buildS3TransferReportHTML(analysis, fallback = false) {
     'RECOMMENDED REPAIR', analysis.suggested_revision || '',
     'EXPECTED IMPACT', `${analysis.why_stronger_evidence || ''} ${analysis.remaining_limitation || ''}`.trim()
   ].join('\n\n');
-  return buildBabbageAnalysisHTML(reportText, fallback, fallback ? 'backend-unavailable' : '');
+  return buildBabbageAnalysisHTML(
+    reportText,
+    fallback,
+    fallback ? 'backend-unavailable' : '',
+    pcS3BuildTransferPresentation(state, analysis)
+  );
 }
 
 async function runS3TransferBabbageAnalysis() {
@@ -1025,13 +1122,13 @@ async function runS3TransferBabbageAnalysis() {
   pcScheduleScenarioTask(() => {
     try { pcCompleteBabbageAnalysisProgress(); } catch (e) {}
     pcScheduleScenarioTask(() => showBabbageTerminalReport({
-      reportHTML: buildS3TransferReportHTML(analysis, fallback),
+      reportHTML: buildS3TransferReportHTML(analysis, fallback, state),
       terminalStateText: fallback ? 'TRANSFER LAB FALLBACK READY' : 'ASSESSMENT DESIGN REVIEW COMPLETE',
       engineLabel: fallback ? 'BABBAGE FALLBACK' : 'BABBAGE ENGINE',
       speakerName: 'Professor Pixel',
       onClose: renderS3TransferRevision,
       readLabel: 'Read Analysis',
-      printLabel: '',
+      printLabel: 'Print / Save PDF',
       continueLabel: 'Rebuild My Assessment',
       ariaLabel: 'Babbage Transfer Lab assessment analysis'
     }), 120, SCENARIO_INDEX.ASSESSMENT);
@@ -1053,8 +1150,8 @@ function renderS3TransferRevision() {
   const html = buildTransferRevisionWorkbenchHTML({
     titleId: 's3TransferRevisionTitle',
     kicker: 'Transfer Lab · Rebuild',
-    title: 'Turn Babbage’s suggestions into your assessment.',
-    instruction: 'These fields are editable. Keep what fits your course, rewrite what does not, and make the evidence chain yours.',
+    title: 'Turn Babbage’s suggestions into your Canvas assessment.',
+    instruction: 'These fields are editable. Keep what fits your course, place each part in an appropriate Canvas surface, and make the evidence chain yours.',
     dimensions,
     submitAction: 's3-transfer-compare',
     submitLabel: 'Compare original and revised →',
@@ -1102,7 +1199,7 @@ function renderS3TransferComparison() {
   const html = buildTransferComparisonHTML({
     titleId: 's3TransferComparisonTitle',
     kicker: 'Transfer Lab · Final analysis',
-    title: 'Your assessment now asks for stronger evidence.',
+    title: 'Your Canvas assessment now asks for stronger evidence.',
     original: state.input.assessment,
     revised: getS3TransferRevisedAssessmentText(state),
     analysisItems: [
@@ -1188,28 +1285,16 @@ async function submitS3TransferIdea() {
 function pcPrintS3TransferLabReport() {
   const state = getS3TransferLabState();
   const analysis = state.analysis || S3_TRANSFER_LOCAL_ANALYSIS;
-  if (!state.input.assessment || !state.revised.performance) return false;
-  const printedAt = new Date().toLocaleString();
-  const evidenceLabels = state.diagnosis.evidence.map(id => S3_TRANSFER_PERFORMANCE_OPTIONS.find(item => item.id === id)?.label || id).join(', ');
-  const gapLabel = S3_TRANSFER_GAP_OPTIONS.find(item => item.id === state.diagnosis.gap)?.label || state.diagnosis.gap;
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) return false;
-  try { printWindow.opener = null; } catch (e) {}
-  // Preserve the text brand without requesting the missing baseline logo file.
-  const logo = '';
-  const section = (title, content) => content ? `<section><h2>${esc(title)}</h2><div class="box">${esc(content).replace(/\n/g,'<br>')}</div></section>` : '';
-  printWindow.document.open();
-  printWindow.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>PromptCraft Assessment Design Analysis</title><style>
-    :root{--navy:#112650;--blue:#086c9f;--gold:#e6a51d;--ink:#172236;--muted:#607083;--line:#cad6df}*{box-sizing:border-box}body{margin:0;background:#eef3f7;color:var(--ink);font:14px/1.5 Arial,sans-serif}.toolbar{max-width:900px;margin:14px auto;text-align:right}.toolbar button{padding:10px 16px;border:2px solid var(--gold);border-radius:7px;background:var(--navy);color:#fff;font-weight:800}.sheet{max-width:900px;margin:0 auto 30px;background:#fff;padding:30px 36px;box-shadow:0 12px 36px rgba(8,26,54,.12);border-top:8px solid var(--navy)}header{border-bottom:3px solid var(--gold);padding-bottom:18px}.brand{display:flex;align-items:center;gap:14px}.brand img{width:58px;height:58px;object-fit:contain}.eyebrow{font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;color:var(--blue)}h1{margin:5px 0 4px;font:700 32px/1.08 Georgia,serif;color:var(--navy)}.meta{color:var(--muted);font-size:12px}section{margin-top:24px;break-inside:avoid}h2{margin:0 0 8px;padding-bottom:5px;border-bottom:2px solid var(--navy);font:700 19px Georgia,serif;color:var(--navy)}.box{padding:13px 15px;border:1px solid var(--line);background:#f9fbfc}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.finding{padding:12px 14px;border-left:4px solid var(--blue);background:#f4f9fc}.finding strong{display:block;color:var(--navy);margin-bottom:4px}.footer{margin-top:28px;padding-top:12px;border-top:2px solid var(--gold);color:var(--muted);font-size:11px}@media print{body{background:#fff}.toolbar{display:none}.sheet{max-width:none;margin:0;padding:0;box-shadow:none;border-top:0}.grid{gap:9px}@page{margin:.6in}}
-  </style></head><body><div class="toolbar"><button onclick="window.print()">Print / Save PDF</button></div><main class="sheet"><header><div class="brand">${logo ? `<img src="${esc(logo)}" alt="">` : ''}<div><div class="eyebrow">PromptCraft · Assessment Designer</div><h1>Assessment Design Analysis</h1><div class="meta">Generated ${esc(printedAt)}</div></div></div></header>
-  ${section('Course / context', state.input.context)}${section('Learning outcome', state.input.outcome)}${section('Original assessment', state.input.assessment)}${section('Original success criteria', state.input.criteria)}
-  <section><h2>Instructor diagnosis before Babbage</h2><div class="grid"><div class="finding"><strong>Evidence currently visible</strong>${esc(evidenceLabels)}</div><div class="finding"><strong>Weakest link identified</strong>${esc(gapLabel)}</div></div></section>
-  <section><h2>Babbage design analysis</h2><div class="grid"><div class="finding"><strong>Current evidence</strong>${esc(analysis.current_evidence || '')}</div><div class="finding"><strong>Alignment gap</strong>${esc(analysis.alignment_gap || '')}</div><div class="finding"><strong>Authenticity opportunity</strong>${esc(analysis.authenticity_opportunity || '')}</div><div class="finding"><strong>Remaining limitation</strong>${esc(analysis.remaining_limitation || '')}</div></div></section>
-  ${section('Revised assessment design', getS3TransferRevisedAssessmentText(state))}${section('Why the revision provides stronger evidence', analysis.why_stronger_evidence || '')}
-  <div class="footer"><strong>Instructional judgment still matters.</strong> Babbage is a design-analysis aid, not an answer key. Review the revision using your disciplinary context, learners, and assessment requirements.</div></main></body></html>`);
-  printWindow.document.close();
-  try { printWindow.focus(); } catch (e) {}
-  return true;
+  if (!state.input.assessment) return false;
+  const output = document.getElementById('babbageTerminalOutput');
+  if (!output) return false;
+  output.classList.add('babbage-analysis-layout');
+  output.innerHTML = buildS3TransferReportHTML(
+    analysis,
+    state.analysisSource === 'fallback',
+    state
+  );
+  return pcPrintCurrentBabbageReport();
 }
 
 function completeS3CaseAndStartTransfer() {
@@ -1219,6 +1304,17 @@ function completeS3CaseAndStartTransfer() {
   markScenarioComplete();
   saveIncrementalData(SCENARIO_INDEX.ASSESSMENT);
   return renderS3TransferInput({ reset: true });
+}
+
+function pcPrintS3CaseAnalysis() {
+  if (scenarioIndex !== SCENARIO_INDEX.ASSESSMENT) return false;
+  const data = getS3Data();
+  const analysis = data.babbageEvidenceAnalysis || S3_LOCAL_BABBAGE_ANALYSIS;
+  const output = document.getElementById('babbageTerminalOutput');
+  if (!output) return false;
+  output.classList.add('babbage-analysis-layout');
+  output.innerHTML = buildS3BabbageReportHTML(analysis, data.s3AnalysisSource === 'fallback');
+  return pcPrintCurrentBabbageReport();
 }
 
 function renderS3FinalResult() {
@@ -1235,8 +1331,8 @@ function renderS3FinalResult() {
   saveIncrementalData(SCENARIO_INDEX.ASSESSMENT);
 
   pcRenderSharedScenarioResult({
-    eyebrow: `Scenario 3 complete · ${revised}/5 assessment indicators`,
-    title: 'Assessment Evidence Profile',
+    eyebrow: `Scenario 4 complete · ${revised}/5 assessment indicators`,
+    title: 'Canvas Assessment Evidence Profile',
     bodyHTML: buildS3FinalBlueprintHTML(data.blueprintFinal || data.blueprintInitial),
     reviewTitle: 'What your evidence now supports',
     reviewItems: [
@@ -1252,11 +1348,12 @@ function renderS3FinalResult() {
       { label: 'Babbage claim audited', value: analysis.claim_about_learning || '' },
       { label: 'Final repair', value: data.repairText || '' }
     ],
-    controlsTitle: 'Scenario 3 result',
+    controlsTitle: 'Scenario 4 result',
     controlsSub: 'You built the assessment, tested the evidence, challenged Babbage, and repaired the exact inference gap instead of treating a high score as proof of everything.',
     controlsActionsHTML: `
       <button class="continue-btn" type="button" data-pc-action="s3-transfer-start">Apply This to My Assessment</button>
-      <button class="s1-secondary-btn" type="button" data-pc-action="s3-replay">Replay Scenario 3</button>
+      <button class="s1-secondary-btn" type="button" data-pc-action="s3-print-case-analysis">Print / Save PDF</button>
+      <button class="s1-secondary-btn" type="button" data-pc-action="s3-replay">Replay Scenario 4</button>
       <button class="s1-secondary-btn" type="button" data-pc-action="open-main-menu" data-pc-panel="scenarios">Scenario Select</button>`
   });
   document.querySelector('#inputContainer button')?.focus();
@@ -1281,5 +1378,6 @@ pcRegisterUIActions({
   's3-transfer-back-comparison': () => renderS3TransferComparison(),
   's3-transfer-print': () => pcPrintS3TransferLabReport(),
   's3-transfer-back-result': () => renderS3FinalResult(),
+  's3-print-case-analysis': () => pcPrintS3CaseAnalysis(),
   's3-replay': () => { resetS3TransferLabState(); return pcActivateScenario(SCENARIO_INDEX.ASSESSMENT, { playIntroduction: true }); }
 });

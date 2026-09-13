@@ -9,7 +9,7 @@ Current compatibility baseline:
 - Apps Script receiver candidate: `V84`; immutable/live baseline: `V83`
 - Babbage proxy: `V373`
 - Asset manifest: `v149`
-- Current browser/cache revision: `529`
+- Current browser/cache revision: `534`
 - Phase 0 repository baseline revision: `524` (documentation, receiver ownership, and fixtures only)
 - Phase 2 refactor patch: `525` (JavaScript ownership only; no design or gameplay changes)
 - Phase 3 refactor patch: `526` (viewport JavaScript ownership only; no design, gameplay, or CSS changes)
@@ -18,6 +18,11 @@ Current compatibility baseline:
 - Phase 6 release checkpoint: patch remains `527` (final ownership documentation and changed-file packaging only)
 - Final analysis readability and printing patch: `528` (wider/smaller Module Path finding, restored print action, synchronized menu build/patch label)
 - Structured print-report patch: `529` (scannable criterion rows and a visual Canvas module-path example)
+- Shared analysis presentation patch: `530` (optional structured findings and accessible process examples; no scenario migration)
+- Scenario 3 analysis migration patch: `531` (structured reflection findings, accessible process example, and shared final printing)
+- Scenario 4 analysis migration patch: `532` (structured assessment findings, five-step evidence sequence, and shared print parity)
+- Scenarios 3 and 4 Canvas-orientation patch: `533` (Canvas as the teaching environment, with existing gameplay and contracts preserved)
+- Scenario 3 Canvas-dialogue patch: `534` (draft dialogue, tracker status, and privacy-safe screenshot contract)
 
 Cache/query revisions are not application build numbers. Do not rename the app build when a cache marker changes.
 
@@ -49,6 +54,11 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 | `development/gfc-visual-theme.md` | Current Great Falls College / PromptCraft visual direction and shared branding rules. |
 | `development/pre-s3-refactor.md` | Historical stabilization record explaining what was removed before S3 development and what must not be reconstructed. |
 | `development/s1-unreachable-modules.md` | Findings record: two complete prior S1 implementations still build into the bundle but aren't reachable from the current registry. Read before assuming either is live or safe to delete. |
+| `development/patch-530-shared-analysis-presentation.md` | Shared structured-finding and process-example interface, ownership, compatibility fallback, and Patch 530 validation status. |
+| `development/patch-531-scenario-3-analysis.md` | Displayed Scenario 3 analysis migration, corrected visible numbering, shared printing, and preservation boundaries. |
+| `development/patch-532-scenario-4-analysis.md` | Displayed Scenario 4 and Transfer Lab analysis migration, print-content parity, duplicate printer removal, and preservation boundaries. |
+| `development/patch-533-scenarios-3-4-canvas-orientation.md` | Canvas module, assessment, feedback, submission, and rubric context for displayed Scenarios 3 and 4. |
+| `development/patch-534-scenario-3-canvas-dialogue.md` | Scenario 3 Canvas dialogue draft, recording status, and required screenshot captures. |
 
 ## Source-of-truth hierarchy
 

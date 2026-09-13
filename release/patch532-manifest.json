@@ -1,0 +1,63 @@
+{
+  "manifest_version": 1,
+  "recorded_at_utc": "2026-09-13T00:00:00Z",
+  "release_id": "PROMPTCRAFT_V429_SCENARIO4_ANALYSIS_P532",
+  "application": {
+    "build": "PROMPTCRAFT_V429",
+    "research_schema": "V121",
+    "browser_cache_patch": 532,
+    "dialogue_asset_version": 149
+  },
+  "receiver": {
+    "live_baseline_version": "V83",
+    "candidate_version": "V84",
+    "deployed": false,
+    "source_changed": false
+  },
+  "babbage_proxy": {
+    "version": "V373",
+    "source_changed": false
+  },
+  "assets": {
+    "manifest_version": 149,
+    "manifest_changed": false,
+    "asset_files_packaged": 0
+  },
+  "patch_532": {
+    "focus": "Displayed Scenario 4 shared analysis and print parity",
+    "changed_file_count": 62,
+    "displayed_scenario": 4,
+    "internal_source": "src/js/scenarios/s3-authentic-assessment.js",
+    "structured_case_findings": true,
+    "structured_transfer_findings": true,
+    "accessible_assessment_sequence": true,
+    "transfer_analysis_print_restored": true,
+    "duplicate_print_template_removed": true,
+    "custom_print_action_bridge_preserved": true,
+    "former_print_fields_preserved": true
+  },
+  "regression_gate": {
+    "quick": {
+      "passed": 73,
+      "total": 73
+    },
+    "browser": {
+      "status": "environment_blocked",
+      "blocked": 17,
+      "reason": "Python Playwright is unavailable; Node Playwright browser executable is not installed",
+      "product_failures_observed": 0
+    }
+  },
+  "preservation": {
+    "gameplay_changed": false,
+    "dialogue_changed": false,
+    "tracking_schema_changed": false,
+    "receiver_logic_changed": false,
+    "ai_contract_changed": false,
+    "device_profile_logic_changed": false,
+    "spreadsheet_structure_changed": false,
+    "scoring_or_progression_changed": false,
+    "ideas_wall_contract_changed": false,
+    "accessibility_behavior_removed": false
+  }
+}
