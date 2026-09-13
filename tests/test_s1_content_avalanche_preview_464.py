@@ -41,9 +41,9 @@ def main() -> None:
 
     for token in (
         "function renderS1ContentAvalanchePreview(",
-        "Development preview · Evidence station",
-        "Your mission",
-        "Find the learning path hidden inside the content.",
+        "buildScenarioMissionHTML(SCENARIO_INDEX.CONTENT_AVALANCHE",
+        "buildScenarioProgressHTML({",
+        "Content Avalanche progress",
         "Reveal After",
         "Open full size ⛶",
         "s1-preview-select-case",
@@ -69,8 +69,8 @@ def main() -> None:
 
     for selector in (
         ".pc-s1-preview",
-        ".pc-s1-preview-hero",
-        ".pc-s1-preview-task",
+        ".pc-s1-preview.pc-scenario-stage",
+        ".pc-s1-preview-mission",
         ".pc-s1-case-tabs",
         ".pc-s1-evidence-station",
         ".pc-s1-state-switch",
@@ -142,9 +142,9 @@ def main() -> None:
     assert "aspect-ratio: 16 / 9.8 !important" in css
     assert ".vn-board-img.loaded" in css
     assert "object-fit: contain !important" in css
-    assert "patch=534" in index
-    assert "DEV · 534" in index
-    assert "runtime/js/dialogue-data.js?v=149&amp;patch=534" in index
+    assert "patch=538" in index
+    assert "DEV · 538" in index
+    assert "runtime/js/dialogue-data.js?v=149&amp;patch=538" in index
     print("S1 Content Avalanche edge-to-edge Canvas reader 482 contract passed.")
 
 

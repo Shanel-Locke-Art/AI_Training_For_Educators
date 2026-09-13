@@ -1,0 +1,30 @@
+{
+  "manifest_version": 1,
+  "release_id": "PROMPTCRAFT_V429_SCENARIO4_CANVAS_DIALOGUE_P535",
+  "versions": {
+    "build": "PROMPTCRAFT_V429",
+    "schema": "V121",
+    "browser_cache_patch": 535,
+    "live_receiver": "V83",
+    "receiver_candidate": "V84",
+    "babbage_proxy": "V373",
+    "asset_manifest": 149
+  },
+  "patch_535": {
+    "scope": "Displayed Scenario 4 Canvas dialogue draft and recording status",
+    "changed_file_count": 67,
+    "dialogue_lines_revised": 36,
+    "dialogue_audio_changed": false,
+    "css_changed": false,
+    "screenshot_assets_changed": false,
+    "tracking_contract_changed": false,
+    "receiver_changed": false,
+    "raw_archives_changed": false,
+    "internal_scenario_ids_preserved": true,
+    "recording_status": "Draft, Do Not Record",
+    "changed_files_manifest": "release/patch535-changed-files.txt",
+    "checksums": "release/patch535-checksums.sha256",
+    "spreadsheet_amendment": "release/patch535-spreadsheet-amendment.json",
+    "test_results": "release/patch535-test-results.md"
+  }
+}

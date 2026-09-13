@@ -109,6 +109,7 @@ assert.deepStrictEqual(eventKeys.filter(key => key.startsWith('visualViewport:')
 
 const applicationSources = fs.readdirSync(path.join(root, 'src/js'), { recursive: true })
   .filter(name => name.endsWith('.js'))
+  .map(name => name.split(path.sep).join('/'))
   .filter(name => name !== 'ui/viewport-controller.js')
   .filter(name => name !== 'pages/ideas-wall.js')
   .map(name => [name, fs.readFileSync(path.join(root, 'src/js', name), 'utf8')]);

@@ -211,6 +211,12 @@ evidence contract. `dialogue-data.js` owns fixed spoken text,
 voice tracker owns recording readiness. Screenshot files remain pending and are
 not referenced as runtime assets until they exist and pass responsive review.
 
+Patch 535 applies the same ownership boundary to displayed Scenario 4. The
+dialogue source owns the revised Pixel and Maya exchange, the Scenario 4 module
+owns the Canvas quiz, assignment, submission, and rubric evidence presentation,
+and the voice tracker records all 36 lines as draft-only. Existing internal
+`s3` identifiers and recording paths remain compatibility names.
+
 ## Retired layout/naming patterns
 
 Do not restore:

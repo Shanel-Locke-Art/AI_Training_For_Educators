@@ -4213,27 +4213,18 @@ function renderS1ContentAvalanchePreview({ preserveProgress = false } = {}) {
       <b>${String(index + 1).padStart(2, '0')}</b><span>${esc(item.label)}</span>
     </button>`).join('');
 
+  const progressHTML = buildScenarioProgressHTML({
+    steps: ['1 Inspect', '2 Compare', '3 Audit Babbage', '4 Transfer'],
+    activeIndex: 0,
+    ariaLabel: 'Content Avalanche progress'
+  });
+
   area.innerHTML = `
-    <section class="pc-s1-preview" role="region" aria-labelledby="pcS1PreviewTitle">
-      <header class="pc-s1-preview-hero">
-        <span class="pc-s1-preview-status">Development preview · Evidence station</span>
-        <div class="pc-activity-kicker">Scenario 1 · Canvas course design</div>
-        <h2 id="pcS1PreviewTitle">The Content Avalanche</h2>
-        <p>Compare real Canvas screens, explain which redesign helps students, and let Babbage test your reasoning.</p>
-        <div class="pc-s1-preview-task" aria-labelledby="pcS1TaskTitle">
-          <div>
-            <span>Your mission</span>
-            <h3 id="pcS1TaskTitle">Find the learning path hidden inside the content.</h3>
-          </div>
-          <ol>
-            <li><b>Inspect Before</b> and notice what a student or instructor must hunt for.</li>
-            <li><b>Reveal After</b> and compare the same Canvas task.</li>
-            <li><b>Explain</b> why the redesign is stronger using visible evidence.</li>
-            <li><b>Analyze</b> your reasoning in Babbage’s terminal.</li>
-            <li><b>Transfer</b> the pattern to one week of your own course.</li>
-          </ol>
-        </div>
-      </header>
+    <section class="pc-s1-preview pc-scenario-stage" role="region" aria-labelledby="pcS1PreviewTitle">
+      ${buildScenarioMissionHTML(SCENARIO_INDEX.CONTENT_AVALANCHE, {
+        className: 'pc-s1-preview-mission',
+        extraHTML: progressHTML
+      }).replace('class="mission-title"', 'class="mission-title" id="pcS1PreviewTitle"')}
 
       <nav class="pc-s1-case-tabs" role="tablist" aria-label="Content Avalanche case files">${caseButtons}</nav>
 
@@ -7987,7 +7978,7 @@ function renderS3Standby(container) {
 function getS3MayaCaseQuote() {
   const opening = Array.isArray(window.pixelDialogue?.scenarioStart_assessment) ? window.pixelDialogue.scenarioStart_assessment : [];
   return opening.find(line => line.id === 'maya-s3-02')?.text
-    || "But if someone handed me a real planning problem tomorrow, I wouldn't know where to start.";
+    || 'But when I opened the Canvas Assignment and saw the county planning brief, I did not know how to turn those terms into a recommendation.';
 }
 
 function buildS3CaseBriefHTML({ compact = false } = {}) {
@@ -8008,16 +7999,16 @@ function buildS3CaseBriefHTML({ compact = false } = {}) {
 
   return `
     ${buildStudentEvidencePanelHTML({
-      title: 'Student Evidence',
+      title: 'Canvas Student Evidence',
       portraitSrc: ASSETS.images.students.maya.uncertain,
       portraitAlt: 'Maya, an adult rural learner and parent, looking uncertain',
       characterId: 'maya',
       quote: getS3MayaCaseQuote(),
-      resultLabel: 'Original result',
+      resultLabel: 'Canvas quiz result',
       resultValue: S3_MAYA_SCORE,
-      resultNote: 'High score'
+      resultNote: 'Week 4 gradebook'
     })}
-    <section class="pc-case-brief pc-case-brief--context" aria-label="Scenario 3 learning outcome and current assessment">
+    <section class="pc-case-brief pc-case-brief--context" aria-label="Scenario 4 learning outcome and current Canvas assessment">
       ${contextHTML}
     </section>`;
 }

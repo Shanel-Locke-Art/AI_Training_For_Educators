@@ -194,56 +194,56 @@ window.pixelDialogue = {
     { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Inspect the Canvas path and find the missing link between Jordan's strategy, the quiz result, and his next decision.", "id": "p89" }
   ],
   "scenarioStart_assessment": [
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "Maya brought us a strange case: a 96 percent.", "id": "p-s3-01" },
-    { "speaker": "Maya", "character": "maya", "expr": "neutral", "text": "I should feel pretty good about that. I knew almost every answer.", "id": "maya-s3-01" },
-    { "speaker": "Maya", "character": "maya", "expr": "uncertain", "text": "But if someone handed me a real planning problem tomorrow, I wouldn't know where to start.", "id": "maya-s3-02" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "That's why the grade caught my attention. The score may be accurate, but the claim attached to it may be too large.", "id": "p-s3-02" },
-    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "The test was mostly definitions, the planning cycle, and explaining terms.", "id": "maya-s3-03" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "The outcome says you should analyze a rural planning problem, recommend a response, and justify the trade-offs.", "id": "p-s3-03" },
-    { "speaker": "Maya", "character": "maya", "expr": "frustrated", "text": "I never actually had to do that on the test.", "id": "maya-s3-04" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Then let's stop staring at the number and map the evidence.", "id": "p-s3-04" }
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "Maya earned 96% on the Week 4 Canvas quiz. The gradebook suggests mastery, but the course outcome asks for more than the quiz required.", "id": "p-s3-01" },
+    { "speaker": "Maya", "character": "maya", "expr": "neutral", "text": "Canvas says I did really well. I knew almost every answer, and the feedback confirmed the terms I missed.", "id": "maya-s3-01" },
+    { "speaker": "Maya", "character": "maya", "expr": "uncertain", "text": "But when I opened the Canvas Assignment and saw the county planning brief, I did not know how to turn those terms into a recommendation.", "id": "maya-s3-02" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "That gap is the case. The quiz score is accurate for the questions asked, but it may not support the larger claim about Maya's planning judgment.", "id": "p-s3-02" },
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "The quiz asked me to define terms, order the planning cycle, and choose an answer in one short example.", "id": "maya-s3-03" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "The module outcome asks you to analyze a rural planning problem, recommend a feasible response, and justify the trade-offs.", "id": "p-s3-03" },
+    { "speaker": "Maya", "character": "maya", "expr": "frustrated", "text": "The gradebook shows 96%, but I never had to produce that kind of decision.", "id": "maya-s3-04" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Then let's map what the Canvas quiz makes visible and what the assignment still needs to collect.", "id": "p-s3-04" }
   ],
   "s3_after_diagnosis": [
-    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "That explains why the test was easy to study for. I knew what to memorize.", "id": "maya-s3-05" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "And the assessment wasn't useless. It measured knowledge and explanation. It just didn't measure the whole outcome.", "id": "p-s3-05" },
-    { "speaker": "Maya", "character": "maya", "expr": "uncertain", "text": "So the 96 percent is real. It just doesn't prove I can make the decision.", "id": "maya-s3-06" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Exactly. Now build a task that gives you evidence of the decision.", "id": "p-s3-06" }
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "Now I see why studying the quiz worked. Canvas showed me which definitions and examples to review.", "id": "maya-s3-05" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "That feedback was useful. It supported knowledge and explanation, but not the full decision-making outcome.", "id": "p-s3-05" },
+    { "speaker": "Maya", "character": "maya", "expr": "uncertain", "text": "So the 96% is real evidence, just not evidence that I can complete the Canvas Assignment.", "id": "maya-s3-06" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Exactly. Now design the assignment, submission, and rubric so the intended performance becomes visible.", "id": "p-s3-06" }
   ],
   "s3_blueprint_strong": [
-    { "speaker": "Maya", "character": "maya", "expr": "confident", "text": "Okay, that feels different. I couldn't memorize my way through a county brief with real constraints.", "id": "maya-s3-07a" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "Good. But a realistic task can still hide weak evidence.", "id": "p-s3-07a" },
-    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "So we test what the task actually lets the instructor see.", "id": "maya-s3-08a" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "Exactly. Stress-test it.", "id": "p-s3-08a" }
+    { "speaker": "Maya", "character": "maya", "expr": "confident", "text": "The Canvas Assignment now gives me a county brief, asks for a recommendation, and requires evidence and trade-offs in the same submission.", "id": "maya-s3-07a" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "Strong alignment. But a well-designed assignment can still invite a claim larger than one submission supports.", "id": "p-s3-07a" },
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "Then we should test which parts of the Canvas submission actually demonstrate the outcome.", "id": "maya-s3-08a" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "Exactly. Stress-test the evidence.", "id": "p-s3-08a" }
   ],
   "s3_blueprint_mixed": [
-    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "Some of this feels much closer to a real decision, but I can still see places where I could complete the task without showing why.", "id": "maya-s3-07b" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "That's the right suspicion. Authentic-looking is not the same as evidence-rich.", "id": "p-s3-07b" },
-    { "speaker": "Maya", "character": "maya", "expr": "neutral", "text": "Then let's see which parts of my work really prove the outcome.", "id": "maya-s3-08b" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Stress-test it.", "id": "p-s3-08b" }
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "The Canvas Assignment feels more realistic, but I could still submit a recommendation without showing enough of my reasoning.", "id": "maya-s3-07b" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "That is the right concern. A Canvas task can look authentic while the submission and rubric still collect weak evidence.", "id": "p-s3-07b" },
+    { "speaker": "Maya", "character": "maya", "expr": "neutral", "text": "Then let's see which parts of the submission support the outcome and which only make it look complete.", "id": "maya-s3-08b" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Stress-test the evidence.", "id": "p-s3-08b" }
   ],
   "s3_blueprint_weak": [
-    { "speaker": "Maya", "character": "maya", "expr": "uncertain", "text": "I think I could still study the format more than the decision.", "id": "maya-s3-07c" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "skeptical", "text": "Then we may have changed the scenery more than the assessment.", "id": "p-s3-07c" },
-    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "So the student evidence should expose that pretty quickly.", "id": "maya-s3-08c" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Exactly. Let's test it.", "id": "p-s3-08c" }
+    { "speaker": "Maya", "character": "maya", "expr": "uncertain", "text": "I think I could still study the rubric checklist and complete the Canvas Assignment without making the decision myself.", "id": "maya-s3-07c" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "skeptical", "text": "Then the Canvas shell changed, but the assessment claim did not.", "id": "p-s3-07c" },
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "The submitted work should reveal that gap quickly.", "id": "maya-s3-08c" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Exactly. Test what the submission actually proves.", "id": "p-s3-08c" }
   ],
   "s3_after_stress_test": [
-    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "The polished memo is the part I'd probably worry about most, but it barely tells you whether my recommendation makes sense.", "id": "maya-s3-09" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "Right. Authentic assessment is not 'make a fancy product.' The product has to expose the performance you care about.", "id": "p-s3-09" },
-    { "speaker": "Maya", "character": "maya", "expr": "confident", "text": "The evidence, trade-offs, and changed constraint are what make the decision visible.", "id": "maya-s3-10" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Now let's give the same evidence to Babbage and see what it claims.", "id": "p-s3-10" }
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "The polished memo and correct vocabulary would score well in Canvas, but neither one shows whether my recommendation fits the county evidence.", "id": "maya-s3-09" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking", "text": "Right. The Canvas submission must expose the performance, not just contain a professional-looking file.", "id": "p-s3-09" },
+    { "speaker": "Maya", "character": "maya", "expr": "confident", "text": "The recommendation, evidence table, rejected alternative, and changed constraint make the planning judgment visible.", "id": "maya-s3-10" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Now let's give that Canvas evidence to Babbage and audit how far its claim reaches.", "id": "p-s3-10" }
   ],
   "s3_after_babbage_audit": [
-    { "speaker": "Maya", "character": "maya", "expr": "uncertain", "text": "So doing well once doesn't prove I can handle every new version of the problem.", "id": "maya-s3-11" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "Right. Evidence supports claims at the level it actually reaches.", "id": "p-s3-11" },
-    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "Then if we want to claim transfer, the assessment needs to make adaptation visible.", "id": "maya-s3-12" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Exactly. Don't rebuild the whole thing. Repair that one inference gap.", "id": "p-s3-12" }
+    { "speaker": "Maya", "character": "maya", "expr": "uncertain", "text": "One strong Canvas submission still does not prove I can transfer the skill to every new planning problem.", "id": "maya-s3-11" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "neutral", "text": "Right. The submission supports the claim only at the level of the evidence it contains.", "id": "p-s3-11" },
+    { "speaker": "Maya", "character": "maya", "expr": "thinking", "text": "If the rubric is supposed to support a transfer claim, the assignment needs to show how I adapt when a meaningful condition changes.", "id": "maya-s3-12" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "Exactly. Repair that inference gap without rebuilding the whole Canvas assessment.", "id": "p-s3-12" }
   ],
   "s3_final_exchange": [
-    { "speaker": "Maya", "character": "maya", "expr": "confident", "text": "That changed-constraint piece is the first part that makes me feel like I'd know what to do when the situation stops matching the example.", "id": "maya-s3-13" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "And now the assessment can show why, not just whether, you got the answer.", "id": "p-s3-13" },
-    { "speaker": "Maya", "character": "maya", "expr": "neutral", "text": "The grade still matters. It just means more when I know what evidence is underneath it.", "id": "maya-s3-14" },
-    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "That's the point. A score is a summary. The evidence is the argument.", "id": "p-s3-14" }
+    { "speaker": "Maya", "character": "maya", "expr": "confident", "text": "Adding the changed constraint to the Canvas Assignment made me revise the recommendation and explain why my reasoning changed.", "id": "maya-s3-13" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "And the submission plus rubric can now show the adaptation, not just the final answer.", "id": "p-s3-13" },
+    { "speaker": "Maya", "character": "maya", "expr": "neutral", "text": "The 96% still matters, but now Canvas holds evidence that matches more of the module outcome.", "id": "maya-s3-14" },
+    { "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging", "text": "That is the point. The gradebook summarizes performance. The submission and rubric show what the score can actually support.", "id": "p-s3-14" }
   ],
   "s2_diagnosis_correct": [
     { "speaker": "Professor Pixel", "character": "pixel", "expr": "proud", "text": "That's the hidden problem. Canvas shows Jordan's module activity and grade, but not evidence connecting his study strategy to what he actually understood. He cannot make an informed next decision yet.", "id": "p90" }

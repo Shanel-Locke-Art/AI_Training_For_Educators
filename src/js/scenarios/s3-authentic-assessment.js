@@ -231,7 +231,7 @@ function renderS3Standby(container) {
 function getS3MayaCaseQuote() {
   const opening = Array.isArray(window.pixelDialogue?.scenarioStart_assessment) ? window.pixelDialogue.scenarioStart_assessment : [];
   return opening.find(line => line.id === 'maya-s3-02')?.text
-    || "But if someone handed me a real planning problem tomorrow, I wouldn't know where to start.";
+    || 'But when I opened the Canvas Assignment and saw the county planning brief, I did not know how to turn those terms into a recommendation.';
 }
 
 function buildS3CaseBriefHTML({ compact = false } = {}) {
@@ -252,16 +252,16 @@ function buildS3CaseBriefHTML({ compact = false } = {}) {
 
   return `
     ${buildStudentEvidencePanelHTML({
-      title: 'Student Evidence',
+      title: 'Canvas Student Evidence',
       portraitSrc: ASSETS.images.students.maya.uncertain,
       portraitAlt: 'Maya, an adult rural learner and parent, looking uncertain',
       characterId: 'maya',
       quote: getS3MayaCaseQuote(),
-      resultLabel: 'Original result',
+      resultLabel: 'Canvas quiz result',
       resultValue: S3_MAYA_SCORE,
-      resultNote: 'High score'
+      resultNote: 'Week 4 gradebook'
     })}
-    <section class="pc-case-brief pc-case-brief--context" aria-label="Scenario 3 learning outcome and current assessment">
+    <section class="pc-case-brief pc-case-brief--context" aria-label="Scenario 4 learning outcome and current Canvas assessment">
       ${contextHTML}
     </section>`;
 }

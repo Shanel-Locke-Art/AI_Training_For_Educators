@@ -2,11 +2,11 @@
 from pathlib import Path
 import re
 ROOT = Path(__file__).resolve().parents[1]
-proto = (ROOT/'src/js/scenarios/s2-metacognition.js').read_text()
-shared = (ROOT/'src/js/scenarios/shared-components.js').read_text()
-bundle = (ROOT/'runtime/js/promptcraft.bundle.js').read_text()
-css = (ROOT/'runtime/css/promptcraft.css').read_text()
-idx = (ROOT/'index.html').read_text()
+proto = (ROOT/'src/js/scenarios/s2-metacognition.js').read_text(encoding='utf-8')
+shared = (ROOT/'src/js/scenarios/shared-components.js').read_text(encoding='utf-8')
+bundle = (ROOT/'runtime/js/promptcraft.bundle.js').read_text(encoding='utf-8')
+css = (ROOT/'runtime/css/promptcraft.css').read_text(encoding='utf-8')
+idx = (ROOT/'index.html').read_text(encoding='utf-8')
 
 # Read the live cache-buster patch number instead of hardcoding one, since it
 # advances on every release.

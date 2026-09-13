@@ -69,7 +69,7 @@ def test_recording_tracker_marks_scenario_3_as_draft_only():
     for marker in (
         "Draft, Do Not Record",
         "Scenario 3 draft lines",
-        "Dialogue draft through patch 534",
+        "Scenario 3 dialogue draft through patch 534",
         "84% on the module quiz",
         "Canvas grade went from 76% to 84%",
     ):
@@ -78,8 +78,8 @@ def test_recording_tracker_marks_scenario_3_as_draft_only():
 
 def test_patch_and_compatibility_ids_remain_separate():
     index = read("index.html")
-    assert "Version 429 · Patch 534" in index
-    assert "DEV · 534" in index
+    assert "Version 429 · Patch 538" in index
+    assert "DEV · 538" in index
     assert "PROMPTCRAFT_V429" in read("README.md")
     assert "V121" in read("docs/README.md")
     assert "analysis_type: 's2_draft'" in read("src/js/scenarios/s2-metacognition.js")

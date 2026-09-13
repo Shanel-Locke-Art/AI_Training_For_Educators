@@ -1,0 +1,11 @@
+{
+  "manifest_version": 1,
+  "release_id": "PROMPTCRAFT_V429_SCENARIO4_CANVAS_DIALOGUE_P535",
+  "browser_cache_patch": 535,
+  "workbook": "docs/asset-management/PromptCraft_Voice_Recording_Tracker.xlsx",
+  "previous_sha256": "597c14298fb210551fe93ec950fd22de07b29f7f3405e96faa3ae5738eb77e71",
+  "current_sha256": "faddd848bf7f0f4c997aefe5bbff58ce3ef9f1a7d0e8f14463d45c943b67c3fd",
+  "change_summary": "Thirty-six displayed Scenario 4 lines added and marked Draft, Do Not Record pending final Canvas evidence and dialogue approval.",
+  "structure_removed": false,
+  "raw_archives_changed": false
+}

@@ -3,7 +3,6 @@
   "failures": [
     "desktop scenario 1: implemented workspace is empty.",
     "desktop scenario 2: implemented workspace is empty.",
-    "tablet: Enter key did not advance name onboarding.",
     "tablet scenario 1: implemented workspace is empty.",
     "tablet scenario 2: implemented workspace is empty.",
     "phone scenario 1: implemented workspace is empty.",

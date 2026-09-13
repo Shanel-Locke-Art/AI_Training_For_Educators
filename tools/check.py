@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import shutil
 import signal
 import subprocess
 import sys
@@ -41,6 +42,9 @@ QUICK_CHECKS = (
     ("Patch 532 displayed Scenario 4 analysis and print parity", [sys.executable, "tests/test_s4_shared_analysis_migration_532.py"]),
     ("Patch 533 displayed Scenarios 3 and 4 Canvas orientation", [sys.executable, "tests/test_s3_s4_canvas_orientation_533.py"]),
     ("Patch 534 displayed Scenario 3 Canvas dialogue draft", [sys.executable, "tests/test_s3_canvas_dialogue_534.py"]),
+    ("Patch 535 displayed Scenario 4 Canvas dialogue draft", [sys.executable, "tests/test_s4_canvas_dialogue_535.py"]),
+    ("Patch 536 Scenario 1 shared visual shell", [sys.executable, "tests/test_s1_shared_visual_shell_536.py"]),
+    ("Patch 537 Windows test-runner portability", [sys.executable, "tests/test_windows_test_runner_537.py"]),
     ("S2 repair terminal contract", [sys.executable, "tests/test_s2_repair_terminal_flow.py"]),
     ("Dialogue cleanup", [sys.executable, "tests/test_dialogue_cleanup.py"]),
     ("GFC action borders", [sys.executable, "tests/test_gfc_action_borders.py"]),
@@ -145,9 +149,25 @@ def _terminate_process_tree(process: subprocess.Popen) -> None:
             process.kill()
 
 
-def run(label: str, command: list[str]) -> bool:
+def _resolve_chromium() -> str | None:
+    configured = os.environ.get("PROMPTCRAFT_CHROMIUM")
+    if configured and Path(configured).is_file():
+        return configured
+    system_browser = shutil.which("chromium") or shutil.which("google-chrome")
+    if system_browser:
+        return system_browser
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as playwright:
+            bundled = playwright.chromium.executable_path
+        return bundled if bundled and Path(bundled).is_file() else None
+    except Exception:
+        return None
+
+
+def run(label: str, command: list[str], env: dict[str, str]) -> bool:
     print(f"\n== {label} ==", flush=True)
-    popen_kwargs = {"cwd": ROOT}
+    popen_kwargs = {"cwd": ROOT, "env": env}
     if os.name == "posix":
         popen_kwargs["start_new_session"] = True
     process = subprocess.Popen(command, **popen_kwargs)
@@ -181,7 +201,13 @@ def main() -> int:
     args = parser.parse_args()
 
     checks = QUICK_CHECKS + (BROWSER_CHECKS if args.full else ())
-    failures = [label for label, command in checks if not run(label, command)]
+    run_env = os.environ.copy()
+    if args.full and not run_env.get("PROMPTCRAFT_CHROMIUM"):
+        chromium = _resolve_chromium()
+        if chromium:
+            run_env["PROMPTCRAFT_CHROMIUM"] = chromium
+            print(f"Using Playwright Chromium: {chromium}")
+    failures = [label for label, command in checks if not run(label, command, run_env)]
 
     print()
     if failures:

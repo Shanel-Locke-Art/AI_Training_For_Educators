@@ -16162,6 +16162,18 @@ body.pc-scenario-activity-active #inputContainer {
   color: #172334;
 }
 
+/* Patch 536: S1 keeps its Canvas evidence station, but its page-level frame
+   now uses the same mission and stage geometry as the playable scenarios. */
+.pc-s1-preview.pc-scenario-stage {
+  width: min(100%, 1500px);
+  margin: 0 auto;
+  padding: var(--pc-stage-pad-block) var(--pc-stage-pad-inline) clamp(28px, 4vw, 44px);
+}
+
+.pc-s1-preview-mission {
+  margin: 0;
+}
+
 .pc-s1-preview-hero {
   padding: clamp(24px, 4vw, 48px);
   border: 2px solid #0a3d62;

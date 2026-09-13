@@ -18,10 +18,10 @@ def main() -> None:
     terminal = read("src/js/ui/babbage-terminal.js")
     bundle = read("runtime/js/promptcraft.bundle.js")
 
-    assert 'runtime/css/promptcraft.css?v=429&patch=534' in index
-    assert 'promptcraft.bundle.js?v=429&amp;patch=534&amp;receiver=84' in index
-    assert 'Version 429 · Patch 534' in index
-    assert 'DEV · 534' in index
+    assert 'runtime/css/promptcraft.css?v=429&patch=538' in index
+    assert 'promptcraft.bundle.js?v=429&amp;patch=538&amp;receiver=84' in index
+    assert 'Version 429 · Patch 538' in index
+    assert 'DEV · 538' in index
 
     for token in (
         "function pcS2BuildImprovementItems(review = {})",

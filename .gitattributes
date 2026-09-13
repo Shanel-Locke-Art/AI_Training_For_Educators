@@ -1,0 +1,3 @@
+# Preserve the supplied V83 receiver byte-for-byte. Its characterization tests
+# intentionally verify the original archive SHA-256 rather than normalized text.
+apps-script/PromptCraft_Receiver_V83_Readable_Prompt_Data.js -text

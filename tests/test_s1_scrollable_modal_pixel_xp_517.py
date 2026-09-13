@@ -51,8 +51,8 @@ def main() -> None:
     assert "Your Level bar is now" not in shared
     assert "You earned ${" not in shared
 
-    assert "patch=534" in index
-    assert "DEV · 534" in index
+    assert "patch=538" in index
+    assert "DEV · 538" in index
     print("V517 scrollable evidence and Pixel progress feedback contract passed.")
 
 

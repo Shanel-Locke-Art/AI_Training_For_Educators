@@ -9,7 +9,7 @@ Current compatibility baseline:
 - Apps Script receiver candidate: `V84`; immutable/live baseline: `V83`
 - Babbage proxy: `V373`
 - Asset manifest: `v149`
-- Current browser/cache revision: `534`
+- Current browser/cache revision: `538`
 - Phase 0 repository baseline revision: `524` (documentation, receiver ownership, and fixtures only)
 - Phase 2 refactor patch: `525` (JavaScript ownership only; no design or gameplay changes)
 - Phase 3 refactor patch: `526` (viewport JavaScript ownership only; no design, gameplay, or CSS changes)
@@ -23,6 +23,10 @@ Current compatibility baseline:
 - Scenario 4 analysis migration patch: `532` (structured assessment findings, five-step evidence sequence, and shared print parity)
 - Scenarios 3 and 4 Canvas-orientation patch: `533` (Canvas as the teaching environment, with existing gameplay and contracts preserved)
 - Scenario 3 Canvas-dialogue patch: `534` (draft dialogue, tracker status, and privacy-safe screenshot contract)
+- Scenario 4 Canvas-dialogue patch: `535` (draft dialogue, tracker status, and privacy-safe screenshot contract)
+- Scenario 1 shared-visual-shell patch: `536` (shared mission briefing and stage geometry; Canvas evidence mechanics preserved)
+- Windows test-runner patch: `537` (bundled Chromium discovery, UTF-8 reads, and path normalization)
+- Cumulative recovery patch: `538` (coherent P534–P538 source/runtime and Windows test baseline)
 
 Cache/query revisions are not application build numbers. Do not rename the app build when a cache marker changes.
 
@@ -59,6 +63,10 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 | `development/patch-532-scenario-4-analysis.md` | Displayed Scenario 4 and Transfer Lab analysis migration, print-content parity, duplicate printer removal, and preservation boundaries. |
 | `development/patch-533-scenarios-3-4-canvas-orientation.md` | Canvas module, assessment, feedback, submission, and rubric context for displayed Scenarios 3 and 4. |
 | `development/patch-534-scenario-3-canvas-dialogue.md` | Scenario 3 Canvas dialogue draft, recording status, and required screenshot captures. |
+| `development/patch-535-scenario-4-canvas-dialogue.md` | Scenario 4 Canvas dialogue draft, recording status, and required screenshot captures. |
+| `development/patch-536-s1-shared-visual-shell.md` | Scenario 1 visual alignment with the shared S3/S4 scenario shell. |
+| `development/patch-537-windows-test-runner.md` | Windows-compatible Playwright and regression-runner setup. |
+| `development/patch-538-cumulative-recovery.md` | Cumulative changed-file recovery overlay through Patch 538. |
 
 ## Source-of-truth hierarchy
 

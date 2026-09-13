@@ -77,6 +77,11 @@ Canvas evidence wording, stable dialogue IDs, synchronized intervention
 fallbacks, draft-only recording status, and the separated V429/V121/patch
 version contract.
 
+Patch 535 adds `test_s4_canvas_dialogue_535.py`. It protects the Scenario 4
+Canvas quiz, assignment, submission, rubric, and changed-constraint dialogue;
+stable internal `s3` IDs; draft-only voice-tracker rows; and the separated
+V429/V121/patch version contract.
+
 ## Superseded patch assertions
 
 These files describe mutually exclusive intermediate states and are retained only as patch history:

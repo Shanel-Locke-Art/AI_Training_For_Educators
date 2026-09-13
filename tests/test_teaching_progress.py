@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 import shutil
 from urllib.parse import urlparse
 from playwright.sync_api import sync_playwright
@@ -15,7 +16,7 @@ CONTENT_TYPES = {
 }
 
 def main():
-    chromium = shutil.which('chromium') or shutil.which('google-chrome')
+    chromium = os.environ.get('PROMPTCRAFT_CHROMIUM') or shutil.which('chromium') or shutil.which('google-chrome')
     assert chromium, 'Chromium is required for progress regression test.'
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True, executable_path=chromium, args=['--no-sandbox'])
