@@ -91,7 +91,7 @@ def main() -> int:
               speaker: document.getElementById('vnSpeaker')?.textContent || '',
               text: document.getElementById('vnText')?.textContent || ''
             })""")
-            if not intro_state['active'] or intro_state['speaker'].strip() != 'Professor Pixel' or 'Maya brought us a strange case' not in intro_state['text']:
+            if not intro_state['active'] or intro_state['speaker'].strip() != 'Professor Pixel' or 'Maya earned 96% on the Week 4 Canvas quiz' not in intro_state['text']:
                 failures.append(f'{label}: S3 introduction did not start from the normal scenario activation path: {intro_state}')
 
             page.evaluate("""() => {
@@ -110,7 +110,7 @@ def main() -> int:
                 failures.append(f'{label}: Maya student-evidence panel did not render exactly once: {evidence}')
             if 'maya/uncertain.png' not in evidence['portrait']:
                 failures.append(f'{label}: Maya uncertain portrait is missing from the diagnosis evidence panel: {evidence}')
-            if 'real planning problem tomorrow' not in evidence['quote']:
+            if 'opened the Canvas Assignment' not in evidence['quote'] or 'county planning brief' not in evidence['quote']:
                 failures.append(f'{label}: Maya opening quote is missing from the diagnosis evidence panel: {evidence}')
             if evidence['score'].strip()!='96%':
                 failures.append(f'{label}: Maya 96% result is missing from the diagnosis evidence panel: {evidence}')

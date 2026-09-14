@@ -71,8 +71,8 @@ def main() -> None:
     assert "analysis_type: 's3_evidence_analysis'" in scenario
     assert "analysis_type: 's3_transfer_assessment'" in scenario
     assert "scenario_label: 'S4: The 96% Problem'" in scenario
-    assert "Version 429 · Patch 538" in index
-    assert "DEV · 538" in index
+    assert "Version 429 · Patch 543" in index
+    assert "DEV · 543" in index
 
     tracker = workbook_text("docs/asset-management/PromptCraft_Voice_Recording_Tracker.xlsx")
     for marker in (

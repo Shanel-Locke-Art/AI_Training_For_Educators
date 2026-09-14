@@ -1,0 +1,29 @@
+{
+  "manifest_version": 1,
+  "release_id": "PROMPTCRAFT_V429_BROWSER_CONTRACT_ALIGNMENT_P539",
+  "versions": {
+    "build": "PROMPTCRAFT_V429",
+    "schema": "V121",
+    "browser_cache_patch": 539,
+    "live_receiver": "V83",
+    "receiver_candidate": "V84",
+    "babbage_proxy": "V373",
+    "asset_manifest": 149
+  },
+  "patch_539": {
+    "scope": "Browser regression contract alignment with current scenario registry and Canvas dialogue",
+    "changed_file_count": 67,
+    "application_behavior_changed": false,
+    "development_shortcuts_corrected": true,
+    "css_changed": false,
+    "dialogue_changed": false,
+    "screenshot_assets_changed": false,
+    "spreadsheet_changed": false,
+    "tracking_contract_changed": false,
+    "receiver_changed": false,
+    "raw_archives_changed": false,
+    "changed_files_manifest": "release/patch539-changed-files.txt",
+    "checksums": "release/patch539-checksums.sha256",
+    "test_results": "release/patch539-test-results.md"
+  }
+}

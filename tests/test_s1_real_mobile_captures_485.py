@@ -51,8 +51,8 @@ def main() -> None:
         assert marker in css
         assert marker in runtime_css
 
-    assert "patch=538" in index
-    assert "DEV · 538" in index
+    assert "patch=543" in index
+    assert "DEV · 543" in index
     print("S1 real Canvas mobile captures 485 contract passed.")
 
 

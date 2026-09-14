@@ -117,7 +117,7 @@ def main()->int:
             failures.append(f'S2 final is missing S1 result-page components: {final}')
         if final['oldComparison']:
             failures.append('Old bespoke S2 before/after completion grid is still rendering.')
-        if final['title']!='Repaired Reflection Activity' or not final['nextButton'].startswith('Next scenario'):
+        if final['title']!='Repaired Canvas Reflection Activity' or not final['nextButton'].startswith('Next scenario'):
             failures.append(f'S2 result content/actions are incomplete: {final}')
 
         page.close(); browser.close()

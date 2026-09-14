@@ -53,7 +53,12 @@ def main()->int:
         })""")
         if before['explicit']!='true' or before['role']!='group' or not before['button']:
             failures.append(f'Recorded Dialogue did not enter explicit-action mode: {before}')
-        if after_click['text']!=before['text'] or not after_click['button'] or not after_click['overlay']:
+        if (
+            before['text'] not in after_click['text']
+            or after_click['explicit'] != 'true'
+            or not after_click['button']
+            or not after_click['overlay']
+        ):
             failures.append(f'Clicking the dialogue surface consumed the scene: before={before}, after={after_click}')
         page.locator('.prediction-continue-btn').click()
         page.wait_for_timeout(150)

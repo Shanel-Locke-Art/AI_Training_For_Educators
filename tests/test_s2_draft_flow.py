@@ -104,8 +104,8 @@ def main() -> int:
         }""")
 
         required = [
-            'Evidence of what the strategy actually did', 'Compare the new grade',
-            'I got an 84 instead of a 76', 'Evaluate a strategy', 'Strategy Check',
+            'Evidence of what the strategy actually did', 'Compare Canvas grades',
+            'My Canvas grade went from 76% to 84%', 'Evaluate a strategy', 'Strategy Check',
             'My grade went up', 'Does Jordan\'s likely response actually show'
         ]
         if not report_state['report']:

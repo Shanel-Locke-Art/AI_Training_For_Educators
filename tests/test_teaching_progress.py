@@ -65,7 +65,7 @@ def main():
         assert page.locator('#xpLabel').inner_text() == '40 / 100 XP'
         assert page.evaluate("() => document.getElementById('xpFill').style.width") == '40%'
         assert page.evaluate('() => awardScenarioCompletionXP(0)') == 60
-        assert page.locator('#levelTag').inner_text() == 'Engagement Facilitator'
+        assert page.locator('#levelTag').inner_text() == 'Learning Path Builder'
         assert page.locator('#progressHeaderLevel').inner_text() == 'LEVEL 2'
         assert page.locator('#xpLabel').inner_text() == '0 / 100 XP'
         assert page.evaluate('() => awardScenarioScoreXP(0, 4, 5)') == 0

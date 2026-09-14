@@ -78,8 +78,8 @@ def test_recording_tracker_marks_scenario_3_as_draft_only():
 
 def test_patch_and_compatibility_ids_remain_separate():
     index = read("index.html")
-    assert "Version 429 · Patch 538" in index
-    assert "DEV · 538" in index
+    assert "Version 429 · Patch 543" in index
+    assert "DEV · 543" in index
     assert "PROMPTCRAFT_V429" in read("README.md")
     assert "V121" in read("docs/README.md")
     assert "analysis_type: 's2_draft'" in read("src/js/scenarios/s2-metacognition.js")

@@ -33,8 +33,8 @@ def main() -> None:
 
     # S1 stage geometry inherits the shared workbench measurements.
     assert ".pc-s1-preview.pc-scenario-stage" in CSS
-    assert "Version 429 · Patch 538" in INDEX
-    assert "DEV · 538" in INDEX
+    assert "Version 429 · Patch 543" in INDEX
+    assert "DEV · 543" in INDEX
 
     print("PASS: Patch 536 S1 shared visual shell")
 

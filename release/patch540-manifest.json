@@ -1,0 +1,29 @@
+{
+  "manifest_version": 1,
+  "release_id": "PROMPTCRAFT_V429_INTERNAL_SCENARIO_SCREENSHOTS_P540",
+  "versions": {
+    "build": "PROMPTCRAFT_V429",
+    "schema": "V121",
+    "browser_cache_patch": 540,
+    "live_receiver": "V83",
+    "receiver_candidate": "V84",
+    "babbage_proxy": "V373",
+    "asset_manifest": 149
+  },
+  "patch_540": {
+    "scope": "Named internal scenario visual-review screenshots",
+    "changed_file_count": 61,
+    "application_behavior_changed": false,
+    "test_capture_changed": true,
+    "css_changed": false,
+    "dialogue_changed": false,
+    "screenshot_assets_changed": false,
+    "spreadsheet_changed": false,
+    "tracking_contract_changed": false,
+    "receiver_changed": false,
+    "raw_archives_changed": false,
+    "changed_files_manifest": "release/patch540-changed-files.txt",
+    "checksums": "release/patch540-checksums.sha256",
+    "test_results": "release/patch540-test-results.md"
+  }
+}

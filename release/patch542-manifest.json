@@ -1,0 +1,29 @@
+{
+  "manifest_version": 1,
+  "release_id": "PROMPTCRAFT_V429_SCENARIO_SCREENSHOT_SCOPE_P542",
+  "versions": {
+    "build": "PROMPTCRAFT_V429",
+    "schema": "V121",
+    "browser_cache_patch": 542,
+    "live_receiver": "V83",
+    "receiver_candidate": "V84",
+    "babbage_proxy": "V373",
+    "asset_manifest": 149
+  },
+  "patch_542": {
+    "scope": "Separate scenario-opening overviews and centered activity checkpoints",
+    "changed_file_count": 62,
+    "application_behavior_changed": false,
+    "test_capture_changed": true,
+    "css_changed": false,
+    "dialogue_changed": false,
+    "screenshot_assets_changed": false,
+    "spreadsheet_changed": false,
+    "tracking_contract_changed": false,
+    "receiver_changed": false,
+    "raw_archives_changed": false,
+    "changed_files_manifest": "release/patch542-changed-files.txt",
+    "checksums": "release/patch542-checksums.sha256",
+    "test_results": "release/patch542-test-results.md"
+  }
+}

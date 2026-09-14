@@ -353,7 +353,7 @@ def main() -> int:
                     window.__pcNativeStaleAttempt += 1;
                     renderS2ThinkingMoveActivity();
                   }, 140);
-                  pcActivateScenario(SCENARIO_INDEX.ENGAGEMENT, { playIntroduction:false });
+                  pcActivateScenario(SCENARIO_INDEX.CONTENT_AVALANCHE, { playIntroduction:false });
                 }"""
             )
             page.wait_for_timeout(520)
@@ -372,7 +372,7 @@ def main() -> int:
                   })
                 })"""
             )
-            if reset_state["scenarioIndex"] != 0 or reset_state["scenarioKey"] != "engagement":
+            if reset_state["scenarioIndex"] != 0 or reset_state["scenarioKey"] != "content-avalanche":
                 failures.append(f"{label}: scenario switch did not settle on a clean S1 state.")
             if reset_state["guardedLeak"] != 0:
                 failures.append(f"{label}: delayed work from S2 survived the scenario-run reset.")

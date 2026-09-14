@@ -9,7 +9,7 @@ Current compatibility baseline:
 - Apps Script receiver candidate: `V84`; immutable/live baseline: `V83`
 - Babbage proxy: `V373`
 - Asset manifest: `v149`
-- Current browser/cache revision: `538`
+- Current browser/cache revision: `543`
 - Phase 0 repository baseline revision: `524` (documentation, receiver ownership, and fixtures only)
 - Phase 2 refactor patch: `525` (JavaScript ownership only; no design or gameplay changes)
 - Phase 3 refactor patch: `526` (viewport JavaScript ownership only; no design, gameplay, or CSS changes)
@@ -26,7 +26,7 @@ Current compatibility baseline:
 - Scenario 4 Canvas-dialogue patch: `535` (draft dialogue, tracker status, and privacy-safe screenshot contract)
 - Scenario 1 shared-visual-shell patch: `536` (shared mission briefing and stage geometry; Canvas evidence mechanics preserved)
 - Windows test-runner patch: `537` (bundled Chromium discovery, UTF-8 reads, and path normalization)
-- Cumulative recovery patch: `538` (coherent P534–P538 source/runtime and Windows test baseline)
+- Current visual-review patch: `543` (deterministic onboarding before 51 opening and focused captures across desktop, tablet, and phone)
 
 Cache/query revisions are not application build numbers. Do not rename the app build when a cache marker changes.
 
@@ -67,6 +67,11 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 | `development/patch-536-s1-shared-visual-shell.md` | Scenario 1 visual alignment with the shared S3/S4 scenario shell. |
 | `development/patch-537-windows-test-runner.md` | Windows-compatible Playwright and regression-runner setup. |
 | `development/patch-538-cumulative-recovery.md` | Cumulative changed-file recovery overlay through Patch 538. |
+| `development/patch-539-browser-contract-alignment.md` | Browser regression expectations aligned with the current scenario registry and Canvas dialogue. |
+| `development/patch-540-internal-scenario-screenshots.md` | Internal S1, S3, and S4 visual-review screenshot inventory. |
+| `development/patch-541-screenshot-capture-integrity.md` | Screenshot asset loading, checkpoint focus, and duplicate-image integrity guards. |
+| `development/patch-542-scenario-screenshot-scope.md` | Separate scenario-opening overviews from centered activity checkpoints for reliable visual comparison. |
+| `development/patch-543-runtime-capture-stability.md` | Deterministic onboarding waits and the corrected 51-image visual-review inventory. |
 
 ## Source-of-truth hierarchy
 

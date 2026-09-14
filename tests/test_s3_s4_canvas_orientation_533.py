@@ -65,7 +65,7 @@ def test_canvas_reorientation_preserves_compatibility_contracts():
     scenario_4 = read("src/js/scenarios/s3-authentic-assessment.js")
     receiver = read("apps-script/PromptCraft_Receiver_V83_Readable_Prompt_Data.js")
 
-    assert "Version 429 · Patch 538" in index
+    assert "Version 429 · Patch 543" in index
     assert "PROMPTCRAFT_V429" in read("README.md")
     assert "V121" in read("docs/README.md")
     assert "analysis_type: 's2_draft'" in scenario_3

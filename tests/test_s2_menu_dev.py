@@ -47,7 +47,7 @@ def main() -> int:
         }""")
         page.wait_for_timeout(100)
         marker=page.evaluate("""() => {
-          const el=document.querySelector('.s2-loop-puzzle .pc-choice-marker');
+          const el=document.querySelector('#s2DiagnosisChoices .pc-choice-marker');
           const cs=getComputedStyle(el);
           const after=getComputedStyle(el,'::after');
           return {w:parseFloat(cs.width),h:parseFloat(cs.height),innerW:parseFloat(after.width),innerH:parseFloat(after.height),innerBg:after.backgroundColor};
@@ -92,7 +92,7 @@ def main() -> int:
             failures.append(f'Audit selected radio center is not visible: {audit_marker}')
 
         # S2 DEV fill should land on Decision 5 with all four fields populated.
-        page.evaluate("() => window.devFillScenario(1)")
+        page.evaluate("() => window.devFillScenario(2)")
         page.wait_for_timeout(350)
         dev=page.evaluate("""() => ({
           active: scenarioIndex,
@@ -101,7 +101,7 @@ def main() -> int:
           enabled: !document.getElementById('s2RepairSubmit')?.disabled,
           audit: getS2Data().auditAttempts?.at(-1)?.selection || ''
         })""")
-        if dev['active'] != 1 or not dev['repair']:
+        if dev['active'] != 2 or not dev['repair']:
             failures.append(f'S2 DEV fill did not land on the guided repair workspace: {dev}')
         if any(len(v) < 12 for v in dev['fields']):
             failures.append('S2 DEV fill did not populate all four guided repair fields.')
@@ -109,7 +109,7 @@ def main() -> int:
             failures.append('S2 DEV fill left the review button disabled.')
         if dev['audit'] != 'no_evidence':
             failures.append(f'S2 DEV fill did not create a coherent audit state: {dev["audit"]}')
-        if page.locator('[data-pc-action="dev-fill-scenario"][data-pc-scenario-index="1"]').count() < 2:
+        if page.locator('[data-pc-action="dev-fill-scenario"][data-pc-scenario-index="2"]').count() < 2:
             failures.append('S2 fill shortcut is missing from desktop or mobile DEV controls.')
 
         # Fallback review must preserve the learner's assembled repair and label

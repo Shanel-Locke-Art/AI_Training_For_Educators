@@ -47,8 +47,8 @@ def main() -> None:
         assert token in runtime_css
 
     assert "← Revise response" not in shared
-    assert "patch=538" in index
-    assert "DEV · 538" in index
+    assert "patch=543" in index
+    assert "DEV · 543" in index
     print("V506 readable Canvas backdrop, focused analysis, and example planner contract passed.")
 
 

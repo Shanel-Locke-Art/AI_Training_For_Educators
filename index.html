@@ -12,14 +12,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=538">
+<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=543">
 <!-- Production CSS is generated from src/css by tools/build.py. -->
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
-<script src="runtime/js/dialogue-data.js?v=149&amp;patch=538"></script>
-<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=538&amp;receiver=84&amp;connections=510"></script>
+<script src="runtime/js/dialogue-data.js?v=149&amp;patch=543"></script>
+<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=543&amp;receiver=84&amp;connections=510"></script>
 
 </head>
 
@@ -138,18 +138,18 @@
 
 <!-- ══════════════════════════════════════════════════════
      DEV BAR — clean shell
-     S1 fill resets the playable baseline. S2 opens its playable case; S3–S8 remain development shells.
+     S1 fill resets the preview baseline. S3 opens its playable case; other shortcuts open their current scenario state.
 ══════════════════════════════════════════════════════ -->
 <div class="dev-bar" role="toolbar" aria-label="PromptCraft development shortcuts">
-  <span class="dev-label" title="Cumulative Windows Playwright recovery baseline">DEV · 538</span>
+  <span class="dev-label" title="Deterministic scenario capture baseline">DEV · 543</span>
   <button class="dev-btn" data-pc-action="dev-reset-progress" title="Clear saved XP and restart Scenario 1">Reset Run + XP</button>
   <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="0">S1</button>
   <button class="dev-btn dev-btn-fill" data-pc-action="dev-fill-scenario" data-pc-scenario-index="0">S1 ✏️</button>
   <button class="dev-btn dev-btn-fill" data-pc-action="dev-fill-s1-transfer">S1 Path ✏️</button>
   <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="1">S2</button>
-  <button class="dev-btn dev-btn-fill" data-pc-action="dev-fill-scenario" data-pc-scenario-index="1">S2 ✏️</button>
-  <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="2">S3 shell</button>
-  <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="3">S4 shell</button>
+  <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="2">S3</button>
+  <button class="dev-btn dev-btn-fill" data-pc-action="dev-fill-scenario" data-pc-scenario-index="2">S3 ✏️</button>
+  <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="3">S4</button>
   <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="4">S5 shell</button>
   <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="5">S6 shell</button>
   <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="6">S7 shell</button>
@@ -231,7 +231,7 @@
         </figure>
         <div class="pc-progress-details">
           <p id="progressLevelDescription">Explores how AI can support teaching without replacing professional judgment.</p>
-          <div class="pc-progress-next" id="progressNextLevel">Next: Engagement Facilitator</div>
+          <div class="pc-progress-next" id="progressNextLevel">Next: Learning Path Builder</div>
           <div class="pc-progress-total" id="progressXPText">0 / 100 XP to next level</div>
           <div class="pc-progress-full-track" aria-hidden="true"><span id="progressPanelFill"></span></div>
           <div class="pc-progress-scenarios" id="progressScenarioText">0 of 8 scenarios completed</div>
@@ -277,9 +277,9 @@
       <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-fill-scenario" data-pc-scenario-index="0" data-pc-close-details="true">S1 ✏️</button>
       <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-fill-s1-transfer" data-pc-close-details="true">S1 Path ✏️</button>
       <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="1" data-pc-close-details="true">S2</button>
-      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-fill-scenario" data-pc-scenario-index="1" data-pc-close-details="true">S2 ✏️</button>
-      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="2" data-pc-close-details="true">S3 shell</button>
-      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="3" data-pc-close-details="true">S4 shell</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="2" data-pc-close-details="true">S3</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-fill-scenario" data-pc-scenario-index="2" data-pc-close-details="true">S3 ✏️</button>
+      <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="3" data-pc-close-details="true">S4</button>
       <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="4" data-pc-close-details="true">S5 shell</button>
       <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="5" data-pc-close-details="true">S6 shell</button>
       <button class="mobile-dropdown-option" type="button" role="menuitem" data-pc-action="dev-go-scenario" data-pc-scenario-index="6" data-pc-close-details="true">S7 shell</button>
@@ -567,7 +567,7 @@
 
     <div class="pc-main-menu-footer">
       <span id="mainMenuStatus">Select an option to begin.</span>
-      <span id="mainMenuVersion" data-pc-app-version>Version 429 · Patch 538</span>
+      <span id="mainMenuVersion" data-pc-app-version>Version 429 · Patch 543</span>
     </div>
   </div>
 </div>
