@@ -19,7 +19,7 @@ The Babbage CRT analysis display intentionally remains green-on-dark as a distin
 Current shared scenario background registry:
 
 - S1 Engagement: `assets/images/backgrounds/gfc/s1-science-wing.jpg`
-- S2 Metacognition: `assets/images/backgrounds/gfc/s2-study-lounge.jpg`
+- S3 Confident Student: `assets/images/backgrounds/gfc/s3-study-lounge.jpg`
 - fallback classroom: `assets/images/backgrounds/classroom.png`
 
 Scenario room selection is owned by `ASSETS.images.backgrounds.scenarios` in `src/js/app/config-and-assets.js`. New scenarios should register backgrounds there rather than add character- or scenario-specific CSS positioning.

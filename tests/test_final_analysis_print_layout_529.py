@@ -16,10 +16,10 @@ def main() -> None:
     terminal = read("src/js/ui/babbage-terminal.js")
     bundle = read("runtime/js/promptcraft.bundle.js")
 
-    assert 'runtime/css/promptcraft.css?v=429&patch=543' in index
-    assert 'promptcraft.bundle.js?v=429&amp;patch=543&amp;receiver=84' in index
-    assert 'Version 429 · Patch 543' in index
-    assert 'DEV · 543' in index
+    assert 'runtime/css/promptcraft.css?v=429&patch=544' in index
+    assert 'promptcraft.bundle.js?v=429&amp;patch=544&amp;receiver=84' in index
+    assert 'Version 429 · Patch 544' in index
+    assert 'DEV · 544' in index
 
     for token in (
         "const criterionItems = selector =>",

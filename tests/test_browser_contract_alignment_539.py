@@ -22,8 +22,8 @@ def main() -> None:
     assessment = read("tests/test_s3_dragdrop.py")
     progress = read("tests/test_teaching_progress.py")
 
-    assert 'Version 429 · Patch 543' in index
-    assert 'DEV · 543' in index
+    assert 'Version 429 · Patch 544' in index
+    assert 'DEV · 544' in index
     assert 'Next: Learning Path Builder' in index
     assert 'data-pc-action="dev-fill-scenario" data-pc-scenario-index="2"' in index
     assert 'configured_chromium or playwright.chromium.executable_path' in runtime

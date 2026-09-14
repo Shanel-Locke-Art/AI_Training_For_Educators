@@ -118,7 +118,7 @@ src/css/
 
 ## Assets
 
-`assets/asset-manifest.json` is the canonical asset classification map. Current manifest version: `149`.
+`assets/asset-manifest.json` is the canonical asset classification map. Current manifest version: `150`.
 
 Major current asset groups:
 

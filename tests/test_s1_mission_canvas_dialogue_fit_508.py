@@ -24,7 +24,7 @@ def main() -> None:
     assert '[data-pc-character="eli"]' in css
     assert "object-fit: cover !important" not in css[css.index("/* V508"):]
 
-    assert "patch=543" in index
+    assert "patch=544" in index
     print("V508 S1 mission image and contained Canvas dialogue contract passed.")
 
 

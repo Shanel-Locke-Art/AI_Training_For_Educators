@@ -50,6 +50,7 @@ QUICK_CHECKS = (
     ("Patch 541 screenshot capture integrity", [sys.executable, "tests/test_screenshot_capture_integrity_541.py"]),
     ("Patch 542 scenario screenshot scope", [sys.executable, "tests/test_screenshot_scope_542.py"]),
     ("Patch 543 runtime capture stability", [sys.executable, "tests/test_runtime_capture_stability_543.py"]),
+    ("Patch 544 current Canvas asset paths", [sys.executable, "tests/test_current_canvas_asset_paths_544.py"]),
     ("S2 repair terminal contract", [sys.executable, "tests/test_s2_repair_terminal_flow.py"]),
     ("Dialogue cleanup", [sys.executable, "tests/test_dialogue_cleanup.py"]),
     ("GFC action borders", [sys.executable, "tests/test_gfc_action_borders.py"]),

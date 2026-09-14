@@ -72,6 +72,7 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 | `development/patch-541-screenshot-capture-integrity.md` | Screenshot asset loading, checkpoint focus, and duplicate-image integrity guards. |
 | `development/patch-542-scenario-screenshot-scope.md` | Separate scenario-opening overviews from centered activity checkpoints for reliable visual comparison. |
 | `development/patch-543-runtime-capture-stability.md` | Deterministic onboarding waits and the corrected 51-image visual-review inventory. |
+| `development/patch-544-current-scenario-assets.md` | Current S1-S4 Canvas evidence folders, normalized filenames, and runtime smartboard routing. |
 
 ## Source-of-truth hierarchy
 

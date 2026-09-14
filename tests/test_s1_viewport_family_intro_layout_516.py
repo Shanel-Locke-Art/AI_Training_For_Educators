@@ -38,8 +38,8 @@ def main() -> None:
         assert token in css
         assert token in runtime_css
 
-    assert 'patch=543' in index
-    assert 'DEV · 543' in index
+    assert 'patch=544' in index
+    assert 'DEV · 544' in index
     print('V517 viewport-family introduction layout contract passed.')
 
 

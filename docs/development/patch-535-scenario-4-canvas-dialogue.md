@@ -6,19 +6,21 @@ required by the module outcome.
 
 ## Canvas evidence contract
 
-The final screenshot integration will use three privacy-safe student-view
-captures from a sandbox course:
+The approved privacy-safe Canvas captures now live under
+`assets/images/scenes/scenario-04-96-percent-problem/canvas/`:
 
-1. `s4-maya-week4-assessments-student.png`: the expanded Week 4 module showing
-   the Canvas quiz and county planning assignment in context.
-2. `s4-maya-quiz-result-96-student.png`: the 96% Canvas quiz result with no
-   identifying student information.
-3. `s4-maya-county-planning-assignment-student.png`: the Canvas Assignment
-   showing the county brief, required submission evidence, and visible rubric.
+1. `s4-before-module.png`
+2. `s4-before-quiz.png`
+3. `s4-before-grade-96.png`
+4. `s4-after-module.png`
+5. `s4-after-brief.png`
+6. `s4-after-assignment.png`
+7. `s4-after-rubric.png`
+8. `s4-after-transfer.png`
 
-Canvas remains the learning and delivery environment. The activity teaches
-assessment alignment and evidence quality, not Canvas navigation. Screenshot
-assets are not added because the final captures do not yet exist.
+The runtime opening smartboard uses `s4-before-module.png`; the complete set is
+registered as current Scenario 4 Canvas evidence. The fictional 96% evidence uses
+Maya only and contains no real student identity.
 
 ## Dialogue ownership
 
