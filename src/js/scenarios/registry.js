@@ -162,8 +162,6 @@ function pcUnlockScenarioTab(index) {
 }
 
 const PC_SCENARIO_RENDERERS = Object.freeze({
-  'guided-builder': ({ container }) => renderGuidedBuilder(container),
-  'content-avalanche-preview': () => renderS1ContentAvalanchePreview(),
   'start-with-learning': () => renderS1StartWithLearning(),
   'metacognition-opening': ({ container }) => renderS2Standby(container),
   'assessment-opening': ({ container }) => renderS3Standby(container),

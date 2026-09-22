@@ -1,5 +1,14 @@
 # Scenario 1 Cleanup Log
 
+## 2026-09-22 — Dormant course-design prototype removal
+
+- Removed the unreachable `s1-course-design.js` and its dedicated CSS from this working package; their prototype tests and temporary archive were removed in the subsequent repository cleanup.
+- Removed both source files from the build manifests and regenerated the browser bundles. These files are no longer shipped to players.
+- Updated the Phase 2 route guard to assert the current `start-with-learning` renderer instead of the superseded evidence route.
+- Left the old Canvas evidence and guided builder modules in place because they still have references in shared code and old tests. Their dependency review and browser coverage are required before removal.
+- The uploaded baseline's broad check already had failures in superseded S1 expectations, stale CSS inventory, spreadsheet expectations, and static validation; a full passing release gate is not claimed.
+
+
 ## 2026-09-17 — Start With the Learning, exploration slice
 
 ### Removed

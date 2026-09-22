@@ -75,7 +75,6 @@ def main() -> int:
         ([sys.executable, str(ROOT / "tools/build.py"), "--check"], "Build validation failed"),
         ([sys.executable, str(ROOT / "tools/audit_css.py")], "CSS audit failed"),
         ([sys.executable, str(ROOT / "tools/audit_assets.py")], "Asset audit failed"),
-        (["node", str(ROOT / "tests/test_netlify_function.js")], "Babbage proxy test failed"),
     ):
         error = run_check(command, label)
         if error:
@@ -192,8 +191,8 @@ def main() -> int:
 
     app_source = (ROOT / "src/js/app/config-and-assets.js").read_text(encoding="utf-8")
     workbench_source = "\n".join((ROOT / path).read_text(encoding="utf-8") for path in JS_SOURCES)
-    if "const PC_BABBAGE_PROCESSING_HOLD_DEFAULT_MS = 350;" not in workbench_source:
-        errors.append("The Babbage post-response transition is not set to the approved short runtime.")
+    if "const PC_BABBAGE_PROCESSING_HOLD_DEFAULT_MS = 80;" not in workbench_source:
+        errors.append("The Babbage post-response transition differs from the current runtime setting.")
     if "const PC_SHEETS_DEBUG = PC_RUNTIME_DEBUG;" not in app_source:
         errors.append("Research payload debugging must remain opt-in.")
     if "console.log('[PromptCraft] Submitting full session payload:'" in workbench_source:

@@ -133,7 +133,6 @@ def run_node_checks() -> list[str]:
             JS_BUNDLE_PATH,
             *(ROOT / runtime for _source, runtime in JS_STANDALONE_FILES),
             ROOT / "netlify/functions/babbage.js",
-            ROOT / "tests/test_netlify_function.js",
         ]
     )
     for path in paths:

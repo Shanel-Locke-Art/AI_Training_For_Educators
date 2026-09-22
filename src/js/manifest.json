@@ -11,7 +11,6 @@
     "scenarios/s1-start-with-learning.js",
     "scenarios/shared-components.js",
     "scenarios/registry.js",
-    "scenarios/s1-course-design.js",
     "scenarios/s2-metacognition.js",
     "scenarios/s3-authentic-assessment.js",
     "ui/workstation-layout.js",
@@ -39,10 +38,6 @@
     }
   ],
   "retained_dormant_modules": [
-    {
-      "source": "scenarios/s1-course-design.js",
-      "reason": "Legacy prototype retained until live-path browser coverage is available."
-    },
     {
       "source": "scenarios/s1-engagement.js",
       "reason": "Legacy guided builder retained until scenario-runtime fallback branches are browser-verified."

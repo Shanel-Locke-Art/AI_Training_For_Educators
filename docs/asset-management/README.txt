@@ -27,7 +27,5 @@ decision; conditional lines with placeholders are not recordable as written.
 The scripts include proposed audio filenames for spoken lines. These names are
 not approved or present in the runtime until the voice tracker and game are updated.
 
-Older Jordan and Eli guides are retained under Legacy Recording Guides for
-historical reference. They are outside the current Scenario 1 recording queue.
 
 The trackers and guides describe PROMPTCRAFT_V429, Patch 575, and asset manifest v150. Do not create version-number copies for routine updates.
