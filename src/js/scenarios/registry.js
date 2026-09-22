@@ -282,6 +282,7 @@ function updateMainMenuHome() {
   const continueButton = document.getElementById('menuContinueBtn');
   const status = document.getElementById('mainMenuStatus');
   const closeButton = document.getElementById('mainMenuCloseBtn');
+  const guideButton = document.getElementById('menuCourseGuideBtn');
 
   if (continueButton) {
     continueButton.textContent = pcScenarioHasLaunched
@@ -297,6 +298,12 @@ function updateMainMenuHome() {
 
   if (closeButton) {
     closeButton.hidden = !pcScenarioHasLaunched;
+  }
+
+  if (guideButton) {
+    const guideAvailable = typeof pcHasSavedS1Guide === 'function' && pcHasSavedS1Guide();
+    guideButton.hidden = !guideAvailable;
+    guideButton.disabled = !guideAvailable;
   }
 }
 

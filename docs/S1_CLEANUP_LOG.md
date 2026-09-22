@@ -1,5 +1,15 @@
 # Scenario 1 Cleanup Log
 
+## 2026-09-22 — Patch 578 feedback, guide access, and research view
+
+- Corrected the My Course review so a valid live Babbage response is no longer replaced by the limited-input fallback.
+- Corrected the Step 1 guide renderer so it displays the calculated Babbage insight instead of discarding it.
+- Added visible `Live Babbage review` and `Built-in review` labels so the feedback source is clear.
+- Preserved the saved My Course feedback in the local guide and added a `My Course Guide` button to the main menu after a guide section has been saved.
+- Moved the personalized course critique ahead of the generic visual-module reference in the completed guide.
+- Simplified the S1 research projection from 13 columns to 11, combined guide status fields, converted technical values to readable labels, and froze only the first two identifying columns.
+- Confirmed the deployed Babbage proxy is configured and returns a specific structured response for deliberately weak course input.
+
 ## 2026-09-22 — Dormant course-design prototype removal
 
 - Removed the unreachable `s1-course-design.js` and its dedicated CSS from this working package; their prototype tests and temporary archive were removed in the subsequent repository cleanup.

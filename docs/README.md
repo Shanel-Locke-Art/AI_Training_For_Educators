@@ -1,6 +1,6 @@
 # PromptCraft production documents
 
-This folder accompanies `PROMPTCRAFT_V429`, browser patch `577`, research schema `V121`, receiver source `V89`, and asset manifest `v150`.
+This folder accompanies `PROMPTCRAFT_V429`, browser patch `578`, research schema `V121`, receiver source `V90`, and asset manifest `v150`.
 
 ## Scenario 1 production
 
@@ -18,6 +18,6 @@ This folder accompanies `PROMPTCRAFT_V429`, browser patch `577`, research schema
 - `development/css-architecture.md`: stylesheet ownership and cascade.
 - `development/gfc-visual-theme.md`: visual direction.
 - `development/s1-removal-audit.md`: remaining S1 legacy dependencies and verification boundary.
-- `development/receiver-v89-deployment.md`: receiver data mapping, workbook refresh/reset behavior, S1 diagnostic, and deployment check.
+- `development/receiver-v90-deployment.md`: receiver data mapping, workbook refresh/reset behavior, S1 diagnostic, and deployment check.
 
 Current source under `src/` and `assets/asset-manifest.json` take precedence over tracker notes or older labels. Research schema keys and internal scenario identifiers may retain historical names for compatibility; user-facing Scenario 1 is Start With the Learning.

@@ -1,5 +1,5 @@
 /**
- * PromptCraft Google Apps Script receiver — START WITH LEARNING V89
+ * PromptCraft Google Apps Script receiver — START WITH LEARNING V90
  *
  * Live job:
  *   1. Receive PromptCraft payloads.
@@ -14,7 +14,7 @@
  *   - inspectS1TrackingNow()    -> count received S1 event types without showing participant text.
  *   - verifyV84MigrationNow()  -> read-only row-count/header-fingerprint inventory for copied-workbook verification.
  *
- * V89 preserves every raw V121 column and lossless payload archive. The S1
+ * V90 preserves every raw V121 column and lossless payload archive. The S1
  * readable tab shows only Start With the Learning design checkpoints.
  * Destructive research reset remains disabled.
  */
@@ -52,7 +52,7 @@ const SCENARIO_TAB_COLORS = Object.freeze({
   5: '#8A4B2A', 6: '#475569', 7: '#5C3D73', 8: '#0F6A63'
 });
 
-const PROMPTCRAFT_RECEIVER_VERSION = 'V89';
+const PROMPTCRAFT_RECEIVER_VERSION = 'V90';
 const EXPECTED_APP_SCHEMA_VERSION = 'V121';
 const EXPECTED_APP_BUILD = 'PROMPTCRAFT_V429';
 const SPREADSHEET_ID = '';
@@ -160,7 +160,7 @@ const PromptCraftReceiver = (() => {
       timestamp: new Date().toISOString(),
       expected_app_schema: EXPECTED_APP_SCHEMA_VERSION,
       expected_app_build: EXPECTED_APP_BUILD,
-      workflow: 'V89 Start With the Learning projections + participant-safe views + lossless raw archives'
+      workflow: 'V90 Start With the Learning projections + participant-safe views + lossless raw archives'
     });
   }
 
@@ -294,6 +294,17 @@ const PromptCraftReceiver = (() => {
       current.setName(currentName);
     }
     older.forEach(sheet => sheet.hideSheet()); // Preserve old results and any manual cells.
+  }
+
+  function hideLegacyScenarioTabs_() {
+    const ss = getSpreadsheet_();
+    const currentNames = Object.keys(SHEET_SCENARIO_TABS).map(key => SHEET_SCENARIO_TABS[key]);
+    ss.getSheets().forEach(sheet => {
+      const name = sheet.getName();
+      if (/^0[2-9]\s*-\s*S[1-8]\b/i.test(name) && currentNames.indexOf(name) === -1) {
+        sheet.hideSheet();
+      }
+    });
   }
 
   function ensureChallengeSheet_() {
@@ -1027,13 +1038,17 @@ const PromptCraftReceiver = (() => {
       .setAllowInvalid(false)
       .setHelpText('Choose whether this candidate should appear on the public Ideas Wall.')
       .build();
-    const validationRows = Math.max(1, sheet.getMaxRows() - 1);
+    if (sheet.getMaxRows() > 1) {
+      // Remove validation left behind on blank rows by older receiver versions.
+      sheet.getRange(2, 8, sheet.getMaxRows() - 1, 1).clearDataValidations();
+    }
+    const validationRows = Math.max(1, sheet.getLastRow() - 1);
     sheet.getRange(2, 8, validationRows, 1).setDataValidation(validation);
   }
 
   function applyIdeasWallStatusFormatting_(sheet) {
-    const maxRows = Math.max(2, sheet.getMaxRows());
-    const range = sheet.getRange(2, 8, maxRows - 1, 1);
+    const rowCount = Math.max(1, sheet.getLastRow() - 1);
+    const range = sheet.getRange(2, 8, rowCount, 1);
     const rules = [
       SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo('Publish').setBackground('#DDF2E5').setFontColor('#155B36').setBold(true).setRanges([range]).build(),
       SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo('Needs Review').setBackground('#FFF3CD').setFontColor('#795500').setBold(true).setRanges([range]).build(),
@@ -1047,10 +1062,12 @@ const PromptCraftReceiver = (() => {
     ensureIdeaHeaders(sheet);
     coerceTimestampColumn_(sheet, 2);
     const lastRow = Math.max(sheet.getLastRow(), 2);
-    sheet.getRange('A:A').setNumberFormat(TIMESTAMP_FORMAT);
-    sheet.getRange('A:I').setWrap(false);
-    sheet.getRange('F:G').setWrap(true);
-    sheet.getRange('I:I').setWrap(true);
+    const bodyRows = Math.max(1, lastRow - 1);
+    if (sheet.getMaxRows() > 1) sheet.getRange(2, 1, sheet.getMaxRows() - 1, 9).clearFormat();
+    sheet.getRange(2, 1, bodyRows, 9).setWrap(false);
+    sheet.getRange(2, 1, bodyRows, 1).setNumberFormat(TIMESTAMP_FORMAT);
+    sheet.getRange(2, 6, bodyRows, 2).setWrap(true);
+    sheet.getRange(2, 9, bodyRows, 1).setWrap(true);
     sheet.getRange(1, 1, 1, 9).setFontWeight('bold').setBackground('#174C3A').setFontColor('#ffffff').setWrap(true).setHorizontalAlignment('center').setVerticalAlignment('middle');
     sheet.setRowHeight(1, 34);
     if (lastRow > 1) {
@@ -1133,6 +1150,11 @@ const PromptCraftReceiver = (() => {
     if (/evidence statement|flagged claim|corrected claim|verification note|self-report|what worked|what fell short|why prompt|surprise|transfer/.test(h)) {
       return { min: 190, max: 285, wrap: true, align: 'left', narrative: true };
     }
+    if (/renamed activities/.test(h)) return { min: 220, max: 300, wrap: true, align: 'left', narrative: true };
+    if (/learning path|prepare\s*\/\s*practice\s*\/\s*evidence/.test(h)) return { min: 260, max: 340, wrap: true, align: 'left', narrative: true };
+    if (/oscqr references/.test(h)) return { min: 280, max: 380, wrap: true, align: 'left', narrative: true };
+    if (/checkpoint feedback/.test(h)) return { min: 300, max: 400, wrap: true, align: 'left', narrative: true };
+    if (/guide step added|guide completed|guide progress/.test(h)) return { min: 150, max: 190, wrap: true, align: 'left' };
     if (/input|prompt|response|repair|revision|reflection|notes|growth narrative/.test(h)) return { min: 220, max: 320, wrap: true, align: 'left', narrative: true };
     if (/quality indicators/.test(h)) return { min: 180, max: 250, wrap: true, align: 'left' };
     if (/review source|provider|model|ai source/.test(h)) return { min: 125, max: 190, wrap: true, align: 'left' };
@@ -1193,9 +1215,21 @@ const PromptCraftReceiver = (() => {
     // Keep short rows compact while allowing wrapped excerpts enough room to display.
     // The excerpts already cap the amount of narrative shown in these research views,
     // so this upper bound prevents a single row from swallowing the sheet.
+    const headers = sheet.getRange(1, 1, 1, columnCount).getDisplayValues()[0];
+    const values = sheet.getRange(startRow, 1, rowCount, columnCount).getDisplayValues();
     for (let r = startRow; r < startRow + rowCount; r++) {
       const measured = sheet.getRowHeight(r);
-      const fitted = Math.max(30, Math.min(160, measured));
+      let estimatedLines = 1;
+      values[r - startRow].forEach((value, i) => {
+        const profile = getReadableColumnProfile_(headers[i]);
+        if (!profile.wrap || !value) return;
+        const charsPerLine = Math.max(12, Math.floor(sheet.getColumnWidth(i + 1) / 7.2));
+        const lines = String(value).split(/\r?\n/).reduce(
+          (sum, line) => sum + Math.max(1, Math.ceil(line.length / charsPerLine)), 0);
+        estimatedLines = Math.max(estimatedLines, lines);
+      });
+      const estimated = estimatedLines * 16 + 10;
+      const fitted = Math.max(30, Math.min(160, Math.max(measured, estimated)));
       if (fitted !== measured) sheet.setRowHeight(r, fitted);
     }
   }
@@ -1207,9 +1241,22 @@ const PromptCraftReceiver = (() => {
     // most responses are visible without opening the cell, while preventing an
     // unusually long response from turning one record into a multi-screen row.
     sheet.autoResizeRows(startRow, rowCount);
+    const columnCount = sheet.getLastColumn();
+    const headers = sheet.getRange(1, 1, 1, columnCount).getDisplayValues()[0];
+    const values = sheet.getRange(startRow, 1, rowCount, columnCount).getDisplayValues();
     for (let r = startRow; r < startRow + rowCount; r++) {
       const measured = sheet.getRowHeight(r);
-      const fitted = Math.max(30, Math.min(420, measured));
+      let estimatedLines = 1;
+      values[r - startRow].forEach((value, i) => {
+        const profile = getReadableColumnProfile_(headers[i]);
+        if (!profile.wrap || !value) return;
+        const charsPerLine = Math.max(12, Math.floor(sheet.getColumnWidth(i + 1) / 7.2));
+        const lines = String(value).split(/\r?\n/).reduce(
+          (sum, line) => sum + Math.max(1, Math.ceil(line.length / charsPerLine)), 0);
+        estimatedLines = Math.max(estimatedLines, lines);
+      });
+      const estimated = estimatedLines * 16 + 10;
+      const fitted = Math.max(30, Math.min(420, Math.max(measured, estimated)));
       if (fitted !== measured) sheet.setRowHeight(r, fitted);
     }
   }
@@ -1383,7 +1430,7 @@ const PromptCraftReceiver = (() => {
     }
     headers.forEach((h, i) => formatReadableColumn_(sheet, i + 1, h, 2, rowCount + 1));
     fitReadableDataRows_(sheet, 2, rowCount, headers.length);
-    sheet.getRange('A:A').setNumberFormat(TIMESTAMP_FORMAT);
+    sheet.getRange(2, 1, Math.max(rowCount, 1), 1).setNumberFormat(TIMESTAMP_FORMAT);
   }
 
   function cleanIdeasWallForResearch_() {
@@ -1425,6 +1472,7 @@ const PromptCraftReceiver = (() => {
 
   function organizeResearchTabs_() {
     const ss = getSpreadsheet_();
+    hideLegacyScenarioTabs_();
     const visible = [[SHEET_OVERVIEW, '#163F33'], [SHEET_SESSIONS, '#215C45']];
     Object.keys(SHEET_SCENARIO_TABS).forEach(n => {
       const sheet = getSheet_(SHEET_SCENARIO_TABS[n]);
@@ -1446,7 +1494,7 @@ const PromptCraftReceiver = (() => {
       moveSheetToPosition_(sheet, i + 1);
     });
 
-    [SHEET_RAW_ARCHIVE, SHEET_RESPONSES, SHEET_INCREMENTAL, SHEET_RAW_AUDIT].forEach(name => {
+    [SHEET_CHALLENGE, SHEET_RAW_ARCHIVE, SHEET_RESPONSES, SHEET_INCREMENTAL, SHEET_RAW_AUDIT].forEach(name => {
       const sh = getSheet_(name);
       sh.setTabColor('#9CA3AF');
       sh.hideSheet();
@@ -1456,19 +1504,20 @@ const PromptCraftReceiver = (() => {
 
   function applyParticipantIdColumnWidths_() {
     [
-      [getSheet_(SHEET_INCREMENTAL), 2, 'B:B'],
-      [getSheet_(SHEET_RESPONSES), 2, 'B:B'],
-      [getSheet_(SHEET_IDEAS), 2, 'B:B'],
-      [getSheet_(SHEET_RAW_AUDIT), 6, 'F:F']
+      [getSheet_(SHEET_INCREMENTAL), 2],
+      [getSheet_(SHEET_RESPONSES), 2],
+      [getSheet_(SHEET_IDEAS), 2],
+      [getSheet_(SHEET_RAW_AUDIT), 6]
     ].forEach(item => {
       const sheet = item[0];
       const col = item[1];
       sheet.autoResizeColumn(col);
       clampColumnWidth_(sheet, col, 220, 320);
-      sheet.getRange(item[2]).setWrap(false);
+      sheet.getRange(2, col, Math.max(1, sheet.getLastRow() - 1), 1).setWrap(false);
     });
-    getSheet_(SHEET_INCREMENTAL).getRange('C:C').setWrap(false);
-    getSheet_(SHEET_RESPONSES).getRange('C:C').setWrap(false);
+    [getSheet_(SHEET_INCREMENTAL), getSheet_(SHEET_RESPONSES)].forEach(sheet => {
+      sheet.getRange(2, 3, Math.max(1, sheet.getLastRow() - 1), 1).setWrap(false);
+    });
   }
 
   function isNumeric_(value) {
@@ -1997,7 +2046,7 @@ const PromptCraftReceiver = (() => {
 
   function scenarioTabHeaders_(scenario) {
     const map = {
-      1: ['Timestamp','Participant ID','Session ID','Design Checkpoints','Best S1 Score (0–5)','Renamed Activities','Prepare / Practice / Evidence','Alignment Diagnosis','Guide Step Added','My Course Guide Completed','Number of Course Activities','Guide OSCQR References','Latest Checkpoint Feedback'],
+      1: ['Timestamp','Participant ID','Session ID','Checkpoints','Best S1 Score (0–5)','Renamed Activities','Learning Path','Alignment Diagnosis','Guide Progress','Guide OSCQR References','Latest Checkpoint Feedback'],
       2: ['Timestamp','Participant ID','Session ID','Attempts','Best Score','Activity Inputs','Diagnosis','Intervention','Thinking Move','Audit Choice','Audit Correct','Repair / Revised Reflection','AI Review Source','AI Provider','AI Model','Babbage Review','Quality Indicators'],
       3: ['Timestamp','Participant ID','Session ID','Attempts','Best Score','Assessment Inputs','Diagnosis','Evidence Choice','Audit Choice','Audit Correct','Repair / Revision','Evidence Statement','Babbage Response','Quality Indicators','AI Source'],
       4: ['Timestamp','Participant ID','Session ID','Attempts','Best Score','Course Inputs','Diagnosis','Function Choice','Audit Choice','Audit Correct','Async Repair','Evidence Statement','Babbage Response','Quality Indicators','AI Source'],
@@ -2034,20 +2083,28 @@ const PromptCraftReceiver = (() => {
           Object.assign(learningPath, parseJsonMaybe_(eventDetail.s1_learning_path_json, {}) || {});
           if (eventDetail.s1_oscqr_standards) oscqr = eventDetail.s1_oscqr_standards;
         });
-        const renamed = Array.isArray(learningPath.renamedTitles) ? learningPath.renamedTitles.join(' | ') : '';
+        const renamedTitles = Array.isArray(learningPath.renamedTitles) ? learningPath.renamedTitles : [];
+        const renamed = renamedTitles.join('\n');
         const organization = learningPath.organization && typeof learningPath.organization === 'object'
-          ? Object.keys(learningPath.organization).map(key => key + ': ' + learningPath.organization[key]).join(' | ')
+          ? Object.keys(learningPath.organization).map((key, index) => {
+            const fallbackTitle = String(key || '').replace(/[-_]+/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase());
+            const title = renamedTitles[index] || fallbackTitle;
+            const purpose = String(learningPath.organization[key] || '').replace(/\b\w/g, letter => letter.toUpperCase());
+            return title + ': ' + purpose;
+          }).join('\n')
           : '';
+        const guideProgress = [];
+        if (learningPath.guideStepAdded) guideProgress.push('Step 1 added');
+        if (record.list.some(event => event.eventType === 's1_course_guide_complete')) guideProgress.push('Guide completed');
+        if (learningPath.activityCount !== undefined) guideProgress.push(`${learningPath.activityCount} course activities`);
         rows.push([latest.timestamp,latest.participant,record.session,
           maxResearchNumber_(record.list.map(event => event.attempts)),
           maxResearchNumber_(record.list.map(event => event.bestScore)),
           fullTextForView_(renamed, 620),
           fullTextForView_(organization, 620),
-          learningPath.diagnosisChoice || '',
-          learningPath.guideStepAdded ? 'Yes' : '',
-          record.list.some(event => event.eventType === 's1_course_guide_complete') ? 'Yes' : '',
-          learningPath.activityCount === undefined ? '' : learningPath.activityCount,
-          fullTextForView_(oscqr || latest.quality, 760),
+          String(learningPath.diagnosisChoice || '').replace(/[-_]+/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase()),
+          guideProgress.join('\n'),
+          fullTextForView_(String(oscqr || latest.quality || '').replace(/\s*\|\s*/g, '\n'), 760),
           fullTextForView_(latest.response, 720)]);
       }
 
@@ -2228,7 +2285,7 @@ const PromptCraftReceiver = (() => {
     const headers = data.headers.length ? data.headers : ['Timestamp','Participant ID','Session ID','Attempts','Best Score'];
     const rows = data.rows;
     if (rows.length) sheet.getRange(2, 1, rows.length, headers.length).setValues(rows.map(safeResearchRow_));
-    formatSimpleResearchTable_(sheet, headers, rows.length, 3, SCENARIO_TAB_COLORS[scenario] || '#2E6A4E');
+    formatSimpleResearchTable_(sheet, headers, rows.length, scenario === 1 ? 2 : 3, SCENARIO_TAB_COLORS[scenario] || '#2E6A4E');
     fitScenarioDataRows_(sheet, 2, rows.length);
     sheet.setTabColor(SCENARIO_TAB_COLORS[scenario] || '#2E6A4E');
     applyAiSourceRules_(sheet, headers, rows.length);
@@ -2347,6 +2404,8 @@ const PromptCraftReceiver = (() => {
       if (scenario >= 3 && scenario <= 5) fallbackFormula = `=COUNTIF('${tab}'!O2:O,"*fallback*")`;
       sheet.getRange(r, 6).setFormula(fallbackFormula);
     });
+    sheet.getRange('A12:B19').setWrap(true).setVerticalAlignment('middle');
+    for (let row = 12; row <= 19; row++) sheet.setRowHeight(row, 34);
     sheet.getRange('C12:C19').setNumberFormat('0'); sheet.getRange('D12:E19').setNumberFormat('0.0'); sheet.getRange('F12:F19').setNumberFormat('0');
 
     sheet.getRange('A21:F22').merge().setValue(
@@ -2355,27 +2414,29 @@ const PromptCraftReceiver = (() => {
 
     sheet.getRange('D24:E29').setValues([
       ['Deployment health','Value'],
-      ['Script in editor',PROMPTCRAFT_RECEIVER_VERSION],
-      ['Latest receiver seen',''],
-      ['Latest app build seen',''],
+      ['Receiver code',PROMPTCRAFT_RECEIVER_VERSION],
+      ['Receiver on last saved event',''],
+      ['App build on last saved event',''],
       ['Expected app build',EXPECTED_APP_BUILD],
-      ['Deployment status','']
+      ['Data status','']
     ]);
     sheet.getRange('D24:E24').setBackground('#475569').setFontColor('#FFFFFF').setFontWeight('bold').setHorizontalAlignment('center');
+    sheet.getRange('D25:E29').setWrap(true).setVerticalAlignment('middle');
+    for (let row = 25; row <= 29; row++) sheet.setRowHeight(row, 32);
     sheet.getRange('E26').setFormula("=IFERROR('99 - Raw Audit'!B2,\"No payload yet\")");
     sheet.getRange('E27').setFormula("=IFERROR('99 - Raw Audit'!D2,\"No payload yet\")");
-    sheet.getRange('E29').setFormula(`=IF(E26="${PROMPTCRAFT_RECEIVER_VERSION}","CURRENT","DEPLOYMENT MISMATCH")`);
+    sheet.getRange('E29').setFormula(`=IF(E26="${PROMPTCRAFT_RECEIVER_VERSION}","Current","Waiting for ${PROMPTCRAFT_RECEIVER_VERSION} event")`);
     sheet.getRange('D25:E29').setBackground('#F7F9F8');
     const statusRange = sheet.getRange('E29');
     const rules = sheet.getConditionalFormatRules();
     rules.push(
-      SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo('CURRENT').setBackground('#DDF2E5').setFontColor('#155B36').setBold(true).setRanges([statusRange]).build(),
-      SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo('DEPLOYMENT MISMATCH').setBackground('#FFF0CC').setFontColor('#7A4A00').setBold(true).setRanges([statusRange]).build()
+      SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo('Current').setBackground('#DDF2E5').setFontColor('#155B36').setBold(true).setRanges([statusRange]).build(),
+      SpreadsheetApp.newConditionalFormatRule().whenTextContains('Waiting for').setBackground('#FFF0CC').setFontColor('#7A4A00').setBold(true).setRanges([statusRange]).build()
     );
     sheet.setConditionalFormatRules(rules);
 
-    sheet.setColumnWidth(1, 185); sheet.setColumnWidth(2, 360); sheet.setColumnWidth(3, 105);
-    sheet.setColumnWidth(4, 185); sheet.setColumnWidth(5, 150); sheet.setColumnWidth(6, 115); sheet.setColumnWidth(7, 24);
+    sheet.setColumnWidth(1, 230); sheet.setColumnWidth(2, 300); sheet.setColumnWidth(3, 95);
+    sheet.setColumnWidth(4, 190); sheet.setColumnWidth(5, 185); sheet.setColumnWidth(6, 100); sheet.setColumnWidth(7, 24);
     sheet.setFrozenRows(1);
     sheet.setTabColor('#163F33');
   }
@@ -2412,7 +2473,8 @@ const PromptCraftReceiver = (() => {
     SpreadsheetApp.flush();
     return jsonResponse({
       status: 'ok',
-      receiver_schema: 'V84 readable projections + lossless raw archive',
+      research_schema: EXPECTED_SCHEMA,
+      receiver_workflow: 'Start With the Learning readable views + lossless raw archive',
       counts: counts,
       message: 'Readable tabs rebuilt from retained raw records. Current S1 guide checkpoints are excluded from automatic Ideas Wall candidacy.'
     });
@@ -2475,7 +2537,8 @@ const PromptCraftReceiver = (() => {
     SpreadsheetApp.flush();
     return jsonResponse({
       status: 'ok',
-      receiver_schema: 'V84 readable projections + lossless raw archive',
+      research_schema: EXPECTED_SCHEMA,
+      receiver_workflow: 'Start With the Learning readable views + lossless raw archive',
       counts: counts,
       consolidated: consolidated,
       message: 'Readable research tabs rebuilt, empty future tabs hidden, and older S1 derived tab aligned to the current name. V121 raw rows were preserved.'
@@ -2483,7 +2546,7 @@ const PromptCraftReceiver = (() => {
   }
 
   function resetResearchDataNow() {
-    throw new Error('Research reset is disabled in V89 because it would erase collected records. Use refreshResearchViewsNow() to rebuild display tabs from raw data.');
+    throw new Error('Research reset is disabled in V90 because it would erase collected records. Use refreshResearchViewsNow() to rebuild display tabs from raw data.');
   }
 
   function bytesToHex_(bytes) {

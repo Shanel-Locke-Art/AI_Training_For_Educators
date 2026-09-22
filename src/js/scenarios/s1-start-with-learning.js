@@ -871,6 +871,7 @@ function pcGetS1GuideStep1Insight(response, input) {
     ? review.suggestions[0]
     : 'Your placements match the suggested Prepare → Practice → Evidence learning path.';
   const fallback = {
+    source: 'fallback',
     summary: review.mismatches.length
       ? `Your clearer titles improve scanning, but ${review.mismatches.length} ${review.mismatches.length === 1 ? 'placement still needs' : 'placements still need'} another look before the learning path is fully coherent.`
       : 'Your revised titles and placements create a clear, visible learning path from preparation to practice to evidence.',
@@ -889,6 +890,7 @@ function pcGetS1GuideStep1Insight(response, input) {
   if (!a || typeof a !== 'object') return fallback;
   const worked = Array.isArray(a.what_worked) ? a.what_worked.map(item => String(item || '').trim()).filter(Boolean).slice(0, 3) : [];
   return {
+    source: response?.mock || response?.provider === 'local-fallback' ? 'fallback' : 'live',
     summary: String(a.feedback_summary || '').trim() || fallback.summary,
     strengths: worked.length ? worked : fallback.strengths,
     watchFor: review.mismatches.length ? mismatchText : (String(a.recommended_repair || a.issue_detected || '').trim() || fallback.watchFor),
@@ -897,8 +899,18 @@ function pcGetS1GuideStep1Insight(response, input) {
 }
 
 function pcRenderS1GuideInsight(insight) {
-  void insight;
+  const result = insight && typeof insight === 'object' ? insight : {};
+  const strengths = Array.isArray(result.strengths) ? result.strengths.filter(Boolean) : [];
+  const sourceLabel = result.source === 'live' ? 'Live Babbage review' : 'Built-in review';
   return `
+    <article class="pc-s1-my-course-findings pc-s1-guide-personalized-feedback">
+      <span class="pc-s1-result-eyebrow">${sourceLabel}</span>
+      <h3>Feedback on the learning path you built</h3>
+      <p>${esc(result.summary || 'Review the activity titles and placements against the purpose of each activity.')}</p>
+      ${strengths.length ? `<ul>${strengths.map(item => `<li>${esc(item)}</li>`).join('')}</ul>` : ''}
+      <div class="pc-s1-my-course-next-check"><h3>Check next</h3><p>${esc(result.watchFor || 'Confirm that each activity appears where students will expect to use it.')}</p></div>
+      ${result.impact ? `<p><strong>Likely student impact:</strong> ${esc(result.impact)}</p>` : ''}
+    </article>
     <div class="pc-s1-guide-reference-grid">
       <section>
         <span class="pc-s1-result-eyebrow">Prepare</span>
@@ -1000,6 +1012,7 @@ async function pcGenerateS1GuideStep1() {
   let response = {};
   try {
     response = await requestBabbageAnalysis({
+      analysis_type: 'scenario1',
       system: `You are Babbage, PromptCraft's course-guide editor. Using only the supplied revised activity titles and Prepare / Practice / Evidence placements, evaluate navigation and organization only. Be specific about the learner's actual placements. For this example, reading, video, and vocabulary are best treated as Prepare, discussion as Practice, and the quiz as Evidence. If a placement differs, state what should be reconsidered rather than treating every arrangement as equally successful. Keep feedback concise. In the normal structured response, use feedback_summary for a 1-2 sentence overview, what_worked for up to three concrete strengths, recommended_repair for one practical thing to keep checking, and expected_impact for the likely student-facing effect. Do not evaluate the later instructor-intent alignment problem yet. Do not invent course facts.`,
       messages: [{ role: 'user', content: JSON.stringify(input, null, 2) }]
     }, 'main');
@@ -1471,6 +1484,7 @@ function pcSaveS1MyCourseIntent(form) {
 function pcGetS1MyCourseFeedback(response, data) {
   const activityCount = data.activities.filter(Boolean).length;
   const structured = response?.structured && typeof response.structured === 'object' ? response.structured : {};
+  const hasLiveAnalysis = !response?.mock && response?.provider !== 'local-fallback' && Object.keys(structured).length > 0;
   const worked = Array.isArray(structured.what_worked) ? structured.what_worked.map(item => String(item || '').trim()).filter(Boolean).slice(0, 3) : [];
   const intent = String(data.intendedLearning || '').trim();
   const activities = data.activities.filter(Boolean).map(item => String(item).trim());
@@ -1489,7 +1503,11 @@ function pcGetS1MyCourseFeedback(response, data) {
     if (/read|chapter|article|case/.test(lower)) return `For “${title},” include the topic and the purpose for reading so students know how it prepares them.`;
     return `For “${title},” replace the generic label with the task, topic, and expected result students will recognize in Canvas.`;
   });
-  if (limitedInput) return {
+  const aiConcerns = Array.isArray(structured?.input_quality?.concerns)
+    ? structured.input_quality.concerns.map(item => String(item || '').trim()).filter(Boolean)
+    : [];
+  if (limitedInput && !hasLiveAnalysis) return {
+    source: 'fallback',
     clear: navigationOnly
       ? 'These entries describe ways to navigate the course. I cannot identify a learning task, practice opportunity, or evidence of learning from them.'
       : 'I cannot judge the learning path from these entries yet. The intended learning or the activity names need more detail.',
@@ -1505,11 +1523,12 @@ function pcGetS1MyCourseFeedback(response, data) {
       : ['Replace test text with the real topic and student task.', 'Describe what students will do during practice.', 'Name what students will produce to show their learning.']
   };
   return {
+    source: hasLiveAnalysis ? 'live' : 'fallback',
     clear: String(structured.feedback_summary || '').trim() || `You named the module and listed ${activityCount} activities. Their titles alone do not establish alignment.`,
     worked: worked.length ? worked : [`Your intended learning states: ${intent}`, `${activityCount} activity titles are available to inspect.`],
     unknown: String(structured.issue_detected || '').trim() || 'Activity titles alone cannot show whether students practice the intended performance or produce evidence of it.',
     next: String(structured.recommended_repair || '').trim() || 'Inspect the instructions and student work for each activity. Then compare the evidence students produce with the intended learning.',
-    improvementIdeas
+    improvementIdeas: [...aiConcerns, ...improvementIdeas].filter((item, index, list) => list.indexOf(item) === index).slice(0, 4)
   };
 }
 
@@ -1545,6 +1564,7 @@ async function pcReviewS1MyCourse(form) {
   let response = {};
   try {
     response = await requestBabbageAnalysis({
+      analysis_type: 'scenario1',
       system: `You are Babbage, PromptCraft's instructional-design review partner. Review only the faculty member's supplied module title, intended learning statement, and current activity titles. Respond to their actual wording. In the structured response, use feedback_summary for a short overview, what_worked for up to three specific observations, issue_detected for what cannot yet be established from titles, and recommended_repair for one practical, specific improvement tied to their activities. Do not invent course facts. Do not rewrite the course. Focus on navigation, activity purpose, and whether preparation, practice, and evidence support the intended learning.`,
       messages: [{ role: 'user', content: JSON.stringify(data, null, 2) }]
     }, 'main');
@@ -1577,7 +1597,7 @@ function pcRenderS1MyCourseFeedback() {
           <nav class="pc-s1-my-course-review-links" aria-label="Jump to a course guidance section"><button type="button" data-pc-action="s1-learning-review-section" data-pc-review-section="pcS1ReviewFeedback">Babbage feedback</button><button type="button" data-pc-action="s1-learning-review-section" data-pc-review-section="pcS1ReviewImprovements">Activity suggestions</button><button type="button" data-pc-action="s1-learning-review-section" data-pc-review-section="pcS1ReviewPattern">Module pattern</button></nav>
           <div class="pc-s1-my-course-review-body">
             <article class="pc-s1-my-course-review-page">
-              <span class="pc-s1-result-eyebrow">Babbage review</span>
+              <span class="pc-s1-result-eyebrow">${feedback.source === 'live' ? 'Live Babbage review' : 'Built-in review'}</span>
               <h2 id="pcS1ReviewFeedback">Set up ${esc(data.moduleTitle || 'your module')} around the learning students must demonstrate</h2>
               <section><h3>What is already clear</h3><ul>${feedback.worked.map(item => `<li>${esc(item)}</li>`).join('')}</ul></section>
               <section><h3>What the activity titles cannot confirm</h3><p>${esc(feedback.unknown)}</p></section>
@@ -1607,6 +1627,7 @@ function pcAddS1MyCourseReviewToGuide() {
     intendedLearning: data.intendedLearning,
     activities: data.activities.filter(Boolean),
     feedback,
+    source: feedback.source,
     addedAt: new Date().toISOString()
   };
   pcSaveS1Guide();
@@ -1636,8 +1657,13 @@ function pcRenderS1FullGuide() {
   pcS1LearningState.view = 'full-guide';
   const area = document.getElementById('chat');
   if (!area) return false;
-  const course = pcS1LearningState.myCourse;
-  const feedback = pcGetS1MyCourseFeedback(pcS1LearningState.myCourseBabbageResponse, course);
+  const savedReview = pcS1LearningState.guide?.myCourseReview;
+  const course = savedReview?.added ? {
+    moduleTitle: savedReview.moduleTitle || '',
+    intendedLearning: savedReview.intendedLearning || '',
+    activities: Array.isArray(savedReview.activities) ? savedReview.activities : []
+  } : pcS1LearningState.myCourse;
+  const feedback = savedReview?.feedback || pcGetS1MyCourseFeedback(pcS1LearningState.myCourseBabbageResponse, course);
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
   area.innerHTML = `
     <section class="pc-s1-learning pc-scenario-stage pc-s1-full-guide" role="region" aria-labelledby="pcS1FullGuideTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
@@ -1645,8 +1671,8 @@ function pcRenderS1FullGuide() {
       <div class="pc-s1-guide-paper pc-s1-full-guide-paper">
         <header class="pc-s1-guide-paper-header"><span>My PromptCraft Course Guide</span><h2>Make the path visible, then check the evidence</h2><p>Use this page when building or revising a Canvas module.</p></header>
         <section class="pc-s1-guide-section"><span class="pc-s1-result-eyebrow">Start here</span><h3>Choose headers by learning purpose</h3><p>Begin with the learning students need to do, then group the activities that prepare them, let them practice, and provide evidence.</p>${pcRenderS1GuideInsight(pcS1LearningState.guide?.step1?.personalizedInsight)}</section>
+        <section class="pc-s1-guide-section pc-s1-full-guide-personal"><span class="pc-s1-result-eyebrow">${feedback.source === 'live' ? 'Live Babbage suggestions for your course' : 'Built-in course review'}</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>${esc(feedback.clear || '')}</p><p><strong>Intended learning:</strong> ${esc(course.intendedLearning)}</p><section class="pc-s1-my-course-findings"><h3>What is clear</h3><ul>${(feedback.worked || []).map(item => `<li>${esc(item)}</li>`).join('')}</ul></section><section class="pc-s1-my-course-findings"><h3>What needs inspection</h3><p>${esc(feedback.unknown || '')}</p></section><div class="pc-s1-full-guide-tips">${(feedback.improvementIdeas || []).map((tip, index) => `<article><span>${index + 1}</span><p>${esc(tip)}</p></article>`).join('')}</div><div class="pc-s1-my-course-next-check"><h3>Next check</h3><p>${esc(feedback.next || '')}</p></div></section>
         <section class="pc-s1-guide-section"><span class="pc-s1-result-eyebrow">Your visual module</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>This draft groups activities only when their titles show a clear purpose. Review every placement against your actual instructions; items with an unclear purpose need your decision.</p><div class="pc-s1-full-guide-module" aria-label="Visual example of the teacher's Canvas module">${pcRenderS1MyCourseMiniModule(course)}</div></section>
-        <section class="pc-s1-guide-section pc-s1-full-guide-personal"><span class="pc-s1-result-eyebrow">Babbage suggestions for your course</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p><strong>Intended learning:</strong> ${esc(course.intendedLearning)}</p><div class="pc-s1-full-guide-tips">${feedback.improvementIdeas.map((tip, index) => `<article><span>${index + 1}</span><p>${esc(tip)}</p></article>`).join('')}</div><div class="pc-s1-my-course-next-check"><h3>Next check</h3><p>${esc(feedback.next)}</p></div></section>
         ${pcRenderS1WeeklyModulePattern()}
         ${pcRenderS1OSCQRStandards()}
         <section class="pc-s1-guide-section pc-s1-guide-tip-grid"><div><h3>Canvas build checklist</h3><ul><li>Name each item for the task students will open or complete.</li><li>Use short headers to show preparation, practice, and evidence.</li><li>Check the instructions and criteria, not only the activity titles.</li></ul></div><div><h3>Use AI effectively</h3><ul><li>Give AI your real titles and intended learning.</li><li>Ask for specific improvements instead of a generic course rewrite.</li><li>Verify every suggestion against your teaching intent and student needs.</li></ul></div></section>
@@ -1826,6 +1852,20 @@ function pcScrollS1ReviewSection(sectionId) {
   return true;
 }
 
+function pcHasSavedS1Guide() {
+  const guide = pcLoadS1Guide();
+  return Boolean(guide?.step1?.added || guide?.myCourseReview?.added);
+}
+
+function pcOpenSavedS1Guide() {
+  pcS1LearningState.guide = pcLoadS1Guide();
+  if (!pcHasSavedS1Guide()) return false;
+  if (typeof closeMainMenu === 'function') closeMainMenu({ force: true });
+  return pcS1LearningState.guide?.myCourseReview?.added
+    ? pcRenderS1FullGuide()
+    : pcRenderS1GuideStep1();
+}
+
 pcRegisterUIActions({
   's1-learning-open-item': target => pcOpenS1LearningItem(target.dataset.pcItemIndex),
   's1-learning-show-module': () => pcShowS1LearningModule(),
@@ -1851,7 +1891,8 @@ pcRegisterUIActions({
   's1-my-course-save-focus': form => pcSaveS1MyCourseFocus(form),
   's1-my-course-save-intent': form => pcSaveS1MyCourseIntent(form),
   's1-my-course-review': form => pcReviewS1MyCourse(form),
+  'open-saved-course-guide': () => pcOpenSavedS1Guide(),
   's1-learning-prevent-link': () => false
 });
 
-pcExposeGlobals({ renderS1StartWithLearning, pcOpenS1LearningItem, pcShowS1LearningModule, pcStartS1Rename, pcStartS1Organize, pcRenderS1RevisedModuleOverview, pcRenderS1GuideStep1, pcGenerateS1GuideStep1, pcRenderS1Diagnosis, pcRenderS1DiagnosisResult, pcRenderS1MyCourseStep, pcRenderS1MyCourseFeedback, pcFillS1StartLearningDev });
+pcExposeGlobals({ renderS1StartWithLearning, pcOpenS1LearningItem, pcShowS1LearningModule, pcStartS1Rename, pcStartS1Organize, pcRenderS1RevisedModuleOverview, pcRenderS1GuideStep1, pcGenerateS1GuideStep1, pcRenderS1Diagnosis, pcRenderS1DiagnosisResult, pcRenderS1MyCourseStep, pcRenderS1MyCourseFeedback, pcFillS1StartLearningDev, pcHasSavedS1Guide, pcOpenSavedS1Guide });
