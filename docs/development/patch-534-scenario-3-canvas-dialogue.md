@@ -6,18 +6,17 @@ handoffs consistently reference the planned Canvas evidence.
 
 ## Canvas evidence contract
 
-The approved privacy-safe Canvas captures now live under
-`assets/images/scenes/scenario-03-confident-student/canvas/`:
+The final screenshot integration will use two privacy-safe captures from a
+sandbox course:
 
-1. `s3-before-module.png`
-2. `s3-before-reflect.png`
-3. `s3-after-module.png`
-4. `s3-after-reflect.png`
-5. `s3-after-evidence-check.png`
-6. `s3-after-feedback.png`
+1. `s3-jordan-week4-module-student.png`: an expanded student-view Week 4 module
+   containing an overview, reading, practice check, graded quiz, and reflection.
+2. `s3-jordan-quiz-result-84-student.png`: a student-view 84% quiz result with
+   no identifying student information.
 
-The runtime opening smartboard uses `s3-before-module.png`; the remaining files are
-registered as current Scenario 3 Canvas evidence for subsequent activity views.
+The dialogue intentionally describes only details required by this capture
+plan. It does not provide Canvas navigation instructions. Screenshot assets are
+not added in this patch because the final captures do not yet exist.
 
 ## Dialogue ownership
 

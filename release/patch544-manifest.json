@@ -1,0 +1,20 @@
+{
+  "patch": 544,
+  "scope": "Scenario 1 Start With the Learning - exploration slice",
+  "application_contract": "PROMPTCRAFT_V429",
+  "research_schema": "V121",
+  "changed_files": [
+    "index.html",
+    "src/js/manifest.json",
+    "src/css/manifest.css",
+    "src/js/scenarios/registry.js",
+    "src/js/app/scenario-runtime.js",
+    "src/js/scenarios/s1-start-with-learning.js",
+    "src/css/scenarios/s1-start-with-learning.css",
+    "runtime/js/promptcraft.bundle.js",
+    "runtime/css/promptcraft.css",
+    "tests/test_s1_start_with_learning_544.py",
+    "docs/S1_CLEANUP_LOG.md",
+    "release/patch544-manifest.json"
+  ]
+}

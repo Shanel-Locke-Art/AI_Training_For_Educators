@@ -34,7 +34,7 @@ def main() -> None:
         "function awardS1PracticeXP",
         "function awardS1TransferXP",
         "function pcGetLevelProgressSnapshot",
-        "Math.round((s1RawScore / 17) * 50)",
+        "? s1RawScore",
     ):
         assert token in progress
 
@@ -51,8 +51,8 @@ def main() -> None:
     assert "Your Level bar is now" not in shared
     assert "You earned ${" not in shared
 
-    assert "patch=544" in index
-    assert "DEV · 544" in index
+    assert "patch=575" in index
+    assert "DEV · 575" in index
     print("V517 scrollable evidence and Pixel progress feedback contract passed.")
 
 

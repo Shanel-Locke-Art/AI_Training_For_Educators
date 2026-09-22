@@ -1,9 +1,12 @@
-# Eli reference sketches
+# Eli visual assets
 
-Expected here, per `assets/asset-manifest.json`
-(`development_reference_images`):
+## Status
 
-- `concept-sheet.png` — early sketches / generated references for Eli,
-  kept separate from the production portraits one level up so they're
-  never confused with final art (same pattern as Jordan's and Maya's
-  `references/` folders).
+Reference material only. Do not use these files as production portraits without visual review and an explicit manifest change.
+
+## File rules
+
+- Use transparent PNG files for final portraits.
+- Use the standard expression names when they fit: `neutral`, `thinking`, `uncertain`, `frustrated`, and `confident`.
+- Keep concept sheets and generated source references in `references/`.
+- Check phone, tablet, and desktop framing before registering a portrait for runtime use.

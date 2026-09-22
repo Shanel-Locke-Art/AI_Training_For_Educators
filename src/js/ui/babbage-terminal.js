@@ -615,8 +615,8 @@ function showBabbageFinalResponseInTerminal(responseText, mock = false, onClose 
       : responseText;
     pcScheduleScenarioTask(() => {
       showBabbageConsultResult(terminalOutput, mock, effectiveClose, mockReason);
-    }, Math.min(180, babbageProcessingHoldMs), resultScenario);
-  }, Math.min(180, babbageProcessingHoldMs), resultScenario);
+    }, Math.min(80, babbageProcessingHoldMs), resultScenario);
+  }, Math.min(80, babbageProcessingHoldMs), resultScenario);
 }
 
 // NOTE: Pixel score-reflection dialogue is still inline. Candidate for dialogue.js pass 2.

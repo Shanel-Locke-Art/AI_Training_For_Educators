@@ -1,16 +1,12 @@
-# Jordan placeholder portraits
+# Jordan visual assets
 
-Current S2 placeholder set:
+## Status
 
-- neutral.png
-- uncertain.png
-- frustrated.png
-- thinking.png
-- confident.png
+Production portrait folder. Current files and their runtime status are listed in the visual asset tracker and asset manifest v150.
 
-These are temporary transparent PNGs for the S2 vertical slice. Replace them
-with Shanel's final artwork using the same filenames so no code changes are needed.
+## File rules
 
-Keep early sketches and generated references inside `references/` so they are
-never confused with production portraits (see `assets/asset-manifest.json`,
-`development_reference_images` -> `concept-sheet.png`).
+- Use transparent PNG files for final portraits.
+- Use the standard expression names when they fit: `neutral`, `thinking`, `uncertain`, `frustrated`, and `confident`.
+- Keep concept sheets and generated source references in `references/`.
+- Check phone, tablet, and desktop framing before registering a portrait for runtime use.

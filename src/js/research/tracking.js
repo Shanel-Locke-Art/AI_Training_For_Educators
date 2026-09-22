@@ -261,6 +261,10 @@ function buildSessionPayload(formData) {
     s1_final_response:    scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].finalResponse,
     s1_oscqr:             scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].oscqrLit,
     s1_section_reviews:   JSON.stringify(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].sectionReviews || []),
+    s1_diagnosis_choice:  scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.diagnosisChoice || '',
+    s1_learning_path_json: JSON.stringify(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath || {}),
+    s1_course_guide_json: JSON.stringify(pcS1LearningState?.guide?.myCourseReview || {}),
+    s1_oscqr_standards:   scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].oscqrLit,
 
     // Legacy receiver columns retained for the metacognition implementation,
     // which is now presented as Scenario 3 in the Canvas roadmap.
@@ -392,6 +396,10 @@ async function saveIncrementalData(scenarioIdx, eventType = 'scenario_complete')
       ai_usage_json: s.aiUsage ? JSON.stringify(s.aiUsage) : '',
       babbage_analysis_json: s.structuredAnalysis ? JSON.stringify(s.structuredAnalysis) : '',
       s2_diagnosis_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.diagnosisAttempts || []) : '',
+      s1_diagnosis_choice: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? (s.s1LearningPath?.diagnosisChoice || '') : '',
+      s1_learning_path_json: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? JSON.stringify(s.s1LearningPath || {}) : '',
+      s1_course_guide_json: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? JSON.stringify(pcS1LearningState?.guide?.myCourseReview || {}) : '',
+      s1_oscqr_standards: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? (s.oscqrLit || '') : '',
       s2_evidence_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.evidenceAttempts || []) : '',
       s2_thinking_move: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? (s.thinkingMove || '') : '',
       s2_audit_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.auditAttempts || []) : '',

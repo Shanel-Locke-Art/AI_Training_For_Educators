@@ -13,11 +13,16 @@
   function devFillScenario(index) {
     const target = pcNormalizeScenarioIndex(index, SCENARIO_INDEX.CONTENT_AVALANCHE);
     if (target === SCENARIO_INDEX.CONTENT_AVALANCHE) {
-      // Preserve the active case. resetS1Dev() rebuilds the preview at case 1,
-      // so it is only appropriate when S1 is not already open.
-      const activeS1Case = scenarioIndex === SCENARIO_INDEX.CONTENT_AVALANCHE
-        && document.getElementById('pcS1CaseReflectionText');
-      return activeS1Case ? pcFillS1DevFields() : resetS1Dev();
+      if (scenarioIndex !== SCENARIO_INDEX.CONTENT_AVALANCHE) {
+        devGoScenario(SCENARIO_INDEX.CONTENT_AVALANCHE);
+        return pcScheduleScenarioTask(
+          () => window.pcFillS1StartLearningDev?.(),
+          180,
+          SCENARIO_INDEX.CONTENT_AVALANCHE
+        );
+      }
+      if (window.pcFillS1StartLearningDev) return window.pcFillS1StartLearningDev();
+      return devGoScenario(SCENARIO_INDEX.CONTENT_AVALANCHE);
     }
     if (target === SCENARIO_INDEX.METACOGNITION) return resetS2Dev();
     return devGoScenario(target);
@@ -31,12 +36,12 @@
     if (scenarioIndex !== SCENARIO_INDEX.CONTENT_AVALANCHE) {
       devGoScenario(SCENARIO_INDEX.CONTENT_AVALANCHE);
       return pcScheduleScenarioTask(
-        () => window.pcFillS1TransferDevTask?.(),
+        () => window.pcFillS1StartLearningDev?.(),
         150,
         SCENARIO_INDEX.CONTENT_AVALANCHE
       );
     }
-    return window.pcFillS1TransferDevTask?.();
+    return window.pcFillS1StartLearningDev?.();
   }
 
   function devResetProgress() {
@@ -67,4 +72,27 @@ pcRegisterUIActions({
   'dev-fill-s1-transfer': () => window.devFillS1TransferTask?.(),
   'dev-reset-progress': () => window.devResetProgress?.(),
   'dev-next-scenario': () => window.devNextScenario?.()
+});
+
+// P569 — keep test controls available without occupying the learning screen.
+window.addEventListener('keydown', event => {
+  const target = event.target;
+  if (target instanceof HTMLElement && (target.matches('input, textarea, select') || target.isContentEditable)) return;
+
+  if (event.ctrlKey && event.shiftKey && event.code === 'KeyD') {
+    event.preventDefault();
+    document.body.classList.toggle('pc-dev-tools-visible');
+    return;
+  }
+
+  const match = event.code.match(/^Digit([1-8])$/);
+  if (!match) return;
+  const scenario = Number(match[1]) - 1;
+  if (event.ctrlKey && event.shiftKey && !event.altKey) {
+    event.preventDefault();
+    window.devGoScenario?.(scenario);
+  } else if (event.ctrlKey && event.altKey && !event.shiftKey) {
+    event.preventDefault();
+    window.devFillScenario?.(scenario);
+  }
 });

@@ -18,13 +18,13 @@ def current_patch(index_html):
 def main():
     for rel in (
         "assets/images/backgrounds/gfc/s1-science-wing.jpg",
-        "assets/images/backgrounds/gfc/s3-study-lounge.jpg",
+        "assets/images/backgrounds/gfc/s2-study-lounge.jpg",
     ):
         assert (ROOT/rel).is_file(), f"Missing campus background {rel}"
     require("src/css/manifest.css", '@import url("ui/gfc-theme.css");')
     require("src/css/ui/gfc-theme.css", "--gfc-navy: #112650")
     require("src/js/app/config-and-assets.js", "s1-science-wing.jpg")
-    require("src/js/app/config-and-assets.js", "s3-study-lounge.jpg")
+    require("src/js/app/config-and-assets.js", "s2-study-lounge.jpg")
     require("src/js/app/scenario-runtime.js", "pcGetScenarioBackgroundAsset(index)")
     require("index.html", "Great Falls College Montana State University")
     index_html = (ROOT / "index.html").read_text(encoding="utf-8")

@@ -53,8 +53,8 @@ def main() -> None:
 
     assert "overflow-y: auto" not in css[css.index(".pc-s1-mobile-evidence-lens {"):css.index("/* Babbage is a workspace")]
     assert 'object-fit: contain !important' in css, "Desktop focused captures must remain intact."
-    assert "patch=544" in index
-    assert "DEV · 544" in index
+    assert "patch=543" in index
+    assert "DEV · 543" in index
     print("S1 readable mobile Canvas evidence lens remains intact through patch 482.")
 
 

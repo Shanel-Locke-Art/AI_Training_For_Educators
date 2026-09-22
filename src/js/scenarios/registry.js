@@ -27,21 +27,21 @@ const SCENARIO_UI = [
   {
     key: 'content-avalanche',
     dataLabel: 'S1: The Content Avalanche',
-    tabLabel: 'S1: The Content Avalanche',
-    missionTitle: 'Turn a content pile into a visible learning path.',
-    missionCopy: 'A Canvas module has plenty of content but no visible path. Inspect what students actually see, uncover the hidden requirements, and use AI to reorganize the experience without replacing instructor judgment.',
-    boardText: 'Week 4 has plenty of content but no clear path. Find what students must guess.',
-    rendererKey: 'content-avalanche-preview',
+    tabLabel: 'S1: Start With the Learning',
+    missionTitle: 'Start with what students are actually being asked to do.',
+    missionCopy: 'Investigate Maya\'s existing Canvas module, improve its usability, and diagnose whether the activities actually provide evidence of the intended learning.',
+    boardText: 'Open Maya’s Canvas module first. See what the activities actually ask her to do before changing anything.',
+    rendererKey: 'start-with-learning',
     workspaceMode: 'development',
     introLayout: 'standard',
     introCast: 'dual',
-    introCharacters: [{ id: 'pixel', slot: 'right' }, { id: 'eli', slot: 'left' }],
+    introCharacters: [{ id: 'maya', slot: 'left' }, { id: 'pixel', slot: 'right' }],
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
     implemented: false,
     previewAvailable: true,
     previewIntroduction: true,
-    developmentStatus: 'Preview available · In development',
-    plannedLoop: ['Inspect the Canvas evidence', 'Find the hidden requirements', 'Rebuild the learning path', 'Check the student view']
+    developmentStatus: 'Exploration playable · In development',
+    plannedLoop: ['Explore Maya\'s module', 'Rename unclear items', 'Organize the activities', 'Diagnose the alignment gap', 'Review Babbage\'s analysis', 'Apply it to My Course']
   },
   {
     key: 'accessibility',
@@ -164,6 +164,7 @@ function pcUnlockScenarioTab(index) {
 const PC_SCENARIO_RENDERERS = Object.freeze({
   'guided-builder': ({ container }) => renderGuidedBuilder(container),
   'content-avalanche-preview': () => renderS1ContentAvalanchePreview(),
+  'start-with-learning': () => renderS1StartWithLearning(),
   'metacognition-opening': ({ container }) => renderS2Standby(container),
   'assessment-opening': ({ container }) => renderS3Standby(container),
   'development-shell': ({ index }) => renderScenarioPlaceholder(index)
@@ -200,6 +201,7 @@ function getMainMenuPanel(panelName) {
 
 function getScenarioMenuStatus(index) {
   const ui = getScenarioUI(index);
+  if (index > SCENARIO_INDEX.CONTENT_AVALANCHE) return 'Locked · New game loop in development';
   if (!ui.implemented) return ui.developmentStatus || 'In redesign';
   if (scenarioCompleted[index]) return 'Completed';
   if (pcScenarioHasLaunched && scenarioIndex === index) return 'Current scenario';
@@ -209,7 +211,7 @@ function getScenarioMenuStatus(index) {
 
 function isScenarioAvailableFromMenu(index) {
   const normalized = pcNormalizeScenarioIndex(index);
-  return normalized !== null && Boolean(SCENARIO_UI[normalized]);
+  return normalized === SCENARIO_INDEX.CONTENT_AVALANCHE;
 }
 
 
@@ -223,13 +225,15 @@ function renderScenarioMenu() {
       ? ' is-complete'
       : (pcScenarioHasLaunched && scenarioIndex === index ? ' is-current' : '');
     const shellClass = ui.implemented ? '' : ' is-development-shell';
+    const rebuildLocked = index > SCENARIO_INDEX.CONTENT_AVALANCHE;
 
     return `
-      <button class="pc-menu-scenario-card${stateClass}${shellClass}"
+      <button class="pc-menu-scenario-card${stateClass}${shellClass}${rebuildLocked ? ' is-rebuild-locked' : ''}"
               type="button"
               data-pc-action="launch-scenario"
               data-pc-scenario-index="${index}"
-              aria-label="Open ${esc(ui.tabLabel)}. ${esc(status)}">
+              ${rebuildLocked ? 'disabled aria-disabled="true"' : ''}
+              aria-label="${rebuildLocked ? 'Locked' : 'Open'} ${esc(ui.tabLabel)}. ${esc(status)}">
         <span class="pc-menu-scenario-number">${String(index + 1).padStart(2, '0')}</span>
         <span class="pc-menu-scenario-content">
           <span class="pc-menu-scenario-title">${esc(ui.tabLabel.replace(/^S\d+:\s*/, ''))}</span>

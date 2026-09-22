@@ -21,10 +21,10 @@ def main() -> None:
     s2 = read("src/js/scenarios/s2-metacognition.js")
     s3 = read("src/js/scenarios/s3-authentic-assessment.js")
 
-    assert 'runtime/css/promptcraft.css?v=429&patch=544' in index
-    assert 'promptcraft.bundle.js?v=429&amp;patch=544&amp;receiver=84' in index
-    assert 'Version 429 · Patch 544' in index
-    assert 'DEV · 544' in index
+    assert 'runtime/css/promptcraft.css?v=429&patch=543' in index
+    assert 'promptcraft.bundle.js?v=429&amp;patch=543&amp;receiver=84' in index
+    assert 'Version 429 · Patch 543' in index
+    assert 'DEV · 543' in index
 
     for token in (
         "function pcNormalizeBabbageFindingItems(items = [])",

@@ -37,6 +37,7 @@ const SHEET_RAW_ARCHIVE    = '96 - Raw Payload Archive';
 const SHEET_RESPONSES      = '97 - Raw Responses';
 const SHEET_INCREMENTAL    = '98 - Raw Events';
 const SHEET_RAW_AUDIT      = '99 - Raw Audit';
+const SHEET_CHALLENGE       = '12 - Challenge Scores';
 
 const SCENARIO_TAB_COLORS = Object.freeze({
   1: '#215C45', 2: '#2E6A4E', 3: '#23665F', 4: '#8A5A20',
@@ -136,6 +137,14 @@ const PromptCraftReceiver = (() => {
         timestamp: new Date().toISOString()
       });
     }
+    if (action === 'getchallengetop') {
+      return jsonResponse({
+        status: 'ok',
+        action: 'getChallengeTop',
+        top_xp: getChallengeTopXP_(),
+        timestamp: new Date().toISOString()
+      });
+    }
 
     return jsonResponse({
       status: 'ok',
@@ -143,7 +152,7 @@ const PromptCraftReceiver = (() => {
       timestamp: new Date().toISOString(),
       expected_app_schema: EXPECTED_APP_SCHEMA_VERSION,
       expected_app_build: EXPECTED_APP_BUILD,
-      workflow: 'V84 readable projections + lossless hidden raw archives + moderated Ideas Wall'
+      workflow: 'V84 readable projections + lossless hidden raw archives + moderated Ideas Wall + anonymous challenge scores'
     });
   }
 
@@ -154,13 +163,23 @@ const PromptCraftReceiver = (() => {
     let lock = null;
     try {
       payload = parsePromptCraftPayload(e);
-      eventId = eventIdForPayload_(payload, raw);
+      const type = String(payload.type || '').toLowerCase();
       lock = LockService.getScriptLock();
-      if (!lock.tryLock(30000)) throw new Error('Receiver is busy. Retry this same event ID.');
+      if (!lock.tryLock(30000)) throw new Error('Receiver is busy. Retry shortly.');
+
+      // Challenge scores are deliberately kept outside V121 research rows. The
+      // sheet contains anonymous game-state numbers only: no names, course text,
+      // prompts, participant IDs, or My Course content.
+      if (type === 'challenge_score') {
+        const challenge = upsertChallengeScore_(payload);
+        SpreadsheetApp.flush();
+        return jsonResponse({ status: 'ok', type: 'challenge_score', top_xp: challenge.topXP });
+      }
+
+      eventId = eventIdForPayload_(payload, raw);
       if (hasArchivedEventId_(eventId)) {
         return jsonResponse({ status: 'ok', duplicate: true, event_id: eventId });
       }
-      const type = String(payload.type || '').toLowerCase();
 
       if (type === 'incremental') {
         const normalized = normalizeIncrementalPayload_(payload);
@@ -254,6 +273,59 @@ const PromptCraftReceiver = (() => {
     let sheet = ss.getSheetByName(name);
     if (!sheet) sheet = ss.insertSheet(name);
     return sheet;
+  }
+
+  function ensureChallengeSheet_() {
+    const sheet = getSheet_(SHEET_CHALLENGE);
+    const headers = ['Anonymous Challenge ID','Best XP','Scenarios Completed','Guide Sections','App Build','Updated At'];
+    if (sheet.getLastRow() === 0) {
+      sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+      sheet.setFrozenRows(1);
+    } else {
+      const existing = sheet.getRange(1, 1, 1, headers.length).getValues()[0];
+      if (existing.join('|') !== headers.join('|')) sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    }
+    return sheet;
+  }
+
+  function normalizeChallengeId_(value) {
+    const id = String(value || '').trim();
+    if (!/^pc-[a-f0-9]{24}$/i.test(id)) throw new Error('Invalid anonymous challenge ID.');
+    return id.toLowerCase();
+  }
+
+  function getChallengeTopXP_() {
+    const sheet = ensureChallengeSheet_();
+    if (sheet.getLastRow() < 2) return 0;
+    const values = sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).getValues();
+    return values.reduce((top, row) => Math.max(top, Number(row[0]) || 0), 0);
+  }
+
+  function upsertChallengeScore_(payload) {
+    const id = normalizeChallengeId_(pick_(payload, ['challenge_id','challengeId'], ''));
+    const xp = Math.max(0, Math.min(9999, Math.floor(Number(pick_(payload, ['xp'], 0)) || 0)));
+    const scenarios = Math.max(0, Math.min(8, Math.floor(Number(pick_(payload, ['scenarios_completed','scenariosCompleted'], 0)) || 0)));
+    const guideSections = Math.max(0, Math.min(32, Math.floor(Number(pick_(payload, ['guide_sections','guideSections'], 0)) || 0)));
+    const appBuild = String(pick_(payload, ['app_build','appBuild'], '') || '').slice(0, 80);
+    const sheet = ensureChallengeSheet_();
+    const lastRow = sheet.getLastRow();
+    let targetRow = 0;
+    let previousXP = 0;
+    if (lastRow >= 2) {
+      const ids = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
+      for (let i = 0; i < ids.length; i += 1) {
+        if (String(ids[i][0] || '').toLowerCase() === id) {
+          targetRow = i + 2;
+          previousXP = Number(ids[i][1]) || 0;
+          break;
+        }
+      }
+    }
+    const bestXP = Math.max(previousXP, xp);
+    const row = [id, bestXP, scenarios, guideSections, appBuild, new Date()];
+    if (targetRow) sheet.getRange(targetRow, 1, 1, row.length).setValues([row]);
+    else sheet.appendRow(row);
+    return { topXP: Math.max(bestXP, getChallengeTopXP_()) };
   }
 
   function jsonResponse(obj) {
@@ -2456,7 +2528,15 @@ const PromptCraftReceiver = (() => {
     });
   }
 
-  return { doGet, doPost, initializeWorkbookNow, resetResearchDataNow, refreshResearchViewsNow, verifyV84MigrationNow };
+  function resetChallengeScoresNow() {
+    const sheet = getSpreadsheet_().getSheetByName(SHEET_CHALLENGE);
+    if (!sheet) return { status: 'ok', cleared: 0, message: 'Challenge sheet did not exist.' };
+    const rows = Math.max(0, sheet.getLastRow() - 1);
+    if (rows) sheet.getRange(2, 1, rows, sheet.getMaxColumns()).clearContent();
+    return { status: 'ok', cleared: rows, sheet: SHEET_CHALLENGE };
+  }
+
+  return { doGet, doPost, initializeWorkbookNow, resetResearchDataNow, refreshResearchViewsNow, verifyV84MigrationNow, resetChallengeScoresNow };
 })();
 
 function doGet(e) { return PromptCraftReceiver.doGet(e); }
@@ -2465,3 +2545,4 @@ function initializeWorkbookNow() { return PromptCraftReceiver.initializeWorkbook
 function resetResearchDataNow() { return PromptCraftReceiver.resetResearchDataNow(); }
 function refreshResearchViewsNow() { return PromptCraftReceiver.refreshResearchViewsNow(); }
 function verifyV84MigrationNow() { return PromptCraftReceiver.verifyV84MigrationNow(); }
+function resetChallengeScoresNow() { return PromptCraftReceiver.resetChallengeScoresNow(); }

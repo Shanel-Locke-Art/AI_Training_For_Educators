@@ -690,7 +690,7 @@ function renderBabbageAnalyzingReadout(partLabel = 'Scenario diagnosis') {
   pcScheduleLiveAnalyzingLayout({ immediate: true });
 }
 
-const PC_BABBAGE_PROCESSING_HOLD_DEFAULT_MS = 350;
+const PC_BABBAGE_PROCESSING_HOLD_DEFAULT_MS = 80;
 let pcBabbageAnalysisProgressTimer = 0;
 let pcBabbageAnalysisProgressFrame = 0;
 let pcBabbageAnalysisProgressValue = 0;
@@ -765,8 +765,8 @@ function pcStartBabbageAnalysisProgress(timeoutMs = 60000) {
   // The request has left the browser. These milestones describe things we can
   // actually know. Between them the bar advances slowly as an elapsed-time
   // estimate, capped at 84% so "almost done" never becomes a lie.
-  window.setTimeout(() => pcSetBabbageAnalysisProgress(12, 'Sending course context'), 120);
-  window.setTimeout(() => pcSetBabbageAnalysisProgress(18, 'Waiting for Babbage'), 500);
+  window.setTimeout(() => pcSetBabbageAnalysisProgress(12, 'Sending course context'), 40);
+  window.setTimeout(() => pcSetBabbageAnalysisProgress(18, 'Waiting for Babbage'), 140);
 
   const safeTimeout = Math.max(10000, Number(timeoutMs) || 60000);
   pcBabbageAnalysisProgressTimer = window.setInterval(() => {
@@ -783,7 +783,7 @@ function pcStartBabbageAnalysisProgress(timeoutMs = 60000) {
     else if (elapsed >= 12000) phaseLabel = 'Babbage is evaluating the design';
 
     pcSetBabbageAnalysisProgress(next, phaseLabel);
-  }, 500);
+  }, 250);
 
   return true;
 }

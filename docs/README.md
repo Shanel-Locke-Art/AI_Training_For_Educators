@@ -6,10 +6,10 @@ Current compatibility baseline:
 
 - Application build: `PROMPTCRAFT_V429`
 - Research schema: `V121`
-- Apps Script receiver candidate: `V84`; immutable/live baseline: `V83`
+- Apps Script receiver source: `V85`; immutable historical baseline: `V83`
 - Babbage proxy: `V373`
-- Asset manifest: `v149`
-- Current browser/cache revision: `543`
+- Asset manifest: `v150`
+- Current browser/cache revision: `575`
 - Phase 0 repository baseline revision: `524` (documentation, receiver ownership, and fixtures only)
 - Phase 2 refactor patch: `525` (JavaScript ownership only; no design or gameplay changes)
 - Phase 3 refactor patch: `526` (viewport JavaScript ownership only; no design, gameplay, or CSS changes)
@@ -72,7 +72,6 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 | `development/patch-541-screenshot-capture-integrity.md` | Screenshot asset loading, checkpoint focus, and duplicate-image integrity guards. |
 | `development/patch-542-scenario-screenshot-scope.md` | Separate scenario-opening overviews from centered activity checkpoints for reliable visual comparison. |
 | `development/patch-543-runtime-capture-stability.md` | Deterministic onboarding waits and the corrected 51-image visual-review inventory. |
-| `development/patch-544-current-scenario-assets.md` | Current S1-S4 Canvas evidence folders, normalized filenames, and runtime smartboard routing. |
 
 ## Source-of-truth hierarchy
 
@@ -84,3 +83,10 @@ The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte
 6. Historical notes and archived dialogue
 
 If a tracker conflicts with current source code, update the tracker. Do not change working runtime code merely to make an old spreadsheet true again.
+
+## Asset production
+
+- `asset-management/ASSET_SYSTEM.md` — current asset lifecycle, naming, status, and update workflow
+- `asset-management/PromptCraft_Production_Overview_Simplified.xlsx` — production summary and open work
+- `asset-management/PromptCraft_Visual_Asset_Tracker_Simplified.xlsx` — visual inventory
+- `asset-management/PromptCraft_Voice_Recording_Tracker.xlsx` — audio inventory and recording decisions

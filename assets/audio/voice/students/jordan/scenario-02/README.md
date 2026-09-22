@@ -1,9 +1,12 @@
-# Jordan S2 voice files
+# Jordan Scenario 02 audio folder
 
-Place Jordan's finalized Scenario 2 recordings here. Recommended names:
+## Status
 
-- `jordan-01.mp3`
-- `jordan-02.mp3`
-- `jordan-03.mp3`
+This folder is documented by asset manifest v150. Missing planned audio files are expected until the current dialogue is locked and the voice tracker marks individual lines Approved to Record.
 
-Dialogue text and audio IDs should be added to `src/js/dialogue-data.js` when the S2 script is locked.
+## Rules
+
+- Use one stable line ID and one audio file per approved line.
+- Confirm the displayed scenario name and any legacy path numbering in `docs/asset-management/PromptCraft_Voice_Recording_Tracker.xlsx`.
+- Do not record from historical dialogue or reuse filenames listed under `retired_audio_names`.
+- Keep unapproved or dynamic dialogue text only.

@@ -35,22 +35,22 @@ window.pixelDialogue = {
       "speaker": "Professor Pixel",
       "character": "pixel",
       "expr": "neutral",
-      "text": "Before we open Canvas, here is the situation. An instructor has taught this topic for years and built Week 4 gradually as the course evolved.",
-      "id": "p-s1-ca-01"
+      "text": "Maya has a Canvas module to work through. Start by seeing exactly what she sees before you decide what needs fixing.",
+      "id": "p-s1-start-01"
+    },
+    {
+      "speaker": "Maya",
+      "character": "maya",
+      "expr": "uncertain",
+      "text": "The module has five activities, but the names do not tell me much. I keep opening things just to figure out what they are.",
+      "id": "m-s1-start-02"
     },
     {
       "speaker": "Professor Pixel",
       "character": "pixel",
-      "expr": "thinking",
-      "text": "Every addition had a reason: notes, a transcript, readings, models, examples, a quiz, and a written comparison. This course does not lack content, expertise, or instructor effort.",
-      "id": "p-s1-ca-02"
-    },
-    {
-      "speaker": "Professor Pixel",
-      "character": "pixel",
-      "expr": "thinking",
-      "text": "But students kept asking where to begin, which version to use, and what the comparison required. We are not judging the instructor—we are tracing where expert knowledge never became visible course design.",
-      "id": "p-s1-ca-03"
+      "expr": "encouraging",
+      "text": "Open all five. Pay attention to what each activity asks Maya to do. We will improve the module only after you understand the current experience.",
+      "id": "p-s1-start-03"
     }
   ],
   "s1_canvas_evidence_intro": [

@@ -8,6 +8,7 @@
     "ai/babbage-client.js",
     "scenarios/shared-shell.js",
     "scenarios/s1-canvas-evidence.js",
+    "scenarios/s1-start-with-learning.js",
     "scenarios/shared-components.js",
     "scenarios/registry.js",
     "scenarios/s1-course-design.js",

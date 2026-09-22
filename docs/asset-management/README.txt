@@ -1,15 +1,15 @@
-PromptCraft Simplified Production Documentation
+PromptCraft Asset Documentation
 
-Spreadsheets
-1. PromptCraft_Production_Overview_Simplified.xlsx
-   - High-level project status and current work only.
-2. PromptCraft_Visual_Asset_Tracker_Simplified.xlsx
-   - Visual assets only, with simplified columns and status tracking.
-3. PromptCraft_Voiceover_Tracker_Simplified.xlsx
-   - Current active recording queue plus dynamic/optional lines needing a decision.
+Start with ASSET_SYSTEM.md. It defines the current asset lifecycle, naming, update, and recording workflow.
 
-Recording Scripts
+Canonical trackers
+- PromptCraft_Production_Overview_Simplified.xlsx — current totals, open work, and file guide.
+- PromptCraft_Visual_Asset_Tracker_Simplified.xlsx — every visual file and manifest status.
+- PromptCraft_Voice_Recording_Tracker.xlsx — actual audio, recording holds, planned paths, and retired names.
+
+Recording guides
 - Recording Scripts/Professor_Pixel_Recording_Script.docx
 - Recording Scripts/Jordan_Recording_Script.docx
+- Recording Scripts/Eli_Recording_Script.docx
 
-The recording scripts contain only current recordable lines. Retired, legacy, development-only, dynamic, and optional lines are excluded from the scripts. Dynamic/optional lines remain visible in the Voiceover Tracker under Needs Decision.
+The trackers and guides describe PROMPTCRAFT_V429, Patch 575, and asset manifest v150. Do not create version-number copies for routine updates.

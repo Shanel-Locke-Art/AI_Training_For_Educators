@@ -59,7 +59,7 @@ function playScenarioIntroduction(index) {
   // settled, making the entire page appear to drop just before the challenge.
   window.pcScenarioIntroPending = false;
   pcApplyIpadLayout();
-  if (index === SCENARIO_INDEX.CONTENT_AVALANCHE) {
+  if (index === SCENARIO_INDEX.CONTENT_AVALANCHE && ui.rendererKey !== 'start-with-learning') {
     pcPrepareS1ClassroomDialogueScene();
     pcPrepareS1MissionBoardImage(0, 'before');
     playPixelSequence(getScenarioStartDialogueKey(index), () => {
@@ -299,9 +299,7 @@ function resetS1Dev() {
 
     loadScenario(SCENARIO_INDEX.CONTENT_AVALANCHE);
 
-    setTimeout(() => {
-      pcFillS1DevFields();
-    }, 120);
+    pcScheduleScenarioTask(() => window.pcFillS1StartLearningDev?.(), 120, SCENARIO_INDEX.CONTENT_AVALANCHE);
   }
 
 pcExposeGlobals({
@@ -359,7 +357,7 @@ function renderScenarioInput(index) {
   // counted as finished scenarios. Route them before the development-shell
   // guard so a partial/stale implementation flag cannot relock the preview.
   const previewAvailable = Boolean(
-    ui.previewAvailable || ui.rendererKey === 'content-avalanche-preview'
+    ui.previewAvailable || ui.rendererKey === 'content-avalanche-preview' || ui.rendererKey === 'start-with-learning'
   );
   if (previewAvailable) {
     pcRenderScenarioWorkspace(index, container);
@@ -670,8 +668,10 @@ function pcNormalizeProgressState(raw = {}) {
   const s1TransferScore = Math.max(0, Math.min(5, Number(raw?.s1TransferScore) || 0));
   const hasS1GranularProgress = s1PracticeScores.some(score => score > 0) || s1TransferScore > 0;
   const s1RawScore = s1PracticeScores.reduce((total, score) => total + score, 0) + s1TransferScore;
+  // Scenario 1 names each checkpoint award in XP. Preserve those exact values
+  // in the HUD so a three-point checkpoint always advances the total by 3 XP.
   const s1ScoreXP = hasS1GranularProgress
-    ? Math.round((s1RawScore / 17) * 50)
+    ? s1RawScore
     : bestScores[SCENARIO_INDEX.CONTENT_AVALANCHE] * PC_SCORE_XP_PER_POINT;
   if (hasS1GranularProgress) bestScores[SCENARIO_INDEX.CONTENT_AVALANCHE] = Math.round((s1RawScore / 17) * 5);
   const otherScoreXP = bestScores.reduce((total, score, index) => (
@@ -683,8 +683,91 @@ function pcNormalizeProgressState(raw = {}) {
   return { xp: computedXP, bestScores, completedAwards, s1PracticeScores, s1TransferScore };
 }
 
+const PC_CHALLENGE_ID_STORAGE_KEY = 'promptcraft_anonymous_challenge_id_v1';
+let pcChallengeTopXP = 0;
+let pcChallengeReceiverSupported = false;
+let pcChallengeLastPostedXP = null;
+let pcChallengeSyncTimer = null;
+
+function pcGetAnonymousChallengeId() {
+  try {
+    let id = localStorage.getItem(PC_CHALLENGE_ID_STORAGE_KEY) || '';
+    if (!id) {
+      const bytes = new Uint8Array(12);
+      if (window.crypto?.getRandomValues) window.crypto.getRandomValues(bytes);
+      else bytes.forEach((_, i) => { bytes[i] = Math.floor(Math.random() * 256); });
+      id = `pc-${Array.from(bytes, value => value.toString(16).padStart(2, '0')).join('')}`;
+      localStorage.setItem(PC_CHALLENGE_ID_STORAGE_KEY, id);
+    }
+    return id;
+  } catch (_error) {
+    return 'pc-local-session';
+  }
+}
+
+function pcCountLocalGuideSections() {
+  try {
+    const guide = JSON.parse(localStorage.getItem('promptcraft_s1_course_guide_v1') || '{}');
+    return guide?.step1?.added ? 1 : 0;
+  } catch (_error) { return 0; }
+}
+
+function pcRenderChallengeScore() {
+  const currentXP = Math.max(0, Number(pcProgressState?.xp || 0));
+  const displayTop = Math.max(currentXP, Number(pcChallengeTopXP || 0));
+  const compact = document.getElementById('progressChallengeTop');
+  const detail = document.getElementById('progressChallengeDetail');
+  if (compact) compact.textContent = `${displayTop} XP`;
+  if (detail) detail.textContent = `${displayTop} XP`;
+}
+
+async function pcFetchPromptCraftChallengeTop() {
+  if (!SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return false;
+  try {
+    const response = await fetch(`${SHEETS_URL}?action=getChallengeTop&t=${Date.now()}`, { cache: 'no-store' });
+    const result = await response.json();
+    if (result?.status === 'ok' && String(result.action || '').toLowerCase() === 'getchallengetop' && Number.isFinite(Number(result.top_xp))) {
+      pcChallengeReceiverSupported = true;
+      pcChallengeTopXP = Math.max(0, Number(result.top_xp));
+      pcRenderChallengeScore();
+      return true;
+    }
+  } catch (error) {
+    console.warn('[PromptCraft] Anonymous challenge score fetch unavailable:', error?.message || error);
+  }
+  pcRenderChallengeScore();
+  return false;
+}
+
+async function pcSyncPromptCraftChallengeScore() {
+  const progress = pcNormalizeProgressState(pcProgressState);
+  const currentXP = Math.max(0, Number(progress.xp || 0));
+  pcChallengeTopXP = Math.max(pcChallengeTopXP, currentXP);
+  pcRenderChallengeScore();
+  if (pcChallengeLastPostedXP === currentXP) return true;
+  pcChallengeLastPostedXP = currentXP;
+  if (!pcChallengeReceiverSupported) return false;
+  const payload = {
+    type: 'challenge_score',
+    challenge_id: pcGetAnonymousChallengeId(),
+    xp: currentXP,
+    scenarios_completed: progress.completedAwards.filter(Boolean).length,
+    guide_sections: pcCountLocalGuideSections(),
+    app_build: PC_APP_BUILD_LABEL
+  };
+  const ok = await postToSheets(payload, 'anonymous PromptCraft challenge score');
+  if (ok) pcFetchPromptCraftChallengeTop();
+  return ok;
+}
+
+function pcSchedulePromptCraftChallengeSync() {
+  window.clearTimeout(pcChallengeSyncTimer);
+  pcChallengeSyncTimer = window.setTimeout(() => pcSyncPromptCraftChallengeScore(), 250);
+}
+
 function pcSaveProgressState() {
   try { localStorage.setItem(PC_PROGRESS_STORAGE_KEY, JSON.stringify(pcProgressState)); } catch (error) {}
+  pcSchedulePromptCraftChallengeSync();
 }
 
 function pcLoadProgressState() {
@@ -760,11 +843,13 @@ function pcRenderProgressHUD() {
     ? `Next: ${level.next.title}`
     : 'Progression complete';
   if (lifetimeXP) lifetimeXP.textContent = `Total XP: ${progress.xp} / ${PC_MAX_XP}`;
+  pcRenderChallengeScore();
 }
 
 function pcInitializeProgressSystem() {
   pcLoadProgressState();
   pcRenderProgressHUD();
+  pcFetchPromptCraftChallengeTop().then(() => pcSchedulePromptCraftChallengeSync());
 }
 
 function pcResetTeachingProgress() {
@@ -878,7 +963,9 @@ pcExposeGlobals({
   awardScenarioCompletionXP,
   awardS1PracticeXP,
   awardS1TransferXP,
-  pcGetLevelProgressSnapshot
+  pcGetLevelProgressSnapshot,
+  pcFetchPromptCraftChallengeTop,
+  pcSyncPromptCraftChallengeScore
 });
 
 // ══════════════════════════════════════════════════════

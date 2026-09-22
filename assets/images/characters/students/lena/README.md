@@ -1,11 +1,12 @@
 # Lena visual assets
 
-Use this folder for final transparent PNG portraits. Recommended names:
+## Status
 
-- `neutral.png`
-- `thinking.png`
-- `uncertain.png`
-- `frustrated.png`
-- `confident.png`
+Production portrait folder. Current files and their runtime status are listed in the visual asset tracker and asset manifest v150.
 
-Keep early sketches and generated references inside `references/` so they are never confused with production portraits.
+## File rules
+
+- Use transparent PNG files for final portraits.
+- Use the standard expression names when they fit: `neutral`, `thinking`, `uncertain`, `frustrated`, and `confident`.
+- Keep concept sheets and generated source references in `references/`.
+- Check phone, tablet, and desktop framing before registering a portrait for runtime use.

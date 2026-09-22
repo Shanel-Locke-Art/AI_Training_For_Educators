@@ -46,8 +46,8 @@ def main() -> None:
     assert "#vnCharacter#vnCharacter" in v497
     assert "/* V497" in runtime_css
 
-    assert "patch=544" in index
-    assert "DEV · 544" in index
+    assert "patch=543" in index
+    assert "DEV · 543" in index
     print("V497 centered-tablet and adaptive-phone-cast contract passed.")
 
 

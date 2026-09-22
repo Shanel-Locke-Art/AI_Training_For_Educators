@@ -12,14 +12,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Fraunces:ital,wght@0,600;0,700;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=544">
+<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=575">
 <!-- Production CSS is generated from src/css by tools/build.py. -->
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
-<script src="runtime/js/dialogue-data.js?v=149&amp;patch=544"></script>
-<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=544&amp;receiver=84&amp;connections=510"></script>
+<script src="runtime/js/dialogue-data.js?v=149&amp;patch=575"></script>
+<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=575&amp;receiver=85&amp;connections=510"></script>
 
 </head>
 
@@ -141,7 +141,7 @@
      S1 fill resets the preview baseline. S3 opens its playable case; other shortcuts open their current scenario state.
 ══════════════════════════════════════════════════════ -->
 <div class="dev-bar" role="toolbar" aria-label="PromptCraft development shortcuts">
-  <span class="dev-label" title="Deterministic scenario capture baseline">DEV · 544</span>
+  <span class="dev-label" title="Deterministic scenario capture baseline">DEV · 575</span>
   <button class="dev-btn" data-pc-action="dev-reset-progress" title="Clear saved XP and restart Scenario 1">Reset Run + XP</button>
   <button class="dev-btn" data-pc-action="dev-go-scenario" data-pc-scenario-index="0">S1</button>
   <button class="dev-btn dev-btn-fill" data-pc-action="dev-fill-scenario" data-pc-scenario-index="0">S1 ✏️</button>
@@ -213,6 +213,10 @@
           <span class="xp-label" id="xpLabel">0 / 100 XP</span>
         </span>
       </span>
+      <span class="pc-challenge-card" title="Highest PromptCraft XP reported to the anonymous challenge board">
+        <span class="pc-challenge-card-label">Top PromptCraft score</span>
+        <strong id="progressChallengeTop">0 XP</strong>
+      </span>
       <span class="pc-progress-view-label">View Progress</span>
       <span class="pc-progress-caret" aria-hidden="true">▾</span>
     </summary>
@@ -236,6 +240,11 @@
           <div class="pc-progress-full-track" aria-hidden="true"><span id="progressPanelFill"></span></div>
           <div class="pc-progress-scenarios" id="progressScenarioText">0 of 8 scenarios completed</div>
           <div class="pc-progress-lifetime" id="progressLifetimeXP">Total XP: 0 / 880</div>
+          <div class="pc-progress-challenge-card">
+            <strong>Anonymous high score</strong>
+            <span id="progressChallengeDetail">0 XP</span>
+            <small>Highest de-identified PromptCraft XP currently reported. No names or course information are shown.</small>
+          </div>
         </div>
       </div>
       <div class="pc-progress-note"><strong>How XP works:</strong> strong scenario decisions and completed scenarios earn XP. Replaying the same result does not add more.</div>
@@ -294,12 +303,12 @@
     <summary class="mobile-dropdown-toggle">
       <span class="mobile-dropdown-copy">
         <span class="mobile-dropdown-eyebrow">SCENARIO MENU</span>
-        <span class="mobile-scenario-current">S1: The Content Avalanche</span>
+        <span class="mobile-scenario-current">S1: Start With the Learning</span>
       </span>
       <span class="mobile-dropdown-caret" aria-hidden="true">▾</span>
     </summary>
     <div class="mobile-dropdown-panel" id="mobileScenarioMenuPanel" role="menu">
-      <button class="mobile-dropdown-option is-active" data-source-index="0" type="button" role="menuitem" aria-current="page" data-pc-action="switch-scenario" data-pc-scenario-index="0" data-pc-close-details="true">S1: The Content Avalanche</button>
+      <button class="mobile-dropdown-option is-active" data-source-index="0" type="button" role="menuitem" aria-current="page" data-pc-action="switch-scenario" data-pc-scenario-index="0" data-pc-close-details="true">S1: Start With the Learning</button>
       <button class="mobile-dropdown-option" data-source-index="1" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="1" data-pc-close-details="true">S2: Access Is Part of the Design</button>
       <button class="mobile-dropdown-option" data-source-index="2" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="2" data-pc-close-details="true">S3: The Confident Student Problem</button>
       <button class="mobile-dropdown-option" data-source-index="3" type="button" role="menuitem" data-pc-action="switch-scenario" data-pc-scenario-index="3" data-pc-close-details="true">S4: The 96% Problem</button>
@@ -567,7 +576,7 @@
 
     <div class="pc-main-menu-footer">
       <span id="mainMenuStatus">Select an option to begin.</span>
-      <span id="mainMenuVersion" data-pc-app-version>Version 429 · Patch 544</span>
+      <span id="mainMenuVersion" data-pc-app-version>Version 429 · Patch 543</span>
     </div>
   </div>
 </div>
@@ -579,14 +588,14 @@
      ══════════════════════════════════════════════════════ -->
 
 <nav class="scenario-tabs" role="tablist" aria-label="Training scenarios">
-  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="0">S1: The Content Avalanche</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="1">S2: Access Is Part of the Design</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="2">S3: The Confident Student Problem</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="3">S4: The 96% Problem</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="4">S5: Hallucination Hunt</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="5">S6: Predict the Output</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="6">S7: The Human Judgment Line</button>
-  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="7">S8: Reflect, Revise, Reuse</button>
+  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="0">S1: Start With the Learning</button>
+  <button class="tab-btn locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="1" disabled aria-disabled="true">S2: Access Is Part of the Design</button>
+  <button class="tab-btn locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="2" disabled aria-disabled="true">S3: The Confident Student Problem</button>
+  <button class="tab-btn locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="3" disabled aria-disabled="true">S4: The 96% Problem</button>
+  <button class="tab-btn locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="4" disabled aria-disabled="true">S5: Hallucination Hunt</button>
+  <button class="tab-btn locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="5" disabled aria-disabled="true">S6: Predict the Output</button>
+  <button class="tab-btn locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="6" disabled aria-disabled="true">S7: The Human Judgment Line</button>
+  <button class="tab-btn locked" role="tab" aria-selected="false" aria-controls="chat" data-pc-action="switch-scenario" data-pc-scenario-index="7" disabled aria-disabled="true">S8: Reflect, Revise, Reuse</button>
 </nav>
 
 

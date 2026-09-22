@@ -20976,6 +20976,2504 @@ html body.pc-s1-canvas-backdrop-active #vnOverlay.vn-overlay.active .vn-smartboa
   .pc-s1-week-planner-basics { grid-template-columns:1fr !important; }
 }
 
+/* SOURCE: src/css/scenarios/s1-start-with-learning.css */
+.pc-s1-learning,
+.pc-s1-learning * {
+  min-width: 0;
+}
+
+.pc-s1-learning {
+  width: min(calc(100% - 24px), 1840px);
+  max-width: none;
+  padding: 20px;
+  background:
+    linear-gradient(rgba(5, 22, 39, 0.24), rgba(5, 22, 39, 0.24)),
+    var(--pc-s1-learning-bg) center / cover no-repeat;
+}
+
+.pc-s1-learning-taskbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+  padding: 14px 18px;
+  border: 1px solid rgba(182, 202, 222, 0.26);
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(180deg, rgba(8, 45, 79, 0.95), rgba(6, 32, 58, 0.92));
+  color: #fff;
+}
+
+.pc-s1-learning-taskbar span {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: #f0bd2b;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.pc-s1-learning-taskbar h1 {
+  margin: 0 0 6px;
+  color: #fff;
+  font-size: clamp(1.85rem, 2.6vw, 2.3rem);
+  line-height: 1.1;
+}
+
+.pc-s1-learning-taskbar p {
+  margin: 0;
+  max-width: 760px;
+  color: #edf4fa;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.pc-s1-learning-task-status {
+  flex: 0 0 auto;
+  align-self: center;
+  padding: 12px 16px;
+  border: 1px solid rgba(234, 241, 247, 0.46);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pc-s1-learning-shell {
+  border: 1px solid rgba(186, 204, 220, 0.28);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: rgba(5, 20, 35, 0.44);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(1px);
+}
+
+.pc-s1-learning-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 302px;
+  gap: 0;
+  align-items: stretch;
+  padding: 12px;
+}
+
+.pc-s1-canvas-frame {
+  min-width: 0;
+  min-height: 700px;
+  border: 1px solid #aeb4b9;
+  border-right: 0;
+  border-radius: 6px 0 0 6px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 7px 26px rgba(0, 0, 0, 0.22);
+}
+
+.pc-s1-canvas-app {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  min-height: 700px;
+  background: #fff;
+  font-family: Lato, "Helvetica Neue", Arial, sans-serif;
+  color: #2d3b45;
+}
+
+.pc-s1-canvas-global-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: #072d66;
+  color: #fff;
+}
+
+.pc-s1-canvas-global-brand {
+  display: grid;
+  place-items: center;
+  min-height: 62px;
+  background: #f0b31a;
+}
+
+.pc-s1-canvas-global-brand img {
+  display: block;
+  width: 46px;
+  height: auto;
+}
+
+.pc-s1-canvas-global-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 62px;
+  padding: 6px 3px;
+  box-sizing: border-box;
+  color: #fff;
+  text-decoration: none;
+  text-align: center;
+  font-size: 0.66rem;
+  line-height: 1.08;
+}
+
+.pc-s1-canvas-global-nav a.is-active {
+  background: #fff;
+  color: #0a4f93;
+}
+
+.pc-s1-canvas-global-nav a:focus-visible {
+  outline: 3px solid #f4b400;
+  outline-offset: -3px;
+}
+
+.pc-s1-canvas-global-nav b {
+  font-weight: 500;
+}
+
+.pc-s1-canvas-global-glyph {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  margin-bottom: 3px;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
+.pc-s1-canvas-global-dot {
+  width: 22px;
+  height: 22px;
+  margin-bottom: 3px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.pc-s1-canvas-course-shell {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.pc-s1-canvas-topbar {
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 18px;
+  border-bottom: 1px solid #e1e4e6;
+  background: #fff;
+}
+
+.pc-s1-canvas-hamburger {
+  display: grid;
+  gap: 4px;
+  width: 34px;
+  margin-right: 12px;
+  border: 0;
+  padding: 5px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pc-s1-canvas-hamburger span {
+  display: block;
+  height: 2px;
+  background: #0875bd;
+}
+
+.pc-s1-canvas-course-title {
+  min-width: 0;
+  color: #0875bd;
+  font-size: 0.94rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pc-s1-canvas-course-title span {
+  padding: 0 6px;
+  color: #7b8790;
+}
+
+.pc-s1-canvas-course-title strong {
+  color: #2d3b45;
+  font-weight: 400;
+}
+
+.pc-s1-canvas-course-body {
+  display: grid;
+  grid-template-columns: 172px minmax(0, 1fr);
+  min-height: 648px;
+}
+
+.pc-s1-canvas-course-nav {
+  padding: 20px 16px 20px 22px;
+  background: #fff;
+}
+
+.pc-s1-canvas-course-nav a {
+  display: block;
+  padding: 7px 4px;
+  color: #0875bd;
+  text-decoration: none;
+  font-size: 0.88rem;
+  line-height: 1.2;
+}
+
+.pc-s1-canvas-course-nav a:hover,
+.pc-s1-canvas-course-nav a:focus-visible {
+  text-decoration: underline;
+}
+
+.pc-s1-canvas-course-nav a.is-active {
+  border-left: 3px solid #2d3b45;
+  margin-left: -6px;
+  padding-left: 7px;
+  color: #2d3b45;
+  font-weight: 700;
+}
+
+.pc-s1-canvas-main {
+  min-width: 0;
+  padding: 28px 18px 28px 8px;
+}
+
+.pc-s1-canvas-module-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 18px;
+}
+
+.pc-s1-canvas-module-toolbar button,
+.pc-s1-canvas-prev-next button {
+  min-height: 36px;
+  border: 1px solid #c7cdd1;
+  border-radius: 3px;
+  padding: 7px 13px;
+  background: #f5f5f5;
+  color: #2d3b45;
+  font: inherit;
+  cursor: pointer;
+}
+
+.pc-s1-canvas-jump {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  margin: 0 0 32px;
+  padding: 0 10px;
+  border: 1px solid #a9b2b8;
+  border-radius: 3px;
+  color: #2d3b45;
+  font-size: 0.87rem;
+}
+
+.pc-s1-canvas-module {
+  border: 1px solid #d6d9dc;
+  background: #fff;
+}
+
+.pc-s1-canvas-module-head {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  min-height: 54px;
+  padding: 0 10px;
+  border-bottom: 1px solid #d6d9dc;
+  background: #f2f3f3;
+}
+
+.pc-s1-canvas-module-head h2 {
+  margin: 0;
+  color: #2d3b45;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.pc-s1-canvas-module-requirement {
+  border: 1px solid #b9bec2;
+  border-radius: 13px;
+  padding: 3px 10px;
+  background: #fff;
+  color: #2d3b45;
+  font-size: 0.73rem;
+  white-space: nowrap;
+}
+
+.pc-s1-canvas-module-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pc-s1-canvas-module-row {
+  display: grid;
+  grid-template-columns: 18px 18px minmax(0, 1fr) auto 24px;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 10px;
+  border-bottom: 1px solid #e3e5e6;
+  background: #fff;
+}
+
+.pc-s1-canvas-module-row:last-child {
+  border-bottom: 0;
+}
+
+.pc-s1-canvas-module-row:hover {
+  background: #fbfbfb;
+}
+
+.pc-s1-canvas-row-indent {
+  width: 10px;
+}
+
+.pc-s1-canvas-doc-icon {
+  position: relative;
+  width: 10px;
+  height: 13px;
+  border: 1px solid #70808c;
+  background: #fff;
+}
+
+.pc-s1-canvas-doc-icon::before,
+.pc-s1-canvas-doc-icon::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  height: 1px;
+  background: #70808c;
+}
+
+.pc-s1-canvas-doc-icon::before {
+  top: 4px;
+}
+
+.pc-s1-canvas-doc-icon::after {
+  top: 7px;
+}
+
+.pc-s1-canvas-item-link {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  border: 0;
+  padding: 8px 7px;
+  background: transparent;
+  color: #2d3b45;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pc-s1-canvas-item-link:hover .pc-s1-canvas-item-title,
+.pc-s1-canvas-item-link:focus-visible .pc-s1-canvas-item-title {
+  color: #0875bd;
+  text-decoration: underline;
+}
+
+.pc-s1-canvas-item-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.pc-s1-canvas-item-type {
+  padding-left: 10px;
+  color: #79858e;
+  font-size: 0.72rem;
+}
+
+.pc-s1-canvas-status {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: #1d9c56;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.pc-s1-explore-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 22px;
+}
+
+.pc-s1-explore-progress {
+  display: grid;
+  gap: 2px;
+}
+
+.pc-s1-explore-progress strong {
+  color: #2d3b45;
+  font-size: 0.92rem;
+}
+
+.pc-s1-explore-progress span {
+  color: #5e6c84;
+  font-size: 0.83rem;
+  line-height: 1.4;
+}
+
+.pc-s1-explore-footer .pc-shell-primary {
+  min-width: 128px;
+}
+
+.pc-s1-explore-footer .pc-shell-primary:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.pc-s1-canvas-item-header {
+  margin-bottom: 22px;
+  border-bottom: 1px solid #c7cdd1;
+}
+
+.pc-s1-canvas-item-header h1 {
+  margin: 0 0 13px;
+  color: #2d3b45;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.pc-s1-canvas-content-page {
+  max-width: none;
+  padding-right: clamp(8px, 2vw, 30px);
+}
+
+.pc-s1-canvas-richtext {
+  color: #2d3b45;
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.pc-s1-canvas-richtext h2 {
+  margin: 24px 0 7px;
+  color: #2d3b45;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.pc-s1-canvas-richtext p {
+  margin: 0 0 15px;
+}
+
+.pc-s1-canvas-richtext ul {
+  margin: 0 0 18px;
+  padding-left: 25px;
+}
+
+.pc-s1-canvas-richtext a {
+  color: #0875bd;
+}
+
+.pc-s1-canvas-video-player {
+  width: min(100%, 560px);
+  margin: 18px 0 20px;
+}
+
+.pc-s1-canvas-video-screen {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid #626d76;
+  background:
+    linear-gradient(180deg, rgba(27, 39, 50, 0.68), rgba(27, 39, 50, 0.84)),
+    radial-gradient(circle at top, #4f697b 0, #293640 58%, #202a32 100%);
+  color: #fff;
+}
+
+.pc-s1-canvas-video-screen::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pc-s1-canvas-video-play {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.48);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.pc-s1-canvas-video-play span {
+  display: block;
+  width: 0;
+  height: 0;
+  margin-left: 6px;
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  border-left: 24px solid #fff;
+}
+
+.pc-s1-canvas-video-overlay {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 44px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 0.95rem;
+}
+
+.pc-s1-canvas-video-overlay strong {
+  max-width: 72%;
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.pc-s1-canvas-video-overlay span {
+  font-size: 0.84rem;
+  font-weight: 700;
+  opacity: 0.95;
+}
+
+.pc-s1-canvas-video-controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(8, 15, 20, 0.72);
+}
+
+.pc-s1-canvas-video-progress {
+  position: relative;
+  flex: 1 1 auto;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+}
+
+.pc-s1-canvas-video-progress i {
+  display: block;
+  width: 18%;
+  height: 100%;
+  background: #f0bd2b;
+}
+
+.pc-s1-canvas-video-time {
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+}
+
+.pc-s1-canvas-prev-next {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 34px;
+  padding-top: 16px;
+  border-top: 1px solid #c7cdd1;
+}
+
+.pc-s1-canvas-prev-next button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pc-s1-maya-panel {
+  position: relative;
+  display: flex;
+  min-height: 700px;
+  border: 1px solid rgba(184, 200, 216, 0.28);
+  border-left: 0;
+  border-radius: 0 6px 6px 0;
+  background: linear-gradient(180deg, rgba(5, 22, 39, 0.68), rgba(5, 22, 39, 0.42));
+  overflow: hidden;
+}
+
+.pc-s1-maya-panel-inner {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 700px;
+  padding: 14px 14px 0;
+  background: linear-gradient(180deg, rgba(9, 33, 56, 0.28), rgba(9, 33, 56, 0));
+}
+
+.pc-s1-maya-quote {
+  position: absolute;
+  z-index: 2;
+  left: 14px;
+  right: 14px;
+  bottom: 355px;
+  margin: 0;
+  padding: 16px 17px 17px;
+  border: 2px solid #f0bd2b;
+  border-radius: 5px;
+  background: rgba(7, 29, 47, 0.94);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.26);
+}
+
+.pc-s1-maya-quote::after {
+  content: "";
+  position: absolute;
+  right: 54px;
+  bottom: -13px;
+  width: 20px;
+  height: 20px;
+  border-right: 2px solid #f0bd2b;
+  border-bottom: 2px solid #f0bd2b;
+  background: #071d2f;
+  transform: rotate(45deg);
+}
+
+.pc-s1-maya-quote span {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  margin-bottom: 4px;
+  color: #f0bd2b;
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.pc-s1-maya-quote p {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #fff;
+  font-size: 1.02rem;
+  line-height: 1.48;
+}
+
+.pc-s1-maya-art-wrap {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 0;
+  height: 520px;
+  overflow: hidden;
+}
+
+.pc-s1-maya-art {
+  display: block;
+  width: min(100%, 355px);
+  height: auto;
+  max-height: 510px;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.22));
+}
+
+.pc-s1-checkpoint-card {
+  align-self: start;
+  margin: 14px;
+  padding: clamp(24px, 3vw, 42px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+.pc-s1-checkpoint-card h2 {
+  margin-top: 0;
+  color: #0d2a4a;
+}
+
+.pc-s1-checkpoint-card p {
+  max-width: 760px;
+  font-size: 1rem;
+  line-height: 1.58;
+}
+
+.pc-s1-checkpoint-note {
+  color: #526777;
+}
+
+
+.pc-s1-final-module-intro {
+  margin-bottom: 22px;
+  border-bottom: 1px solid #c7cdd1;
+  padding-bottom: 14px;
+}
+.pc-s1-final-module-intro h1 {
+  margin: 0 0 7px;
+  color: #2d3b45;
+  font-size: 1.55rem;
+  font-weight: 400;
+}
+.pc-s1-final-module-intro p { margin: 0; color: #5e6c84; }
+.pc-s1-final-module-sections { display: grid; gap: 16px; }
+.pc-s1-final-module-section { border: 1px solid #d4d8dc; background: #fff; }
+.pc-s1-final-text-header {
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #d4d8dc;
+  background: #f1f2f3;
+}
+.pc-s1-final-text-header strong { color: #2d3b45; font-size: 1rem; }
+.pc-s1-final-text-header span { color: #5e6c84; font-size: .82rem; }
+.pc-s1-final-module-title { padding: 8px 7px; color: #2d3b45; font-size: .88rem; font-weight: 600; }
+.pc-s1-final-module-actions { display: flex; justify-content: flex-end; margin-top: 22px; padding-top: 16px; border-top: 1px solid #c7cdd1; }
+.pc-s1-result-eyebrow { color: #6a7f90; font-size: .78rem; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
+.pc-s1-diagnosis-result-card h2 { margin: 8px 0 16px; font-size: 1.25rem; line-height: 1.35; }
+.pc-s1-diagnosis-result-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+
+@media (max-width: 1200px) {
+  .pc-s1-learning-workspace {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+
+  .pc-s1-canvas-course-body {
+    grid-template-columns: 145px minmax(0, 1fr);
+  }
+
+  .pc-s1-canvas-course-nav {
+    padding-left: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .pc-s1-learning {
+    padding: 14px;
+  }
+
+  .pc-s1-learning-taskbar {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pc-s1-learning-task-status {
+    white-space: normal;
+  }
+
+  .pc-s1-learning-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-s1-canvas-frame {
+    border-right: 1px solid #aeb4b9;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .pc-s1-maya-panel {
+    min-height: 280px;
+    border-top: 0;
+    border-left: 1px solid rgba(184, 200, 216, 0.28);
+    border-radius: 0 0 6px 6px;
+  }
+
+  .pc-s1-maya-panel-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 200px;
+    grid-template-rows: 1fr;
+    align-items: center;
+    min-height: 280px;
+    padding: 14px;
+  }
+
+  .pc-s1-maya-quote {
+    position: relative;
+    left: auto; right: auto; bottom: auto;
+    margin: 0 10px 0 0;
+  }
+
+  .pc-s1-maya-quote::after {
+    right: -12px;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%) rotate(-45deg);
+  }
+
+  .pc-s1-maya-art-wrap {
+    position: relative;
+    inset: auto;
+    height: 240px;
+  }
+
+  .pc-s1-maya-art {
+    max-height: 235px;
+  }
+}
+
+@media (max-width: 680px) {
+  .pc-s1-canvas-frame,
+  .pc-s1-canvas-app {
+    min-height: 0;
+  }
+
+  .pc-s1-canvas-app {
+    grid-template-columns: 46px minmax(0, 1fr);
+  }
+
+  .pc-s1-canvas-global-brand {
+    min-height: 46px;
+  }
+
+  .pc-s1-canvas-global-brand img {
+    width: 34px;
+  }
+
+  .pc-s1-canvas-global-nav a {
+    min-height: 48px;
+  }
+
+  .pc-s1-canvas-global-nav b {
+    display: none;
+  }
+
+  .pc-s1-canvas-global-glyph,
+  .pc-s1-canvas-global-dot {
+    margin: 0;
+  }
+
+  .pc-s1-canvas-topbar {
+    min-height: 46px;
+    padding: 0 10px;
+  }
+
+  .pc-s1-canvas-course-body {
+    display: block;
+  }
+
+  .pc-s1-canvas-course-nav {
+    display: flex;
+    overflow-x: auto;
+    gap: 2px;
+    border-bottom: 1px solid #d6d9dc;
+    padding: 6px 8px;
+  }
+
+  .pc-s1-canvas-course-nav a,
+  .pc-s1-canvas-course-nav a.is-active {
+    flex: 0 0 auto;
+    border-left: 0;
+    margin: 0;
+    padding: 8px;
+  }
+
+  .pc-s1-canvas-course-nav a.is-active {
+    border-bottom: 3px solid #2d3b45;
+  }
+
+  .pc-s1-canvas-main {
+    padding: 16px 10px 20px;
+  }
+
+  .pc-s1-canvas-jump {
+    margin-bottom: 18px;
+  }
+
+  .pc-s1-canvas-module-head {
+    grid-template-columns: 14px minmax(0, 1fr);
+  }
+
+  .pc-s1-canvas-module-requirement {
+    display: none;
+  }
+
+  .pc-s1-canvas-module-row {
+    grid-template-columns: 12px 16px minmax(0, 1fr) 20px;
+    padding: 0 7px;
+  }
+
+  .pc-s1-canvas-item-type {
+    display: none;
+  }
+
+  .pc-s1-explore-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pc-s1-explore-footer .pc-shell-primary {
+    width: 100%;
+  }
+
+  .pc-s1-canvas-video-player {
+    width: 100%;
+  }
+
+  .pc-s1-canvas-video-play {
+    width: 66px;
+    height: 66px;
+  }
+
+  .pc-s1-maya-panel {
+    min-height: 430px;
+  }
+
+  .pc-s1-maya-panel-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    padding: 12px 12px 0;
+  }
+
+  .pc-s1-maya-quote {
+    margin: 0 2px 8px;
+  }
+
+  .pc-s1-maya-quote::after {
+    right: 52px;
+    top: auto;
+    bottom: -13px;
+    transform: rotate(45deg);
+  }
+
+  .pc-s1-maya-art-wrap {
+    height: 270px;
+  }
+
+  .pc-s1-maya-art {
+    max-height: 270px;
+  }
+}
+
+/* P572 — a light weekly rhythm instructors can reuse without cloning every activity type. */
+.pc-s1-weekly-pattern { border-top: 6px solid #1672a5; }
+.pc-s1-weekly-pattern > p { max-width: 88ch; }
+.pc-s1-weekly-pattern-grid { display: grid; gap: 12px; margin-top: 16px; }
+.pc-s1-weekly-pattern-grid article { overflow: hidden; border: 1px solid #c7d4dc; border-radius: 7px; background: #fff; }
+.pc-s1-weekly-pattern-grid header { display: grid; gap: 2px; padding: 11px 13px; background: #0d2a55; color: #fff; }
+.pc-s1-weekly-pattern-grid header span { color: #ffd55b; font-size: .74rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+.pc-s1-weekly-pattern-grid article > div { padding: 10px 13px; border-top: 1px solid #dbe3e8; }
+.pc-s1-weekly-pattern-grid article > div b { color: #17364e; }
+.pc-s1-weekly-pattern-grid article > div p { margin: 3px 0 0; color: #4b6171; line-height: 1.4; }
+.pc-s1-weekly-pattern-grid article > div.is-evidence { border-left: 4px solid #e6a51d; background: #fffaf0; }
+@media (min-width: 900px) {
+  .pc-s1-weekly-pattern-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* P548 — S1 rename flow. Keep the same Canvas + Maya frame rather than
+   interrupting the scenario with a generic checkpoint card. */
+.pc-s1-rename-instructions {
+  margin-bottom: 20px;
+}
+.pc-s1-rename-instructions h1 {
+  margin: 0 0 8px;
+  color: #2d3b45;
+  font-size: 1.55rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+.pc-s1-rename-instructions p {
+  margin: 0;
+  max-width: 760px;
+  color: #4d5b66;
+  line-height: 1.5;
+}
+.pc-s1-rename-module {
+  margin-bottom: 22px;
+}
+.pc-s1-rename-row {
+  display: grid;
+  grid-template-columns: 18px 18px minmax(0, 1fr) auto 24px;
+  align-items: center;
+  min-height: 62px;
+  padding: 0 10px;
+  border-bottom: 1px solid #e3e5e6;
+  background: #fff;
+}
+.pc-s1-rename-row:last-child {
+  border-bottom: 0;
+}
+.pc-s1-rename-row.is-active {
+  box-shadow: inset 4px 0 0 #0875bd;
+  background: #f5f9fc;
+}
+.pc-s1-rename-row.is-saved .pc-s1-rename-original {
+  color: #6b7780;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.pc-s1-rename-row-copy {
+  display: grid;
+  gap: 3px;
+  padding: 9px 7px;
+}
+.pc-s1-rename-original {
+  color: #2d3b45;
+  font-size: .88rem;
+  font-weight: 650;
+}
+.pc-s1-rename-saved-title {
+  color: #0875bd;
+  font-size: .83rem;
+  font-weight: 700;
+}
+.pc-s1-rename-pending {
+  color: #7a8790;
+  font-size: .78rem;
+}
+.pc-s1-rename-editor {
+  padding: 18px 20px 20px;
+  border: 1px solid #c8d0d6;
+  border-radius: 3px;
+  background: #f8f9fa;
+}
+.pc-s1-rename-editor-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.pc-s1-rename-editor-heading span {
+  color: #5e6c84;
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.pc-s1-rename-editor-heading strong {
+  color: #2d3b45;
+  font-size: 1rem;
+}
+.pc-s1-rename-editor label {
+  display: block;
+  margin-bottom: 6px;
+  color: #2d3b45;
+  font-weight: 700;
+}
+.pc-s1-rename-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: stretch;
+}
+.pc-s1-rename-input-row input {
+  width: 100%;
+  min-height: 46px;
+  box-sizing: border-box;
+  border: 1px solid #8e9aa3;
+  border-radius: 3px;
+  padding: 9px 11px;
+  background: #fff;
+  color: #2d3b45;
+  font: inherit;
+}
+.pc-s1-rename-input-row input:focus {
+  outline: 3px solid rgba(8, 117, 189, .24);
+  border-color: #0875bd;
+}
+.pc-s1-rename-help,
+.pc-s1-rename-notice {
+  margin: 8px 0 0;
+  line-height: 1.45;
+}
+.pc-s1-rename-help {
+  color: #5e6c84;
+  font-size: .82rem;
+}
+.pc-s1-rename-notice {
+  min-height: 1.25em;
+  color: #126b45;
+  font-size: .84rem;
+  font-weight: 700;
+}
+.pc-s1-rename-summary {
+  min-height: 700px;
+  padding: 28px;
+  box-sizing: border-box;
+  border: 1px solid #aeb4b9;
+  border-right: 0;
+  border-radius: 6px 0 0 6px;
+  background: #fff;
+}
+.pc-s1-rename-summary h2 {
+  margin: 0 0 18px;
+  color: #2d3b45;
+  font-size: 1.45rem;
+}
+.pc-s1-rename-summary ul {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  border: 1px solid #d6d9dc;
+}
+.pc-s1-rename-summary li {
+  display: grid;
+  grid-template-columns: minmax(130px, .75fr) minmax(0, 1.25fr);
+  gap: 18px;
+  padding: 9px 11px;
+  border-bottom: 1px solid #e3e5e6;
+}
+.pc-s1-rename-summary li:last-child {
+  border-bottom: 0;
+}
+.pc-s1-rename-summary li span {
+  color: #69757e;
+  text-decoration: line-through;
+}
+.pc-s1-rename-summary li strong {
+  color: #0875bd;
+}
+.pc-s1-canvas-prev-next .pc-s1-canvas-continue {
+  border-color: #d9a700;
+  background: #f0bd2b;
+  color: #102f4a;
+  font-weight: 800;
+}
+.pc-s1-canvas-prev-next .pc-s1-canvas-continue:hover,
+.pc-s1-canvas-prev-next .pc-s1-canvas-continue:focus-visible {
+  background: #ffd45b;
+  border-color: #b88d00;
+}
+@media (max-width: 680px) {
+  .pc-s1-rename-row {
+    grid-template-columns: 12px 16px minmax(0, 1fr) 20px;
+  }
+  .pc-s1-rename-input-row {
+    grid-template-columns: 1fr;
+  }
+  .pc-s1-rename-input-row .pc-shell-primary {
+    width: 100%;
+  }
+  .pc-s1-rename-summary {
+    min-height: 0;
+    border-right: 1px solid #aeb4b9;
+    border-radius: 6px 6px 0 0;
+    padding: 20px 16px;
+  }
+  .pc-s1-rename-summary li {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+/* P548.1 — keep the active rename control visible before the module list. */
+.pc-s1-renaming .pc-s1-rename-editor {
+  margin-bottom: 18px;
+}
+.pc-s1-renaming .pc-s1-rename-module {
+  margin-bottom: 0;
+}
+.pc-s1-renaming .pc-s1-rename-row {
+  min-height: 55px;
+}
+
+/* P549 — S1 Canvas text-header organization exercise. */
+.pc-s1-rename-summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+}
+.pc-s1-organize-instructions {
+  margin-bottom: 18px;
+}
+.pc-s1-organize-instructions h1 {
+  margin: 0 0 8px;
+  color: #2d3b45;
+  font-size: 1.58rem;
+  font-weight: 400;
+}
+.pc-s1-organize-instructions p {
+  margin: 0;
+  color: #4a5864;
+  line-height: 1.5;
+}
+.pc-s1-organize-board {
+  display: grid;
+  gap: 18px;
+}
+.pc-s1-organize-destinations {
+  min-width: 0;
+  border: 1px solid #c7cdd1;
+  background: #f7f8f9;
+}
+.pc-s1-organize-destination-heading {
+  display: grid;
+  gap: 3px;
+  padding: 11px 14px;
+  border-bottom: 1px solid #d8dcdf;
+  background: #eef3f6;
+}
+.pc-s1-organize-destination-heading strong { color: #2d3b45; font-size: .92rem; }
+.pc-s1-organize-destination-heading span { color: #5e6c84; font-size: .78rem; }
+.pc-s1-organize-tray {
+  border: 1px solid #c7cdd1;
+  background: #fff;
+}
+.pc-s1-organize-tray-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: baseline;
+  padding: 11px 14px;
+  border-bottom: 1px solid #d8dcdf;
+  background: #f5f5f5;
+}
+.pc-s1-organize-tray-heading strong {
+  color: #2d3b45;
+  font-size: .92rem;
+}
+.pc-s1-organize-tray-heading span {
+  color: #5e6c84;
+  font-size: .78rem;
+}
+.pc-s1-organize-tray-items,
+.pc-s1-organize-zone-items {
+  min-height: 54px;
+}
+.pc-s1-organize-zones {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+}
+.pc-s1-organize-zone {
+  border: 1px solid #c7cdd1;
+  background: #fff;
+  cursor: pointer;
+}
+.pc-s1-organize-text-header {
+  display: grid;
+  gap: 2px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #d6d9dc;
+  background: #f2f3f3;
+}
+.pc-s1-organize-text-header strong {
+  color: #2d3b45;
+  font-size: .96rem;
+}
+.pc-s1-organize-text-header span {
+  color: #5e6c84;
+  font-size: .78rem;
+  line-height: 1.35;
+}
+.pc-s1-organize-card {
+  display: grid;
+  grid-template-columns: 18px minmax(0,1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 8px 14px;
+  border: 0;
+  border-bottom: 1px solid #e3e5e6;
+  border-radius: 0;
+  background: #fff;
+  color: #2d3b45;
+  box-shadow: none;
+  cursor: grab;
+}
+.pc-s1-organize-card:last-child {
+  border-bottom: 0;
+}
+.pc-s1-organize-card:hover,
+.pc-s1-organize-card:focus-visible,
+.pc-s1-organize-card.is-selected {
+  background: #eef7fc;
+  outline: 2px solid #0875bd;
+  outline-offset: -2px;
+}
+.pc-s1-organize-card-copy {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.pc-s1-organize-card-copy strong {
+  font-size: .88rem;
+  font-weight: 600;
+}
+.pc-s1-organize-card-copy small {
+  color: #79858e;
+  font-size: .72rem;
+}
+.pc-s1-organize-zone.is-targetable .pc-s1-organize-text-header,
+.pc-s1-organize-zone.is-drop-hover .pc-s1-organize-text-header {
+  background: #e5f3fb;
+}
+.pc-s1-organize-zone.is-drop-hover {
+  outline: 3px solid #0875bd;
+  outline-offset: 2px;
+}
+.pc-s1-organize-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #c7cdd1;
+}
+.pc-s1-organize-footer span {
+  color: #2d3b45;
+  font-weight: 700;
+}
+.pc-s1-organize-notice {
+  min-height: 1.4em;
+  margin: 8px 0 0;
+  color: #526777;
+  font-size: .84rem;
+}
+@media (max-width: 680px) {
+  .pc-s1-rename-summary-actions,
+  .pc-s1-organize-footer,
+  .pc-s1-organize-tray-heading,
+  .pc-s1-organize-card-copy {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .pc-s1-rename-summary-actions > *,
+  .pc-s1-organize-footer .pc-shell-primary {
+    width: 100%;
+  }
+  .pc-s1-organize-tray-heading span {
+    margin-top: 4px;
+  }
+}
+
+/* P550 — Diagnosis 1 keeps the same S1 workspace and single-task hierarchy. */
+.pc-s1-diagnosis-card {
+  align-self: stretch;
+  height: calc(100% - 28px);
+  box-sizing: border-box;
+  margin: 14px;
+  padding: clamp(22px, 3vw, 40px);
+  border: 1px solid #c7d1d9;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .16);
+  overflow: auto;
+}
+.pc-s1-diagnosis-purpose {
+  margin-bottom: 20px;
+  padding: 15px 18px;
+  border-left: 5px solid #f0bd2b;
+  background: #fff8e7;
+}
+.pc-s1-diagnosis-purpose strong { display: block; margin-bottom: 4px; color: #17364e; }
+.pc-s1-diagnosis-purpose p { margin: 0; color: #405767; line-height: 1.5; }
+.pc-s1-diagnosis-context {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 26px;
+  padding: 15px 17px;
+  border-left: 5px solid #f0bd2b;
+  background: #eef5f8;
+}
+.pc-s1-diagnosis-context span {
+  color: #36556c;
+  font-size: .78rem;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.pc-s1-diagnosis-context strong {
+  color: #17364e;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+.pc-s1-diagnosis-card h2 {
+  margin: 0 0 7px;
+  color: #0d2a4a;
+  font-size: clamp(1.45rem, 2.2vw, 1.9rem);
+}
+.pc-s1-diagnosis-help {
+  margin: 0 0 18px;
+  color: #526777;
+  line-height: 1.5;
+}
+.pc-s1-diagnosis-choices {
+  display: grid;
+  gap: 10px;
+}
+.pc-s1-diagnosis-choice {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  width: 100%;
+  min-height: 58px;
+  padding: 14px 16px;
+  border: 2px solid #bac6cf;
+  border-radius: 6px;
+  background: #fff;
+  color: #263a49;
+  font: inherit;
+  line-height: 1.45;
+  text-align: left;
+  cursor: pointer;
+}
+.pc-s1-diagnosis-choice:hover,
+.pc-s1-diagnosis-choice:focus-visible {
+  border-color: #1672a5;
+  outline: 3px solid rgba(22, 114, 165, .16);
+  outline-offset: 1px;
+}
+.pc-s1-diagnosis-choice.is-selected {
+  border-color: #f0bd2b;
+  background: #fdf7e8;
+  box-shadow: inset 0 0 0 1px #8c6b00;
+}
+.pc-s1-diagnosis-radio {
+  position: relative;
+  width: 19px;
+  height: 19px;
+  margin-top: 2px;
+  border: 2px solid #71818d;
+  border-radius: 50%;
+  background: #fff;
+}
+.pc-s1-diagnosis-choice.is-selected .pc-s1-diagnosis-radio {
+  border-color: #0d4f70;
+}
+.pc-s1-diagnosis-choice.is-selected .pc-s1-diagnosis-radio::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: #0d4f70;
+}
+.pc-s1-diagnosis-submit {
+  margin: 0;
+  min-width: 190px;
+}
+.pc-s1-diagnosis-submit:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+}
+.pc-s1-diagnosis-notice {
+  margin: 0;
+  color: #36556c;
+  font-weight: 700;
+}
+.pc-s1-diagnosis-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px 0 0;
+  border-top: 1px solid #c7d2da;
+  background: #fff;
+}
+.pc-s1-diagnosis-actions .pc-s1-diagnosis-notice:empty { display: none; }
+@media (max-width: 680px) {
+  .pc-s1-diagnosis-card { margin: 8px; padding: 18px; }
+  .pc-s1-diagnosis-submit { width: 100%; }
+  .pc-s1-diagnosis-actions { align-items: stretch; flex-direction: column; }
+}
+
+
+/* P551 — compact, readable S1 Babbage report inside the preserved workstation monitor. */
+.pc-s1-babbage-report {
+  display: grid;
+  gap: 9px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px;
+  color: #eef7fb;
+  font-family: "Nunito", Arial, sans-serif;
+}
+.pc-s1-babbage-report header,
+.pc-s1-babbage-report section {
+  padding: 9px 11px;
+  border: 1px solid rgba(130, 196, 226, .35);
+  border-radius: 9px;
+  background: rgba(8, 42, 72, .78);
+}
+.pc-s1-babbage-report header {
+  border-color: rgba(240, 189, 43, .55);
+}
+.pc-s1-babbage-kicker {
+  display: block;
+  margin-bottom: 4px;
+  color: #f0bd2b;
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.pc-s1-babbage-report h2,
+.pc-s1-babbage-report h3 {
+  margin: 0;
+  color: #fff;
+}
+.pc-s1-babbage-report h2 { font-size: 1.12rem; }
+.pc-s1-babbage-report h3 { margin-bottom: 5px; font-size: .86rem; }
+.pc-s1-babbage-report p {
+  margin: 4px 0;
+  font-size: .78rem;
+  line-height: 1.3;
+}
+.pc-s1-babbage-gap {
+  border-left: 4px solid #f0bd2b !important;
+}
+.pc-s1-babbage-complete-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+@media (max-width: 680px) {
+  .pc-s1-babbage-report { padding: 10px; gap: 9px; }
+  .pc-s1-babbage-report header,
+  .pc-s1-babbage-report section { padding: 10px 11px; }
+  .pc-s1-babbage-report p { font-size: .76rem; }
+}
+
+/* P552 — S1 organization-only Babbage review. Keep the physical monitor scene
+   untouched while matching the report surface to the monitor's natural black. */
+html body #vnOverlay.vn-overlay.active.pc-s1-structure-analysis.babbage-terminal-textmode
+.babbage-terminal-screen {
+  background: #050505 !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 22px rgba(0, 0, 0, .78) !important;
+}
+html body #vnOverlay.vn-overlay.active.pc-s1-structure-analysis
+#babbageTerminalOutput {
+  text-shadow: none !important;
+}
+.pc-s1-babbage-report header,
+.pc-s1-babbage-report section {
+  box-shadow: none;
+}
+.pc-s1-babbage-structure-note {
+  border-left: 4px solid #f0bd2b !important;
+  background: rgba(8, 31, 49, .88) !important;
+}
+
+/* P554 — revised diagnosis comparison and local-first My Course overview. */
+.pc-s1-diagnosis-compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.pc-s1-diagnosis-context {
+  margin: 0;
+  min-height: 132px;
+  align-content: start;
+}
+.pc-s1-diagnosis-context.is-evidence {
+  border-left-color: #2f79a8;
+  background: #f4f8fb;
+}
+.pc-s1-diagnosis-question-block {
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #d5dde3;
+}
+.pc-s1-diagnosis-question-block .pc-s1-result-eyebrow {
+  display: inline-block;
+  margin-bottom: 7px;
+}
+
+.pc-s1-my-course-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(270px, .75fr);
+  gap: 18px;
+  padding: 18px;
+}
+.pc-s1-my-course-card,
+.pc-s1-my-course-summary {
+  border: 1px solid #c9d4dc;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, .98);
+  box-shadow: 0 7px 22px rgba(0, 0, 0, .14);
+}
+.pc-s1-my-course-card {
+  padding: clamp(22px, 3vw, 38px);
+}
+.pc-s1-my-course-card h2,
+.pc-s1-my-course-summary h2 {
+  margin: 7px 0 12px;
+  color: #0d2a4a;
+}
+.pc-s1-my-course-card h3 {
+  color: #17364e;
+}
+.pc-s1-my-course-card > p,
+.pc-s1-my-course-summary p {
+  color: #445a6b;
+  line-height: 1.55;
+}
+.pc-s1-my-course-card label,
+.pc-s1-my-course-activity-row > span {
+  display: block;
+  margin: 18px 0 7px;
+  color: #21394c;
+  font-weight: 800;
+}
+.pc-s1-my-course-card input,
+.pc-s1-my-course-card textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 2px solid #b9c7d1;
+  border-radius: 5px;
+  padding: 12px 13px;
+  background: #fff;
+  color: #1d3140;
+  font: inherit;
+  line-height: 1.45;
+}
+.pc-s1-my-course-card input:focus,
+.pc-s1-my-course-card textarea:focus {
+  border-color: #1672a5;
+  outline: 3px solid rgba(22, 114, 165, .16);
+  outline-offset: 1px;
+}
+.pc-s1-my-course-summary {
+  align-self: start;
+  padding: 22px;
+  border-top: 5px solid #f0bd2b;
+}
+.pc-s1-my-course-privacy {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #d7dfe5;
+  font-size: .84rem;
+}
+.pc-s1-my-course-activities {
+  display: grid;
+  gap: 4px;
+}
+.pc-s1-my-course-activity-row {
+  margin: 0;
+}
+.pc-s1-my-course-consent {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border-left: 5px solid #f0bd2b;
+  background: #f7fafc;
+  color: #36556c;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+.pc-s1-my-course-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #d5dde3;
+}
+.pc-s1-my-course-card ul {
+  padding-left: 22px;
+  color: #334d60;
+  line-height: 1.55;
+}
+.pc-s1-my-course-feedback-text {
+  white-space: pre-line;
+}
+
+@media (max-width: 900px) {
+  .pc-s1-diagnosis-compare,
+  .pc-s1-my-course-layout {
+    grid-template-columns: 1fr;
+  }
+  .pc-s1-diagnosis-context {
+    min-height: 0;
+  }
+  .pc-s1-my-course-summary {
+    order: -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .pc-s1-my-course-layout {
+    padding: 8px;
+  }
+  .pc-s1-my-course-card,
+  .pc-s1-my-course-summary {
+    padding: 18px;
+  }
+  .pc-s1-my-course-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .pc-s1-my-course-actions > * {
+    width: 100%;
+  }
+}
+
+/* P555 — Course Guide Step 1 preview */
+.pc-s1-guide-preview .pc-s1-learning-shell {
+  display: block;
+}
+.pc-s1-guide-paper {
+  width: min(1080px, calc(100% - 32px));
+  margin: 22px auto 34px;
+  padding: clamp(24px, 4vw, 46px);
+  background: #fff;
+  color: #18384f;
+  border: 1px solid #ccd6dd;
+  box-shadow: 0 18px 40px rgba(9, 34, 50, .16);
+}
+.pc-s1-guide-paper-header {
+  padding-bottom: 22px;
+  border-bottom: 4px solid #f0bd2b;
+}
+.pc-s1-guide-paper-header > span {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: .8rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: #315a74;
+}
+.pc-s1-guide-paper-header h2 {
+  margin: 0 0 10px;
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  line-height: 1.1;
+  color: #10364e;
+}
+.pc-s1-guide-paper-header p,
+.pc-s1-guide-section p,
+.pc-s1-guide-section li {
+  font-size: 1rem;
+  line-height: 1.58;
+}
+.pc-s1-guide-section {
+  padding: 24px 0;
+  border-bottom: 1px solid #dbe2e7;
+}
+.pc-s1-guide-section h3 {
+  margin: 0 0 12px;
+  color: #123f5a;
+  font-size: 1.15rem;
+}
+.pc-s1-guide-before-after,
+.pc-s1-guide-tip-grid {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  gap: 28px;
+}
+.pc-s1-guide-old-list,
+.pc-s1-guide-module {
+  border: 1px solid #cbd6dd;
+  background: #f8fafb;
+}
+.pc-s1-guide-old-list span {
+  display: block;
+  padding: 11px 14px;
+  border-bottom: 1px solid #dde4e8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+.pc-s1-guide-old-list span:last-child {
+  border-bottom: 0;
+}
+.pc-s1-guide-module-group strong {
+  display: block;
+  padding: 10px 14px;
+  background: #e9eef2;
+  border-top: 1px solid #cbd6dd;
+  border-bottom: 1px solid #cbd6dd;
+  color: #193f56;
+}
+.pc-s1-guide-module-group:first-child strong {
+  border-top: 0;
+}
+.pc-s1-guide-module-group span {
+  display: block;
+  padding: 10px 16px 10px 28px;
+  border-bottom: 1px solid #e3e8eb;
+  background: #fff;
+}
+.pc-s1-guide-module-group span.is-empty {
+  color: #687d8c;
+  font-style: italic;
+}
+.pc-s1-guide-babbage-note {
+  margin: 24px 0 0;
+  padding: 22px 24px;
+  border-left: 6px solid #f0bd2b;
+  background: #f4f8fa;
+}
+.pc-s1-guide-babbage-note h3 {
+  margin-top: 6px;
+}
+.pc-s1-guide-ai-box {
+  margin-top: 24px;
+  padding: 22px 24px;
+  border: 1px solid #b9cbd6;
+  background: #eef5f8;
+}
+.pc-s1-guide-section ul {
+  margin: 10px 0 0;
+  padding-left: 22px;
+}
+.pc-s1-guide-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 26px;
+}
+@media (max-width: 760px) {
+  .pc-s1-guide-paper {
+    width: calc(100% - 16px);
+    margin: 10px auto 20px;
+    padding: 20px 16px;
+  }
+  .pc-s1-guide-before-after,
+  .pc-s1-guide-tip-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .pc-s1-guide-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+  .pc-s1-guide-actions > * {
+    width: 100%;
+  }
+}
+@media print {
+  .pc-s1-guide-preview .pc-s1-learning-taskbar,
+  .pc-s1-guide-actions {
+    display: none !important;
+  }
+  .pc-s1-guide-paper {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+}
+
+/* P556 — Step 1 guide is a readable instructor manual, not a raw AI transcript. */
+.pc-s1-guide-paper-header {
+  margin: calc(clamp(24px, 4vw, 46px) * -1) calc(clamp(24px, 4vw, 46px) * -1) 0;
+  padding: 24px clamp(24px, 4vw, 46px) 22px;
+  background: #0b3156;
+  border-bottom: 4px solid #f0bd2b;
+}
+.pc-s1-guide-paper-header > span { color: #ffd55b; }
+.pc-s1-guide-paper-header h2 { color: #ffffff !important; }
+.pc-s1-guide-paper-header p { margin-bottom: 0; color: #f3f7fa !important; }
+.pc-s1-guide-insight-summary {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 1px solid #bfd0da;
+  border-radius: 8px;
+  background: #ffffff;
+}
+.pc-s1-guide-insight-summary p { margin: 0; }
+.pc-s1-guide-insight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+.pc-s1-guide-insight-grid > section {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #c8d6de;
+  border-radius: 8px;
+  background: #ffffff;
+}
+.pc-s1-guide-insight-grid p,
+.pc-s1-guide-insight-grid ul { margin: 8px 0 0; }
+.pc-s1-guide-insight-grid ul { padding-left: 20px; }
+.pc-s1-guide-insight-grid li + li { margin-top: 7px; }
+
+.pc-s1-guide-plan-report .pc-s1-guide-plan-intro p { margin-bottom: 0; }
+.pc-s1-guide-plan-report .pc-s1-guide-plan-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.pc-s1-guide-plan-report .pc-s1-guide-plan-grid > div {
+  padding: 14px 16px;
+  border: 1px solid rgba(108, 184, 221, .55);
+  border-radius: 8px;
+  background: rgba(8, 51, 79, .86);
+}
+.pc-s1-guide-plan-report .pc-s1-guide-plan-grid p { margin: 7px 0 0; }
+.pc-s1-guide-plan-report .pc-s1-guide-plan-grid ul { margin: 8px 0 0; padding-left: 20px; }
+.pc-s1-guide-plan-report .pc-s1-guide-plan-grid li + li { margin-top: 6px; }
+
+@media (max-width: 820px) {
+  .pc-s1-guide-insight-grid,
+  .pc-s1-guide-plan-report .pc-s1-guide-plan-grid { grid-template-columns: 1fr; }
+}
+
+/* P557 — revised module gives placement-specific coaching instead of decorative checks. */
+.pc-s1-final-module-row {
+  grid-template-columns: auto auto minmax(0, 1fr) auto minmax(118px, auto);
+  align-items: center;
+}
+.pc-s1-module-feedback {
+  display: grid;
+  justify-items: end;
+  gap: 1px;
+  min-width: 112px;
+  padding-left: 10px;
+  text-align: right;
+  line-height: 1.15;
+}
+.pc-s1-module-feedback strong {
+  font-size: .78rem;
+}
+.pc-s1-module-feedback small {
+  max-width: 150px;
+  font-size: .69rem;
+  color: #5b6e7b;
+}
+.pc-s1-module-feedback.is-good strong { color: #147347; }
+.pc-s1-module-feedback.is-reconsider strong { color: #805600; }
+.pc-s1-final-module-row.is-reconsider-placement {
+  background: #fffaf0;
+  box-shadow: inset 4px 0 0 #f0bd2b;
+}
+.pc-s1-module-review-summary {
+  display: grid;
+  gap: 3px;
+  margin: 12px 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #c9d5dc;
+  border-left-width: 5px;
+  background: #f7fafb;
+  color: #263f50;
+}
+.pc-s1-module-review-summary.is-good { border-left-color: #24845a; }
+.pc-s1-module-review-summary.is-reconsider { border-left-color: #f0bd2b; }
+.pc-s1-module-review-summary strong { font-size: .92rem; }
+.pc-s1-module-review-summary span { font-size: .82rem; line-height: 1.4; }
+
+/* Babbage guide-plan hierarchy uses GFC gold on the dark monitor. */
+.pc-s1-guide-plan-report .pc-s1-result-eyebrow,
+.pc-s1-guide-plan-report .pc-s1-guide-plan-intro h3,
+.pc-s1-guide-plan-report .pc-s1-babbage-structure-note h3 {
+  color: #ffd55b !important;
+}
+.pc-s1-guide-plan-report .pc-s1-guide-plan-grid > div {
+  border-color: rgba(240, 189, 43, .48);
+}
+
+/* Keep guide actions visible enough that saving does not become another dead end. */
+.pc-s1-guide-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  margin: 8px calc(clamp(24px, 4vw, 46px) * -1) calc(clamp(24px, 4vw, 46px) * -1);
+  padding: 16px clamp(24px, 4vw, 46px);
+  border-top: 1px solid #ccd6dd;
+  background: rgba(255,255,255,.97);
+  box-shadow: 0 -8px 20px rgba(18, 52, 75, .08);
+}
+
+@media (max-width: 760px) {
+  .pc-s1-final-module-row {
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+  }
+  .pc-s1-module-feedback {
+    grid-column: 3 / -1;
+    justify-items: start;
+    padding: 5px 0 2px;
+    text-align: left;
+  }
+  .pc-s1-guide-actions {
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-bottom: -20px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+/* P558 — Step 1 is a reusable Canvas-building reference, not a scored repair report. */
+.pc-s1-guide-reference-intro {
+  max-width: 78ch;
+}
+.pc-s1-guide-reference-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+.pc-s1-guide-reference-grid > section,
+.pc-s1-guide-header-ideas {
+  padding: 16px;
+  border: 1px solid #c5d1db;
+  border-radius: 8px;
+  background: #fff;
+}
+.pc-s1-guide-reference-grid .pc-s1-result-eyebrow,
+.pc-s1-guide-header-ideas .pc-s1-result-eyebrow {
+  color: #9a6900;
+  font-weight: 900;
+}
+.pc-s1-guide-reference-grid p,
+.pc-s1-guide-header-ideas p {
+  margin: 8px 0 0;
+}
+.pc-s1-guide-header-ideas {
+  margin-top: 14px;
+  border-left: 4px solid #f0bd2b;
+}
+@media (max-width: 820px) {
+  .pc-s1-guide-reference-grid { grid-template-columns: 1fr; }
+}
+
+/* P559 — readable module notes and a single visual guide reference. */
+.pc-s1-final-module-row {
+  grid-template-columns: auto auto minmax(0, 1fr) minmax(160px, 220px);
+  column-gap: 12px;
+}
+.pc-s1-module-feedback {
+  width: 100%;
+  min-width: 0;
+  justify-items: start;
+  padding: 8px 10px;
+  border-left: 2px solid currentColor;
+  text-align: left;
+  line-height: 1.3;
+}
+.pc-s1-module-feedback small { max-width: none; font-size: .76rem; }
+.pc-s1-module-feedback.is-good { color: #147347; background: #effaf4; }
+.pc-s1-module-feedback.is-reconsider { color: #805600; background: #fff3d4; }
+.pc-s1-guide-preview .pc-s1-learning-taskbar > div:first-child,
+.pc-s1-guide-paper-header { text-align: left; }
+.pc-s1-guide-paper-header { display: block; }
+.pc-s1-guide-paper-header h2 { font-size: clamp(1.7rem, 3vw, 2.35rem); }
+.pc-s1-guide-babbage-note {
+  background: #f7fafc;
+  border: 1px solid #c5d1db;
+  border-radius: 10px;
+  padding: 22px;
+}
+.pc-s1-guide-reference-grid > section { border-top: 5px solid #f0bd2b; }
+.pc-s1-guide-reference-grid ul { display: grid; gap: 7px; margin: 14px 0 0; padding: 0; list-style: none; }
+.pc-s1-guide-reference-grid li { padding: 8px 10px; background: #eef4f8; border-radius: 5px; }
+.pc-s1-guide-header-ideas { background: #fffaf0; }
+html body #vnOverlay.pc-s1-guide-reflection #babbageTerminalScene { display: none !important; }
+html body #vnOverlay.pc-s1-guide-reflection .vn-smartboard-wrap { display: block !important; }
+.pc-s1-field-examples {
+  margin: 8px 0 0 !important;
+  color: #607487 !important;
+  font-size: .86rem;
+  line-height: 1.45;
+}
+.pc-s1-my-course-card input::placeholder,
+.pc-s1-my-course-card textarea::placeholder { color: #687b8b; font-style: italic; opacity: 1; }
+
+html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode
+#babbageTerminalScene .babbage-terminal-screen {
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode
+#babbageTerminalOutput { overflow: visible !important; }
+@media (max-width: 640px) {
+  .pc-s1-final-module-row { grid-template-columns: auto minmax(0, 1fr); }
+  .pc-s1-final-module-row .pc-s1-module-feedback { grid-column: 2; }
+}
+
+/* P562 — isolate Maya from Canvas content height and present the personal
+   course review as a readable Canvas-style guide page. */
+.pc-s1-my-course-review-canvas {
+  margin: 18px;
+  border: 1px solid #aeb4b9;
+  border-radius: 6px;
+  background: #fff;
+  color: #2d3b45;
+  font-family: Lato, "Helvetica Neue", Arial, sans-serif;
+  box-shadow: 0 7px 26px rgba(0, 0, 0, .22);
+  overflow: hidden;
+}
+.pc-s1-my-course-canvas-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 54px;
+  padding: 0 20px;
+  border-bottom: 1px solid #d9dfe3;
+  border-bottom: 3px solid #f0bd2b;
+  background: #0d2a55;
+  color: #fff;
+}
+.pc-s1-my-course-canvas-bar strong { color: #f0bd2b; }
+.pc-s1-my-course-canvas-bar span:last-child { color: #fff; }
+.pc-s1-canvas-menu-mark { color: #f0bd2b; font-size: 1.35rem; }
+.pc-s1-my-course-review-links { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 18px; border-bottom: 1px solid #d9dfe3; background: #f5f7f9; }
+.pc-s1-my-course-review-links a { padding: 8px 12px; border-radius: 4px; color: #0875bd; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.pc-s1-my-course-review-links a:hover,
+.pc-s1-my-course-review-links a:focus-visible { background: #e3f1fa; outline: 2px solid #0875bd; }
+.pc-s1-my-course-review-body { display: block; }
+.pc-s1-my-course-review-nav { display: grid; align-content: start; gap: 2px; padding: 28px 20px; border-right: 1px solid #e2e6e9; }
+.pc-s1-my-course-review-nav strong { margin-bottom: 12px; }
+.pc-s1-my-course-review-nav span { padding: 9px 10px; color: #0875bd; }
+.pc-s1-my-course-review-nav .is-active { border-left: 3px solid #2d3b45; color: #2d3b45; font-weight: 800; }
+.pc-s1-my-course-review-page { padding: clamp(24px, 4vw, 52px); }
+.pc-s1-my-course-review-page h2 { margin: 8px 0 24px; color: #2d3b45; font-size: clamp(1.45rem, 2.5vw, 2rem); }
+.pc-s1-my-course-review-page section { margin: 0 0 20px; padding: 0 0 20px; border-bottom: 1px solid #c7cdd1; }
+.pc-s1-my-course-review-page h3 { margin: 0 0 8px; color: #2d3b45; }
+.pc-s1-my-course-review-page p,
+.pc-s1-my-course-review-page li { line-height: 1.55; }
+.pc-s1-my-course-review-page .pc-s1-guide-reference-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.pc-s1-my-course-review-page .pc-s1-guide-reference-grid > div { display: grid; gap: 6px; padding: 15px; border-top: 4px solid #f0bd2b; background: #f4f7f9; }
+.pc-s1-my-course-review-page .pc-s1-guide-reference-grid em { color: #536b7c; }
+.pc-s1-my-course-next-check { padding: 18px !important; border-left: 5px solid #f0bd2b; background: #fffaf0; }
+@media (max-width: 760px) {
+  .pc-s1-my-course-review-canvas { margin: 8px; }
+  .pc-s1-my-course-review-body { grid-template-columns: 1fr; }
+  .pc-s1-my-course-review-nav { display: none; }
+  .pc-s1-my-course-review-page { padding: 20px 16px; }
+  .pc-s1-my-course-review-page .pc-s1-guide-reference-grid { grid-template-columns: 1fr; }
+  .pc-s1-my-course-canvas-bar span:last-child { display: none; }
+}
+
+.pc-s1-full-guide-paper { width: calc(100% - 36px); max-width: 1680px; }
+.pc-s1-full-guide-module {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid #aeb4b9;
+  border-radius: 7px;
+  background: #f5f7f9;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .1);
+}
+.pc-s1-full-guide-module .pc-s1-guide-module-group {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 8px;
+  padding: 12px;
+  border-left: 5px solid #f0bd2b;
+  background: #fff;
+}
+.pc-s1-full-guide-module .pc-s1-guide-module-group strong { color: #0d2a4a; }
+.pc-s1-full-guide-module .pc-s1-guide-module-group span { grid-column: 2; padding: 5px 9px; border: 1px solid #d4dce2; border-radius: 4px; color: #2d3b45; }
+.pc-s1-full-guide-personal { border-top: 6px solid #1672a5; }
+.pc-s1-full-guide-tips { display: grid; gap: 10px; margin: 18px 0; }
+.pc-s1-full-guide-tips article { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: start; padding: 13px; background: #eef5f8; }
+.pc-s1-full-guide-tips article > span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #0d2a55; color: #f0bd2b; font-weight: 900; }
+.pc-s1-full-guide-tips p { margin: 3px 0 0; }
+.pc-s1-oscqr-section { border-top: 6px solid #e6a51d; }
+.pc-s1-oscqr-grid { display: grid; gap: 10px; margin-top: 12px; }
+.pc-s1-oscqr-grid article { display: grid; grid-template-columns: minmax(190px, .72fr) minmax(0, 1.28fr); gap: 14px; align-items: start; padding: 12px 14px; border: 1px solid #cbd7df; border-left: 5px solid #1672a5; background: #f5f8fa; }
+.pc-s1-oscqr-grid article strong { display: grid; gap: 3px; color: #0d2a4a; }
+.pc-s1-oscqr-grid article strong span { width: fit-content; padding: 2px 7px; border-radius: 999px; background: #0d2a55; color: #ffd55b; font-size: .72rem; letter-spacing: .04em; }
+.pc-s1-oscqr-grid article p { margin: 0; color: #42566a; }
+html body #vnOverlay.pc-s1-clean-closing .vn-smartboard-wrap,
+html body #vnOverlay.pc-s1-clean-closing #babbageTerminalScene { display: none !important; }
+
+@media (min-width: 1400px) {
+  .pc-s1-diagnosis-choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pc-s1-diagnosis-choice { height: 100%; }
+  .pc-s1-my-course-activities { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; }
+  .pc-s1-full-guide-module { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+  .pc-s1-full-guide-module .pc-s1-guide-module-group { grid-template-columns: 1fr; align-content: start; height: 100%; box-sizing: border-box; }
+  .pc-s1-full-guide-module .pc-s1-guide-module-group span { grid-column: 1; }
+  .pc-s1-full-guide-tips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 900px) {
+  .pc-s1-organize-board {
+    grid-template-columns: minmax(330px, .82fr) minmax(500px, 1.18fr);
+    align-items: start;
+  }
+  .pc-s1-organize-tray {
+    position: sticky;
+    top: 0;
+  }
+}
+@media (max-width: 640px) {
+  .pc-s1-full-guide-module { padding: 10px; }
+  .pc-s1-full-guide-module .pc-s1-guide-module-group { grid-template-columns: 1fr; }
+  .pc-s1-full-guide-module .pc-s1-guide-module-group span { grid-column: 1; }
+  .pc-s1-oscqr-grid article { grid-template-columns: 1fr; gap: 7px; }
+}
+
+/* P574 — canonical Scenario 1 stage and responsive system.
+   One owner for workspace height, actor placement, and device breakpoints. */
+.pc-s1-learning-shell,
+.pc-s1-learning-workspace,
+.pc-s1-canvas-frame { min-height: 0; }
+
+.pc-s1-learning-workspace {
+  height: clamp(420px, calc(100dvh - 285px), 700px);
+  contain: layout paint;
+}
+.pc-s1-learning-workspace > .pc-s1-canvas-frame,
+.pc-s1-learning-workspace > .pc-s1-maya-panel { min-height: 0; height: 100%; }
+.pc-s1-learning-workspace > .pc-s1-canvas-frame { overflow: auto; }
+.pc-s1-learning-workspace .pc-s1-canvas-app { min-height: 100%; }
+.pc-s1-learning-workspace > .pc-s1-maya-panel .pc-s1-maya-panel-inner {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: end;
+  gap: 8px;
+  min-height: 0;
+  height: 100%;
+  padding: 18px 14px 0;
+}
+.pc-s1-learning-workspace .pc-s1-maya-quote {
+  position: relative;
+  inset: auto;
+  z-index: 2;
+  align-self: start;
+  margin: 0;
+}
+.pc-s1-learning-workspace .pc-s1-maya-quote::after { display: none; }
+.pc-s1-learning-workspace .pc-s1-maya-art-wrap {
+  position: relative;
+  inset: auto;
+  justify-self: center;
+  width: 100%;
+  height: 100%;
+  max-height: 390px;
+}
+.pc-s1-learning-workspace .pc-s1-maya-art { max-height: 100%; }
+
+.pc-s1-my-course-report .pc-s1-my-course-findings ul { margin: 7px 0 0; padding-left: 20px; }
+.pc-s1-my-course-report .pc-s1-my-course-findings li + li { margin-top: 5px; }
+
+.pc-s1-organize-destination-heading,
+.pc-s1-organize-tray-heading {
+  display: grid;
+  grid-template-columns: minmax(130px, .55fr) minmax(0, 1fr);
+  gap: 3px;
+  align-items: start;
+  padding: 11px 14px;
+  border-bottom: 1px solid #d8dcdf;
+  background: #eef3f6;
+}
+.pc-s1-organize-destination-heading strong,
+.pc-s1-organize-tray-heading strong { color: #2d3b45; font-size: .92rem; }
+.pc-s1-organize-destination-heading span,
+.pc-s1-organize-tray-heading span { margin: 0; color: #5e6c84; font-size: .78rem; line-height: 1.4; }
+
+.pc-s1-diagnosis-card {
+  display: grid;
+  align-content: start;
+  gap: clamp(10px, 1.5vh, 16px);
+  padding: clamp(16px, 2vw, 28px);
+}
+.pc-s1-diagnosis-purpose { margin: 0; padding: 11px 15px; }
+.pc-s1-diagnosis-purpose p { line-height: 1.4; }
+.pc-s1-diagnosis-compare { margin: 0; }
+.pc-s1-diagnosis-context { min-height: 0; margin: 0; }
+.pc-s1-diagnosis-question-block { margin: 0; padding-bottom: 10px; }
+.pc-s1-diagnosis-result .pc-s1-learning-workspace,
+.pc-s1-diagnosis-result .pc-s1-diagnosis-result-card {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.pc-s1-my-course-review-canvas {
+  max-height: calc(100dvh - 190px);
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+.pc-s1-my-course-review-links {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.pc-s1-my-course-review-links button {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #0875bd;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.pc-s1-my-course-review-links button:hover,
+.pc-s1-my-course-review-links button:focus-visible {
+  background: #e3f1fa;
+  outline: 2px solid #0875bd;
+}
+.pc-s1-my-course-review-page section[id] { scroll-margin-top: 120px; }
+
+@media (min-width: 1400px) {
+  .pc-s1-organize-board {
+    grid-template-columns: minmax(330px, .82fr) minmax(500px, 1.18fr);
+    align-items: start;
+  }
+  .pc-s1-organize-tray { position: sticky; top: 0; }
+}
+
+@media (max-width: 1399px) {
+  .pc-s1-organize-board { grid-template-columns: minmax(0, 1fr); }
+  .pc-s1-organize-tray { position: static; }
+}
+
+@media (max-width: 1050px) {
+  .pc-s1-learning-workspace {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 170px);
+    min-height: 620px;
+    max-height: none;
+    contain: none;
+  }
+  .pc-s1-learning-workspace > .pc-s1-maya-panel {
+    order: -1;
+    flex: 0 0 150px;
+    min-height: 0;
+    border: 1px solid rgba(184, 200, 216, .28);
+    border-radius: 6px 6px 0 0;
+  }
+  .pc-s1-learning-workspace > .pc-s1-maya-panel .pc-s1-maya-panel-inner {
+    grid-template-columns: minmax(0, 1fr) 110px;
+    grid-template-rows: 1fr;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+  .pc-s1-learning-workspace .pc-s1-maya-quote { padding: 10px 12px; }
+  .pc-s1-learning-workspace .pc-s1-maya-quote p { font-size: .84rem; line-height: 1.32; }
+  .pc-s1-learning-workspace .pc-s1-maya-art-wrap { height: 134px; max-height: 134px; }
+  .pc-s1-learning-workspace .pc-s1-maya-art { max-height: 134px; }
+  .pc-s1-learning-workspace > .pc-s1-canvas-frame {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    border: 1px solid #aeb4b9;
+    border-radius: 0 0 6px 6px;
+  }
+  .pc-s1-organizing .pc-s1-learning-workspace > .pc-s1-maya-panel { flex-basis: 126px; }
+  .pc-s1-organizing .pc-s1-learning-workspace .pc-s1-maya-art-wrap,
+  .pc-s1-organizing .pc-s1-learning-workspace .pc-s1-maya-art { height: 110px; max-height: 110px; }
+}
+
+@media (min-width: 1051px) {
+  .pc-s1-diagnosis-card { overflow: auto; }
+  .pc-s1-diagnosis-choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pc-s1-diagnosis-choice { min-height: 54px; padding: 11px 14px; }
+}
+
+@media (min-width: 1051px) and (max-height: 820px) {
+  .pc-s1-diagnosis-card { gap: 8px; margin: 8px; height: calc(100% - 16px); padding: 12px 16px; }
+  .pc-s1-diagnosis-purpose { padding: 8px 12px; font-size: .88rem; }
+  .pc-s1-diagnosis-context { padding: 9px 12px; }
+  .pc-s1-diagnosis-context strong { font-size: .9rem; line-height: 1.3; }
+  .pc-s1-diagnosis-question-block .pc-s1-result-eyebrow { margin-bottom: 3px; }
+  .pc-s1-diagnosis-card h2 { font-size: 1.45rem; }
+  .pc-s1-diagnosis-help { margin-bottom: 6px; line-height: 1.35; }
+  .pc-s1-diagnosis-choice { min-height: 46px; padding: 9px 12px; line-height: 1.3; }
+}
+
+@media (max-width: 640px) {
+  .pc-s1-learning {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px;
+    overflow: hidden;
+  }
+  .pc-s1-learning-taskbar { gap: 8px; padding: 11px 12px; }
+  .pc-s1-learning-taskbar h1 { font-size: 1.38rem; }
+  .pc-s1-learning-taskbar p { font-size: .84rem; }
+  .pc-s1-learning-task-status { align-self: stretch; text-align: center; }
+  .pc-s1-learning-workspace {
+    width: 100%;
+    box-sizing: border-box;
+    height: calc(100dvh - 248px);
+    min-height: 480px;
+    max-height: 700px;
+    padding: 4px;
+    overflow: hidden;
+  }
+  .pc-s1-learning-workspace > .pc-s1-maya-panel { flex-basis: 144px; }
+  .pc-s1-learning-workspace > .pc-s1-maya-panel .pc-s1-maya-panel-inner {
+    grid-template-columns: minmax(0, 1fr) 72px;
+    gap: 4px;
+    padding: 6px;
+  }
+  .pc-s1-learning-workspace .pc-s1-maya-art-wrap,
+  .pc-s1-learning-workspace .pc-s1-maya-art { height: 128px; max-height: 128px; }
+  .pc-s1-learning-workspace .pc-s1-maya-quote { max-height: 124px; overflow: auto; padding: 8px 9px; }
+  .pc-s1-learning-workspace .pc-s1-maya-quote p { font-size: .72rem; line-height: 1.28; }
+
+  .pc-s1-canvas-app { grid-template-columns: minmax(0, 1fr); }
+  .pc-s1-canvas-global-nav { display: none; }
+  .pc-s1-canvas-topbar { min-height: 44px; padding: 0 8px; }
+  .pc-s1-canvas-course-nav {
+    display: flex;
+    justify-content: flex-start;
+    overflow: visible;
+    white-space: normal;
+    scrollbar-width: none;
+  }
+  .pc-s1-canvas-course-nav::-webkit-scrollbar { display: none; }
+  .pc-s1-canvas-course-nav a:nth-child(n+4) { display: none; }
+  .pc-s1-canvas-course-nav a,
+  .pc-s1-canvas-course-nav a.is-active {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px 5px;
+    font-size: .72rem;
+    text-align: center;
+  }
+  .pc-s1-canvas-course-title strong {
+    display: inline-block;
+    max-width: 42%;
+    vertical-align: bottom;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pc-s1-canvas-main { padding: 14px 10px 22px; }
+  .pc-s1-rename-editor { padding: 13px; }
+  .pc-s1-rename-editor-heading { display: grid; gap: 4px; }
+  .pc-s1-rename-editor-heading strong { overflow-wrap: anywhere; }
+  .pc-s1-rename-input-row { grid-template-columns: minmax(0, 1fr); }
+  .pc-s1-final-module-row { grid-template-columns: 16px minmax(0, 1fr); gap: 4px 8px; padding: 8px; }
+  .pc-s1-final-module-row .pc-s1-canvas-row-indent { display: none; }
+  .pc-s1-final-module-row .pc-s1-canvas-doc-icon { grid-column: 1; }
+  .pc-s1-final-module-row .pc-s1-final-module-title { grid-column: 2; overflow-wrap: anywhere; }
+
+  .pc-s1-organize-destination-heading,
+  .pc-s1-organize-tray-heading { grid-template-columns: 1fr; }
+
+  .pc-s1-guide-preview { overflow: visible; }
+  .pc-s1-guide-preview .pc-s1-learning-shell { max-height: none; overflow: visible; }
+  .pc-s1-guide-preview .pc-s1-guide-paper-header { display: none !important; }
+  .pc-s1-guide-preview .pc-s1-guide-paper {
+    width: calc(100% - 12px);
+    margin: 6px auto 18px;
+    padding: 18px 14px;
+  }
+  .pc-s1-guide-actions {
+    position: static;
+    inset: auto;
+    margin-top: 18px;
+    padding: 16px 0 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .pc-s1-diagnosis-result .pc-s1-learning-workspace { overflow-y: auto; }
+  .pc-s1-my-course-review-canvas { max-height: calc(100dvh - 230px); }
+  .pc-s1-my-course-review-links {
+    display: grid;
+    grid-template-columns: 1fr;
+    position: static;
+  }
+}
+
 /* SOURCE: src/css/responsive/intro.css */
 /* ══════════════════════════════════════════════════════
    INTRO RESPONSIVE LAYOUT
@@ -31325,4 +33823,639 @@ html body .pc-app-header .pc-progress-menu .level-tag {
     top: 4px !important;
     font-size: 1.08rem !important;
   }
+}
+
+
+/* P547 — Compact desktop PromptCraft HUD.
+   Preserve the brand dropdown and Teaching Progress controls while returning
+   vertical space to the scenario workspace. */
+@media screen and (min-width: 641px) {
+  html body .pc-app-header {
+    min-height: 62px !important;
+    padding: 5px 18px !important;
+    gap: 14px !important;
+  }
+
+  html body .pc-app-header .pc-brand-summary {
+    min-height: 48px !important;
+    gap: 9px !important;
+    padding: 4px 8px !important;
+  }
+
+  html body .pc-app-header .pc-brand-summary .logo-icon,
+  html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    border-radius: 9px !important;
+  }
+
+  html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon img {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  html body .pc-app-header .pc-brand-summary .logo-name,
+  html body .pc-app-header .pc-brand-summary .logo-name span {
+    font-size: 1.08rem !important;
+    line-height: 1 !important;
+  }
+
+  html body .pc-app-header .pc-brand-summary .logo-sub {
+    margin-top: 1px !important;
+    font-size: .58rem !important;
+    line-height: 1 !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+    min-width: min(390px, 37vw) !important;
+    min-height: 50px !important;
+    column-gap: 9px !important;
+    padding: 5px 10px !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-level-badge {
+    padding: 7px 10px !important;
+    font-size: .68rem !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    text-align: left !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+    width: auto !important;
+    font-size: .60rem !important;
+    line-height: 1 !important;
+    text-align: left !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    top: 1px !important;
+    width: auto !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    text-align: left !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-template-columns: minmax(110px, 1fr) auto !important;
+    gap: 7px !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .xp-track {
+    min-width: 110px !important;
+    height: 10px !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .xp-label,
+  html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+    font-size: .64rem !important;
+  }
+}
+
+@media screen and (min-width: 641px) and (max-width: 1000px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    min-width: min(330px, 45vw) !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-template-columns: minmax(82px, 1fr) auto !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-track {
+    min-width: 82px !important;
+  }
+}
+
+/* P547.1 — keep the compact Teaching Progress summary to two visual rows. */
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    align-items: center !important;
+    column-gap: 7px !important;
+    row-gap: 2px !important;
+    text-align: left !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    white-space: nowrap !important;
+  }
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    top: 0 !important;
+    white-space: nowrap !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    align-self: center !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+  }
+}
+
+/* P548 — Rebalance the compact Teaching Progress summary.
+   One calm hierarchy: level badge, progress identity + XP, then disclosure. */
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: auto minmax(245px, 1fr) auto 12px !important;
+    width: clamp(430px, 36vw, 540px) !important;
+    min-width: 0 !important;
+    min-height: 54px !important;
+    column-gap: 11px !important;
+    padding: 6px 10px !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-level-badge {
+    align-self: stretch !important;
+    display: grid !important;
+    place-items: center !important;
+    min-width: 56px !important;
+    padding: 4px 8px !important;
+    border-radius: 13px !important;
+    font-size: .69rem !important;
+    line-height: 1.05 !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    align-items: center !important;
+    column-gap: 10px !important;
+    row-gap: 5px !important;
+    width: 100% !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+    color: #b9dced !important;
+    font-size: .62rem !important;
+    line-height: 1 !important;
+    letter-spacing: .055em !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    position: static !important;
+    margin: 0 !important;
+    font-size: 1.02rem !important;
+    line-height: 1 !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    display: grid !important;
+    grid-template-columns: minmax(120px, 1fr) auto !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .xp-track {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 9px !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .xp-label {
+    font-size: .65rem !important;
+    white-space: nowrap !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+    align-self: center !important;
+    font-size: .64rem !important;
+    white-space: nowrap !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret {
+    align-self: center !important;
+    justify-self: end !important;
+  }
+}
+
+@media screen and (min-width: 641px) and (max-width: 1050px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    width: clamp(355px, 44vw, 430px) !important;
+    grid-template-columns: auto minmax(190px, 1fr) 12px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+    display: none !important;
+  }
+}
+
+/* P548.1 — keep the rebalanced HUD inside the viewport at large text sizes. */
+@media screen and (min-width: 641px) and (max-width: 1400px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    width: min(400px, 34vw) !important;
+    grid-template-columns: auto minmax(0, 1fr) 12px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+    display: none !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    column-gap: 7px !important;
+  }
+}
+
+/* P549 — Simplify the collapsed Teaching Progress control to match the
+   expanded panel hierarchy: label + level name on the left, level badge on the
+   right. XP remains available inside the expanded progress panel. */
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: minmax(0,1fr) auto 12px !important;
+    width: clamp(300px, 27vw, 390px) !important;
+    min-height: 50px !important;
+    padding: 7px 10px 7px 13px !important;
+    column-gap: 10px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    grid-column: 1 !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 3px !important;
+    text-align: left !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    color: #b9dced !important;
+    font-size: .64rem !important;
+    line-height: 1 !important;
+    text-align: left !important;
+    letter-spacing: .065em !important;
+  }
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    position: static !important;
+    font-size: 1.02rem !important;
+    line-height: 1.05 !important;
+    text-align: left !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-level-badge {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    min-width: 62px !important;
+    min-height: 34px !important;
+    padding: 5px 9px !important;
+    border-radius: 10px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-group,
+  html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+    display: none !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+  }
+}
+
+/* P550 — Keep the collapsed progress control useful without duplicating the
+   expanded panel heading. The main header shows level identity + live XP only;
+   the detailed Teaching Progress label remains inside the expanded panel. */
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: minmax(0,1fr) auto 12px !important;
+    grid-template-rows: auto auto !important;
+    width: clamp(320px, 29vw, 420px) !important;
+    min-height: 56px !important;
+    padding: 7px 10px 7px 13px !important;
+    row-gap: 5px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    display: block !important;
+    min-width: 0 !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+    display: none !important;
+  }
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    display: block !important;
+    position: static !important;
+    font-size: 1rem !important;
+    line-height: 1.05 !important;
+    text-align: left !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-level-badge {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    min-width: 62px !important;
+    min-height: 32px !important;
+    padding: 4px 9px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-column: 1 / 3 !important;
+    grid-row: 2 !important;
+    display: grid !important;
+    grid-template-columns: minmax(110px, 1fr) auto !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-track {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 8px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-label {
+    display: block !important;
+    font-size: .63rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+    display: none !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret {
+    grid-column: 3 !important;
+    grid-row: 1 / 3 !important;
+    align-self: center !important;
+  }
+}
+
+
+/* P551 — the collapsed header owns level identity + XP. The expanded panel
+   provides details without repeating the same heading and progress meter. */
+html body .pc-app-header .pc-progress-panel .pc-progress-panel-heading {
+  display: none !important;
+}
+html body .pc-app-header .pc-progress-panel .pc-progress-total,
+html body .pc-app-header .pc-progress-panel .pc-progress-full-track {
+  display: none !important;
+}
+html body .pc-app-header .pc-progress-panel .pc-progress-panel-body {
+  padding-top: 16px !important;
+}
+
+/* P555 — Later scenarios stay visible but locked during the new game-loop rebuild. */
+.pc-menu-scenario-card.is-rebuild-locked,
+.pc-menu-scenario-card:disabled {
+  cursor: not-allowed;
+  opacity: .58;
+}
+.pc-menu-scenario-card.is-rebuild-locked .pc-menu-scenario-status {
+  font-weight: 800;
+}
+
+/* P556 — anonymous challenge score lives beside, not instead of, personal XP. */
+html body .pc-app-header .pc-progress-menu .pc-challenge-top {
+  display: inline-block;
+  color: #ffd55b;
+  font-size: .63rem;
+  line-height: 1;
+  font-weight: 800;
+  white-space: nowrap;
+}
+html body .pc-app-header .pc-progress-menu .pc-progress-challenge {
+  margin-top: 5px;
+  color: #ffd55b;
+  font-size: .78rem;
+  font-weight: 800;
+}
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-template-columns: minmax(90px, 1fr) auto auto !important;
+  }
+}
+@media screen and (max-width: 640px) {
+  html body .pc-app-header .pc-progress-menu .pc-challenge-top {
+    display: block;
+    margin-top: 4px;
+  }
+}
+
+/* P557 — anonymous challenge score is its own explained status card. */
+html body .pc-app-header .pc-progress-menu .pc-challenge-card {
+  display: grid;
+  align-content: center;
+  gap: 1px;
+  min-width: 128px;
+  padding: 7px 10px;
+  border: 1px solid rgba(240, 189, 43, .72);
+  border-radius: 9px;
+  background: rgba(6, 40, 73, .78);
+  color: #fff;
+  line-height: 1.08;
+}
+html body .pc-app-header .pc-progress-menu .pc-challenge-card-label {
+  color: #ffd55b;
+  font-size: .61rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+html body .pc-app-header .pc-progress-menu .pc-challenge-card strong {
+  font-size: .76rem;
+  color: #fff;
+}
+html body .pc-app-header .pc-progress-menu .pc-challenge-card small {
+  color: #cbd9e5;
+  font-size: .55rem;
+  white-space: nowrap;
+}
+
+/* P574 — keep the collapsed progress caret inside the header paint area. */
+html body .pc-app-header { overflow-x: clip; }
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret {
+    position: relative !important;
+    right: 6px !important;
+  }
+}
+html body .pc-app-header .pc-progress-panel .pc-progress-challenge-card {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 3px 10px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(240, 189, 43, .7);
+  border-radius: 8px;
+  background: rgba(4, 34, 64, .42);
+}
+html body .pc-app-header .pc-progress-panel .pc-progress-challenge-card strong { color: #ffd55b; }
+html body .pc-app-header .pc-progress-panel .pc-progress-challenge-card span { justify-self: end; font-weight: 800; color: #fff; }
+html body .pc-app-header .pc-progress-panel .pc-progress-challenge-card small {
+  grid-column: 1 / -1;
+  color: #cbd9e5;
+  font-size: .72rem;
+  line-height: 1.3;
+}
+html body .pc-app-header .pc-progress-menu .pc-challenge-top,
+html body .pc-app-header .pc-progress-menu .pc-progress-challenge {
+  display: unset;
+  margin: 0;
+  color: inherit;
+  font-size: inherit;
+}
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-template-columns: minmax(90px, 1fr) auto !important;
+  }
+}
+@media screen and (max-width: 800px) {
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card small { display: none; }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card { min-width: 108px; padding: 6px 8px; }
+}
+@media screen and (max-width: 640px) {
+  html body .pc-app-header .pc-progress-menu .header-status { grid-template-columns: minmax(0,1fr) auto auto; }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card { display: none; }
+}
+
+/* P558 — balanced progress summary: level left, explorer centered, challenge right. */
+html body .pc-app-header .pc-progress-menu .pc-challenge-card small { display: none !important; }
+html body .pc-app-header .pc-progress-menu .pc-challenge-card {
+  min-width: 132px;
+  text-align: left;
+}
+html body .pc-app-header .pc-progress-menu .pc-challenge-card-label {
+  font-size: .6rem;
+}
+html body .pc-app-header .pc-progress-menu .pc-challenge-card strong {
+  font-size: .82rem;
+}
+@media screen and (min-width: 801px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: auto minmax(180px, 1fr) auto auto !important;
+    column-gap: 14px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-level-badge {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    text-align: center !important;
+    justify-items: stretch !important;
+  }
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    text-align: center !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    width: min(100%, 320px) !important;
+    margin-inline: auto !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret {
+    grid-column: 4 !important;
+    grid-row: 1 !important;
+  }
+}
+
+/* P560 — keep the progress control inside narrow headers. */
+@media screen and (min-width: 641px) and (max-width: 1300px) {
+  html body .pc-app-header .pc-progress-menu { width: min(100%, 390px) !important; }
+  html body .pc-app-header .pc-progress-menu .header-status {
+    width: 100% !important;
+    min-width: 0 !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card { display: none !important; }
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret { grid-column: 3 !important; }
+}
+@media screen and (max-width: 640px) {
+  html body .pc-app-header { width: 100% !important; box-sizing: border-box !important; }
+  html body .pc-app-header .pc-progress-menu { width: 100% !important; max-width: none !important; }
+  html body .pc-app-header .pc-progress-menu .header-status {
+    width: 100% !important;
+    min-width: 0 !important;
+    grid-template-columns: 54px minmax(0, 1fr) 12px !important;
+    grid-template-rows: auto auto !important;
+    gap: 5px 8px !important;
+    padding: 8px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-level-badge { grid-column: 1 !important; grid-row: 1 / 3 !important; min-width: 0 !important; }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy { grid-column: 2 !important; grid-row: 1 !important; }
+  html body .pc-app-header .pc-progress-menu .level-tag { min-height: 0 !important; height: auto !important; top: 0 !important; line-height: 1.1 !important; }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy { row-gap: 2px !important; }
+  html body .pc-app-header .pc-progress-menu .xp-group { min-height: 0 !important; padding: 3px 0 !important; margin-top: 2px !important; border: 0 !important; background: transparent !important; }
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret { grid-column: 3 !important; grid-row: 1 !important; }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card {
+    display: flex !important;
+    grid-column: 2 / 4 !important;
+    grid-row: 2 !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 7px !important;
+    min-width: 0 !important;
+    padding: 4px 7px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card-label { font-size: .59rem !important; }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card strong { flex: 0 0 auto !important; font-size: .72rem !important; }
+  html body .pc-app-header .pc-progress-menu .xp-group { grid-template-columns: minmax(0, 1fr) auto !important; }
+  html body .pc-app-header .pc-progress-menu .xp-track { min-width: 0 !important; }
+  html body .pc-app-header .pc-progress-menu .pc-progress-panel { width: min(380px, calc(100vw - 16px)) !important; }
+}
+
+/* P568 — final phone header sizing; identical proportions across narrow devices. */
+@media screen and (max-width: 640px) {
+  html body .pc-app-header { gap: 6px !important; padding: 7px 10px 9px !important; }
+  html body .pc-app-header .pc-brand-menu { width: min(100%, 300px) !important; }
+  html body .pc-app-header .pc-brand-summary { min-height: 46px !important; }
+  html body .pc-app-header .pc-brand-summary .logo-icon,
+  html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+  }
+  html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon img { width: 34px !important; height: 34px !important; }
+  html body .pc-app-header .pc-brand-summary .logo-name,
+  html body .pc-app-header .pc-brand-summary .logo-name span { font-size: 1.02rem !important; }
+  html body .pc-app-header .pc-brand-summary .logo-sub { display: block !important; font-size: .54rem !important; }
+  html body .pc-app-header .pc-progress-menu .header-status {
+    min-height: 70px !important;
+    padding: 7px 8px !important;
+    gap: 3px 7px !important;
+  }
+}
+
+/* P569 — scenario navigation lives in the PromptCraft menu; DEV is opt-in. */
+html body > nav.scenario-tabs,
+html body .pc-compact-nav,
+html body > .dev-bar {
+  display: none !important;
+}
+html body.pc-dev-tools-visible > .dev-bar {
+  position: fixed !important;
+  inset: auto 0 0 0 !important;
+  z-index: 10050 !important;
+  display: flex !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  box-sizing: border-box !important;
+  box-shadow: 0 -4px 18px rgba(0, 0, 0, .28) !important;
 }

@@ -1254,3 +1254,638 @@ html body .pc-app-header .pc-progress-menu .level-tag {
     font-size: 1.08rem !important;
   }
 }
+
+
+/* P547 — Compact desktop PromptCraft HUD.
+   Preserve the brand dropdown and Teaching Progress controls while returning
+   vertical space to the scenario workspace. */
+@media screen and (min-width: 641px) {
+  html body .pc-app-header {
+    min-height: 62px !important;
+    padding: 5px 18px !important;
+    gap: 14px !important;
+  }
+
+  html body .pc-app-header .pc-brand-summary {
+    min-height: 48px !important;
+    gap: 9px !important;
+    padding: 4px 8px !important;
+  }
+
+  html body .pc-app-header .pc-brand-summary .logo-icon,
+  html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    border-radius: 9px !important;
+  }
+
+  html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon img {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  html body .pc-app-header .pc-brand-summary .logo-name,
+  html body .pc-app-header .pc-brand-summary .logo-name span {
+    font-size: 1.08rem !important;
+    line-height: 1 !important;
+  }
+
+  html body .pc-app-header .pc-brand-summary .logo-sub {
+    margin-top: 1px !important;
+    font-size: .58rem !important;
+    line-height: 1 !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+    min-width: min(390px, 37vw) !important;
+    min-height: 50px !important;
+    column-gap: 9px !important;
+    padding: 5px 10px !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-level-badge {
+    padding: 7px 10px !important;
+    font-size: .68rem !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    text-align: left !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+    width: auto !important;
+    font-size: .60rem !important;
+    line-height: 1 !important;
+    text-align: left !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    top: 1px !important;
+    width: auto !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    text-align: left !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-template-columns: minmax(110px, 1fr) auto !important;
+    gap: 7px !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .xp-track {
+    min-width: 110px !important;
+    height: 10px !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .xp-label,
+  html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+    font-size: .64rem !important;
+  }
+}
+
+@media screen and (min-width: 641px) and (max-width: 1000px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    min-width: min(330px, 45vw) !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-template-columns: minmax(82px, 1fr) auto !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-track {
+    min-width: 82px !important;
+  }
+}
+
+/* P547.1 — keep the compact Teaching Progress summary to two visual rows. */
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    align-items: center !important;
+    column-gap: 7px !important;
+    row-gap: 2px !important;
+    text-align: left !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    white-space: nowrap !important;
+  }
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    top: 0 !important;
+    white-space: nowrap !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    align-self: center !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+  }
+}
+
+/* P548 — Rebalance the compact Teaching Progress summary.
+   One calm hierarchy: level badge, progress identity + XP, then disclosure. */
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: auto minmax(245px, 1fr) auto 12px !important;
+    width: clamp(430px, 36vw, 540px) !important;
+    min-width: 0 !important;
+    min-height: 54px !important;
+    column-gap: 11px !important;
+    padding: 6px 10px !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-level-badge {
+    align-self: stretch !important;
+    display: grid !important;
+    place-items: center !important;
+    min-width: 56px !important;
+    padding: 4px 8px !important;
+    border-radius: 13px !important;
+    font-size: .69rem !important;
+    line-height: 1.05 !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    align-items: center !important;
+    column-gap: 10px !important;
+    row-gap: 5px !important;
+    width: 100% !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+    color: #b9dced !important;
+    font-size: .62rem !important;
+    line-height: 1 !important;
+    letter-spacing: .055em !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    position: static !important;
+    margin: 0 !important;
+    font-size: 1.02rem !important;
+    line-height: 1 !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    display: grid !important;
+    grid-template-columns: minmax(120px, 1fr) auto !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .xp-track {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 9px !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .xp-label {
+    font-size: .65rem !important;
+    white-space: nowrap !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+    align-self: center !important;
+    font-size: .64rem !important;
+    white-space: nowrap !important;
+  }
+
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret {
+    align-self: center !important;
+    justify-self: end !important;
+  }
+}
+
+@media screen and (min-width: 641px) and (max-width: 1050px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    width: clamp(355px, 44vw, 430px) !important;
+    grid-template-columns: auto minmax(190px, 1fr) 12px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+    display: none !important;
+  }
+}
+
+/* P548.1 — keep the rebalanced HUD inside the viewport at large text sizes. */
+@media screen and (min-width: 641px) and (max-width: 1400px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    width: min(400px, 34vw) !important;
+    grid-template-columns: auto minmax(0, 1fr) 12px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+    display: none !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    column-gap: 7px !important;
+  }
+}
+
+/* P549 — Simplify the collapsed Teaching Progress control to match the
+   expanded panel hierarchy: label + level name on the left, level badge on the
+   right. XP remains available inside the expanded progress panel. */
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: minmax(0,1fr) auto 12px !important;
+    width: clamp(300px, 27vw, 390px) !important;
+    min-height: 50px !important;
+    padding: 7px 10px 7px 13px !important;
+    column-gap: 10px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    grid-column: 1 !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 3px !important;
+    text-align: left !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    color: #b9dced !important;
+    font-size: .64rem !important;
+    line-height: 1 !important;
+    text-align: left !important;
+    letter-spacing: .065em !important;
+  }
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    position: static !important;
+    font-size: 1.02rem !important;
+    line-height: 1.05 !important;
+    text-align: left !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-level-badge {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    min-width: 62px !important;
+    min-height: 34px !important;
+    padding: 5px 9px !important;
+    border-radius: 10px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-group,
+  html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+    display: none !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+  }
+}
+
+/* P550 — Keep the collapsed progress control useful without duplicating the
+   expanded panel heading. The main header shows level identity + live XP only;
+   the detailed Teaching Progress label remains inside the expanded panel. */
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: minmax(0,1fr) auto 12px !important;
+    grid-template-rows: auto auto !important;
+    width: clamp(320px, 29vw, 420px) !important;
+    min-height: 56px !important;
+    padding: 7px 10px 7px 13px !important;
+    row-gap: 5px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    display: block !important;
+    min-width: 0 !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-kicker {
+    display: none !important;
+  }
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    display: block !important;
+    position: static !important;
+    font-size: 1rem !important;
+    line-height: 1.05 !important;
+    text-align: left !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-level-badge {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    min-width: 62px !important;
+    min-height: 32px !important;
+    padding: 4px 9px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-column: 1 / 3 !important;
+    grid-row: 2 !important;
+    display: grid !important;
+    grid-template-columns: minmax(110px, 1fr) auto !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-track {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 8px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-label {
+    display: block !important;
+    font-size: .63rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-view-label {
+    display: none !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret {
+    grid-column: 3 !important;
+    grid-row: 1 / 3 !important;
+    align-self: center !important;
+  }
+}
+
+
+/* P551 — the collapsed header owns level identity + XP. The expanded panel
+   provides details without repeating the same heading and progress meter. */
+html body .pc-app-header .pc-progress-panel .pc-progress-panel-heading {
+  display: none !important;
+}
+html body .pc-app-header .pc-progress-panel .pc-progress-total,
+html body .pc-app-header .pc-progress-panel .pc-progress-full-track {
+  display: none !important;
+}
+html body .pc-app-header .pc-progress-panel .pc-progress-panel-body {
+  padding-top: 16px !important;
+}
+
+/* P555 — Later scenarios stay visible but locked during the new game-loop rebuild. */
+.pc-menu-scenario-card.is-rebuild-locked,
+.pc-menu-scenario-card:disabled {
+  cursor: not-allowed;
+  opacity: .58;
+}
+.pc-menu-scenario-card.is-rebuild-locked .pc-menu-scenario-status {
+  font-weight: 800;
+}
+
+/* P556 — anonymous challenge score lives beside, not instead of, personal XP. */
+html body .pc-app-header .pc-progress-menu .pc-challenge-top {
+  display: inline-block;
+  color: #ffd55b;
+  font-size: .63rem;
+  line-height: 1;
+  font-weight: 800;
+  white-space: nowrap;
+}
+html body .pc-app-header .pc-progress-menu .pc-progress-challenge {
+  margin-top: 5px;
+  color: #ffd55b;
+  font-size: .78rem;
+  font-weight: 800;
+}
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-template-columns: minmax(90px, 1fr) auto auto !important;
+  }
+}
+@media screen and (max-width: 640px) {
+  html body .pc-app-header .pc-progress-menu .pc-challenge-top {
+    display: block;
+    margin-top: 4px;
+  }
+}
+
+/* P557 — anonymous challenge score is its own explained status card. */
+html body .pc-app-header .pc-progress-menu .pc-challenge-card {
+  display: grid;
+  align-content: center;
+  gap: 1px;
+  min-width: 128px;
+  padding: 7px 10px;
+  border: 1px solid rgba(240, 189, 43, .72);
+  border-radius: 9px;
+  background: rgba(6, 40, 73, .78);
+  color: #fff;
+  line-height: 1.08;
+}
+html body .pc-app-header .pc-progress-menu .pc-challenge-card-label {
+  color: #ffd55b;
+  font-size: .61rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+html body .pc-app-header .pc-progress-menu .pc-challenge-card strong {
+  font-size: .76rem;
+  color: #fff;
+}
+html body .pc-app-header .pc-progress-menu .pc-challenge-card small {
+  color: #cbd9e5;
+  font-size: .55rem;
+  white-space: nowrap;
+}
+
+/* P574 — keep the collapsed progress caret inside the header paint area. */
+html body .pc-app-header { overflow-x: clip; }
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret {
+    position: relative !important;
+    right: 6px !important;
+  }
+}
+html body .pc-app-header .pc-progress-panel .pc-progress-challenge-card {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 3px 10px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(240, 189, 43, .7);
+  border-radius: 8px;
+  background: rgba(4, 34, 64, .42);
+}
+html body .pc-app-header .pc-progress-panel .pc-progress-challenge-card strong { color: #ffd55b; }
+html body .pc-app-header .pc-progress-panel .pc-progress-challenge-card span { justify-self: end; font-weight: 800; color: #fff; }
+html body .pc-app-header .pc-progress-panel .pc-progress-challenge-card small {
+  grid-column: 1 / -1;
+  color: #cbd9e5;
+  font-size: .72rem;
+  line-height: 1.3;
+}
+html body .pc-app-header .pc-progress-menu .pc-challenge-top,
+html body .pc-app-header .pc-progress-menu .pc-progress-challenge {
+  display: unset;
+  margin: 0;
+  color: inherit;
+  font-size: inherit;
+}
+@media screen and (min-width: 641px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    grid-template-columns: minmax(90px, 1fr) auto !important;
+  }
+}
+@media screen and (max-width: 800px) {
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card small { display: none; }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card { min-width: 108px; padding: 6px 8px; }
+}
+@media screen and (max-width: 640px) {
+  html body .pc-app-header .pc-progress-menu .header-status { grid-template-columns: minmax(0,1fr) auto auto; }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card { display: none; }
+}
+
+/* P558 — balanced progress summary: level left, explorer centered, challenge right. */
+html body .pc-app-header .pc-progress-menu .pc-challenge-card small { display: none !important; }
+html body .pc-app-header .pc-progress-menu .pc-challenge-card {
+  min-width: 132px;
+  text-align: left;
+}
+html body .pc-app-header .pc-progress-menu .pc-challenge-card-label {
+  font-size: .6rem;
+}
+html body .pc-app-header .pc-progress-menu .pc-challenge-card strong {
+  font-size: .82rem;
+}
+@media screen and (min-width: 801px) {
+  html body .pc-app-header .pc-progress-menu .header-status {
+    grid-template-columns: auto minmax(180px, 1fr) auto auto !important;
+    column-gap: 14px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-level-badge {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    text-align: center !important;
+    justify-items: stretch !important;
+  }
+  html body .pc-app-header .pc-progress-menu .level-tag {
+    text-align: center !important;
+  }
+  html body .pc-app-header .pc-progress-menu .xp-group {
+    width: min(100%, 320px) !important;
+    margin-inline: auto !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret {
+    grid-column: 4 !important;
+    grid-row: 1 !important;
+  }
+}
+
+/* P560 — keep the progress control inside narrow headers. */
+@media screen and (min-width: 641px) and (max-width: 1300px) {
+  html body .pc-app-header .pc-progress-menu { width: min(100%, 390px) !important; }
+  html body .pc-app-header .pc-progress-menu .header-status {
+    width: 100% !important;
+    min-width: 0 !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card { display: none !important; }
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret { grid-column: 3 !important; }
+}
+@media screen and (max-width: 640px) {
+  html body .pc-app-header { width: 100% !important; box-sizing: border-box !important; }
+  html body .pc-app-header .pc-progress-menu { width: 100% !important; max-width: none !important; }
+  html body .pc-app-header .pc-progress-menu .header-status {
+    width: 100% !important;
+    min-width: 0 !important;
+    grid-template-columns: 54px minmax(0, 1fr) 12px !important;
+    grid-template-rows: auto auto !important;
+    gap: 5px 8px !important;
+    padding: 8px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-progress-level-badge { grid-column: 1 !important; grid-row: 1 / 3 !important; min-width: 0 !important; }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy { grid-column: 2 !important; grid-row: 1 !important; }
+  html body .pc-app-header .pc-progress-menu .level-tag { min-height: 0 !important; height: auto !important; top: 0 !important; line-height: 1.1 !important; }
+  html body .pc-app-header .pc-progress-menu .pc-progress-summary-copy { row-gap: 2px !important; }
+  html body .pc-app-header .pc-progress-menu .xp-group { min-height: 0 !important; padding: 3px 0 !important; margin-top: 2px !important; border: 0 !important; background: transparent !important; }
+  html body .pc-app-header .pc-progress-menu .pc-progress-caret { grid-column: 3 !important; grid-row: 1 !important; }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card {
+    display: flex !important;
+    grid-column: 2 / 4 !important;
+    grid-row: 2 !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 7px !important;
+    min-width: 0 !important;
+    padding: 4px 7px !important;
+  }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card-label { font-size: .59rem !important; }
+  html body .pc-app-header .pc-progress-menu .pc-challenge-card strong { flex: 0 0 auto !important; font-size: .72rem !important; }
+  html body .pc-app-header .pc-progress-menu .xp-group { grid-template-columns: minmax(0, 1fr) auto !important; }
+  html body .pc-app-header .pc-progress-menu .xp-track { min-width: 0 !important; }
+  html body .pc-app-header .pc-progress-menu .pc-progress-panel { width: min(380px, calc(100vw - 16px)) !important; }
+}
+
+/* P568 — final phone header sizing; identical proportions across narrow devices. */
+@media screen and (max-width: 640px) {
+  html body .pc-app-header { gap: 6px !important; padding: 7px 10px 9px !important; }
+  html body .pc-app-header .pc-brand-menu { width: min(100%, 300px) !important; }
+  html body .pc-app-header .pc-brand-summary { min-height: 46px !important; }
+  html body .pc-app-header .pc-brand-summary .logo-icon,
+  html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+  }
+  html body .pc-app-header .pc-brand-summary .pc-babbage-logo-icon img { width: 34px !important; height: 34px !important; }
+  html body .pc-app-header .pc-brand-summary .logo-name,
+  html body .pc-app-header .pc-brand-summary .logo-name span { font-size: 1.02rem !important; }
+  html body .pc-app-header .pc-brand-summary .logo-sub { display: block !important; font-size: .54rem !important; }
+  html body .pc-app-header .pc-progress-menu .header-status {
+    min-height: 70px !important;
+    padding: 7px 8px !important;
+    gap: 3px 7px !important;
+  }
+}
+
+/* P569 — scenario navigation lives in the PromptCraft menu; DEV is opt-in. */
+html body > nav.scenario-tabs,
+html body .pc-compact-nav,
+html body > .dev-bar {
+  display: none !important;
+}
+html body.pc-dev-tools-visible > .dev-bar {
+  position: fixed !important;
+  inset: auto 0 0 0 !important;
+  z-index: 10050 !important;
+  display: flex !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  box-sizing: border-box !important;
+  box-shadow: 0 -4px 18px rgba(0, 0, 0, .28) !important;
+}

@@ -114,7 +114,7 @@ const ASSETS = Object.freeze({
       classroom: pcProjectUrl('assets/images/backgrounds/classroom.png'),
       scenarios: Object.freeze({
         0: pcProjectUrl('assets/images/backgrounds/gfc/s1-science-wing.jpg'),
-        2: pcProjectUrl('assets/images/backgrounds/gfc/s3-study-lounge.jpg')
+        2: pcProjectUrl('assets/images/backgrounds/gfc/s2-study-lounge.jpg')
       })
     }),
     professorPixel: Object.freeze({
@@ -149,73 +149,45 @@ const ASSETS = Object.freeze({
       })
     }),
     scenes: Object.freeze({
-      // Current visible scenario order. S1-S4 use the approved Canvas captures on
-      // the classroom smartboard so the scene evidence matches the live game.
-      0: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-module.png'),
-      1: pcProjectUrl('assets/images/scenes/scenario-02-accessibility/canvas/s2-before-module.png'),
-      2: pcProjectUrl('assets/images/scenes/scenario-03-confident-student/canvas/s3-before-module.png'),
-      3: pcProjectUrl('assets/images/scenes/scenario-04-96-percent-problem/canvas/s4-before-module.png'),
+      0: pcProjectUrl('assets/images/scenes/scenario-01-engagement/scene.png'),
+      1: pcProjectUrl('assets/images/backgrounds/classroom.png'),
+      2: pcProjectUrl('assets/images/scenes/scenario-02-metacognition/scene.png'),
+      3: pcProjectUrl('assets/images/backgrounds/classroom.png'),
       4: pcProjectUrl('assets/images/scenes/scenario-05-hallucination-hunt/scene.png'),
       5: pcProjectUrl('assets/images/scenes/scenario-06-predict-output/scene.png'),
       complete: pcProjectUrl('assets/images/scenes/completion/all-scenarios-complete.png')
     }),
     canvasContentAvalanche: Object.freeze({
       instructor: Object.freeze({
-        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-module.png'),
-        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-module.png'),
-        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-module.png'),
-        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-after-module.png'),
-        beforeWeek4Notes: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-notes.png'),
-        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-assignment.png'),
-        beforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-notes.png'),
-        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-after-start-here.png'),
-        afterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-after-assignment.png'),
-        afterReadPage: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-after-start-here.png')
+        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-module.png'),
+        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-module-mobile-wide.png'),
+        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-module-mobile-phone.png'),
+        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-module.png'),
+        beforeWeek4Notes: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-week-4-notes.png'),
+        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-comparison-assignment.png'),
+        beforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-buried-directions.png'),
+        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-start-here.png'),
+        afterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-submit-assignment.png'),
+        afterReadPage: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-read-page.png')
       }),
       student: Object.freeze({
-        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-module.png'),
-        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-module.png'),
-        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-module.png'),
-        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-after-module.png'),
-        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-assignment.png'),
-        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-after-start-here.png')
+        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-module.png'),
+        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-module-mobile-wide.png'),
+        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-module-mobile-phone.png'),
+        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-after-module.png'),
+        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-comparison-assignment.png'),
+        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-after-start-here.png')
       }),
       smartboard: Object.freeze({
-        instructorBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-module.png'),
-        instructorAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-after-module.png'),
-        studentBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-module.png'),
-        studentAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-after-module.png'),
-        instructorBeforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-assignment.png'),
-        instructorAfterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-after-assignment.png'),
-        instructorBeforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-notes.png'),
-        instructorAfterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/s1-after-start-here.png')
+        instructorBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-module-focus.png'),
+        instructorAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-after-module-focus.png'),
+        studentBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/student-before-module-focus.png'),
+        studentAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/student-after-module-focus.png'),
+        instructorBeforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-comparison-assignment-safe-focus.png'),
+        instructorAfterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-after-submit-assignment-focus.png'),
+        instructorBeforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-buried-directions-focus.png'),
+        instructorAfterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-after-start-here-focus.png')
       })
-    }),
-    canvasAccessibility: Object.freeze({
-      beforeModule: pcProjectUrl('assets/images/scenes/scenario-02-accessibility/canvas/s2-before-module.png'),
-      beforeFieldGuide: pcProjectUrl('assets/images/scenes/scenario-02-accessibility/canvas/s2-before-field-guide.png'),
-      beforeMedia: pcProjectUrl('assets/images/scenes/scenario-02-accessibility/canvas/s2-before-media.png'),
-      afterModule: pcProjectUrl('assets/images/scenes/scenario-02-accessibility/canvas/s2-after-module.png'),
-      afterFieldGuide: pcProjectUrl('assets/images/scenes/scenario-02-accessibility/canvas/s2-after-field-guide.png'),
-      afterCheck: pcProjectUrl('assets/images/scenes/scenario-02-accessibility/canvas/s2-after-check.png')
-    }),
-    canvasConfidentStudent: Object.freeze({
-      beforeModule: pcProjectUrl('assets/images/scenes/scenario-03-confident-student/canvas/s3-before-module.png'),
-      beforeReflect: pcProjectUrl('assets/images/scenes/scenario-03-confident-student/canvas/s3-before-reflect.png'),
-      afterModule: pcProjectUrl('assets/images/scenes/scenario-03-confident-student/canvas/s3-after-module.png'),
-      afterReflect: pcProjectUrl('assets/images/scenes/scenario-03-confident-student/canvas/s3-after-reflect.png'),
-      afterEvidenceCheck: pcProjectUrl('assets/images/scenes/scenario-03-confident-student/canvas/s3-after-evidence-check.png'),
-      afterFeedback: pcProjectUrl('assets/images/scenes/scenario-03-confident-student/canvas/s3-after-feedback.png')
-    }),
-    canvasNinetySixPercent: Object.freeze({
-      beforeModule: pcProjectUrl('assets/images/scenes/scenario-04-96-percent-problem/canvas/s4-before-module.png'),
-      beforeQuiz: pcProjectUrl('assets/images/scenes/scenario-04-96-percent-problem/canvas/s4-before-quiz.png'),
-      beforeGrade96: pcProjectUrl('assets/images/scenes/scenario-04-96-percent-problem/canvas/s4-before-grade-96.png'),
-      afterModule: pcProjectUrl('assets/images/scenes/scenario-04-96-percent-problem/canvas/s4-after-module.png'),
-      afterBrief: pcProjectUrl('assets/images/scenes/scenario-04-96-percent-problem/canvas/s4-after-brief.png'),
-      afterAssignment: pcProjectUrl('assets/images/scenes/scenario-04-96-percent-problem/canvas/s4-after-assignment.png'),
-      afterRubric: pcProjectUrl('assets/images/scenes/scenario-04-96-percent-problem/canvas/s4-after-rubric.png'),
-      afterTransfer: pcProjectUrl('assets/images/scenes/scenario-04-96-percent-problem/canvas/s4-after-transfer.png')
     })
   }),
   audio: Object.freeze({
@@ -252,21 +224,6 @@ function pcGetS1CanvasEvidence(id) {
 }
 
 pcExposeGlobals({ PC_S1_CANVAS_EVIDENCE, pcGetS1CanvasEvidence });
-
-const PC_CANVAS_EVIDENCE_BY_SCENARIO = Object.freeze({
-  0: ASSETS.images.canvasContentAvalanche,
-  1: ASSETS.images.canvasAccessibility,
-  2: ASSETS.images.canvasConfidentStudent,
-  3: ASSETS.images.canvasNinetySixPercent
-});
-
-function pcGetScenarioCanvasEvidence(index, key = '') {
-  const group = PC_CANVAS_EVIDENCE_BY_SCENARIO[Number(index)] || null;
-  if (!group) return null;
-  return key ? (group[key] || null) : group;
-}
-
-pcExposeGlobals({ PC_CANVAS_EVIDENCE_BY_SCENARIO, pcGetScenarioCanvasEvidence });
 
 function pcGetScenarioBackgroundAsset(index) {
   const normalized = Number(index);
@@ -313,13 +270,13 @@ const LEGACY_ASSETS = Object.freeze({
       })
     }),
     scenes: Object.freeze({
-      0: 'assets/images/scenes/scenario-01-content-avalanche/canvas/s1-before-module.png',
-      1: 'assets/images/scenes/scenario-02-accessibility/canvas/s2-before-module.png',
-      2: 'assets/images/scenes/scenario-03-confident-student/canvas/s3-before-module.png',
-      3: 'assets/images/scenes/scenario-04-96-percent-problem/canvas/s4-before-module.png',
-      4: 'assets/images/scenes/scenario-05-hallucination-hunt/scene.png',
-      5: 'assets/images/scenes/scenario-06-predict-output/scene.png',
-      complete: 'assets/images/scenes/completion/all-scenarios-complete.png'
+      0: 'images/scene-s1.png',
+      1: 'images/scene-s2.png',
+      2: 'images/classroom-bg.png',
+      3: 'images/scene-s4.png',
+      4: 'images/scene-s5.png',
+      5: 'images/scene-s6.png',
+      complete: 'images/scene-complete.png'
     })
   })
 });

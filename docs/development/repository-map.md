@@ -1,6 +1,6 @@
 # PromptCraft repository architecture
 
-This is the canonical repository map for `PROMPTCRAFT_V429` after Phase 6, represented by browser/cache patch 529 and research schema V121. Older flat/numeric layouts should not be reconstructed from memory.
+This is the canonical repository map for `PROMPTCRAFT_V429` at browser Patch 575 and research schema V121. Older flat or numeric layouts should not be reconstructed from memory.
 
 ## Major subsystem ownership
 
@@ -118,22 +118,19 @@ src/css/
 
 ## Assets
 
-`assets/asset-manifest.json` is the canonical asset classification map. Current manifest version: `150`.
+`assets/asset-manifest.json` is the canonical asset classification map. Current manifest version: `150`. See `docs/asset-management/ASSET_SYSTEM.md` for the lifecycle and update workflow.
 
 Major current asset groups:
 
-- application/classroom backgrounds
-- GFC S1/S2 campus backgrounds
-- Professor Pixel portraits
-- Jordan S2 portraits
-- scenario scene art
-- Babbage mark, Charles Babbage portrait, Babbage engine
-- Great Falls College print/logo asset
-- PromptCraft QR code
-- S1 Content Avalanche Canvas evidence, paired across instructor/student and before/after views, plus eight dedicated smartboard-focused views
-- current runtime audio
-- planned line-by-line audio
-- development-only character references
+- current application, classroom, and GFC backgrounds
+- Professor Pixel and current student portraits, including Maya in Scenario 1
+- Babbage, river otter, QR, and shared UI assets
+- current scenario scene art and planned scene art
+- legacy Content Avalanche Canvas evidence retained for dormant modules and tests
+- runtime audio, planned recording paths, and retired audio names
+- development reference images kept outside production portrait folders
+
+Canonical production documentation lives under `docs/asset-management/`. The spreadsheets are generated from the manifest and filesystem; recording guides define session procedure while the voice tracker owns recording approval.
 
 ## Tooling
 
