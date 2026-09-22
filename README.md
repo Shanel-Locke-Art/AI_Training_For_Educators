@@ -1,6 +1,6 @@
 # PromptCraft
 
-Current application: `PROMPTCRAFT_V429`, browser patch `576`, research schema `V121`, Apps Script receiver source `V89`, asset manifest `v150`.
+Current application: `PROMPTCRAFT_V429`, browser patch `577`, research schema `V121`, Apps Script receiver source `V89`, asset manifest `v150`.
 
 Scenario 1 is **Start With the Learning** with Maya and Professor Pixel. Its playable source is `src/js/scenarios/s1-start-with-learning.js`, selected by `src/js/scenarios/registry.js`. The internal `content-avalanche` scenario key remains for saved data and research compatibility.
 

@@ -1,6 +1,6 @@
 # PromptCraft production documents
 
-This folder accompanies `PROMPTCRAFT_V429`, browser patch `576`, research schema `V121`, receiver source `V89`, and asset manifest `v150`.
+This folder accompanies `PROMPTCRAFT_V429`, browser patch `577`, research schema `V121`, receiver source `V89`, and asset manifest `v150`.
 
 ## Scenario 1 production
 

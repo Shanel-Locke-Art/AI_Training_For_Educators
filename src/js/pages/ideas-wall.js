@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzAtqwPWbS-5BZQ3LyTjgDIkABoMM8KeL-OrzErb64SAipeu6gbxGFSjfHV_GVcH5ZU/exec';
+  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxuFD0Om5pbXMDK_4idEGm5WIJLS-gbDSyqei0VW9bNGud0xBU8if6plRLKQ6ArbPFQ/exec';
 
   const SCENARIOS = Object.freeze({
     1: { label: 'S1: Course Design', short: 'Course Design', tag: 'tag-1' },
