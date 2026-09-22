@@ -3,9 +3,14 @@ PromptCraft Asset Documentation
 Start with ASSET_SYSTEM.md. It defines the current asset lifecycle, naming, update, and recording workflow.
 
 Canonical trackers
-- PromptCraft_Production_Overview_Simplified.xlsx — current totals, open work, and file guide.
-- PromptCraft_Visual_Asset_Tracker_Simplified.xlsx — every visual file and manifest status.
-- PromptCraft_Voice_Recording_Tracker.xlsx — actual audio, recording holds, planned paths, and retired names.
+- PromptCraft_Production_Overview_Simplified.xlsx — the short production order and file guide.
+- PromptCraft_Visual_Asset_Tracker_Simplified.xlsx — S1 art check first, then all artwork and legacy captures.
+- PromptCraft_Voice_Recording_Tracker.xlsx — S1 spoken-line approval and recording queue first, then on-screen text and existing audio.
+
+To produce S1 voice quickly, open S1 Record in the voice tracker. Approve the
+wording, record the proposed file, and mark the audio check in the same row.
+The yellow cells are the production decisions. Use S1 Artwork in the visual
+tracker to check framing or request a specific replacement.
 
 Recording guides
 - Recording Scripts/S1_Professor_Pixel_Recording_Script.docx

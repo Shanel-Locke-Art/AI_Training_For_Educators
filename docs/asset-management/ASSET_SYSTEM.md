@@ -17,9 +17,9 @@ This document is the current operating guide for visual, audio, reference, and p
 | Asset role and lifecycle | `assets/asset-manifest.json` |
 | Runtime asset paths | `src/js/app/config-and-assets.js` and the manifest |
 | Actual files | `assets/` filesystem |
-| Visual production status | `PromptCraft_Visual_Asset_Tracker_Simplified.xlsx` |
-| Audio and recording status | `PromptCraft_Voice_Recording_Tracker.xlsx` |
-| Project summary and open work | `PromptCraft_Production_Overview_Simplified.xlsx` |
+| S1 artwork check and complete visual inventory | `PromptCraft_Visual_Asset_Tracker_Simplified.xlsx` |
+| S1 approval and recording queue, then existing audio | `PromptCraft_Voice_Recording_Tracker.xlsx` |
+| Production order and file guide | `PromptCraft_Production_Overview_Simplified.xlsx` |
 
 ## Asset lifecycle
 

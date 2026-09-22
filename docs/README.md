@@ -36,9 +36,9 @@ Cache/query revisions are not application build numbers. Do not rename the app b
 
 | File | Use it for | Relationship to the others |
 |---|---|---|
-| `asset-management/PromptCraft_Production_Overview_Simplified.xlsx` | High-level production inventory across visual assets and audio | Main overview workbook. Use this when you want one place to see production status. |
-| `asset-management/PromptCraft_Visual_Asset_Tracker_Simplified.xlsx` | Detailed image production: backgrounds, scene art, character portraits, Babbage/brand UI assets, and references | Visual-only working tracker. More detailed than the master workbook for art production. |
-| `asset-management/PromptCraft_Voice_Recording_Tracker.xlsx` | Dialogue wording, speaker/expression, voice filenames, recording status, and archived lines | Dialogue/recording source for voice production. It is not an image/audio-file inventory. |
+| `asset-management/PromptCraft_Production_Overview_Simplified.xlsx` | Short S1 production order and file guide | Start here to see which workbook to open. |
+| `asset-management/PromptCraft_Visual_Asset_Tracker_Simplified.xlsx` | Current S1 artwork, complete visual inventory, and older S1 captures | Use S1 Artwork first for art checks. |
+| `asset-management/PromptCraft_Voice_Recording_Tracker.xlsx` | S1 spoken-line approval, recording, and audio checks; on-screen text; existing audio | Use S1 Record first for voice production. |
 
 The old `v137`, `v356`, and `PromptCraft_*_v356` spreadsheet filenames were byte-for-byte duplicates of the three canonical workbooks above. They are intentionally removed from this cleaned documentation package. Version history belongs in source control and the Process Log, not in duplicate filenames.
 
@@ -87,9 +87,9 @@ If a tracker conflicts with current source code, update the tracker. Do not chan
 ## Asset production
 
 - `asset-management/ASSET_SYSTEM.md` — current asset lifecycle, naming, status, and update workflow
-- `asset-management/PromptCraft_Production_Overview_Simplified.xlsx` — production summary and open work
-- `asset-management/PromptCraft_Visual_Asset_Tracker_Simplified.xlsx` — visual inventory
-- `asset-management/PromptCraft_Voice_Recording_Tracker.xlsx` — audio inventory and recording decisions
+- `asset-management/PromptCraft_Production_Overview_Simplified.xlsx` — short production order and file guide
+- `asset-management/PromptCraft_Visual_Asset_Tracker_Simplified.xlsx` — S1 artwork check, complete inventory, and legacy review
+- `asset-management/PromptCraft_Voice_Recording_Tracker.xlsx` — S1 line approval, recording, and audio checks, with other audio on later tabs
 - `asset-management/Recording Scripts/` — current Scenario 1 scripts for Professor Pixel and Maya with proposed audio filenames; spoken lines and on-screen text are labeled separately
 - `asset-management/S1_ARTWORK_CURRENT.md` — current Scenario 1 artwork list
 - `asset-management/S1_ARTWORK_LEGACY_REVIEW.md` — earlier Content Avalanche art still awaiting lifecycle review
