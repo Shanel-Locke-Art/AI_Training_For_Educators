@@ -90,3 +90,7 @@ If a tracker conflicts with current source code, update the tracker. Do not chan
 - `asset-management/PromptCraft_Production_Overview_Simplified.xlsx` — production summary and open work
 - `asset-management/PromptCraft_Visual_Asset_Tracker_Simplified.xlsx` — visual inventory
 - `asset-management/PromptCraft_Voice_Recording_Tracker.xlsx` — audio inventory and recording decisions
+- `asset-management/Recording Scripts/` — current Scenario 1 scripts for Professor Pixel and Maya with proposed audio filenames; spoken lines and on-screen text are labeled separately
+- `asset-management/S1_ARTWORK_CURRENT.md` — current Scenario 1 artwork list
+- `asset-management/S1_ARTWORK_LEGACY_REVIEW.md` — earlier Content Avalanche art still awaiting lifecycle review
+- `asset-management/Legacy Recording Guides/` — older Jordan and Eli guides, outside the current Scenario 1 recording queue

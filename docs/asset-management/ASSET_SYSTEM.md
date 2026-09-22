@@ -3,7 +3,7 @@
 ## Current baseline
 
 - Application: `PROMPTCRAFT_V429`
-- Browser patch: `574`
+- Browser patch: `575`
 - Asset manifest: `v150`
 - Research schema: `V121`
 - Receiver source: `V85`
@@ -61,4 +61,14 @@ Scenario 1 is **Start With the Learning**. Maya is the current student character
 
 ## Recording workflow
 
-Do not record from an old Word script. First export the current approved dialogue from application source into the voice tracker, confirm speaker and scenario numbering, and mark each row Approved to Record. The Word recording guides describe session procedure and performance expectations; the tracker owns the line queue.
+The active Word scripts cover Scenario 1 only: Professor Pixel and Maya. They
+transcribe current application text and label spoken dialogue separately from
+on-screen quotes. Review each spoken line against the current application,
+confirm its file name in the voice tracker, and mark it Approved to Record before
+recording. On-screen quotes need a separate voice decision. Conditional text
+containing placeholders must be resolved into exact lines first. The tracker
+owns the approved recording queue.
+
+The current S1 artwork list is `S1_ARTWORK_CURRENT.md`. Older Content Avalanche
+captures are inventoried in `S1_ARTWORK_LEGACY_REVIEW.md` because they remain
+registered in the manifest while the current S1 route does not use them.
