@@ -1,5 +1,5 @@
 /**
- * PromptCraft Google Apps Script receiver — START WITH LEARNING V85
+ * PromptCraft Google Apps Script receiver — START WITH LEARNING V89
  *
  * Live job:
  *   1. Receive PromptCraft payloads.
@@ -8,18 +8,21 @@
  *   4. Rebuild research-facing views only at meaningful completion points.
  *
  * Manual administration:
- *   - initializeWorkbookNow()  -> add/format V84 projections without deleting or renaming any tab.
- *   - refreshResearchViewsNow()-> rebuild Overview, Sessions, eight scenario tabs, Process Log, Ideas Wall, and Research Guide.
+ *   - initializeWorkbookNow()  -> format raw headers and rebuild readable views;
+ *                                 hide obsolete S1 result tabs without erasing them.
+ *   - refreshResearchViewsNow()-> rebuild readable tabs from preserved raw rows.
+ *   - inspectS1TrackingNow()    -> count received S1 event types without showing participant text.
  *   - verifyV84MigrationNow()  -> read-only row-count/header-fingerprint inventory for copied-workbook verification.
  *
- * V85 preserves every V83 tab and V121 raw column, adds lossless raw payload
- * chunks and additive readable projections, and disables destructive reset.
+ * V89 preserves every raw V121 column and lossless payload archive. The S1
+ * readable tab shows only Start With the Learning design checkpoints.
+ * Destructive research reset remains disabled.
  */
 
 const SHEET_OVERVIEW       = '00 - Overview';
 const SHEET_SESSIONS       = '01 - Sessions';
 const SHEET_SCENARIO_TABS  = Object.freeze({
-  1: '02 - S1 Engagement',
+  1: '02 - S1 Start With Learning',
   2: '03 - S2 Metacognition',
   3: '04 - S3 Assessment',
   4: '05 - S4 Sync Bias',
@@ -38,13 +41,18 @@ const SHEET_RESPONSES      = '97 - Raw Responses';
 const SHEET_INCREMENTAL    = '98 - Raw Events';
 const SHEET_RAW_AUDIT      = '99 - Raw Audit';
 const SHEET_CHALLENGE       = '12 - Challenge Scores';
+const LEGACY_S1_VIEW_NAME = /^02\s*-\s*S1\b/i;
+const S1_LEARNING_EVENTS = Object.freeze([
+  's1_learning_path_organized', 's1_alignment_diagnosis_complete',
+  's1_course_guide_step_added', 's1_course_guide_complete'
+]);
 
 const SCENARIO_TAB_COLORS = Object.freeze({
   1: '#215C45', 2: '#2E6A4E', 3: '#23665F', 4: '#8A5A20',
   5: '#8A4B2A', 6: '#475569', 7: '#5C3D73', 8: '#0F6A63'
 });
 
-const PROMPTCRAFT_RECEIVER_VERSION = 'V85';
+const PROMPTCRAFT_RECEIVER_VERSION = 'V89';
 const EXPECTED_APP_SCHEMA_VERSION = 'V121';
 const EXPECTED_APP_BUILD = 'PROMPTCRAFT_V429';
 const SPREADSHEET_ID = '';
@@ -91,7 +99,7 @@ const RESPONSE_HEADERS = [
 
 const RESPONSE_GROUPS = [
   ['Session', 1, 8, '#174C3A'],
-  ['S1: Engagement', 9, 14, '#215C45'],
+  ['S1: Start With the Learning', 9, 14, '#215C45'],
   ['S2: Metacognition', 15, 33, '#2E6A4E'],
   ['S3: Authentic Assessment', 34, 38, '#23665F'],
   ['S4: Sync Bias', 39, 43, '#8A5A20'],
@@ -152,7 +160,7 @@ const PromptCraftReceiver = (() => {
       timestamp: new Date().toISOString(),
       expected_app_schema: EXPECTED_APP_SCHEMA_VERSION,
       expected_app_build: EXPECTED_APP_BUILD,
-      workflow: 'V85 Start With the Learning projections + OSCQR guide coverage + verified scoring + lossless raw archives'
+      workflow: 'V89 Start With the Learning projections + participant-safe views + lossless raw archives'
     });
   }
 
@@ -275,6 +283,19 @@ const PromptCraftReceiver = (() => {
     return sheet;
   }
 
+  function ensureCurrentS1Tab_() {
+    const ss = getSpreadsheet_();
+    const currentName = SHEET_SCENARIO_TABS[1];
+    let current = ss.getSheetByName(currentName);
+    const older = ss.getSheets().filter(sheet =>
+      sheet.getName() !== currentName && LEGACY_S1_VIEW_NAME.test(sheet.getName()));
+    if (!current && older.length) {
+      current = older.shift();
+      current.setName(currentName);
+    }
+    older.forEach(sheet => sheet.hideSheet()); // Preserve old results and any manual cells.
+  }
+
   function ensureChallengeSheet_() {
     const sheet = getSheet_(SHEET_CHALLENGE);
     const headers = ['Anonymous Challenge ID','Best XP','Scenarios Completed','Guide Sections','App Build','Updated At'];
@@ -285,6 +306,20 @@ const PromptCraftReceiver = (() => {
       const existing = sheet.getRange(1, 1, 1, headers.length).getValues()[0];
       if (existing.join('|') !== headers.join('|')) sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     }
+    const header = sheet.getRange(1, 1, 1, headers.length);
+    header.setBackground('#174C3A').setFontColor('#FFFFFF').setFontWeight('bold')
+      .setWrap(true).setVerticalAlignment('middle');
+    sheet.setRowHeight(1, 42);
+    sheet.setFrozenRows(1);
+    sheet.setColumnWidth(1, 250);
+    sheet.setColumnWidth(2, 110);
+    sheet.setColumnWidth(3, 170);
+    sheet.setColumnWidth(4, 145);
+    sheet.setColumnWidth(5, 180);
+    sheet.setColumnWidth(6, 200);
+    sheet.getRange('B:D').setNumberFormat('0');
+    sheet.getRange('F:F').setNumberFormat(TIMESTAMP_FORMAT);
+    sheet.setTabColor('#174C3A');
     return sheet;
   }
 
@@ -1247,14 +1282,22 @@ const PromptCraftReceiver = (() => {
     raw.forEach(row => {
       const e = normalizeResearchEventRow_(row);
       if (!e || !e.session || !e.scenario) return;
-      const key = [timestampToMillis_(e.timestamp), e.participant, e.session, e.scenario,
-        String(e.prompt || '').slice(0, 180), String(e.response || '').slice(0, 180)].join('||');
+      // A real event ID is authoritative. Multiple choices can happen in the
+      // same millisecond with unchanged prompt/response text.
+      const key = e.eventId ? 'id:' + e.eventId : 'legacy:' + JSON.stringify([
+        timestampToMillis_(e.timestamp), e.participant, e.session, e.scenario,
+        e.eventType, e.activityId, e.prompt, e.response, e.detail
+      ]);
       if (seen[key]) return;
       seen[key] = true;
       events.push(e);
     });
     events.sort((a, b) => timestampToMillis_(b.timestamp) - timestampToMillis_(a.timestamp));
     return events;
+  }
+
+  function participantSessionKey_(participant, session) {
+    return JSON.stringify([String(participant || 'anonymous'), String(session || '')]);
   }
 
   function latestResponseRowsBySession_() {
@@ -1268,8 +1311,9 @@ const PromptCraftReceiver = (() => {
     rows.forEach(row => {
       const session = String(row[2] || '').trim();
       if (!session) return; // Legacy rows without a valid session key are recovered from Raw Events instead.
-      const current = bySession[session];
-      if (!current || timestampToMillis_(row[0]) > timestampToMillis_(current[0])) bySession[session] = row;
+      const key = participantSessionKey_(row[1], session);
+      const current = bySession[key];
+      if (!current || timestampToMillis_(row[0]) > timestampToMillis_(current[0])) bySession[key] = row;
     });
     return bySession;
   }
@@ -1372,106 +1416,6 @@ const PromptCraftReceiver = (() => {
     return clean.length;
   }
 
-  function rowHasData_(row) {
-    return (row || []).some(v => v !== '' && v !== null && v !== undefined);
-  }
-
-  function rowSignature_(row) {
-    return (row || []).map(v => {
-      if (Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v.getTime())) return String(v.getTime());
-      return String(v === null || v === undefined ? '' : v);
-    }).join('\u241F');
-  }
-
-  function mergeLegacySheetIntoCanonical_(canonicalName, legacyName, headerRows, columnCount, ensureHeadersFn) {
-    const ss = getSpreadsheet_();
-    const legacy = ss.getSheetByName(legacyName);
-    if (!legacy || legacy.getName() === canonicalName) return { moved: 0, deleted: false };
-
-    let canonical = ss.getSheetByName(canonicalName);
-    if (!canonical) {
-      canonical = getSheet_(canonicalName);
-      ensureHeadersFn(canonical);
-    }
-
-    ensureHeadersFn(canonical);
-    const canonicalRows = canonical.getLastRow() > headerRows
-      ? canonical.getRange(headerRows + 1, 1, canonical.getLastRow() - headerRows, columnCount).getValues() : [];
-    const legacyRows = legacy.getLastRow() > headerRows
-      ? legacy.getRange(headerRows + 1, 1, legacy.getLastRow() - headerRows, columnCount).getValues() : [];
-
-    const seen = {};
-    const combined = [];
-    canonicalRows.concat(legacyRows).forEach(row => {
-      if (!rowHasData_(row)) return;
-      const sig = rowSignature_(row);
-      if (seen[sig]) return;
-      seen[sig] = true;
-      combined.push(row);
-    });
-    combined.sort((a, b) => timestampToMillis_(b[0]) - timestampToMillis_(a[0]));
-
-    const existingDataRows = Math.max(0, canonical.getLastRow() - headerRows);
-    if (existingDataRows) canonical.getRange(headerRows + 1, 1, existingDataRows, columnCount).clearContent();
-    if (combined.length) {
-      if (canonical.getMaxRows() < headerRows + combined.length) {
-        canonical.insertRowsAfter(canonical.getMaxRows(), headerRows + combined.length - canonical.getMaxRows());
-      }
-      canonical.getRange(headerRows + 1, 1, combined.length, columnCount).setValues(combined.map(safeResearchRow_));
-    }
-
-    return { copied: legacyRows.length, deleted: false, source_retained: legacyName };
-  }
-
-  function mergeLegacyIdeasSheet_(legacyName) {
-    const ss = getSpreadsheet_();
-    const legacy = ss.getSheetByName(legacyName);
-    if (!legacy || legacy.getName() === SHEET_IDEAS) return { moved: 0, deleted: false };
-
-    const canonical = getSheet_(SHEET_IDEAS);
-    ensureIdeaHeaders(canonical);
-    const canonicalRows = canonical.getLastRow() >= 2
-      ? canonical.getRange(2, 1, canonical.getLastRow() - 1, 9).getValues() : [];
-
-    const legacyLastRow = legacy.getLastRow();
-    const legacyRows = legacyLastRow >= 2 ? legacy.getRange(2, 1, legacyLastRow - 1, Math.min(legacy.getLastColumn(), 8)).getValues() : [];
-    const migrated = legacyRows.map(row => {
-      while (row.length < 8) row.push('');
-      return [
-        row[0], row[1], row[2], row[3], row[4], row[5],
-        'Legacy Ideas Wall entry',
-        normalizeWallReviewStatus_(row[6]),
-        row[7]
-      ];
-    });
-
-    const seen = {};
-    const combined = [];
-    canonicalRows.concat(migrated).forEach(row => {
-      if (!rowHasData_(row)) return;
-      const key = [row[1], row[2], String(row[5] || '').replace(/\s+/g, ' ').slice(0, 240)].join('||');
-      if (seen[key]) return;
-      seen[key] = true;
-      combined.push(row);
-    });
-    combined.sort((a, b) => timestampToMillis_(b[0]) - timestampToMillis_(a[0]));
-
-    if (canonical.getMaxRows() > 1) canonical.getRange(2, 1, canonical.getMaxRows() - 1, 9).clearContent();
-    if (combined.length) canonical.getRange(2, 1, combined.length, 9).setValues(combined.map(safeResearchRow_));
-
-    return { copied: migrated.length, deleted: false, source_retained: legacyName };
-  }
-
-  function consolidateLegacyTabs_() {
-    const results = {};
-    results.responses = mergeLegacySheetIntoCanonical_(SHEET_RESPONSES, 'PromptCraft Responses', 2, RESPONSE_HEADERS.length, ensureFullResponseHeaders);
-    results.events = mergeLegacySheetIntoCanonical_(SHEET_INCREMENTAL, 'Incremental Saves', 1, INCREMENTAL_HEADERS.length, ensureIncrementalHeaders);
-    results.audit = mergeLegacySheetIntoCanonical_(SHEET_RAW_AUDIT, 'Raw Payload Audit', 1, 9, ensureRawAuditHeaders_);
-    results.ideas_v78 = mergeLegacyIdeasSheet_('04 - Ideas Wall');
-    results.ideas_legacy = mergeLegacyIdeasSheet_('Ideas Wall');
-    return results;
-  }
-
   function moveSheetToPosition_(sheet, position) {
     const ss = getSpreadsheet_();
     sheet.showSheet();
@@ -1482,7 +1426,14 @@ const PromptCraftReceiver = (() => {
   function organizeResearchTabs_() {
     const ss = getSpreadsheet_();
     const visible = [[SHEET_OVERVIEW, '#163F33'], [SHEET_SESSIONS, '#215C45']];
-    Object.keys(SHEET_SCENARIO_TABS).forEach(n => visible.push([SHEET_SCENARIO_TABS[n], SCENARIO_TAB_COLORS[n]]));
+    Object.keys(SHEET_SCENARIO_TABS).forEach(n => {
+      const sheet = getSheet_(SHEET_SCENARIO_TABS[n]);
+      if (Number(n) === 1 || sheet.getLastRow() > 1) {
+        visible.push([SHEET_SCENARIO_TABS[n], SCENARIO_TAB_COLORS[n]]);
+      } else {
+        sheet.hideSheet(); // Keep unused future views available without clutter.
+      }
+    });
     visible.push(
       [SHEET_PROCESS_LOG, '#35646A'], [SHEET_IDEAS, '#8A5A20'],
       [SHEET_READABLE_RESPONSES, '#215C45'], [SHEET_PROCESS_EVENTS, '#35646A'],
@@ -1760,9 +1711,7 @@ const PromptCraftReceiver = (() => {
     const detail = latest.detail || {};
     let text = '';
 
-    if (scenario === 1) {
-      text = fields.response || latest.response || fields.primaryInput || latest.allPrompts || latest.prompt;
-    } else if (scenario === 2) {
+    if (scenario === 2) {
       text = fields.repair || detail.s2_repair_text || '';
       if (!text && latest.prompt) text = String(latest.prompt).replace(/^S2 repair:\s*/i, '');
       if (!text) text = fields.response || latest.response || fields.primaryInput || latest.allPrompts;
@@ -1817,7 +1766,8 @@ const PromptCraftReceiver = (() => {
     const existing = existingWallCandidateKeys_();
     const additions = [];
 
-    for (let scenario = 1; scenario <= 8; scenario++) {
+    // Current S1 checkpoints do not contain an instructor-approved public idea.
+    for (let scenario = 2; scenario <= 8; scenario++) {
       const records = getScenarioSessionRecords_(scenario, events, responseBySession);
       records.forEach(record => {
         if (!wallRecordHasCompletion_(record)) return;
@@ -1926,14 +1876,16 @@ const PromptCraftReceiver = (() => {
   function buildSessionResearchRows_(events) {
     const groups = {};
     (events || []).forEach(e => {
-      if (!groups[e.session]) groups[e.session] = [];
-      groups[e.session].push(e);
+      const key = participantSessionKey_(e.participant, e.session);
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(e);
     });
 
     const rows = [];
-    Object.keys(groups).forEach(session => {
-      const list = groups[session].slice().sort((a, b) => timestampToMillis_(b.timestamp) - timestampToMillis_(a.timestamp));
+    Object.keys(groups).forEach(key => {
+      const list = groups[key].slice().sort((a, b) => timestampToMillis_(b.timestamp) - timestampToMillis_(a.timestamp));
       const latest = list[0];
+      const session = latest.session;
       const scenarioMap = {};
       list.forEach(e => { scenarioMap[e.scenario] = e.label || SCENARIO_LABELS[e.scenario] || ('S' + e.scenario); });
       const scenarioNums = Object.keys(scenarioMap).map(Number).sort((a, b) => a - b);
@@ -1978,23 +1930,31 @@ const PromptCraftReceiver = (() => {
     return false;
   }
 
+  function isCurrentS1Event_(event) {
+    return S1_LEARNING_EVENTS.indexOf(String(event && event.eventType || '')) !== -1;
+  }
+
   function getScenarioSessionRecords_(scenario, events, responseBySession) {
     const groups = {};
     (events || []).forEach(e => {
       if (Number(e.scenario) !== Number(scenario) || !e.session) return;
-      if (!groups[e.session]) groups[e.session] = [];
-      groups[e.session].push(e);
+      if (Number(scenario) === 1 && !isCurrentS1Event_(e)) return;
+      const key = participantSessionKey_(e.participant, e.session);
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(e);
     });
 
-    Object.keys(responseBySession || {}).forEach(session => {
-      const row = responseBySession[session];
+    Object.keys(responseBySession || {}).forEach(key => {
+      const row = responseBySession[key];
       if (!scenarioResponseHasData_(row, scenario)) return;
-      if (!groups[session]) groups[session] = [];
+      if (Number(scenario) === 1 && !groups[key]) return; // Old S1 responses remain raw history.
+      if (!groups[key]) groups[key] = [];
     });
 
-    return Object.keys(groups).map(session => {
-      const list = groups[session].slice().sort((a, b) => timestampToMillis_(b.timestamp) - timestampToMillis_(a.timestamp));
-      const responseRow = responseBySession ? responseBySession[session] : null;
+    return Object.keys(groups).map(key => {
+      const list = groups[key].slice().sort((a, b) => timestampToMillis_(b.timestamp) - timestampToMillis_(a.timestamp));
+      const responseRow = responseBySession ? responseBySession[key] : null;
+      const session = list[0] ? list[0].session : String(responseRow && responseRow[2] || '');
       const latest = list[0] || {
         timestamp: responseRow ? responseRow[0] : '', participant: responseRow ? (responseRow[1] || 'anonymous') : 'anonymous',
         session: session, scenario: scenario, label: SCENARIO_LABELS[scenario] || '', attempts: '', bestScore: '',
@@ -2037,7 +1997,7 @@ const PromptCraftReceiver = (() => {
 
   function scenarioTabHeaders_(scenario) {
     const map = {
-      1: ['Timestamp','Participant ID','Session ID','Attempts','Best Score','Renamed Activities','Learning-Purpose Organization','Alignment Diagnosis','Personal Module','Intended Learning','OSCQR Standards','Babbage Feedback','AI Source'],
+      1: ['Timestamp','Participant ID','Session ID','Design Checkpoints','Best S1 Score (0–5)','Renamed Activities','Prepare / Practice / Evidence','Alignment Diagnosis','Guide Step Added','My Course Guide Completed','Number of Course Activities','Guide OSCQR References','Latest Checkpoint Feedback'],
       2: ['Timestamp','Participant ID','Session ID','Attempts','Best Score','Activity Inputs','Diagnosis','Intervention','Thinking Move','Audit Choice','Audit Correct','Repair / Revised Reflection','AI Review Source','AI Provider','AI Model','Babbage Review','Quality Indicators'],
       3: ['Timestamp','Participant ID','Session ID','Attempts','Best Score','Assessment Inputs','Diagnosis','Evidence Choice','Audit Choice','Audit Correct','Repair / Revision','Evidence Statement','Babbage Response','Quality Indicators','AI Source'],
       4: ['Timestamp','Participant ID','Session ID','Attempts','Best Score','Course Inputs','Diagnosis','Function Choice','Audit Choice','Audit Correct','Async Repair','Evidence Statement','Babbage Response','Quality Indicators','AI Source'],
@@ -2063,21 +2023,32 @@ const PromptCraftReceiver = (() => {
       const aiSource = scenarioAiSource_(fields.reviewSource, fields.provider || latest.aiProvider, fields.model || latest.aiModel);
 
       if (scenario === 1) {
-        headers = ['Timestamp','Participant ID','Session ID','Attempts','Best Score','Renamed Activities','Learning-Purpose Organization','Alignment Diagnosis','Personal Module','Intended Learning','OSCQR Standards','Babbage Feedback','AI Source'];
-        const learningPath = parseJsonMaybe_(detail.s1_learning_path_json, {}) || {};
-        const courseGuide = parseJsonMaybe_(detail.s1_course_guide_json, {}) || {};
+        // Each checkpoint can carry only part of the design. Combine the
+        // current S1 events in time order so later guide work keeps earlier
+        // renamed activities, placements, and the diagnosis visible.
+        const s1Events = record.list.slice().reverse();
+        const learningPath = {};
+        let oscqr = '';
+        s1Events.forEach(event => {
+          const eventDetail = event.detail || {};
+          Object.assign(learningPath, parseJsonMaybe_(eventDetail.s1_learning_path_json, {}) || {});
+          if (eventDetail.s1_oscqr_standards) oscqr = eventDetail.s1_oscqr_standards;
+        });
         const renamed = Array.isArray(learningPath.renamedTitles) ? learningPath.renamedTitles.join(' | ') : '';
         const organization = learningPath.organization && typeof learningPath.organization === 'object'
           ? Object.keys(learningPath.organization).map(key => key + ': ' + learningPath.organization[key]).join(' | ')
           : '';
-        rows.push([c.timestamp,c.participant,c.session,c.attempts,c.bestScore,
-          fullTextForView_(renamed || latest.allPrompts || latest.prompt, 620),
+        rows.push([latest.timestamp,latest.participant,record.session,
+          maxResearchNumber_(record.list.map(event => event.attempts)),
+          maxResearchNumber_(record.list.map(event => event.bestScore)),
+          fullTextForView_(renamed, 620),
           fullTextForView_(organization, 620),
-          detail.s1_diagnosis_choice || learningPath.diagnosisChoice || '',
-          courseGuide.moduleTitle || learningPath.moduleTitle || '',
-          courseGuide.intendedLearning || learningPath.intendedLearning || '',
-          fullTextForView_(detail.s1_oscqr_standards || fields.quality || latest.quality, 760),
-          fullTextForView_(fields.response || latest.response, 720), aiSource]);
+          learningPath.diagnosisChoice || '',
+          learningPath.guideStepAdded ? 'Yes' : '',
+          record.list.some(event => event.eventType === 's1_course_guide_complete') ? 'Yes' : '',
+          learningPath.activityCount === undefined ? '' : learningPath.activityCount,
+          fullTextForView_(oscqr || latest.quality, 760),
+          fullTextForView_(latest.response, 720)]);
       }
 
       if (scenario === 2) {
@@ -2291,16 +2262,11 @@ const PromptCraftReceiver = (() => {
 
     const coding = [
       ['Construct','Primary Evidence','How to Interpret','Coding Notes'],
-      ['Learning-first course design','02 - S1 Engagement (legacy tab name)','Renamed activities, learning-purpose organization, alignment diagnosis, personal course guide, and OSCQR connections.','Interpret the score with the 0-5 S1 learning-path scale; the legacy tab name remains for workbook compatibility.'],
-      ['Accessibility design','03 - S2 Metacognition (legacy tab name)','Reserved roadmap position for Access Is Part of the Design.','Do not interpret legacy S2 fields as current Scenario 2.'],
-      ['Metacognitive design','04 - S3 Assessment (legacy tab name)','Confident Student diagnosis, evidence, repair, and review.','Legacy s2_* storage fields map to current Scenario 3.'],
-      ['Assessment design','05 - S4 Sync Bias (legacy tab name)','The 96% Problem diagnosis, evidence, audit, and repair.','Legacy s3_*/s4_* storage fields map to current Scenario 4.'],
-      ['Hallucination checking','06 - S5 Hallucination','Ability to flag, correct, and verify unsupported AI claims.','Use check/audit decisions plus flagged and corrected claim evidence.'],
-      ['Prediction before trust','07 - S6 Prediction','Whether participants anticipate AI behavior before accepting output.','Focus on prediction quality and correctness, not only completion.'],
-      ['Overreliance judgment','08 - S7 Overreliance','Judgment across policy, cases, integrity, scenarios, and learning objectives.','Compare decision patterns across the five instructional contexts.'],
-      ['Reflective revision / transfer','09 - S8 Reflect & Revise','How participants revise prompts, explain changes, and transfer learning to practice.','Use score delta, reflection fields, transfer response, and AI growth narrative.'],
-      ['Engagement with activity','01 - Sessions + 10 - Process Log','Persistence, pacing, attempts, and completion across PromptCraft.','More attempts can represent productive iteration rather than weakness.'],
-      ['AI provenance / trust','AI Source / AI Review Source fields','Separates live AI output from demonstration fallback.','Exclude fallback output from claims about live AI response quality.']
+      ['Learning path','02 - S1 Start With Learning','Renamed activities and Prepare / Practice / Evidence placements.','These are design choices; they do not alone prove student learning.'],
+      ['Alignment judgment','02 - S1 Start With Learning','Diagnosis of the gap between the intended learning and the module evidence.','Compare the diagnosis with the participant’s placement choices.'],
+      ['Transfer to My Course','02 - S1 Start With Learning','Guide completion and number of listed activities.','Personal module wording stays on the participant’s device.'],
+      ['Process','01 - Sessions + 10 - Process Log','Checkpoint count, sequence, and time across the activity.','A design checkpoint is not an AI prompt attempt or a mastery score.'],
+      ['AI provenance','Raw Events','Provider details only where the app sends them.','The separate S1 Babbage review is not currently saved as a research event.']
     ];
     sheet.getRange(3, 1, coding.length, 4).setValues(coding);
     sheet.getRange('A3:D3').setBackground('#475569').setFontColor('#FFFFFF').setFontWeight('bold').setHorizontalAlignment('center');
@@ -2308,24 +2274,18 @@ const PromptCraftReceiver = (() => {
 
     const guide = [
       ['Tab','Main contents','Use','Notes'],
-      ['00 - Overview','Workbook health and cross-scenario metrics','Start here','Includes deployment health so an old web-app deployment is visible.'],
-      ['01 - Sessions','One row per participant session','Cross-scenario participation analysis','Session ID is the join key.'],
-      ['02 - S1 Engagement','Current S1: Start With the Learning','Learning-path organization, alignment diagnosis, personal guide, and OSCQR coverage','Tab name is retained for spreadsheet compatibility.'],
-      ['03 - S2 Metacognition','Current S2: Access Is Part of the Design','Reserved accessibility-design view','Tab name is retained for spreadsheet compatibility.'],
-      ['04 - S3 Assessment','Current S3: The Confident Student Problem','Metacognitive process analysis','Legacy s2_* fields remain raw compatibility fields.'],
-      ['05 - S4 Sync Bias','Current S4: The 96% Problem','Assessment-design analysis','Legacy s3_*/s4_* fields remain raw compatibility fields.'],
-      ['06 - S5 Hallucination','Check/audit decisions, flagged claim, correction, verification','Hallucination-detection analysis','Keeps claim-level evidence together.'],
-      ['07 - S6 Prediction','Prediction, correctness, prompt context','Prediction-before-trust analysis','Scenario has intentionally fewer result fields.'],
-      ['08 - S7 Overreliance','Five instructional judgment decisions','Overreliance analysis','Each decision remains its own column.'],
-      ['09 - S8 Reflect & Revise','Initial/revised prompts, score delta, reflections, transfer, growth narrative','Revision and transfer analysis','Growth JSON remains only in the hidden raw archive.'],
-      ['10 - Process Log','Chronological attempt/event trail','Sequence analysis','Use only when event-level detail is needed.'],
-      ['11 - Ideas Wall','High-quality completed outputs surfaced at score 4+','Manual Publish / Hold / Reject moderation','Only Publish appears on the public wall; not a substitute for research-consent decisions.'],
-      ['97–99 Raw','Responses, events, payload audit','Troubleshooting only','Hidden during normal research work.']
+      ['00 - Overview','Workbook status and counts','Start here','S1 fallback AI count is not inferred from course text.'],
+      ['01 - Sessions','One row per participant and session','Participation summary','Join on participant ID plus session ID.'],
+      ['02 - S1 Start With Learning','Current S1 design checkpoints','S1 analysis','Older Content Avalanche events remain only in raw history.'],
+      ['10 - Process Log','Event sequence','Process analysis','Includes historical raw events.'],
+      ['11 - Ideas Wall','Manually moderated candidate queue','Public sharing review','Current S1 course text is not automatically added as a wall candidate.'],
+      ['12–13 Readable','Research responses and process events','Detailed analysis','Built from raw records.'],
+      ['96–99 Raw','Payload archive, responses, events, and audit','Recovery and verification','Preserve these tabs; refresh never resets them.']
     ];
-    sheet.getRange('A16:D16').merge().setValue('Plain-language tab guide').setBackground('#E7F0EC').setFontWeight('bold').setFontColor('#163F33');
-    sheet.getRange(17, 1, guide.length, 4).setValues(guide);
-    sheet.getRange('A17:D17').setBackground('#215C45').setFontColor('#FFFFFF').setFontWeight('bold').setHorizontalAlignment('center');
-    sheet.getRange(18, 1, guide.length - 1, 4).setWrap(true).setVerticalAlignment('top');
+    sheet.getRange('A10:D10').merge().setValue('Plain-language tab guide').setBackground('#E7F0EC').setFontWeight('bold').setFontColor('#163F33');
+    sheet.getRange(11, 1, guide.length, 4).setValues(guide);
+    sheet.getRange('A11:D11').setBackground('#215C45').setFontColor('#FFFFFF').setFontWeight('bold').setHorizontalAlignment('center');
+    sheet.getRange(12, 1, guide.length - 1, 4).setWrap(true).setVerticalAlignment('top');
     sheet.setFrozenRows(3);
     [190, 260, 420, 340].forEach((w, i) => sheet.setColumnWidth(i + 1, w));
     sheet.setTabColor('#475569');
@@ -2364,7 +2324,6 @@ const PromptCraftReceiver = (() => {
     sheet.getRange('E7').setFormula("=IFERROR(AVERAGE('01 - Sessions'!D2:D),0)");
     sheet.getRange('E8').setFormula("=IFERROR(AVERAGE('01 - Sessions'!G2:G),0)");
     const fallbackParts = [
-      `COUNTIF('${SHEET_SCENARIO_TABS[1]}'!I2:I,"*fallback*")`,
       `COUNTIF('${SHEET_SCENARIO_TABS[2]}'!M2:M,"fallback")`,
       `COUNTIF('${SHEET_SCENARIO_TABS[3]}'!O2:O,"*fallback*")`,
       `COUNTIF('${SHEET_SCENARIO_TABS[4]}'!O2:O,"*fallback*")`,
@@ -2384,7 +2343,6 @@ const PromptCraftReceiver = (() => {
       sheet.getRange(r, 4).setFormula(`=IFERROR(AVERAGE('${tab}'!E2:E),0)`);
       sheet.getRange(r, 5).setFormula(`=IFERROR(AVERAGE('${tab}'!D2:D),0)`);
       let fallbackFormula = '=0';
-      if (scenario === 1) fallbackFormula = `=COUNTIF('${tab}'!I2:I,"*fallback*")`;
       if (scenario === 2) fallbackFormula = `=COUNTIF('${tab}'!M2:M,"fallback")`;
       if (scenario >= 3 && scenario <= 5) fallbackFormula = `=COUNTIF('${tab}'!O2:O,"*fallback*")`;
       sheet.getRange(r, 6).setFormula(fallbackFormula);
@@ -2423,6 +2381,7 @@ const PromptCraftReceiver = (() => {
   }
 
   function refreshHumanReadableViews_() {
+    ensureCurrentS1Tab_();
     const events = collectResearchEvents_();
     const responseBySession = latestResponseRowsBySession_();
     const sessions = rebuildSessionsView_(events);
@@ -2455,18 +2414,44 @@ const PromptCraftReceiver = (() => {
       status: 'ok',
       receiver_schema: 'V84 readable projections + lossless raw archive',
       counts: counts,
-      message: 'Research-facing tabs refreshed. Score-4+ completed outputs were checked for Ideas Wall candidacy; publication remains manual.'
+      message: 'Readable tabs rebuilt from retained raw records. Current S1 guide checkpoints are excluded from automatic Ideas Wall candidacy.'
     });
+  }
+
+  function inspectS1TrackingNow() {
+    const source = getSheet_(SHEET_INCREMENTAL);
+    ensureIncrementalHeaders(source);
+    const lastRow = source.getLastRow();
+    const counts = {};
+    let currentCheckpoints = 0;
+    let missingSessionId = 0;
+    if (lastRow > 1) {
+      const rows = source.getRange(2, 1, lastRow - 1, INCREMENTAL_HEADERS.length).getValues();
+      rows.forEach(row => {
+        if (Number(row[INC_COL.scenario - 1]) !== 1) return;
+        const eventType = String(row[INC_COL.eventType - 1] || '(missing event type)');
+        counts[eventType] = (counts[eventType] || 0) + 1;
+        if (S1_LEARNING_EVENTS.indexOf(eventType) !== -1) currentCheckpoints++;
+        if (!String(row[INC_COL.session - 1] || '').trim()) missingSessionId++;
+      });
+    }
+    const report = {
+      status: 'ok', receiver_version: PROMPTCRAFT_RECEIVER_VERSION,
+      s1_raw_events: Object.values(counts).reduce((sum, count) => sum + count, 0),
+      current_s1_checkpoints: currentCheckpoints,
+      missing_session_id: missingSessionId,
+      event_types: counts,
+      note: 'Only the four Start With the Learning checkpoint events appear in the current S1 tab. Browser connection tests and older S1 events remain in raw history.'
+    };
+    console.log(JSON.stringify(report, null, 2));
+    return report;
   }
 
 
   function shouldRefreshResearchViewsForIncremental_(p) {
     const eventType = String((p && p.event_type) || '').toLowerCase();
+    if (Number(p && p.scenario_index) === 1 && S1_LEARNING_EVENTS.indexOf(eventType) !== -1) return true;
     return /complete|completed|final|result|review/.test(eventType);
-  }
-
-  function removeRetiredResearchSheets_() {
-    return { deleted: 0, policy: 'V84 never deletes or renames existing tabs' };
   }
 
   function formatRawWorkbook_() {
@@ -2479,7 +2464,7 @@ const PromptCraftReceiver = (() => {
   }
 
   function initializeWorkbookNow() {
-    const consolidated = { skipped: true, reason: 'V85 preserves all existing tabs; migrate only on a recovery copy.' };
+    const consolidated = { skipped: true, reason: 'Raw rows are preserved; the older derived S1 tab may be renamed.' };
     ensureRawArchiveHeaders_(getSheet_(SHEET_RAW_ARCHIVE));
     ensureIncrementalHeaders(getSheet_(SHEET_INCREMENTAL));
     ensureFullResponseHeaders(getSheet_(SHEET_RESPONSES));
@@ -2493,20 +2478,12 @@ const PromptCraftReceiver = (() => {
       receiver_schema: 'V84 readable projections + lossless raw archive',
       counts: counts,
       consolidated: consolidated,
-      message: 'V84 readable projections and lossless raw archive initialized without deleting or renaming existing tabs or V121 columns.'
+      message: 'Readable research tabs rebuilt, empty future tabs hidden, and older S1 derived tab aligned to the current name. V121 raw rows were preserved.'
     });
   }
 
-  function clearRowsBelowHeader_(sheet, headerRows, columnCount) {
-    const lastRow = sheet.getLastRow();
-    if (lastRow <= headerRows) return 0;
-    const rows = lastRow - headerRows;
-    sheet.getRange(headerRows + 1, 1, rows, columnCount).clearContent();
-    return rows;
-  }
-
   function resetResearchDataNow() {
-    throw new Error('resetResearchDataNow is disabled in V84. Use a disposable workbook copy for reset or replay work.');
+    throw new Error('Research reset is disabled in V89 because it would erase collected records. Use refreshResearchViewsNow() to rebuild display tabs from raw data.');
   }
 
   function bytesToHex_(bytes) {
@@ -2539,14 +2516,20 @@ const PromptCraftReceiver = (() => {
   }
 
   function resetChallengeScoresNow() {
-    const sheet = getSpreadsheet_().getSheetByName(SHEET_CHALLENGE);
-    if (!sheet) return { status: 'ok', cleared: 0, message: 'Challenge sheet did not exist.' };
-    const rows = Math.max(0, sheet.getLastRow() - 1);
-    if (rows) sheet.getRange(2, 1, rows, sheet.getMaxColumns()).clearContent();
-    return { status: 'ok', cleared: rows, sheet: SHEET_CHALLENGE };
+    const lock = LockService.getScriptLock();
+    if (!lock.tryLock(30000)) throw new Error('Receiver is busy. Retry the Challenge Scores reset shortly.');
+    try {
+      const sheet = ensureChallengeSheet_();
+      const rows = Math.max(0, sheet.getLastRow() - 1);
+      if (rows) sheet.getRange(2, 1, rows, sheet.getMaxColumns()).clearContent();
+      SpreadsheetApp.flush();
+      return { status: 'ok', cleared: rows, sheet: SHEET_CHALLENGE, top_xp: 0 };
+    } finally {
+      lock.releaseLock();
+    }
   }
 
-  return { doGet, doPost, initializeWorkbookNow, resetResearchDataNow, refreshResearchViewsNow, verifyV84MigrationNow, resetChallengeScoresNow };
+  return { doGet, doPost, initializeWorkbookNow, resetResearchDataNow, refreshResearchViewsNow, inspectS1TrackingNow, verifyV84MigrationNow, resetChallengeScoresNow };
 })();
 
 function doGet(e) { return PromptCraftReceiver.doGet(e); }
@@ -2554,6 +2537,6 @@ function doPost(e) { return PromptCraftReceiver.doPost(e); }
 function initializeWorkbookNow() { return PromptCraftReceiver.initializeWorkbookNow(); }
 function resetResearchDataNow() { return PromptCraftReceiver.resetResearchDataNow(); }
 function refreshResearchViewsNow() { return PromptCraftReceiver.refreshResearchViewsNow(); }
+function inspectS1TrackingNow() { return PromptCraftReceiver.inspectS1TrackingNow(); }
 function verifyV84MigrationNow() { return PromptCraftReceiver.verifyV84MigrationNow(); }
 function resetChallengeScoresNow() { return PromptCraftReceiver.resetChallengeScoresNow(); }
-

@@ -262,8 +262,19 @@ function buildSessionPayload(formData) {
     s1_oscqr:             scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].oscqrLit,
     s1_section_reviews:   JSON.stringify(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].sectionReviews || []),
     s1_diagnosis_choice:  scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.diagnosisChoice || '',
-    s1_learning_path_json: JSON.stringify(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath || {}),
-    s1_course_guide_json: JSON.stringify(pcS1LearningState?.guide?.myCourseReview || {}),
+    s1_learning_path_json: JSON.stringify({
+      organization: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.organization || {},
+      renamedTitles: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.renamedTitles || [],
+      placementMatches: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.placementMatches ?? '',
+      placementTotal: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.placementTotal ?? '',
+      diagnosisChoice: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.diagnosisChoice || '',
+      diagnosisCorrect: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.diagnosisCorrect ?? '',
+      guideStepAdded: Boolean(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.guideStepAdded),
+      activityCount: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.activityCount ?? '',
+      lastEvent: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.lastEvent || ''
+    }),
+    // Personal My Course wording remains local on the participant's device.
+    s1_course_guide_json: '',
     s1_oscqr_standards:   scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].oscqrLit,
 
     // Legacy receiver columns retained for the metacognition implementation,
@@ -397,8 +408,19 @@ async function saveIncrementalData(scenarioIdx, eventType = 'scenario_complete')
       babbage_analysis_json: s.structuredAnalysis ? JSON.stringify(s.structuredAnalysis) : '',
       s2_diagnosis_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.diagnosisAttempts || []) : '',
       s1_diagnosis_choice: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? (s.s1LearningPath?.diagnosisChoice || '') : '',
-      s1_learning_path_json: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? JSON.stringify(s.s1LearningPath || {}) : '',
-      s1_course_guide_json: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? JSON.stringify(pcS1LearningState?.guide?.myCourseReview || {}) : '',
+      s1_learning_path_json: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? JSON.stringify({
+        organization: s.s1LearningPath?.organization || {},
+        renamedTitles: s.s1LearningPath?.renamedTitles || [],
+        placementMatches: s.s1LearningPath?.placementMatches ?? '',
+        placementTotal: s.s1LearningPath?.placementTotal ?? '',
+        diagnosisChoice: s.s1LearningPath?.diagnosisChoice || '',
+        diagnosisCorrect: s.s1LearningPath?.diagnosisCorrect ?? '',
+        guideStepAdded: Boolean(s.s1LearningPath?.guideStepAdded),
+        activityCount: s.s1LearningPath?.activityCount ?? '',
+        lastEvent: s.s1LearningPath?.lastEvent || ''
+      }) : '',
+      // My Course wording stays on this device, as promised in the S1 interface.
+      s1_course_guide_json: '',
       s1_oscqr_standards: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? (s.oscqrLit || '') : '',
       s2_evidence_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.evidenceAttempts || []) : '',
       s2_thinking_move: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? (s.thinkingMove || '') : '',

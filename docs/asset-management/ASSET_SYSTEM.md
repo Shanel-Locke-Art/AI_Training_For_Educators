@@ -6,7 +6,7 @@
 - Browser patch: `575`
 - Asset manifest: `v150`
 - Research schema: `V121`
-- Receiver source: `V85`
+- Receiver source: `V89`
 
 This document is the current operating guide for visual, audio, reference, and production documentation assets. Historical release notes preserve the baseline that existed when each release was created and should not be rewritten as current guidance.
 

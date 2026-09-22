@@ -23000,6 +23000,8 @@ html body #vnOverlay.vn-overlay.active.babbage-terminal-textmode
 }
 .pc-s1-full-guide-module .pc-s1-guide-module-group strong { color: #0d2a4a; }
 .pc-s1-full-guide-module .pc-s1-guide-module-group span { grid-column: 2; padding: 5px 9px; border: 1px solid #d4dce2; border-radius: 4px; color: #2d3b45; }
+.pc-s1-full-guide-module .pc-s1-guide-module-unclear { border-left-color: #75869a; }
+.pc-s1-full-guide-module .pc-s1-guide-module-unclear strong { color: #364a5f; }
 .pc-s1-full-guide-personal { border-top: 6px solid #1672a5; }
 .pc-s1-full-guide-tips { display: grid; gap: 10px; margin: 18px 0; }
 .pc-s1-full-guide-tips article { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: start; padding: 13px; background: #eef5f8; }
@@ -23020,6 +23022,7 @@ html body #vnOverlay.pc-s1-clean-closing #babbageTerminalScene { display: none !
   .pc-s1-my-course-activities { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; }
   .pc-s1-full-guide-module { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
   .pc-s1-full-guide-module .pc-s1-guide-module-group { grid-template-columns: 1fr; align-content: start; height: 100%; box-sizing: border-box; }
+  .pc-s1-full-guide-module .pc-s1-guide-module-unclear { grid-column: 1 / -1; height: auto; }
   .pc-s1-full-guide-module .pc-s1-guide-module-group span { grid-column: 1; }
   .pc-s1-full-guide-tips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

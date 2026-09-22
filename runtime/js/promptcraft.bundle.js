@@ -1335,8 +1335,19 @@ function buildSessionPayload(formData) {
     s1_oscqr:             scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].oscqrLit,
     s1_section_reviews:   JSON.stringify(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].sectionReviews || []),
     s1_diagnosis_choice:  scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.diagnosisChoice || '',
-    s1_learning_path_json: JSON.stringify(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath || {}),
-    s1_course_guide_json: JSON.stringify(pcS1LearningState?.guide?.myCourseReview || {}),
+    s1_learning_path_json: JSON.stringify({
+      organization: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.organization || {},
+      renamedTitles: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.renamedTitles || [],
+      placementMatches: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.placementMatches ?? '',
+      placementTotal: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.placementTotal ?? '',
+      diagnosisChoice: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.diagnosisChoice || '',
+      diagnosisCorrect: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.diagnosisCorrect ?? '',
+      guideStepAdded: Boolean(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.guideStepAdded),
+      activityCount: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.activityCount ?? '',
+      lastEvent: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.lastEvent || ''
+    }),
+    // Personal My Course wording remains local on the participant's device.
+    s1_course_guide_json: '',
     s1_oscqr_standards:   scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].oscqrLit,
 
     // Legacy receiver columns retained for the metacognition implementation,
@@ -1470,8 +1481,19 @@ async function saveIncrementalData(scenarioIdx, eventType = 'scenario_complete')
       babbage_analysis_json: s.structuredAnalysis ? JSON.stringify(s.structuredAnalysis) : '',
       s2_diagnosis_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.diagnosisAttempts || []) : '',
       s1_diagnosis_choice: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? (s.s1LearningPath?.diagnosisChoice || '') : '',
-      s1_learning_path_json: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? JSON.stringify(s.s1LearningPath || {}) : '',
-      s1_course_guide_json: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? JSON.stringify(pcS1LearningState?.guide?.myCourseReview || {}) : '',
+      s1_learning_path_json: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? JSON.stringify({
+        organization: s.s1LearningPath?.organization || {},
+        renamedTitles: s.s1LearningPath?.renamedTitles || [],
+        placementMatches: s.s1LearningPath?.placementMatches ?? '',
+        placementTotal: s.s1LearningPath?.placementTotal ?? '',
+        diagnosisChoice: s.s1LearningPath?.diagnosisChoice || '',
+        diagnosisCorrect: s.s1LearningPath?.diagnosisCorrect ?? '',
+        guideStepAdded: Boolean(s.s1LearningPath?.guideStepAdded),
+        activityCount: s.s1LearningPath?.activityCount ?? '',
+        lastEvent: s.s1LearningPath?.lastEvent || ''
+      }) : '',
+      // My Course wording stays on this device, as promised in the S1 interface.
+      s1_course_guide_json: '',
       s1_oscqr_standards: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? (s.oscqrLit || '') : '',
       s2_evidence_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.evidenceAttempts || []) : '',
       s2_thinking_move: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? (s.thinkingMove || '') : '',
@@ -5794,6 +5816,14 @@ function pcGetS1MyCourseFeedback(response, data) {
   const activityCount = data.activities.filter(Boolean).length;
   const structured = response?.structured && typeof response.structured === 'object' ? response.structured : {};
   const worked = Array.isArray(structured.what_worked) ? structured.what_worked.map(item => String(item || '').trim()).filter(Boolean).slice(0, 3) : [];
+  const intent = String(data.intendedLearning || '').trim();
+  const activities = data.activities.filter(Boolean).map(item => String(item).trim());
+  const isUnclear = text => /^(?:.{0,2}|(?:test|testing|asdf|qwerty|lorem|random|placeholder|n\/a)(?:\s+\w+){0,2})$/i.test(text)
+    || /^(.)\1{3,}$/i.test(text) || !/[a-z]{3}/i.test(text);
+  const unclearIntent = isUnclear(intent) || !/\b(analy[sz]e|apply|build|compare|create|demonstrate|design|develop|evaluate|explain|identify|interpret|justify|perform|produce|recommend|solve|use|write)\b/i.test(intent);
+  const navigationOnly = activities.length > 0 && activities.every(item => /^(start here|your instructor|helpful links|next steps|overview|introduction|course resources|welcome|syllabus)$/i.test(item));
+  const unclearActivities = activities.length > 0 && activities.every(isUnclear);
+  const limitedInput = unclearIntent || navigationOnly || unclearActivities;
   const improvementIdeas = data.activities.filter(Boolean).map(activity => {
     const title = String(activity || '').trim();
     const lower = title.toLowerCase();
@@ -5803,9 +5833,24 @@ function pcGetS1MyCourseFeedback(response, data) {
     if (/read|chapter|article|case/.test(lower)) return `For “${title},” include the topic and the purpose for reading so students know how it prepares them.`;
     return `For “${title},” replace the generic label with the task, topic, and expected result students will recognize in Canvas.`;
   });
+  if (limitedInput) return {
+    clear: navigationOnly
+      ? 'These entries describe ways to navigate the course. I cannot identify a learning task, practice opportunity, or evidence of learning from them.'
+      : 'I cannot judge the learning path from these entries yet. The intended learning or the activity names need more detail.',
+    worked: navigationOnly ? ['The course has a starting point and support links.'] : ['You have a draft module to revise.'],
+    unknown: unclearIntent
+      ? 'The intended learning needs an observable action and a topic before I can check whether the activities align.'
+      : 'The listed items do not show what students will practice or produce to demonstrate the intended learning.',
+    next: unclearIntent
+      ? 'State what students should be able to do with the course content. Then name the activities that help them practice and show that action.'
+      : 'Keep these navigation items, then add a named practice task and an assignment or other product that shows the intended learning.',
+    improvementIdeas: navigationOnly
+      ? ['Keep “Start Here” and “Helpful Links” as navigation or support items.', 'Add a practice activity that asks students to use the course ideas.', 'Add an assignment or other evidence that shows what students learned.']
+      : ['Replace test text with the real topic and student task.', 'Describe what students will do during practice.', 'Name what students will produce to show their learning.']
+  };
   return {
-    clear: String(structured.feedback_summary || '').trim() || `You named the module, stated an intended performance, and listed ${activityCount} current activities. That gives the review a concrete starting point.`,
-    worked: worked.length ? worked : [`The intended learning is visible: ${data.intendedLearning}`, `${activityCount} current activities are listed for comparison.`],
+    clear: String(structured.feedback_summary || '').trim() || `You named the module and listed ${activityCount} activities. Their titles alone do not establish alignment.`,
+    worked: worked.length ? worked : [`Your intended learning states: ${intent}`, `${activityCount} activity titles are available to inspect.`],
     unknown: String(structured.issue_detected || '').trim() || 'Activity titles alone cannot show whether students practice the intended performance or produce evidence of it.',
     next: String(structured.recommended_repair || '').trim() || 'Inspect the instructions and student work for each activity. Then compare the evidence students produce with the intended learning.',
     improvementIdeas
@@ -5921,11 +5966,9 @@ function pcAddS1MyCourseReviewToGuide() {
   const organizationScore = review.matchCount === review.total ? 2 : review.matchCount >= 3 ? 1 : 0;
   const diagnosisScore = pcS1LearningState.diagnosisChoice === 'evidence-gap' ? 2 : 1;
   const finalScore = Math.min(5, organizationScore + diagnosisScore + (transferScore >= 4 ? 1 : 0));
-  pcRecordS1LearningProgress('s1_course_guide_complete', finalScore, `${data.moduleTitle}: ${data.intendedLearning}`, feedback.summary || feedback.clear || 'Personal course guidance completed.', {
+  pcRecordS1LearningProgress('s1_course_guide_complete', finalScore, 'Completed My Course Guide', 'Personal course guidance completed on this device.', {
     diagnosisChoice: pcS1LearningState.diagnosisChoice,
-    moduleTitle: data.moduleTitle,
-    intendedLearning: data.intendedLearning,
-    activities: data.activities.filter(Boolean),
+    activityCount: completedActivities,
     organization: pcS1LearningState.organization,
     renamedTitles: pcS1LearningState.renamedTitles,
     oscqrStandards: PC_S1_OSCQR_STANDARDS.map(item => item.number)
@@ -5946,7 +5989,7 @@ function pcRenderS1FullGuide() {
       <div class="pc-s1-guide-paper pc-s1-full-guide-paper">
         <header class="pc-s1-guide-paper-header"><span>My PromptCraft Course Guide</span><h2>Make the path visible, then check the evidence</h2><p>Use this page when building or revising a Canvas module.</p></header>
         <section class="pc-s1-guide-section"><span class="pc-s1-result-eyebrow">Start here</span><h3>Choose headers by learning purpose</h3><p>Begin with the learning students need to do, then group the activities that prepare them, let them practice, and provide evidence.</p>${pcRenderS1GuideInsight(pcS1LearningState.guide?.step1?.personalizedInsight)}</section>
-        <section class="pc-s1-guide-section"><span class="pc-s1-result-eyebrow">Your visual module</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>This suggested Canvas view uses the activities you entered. The headers make each activity’s role visible; review the placement and adjust it to match your actual instructions.</p><div class="pc-s1-full-guide-module" aria-label="Visual example of the teacher's Canvas module">${pcRenderS1MyCourseMiniModule(course)}</div></section>
+        <section class="pc-s1-guide-section"><span class="pc-s1-result-eyebrow">Your visual module</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>This draft groups activities only when their titles show a clear purpose. Review every placement against your actual instructions; items with an unclear purpose need your decision.</p><div class="pc-s1-full-guide-module" aria-label="Visual example of the teacher's Canvas module">${pcRenderS1MyCourseMiniModule(course)}</div></section>
         <section class="pc-s1-guide-section pc-s1-full-guide-personal"><span class="pc-s1-result-eyebrow">Babbage suggestions for your course</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p><strong>Intended learning:</strong> ${esc(course.intendedLearning)}</p><div class="pc-s1-full-guide-tips">${feedback.improvementIdeas.map((tip, index) => `<article><span>${index + 1}</span><p>${esc(tip)}</p></article>`).join('')}</div><div class="pc-s1-my-course-next-check"><h3>Next check</h3><p>${esc(feedback.next)}</p></div></section>
         ${pcRenderS1WeeklyModulePattern()}
         ${pcRenderS1OSCQRStandards()}
@@ -5959,7 +6002,7 @@ function pcRenderS1FullGuide() {
 }
 
 function pcRenderS1MyCourseMiniModule(course) {
-  const groups = { prepare: [], practice: [], evidence: [] };
+  const groups = { prepare: [], practice: [], evidence: [], unclear: [] };
   course.activities.filter(Boolean).forEach(activity => {
     const text = String(activity);
     const lower = text.toLowerCase();
@@ -5967,14 +6010,19 @@ function pcRenderS1MyCourseMiniModule(course) {
       ? 'evidence'
       : /practice|discuss|discussion|draft|peer|rehears/.test(lower)
         ? 'practice'
-        : 'prepare';
+        : /read|watch|video|lecture|demonstration|example|lesson/.test(lower)
+          ? 'prepare'
+          : 'unclear';
     groups[purpose].push(text);
   });
-  return Object.entries(groups).map(([purpose, activities]) => `
+  const learningGroups = ['prepare', 'practice', 'evidence'].map(purpose => `
     <div class="pc-s1-guide-module-group">
       <strong>${esc(PC_S1_PURPOSE_LABELS[purpose])}</strong>
-      ${activities.length ? activities.map(activity => `<span>${esc(activity)}</span>`).join('') : '<span class="is-empty">Add an activity that serves this purpose</span>'}
+      ${groups[purpose].length ? groups[purpose].map(activity => `<span>${esc(activity)}</span>`).join('') : '<span class="is-empty">No activity identified yet</span>'}
     </div>`).join('');
+  return learningGroups + (groups.unclear.length
+    ? `<div class="pc-s1-guide-module-group pc-s1-guide-module-unclear"><strong>Purpose to confirm</strong>${groups.unclear.map(activity => `<span>${esc(activity)}</span>`).join('')}</div>`
+    : '');
 }
 
 function pcPlayS1ClosingDialogue() {

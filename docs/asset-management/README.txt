@@ -28,4 +28,4 @@ The scripts include proposed audio filenames for spoken lines. These names are
 not approved or present in the runtime until the voice tracker and game are updated.
 
 
-The trackers and guides describe PROMPTCRAFT_V429, Patch 575, and asset manifest v150. Do not create version-number copies for routine updates.
+The trackers and guides were last rebuilt for PROMPTCRAFT_V429, Patch 575, and asset manifest v150. Patch 576 does not change the asset inventory. Do not create version-number copies for routine updates.
