@@ -1,5 +1,5 @@
 /**
- * PromptCraft Google Apps Script receiver — START WITH LEARNING V90
+ * PromptCraft Google Apps Script receiver — START WITH LEARNING V91
  *
  * Live job:
  *   1. Receive PromptCraft payloads.
@@ -13,10 +13,11 @@
  *   - refreshResearchViewsNow()-> rebuild readable tabs from preserved raw rows.
  *   - inspectS1TrackingNow()    -> count received S1 event types without showing participant text.
  *   - verifyV84MigrationNow()  -> read-only row-count/header-fingerprint inventory for copied-workbook verification.
+ *   - resetResearchDataNow()   -> clear testing records while preserving workbook structure.
  *
- * V90 preserves every raw V121 column and lossless payload archive. The S1
+ * V91 preserves every raw V121 column and lossless payload archive. The S1
  * readable tab shows only Start With the Learning design checkpoints.
- * Destructive research reset remains disabled.
+ * Testing reset is enabled and rebuilds the formatted, empty research views.
  */
 
 const SHEET_OVERVIEW       = '00 - Overview';
@@ -52,7 +53,7 @@ const SCENARIO_TAB_COLORS = Object.freeze({
   5: '#8A4B2A', 6: '#475569', 7: '#5C3D73', 8: '#0F6A63'
 });
 
-const PROMPTCRAFT_RECEIVER_VERSION = 'V90';
+const PROMPTCRAFT_RECEIVER_VERSION = 'V91';
 const EXPECTED_APP_SCHEMA_VERSION = 'V121';
 const EXPECTED_APP_BUILD = 'PROMPTCRAFT_V429';
 const SPREADSHEET_ID = '';
@@ -160,7 +161,7 @@ const PromptCraftReceiver = (() => {
       timestamp: new Date().toISOString(),
       expected_app_schema: EXPECTED_APP_SCHEMA_VERSION,
       expected_app_build: EXPECTED_APP_BUILD,
-      workflow: 'V90 Start With the Learning projections + participant-safe views + lossless raw archives'
+      workflow: 'V91 Start With the Learning projections + participant-safe views + lossless raw archives'
     });
   }
 
@@ -2545,8 +2546,55 @@ const PromptCraftReceiver = (() => {
     });
   }
 
+  function clearTestingRows_(sheetName, headerRows) {
+    const sheet = getSheet_(sheetName);
+    const firstDataRow = Number(headerRows || 1) + 1;
+    const rowCount = Math.max(0, sheet.getLastRow() - Number(headerRows || 1));
+    if (rowCount > 0) sheet.getRange(firstDataRow, 1, rowCount, sheet.getMaxColumns()).clearContent();
+    return rowCount;
+  }
+
   function resetResearchDataNow() {
-    throw new Error('Research reset is disabled in V90 because it would erase collected records. Use refreshResearchViewsNow() to rebuild display tabs from raw data.');
+    const lock = LockService.getScriptLock();
+    if (!lock.tryLock(30000)) throw new Error('Receiver is busy. Retry the testing-data reset shortly.');
+    try {
+      const cleared = {};
+      cleared[SHEET_RAW_ARCHIVE] = clearTestingRows_(SHEET_RAW_ARCHIVE, 1);
+      cleared[SHEET_RESPONSES] = clearTestingRows_(SHEET_RESPONSES, 2);
+      cleared[SHEET_INCREMENTAL] = clearTestingRows_(SHEET_INCREMENTAL, 1);
+      cleared[SHEET_RAW_AUDIT] = clearTestingRows_(SHEET_RAW_AUDIT, 1);
+      cleared[SHEET_IDEAS] = clearTestingRows_(SHEET_IDEAS, 1);
+      cleared[SHEET_CHALLENGE] = clearTestingRows_(SHEET_CHALLENGE, 1);
+
+      const currentScenarioNames = Object.keys(SHEET_SCENARIO_TABS).map(key => SHEET_SCENARIO_TABS[key]);
+      getSpreadsheet_().getSheets().forEach(sheet => {
+        const name = sheet.getName();
+        if (/^0[2-9]\s*-\s*S[1-8]\b/i.test(name) && currentScenarioNames.indexOf(name) === -1) {
+          cleared[name] = clearTestingRows_(name, 1);
+        }
+      });
+
+      ensureRawArchiveHeaders_(getSheet_(SHEET_RAW_ARCHIVE));
+      ensureIncrementalHeaders(getSheet_(SHEET_INCREMENTAL));
+      ensureFullResponseHeaders(getSheet_(SHEET_RESPONSES));
+      ensureIdeaHeaders(getSheet_(SHEET_IDEAS));
+      ensureRawAuditHeaders_(getSheet_(SHEET_RAW_AUDIT));
+      ensureChallengeSheet_();
+      formatRawWorkbook_();
+      const views = refreshHumanReadableViews_();
+      SpreadsheetApp.flush();
+      const report = {
+        status: 'ok',
+        testing_data_reset: true,
+        cleared_rows: cleared,
+        views: views,
+        message: 'Testing records were cleared. Headers, formatting, formulas, and the workbook structure were rebuilt.'
+      };
+      console.log(JSON.stringify(report, null, 2));
+      return jsonResponse(report);
+    } finally {
+      lock.releaseLock();
+    }
   }
 
   function bytesToHex_(bytes) {

@@ -808,7 +808,7 @@ textarea::placeholder {
 /* ── CONTROLS ──────────────────────────────────────── */
 /* Anchor controls relative to character */
 :root {
-  --pc-app-background: url("../../assets/images/backgrounds/app-background.png?v=2");
+  --pc-app-background: url("../../assets/images/backgrounds/bg_01_app.png?v=2");
   --pc-app-background-legacy: none;
   --cream: #faf6f0;
   --parchment: #f2ebe0;
@@ -23037,6 +23037,196 @@ html body #vnOverlay.pc-s1-clean-closing #babbageTerminalScene { display: none !
     top: 0;
   }
 }
+
+/* P579 — saved Course Guide reading surface.
+   The guide owns one reliable scroll container and cannot inherit an invisible
+   dialogue overlay or the fixed-height activity workspace. */
+body.pc-s1-guide-open #chat {
+  display: block !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #e9eff3 !important;
+}
+body.pc-s1-guide-open #inputContainer { display: none !important; }
+body.pc-s1-guide-open #vnOverlay { pointer-events: none !important; }
+
+body.pc-s1-guide-open .pc-s1-guide-preview,
+body.pc-s1-guide-open .pc-s1-full-guide {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: clamp(12px, 2vw, 24px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+  background: linear-gradient(180deg, #dfe8ee 0, #f5f7f8 320px) !important;
+}
+
+body.pc-s1-guide-open .pc-s1-guide-taskbar,
+body.pc-s1-guide-open .pc-s1-full-guide-nav,
+body.pc-s1-guide-open .pc-s1-guide-paper {
+  width: min(1180px, 100%);
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body.pc-s1-guide-open .pc-s1-guide-taskbar {
+  margin-bottom: 0;
+  padding: clamp(16px, 2vw, 24px);
+  border-radius: 10px 10px 0 0;
+}
+
+.pc-s1-guide-heading-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.pc-s1-guide-heading-actions .pc-s1-learning-task-status {
+  padding: 8px 11px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(240, 189, 43, .17);
+  color: #ffe394;
+  font-size: .82rem;
+}
+.pc-s1-guide-heading-actions .pc-shell-secondary {
+  border-color: rgba(255,255,255,.72);
+  background: #fff;
+  color: #0d3155;
+}
+
+.pc-s1-full-guide-nav {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 9px 12px;
+  overflow-x: auto;
+  border: 1px solid #c1cdd5;
+  border-top: 3px solid #f0bd2b;
+  background: rgba(255, 255, 255, .98);
+  box-shadow: 0 7px 18px rgba(14, 42, 63, .12);
+  scrollbar-width: thin;
+}
+.pc-s1-full-guide-nav button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 8px 11px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: #125f8e;
+  font: inherit;
+  font-size: .86rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.pc-s1-full-guide-nav button:hover,
+.pc-s1-full-guide-nav button:focus-visible {
+  border-color: #8bb7ce;
+  background: #eaf5fa;
+  outline: 2px solid #125f8e;
+  outline-offset: 1px;
+}
+.pc-s1-full-guide-nav .pc-s1-guide-print {
+  margin-left: auto;
+  background: #0d3155;
+  color: #fff;
+}
+
+body.pc-s1-guide-open .pc-s1-guide-paper {
+  margin-top: 18px;
+  margin-bottom: 32px;
+  padding: clamp(24px, 3vw, 38px);
+  border-radius: 8px;
+  box-shadow: 0 14px 34px rgba(14, 42, 63, .14);
+}
+body.pc-s1-guide-open .pc-s1-guide-paper-header {
+  display: block !important;
+  margin: calc(clamp(24px, 3vw, 38px) * -1) calc(clamp(24px, 3vw, 38px) * -1) 0;
+  padding: 24px clamp(24px, 3vw, 38px) 22px;
+}
+body.pc-s1-guide-open .pc-s1-guide-section[id] { scroll-margin-top: 80px; }
+body.pc-s1-guide-open .pc-s1-guide-section > p { max-width: 88ch; }
+body.pc-s1-guide-open .pc-s1-full-guide-personal {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 22px;
+}
+body.pc-s1-guide-open .pc-s1-full-guide-personal > :is(.pc-s1-result-eyebrow, h3, p, .pc-s1-full-guide-tips, .pc-s1-my-course-next-check) {
+  grid-column: 1 / -1;
+}
+body.pc-s1-guide-open .pc-s1-full-guide-personal > .pc-s1-my-course-findings {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid #cbd7df;
+  border-radius: 7px;
+  background: #f7fafb;
+}
+body.pc-s1-guide-open .pc-s1-guide-actions {
+  position: static;
+  margin: 8px 0 0;
+  padding: 22px 0 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+@media (max-width: 760px) {
+  body.pc-s1-guide-open .pc-s1-guide-preview,
+  body.pc-s1-guide-open .pc-s1-full-guide { padding: 6px; }
+  body.pc-s1-guide-open .pc-s1-guide-taskbar {
+    display: grid;
+    gap: 14px;
+    padding: 15px;
+  }
+  .pc-s1-guide-heading-actions {
+    justify-content: stretch;
+    flex-wrap: wrap;
+  }
+  .pc-s1-guide-heading-actions .pc-shell-secondary { flex: 1 1 100%; }
+  .pc-s1-full-guide-nav { top: 0; padding: 7px 8px; }
+  .pc-s1-full-guide-nav button { min-height: 42px; }
+  .pc-s1-full-guide-nav .pc-s1-guide-print { margin-left: 0; }
+  body.pc-s1-guide-open .pc-s1-guide-paper {
+    width: 100%;
+    margin: 8px 0 18px;
+    padding: 18px 14px;
+    border-radius: 5px;
+  }
+  body.pc-s1-guide-open .pc-s1-guide-paper-header {
+    margin: -18px -14px 0;
+    padding: 20px 14px 18px;
+  }
+  body.pc-s1-guide-open .pc-s1-full-guide-personal { grid-template-columns: 1fr; }
+  body.pc-s1-guide-open .pc-s1-full-guide-personal > * { grid-column: 1 !important; }
+}
+
+@media print {
+  .pc-s1-full-guide-nav,
+  .pc-s1-guide-heading-actions { display: none !important; }
+  body.pc-s1-guide-open #chat,
+  body.pc-s1-guide-open .pc-s1-guide-preview,
+  body.pc-s1-guide-open .pc-s1-full-guide {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+}
 @media (max-width: 640px) {
   .pc-s1-full-guide-module { padding: 10px; }
   .pc-s1-full-guide-module .pc-s1-guide-module-group { grid-template-columns: 1fr; }
@@ -31039,10 +31229,10 @@ body[data-pc-scenario="metacognition"] .s2-evidence-portrait::after {
   z-index: 2 !important;
   pointer-events: none !important;
   background-image:
-    url("../../assets/images/ui/babbage-mark.svg"),
-    url("../../assets/images/ui/babbage-mark.svg"),
-    url("../../assets/images/ui/babbage-mark.svg"),
-    url("../../assets/images/ui/babbage-mark.svg") !important;
+    url("../../assets/images/ui/ui_01_babbage_mark.svg"),
+    url("../../assets/images/ui/ui_01_babbage_mark.svg"),
+    url("../../assets/images/ui/ui_01_babbage_mark.svg"),
+    url("../../assets/images/ui/ui_01_babbage_mark.svg") !important;
   background-repeat: no-repeat !important;
   background-size: clamp(26px, 10%, 38px) clamp(26px, 10%, 38px) !important;
   background-position:
@@ -31121,10 +31311,10 @@ body[data-pc-scenario="metacognition"] .s2-evidence-portrait::after {
   z-index: 4 !important;
   pointer-events: none !important;
   background-image:
-    url("../../assets/images/ui/babbage-mark.svg"),
-    url("../../assets/images/ui/babbage-mark.svg"),
-    url("../../assets/images/ui/babbage-mark.svg"),
-    url("../../assets/images/ui/babbage-mark.svg") !important;
+    url("../../assets/images/ui/ui_01_babbage_mark.svg"),
+    url("../../assets/images/ui/ui_01_babbage_mark.svg"),
+    url("../../assets/images/ui/ui_01_babbage_mark.svg"),
+    url("../../assets/images/ui/ui_01_babbage_mark.svg") !important;
   background-repeat: no-repeat !important;
   background-size: clamp(30px, 13%, 46px) clamp(30px, 13%, 46px) !important;
   background-position:

@@ -443,7 +443,7 @@
 /* ── CONTROLS ──────────────────────────────────────── */
 /* Anchor controls relative to character */
 :root {
-  --pc-app-background: url("../../assets/images/backgrounds/app-background.png?v=2");
+  --pc-app-background: url("../../assets/images/backgrounds/bg_01_app.png?v=2");
   --pc-app-background-legacy: none;
   --cream: #faf6f0;
   --parchment: #f2ebe0;

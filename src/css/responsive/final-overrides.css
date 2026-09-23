@@ -4287,10 +4287,10 @@ body[data-pc-scenario="metacognition"] .s2-evidence-portrait::after {
   z-index: 2 !important;
   pointer-events: none !important;
   background-image:
-    url("../../assets/images/ui/babbage-mark.svg"),
-    url("../../assets/images/ui/babbage-mark.svg"),
-    url("../../assets/images/ui/babbage-mark.svg"),
-    url("../../assets/images/ui/babbage-mark.svg") !important;
+    url("../../assets/images/ui/ui_01_babbage_mark.svg"),
+    url("../../assets/images/ui/ui_01_babbage_mark.svg"),
+    url("../../assets/images/ui/ui_01_babbage_mark.svg"),
+    url("../../assets/images/ui/ui_01_babbage_mark.svg") !important;
   background-repeat: no-repeat !important;
   background-size: clamp(26px, 10%, 38px) clamp(26px, 10%, 38px) !important;
   background-position:
@@ -4369,10 +4369,10 @@ body[data-pc-scenario="metacognition"] .s2-evidence-portrait::after {
   z-index: 4 !important;
   pointer-events: none !important;
   background-image:
-    url("../../assets/images/ui/babbage-mark.svg"),
-    url("../../assets/images/ui/babbage-mark.svg"),
-    url("../../assets/images/ui/babbage-mark.svg"),
-    url("../../assets/images/ui/babbage-mark.svg") !important;
+    url("../../assets/images/ui/ui_01_babbage_mark.svg"),
+    url("../../assets/images/ui/ui_01_babbage_mark.svg"),
+    url("../../assets/images/ui/ui_01_babbage_mark.svg"),
+    url("../../assets/images/ui/ui_01_babbage_mark.svg") !important;
   background-repeat: no-repeat !important;
   background-size: clamp(30px, 13%, 46px) clamp(30px, 13%, 46px) !important;
   background-position:

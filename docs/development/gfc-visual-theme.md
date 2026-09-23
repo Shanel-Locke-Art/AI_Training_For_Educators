@@ -18,9 +18,9 @@ The Babbage CRT analysis display intentionally remains green-on-dark as a distin
 
 Current shared scenario background registry:
 
-- S1 Engagement: `assets/images/backgrounds/gfc/s1-science-wing.jpg`
-- S2 Metacognition: `assets/images/backgrounds/gfc/s2-study-lounge.jpg`
-- fallback classroom: `assets/images/backgrounds/classroom.png`
+- S1 Engagement: `assets/images/backgrounds/gfc/bg_s01_01_science_wing.jpg`
+- S2 Metacognition: `assets/images/backgrounds/gfc/bg_s02_01_study_lounge.jpg`
+- fallback classroom: `assets/images/backgrounds/bg_02_classroom.png`
 
 Scenario room selection is owned by `ASSETS.images.backgrounds.scenarios` in `src/js/app/config-and-assets.js`. New scenarios should register backgrounds there rather than add character- or scenario-specific CSS positioning.
 
@@ -28,11 +28,11 @@ Scenario room selection is owned by `ASSETS.images.backgrounds.scenarios` in `sr
 
 Current brand/interface assets include:
 
-- `assets/images/ui/babbage-mark.svg`
-- `assets/images/ui/charles-babbage.png`
-- `assets/images/ui/babbage-engine.webp`
+- `assets/images/ui/ui_01_babbage_mark.svg`
+- `assets/images/ui/ui_03_charles_babbage.png`
+- `assets/images/ui/ui_02_babbage_engine.webp`
 - `assets/images/brand/great-falls-college-logo.jpg`
-- `assets/ui/promptcraft-qr.png`
+- `assets/ui/ui_06_promptcraft_qr.png`
 
 `babbage-engine-plate.svg` is retained as a development/reference asset rather than the active Meet Babbage presentation.
 

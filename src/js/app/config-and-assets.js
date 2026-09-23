@@ -110,93 +110,93 @@ pcExposeGlobals({
 const ASSETS = Object.freeze({
   images: Object.freeze({
     backgrounds: Object.freeze({
-      app: pcProjectUrl('assets/images/backgrounds/app-background.png?v=2'),
-      classroom: pcProjectUrl('assets/images/backgrounds/classroom.png'),
+      app: pcProjectUrl('assets/images/backgrounds/bg_01_app.png?v=2'),
+      classroom: pcProjectUrl('assets/images/backgrounds/bg_02_classroom.png'),
       scenarios: Object.freeze({
-        0: pcProjectUrl('assets/images/backgrounds/gfc/s1-science-wing.jpg'),
-        2: pcProjectUrl('assets/images/backgrounds/gfc/s2-study-lounge.jpg')
+        0: pcProjectUrl('assets/images/backgrounds/gfc/bg_s01_01_science_wing.jpg'),
+        2: pcProjectUrl('assets/images/backgrounds/gfc/bg_s02_01_study_lounge.jpg')
       })
     }),
     professorPixel: Object.freeze({
-      neutral: pcProjectUrl('assets/images/characters/professor-pixel/neutral.png'),
-      thinking: pcProjectUrl('assets/images/characters/professor-pixel/thinking.png'),
-      excited: pcProjectUrl('assets/images/characters/professor-pixel/excited.png'),
-      encouraging: pcProjectUrl('assets/images/characters/professor-pixel/encouraging.png'),
-      skeptical: pcProjectUrl('assets/images/characters/professor-pixel/skeptical.png'),
-      proud: pcProjectUrl('assets/images/characters/professor-pixel/proud.png')
+      neutral: pcProjectUrl('assets/images/characters/professor-pixel/pp_01_neutral.png'),
+      thinking: pcProjectUrl('assets/images/characters/professor-pixel/pp_02_thinking.png'),
+      excited: pcProjectUrl('assets/images/characters/professor-pixel/pp_03_excited.png'),
+      encouraging: pcProjectUrl('assets/images/characters/professor-pixel/pp_04_encouraging.png'),
+      skeptical: pcProjectUrl('assets/images/characters/professor-pixel/pp_05_skeptical.png'),
+      proud: pcProjectUrl('assets/images/characters/professor-pixel/pp_06_proud.png')
     }),
     students: Object.freeze({
       jordan: Object.freeze({
-        neutral: pcProjectUrl('assets/images/characters/students/jordan/neutral.png'),
-        uncertain: pcProjectUrl('assets/images/characters/students/jordan/uncertain.png'),
-        frustrated: pcProjectUrl('assets/images/characters/students/jordan/frustrated.png'),
-        thinking: pcProjectUrl('assets/images/characters/students/jordan/thinking.png'),
-        confident: pcProjectUrl('assets/images/characters/students/jordan/confident.png')
+        neutral: pcProjectUrl('assets/images/characters/students/jordan/jordan_01_neutral.png'),
+        uncertain: pcProjectUrl('assets/images/characters/students/jordan/jordan_03_uncertain.png'),
+        frustrated: pcProjectUrl('assets/images/characters/students/jordan/jordan_04_frustrated.png'),
+        thinking: pcProjectUrl('assets/images/characters/students/jordan/jordan_02_thinking.png'),
+        confident: pcProjectUrl('assets/images/characters/students/jordan/jordan_05_confident.png')
       }),
       eli: Object.freeze({
-        neutral: pcProjectUrl('assets/images/characters/students/eli/neutral.png'),
-        uncertain: pcProjectUrl('assets/images/characters/students/eli/uncertain.png'),
-        frustrated: pcProjectUrl('assets/images/characters/students/eli/frustrated.png'),
-        thinking: pcProjectUrl('assets/images/characters/students/eli/thinking.png'),
-        confident: pcProjectUrl('assets/images/characters/students/eli/confident.png')
+        neutral: pcProjectUrl('assets/images/characters/students/eli/eli_01_neutral.png'),
+        uncertain: pcProjectUrl('assets/images/characters/students/eli/eli_03_uncertain.png'),
+        frustrated: pcProjectUrl('assets/images/characters/students/eli/eli_04_frustrated.png'),
+        thinking: pcProjectUrl('assets/images/characters/students/eli/eli_02_thinking.png'),
+        confident: pcProjectUrl('assets/images/characters/students/eli/eli_05_confident.png')
       }),
       maya: Object.freeze({
-        neutral: pcProjectUrl('assets/images/characters/students/maya/neutral.png'),
-        thinking: pcProjectUrl('assets/images/characters/students/maya/thinking.png'),
-        uncertain: pcProjectUrl('assets/images/characters/students/maya/uncertain.png'),
-        frustrated: pcProjectUrl('assets/images/characters/students/maya/frustrated.png'),
-        confident: pcProjectUrl('assets/images/characters/students/maya/confident.png')
+        neutral: pcProjectUrl('assets/images/characters/students/maya/maya_01_neutral.png'),
+        thinking: pcProjectUrl('assets/images/characters/students/maya/maya_02_thinking.png'),
+        uncertain: pcProjectUrl('assets/images/characters/students/maya/maya_03_uncertain.png'),
+        frustrated: pcProjectUrl('assets/images/characters/students/maya/maya_04_frustrated.png'),
+        confident: pcProjectUrl('assets/images/characters/students/maya/maya_05_confident.png')
       })
     }),
     scenes: Object.freeze({
-      0: pcProjectUrl('assets/images/scenes/scenario-01-engagement/scene.png'),
-      1: pcProjectUrl('assets/images/backgrounds/classroom.png'),
-      2: pcProjectUrl('assets/images/scenes/scenario-02-metacognition/scene.png'),
-      3: pcProjectUrl('assets/images/backgrounds/classroom.png'),
-      4: pcProjectUrl('assets/images/scenes/scenario-05-hallucination-hunt/scene.png'),
-      5: pcProjectUrl('assets/images/scenes/scenario-06-predict-output/scene.png'),
-      complete: pcProjectUrl('assets/images/scenes/completion/all-scenarios-complete.png')
+      0: pcProjectUrl('assets/images/scenes/scenario-01-engagement/s01_legacy_01_scene.png'),
+      1: pcProjectUrl('assets/images/backgrounds/bg_02_classroom.png'),
+      2: pcProjectUrl('assets/images/scenes/scenario-02-metacognition/s02_01_scene.png'),
+      3: pcProjectUrl('assets/images/backgrounds/bg_02_classroom.png'),
+      4: pcProjectUrl('assets/images/scenes/scenario-05-hallucination-hunt/s05_01_scene.png'),
+      5: pcProjectUrl('assets/images/scenes/scenario-06-predict-output/s06_01_scene.png'),
+      complete: pcProjectUrl('assets/images/scenes/completion/end_01_all_scenarios.png')
     }),
     canvasContentAvalanche: Object.freeze({
       instructor: Object.freeze({
-        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-module.png'),
-        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-module-mobile-wide.png'),
-        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-module-mobile-phone.png'),
-        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-module.png'),
-        beforeWeek4Notes: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-week-4-notes.png'),
-        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-comparison-assignment.png'),
-        beforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-buried-directions.png'),
-        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-start-here.png'),
-        afterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-submit-assignment.png'),
-        afterReadPage: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-read-page.png')
+        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_01_instructor_before_module.png'),
+        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_02_instructor_before_module_wide.png'),
+        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_03_instructor_before_module_phone.png'),
+        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_04_instructor_after_module.png'),
+        beforeWeek4Notes: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_05_instructor_before_week4_notes.png'),
+        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_06_instructor_before_comparison.png'),
+        beforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_07_instructor_before_buried_directions.png'),
+        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_08_instructor_after_start_here.png'),
+        afterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_09_instructor_after_submit.png'),
+        afterReadPage: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_10_instructor_after_read.png')
       }),
       student: Object.freeze({
-        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-module.png'),
-        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-module-mobile-wide.png'),
-        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-module-mobile-phone.png'),
-        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-after-module.png'),
-        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-comparison-assignment.png'),
-        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-after-start-here.png')
+        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_11_student_before_module.png'),
+        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_12_student_before_module_wide.png'),
+        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_13_student_before_module_phone.png'),
+        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_14_student_after_module.png'),
+        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_15_student_before_comparison.png'),
+        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_16_student_after_start_here.png')
       }),
       smartboard: Object.freeze({
-        instructorBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-module-focus.png'),
-        instructorAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-after-module-focus.png'),
-        studentBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/student-before-module-focus.png'),
-        studentAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/student-after-module-focus.png'),
-        instructorBeforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-comparison-assignment-safe-focus.png'),
-        instructorAfterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-after-submit-assignment-focus.png'),
-        instructorBeforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-buried-directions-focus.png'),
-        instructorAfterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-after-start-here-focus.png')
+        instructorBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_17_instructor_before_module.png'),
+        instructorAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_18_instructor_after_module.png'),
+        studentBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_19_student_before_module.png'),
+        studentAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_20_student_after_module.png'),
+        instructorBeforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_21_instructor_before_comparison_safe.png'),
+        instructorAfterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_22_instructor_after_submit.png'),
+        instructorBeforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_23_instructor_before_buried.png'),
+        instructorAfterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_24_instructor_after_start_here.png')
       })
     })
   }),
   audio: Object.freeze({
     music: Object.freeze({
-      background: pcProjectUrl('assets/audio/music/background.mp3')
+      background: pcProjectUrl('assets/audio/music/music_01_background.mp3')
     }),
     professorPixel: Object.freeze({
-      scenarioIntro0: pcProjectUrl('assets/audio/voice/professor-pixel/scenario-01/intro.mp3'),
-      reflectionOpen: pcProjectUrl('assets/audio/voice/professor-pixel/reflection/open.mp3')
+      scenarioIntro0: pcProjectUrl('assets/audio/voice/professor-pixel/scenario-01/pp_s01_00.mp3'),
+      reflectionOpen: pcProjectUrl('assets/audio/voice/professor-pixel/reflection/pp_ref_01.mp3')
     })
   })
 });

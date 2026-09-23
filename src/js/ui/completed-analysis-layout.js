@@ -919,7 +919,7 @@ function pcApplyAnalysisDeskExtension(scene, frame, viewportHeight) {
     ['margin', '0'],
     ['padding', '0'],
     ['display', 'block'],
-    ['background-image', 'url("assets/images/backgrounds/desk-extension.png")'],
+    ['background-image', 'url("assets/images/backgrounds/bg_03_desk_extension.png")'],
     ['background-size', 'cover'],
     ['background-position', 'center center'],
     ['background-repeat', 'no-repeat'],

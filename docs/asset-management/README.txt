@@ -1,6 +1,7 @@
 PromptCraft Asset Documentation
 
 Start with ASSET_SYSTEM.md. It defines the current asset lifecycle, naming, update, and recording workflow.
+Use ASSET_NAMING_STANDARD.md as the filename quick reference for audio and visual production.
 
 Canonical trackers
 - PromptCraft_Production_Overview_Simplified.xlsx — the short production order and file guide.
@@ -28,4 +29,4 @@ The scripts include proposed audio filenames for spoken lines. These names are
 not approved or present in the runtime until the voice tracker and game are updated.
 
 
-The trackers and guides were last rebuilt for PROMPTCRAFT_V429, Patch 575, and asset manifest v150. Patch 576 does not change the asset inventory. Do not create version-number copies for routine updates.
+The trackers and guides were updated for PROMPTCRAFT_V429, Patch 580, and asset manifest v151. Do not create version-number copies for routine updates.

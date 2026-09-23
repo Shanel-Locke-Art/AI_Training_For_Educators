@@ -1,6 +1,6 @@
 # PromptCraft source map
 
-Current identifiers: application `PROMPTCRAFT_V429`, patch `578`, research `V121`, receiver `V90`, asset manifest `v150`.
+Current identifiers: application `PROMPTCRAFT_V429`, patch `580`, research `V121`, receiver `V91`, asset manifest `v151`.
 
 | Area | Current owner |
 |---|---|
@@ -13,7 +13,7 @@ Current identifiers: application `PROMPTCRAFT_V429`, patch `578`, research `V121
 | Dialogue | `src/js/content/dialogue-data.js` |
 | Research events | `src/js/research/tracking.js` |
 | Babbage browser and server | `src/js/ai/babbage-client.js` and `netlify/functions/babbage.js` |
-| Receiver source | `apps-script/PromptCraft_Receiver_V90_Start_With_Learning.js` |
+| Receiver source | `apps-script/PromptCraft_Receiver_V91_Start_With_Learning.js` |
 | Browser styles | `src/css/manifest.css` and its imports |
 | Generated browser files | `runtime/`, rebuilt with `python tools/build.py` |
 

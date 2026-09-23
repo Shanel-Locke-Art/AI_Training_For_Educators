@@ -2,7 +2,7 @@
 
 ## Status
 
-This folder is documented by asset manifest v150. Missing planned audio files are expected until the current dialogue is locked and the voice tracker marks individual lines Approved to Record.
+This folder is documented by asset manifest v151. Missing planned audio files are expected until the current dialogue is locked and the voice tracker marks individual lines Approved to Record.
 
 ## Rules
 

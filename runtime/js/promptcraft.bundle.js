@@ -781,93 +781,93 @@ pcExposeGlobals({
 const ASSETS = Object.freeze({
   images: Object.freeze({
     backgrounds: Object.freeze({
-      app: pcProjectUrl('assets/images/backgrounds/app-background.png?v=2'),
-      classroom: pcProjectUrl('assets/images/backgrounds/classroom.png'),
+      app: pcProjectUrl('assets/images/backgrounds/bg_01_app.png?v=2'),
+      classroom: pcProjectUrl('assets/images/backgrounds/bg_02_classroom.png'),
       scenarios: Object.freeze({
-        0: pcProjectUrl('assets/images/backgrounds/gfc/s1-science-wing.jpg'),
-        2: pcProjectUrl('assets/images/backgrounds/gfc/s2-study-lounge.jpg')
+        0: pcProjectUrl('assets/images/backgrounds/gfc/bg_s01_01_science_wing.jpg'),
+        2: pcProjectUrl('assets/images/backgrounds/gfc/bg_s02_01_study_lounge.jpg')
       })
     }),
     professorPixel: Object.freeze({
-      neutral: pcProjectUrl('assets/images/characters/professor-pixel/neutral.png'),
-      thinking: pcProjectUrl('assets/images/characters/professor-pixel/thinking.png'),
-      excited: pcProjectUrl('assets/images/characters/professor-pixel/excited.png'),
-      encouraging: pcProjectUrl('assets/images/characters/professor-pixel/encouraging.png'),
-      skeptical: pcProjectUrl('assets/images/characters/professor-pixel/skeptical.png'),
-      proud: pcProjectUrl('assets/images/characters/professor-pixel/proud.png')
+      neutral: pcProjectUrl('assets/images/characters/professor-pixel/pp_01_neutral.png'),
+      thinking: pcProjectUrl('assets/images/characters/professor-pixel/pp_02_thinking.png'),
+      excited: pcProjectUrl('assets/images/characters/professor-pixel/pp_03_excited.png'),
+      encouraging: pcProjectUrl('assets/images/characters/professor-pixel/pp_04_encouraging.png'),
+      skeptical: pcProjectUrl('assets/images/characters/professor-pixel/pp_05_skeptical.png'),
+      proud: pcProjectUrl('assets/images/characters/professor-pixel/pp_06_proud.png')
     }),
     students: Object.freeze({
       jordan: Object.freeze({
-        neutral: pcProjectUrl('assets/images/characters/students/jordan/neutral.png'),
-        uncertain: pcProjectUrl('assets/images/characters/students/jordan/uncertain.png'),
-        frustrated: pcProjectUrl('assets/images/characters/students/jordan/frustrated.png'),
-        thinking: pcProjectUrl('assets/images/characters/students/jordan/thinking.png'),
-        confident: pcProjectUrl('assets/images/characters/students/jordan/confident.png')
+        neutral: pcProjectUrl('assets/images/characters/students/jordan/jordan_01_neutral.png'),
+        uncertain: pcProjectUrl('assets/images/characters/students/jordan/jordan_03_uncertain.png'),
+        frustrated: pcProjectUrl('assets/images/characters/students/jordan/jordan_04_frustrated.png'),
+        thinking: pcProjectUrl('assets/images/characters/students/jordan/jordan_02_thinking.png'),
+        confident: pcProjectUrl('assets/images/characters/students/jordan/jordan_05_confident.png')
       }),
       eli: Object.freeze({
-        neutral: pcProjectUrl('assets/images/characters/students/eli/neutral.png'),
-        uncertain: pcProjectUrl('assets/images/characters/students/eli/uncertain.png'),
-        frustrated: pcProjectUrl('assets/images/characters/students/eli/frustrated.png'),
-        thinking: pcProjectUrl('assets/images/characters/students/eli/thinking.png'),
-        confident: pcProjectUrl('assets/images/characters/students/eli/confident.png')
+        neutral: pcProjectUrl('assets/images/characters/students/eli/eli_01_neutral.png'),
+        uncertain: pcProjectUrl('assets/images/characters/students/eli/eli_03_uncertain.png'),
+        frustrated: pcProjectUrl('assets/images/characters/students/eli/eli_04_frustrated.png'),
+        thinking: pcProjectUrl('assets/images/characters/students/eli/eli_02_thinking.png'),
+        confident: pcProjectUrl('assets/images/characters/students/eli/eli_05_confident.png')
       }),
       maya: Object.freeze({
-        neutral: pcProjectUrl('assets/images/characters/students/maya/neutral.png'),
-        thinking: pcProjectUrl('assets/images/characters/students/maya/thinking.png'),
-        uncertain: pcProjectUrl('assets/images/characters/students/maya/uncertain.png'),
-        frustrated: pcProjectUrl('assets/images/characters/students/maya/frustrated.png'),
-        confident: pcProjectUrl('assets/images/characters/students/maya/confident.png')
+        neutral: pcProjectUrl('assets/images/characters/students/maya/maya_01_neutral.png'),
+        thinking: pcProjectUrl('assets/images/characters/students/maya/maya_02_thinking.png'),
+        uncertain: pcProjectUrl('assets/images/characters/students/maya/maya_03_uncertain.png'),
+        frustrated: pcProjectUrl('assets/images/characters/students/maya/maya_04_frustrated.png'),
+        confident: pcProjectUrl('assets/images/characters/students/maya/maya_05_confident.png')
       })
     }),
     scenes: Object.freeze({
-      0: pcProjectUrl('assets/images/scenes/scenario-01-engagement/scene.png'),
-      1: pcProjectUrl('assets/images/backgrounds/classroom.png'),
-      2: pcProjectUrl('assets/images/scenes/scenario-02-metacognition/scene.png'),
-      3: pcProjectUrl('assets/images/backgrounds/classroom.png'),
-      4: pcProjectUrl('assets/images/scenes/scenario-05-hallucination-hunt/scene.png'),
-      5: pcProjectUrl('assets/images/scenes/scenario-06-predict-output/scene.png'),
-      complete: pcProjectUrl('assets/images/scenes/completion/all-scenarios-complete.png')
+      0: pcProjectUrl('assets/images/scenes/scenario-01-engagement/s01_legacy_01_scene.png'),
+      1: pcProjectUrl('assets/images/backgrounds/bg_02_classroom.png'),
+      2: pcProjectUrl('assets/images/scenes/scenario-02-metacognition/s02_01_scene.png'),
+      3: pcProjectUrl('assets/images/backgrounds/bg_02_classroom.png'),
+      4: pcProjectUrl('assets/images/scenes/scenario-05-hallucination-hunt/s05_01_scene.png'),
+      5: pcProjectUrl('assets/images/scenes/scenario-06-predict-output/s06_01_scene.png'),
+      complete: pcProjectUrl('assets/images/scenes/completion/end_01_all_scenarios.png')
     }),
     canvasContentAvalanche: Object.freeze({
       instructor: Object.freeze({
-        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-module.png'),
-        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-module-mobile-wide.png'),
-        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-module-mobile-phone.png'),
-        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-module.png'),
-        beforeWeek4Notes: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-week-4-notes.png'),
-        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-comparison-assignment.png'),
-        beforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-before-buried-directions.png'),
-        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-start-here.png'),
-        afterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-submit-assignment.png'),
-        afterReadPage: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/instructor-after-read-page.png')
+        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_01_instructor_before_module.png'),
+        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_02_instructor_before_module_wide.png'),
+        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_03_instructor_before_module_phone.png'),
+        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_04_instructor_after_module.png'),
+        beforeWeek4Notes: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_05_instructor_before_week4_notes.png'),
+        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_06_instructor_before_comparison.png'),
+        beforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_07_instructor_before_buried_directions.png'),
+        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_08_instructor_after_start_here.png'),
+        afterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_09_instructor_after_submit.png'),
+        afterReadPage: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_10_instructor_after_read.png')
       }),
       student: Object.freeze({
-        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-module.png'),
-        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-module-mobile-wide.png'),
-        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-module-mobile-phone.png'),
-        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-after-module.png'),
-        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-before-comparison-assignment.png'),
-        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/student-after-start-here.png')
+        beforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_11_student_before_module.png'),
+        beforeModuleMobileWide: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_12_student_before_module_wide.png'),
+        beforeModuleMobilePhone: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_13_student_before_module_phone.png'),
+        afterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_14_student_after_module.png'),
+        beforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_15_student_before_comparison.png'),
+        afterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/legacy_s01_canvas_16_student_after_start_here.png')
       }),
       smartboard: Object.freeze({
-        instructorBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-module-focus.png'),
-        instructorAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-after-module-focus.png'),
-        studentBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/student-before-module-focus.png'),
-        studentAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/student-after-module-focus.png'),
-        instructorBeforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-comparison-assignment-safe-focus.png'),
-        instructorAfterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-after-submit-assignment-focus.png'),
-        instructorBeforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-before-buried-directions-focus.png'),
-        instructorAfterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/instructor-after-start-here-focus.png')
+        instructorBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_17_instructor_before_module.png'),
+        instructorAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_18_instructor_after_module.png'),
+        studentBeforeModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_19_student_before_module.png'),
+        studentAfterModule: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_20_student_after_module.png'),
+        instructorBeforeComparisonAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_21_instructor_before_comparison_safe.png'),
+        instructorAfterSubmitAssignment: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_22_instructor_after_submit.png'),
+        instructorBeforeBuriedDirections: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_23_instructor_before_buried.png'),
+        instructorAfterStartHere: pcProjectUrl('assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_24_instructor_after_start_here.png')
       })
     })
   }),
   audio: Object.freeze({
     music: Object.freeze({
-      background: pcProjectUrl('assets/audio/music/background.mp3')
+      background: pcProjectUrl('assets/audio/music/music_01_background.mp3')
     }),
     professorPixel: Object.freeze({
-      scenarioIntro0: pcProjectUrl('assets/audio/voice/professor-pixel/scenario-01/intro.mp3'),
-      reflectionOpen: pcProjectUrl('assets/audio/voice/professor-pixel/reflection/open.mp3')
+      scenarioIntro0: pcProjectUrl('assets/audio/voice/professor-pixel/scenario-01/pp_s01_00.mp3'),
+      reflectionOpen: pcProjectUrl('assets/audio/voice/professor-pixel/reflection/pp_ref_01.mp3')
     })
   })
 });
@@ -2878,7 +2878,7 @@ async function pcShowS1ReflectionAnalysis() {
     <div class="pc-s1-reflection-analysis-shell">
       <header class="pc-s1-reflection-analysis-header">
         <span class="pc-s1-reflection-analysis-mark">
-          <img src="${pcProjectUrl('assets/images/ui/babbage-mark.svg')}" alt="Babbage">
+          <img src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="Babbage">
         </span>
         <div>
           <p>BABBAGE // CASE_${state.caseIndex + 1} // ${esc(item.label).toUpperCase()} // ${state.analysisSource === 'live' ? 'LIVE' : 'LOCAL FALLBACK'}</p>
@@ -3820,7 +3820,7 @@ function pcRenderS1WeekPlanAnalysis(data, analysis, analysisSource) {
     <div class="pc-s1-reflection-analysis-shell">
       <header class="pc-s1-reflection-analysis-header">
         <span class="pc-s1-reflection-analysis-mark">
-          <img src="${pcProjectUrl('assets/images/ui/babbage-mark.svg')}" alt="Babbage">
+          <img src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="Babbage">
         </span>
         <div>
           <p>BABBAGE // TRANSFER_TASK // PATH_CHECK // ${esc(analysisSource)}</p>
@@ -4345,7 +4345,7 @@ pcExposeGlobals({ pcFillS1TransferDevTask });
 /* PROMPTCRAFT S1 — START WITH THE LEARNING
    Rebuild slice 1: explore Maya's intentionally unclear Canvas module. */
 
-const PC_S1_MO_ASSET = 'assets/images/ui/mo-river-otter.png';
+const PC_S1_MO_ASSET = 'assets/images/ui/ui_04_mo_river_otter.png';
 
 const PC_S1_LEARNING_ITEMS = Object.freeze([
   Object.freeze({
@@ -4479,7 +4479,7 @@ function pcS1OSCQRLabel() {
 }
 
 function pcRenderS1OSCQRStandards() {
-  return `<section class="pc-s1-guide-section pc-s1-oscqr-section" aria-labelledby="pcS1OSCQRHeading">
+  return `<section class="pc-s1-guide-section pc-s1-oscqr-section" id="pcS1GuideStandards" aria-labelledby="pcS1OSCQRHeading">
     <span class="pc-s1-result-eyebrow">OSCQR 4.1 connections</span>
     <h3 id="pcS1OSCQRHeading">Standards addressed in this guide</h3>
     <p>These standards are the direct course-design connections for the work in Scenario 1.</p>
@@ -4621,8 +4621,22 @@ let pcS1LearningState = {
   myCourseNotice: '',
   myCourseBabbageResponse: null
 };
+let pcS1GuideOpenedFromMenu = false;
+
+function pcPrepareS1GuideSurface(fromMenu = false) {
+  pcS1GuideOpenedFromMenu = Boolean(fromMenu);
+  document.body.classList.remove('s1-active', 's1-result-active', 'pc-shared-result-active', 'pc-scenario-activity-active');
+  document.body.classList.add('pc-s1-guide-open');
+  const overlay = pcSetVNOverlayState({ active: false });
+  if (overlay && fromMenu) {
+    overlay.setAttribute('aria-hidden', 'true');
+    overlay.inert = true;
+  }
+}
 
 function pcResetS1LearningState() {
+  pcS1GuideOpenedFromMenu = false;
+  document.body.classList.remove('pc-s1-guide-open');
   pcS1LearningState = {
     view: 'module',
     activeIndex: 0,
@@ -5289,7 +5303,7 @@ function pcRenderS1WeeklyModulePattern() {
     { week: 'Week 2', topic: 'Work with the evidence', learn: 'Demonstration, discussion, guided practice', show: 'Use evidence in a draft or case response' },
     { week: 'Week 3', topic: 'Apply the learning', learn: 'Targeted review and feedback', show: 'Submit the aligned performance or product' }
   ];
-  return `<section class="pc-s1-guide-section pc-s1-weekly-pattern" aria-labelledby="pcS1WeeklyPatternHeading">
+  return `<section class="pc-s1-guide-section pc-s1-weekly-pattern" id="pcS1GuidePattern" aria-labelledby="pcS1WeeklyPatternHeading">
     <span class="pc-s1-result-eyebrow">Repeatable module pattern</span>
     <h3 id="pcS1WeeklyPatternHeading">Keep a few anchors consistent each week</h3>
     <p>Students do not need every module to contain every category. Repeat the overview, a clear path into the work, and a visible place to show learning; change the activities to fit that week.</p>
@@ -5302,7 +5316,8 @@ function pcRenderS1WeeklyModulePattern() {
   </section>`;
 }
 
-function pcRenderS1GuideStep1() {
+function pcRenderS1GuideStep1({ fromMenu = pcS1GuideOpenedFromMenu } = {}) {
+  pcPrepareS1GuideSurface(fromMenu);
   pcS1LearningState.view = 'guide-step1';
   const area = document.getElementById('chat');
   if (!area) return false;
@@ -5312,9 +5327,9 @@ function pcRenderS1GuideStep1() {
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
   area.innerHTML = `
     <section class="pc-s1-learning pc-scenario-stage pc-s1-guide-preview" role="region" aria-labelledby="pcS1GuideStep1Title" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar">
+      <div class="pc-s1-learning-taskbar pc-s1-guide-taskbar">
         <div><span>My PromptCraft Course Guide · Step 1</span><h1 id="pcS1GuideStep1Title">Make the Learning Path Visible</h1><p>A Canvas building reference for your own course.</p></div>
-        <div class="pc-s1-learning-task-status">${guide.added ? 'Added to My Guide' : 'Guide preview'}</div>
+        <div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">${guide.added ? 'Saved to My Guide' : 'Guide preview'}</span>${fromMenu ? '<button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>' : ''}</div>
       </div>
       <div class="pc-s1-guide-paper" role="document" aria-label="Course Guide Step 1 preview">
         <header class="pc-s1-guide-paper-header"><span>My PromptCraft Course Guide · Step 1</span><h2>Make the Learning Path Visible</h2><p>A Canvas building reference for your own course.</p></header>
@@ -5335,7 +5350,9 @@ function pcRenderS1GuideStep1() {
         ${pcRenderS1OSCQRStandards()}
         <section class="pc-s1-guide-section pc-s1-guide-ai-box"><h3>Try this with AI</h3><ul><li>Give AI a list of vague Canvas item names and ask for clearer student-facing alternatives, then verify each suggestion.</li><li>Ask AI to sort activities into Prepare, Practice, and Evidence, then check the classifications against your own intent.</li><li>Ask AI which titles still fail to reveal what students actually do.</li></ul></section>
         <footer class="pc-s1-guide-actions">
-          ${guide.added
+          ${fromMenu
+            ? '<button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-print-guide">Print / Save PDF</button><button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>'
+            : guide.added
             ? '<button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-view-guide-step1">View saved guide</button><button type="button" class="pc-shell-primary" data-pc-action="s1-learning-reflect-overview">Continue with Maya</button>'
             : '<button type="button" class="pc-shell-primary" data-pc-action="s1-learning-add-guide-step1">Add to My Guide</button>'}
         </footer>
@@ -5418,6 +5435,8 @@ const PC_S1_DIAGNOSIS_CHOICES = Object.freeze([
 ]);
 
 function pcPlayS1OverviewReflection() {
+  pcS1GuideOpenedFromMenu = false;
+  document.body.classList.remove('pc-s1-guide-open');
   pcS1LearningState.view = 'overview-dialogue';
   const cast = [{ id: 'maya', slot: 'left' }, { id: 'pixel', slot: 'right' }];
   // Guide/Babbage handoffs can leave VN typing state alive even when the overlay
@@ -5997,7 +6016,8 @@ function pcAddS1MyCourseReviewToGuide() {
   return pcRenderS1FullGuide();
 }
 
-function pcRenderS1FullGuide() {
+function pcRenderS1FullGuide({ fromMenu = false } = {}) {
+  pcPrepareS1GuideSurface(fromMenu);
   pcS1LearningState.view = 'full-guide';
   const area = document.getElementById('chat');
   if (!area) return false;
@@ -6011,16 +6031,25 @@ function pcRenderS1FullGuide() {
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
   area.innerHTML = `
     <section class="pc-s1-learning pc-scenario-stage pc-s1-full-guide" role="region" aria-labelledby="pcS1FullGuideTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar"><div><span>My PromptCraft Course Guide · Scenario 1</span><h1 id="pcS1FullGuideTitle">Start with the learning</h1><p>Your visual guide combines the module-building reference with Babbage’s feedback on your course.</p></div><div class="pc-s1-learning-task-status">Saved to My Guide</div></div>
+      <div class="pc-s1-learning-taskbar pc-s1-guide-taskbar"><div><span>My PromptCraft Course Guide · Scenario 1</span><h1 id="pcS1FullGuideTitle">Start with the learning</h1><p>Your reusable Canvas course-design reference.</p></div><div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">Saved to My Guide</span><button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button></div></div>
+      <nav class="pc-s1-full-guide-nav" aria-label="Course guide sections">
+        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideStart">Start here</button>
+        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideFeedback">Course feedback</button>
+        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideModule">Visual module</button>
+        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuidePattern">Module pattern</button>
+        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideStandards">OSCQR</button>
+        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideChecklist">Checklist</button>
+        <button type="button" class="pc-s1-guide-print" data-pc-action="s1-learning-print-guide">Print / Save PDF</button>
+      </nav>
       <div class="pc-s1-guide-paper pc-s1-full-guide-paper">
         <header class="pc-s1-guide-paper-header"><span>My PromptCraft Course Guide</span><h2>Make the path visible, then check the evidence</h2><p>Use this page when building or revising a Canvas module.</p></header>
-        <section class="pc-s1-guide-section"><span class="pc-s1-result-eyebrow">Start here</span><h3>Choose headers by learning purpose</h3><p>Begin with the learning students need to do, then group the activities that prepare them, let them practice, and provide evidence.</p>${pcRenderS1GuideInsight(pcS1LearningState.guide?.step1?.personalizedInsight)}</section>
-        <section class="pc-s1-guide-section pc-s1-full-guide-personal"><span class="pc-s1-result-eyebrow">${feedback.source === 'live' ? 'Live Babbage suggestions for your course' : 'Built-in course review'}</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>${esc(feedback.clear || '')}</p><p><strong>Intended learning:</strong> ${esc(course.intendedLearning)}</p><section class="pc-s1-my-course-findings"><h3>What is clear</h3><ul>${(feedback.worked || []).map(item => `<li>${esc(item)}</li>`).join('')}</ul></section><section class="pc-s1-my-course-findings"><h3>What needs inspection</h3><p>${esc(feedback.unknown || '')}</p></section><div class="pc-s1-full-guide-tips">${(feedback.improvementIdeas || []).map((tip, index) => `<article><span>${index + 1}</span><p>${esc(tip)}</p></article>`).join('')}</div><div class="pc-s1-my-course-next-check"><h3>Next check</h3><p>${esc(feedback.next || '')}</p></div></section>
-        <section class="pc-s1-guide-section"><span class="pc-s1-result-eyebrow">Your visual module</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>This draft groups activities only when their titles show a clear purpose. Review every placement against your actual instructions; items with an unclear purpose need your decision.</p><div class="pc-s1-full-guide-module" aria-label="Visual example of the teacher's Canvas module">${pcRenderS1MyCourseMiniModule(course)}</div></section>
+        <section class="pc-s1-guide-section" id="pcS1GuideStart"><span class="pc-s1-result-eyebrow">Start here</span><h3>Choose headers by learning purpose</h3><p>Begin with the learning students need to do, then group the activities that prepare them, let them practice, and provide evidence.</p>${pcRenderS1GuideInsight(pcS1LearningState.guide?.step1?.personalizedInsight)}</section>
+        <section class="pc-s1-guide-section pc-s1-full-guide-personal" id="pcS1GuideFeedback"><span class="pc-s1-result-eyebrow">${feedback.source === 'live' ? 'Live Babbage suggestions for your course' : 'Built-in course review'}</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>${esc(feedback.clear || '')}</p><p><strong>Intended learning:</strong> ${esc(course.intendedLearning)}</p><section class="pc-s1-my-course-findings"><h3>What is clear</h3><ul>${(feedback.worked || []).map(item => `<li>${esc(item)}</li>`).join('')}</ul></section><section class="pc-s1-my-course-findings"><h3>What needs inspection</h3><p>${esc(feedback.unknown || '')}</p></section><div class="pc-s1-full-guide-tips">${(feedback.improvementIdeas || []).map((tip, index) => `<article><span>${index + 1}</span><p>${esc(tip)}</p></article>`).join('')}</div><div class="pc-s1-my-course-next-check"><h3>Next check</h3><p>${esc(feedback.next || '')}</p></div></section>
+        <section class="pc-s1-guide-section" id="pcS1GuideModule"><span class="pc-s1-result-eyebrow">Your visual module</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>This draft groups activities only when their titles show a clear purpose. Review every placement against your actual instructions; items with an unclear purpose need your decision.</p><div class="pc-s1-full-guide-module" aria-label="Visual example of the teacher's Canvas module">${pcRenderS1MyCourseMiniModule(course)}</div></section>
         ${pcRenderS1WeeklyModulePattern()}
         ${pcRenderS1OSCQRStandards()}
-        <section class="pc-s1-guide-section pc-s1-guide-tip-grid"><div><h3>Canvas build checklist</h3><ul><li>Name each item for the task students will open or complete.</li><li>Use short headers to show preparation, practice, and evidence.</li><li>Check the instructions and criteria, not only the activity titles.</li></ul></div><div><h3>Use AI effectively</h3><ul><li>Give AI your real titles and intended learning.</li><li>Ask for specific improvements instead of a generic course rewrite.</li><li>Verify every suggestion against your teaching intent and student needs.</li></ul></div></section>
-        <footer class="pc-s1-guide-actions"><button type="button" class="pc-shell-primary" data-pc-action="s1-learning-close-with-pixel">Continue with Professor Pixel</button></footer>
+        <section class="pc-s1-guide-section pc-s1-guide-tip-grid" id="pcS1GuideChecklist"><div><h3>Canvas build checklist</h3><ul><li>Name each item for the task students will open or complete.</li><li>Use short headers to show preparation, practice, and evidence.</li><li>Check the instructions and criteria, not only the activity titles.</li></ul></div><div><h3>Use AI effectively</h3><ul><li>Give AI your real titles and intended learning.</li><li>Ask for specific improvements instead of a generic course rewrite.</li><li>Verify every suggestion against your teaching intent and student needs.</li></ul></div></section>
+        <footer class="pc-s1-guide-actions"><button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-print-guide">Print / Save PDF</button>${fromMenu ? '<button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>' : '<button type="button" class="pc-shell-primary" data-pc-action="s1-learning-close-with-pixel">Continue with Professor Pixel</button>'}</footer>
       </div>
     </section>`;
   resetSectionScroll(area);
@@ -6052,6 +6081,8 @@ function pcRenderS1MyCourseMiniModule(course) {
 }
 
 function pcPlayS1ClosingDialogue() {
+  pcS1GuideOpenedFromMenu = false;
+  document.body.classList.remove('pc-s1-guide-open');
   pcS1LearningState.view = 'closing-dialogue';
   try {
     clearTimeout(vnTypeTimer);
@@ -6171,6 +6202,8 @@ function pcCompleteS1LearningExplore() {
 }
 
 function renderS1StartWithLearning({ preserveProgress = false } = {}) {
+  pcS1GuideOpenedFromMenu = false;
+  document.body.classList.remove('pc-s1-guide-open');
   const area = document.getElementById('chat');
   const container = document.getElementById('inputContainer');
   if (!area) return false;
@@ -6196,6 +6229,22 @@ function pcScrollS1ReviewSection(sectionId) {
   return true;
 }
 
+function pcScrollS1GuideSection(sectionId) {
+  const section = document.getElementById(String(sectionId || ''));
+  const scroller = document.querySelector('.pc-s1-full-guide');
+  if (!section || !scroller) return false;
+  const targetTop = Math.max(0, section.offsetTop - 176);
+  scroller.scrollTo({ top: targetTop, behavior: 'smooth' });
+  section.setAttribute('tabindex', '-1');
+  window.setTimeout(() => section.focus({ preventScroll: true }), 280);
+  return true;
+}
+
+function pcPrintS1CourseGuide() {
+  window.print();
+  return false;
+}
+
 function pcHasSavedS1Guide() {
   const guide = pcLoadS1Guide();
   return Boolean(guide?.step1?.added || guide?.myCourseReview?.added);
@@ -6204,10 +6253,11 @@ function pcHasSavedS1Guide() {
 function pcOpenSavedS1Guide() {
   pcS1LearningState.guide = pcLoadS1Guide();
   if (!pcHasSavedS1Guide()) return false;
+  pcPrepareS1GuideSurface(true);
   if (typeof closeMainMenu === 'function') closeMainMenu({ force: true });
   return pcS1LearningState.guide?.myCourseReview?.added
-    ? pcRenderS1FullGuide()
-    : pcRenderS1GuideStep1();
+    ? pcRenderS1FullGuide({ fromMenu: true })
+    : pcRenderS1GuideStep1({ fromMenu: true });
 }
 
 pcRegisterUIActions({
@@ -6228,6 +6278,8 @@ pcRegisterUIActions({
   's1-learning-start-my-course': () => pcPlayS1MyCourseTransition(),
   's1-my-course-add-guide': () => pcAddS1MyCourseReviewToGuide(),
   's1-learning-view-full-guide': () => pcRenderS1FullGuide(),
+  's1-learning-guide-section': target => pcScrollS1GuideSection(target.dataset.pcGuideSection),
+  's1-learning-print-guide': () => pcPrintS1CourseGuide(),
   's1-learning-review-section': target => pcScrollS1ReviewSection(target.dataset.pcReviewSection),
   's1-learning-close-with-pixel': () => pcPlayS1ClosingDialogue(),
   's1-my-course-step': target => pcRenderS1MyCourseStep(target.dataset.pcMyCourseStep || 'focus'),
@@ -11949,7 +12001,7 @@ function pcApplyAnalysisDeskExtension(scene, frame, viewportHeight) {
     ['margin', '0'],
     ['padding', '0'],
     ['display', 'block'],
-    ['background-image', 'url("assets/images/backgrounds/desk-extension.png")'],
+    ['background-image', 'url("assets/images/backgrounds/bg_03_desk_extension.png")'],
     ['background-size', 'cover'],
     ['background-position', 'center center'],
     ['background-repeat', 'no-repeat'],
@@ -14899,7 +14951,7 @@ function prepareScenarioShell(index) {
   const scenario = scenarios[index];
   const ui = getScenarioUI(index);
 
-  document.body.classList.remove('s1-active', 's1-result-active', 'pc-scenario-activity-active');
+  document.body.classList.remove('s1-active', 's1-result-active', 'pc-scenario-activity-active', 'pc-s1-guide-open');
   document.body.classList.toggle('s1-active', ui.workspaceMode === 'guided' && ui.implemented);
   document.body.classList.toggle('pc-scenario-activity-active', ui.workspaceMode === 'activity' && ui.implemented);
   document.body.dataset.pcScenario = ui.key;

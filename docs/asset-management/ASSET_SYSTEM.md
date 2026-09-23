@@ -3,10 +3,10 @@
 ## Current baseline
 
 - Application: `PROMPTCRAFT_V429`
-- Browser patch: `575`
-- Asset manifest: `v150`
+- Browser patch: `580`
+- Asset manifest: `v151`
 - Research schema: `V121`
-- Receiver source: `V90`
+- Receiver source: `V91`
 
 This document is the current operating guide for visual, audio, reference, and production documentation assets. Historical release notes preserve the baseline that existed when each release was created and should not be rewritten as current guidance.
 
@@ -20,6 +20,7 @@ This document is the current operating guide for visual, audio, reference, and p
 | S1 artwork check and complete visual inventory | `PromptCraft_Visual_Asset_Tracker_Simplified.xlsx` |
 | S1 approval and recording queue, then existing audio | `PromptCraft_Voice_Recording_Tracker.xlsx` |
 | Production order and file guide | `PromptCraft_Production_Overview_Simplified.xlsx` |
+| Filename patterns and codes | `ASSET_NAMING_STANDARD.md` |
 
 ## Asset lifecycle
 
@@ -35,7 +36,8 @@ A file that exists without one of these roles is an open classification problem.
 
 ## Naming and folders
 
-- Use lowercase kebab case for new media filenames.
+- Follow `ASSET_NAMING_STANDARD.md` for every new audio or visual file.
+- Use lowercase letters, numbers, and underscores in media filenames.
 - Keep characters under `assets/images/characters/<role>/<character>/`.
 - Keep concept sheets and source references inside a `references/` subfolder.
 - Keep current scenario scenes under `assets/images/scenes/`.

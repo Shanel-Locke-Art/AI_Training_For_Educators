@@ -1,6 +1,6 @@
 # PromptCraft
 
-Current application: `PROMPTCRAFT_V429`, browser patch `578`, research schema `V121`, Apps Script receiver source `V90`, asset manifest `v150`.
+Current application: `PROMPTCRAFT_V429`, browser patch `580`, research schema `V121`, Apps Script receiver source `V91`, asset manifest `v151`.
 
 Scenario 1 is **Start With the Learning** with Maya and Professor Pixel. Its playable source is `src/js/scenarios/s1-start-with-learning.js`, selected by `src/js/scenarios/registry.js`. The internal `content-avalanche` scenario key remains for saved data and research compatibility.
 
@@ -10,7 +10,7 @@ Scenario 1 is **Start With the Learning** with Maya and Professor Pixel. Its pla
 - Run `python tools/build.py` after source changes, then `python tools/build.py --check` to confirm the browser files match.
 - Run `python tools/audit_assets.py` and `python tools/audit_css.py` when changing assets or styles.
 - `index.html` opens the game; `wall.html` opens the Ideas Wall. `netlify/functions/babbage.js` owns the Babbage server contract.
-- `apps-script/PromptCraft_Receiver_V90_Start_With_Learning.js` is the retained receiver source. After deploying it as a new web-app version, run `initializeWorkbookNow()` once. `inspectS1TrackingNow()` provides a privacy-safe count of the S1 event types received.
+- `apps-script/PromptCraft_Receiver_V91_Start_With_Learning.js` is the retained receiver source. After deploying it as a new web-app version, run `initializeWorkbookNow()` once. During testing, `resetResearchDataNow()` clears collected test records without removing headers or workbook structure. `inspectS1TrackingNow()` provides a privacy-safe count of the S1 event types received.
 
 ## Production references
 

@@ -314,7 +314,7 @@ function prepareScenarioShell(index) {
   const scenario = scenarios[index];
   const ui = getScenarioUI(index);
 
-  document.body.classList.remove('s1-active', 's1-result-active', 'pc-scenario-activity-active');
+  document.body.classList.remove('s1-active', 's1-result-active', 'pc-scenario-activity-active', 'pc-s1-guide-open');
   document.body.classList.toggle('s1-active', ui.workspaceMode === 'guided' && ui.implemented);
   document.body.classList.toggle('pc-scenario-activity-active', ui.workspaceMode === 'activity' && ui.implemented);
   document.body.dataset.pcScenario = ui.key;

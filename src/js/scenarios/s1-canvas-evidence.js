@@ -884,7 +884,7 @@ async function pcShowS1ReflectionAnalysis() {
     <div class="pc-s1-reflection-analysis-shell">
       <header class="pc-s1-reflection-analysis-header">
         <span class="pc-s1-reflection-analysis-mark">
-          <img src="${pcProjectUrl('assets/images/ui/babbage-mark.svg')}" alt="Babbage">
+          <img src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="Babbage">
         </span>
         <div>
           <p>BABBAGE // CASE_${state.caseIndex + 1} // ${esc(item.label).toUpperCase()} // ${state.analysisSource === 'live' ? 'LIVE' : 'LOCAL FALLBACK'}</p>
@@ -1826,7 +1826,7 @@ function pcRenderS1WeekPlanAnalysis(data, analysis, analysisSource) {
     <div class="pc-s1-reflection-analysis-shell">
       <header class="pc-s1-reflection-analysis-header">
         <span class="pc-s1-reflection-analysis-mark">
-          <img src="${pcProjectUrl('assets/images/ui/babbage-mark.svg')}" alt="Babbage">
+          <img src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="Babbage">
         </span>
         <div>
           <p>BABBAGE // TRANSFER_TASK // PATH_CHECK // ${esc(analysisSource)}</p>
