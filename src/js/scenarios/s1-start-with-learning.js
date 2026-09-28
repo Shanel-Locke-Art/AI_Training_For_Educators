@@ -1255,10 +1255,11 @@ function pcRenderS1Diagnosis() {
             </div>
             <div class="pc-s1-diagnosis-choices">${choices}</div>
             ${selected ? `<div class="pc-s1-diagnosis-rationale">
-              <label for="pcS1DiagnosisRationale"><strong>What evidence led you to this diagnosis?</strong><span>Briefly connect the intended learning with what students currently produce.</span></label>
-              <textarea id="pcS1DiagnosisRationale" name="diagnosisRationale" rows="3" minlength="10" maxlength="500" required>${esc(pcS1LearningState.diagnosisRationale)}</textarea>
+              <label for="pcS1DiagnosisRationale"><strong>Explain what you noticed before checking your decision</strong><span>Your explanation will appear beside the alignment feedback so you can compare it with your reasoning. A short de-identified copy is also included in the study record. Do not include names.</span></label>
+              <textarea id="pcS1DiagnosisRationale" name="diagnosisRationale" rows="3" minlength="10" maxlength="500" required aria-describedby="pcS1DiagnosisRationaleStatus" data-pc-input-action="s1-learning-update-diagnosis-rationale" placeholder="For example: The objective asks students to recommend a response, but the activities only check recall and description.">${esc(pcS1LearningState.diagnosisRationale)}</textarea>
+              <p class="pc-s1-response-status" id="pcS1DiagnosisRationaleStatus">${pcS1LearningState.diagnosisRationale.trim().length >= 10 ? 'Ready to compare with the alignment feedback.' : 'Required: enter at least 10 characters. This is about your reasoning, not polished writing.'}</p>
               ${pcS1LearningState.diagnosisNotice ? `<p class="pc-s1-diagnosis-notice" role="alert">${esc(pcS1LearningState.diagnosisNotice)}</p>` : ''}
-              <button type="submit" class="pc-shell-primary pc-s1-diagnosis-submit">Use this diagnosis</button>
+              <button type="submit" class="pc-shell-primary pc-s1-diagnosis-submit"${pcS1LearningState.diagnosisRationale.trim().length >= 10 ? '' : ' disabled'}>Compare my reasoning</button>
             </div>` : ''}
           </form>
           ${pcRenderS1MayaPanel('The module is clearer now. I can see what I am supposed to do. The question is whether any of this actually lets me show the performance the instructor cares about.')}
@@ -1693,11 +1694,12 @@ function pcRenderS1MyCourseFeedback() {
         <button type="button" class="pc-shell-primary" data-pc-action="s1-learning-view-full-guide">View My Course Guide</button>
       </div>`
     : `<form class="pc-s1-transfer-reflection" data-pc-submit-action="s1-my-course-add-guide">
-        <label for="pcS1TransferReflection"><strong>What will you check or change first in your own course?</strong><span>This short reflection is included in the research record. Your module title, learning statement, and activity names stay on this device.</span></label>
-        <textarea id="pcS1TransferReflection" name="transferReflection" rows="3" minlength="10" maxlength="500" required>${esc(pcS1LearningState.transferReflection)}</textarea>
+        <label for="pcS1TransferReflection"><strong>Save one next step for your own course</strong><span>This becomes a personal reminder in My Course Guide. A short de-identified copy is also included in the study record. Your module title, learning statement, and activity names stay on this device.</span></label>
+        <textarea id="pcS1TransferReflection" name="transferReflection" rows="3" minlength="10" maxlength="500" required aria-describedby="pcS1TransferReflectionStatus" data-pc-input-action="s1-learning-update-transfer-reflection" placeholder="For example: Check whether my final activity actually demonstrates the stated learning objective.">${esc(pcS1LearningState.transferReflection)}</textarea>
+        <p class="pc-s1-response-status" id="pcS1TransferReflectionStatus">${pcS1LearningState.transferReflection.trim().length >= 10 ? 'Ready to save in My Course Guide.' : 'Required to save: enter at least 10 characters.'}</p>
         <div class="pc-s1-my-course-actions">
           <button type="button" class="pc-shell-secondary" data-pc-action="s1-my-course-step" data-pc-my-course-step="focus">Revise overview</button>
-          <button type="submit" class="pc-shell-primary">Add to My Course Guide</button>
+          <button type="submit" class="pc-shell-primary"${pcS1LearningState.transferReflection.trim().length >= 10 ? '' : ' disabled'}>Add to My Course Guide</button>
         </div>
       </form>`;
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
@@ -1920,6 +1922,39 @@ function pcUseS1Diagnosis(form) {
   return pcRenderS1DiagnosisResult();
 }
 
+function pcUpdateS1RequiredResponse(target, stateKey, statusId, readyText, pendingText) {
+  const value = String(target?.value || '');
+  pcS1LearningState[stateKey] = value;
+  const ready = value.trim().length >= 10;
+  const form = target?.closest('form');
+  const submit = form?.querySelector('button[type="submit"]');
+  const status = document.getElementById(statusId);
+  if (submit) submit.disabled = !ready;
+  if (status) status.textContent = ready ? readyText : pendingText;
+  return ready;
+}
+
+function pcUpdateS1DiagnosisRationale(target) {
+  pcS1LearningState.diagnosisNotice = '';
+  return pcUpdateS1RequiredResponse(
+    target,
+    'diagnosisRationale',
+    'pcS1DiagnosisRationaleStatus',
+    'Ready to compare with the alignment feedback.',
+    'Required: enter at least 10 characters. This is about your reasoning, not polished writing.'
+  );
+}
+
+function pcUpdateS1TransferReflection(target) {
+  return pcUpdateS1RequiredResponse(
+    target,
+    'transferReflection',
+    'pcS1TransferReflectionStatus',
+    'Ready to save in My Course Guide.',
+    'Required to save: enter at least 10 characters.'
+  );
+}
+
 function pcCompleteS1Organize() {
   const placements = pcS1LearningState.organization || {};
   if (PC_S1_LEARNING_ITEMS.some(item => !placements[item.id])) return false;
@@ -2123,6 +2158,7 @@ pcRegisterUIActions({
   's1-learning-save-rename': form => pcSaveS1Rename(form),
   's1-learning-start-organize': () => pcStartS1Organize(),
   's1-learning-select-diagnosis': target => pcSelectS1Diagnosis(target.dataset.pcDiagnosisId),
+  's1-learning-update-diagnosis-rationale': target => pcUpdateS1DiagnosisRationale(target),
   's1-learning-submit-diagnosis': form => pcUseS1Diagnosis(form),
   's1-learning-reflect-overview': () => pcPlayS1OverviewReflection(),
   's1-learning-build-guide-step1': () => pcGenerateS1GuideStep1(),
@@ -2131,6 +2167,7 @@ pcRegisterUIActions({
   's1-learning-continue-diagnosis': () => pcRenderS1Diagnosis(),
   's1-learning-start-my-course': () => pcPlayS1MyCourseTransition(),
   's1-my-course-add-guide': form => pcAddS1MyCourseReviewToGuide(form),
+  's1-learning-update-transfer-reflection': target => pcUpdateS1TransferReflection(target),
   's1-learning-view-full-guide': () => pcRenderS1FullGuide(),
   's1-learning-guide-section': target => pcScrollS1GuideSection(target.dataset.pcGuideSection),
   's1-learning-print-guide': () => pcPrintS1CourseGuide(),

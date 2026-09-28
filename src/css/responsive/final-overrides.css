@@ -1025,7 +1025,7 @@
 /* v390 — S2 learning-loop puzzle. Replaces the quiz-like diagnosis sheet. */
 .s2-loop-puzzle{max-width:1040px;margin:0 auto;background:#fffdf9;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 18px 40px rgba(48,38,27,.08)}
 .s2-loop-header{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:18px 28px 14px;border-bottom:1px solid var(--border);background:#fbf5eb}
-.s2-loop-header h1{margin:3px 0 0;color:var(--forest-dark);font:700 clamp(25px,2.3vw,36px)/1.08 "Lora",Georgia,serif}
+.s2-loop-header h1{margin:3px 0 0;color:var(--forest-dark);font:700 clamp(25px,2.3vw,36px)/1.08 "Fraunces",Georgia,serif}
 
 
 .s2-learning-gap{padding:24px 28px 28px;background:linear-gradient(180deg,#fffdf9,#fbf5eb)}
@@ -1035,7 +1035,7 @@
 
 .s2-gap-flow{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:center;gap:6px;margin-top:24px}
 .s2-flow-node{min-height:112px;padding:17px 18px;border:1px solid var(--border-strong);border-radius:12px;background:#fff;display:flex;flex-direction:column;justify-content:center;text-align:center}
-.s2-flow-node strong{display:block;margin:8px 0 5px;color:var(--forest-dark);font:700 clamp(18px,1.7vw,24px)/1.15 "Lora",Georgia,serif}.s2-flow-node small{color:var(--ink-light);line-height:1.3}
+.s2-flow-node strong{display:block;margin:8px 0 5px;color:var(--forest-dark);font:700 clamp(18px,1.7vw,24px)/1.15 "Fraunces",Georgia,serif}.s2-flow-node small{color:var(--ink-light);line-height:1.3}
 .s2-flow-node--missing{border:2px dashed var(--terracotta);background:#fff9ee}.s2-flow-node--missing strong{font-size:34px;color:var(--terracotta)}
 .s2-flow-node--missing.is-solved{border-style:solid;border-color:var(--forest);background:#edf7f0}.s2-flow-node--missing.is-solved strong{font-size:22px;color:var(--forest-dark)}
 .s2-flow-arrow{text-align:center;color:var(--forest);font-size:28px;font-weight:700}
@@ -1057,7 +1057,7 @@
 .s2-loop-result small{color:var(--ink-light);white-space:nowrap}
 
 .s2-learning-gap{padding:18px 28px 22px}
-.s2-learning-gap>h2{margin:0;color:var(--forest-dark);font:700 clamp(20px,1.8vw,27px)/1.2 "Lora",Georgia,serif}
+.s2-learning-gap>h2{margin:0;color:var(--forest-dark);font:700 clamp(20px,1.8vw,27px)/1.2 "Fraunces",Georgia,serif}
 .s2-gap-flow{margin-top:16px}
 .s2-loop-puzzle>.pc-activity-task{padding-top:20px}
 @media(max-width:760px){.s2-loop-header{grid-template-columns:minmax(0,1fr) auto;padding:12px 16px;gap:10px}.s2-loop-result{grid-column:1;padding:5px 0 0;border-left:0;border-top:1px solid var(--border);justify-content:start}.s2-learning-gap{padding:16px}.s2-learning-gap>h2{font-size:20px}.s2-gap-flow{margin-top:12px}}
@@ -1096,7 +1096,7 @@
   line-height: 1;
 }
 .name-modal-brand-name {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1.35rem;
   line-height: 1.05;
   font-weight: 800;
@@ -3210,7 +3210,7 @@ body[data-pc-scenario="metacognition"] .s2-jordan-quote {
   max-width: none !important;
   margin: 0 !important;
   color: var(--forest-dark) !important;
-  font: 600 clamp(24px, 2.15vw, 32px)/1.24 "Lora", Georgia, serif !important;
+  font: 600 clamp(24px, 2.15vw, 32px)/1.24 "Fraunces", Georgia, serif !important;
   text-align: center !important;
 }
 body[data-pc-scenario="metacognition"] .s2-quote-copy {
@@ -3224,7 +3224,7 @@ body[data-pc-scenario="metacognition"] .s2-quote-mark {
   width: auto !important;
   flex: 0 0 auto !important;
   color: var(--forest-dark) !important;
-  font: 700 2.55em/.7 "Lora", Georgia, serif !important;
+  font: 700 2.55em/.7 "Fraunces", Georgia, serif !important;
   opacity: .28 !important;
   transform: translateY(-.02em) !important;
 }
@@ -3659,7 +3659,7 @@ body[data-pc-scenario="metacognition"] .s2-evidence-panel .s2-jordan-quote {
   justify-content: center !important;
   gap: .2em !important;
   color: var(--forest-dark) !important;
-  font: 700 clamp(22px, 2vw, 30px)/1.2 "Lora", Georgia, serif !important;
+  font: 700 clamp(22px, 2vw, 30px)/1.2 "Fraunces", Georgia, serif !important;
   text-align: center !important;
   white-space: nowrap !important;
 }
@@ -3683,7 +3683,7 @@ body[data-pc-scenario="metacognition"] .s2-evidence-panel .s2-quote-mark {
   max-width: none !important;
   margin: 0 !important;
   color: var(--forest-dark) !important;
-  font: 700 3.9em/.52 "Lora", Georgia, serif !important;
+  font: 700 3.9em/.52 "Fraunces", Georgia, serif !important;
   line-height: .52 !important;
   opacity: .23 !important;
   transform: translateY(.13em) !important;
@@ -4000,7 +4000,7 @@ body[data-pc-scenario="metacognition"] .s2-evidence-panel .s2-jordan-quote {
   justify-content: center !important;
   gap: .18em !important;
   color: var(--forest-dark) !important;
-  font: 700 clamp(21px, 2.1vw, 30px)/1.2 "Lora", Georgia, serif !important;
+  font: 700 clamp(21px, 2.1vw, 30px)/1.2 "Fraunces", Georgia, serif !important;
   text-align: center !important;
   white-space: nowrap !important;
   border: 0 !important;
@@ -4024,7 +4024,7 @@ body[data-pc-scenario="metacognition"] .s2-evidence-panel .s2-quote-mark {
   width: auto !important;
   margin: 0 !important;
   color: var(--forest-dark) !important;
-  font: 700 4.35em/.48 "Lora", Georgia, serif !important;
+  font: 700 4.35em/.48 "Fraunces", Georgia, serif !important;
   line-height: .48 !important;
   opacity: .22 !important;
   transform: translateY(.12em) !important;
@@ -4783,7 +4783,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
   border: 0 !important;
   background: transparent !important;
   color: #eef9f1 !important;
-  font: 700 clamp(.98rem, 1.15vw, 1.12rem)/1.45 "Lora", Georgia, serif !important;
+  font: 700 clamp(.98rem, 1.15vw, 1.12rem)/1.45 "Fraunces", Georgia, serif !important;
   text-align: left !important;
 }
 
@@ -4801,7 +4801,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
 
 body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-quote-mark {
   color: #f4e5ba !important;
-  font: 700 2.1em/.8 "Lora", Georgia, serif !important;
+  font: 700 2.1em/.8 "Fraunces", Georgia, serif !important;
   opacity: .42 !important;
 }
 
@@ -5504,7 +5504,7 @@ html body #vnOverlay.vn-overlay.active.pc-s1-mission-board-image .vn-screen::bef
 }
 
 .pc-s1-intro-evidence-card > header strong {
-  font: 800 clamp(.9rem, 1.35vw, 1.25rem)/1.25 "Atkinson Hyperlegible", system-ui, sans-serif;
+  font: 800 clamp(.9rem, 1.35vw, 1.25rem)/1.25 "Nunito", system-ui, sans-serif;
 }
 
 .pc-s1-intro-evidence-picture {

@@ -18,6 +18,7 @@ HTML_FILES = (ROOT / "index.html", ROOT / "wall.html")
 ACTION_ATTRIBUTES = (
     "data-pc-action",
     "data-pc-submit-action",
+    "data-pc-input-action",
     "data-pc-change-action",
     "data-pc-key-action",
     "data-pc-toggle-action",

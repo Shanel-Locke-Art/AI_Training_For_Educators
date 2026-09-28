@@ -1,5 +1,19 @@
 # Scenario 1 Cleanup Log
 
+## 2026-09-28 — Patch 595 purposeful required responses
+
+- Reframed the diagnosis explanation as a comparison between the participant’s reasoning and the alignment feedback.
+- Reframed the transfer reflection as a personal next step saved in My Course Guide.
+- Added plain-language research-record notices and reminders not to enter names.
+- Disabled both submit actions until the participant enters a meaningful response, with live readiness messages.
+
+## 2026-09-28 — Patch 594 shared typography hierarchy
+
+- Standardized the game on Nunito for body copy and controls, Fraunces for display headings and dialogue, and uppercase Source Code Pro for section labels and eyebrow headings.
+- Applied the same hierarchy to the main menu, scenarios, Course Guide, onboarding, analysis screens, and Ideas Wall.
+- Preserved the Canvas replica and Babbage terminal as intentional in-world typography exceptions.
+- Removed the unused Lora webfont request and bumped the browser cache key to Patch 594.
+
 ## 2026-09-28 — Patch 593 and Receiver V94 focused research evidence
 
 - Replaced S1 checkpoint scores and attempt counts in the readable workbook with placement decisions, alignment correctness, written rationale, transfer reflection, completion status, and feedback provenance.

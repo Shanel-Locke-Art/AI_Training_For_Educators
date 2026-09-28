@@ -1584,7 +1584,7 @@ body.pc-main-menu-open .pixel-coach-card {
 .ref-title {
   margin-bottom: 10px;
   color: var(--ref-ink, #2c2416);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(1.35rem, 3vw, 1.75rem);
   font-weight: 700;
   line-height: 1.3;
@@ -1596,7 +1596,7 @@ body.pc-main-menu-open .pixel-coach-card {
   padding-bottom: 20px;
   border-bottom: 1px solid var(--ref-border, #d6cfc0);
   color: #514733;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1rem;
   line-height: 1.65;
   text-align: center;
@@ -1610,7 +1610,7 @@ body.pc-main-menu-open .pixel-coach-card {
   display: block;
   margin-bottom: 8px;
   color: var(--ref-ink-mid, #3d3020);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.5;
@@ -1627,7 +1627,7 @@ body.pc-main-menu-open .pixel-coach-card {
 
 .ref-label-note {
   color: #514733;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 0.9rem;
   font-style: italic;
   font-weight: 400;
@@ -1692,7 +1692,7 @@ body.pc-main-menu-open .pixel-coach-card {
 .ideas-wall-success-btn {
   min-height: 48px;
   border-radius: 6px;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.3;
@@ -1743,7 +1743,7 @@ body.pc-main-menu-open .pixel-coach-card {
 .ref-success-title {
   margin-bottom: 10px;
   color: var(--ref-ink, #2c2416);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1.45rem;
   font-weight: 700;
 }
@@ -1751,7 +1751,7 @@ body.pc-main-menu-open .pixel-coach-card {
 .ref-success-body {
   margin-bottom: 20px;
   color: #514733;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1rem;
   line-height: 1.65;
 }
@@ -1990,7 +1990,7 @@ body.pc-main-menu-open .pixel-coach-card {
 .audio-setup-title {
   max-width: 520px;
   margin: 0 126px 10px 0;
-  font: 800 clamp(1.35rem, 3vw, 1.75rem)/1.28 "Lora", Georgia, serif;
+  font: 800 clamp(1.35rem, 3vw, 1.75rem)/1.28 "Fraunces", Georgia, serif;
   color: #1f160f;
 }
 

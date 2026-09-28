@@ -5,6 +5,10 @@
    ══════════════════════════════════════════════════════ */
 
 :root {
+  --pc-font-body: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --pc-font-display: "Fraunces", Georgia, serif;
+  --pc-font-label: "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --pc-font-canvas: Lato, "Helvetica Neue", Arial, sans-serif;
   --gfc-navy: #112650;
   --gfc-navy-deep: #081a36;
   --gfc-blue: #086c9f;
@@ -1888,4 +1892,90 @@ html body.pc-dev-tools-visible > .dev-bar {
   max-width: 100vw !important;
   box-sizing: border-box !important;
   box-shadow: 0 -4px 18px rgba(0, 0, 0, .28) !important;
+}
+
+/* P594 — one typography hierarchy across the game.
+   Body copy and controls use Nunito, display headings use Fraunces, and small
+   navigational labels use uppercase Source Code Pro. Canvas replicas and
+   Babbage's CRT retain their native interface type so the simulation remains
+   legible and visually distinct. */
+html body,
+html body :is(button, input, textarea, select) {
+  font-family: var(--pc-font-body);
+}
+
+html body :is(h1, h2, h3, h4, h5, h6),
+html body :is(
+  .mission-title,
+  .pc-feedback-heading,
+  .pc-guided-repair-reference-title,
+  .name-modal-title,
+  .audio-setup-title,
+  .vn-speaker,
+  .vn-text
+) {
+  font-family: var(--pc-font-display);
+}
+
+html body :is(
+  .pc-main-menu-kicker,
+  .pc-menu-eyebrow,
+  .pc-menu-card-label,
+  .pc-menu-qr-kicker,
+  .mission-eyebrow,
+  .pc-activity-kicker,
+  .pc-shell-status,
+  .pc-s1-result-eyebrow,
+  .pc-s1-babbage-kicker,
+  .pc-guided-repair-label,
+  .pc-guided-repair-ingredients-heading,
+  .pc-guided-repair-preview-label,
+  .pc-guided-repair-problem-label,
+  .pc-progress-eyebrow,
+  .pc-progress-summary-kicker,
+  .analysis-label,
+  .growth-section-label,
+  .ingredient-heading,
+  .ref-eyebrow,
+  .ref-label,
+  .s1-clean-eyebrow,
+  .s1-clean-label,
+  .s1-result-eyebrow,
+  .pc-terminal-kicker,
+  .pc-s1-reflection-analysis-kicker
+) {
+  font-family: var(--pc-font-label);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+html body .pc-s1-learning-taskbar > div:first-child > span {
+  font-family: var(--pc-font-label);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+/* Intentional in-world exceptions. */
+html body .pc-s1-canvas-app,
+html body .pc-s1-canvas-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
+  font-family: var(--pc-font-canvas) !important;
+}
+
+html body :is(
+  .babbage-terminal-screen,
+  .pc-terminal,
+  .pc-s1-reflection-analysis--terminal,
+  .pc-s1-week-terminal
+),
+html body :is(
+  .babbage-terminal-screen,
+  .pc-terminal,
+  .pc-s1-reflection-analysis--terminal,
+  .pc-s1-week-terminal
+) :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
+  font-family: var(--pc-font-label) !important;
 }

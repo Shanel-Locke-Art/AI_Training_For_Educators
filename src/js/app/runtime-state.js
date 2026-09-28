@@ -179,6 +179,7 @@ function pcRegisterUIActions(actions = {}) {
 const PC_UI_EVENT_CONFIG = Object.freeze({
   click:  { attribute: 'data-pc-action',        datasetKey: 'pcAction',       preventDefault: true },
   submit: { attribute: 'data-pc-submit-action', datasetKey: 'pcSubmitAction', preventDefault: true },
+  input:  { attribute: 'data-pc-input-action',  datasetKey: 'pcInputAction',  preventDefault: false },
   change: { attribute: 'data-pc-change-action', datasetKey: 'pcChangeAction', preventDefault: false },
   keydown:{ attribute: 'data-pc-key-action',    datasetKey: 'pcKeyAction',    preventDefault: true },
   toggle: { attribute: 'data-pc-toggle-action', datasetKey: 'pcToggleAction', preventDefault: false }

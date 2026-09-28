@@ -854,7 +854,7 @@ body .vn-overlay.active {
     margin: 0 0 10px !important;
     padding: 0 !important;
     color: #b9e6c8 !important;
-    font-family: "Lora", Georgia, serif !important;
+    font-family: "Fraunces", Georgia, serif !important;
     font-size: clamp(1.18rem, 4.9vw, 1.34rem) !important;
     font-weight: 800 !important;
     font-style: italic !important;
@@ -865,7 +865,7 @@ body .vn-overlay.active {
   html body .vn-overlay.active #vnText,
   html body .vn-overlay.active .vn-text {
     color: #f5f7f5 !important;
-    font-family: "Lora", Georgia, serif !important;
+    font-family: "Fraunces", Georgia, serif !important;
     font-size: clamp(0.96rem, 4vw, 1.04rem) !important;
     font-weight: 650 !important;
     line-height: 1.46 !important;
@@ -886,7 +886,7 @@ body .vn-overlay.active {
   html body #vnOverlay#vnOverlay.vn-overlay.active:not(.babbage-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.babbage-terminal-consult):not(.babbage-terminal-textmode) #vnSpeaker {
     margin: 0 0 8px !important;
     padding: 0 !important;
-    font-family: "Lora", Georgia, serif !important;
+    font-family: "Fraunces", Georgia, serif !important;
     font-size: clamp(1.05rem, 3.8vw, 1.2rem) !important;
     font-weight: 700 !important;
     font-style: italic !important;
@@ -894,7 +894,7 @@ body .vn-overlay.active {
   }
 
   html body #vnOverlay#vnOverlay.vn-overlay.active:not(.babbage-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.babbage-terminal-consult):not(.babbage-terminal-textmode) #vnText {
-    font-family: "Lora", Georgia, serif !important;
+    font-family: "Fraunces", Georgia, serif !important;
     font-size: clamp(1rem, 3.45vw, 1.12rem) !important;
     font-weight: 600 !important;
     line-height: 1.5 !important;

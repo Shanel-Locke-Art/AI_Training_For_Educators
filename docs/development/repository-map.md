@@ -1,6 +1,6 @@
 # PromptCraft source map
 
-Current identifiers: application `PROMPTCRAFT_V429`, patch `593`, research `V121`, receiver `V94`, asset manifest `v151`.
+Current identifiers: application `PROMPTCRAFT_V429`, patch `595`, research `V121`, receiver `V94`, asset manifest `v151`.
 
 | Area | Current owner |
 |---|---|

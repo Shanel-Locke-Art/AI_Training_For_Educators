@@ -1583,18 +1583,18 @@ textarea::placeholder {
 
 /* ══════════════════════════════════════════════════════
    TYPOGRAPHY — COZY ACADEMIC EDITION
-   Lora replaces Nunito for body/bubble text
+   Fraunces replaces Nunito for body/bubble text
    Fraunces stays for display/character text
    Nunito stays for UI chrome (buttons, labels, chips)
    ══════════════════════════════════════════════════════ */
-/* Body text in chat bubbles — Lora gives a literary feel */
+/* Body text in chat bubbles — Fraunces gives a literary feel */
 .bubble {
   padding: 11px 14px;
   border-radius: var(--radius-lg);
   font-size: 0.875rem;
   line-height: 1.75;
   border: 1.5px solid var(--border);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
 }
 /* User prompt stays monospace — feels like typing a command */
 .message.user .bubble {
@@ -1614,7 +1614,7 @@ textarea::placeholder {
 
 /* VN dialogue box */
 .vn-text {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1.15rem;
   color: #f2f4f2;
   line-height: 1.7;
@@ -1628,7 +1628,7 @@ textarea::placeholder {
   font-size: 0.78rem;
   color: var(--ink-mid);
   line-height: 1.55;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-style: italic;
 }
 /* Memory hint */
@@ -1642,9 +1642,9 @@ textarea::placeholder {
 /* ══════════════════════════════════════════════════════
    LORA FONT OVERRIDES — Cozy Academic Typography
    ══════════════════════════════════════════════════════ */
-/* Logo — Lora gives it a worn, literary quality */
+/* Logo — Fraunces gives it a worn, literary quality */
 .logo-name {
-  font-family: "Lora", serif;
+  font-family: "Fraunces", serif;
   font-weight: 700;
   font-size: 1.15rem;
   color: var(--chalk-white);
@@ -1653,7 +1653,7 @@ textarea::placeholder {
 }
 /* VN speaker name */
 .vn-speaker {
-  font-family: "Lora", serif;
+  font-family: "Fraunces", serif;
   font-size: 1.25rem;
   font-weight: 700;
   color: #b9e6c8;
@@ -1663,7 +1663,7 @@ textarea::placeholder {
 }
 /* Scenario challenge text on smartboard */
 .vn-board-text {
-  font-family: "Lora", serif;
+  font-family: "Fraunces", serif;
   font-size: 1.55rem;
   color: #f0fdf4;
   line-height: 1.6;
@@ -1683,21 +1683,21 @@ textarea::placeholder {
 }
 /* Name modal title */
 .name-modal-title {
-  font-family: "Lora", serif;
+  font-family: "Fraunces", serif;
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--ink);
   margin-bottom: 6px;
   line-height: 1.3;
 }
-/* Name modal input — Lora makes entered names feel special */
+/* Name modal input — Fraunces makes entered names feel special */
 .name-modal-input {
   width: 100%;
   background: var(--cream);
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius);
   color: var(--ink);
-  font-family: "Lora", serif;
+  font-family: "Fraunces", serif;
   font-size: 1.1rem;
   font-weight: 600;
   padding: 12px 16px;
@@ -1715,7 +1715,7 @@ textarea::placeholder {
 
 /* Pixel coach name in sticky note */
 .pixel-coach-name{
-  font-family: "Lora", serif;
+  font-family: "Fraunces", serif;
   font-style: italic;
 }
 /* Professor Pixel inline sender label */
@@ -2562,7 +2562,7 @@ textarea::placeholder {
 }body.s1-result-active .s1-result-eyebrow{margin:0 0 16px!important;color:#c4622d!important;font-family:"Source Code Pro", monospace!important;font-size:clamp(.76rem, .9vw, .9rem)!important;font-weight:800!important;letter-spacing:.16em!important;line-height:1.3!important;text-transform:uppercase!important
 }body.s1-result-active .s1-result-title{margin:0 0 30px!important;color:#173d27!important;font-family:"Fraunces", Georgia, serif!important;font-size:clamp(2.25rem, 4vw, 4rem)!important;font-weight:800!important;line-height:1.08!important;letter-spacing:-.025em!important
 }body.s1-result-active .s1-result-content-box{border:0!important;background:transparent!important;box-shadow:none!important;padding:0!important
-}body.s1-result-active .s1-result-body{max-width:880px!important;color:#46392e!important;font-family:"Lora", Georgia, serif!important;font-size:clamp(1.08rem, 1.32vw, 1.34rem)!important;line-height:1.78!important;font-weight:500!important
+}body.s1-result-active .s1-result-body{max-width:880px!important;color:#46392e!important;font-family:"Fraunces", Georgia, serif!important;font-size:clamp(1.08rem, 1.32vw, 1.34rem)!important;line-height:1.78!important;font-weight:500!important
 }body.s1-result-active .s1-result-body h1,body.s1-result-active .s1-result-body h2,body.s1-result-active .s1-result-body h3,body.s1-result-active .s1-result-body strong{color:#173d27!important;font-family:"Fraunces", Georgia, serif!important;font-weight:800!important
 }body.s1-result-active .s1-result-body h2,body.s1-result-active .s1-result-body h3{margin:30px 0 10px!important;font-size:clamp(1.32rem, 2vw, 1.9rem)!important;line-height:1.22!important
 }body.s1-result-active .s1-result-body p{margin:0 0 22px!important
@@ -2800,8 +2800,8 @@ font-weight:700!important;}body.s1-result-active .s1-result-controls-actions{dis
       rgba(0,0,0,.12) 100%
     )!important;border-top:1.5px solid rgba(185,230,200,.66)!important;border-left:1px solid rgba(185,230,200,.34)!important;border-right:1px solid rgba(185,230,200,.34)!important;z-index:40!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;overflow:visible!important;box-shadow:0 -16px 38px rgba(0,0,0,.48)!important
 }body .vn-overlay.active.pc-clean-prediction .vn-dialogue::before,body .vn-overlay.active.babbage-prediction .vn-dialogue::before,body .vn-overlay.active.babbage-terminal-consult .vn-dialogue::before,body .vn-overlay.active.babbage-terminal-textmode .vn-dialogue::before,body .vn-overlay.active.pc-clean-prediction .vn-dialogue::after,body .vn-overlay.active.babbage-prediction .vn-dialogue::after,body .vn-overlay.active.babbage-terminal-consult .vn-dialogue::after,body .vn-overlay.active.babbage-terminal-textmode .vn-dialogue::after{opacity:.72!important
-}body .vn-overlay.active.pc-clean-prediction #vnSpeaker,body .vn-overlay.active.babbage-prediction #vnSpeaker,body .vn-overlay.active.babbage-terminal-consult #vnSpeaker,body .vn-overlay.active.babbage-terminal-textmode #vnSpeaker,body .vn-overlay.active.pc-clean-prediction .vn-speaker,body .vn-overlay.active.babbage-prediction .vn-speaker,body .vn-overlay.active.babbage-terminal-consult .vn-speaker,body .vn-overlay.active.babbage-terminal-textmode .vn-speaker{margin:0 0 12px!important;padding:0!important;color:#b9e6c8!important;font-family:"Lora", Georgia, serif!important;font-size:clamp(1.15rem, 1.35vw, 1.45rem)!important;font-weight:800!important;font-style:italic!important;line-height:1.15!important;text-shadow:0 2px 10px rgba(0,0,0,.72)!important
-}body .vn-overlay.active.pc-clean-prediction #vnText,body .vn-overlay.active.babbage-prediction #vnText,body .vn-overlay.active.babbage-terminal-consult #vnText,body .vn-overlay.active.babbage-terminal-textmode #vnText,body .vn-overlay.active.pc-clean-prediction .vn-text,body .vn-overlay.active.babbage-prediction .vn-text,body .vn-overlay.active.babbage-terminal-consult .vn-text,body .vn-overlay.active.babbage-terminal-textmode .vn-text{max-width:min(980px, 72vw)!important;min-height:0!important;margin:0!important;padding:0!important;color:#f5f7f5!important;font-family:"Lora", Georgia, serif!important;font-size:clamp(1rem, 1.1vw, 1.18rem)!important;font-weight:650!important;line-height:1.58!important;text-shadow:0 2px 10px rgba(0,0,0,.78)!important
+}body .vn-overlay.active.pc-clean-prediction #vnSpeaker,body .vn-overlay.active.babbage-prediction #vnSpeaker,body .vn-overlay.active.babbage-terminal-consult #vnSpeaker,body .vn-overlay.active.babbage-terminal-textmode #vnSpeaker,body .vn-overlay.active.pc-clean-prediction .vn-speaker,body .vn-overlay.active.babbage-prediction .vn-speaker,body .vn-overlay.active.babbage-terminal-consult .vn-speaker,body .vn-overlay.active.babbage-terminal-textmode .vn-speaker{margin:0 0 12px!important;padding:0!important;color:#b9e6c8!important;font-family:"Fraunces", Georgia, serif!important;font-size:clamp(1.15rem, 1.35vw, 1.45rem)!important;font-weight:800!important;font-style:italic!important;line-height:1.15!important;text-shadow:0 2px 10px rgba(0,0,0,.72)!important
+}body .vn-overlay.active.pc-clean-prediction #vnText,body .vn-overlay.active.babbage-prediction #vnText,body .vn-overlay.active.babbage-terminal-consult #vnText,body .vn-overlay.active.babbage-terminal-textmode #vnText,body .vn-overlay.active.pc-clean-prediction .vn-text,body .vn-overlay.active.babbage-prediction .vn-text,body .vn-overlay.active.babbage-terminal-consult .vn-text,body .vn-overlay.active.babbage-terminal-textmode .vn-text{max-width:min(980px, 72vw)!important;min-height:0!important;margin:0!important;padding:0!important;color:#f5f7f5!important;font-family:"Fraunces", Georgia, serif!important;font-size:clamp(1rem, 1.1vw, 1.18rem)!important;font-weight:650!important;line-height:1.58!important;text-shadow:0 2px 10px rgba(0,0,0,.78)!important
 }body .vn-overlay.active.pc-clean-prediction .pc-feedback-copy{max-width:min(980px, 72vw)!important;margin:0!important
 }body .vn-overlay.active.pc-clean-prediction .vn-dialogue,body .vn-overlay.active.babbage-prediction .vn-dialogue{min-height:240px!important;padding-bottom:104px!important
 }body .vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel,body .vn-overlay.active.babbage-prediction #vnPredictionChoicePanel,body .vn-overlay.active.pc-clean-prediction .pc-choice-panel-final,body .vn-overlay.active.babbage-prediction .pc-choice-panel-final,body .vn-overlay.active.pc-clean-prediction .pc-clean-choice-grid,body .vn-overlay.active.babbage-prediction .pc-clean-choice-grid,body .vn-overlay.active.pc-clean-prediction .vn-prediction-options,body .vn-overlay.active.babbage-prediction .vn-prediction-options{position:fixed!important;left:20vw!important;right:20vw!important;bottom:24px!important;z-index:75!important;display:grid!important;grid-template-columns:repeat(4, minmax(150px, 1fr))!important;gap:14px!important;width:auto!important;max-width:none!important;margin:0!important;pointer-events:auto!important
@@ -2837,7 +2837,7 @@ font-weight:700!important;}body.s1-result-active .s1-result-controls-actions{dis
 }body .vn-overlay.active.babbage-prediction .vn-dialogue::before,body .vn-overlay.active.pc-clean-prediction .vn-dialogue::before,body .vn-overlay.active.pc-prediction-question .vn-dialogue::before,body .vn-overlay.active.pc-prediction-result .vn-dialogue::before,body .vn-overlay.active.babbage-terminal-consult .vn-dialogue::before,body .vn-overlay.active.babbage-terminal-textmode .vn-dialogue::before{top:14px!important;left:14px!important;width:14px!important;height:14px!important;border-width:2px 0 0 2px!important;border-color:rgba(146,220,191,.62)!important
 }body .vn-overlay.active.babbage-prediction .vn-dialogue::after,body .vn-overlay.active.pc-clean-prediction .vn-dialogue::after,body .vn-overlay.active.pc-prediction-question .vn-dialogue::after,body .vn-overlay.active.pc-prediction-result .vn-dialogue::after,body .vn-overlay.active.babbage-terminal-consult .vn-dialogue::after,body .vn-overlay.active.babbage-terminal-textmode .vn-dialogue::after{top:14px!important;right:14px!important;width:14px!important;height:14px!important;border-width:2px 2px 0 0!important;border-color:rgba(146,220,191,.62)!important
 }body .vn-overlay.active.babbage-prediction .vn-speaker,body .vn-overlay.active.pc-clean-prediction .vn-speaker,body .vn-overlay.active.pc-prediction-question .vn-speaker,body .vn-overlay.active.pc-prediction-result .vn-speaker,body .vn-overlay.active.babbage-terminal-consult .vn-speaker,body .vn-overlay.active.babbage-terminal-textmode .vn-speaker{margin:0 0 8px!important;padding:0!important;color:#b9e6c8!important;font-size:clamp(1.18rem, 1.25vw, 1.45rem)!important;line-height:1.1!important
-}body .vn-overlay.active.babbage-prediction #vnText,body .vn-overlay.active.pc-clean-prediction #vnText,body .vn-overlay.active.pc-prediction-question #vnText,body .vn-overlay.active.pc-prediction-result #vnText,body .vn-overlay.active.babbage-terminal-consult #vnText,body .vn-overlay.active.babbage-terminal-textmode #vnText,body .vn-overlay.active.babbage-prediction .pc-feedback-copy,body .vn-overlay.active.pc-clean-prediction .pc-feedback-copy,body .vn-overlay.active.pc-prediction-question .pc-feedback-copy,body .vn-overlay.active.pc-prediction-result .pc-feedback-copy,body .vn-overlay.active.babbage-terminal-consult .pc-feedback-copy,body .vn-overlay.active.babbage-terminal-textmode .pc-feedback-copy{position:relative!important;width:auto!important;max-width:min(980px, calc(100vw - 170px))!important;margin:0!important;padding:0!important;color:#f2f4f2!important;font-family:"Lora", Georgia, serif!important;font-size:clamp(1rem, 1.02vw, 1.18rem)!important;line-height:1.62!important;text-align:left!important;text-shadow:0 2px 8px rgba(0,0,0,.55)!important
+}body .vn-overlay.active.babbage-prediction #vnText,body .vn-overlay.active.pc-clean-prediction #vnText,body .vn-overlay.active.pc-prediction-question #vnText,body .vn-overlay.active.pc-prediction-result #vnText,body .vn-overlay.active.babbage-terminal-consult #vnText,body .vn-overlay.active.babbage-terminal-textmode #vnText,body .vn-overlay.active.babbage-prediction .pc-feedback-copy,body .vn-overlay.active.pc-clean-prediction .pc-feedback-copy,body .vn-overlay.active.pc-prediction-question .pc-feedback-copy,body .vn-overlay.active.pc-prediction-result .pc-feedback-copy,body .vn-overlay.active.babbage-terminal-consult .pc-feedback-copy,body .vn-overlay.active.babbage-terminal-textmode .pc-feedback-copy{position:relative!important;width:auto!important;max-width:min(980px, calc(100vw - 170px))!important;margin:0!important;padding:0!important;color:#f2f4f2!important;font-family:"Fraunces", Georgia, serif!important;font-size:clamp(1rem, 1.02vw, 1.18rem)!important;line-height:1.62!important;text-align:left!important;text-shadow:0 2px 8px rgba(0,0,0,.55)!important
 }body .vn-overlay.active.babbage-prediction .vn-dialogue,body .vn-overlay.active.pc-clean-prediction .vn-dialogue,body .vn-overlay.active.pc-prediction-question .vn-dialogue{min-height:232px!important;padding-bottom:92px!important
 }body .vn-overlay.active.pc-prediction-result .vn-dialogue{min-height:188px!important;padding-bottom:30px!important
 }body .vn-overlay.active.babbage-prediction #vnPredictionChoicePanel,body .vn-overlay.active.pc-clean-prediction #vnPredictionChoicePanel,body .vn-overlay.active.pc-prediction-question #vnPredictionChoicePanel,body .vn-overlay.active.babbage-prediction .pc-choice-panel-final,body .vn-overlay.active.pc-clean-prediction .pc-choice-panel-final,body .vn-overlay.active.pc-prediction-question .pc-choice-panel-final,body .vn-overlay.active.babbage-prediction .pc-clean-choice-grid,body .vn-overlay.active.pc-clean-prediction .pc-clean-choice-grid,body .vn-overlay.active.pc-prediction-question .pc-clean-choice-grid,body .vn-overlay.active.babbage-prediction .vn-prediction-options,body .vn-overlay.active.pc-clean-prediction .vn-prediction-options,body .vn-overlay.active.pc-prediction-question .vn-prediction-options{position:absolute!important;left:max(76px, 20vw)!important;right:max(76px, 20vw)!important;bottom:26px!important;z-index:88!important;display:grid!important;grid-template-columns:repeat(4, minmax(150px, 1fr))!important;gap:12px!important;width:auto!important;max-width:none!important;margin:0!important;padding:0!important;pointer-events:auto!important
@@ -3627,7 +3627,7 @@ body .name-modal {
 
 
 body .name-modal-title {
-  font-family: "Lora",Georgia,serif !important;
+  font-family: "Fraunces",Georgia,serif !important;
   font-size: clamp(1.35rem,2.8vw,1.6rem) !important;
   line-height: 1.25 !important;
   font-weight: 800 !important;
@@ -10536,7 +10536,7 @@ body.pc-main-menu-open .pixel-coach-card {
 .ref-title {
   margin-bottom: 10px;
   color: var(--ref-ink, #2c2416);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(1.35rem, 3vw, 1.75rem);
   font-weight: 700;
   line-height: 1.3;
@@ -10548,7 +10548,7 @@ body.pc-main-menu-open .pixel-coach-card {
   padding-bottom: 20px;
   border-bottom: 1px solid var(--ref-border, #d6cfc0);
   color: #514733;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1rem;
   line-height: 1.65;
   text-align: center;
@@ -10562,7 +10562,7 @@ body.pc-main-menu-open .pixel-coach-card {
   display: block;
   margin-bottom: 8px;
   color: var(--ref-ink-mid, #3d3020);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.5;
@@ -10579,7 +10579,7 @@ body.pc-main-menu-open .pixel-coach-card {
 
 .ref-label-note {
   color: #514733;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 0.9rem;
   font-style: italic;
   font-weight: 400;
@@ -10644,7 +10644,7 @@ body.pc-main-menu-open .pixel-coach-card {
 .ideas-wall-success-btn {
   min-height: 48px;
   border-radius: 6px;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.3;
@@ -10695,7 +10695,7 @@ body.pc-main-menu-open .pixel-coach-card {
 .ref-success-title {
   margin-bottom: 10px;
   color: var(--ref-ink, #2c2416);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1.45rem;
   font-weight: 700;
 }
@@ -10703,7 +10703,7 @@ body.pc-main-menu-open .pixel-coach-card {
 .ref-success-body {
   margin-bottom: 20px;
   color: #514733;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1rem;
   line-height: 1.65;
 }
@@ -10942,7 +10942,7 @@ body.pc-main-menu-open .pixel-coach-card {
 .audio-setup-title {
   max-width: 520px;
   margin: 0 126px 10px 0;
-  font: 800 clamp(1.35rem, 3vw, 1.75rem)/1.28 "Lora", Georgia, serif;
+  font: 800 clamp(1.35rem, 3vw, 1.75rem)/1.28 "Fraunces", Georgia, serif;
   color: #1f160f;
 }
 
@@ -12538,7 +12538,7 @@ body .vn-overlay.active {
     margin: 0 0 10px !important;
     padding: 0 !important;
     color: #b9e6c8 !important;
-    font-family: "Lora", Georgia, serif !important;
+    font-family: "Fraunces", Georgia, serif !important;
     font-size: clamp(1.18rem, 4.9vw, 1.34rem) !important;
     font-weight: 800 !important;
     font-style: italic !important;
@@ -12549,7 +12549,7 @@ body .vn-overlay.active {
   html body .vn-overlay.active #vnText,
   html body .vn-overlay.active .vn-text {
     color: #f5f7f5 !important;
-    font-family: "Lora", Georgia, serif !important;
+    font-family: "Fraunces", Georgia, serif !important;
     font-size: clamp(0.96rem, 4vw, 1.04rem) !important;
     font-weight: 650 !important;
     line-height: 1.46 !important;
@@ -12570,7 +12570,7 @@ body .vn-overlay.active {
   html body #vnOverlay#vnOverlay.vn-overlay.active:not(.babbage-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.babbage-terminal-consult):not(.babbage-terminal-textmode) #vnSpeaker {
     margin: 0 0 8px !important;
     padding: 0 !important;
-    font-family: "Lora", Georgia, serif !important;
+    font-family: "Fraunces", Georgia, serif !important;
     font-size: clamp(1.05rem, 3.8vw, 1.2rem) !important;
     font-weight: 700 !important;
     font-style: italic !important;
@@ -12578,7 +12578,7 @@ body .vn-overlay.active {
   }
 
   html body #vnOverlay#vnOverlay.vn-overlay.active:not(.babbage-prediction):not(.pc-clean-prediction):not(.pc-prediction-question):not(.babbage-terminal-consult):not(.babbage-terminal-textmode) #vnText {
-    font-family: "Lora", Georgia, serif !important;
+    font-family: "Fraunces", Georgia, serif !important;
     font-size: clamp(1rem, 3.45vw, 1.12rem) !important;
     font-weight: 600 !important;
     line-height: 1.5 !important;
@@ -13034,7 +13034,7 @@ html body .vn-overlay.active .terminal-return {
 @media screen and (min-width: 701px) {
   html body #vnOverlay.vn-overlay.active:not(.babbage-terminal-textmode) #vnSpeaker,
   html body #vnOverlay.vn-overlay.active:not(.babbage-terminal-textmode) .vn-speaker {
-    font-family: "Lora", Georgia, serif !important;
+    font-family: "Fraunces", Georgia, serif !important;
     font-size: var(--pc-type-speaker) !important;
     font-weight: 700 !important;
     font-style: italic !important;
@@ -13046,7 +13046,7 @@ html body .vn-overlay.active .terminal-return {
   html body #vnOverlay.vn-overlay.active:not(.babbage-terminal-textmode) .vn-text,
   html body #vnOverlay.vn-overlay.active:not(.babbage-terminal-textmode) .pc-feedback-copy,
   html body #vnOverlay.vn-overlay.active:not(.babbage-terminal-textmode) .pc-feedback-message {
-    font-family: "Lora", Georgia, serif !important;
+    font-family: "Fraunces", Georgia, serif !important;
     font-size: var(--pc-type-dialogue) !important;
     font-weight: 600 !important;
     line-height: 1.5 !important;
@@ -15159,7 +15159,7 @@ body.s1-active:not(.s1-result-active) #chat {
   border: 2px dashed var(--border-strong);
   border-radius: 12px;
   padding: 13px 14px;
-  font-family: "Lora",serif;
+  font-family: "Fraunces",serif;
   color: var(--ink-mid);
   font-size: 1rem;
   line-height: 1.62;
@@ -15756,7 +15756,7 @@ body.pc-scenario-activity-active #inputContainer {
 }
 
 .pc-activity-card h2{
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   color: var(--forest-dark);
   font-size: var(--pc-type-card-title);
   line-height: 1.25;
@@ -15959,7 +15959,7 @@ body.pc-scenario-activity-active #inputContainer {
 
 .pc-feedback-heading {
   color: var(--forest-dark);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-card-title);
   line-height: 1.3;
   font-weight: 800;
@@ -16040,7 +16040,7 @@ body.pc-scenario-activity-active #inputContainer {
 .pc-s1-preview-hero h2 {
   margin: 7px 0 12px;
   color: #fff;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-mission-title);
   line-height: 1.1;
 }
@@ -16096,7 +16096,7 @@ body.pc-scenario-activity-active #inputContainer {
 .pc-s1-preview-next h3 {
   margin: 6px 0 0;
   color: #112650;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-card-title);
   line-height: 1.25;
 }
@@ -16135,7 +16135,7 @@ body.pc-scenario-activity-active #inputContainer {
 .pc-s1-comparison-heading h3 {
   margin: 5px 0 15px;
   color: #112650;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-card-title);
   line-height: 1.25;
 }
@@ -16252,7 +16252,7 @@ body.pc-scenario-activity-active #inputContainer {
 .pc-s1-preview-task h3 {
   margin: 6px 0 0;
   color: #fff;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-card-title);
   line-height: 1.25;
 }
@@ -16349,7 +16349,7 @@ body.pc-scenario-activity-active #inputContainer {
 .pc-s1-evidence-heading h3 {
   margin: 7px 0 0;
   color: #112650;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-card-title);
   line-height: 1.25;
 }
@@ -16831,7 +16831,7 @@ body.pc-s1-ai-workspace-active {
   border-radius: 16px;
   background: #071a31;
   color: #f7d77e;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(24px, 3vw, 36px);
   font-weight: 850;
   box-shadow: inset 0 0 18px rgba(242, 193, 78, .12);
@@ -16854,7 +16854,7 @@ body.pc-s1-ai-workspace-active {
 }
 
 .pc-s1-ai-workspace-header h2 {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(24px, 3vw, 38px);
   line-height: 1.08;
 }
@@ -17046,7 +17046,7 @@ body.pc-s1-ai-workspace-active {
 .pc-s1-ai-workspace-step > h3 {
   margin: 0;
   color: #102b52;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(27px, 4vw, 43px);
   line-height: 1.12;
 }
@@ -17089,7 +17089,7 @@ body.pc-s1-ai-workspace-active {
 .pc-s1-ai-workspace-review-card h4 {
   margin: 0;
   color: #102b52;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(22px, 2.8vw, 32px);
   line-height: 1.2;
 }
@@ -17197,7 +17197,7 @@ body.pc-s1-ai-workspace-active {
   border-radius: 50%;
   background: #112650;
   color: #f7d77e;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 24px;
   font-weight: 850;
 }
@@ -17489,7 +17489,7 @@ body.pc-s1-ai-workspace-active {
   max-width: 1050px;
   margin: 0 0 12px;
   color: #fff;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-mission-title);
   line-height: 1.1;
 }
@@ -17569,7 +17569,7 @@ body.pc-s1-ai-workspace-active {
 .pc-s1-rescue-intro h3 {
   margin: 6px 0 0;
   color: #102b52;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-card-title);
   line-height: 1.2;
 }
@@ -17695,7 +17695,7 @@ body.pc-s1-ai-workspace-active {
 .pc-s1-rescue-loading h2 {
   max-width: 820px;
   margin: 12px 0;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-mission-title);
 }
 
@@ -17779,7 +17779,7 @@ body.pc-s1-ai-workspace-active {
   display: block;
   margin: 8px 0;
   color: #075e8a;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(34px, 4vw, 58px);
 }
 
@@ -17882,7 +17882,7 @@ html body.pc-s1-canvas-smartboard-active
 
 .pc-s1-dialogue-question {
   color: #fff;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(18px, 1.45vw, 25px);
   line-height: 1.2;
 }
@@ -19167,7 +19167,7 @@ html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
   display: inline-block;
   max-width: 28ch;
   color: var(--gfc-navy-deep);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(20px, 2vw, 28px);
   font-weight: 700;
   line-height: 1.28;
@@ -19177,7 +19177,7 @@ html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
 .pc-student-evidence-quote-mark {
   flex: 0 0 auto;
   color: var(--gfc-gold);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(54px, 5vw, 78px);
   font-weight: 700;
   line-height: .6;
@@ -19210,7 +19210,7 @@ html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
 
 .pc-student-evidence-result > strong {
   color: var(--gfc-navy-deep);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(40px, 4vw, 56px);
   line-height: 1;
 }
@@ -19311,7 +19311,7 @@ html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
   display: block;
   margin: 3px 0 1px;
   color: #fff;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(38px, 5vw, 62px);
   line-height: 1;
 }
@@ -19392,7 +19392,7 @@ html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
 }
 .pc-drag-tray-head strong {
   color: var(--forest-dark);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(17px, 1.6vw, 21px);
 }
 .pc-drag-tray-head span {
@@ -19595,7 +19595,7 @@ html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
 .pc-drag-slot-heading h3 {
   margin: 0;
   color: var(--forest-dark);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(18px, 1.7vw, 22px);
   line-height: 1.25;
 }
@@ -20006,7 +20006,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-case-brief .pc-case-brief-copy > d
 .pc-s1-after-reflection-form textarea {
   width:100%; min-height:112px; resize:vertical; padding:12px 14px;
   border:1px solid #69cfe8; border-radius:7px; background:rgba(255,255,255,.97);
-  color:#102a43; font:600 1rem/1.45 "Source Sans 3","Source Sans Pro",Arial,sans-serif;
+  color:#102a43; font:600 1rem/1.45 "Nunito",system-ui,sans-serif;
   box-shadow:inset 0 1px 3px rgba(0,0,0,.12);
 }
 .pc-s1-after-reflection-form textarea:focus { outline:3px solid rgba(244,179,0,.42); outline-offset:1px; }
@@ -20042,7 +20042,7 @@ body.pc-s1-reflection-analysis-active { overflow:hidden !important; }
   letter-spacing:.06em; text-transform:uppercase;
 }
 .pc-s1-reflection-analysis-header h2 {
-  margin-top:4px; color:#fff; font:800 clamp(1.7rem,3vw,2.45rem)/1.05 "Lora",Georgia,serif;
+  margin-top:4px; color:#fff; font:800 clamp(1.7rem,3vw,2.45rem)/1.05 "Fraunces",Georgia,serif;
 }
 .pc-s1-reflection-analysis-header h2:focus { outline:none; }
 .pc-s1-reflection-analysis-verdict {
@@ -20066,12 +20066,12 @@ body.pc-s1-reflection-analysis-active { overflow:hidden !important; }
   font:800 .74rem/1.2 "Source Code Pro",monospace; letter-spacing:.08em; text-transform:uppercase;
 }
 .pc-s1-reflection-response blockquote {
-  margin:0; color:#183b56; font:650 clamp(1rem,1.7vw,1.18rem)/1.5 "Lora",Georgia,serif;
+  margin:0; color:#183b56; font:650 clamp(1rem,1.7vw,1.18rem)/1.5 "Fraunces",Georgia,serif;
 }
 .pc-s1-reflection-feedback { margin-top:22px; }
 .pc-s1-reflection-feedback h3 {
   max-width:820px; margin:0; color:#102a43;
-  font:750 clamp(1.35rem,2.6vw,2rem)/1.18 "Lora",Georgia,serif;
+  font:750 clamp(1.35rem,2.6vw,2rem)/1.18 "Fraunces",Georgia,serif;
 }
 .pc-s1-reflection-feedback ol {
   display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px;
@@ -20130,8 +20130,8 @@ body.pc-s1-reflection-analysis-active { overflow:hidden !important; }
 .pc-s1-case-reflection{display:grid;gap:14px;width:100%;padding:clamp(18px,2.5vw,28px);border:2px solid #315b78;border-radius:14px;background:#f8fbfd}
 .pc-s1-case-reflection-head{display:flex;align-items:end;justify-content:space-between;gap:24px}.pc-s1-case-reflection-head>div:first-child{min-width:0}
 .pc-s1-case-reflection-head span,.pc-s1-case-reflection>label{color:#7b4e05;font:800 .78rem/1.3 "Source Code Pro",monospace;letter-spacing:.08em;text-transform:uppercase}
-.pc-s1-case-reflection-head h4{margin:6px 0 0;color:#112650;font:800 clamp(1.2rem,2vw,1.65rem)/1.25 "Lora",Georgia,serif}.pc-s1-case-reflection-status{margin:0;color:#526778}
-.pc-s1-case-reflection textarea{width:100%;min-height:130px;resize:vertical;padding:14px 16px;border:1px solid #8fa2b0;border-radius:10px;background:#fff;color:#172334;font:500 1rem/1.55 "Atkinson Hyperlegible",Arial,sans-serif}
+.pc-s1-case-reflection-head h4{margin:6px 0 0;color:#112650;font:800 clamp(1.2rem,2vw,1.65rem)/1.25 "Fraunces",Georgia,serif}.pc-s1-case-reflection-status{margin:0;color:#526778}
+.pc-s1-case-reflection textarea{width:100%;min-height:130px;resize:vertical;padding:14px 16px;border:1px solid #8fa2b0;border-radius:10px;background:#fff;color:#172334;font:500 1rem/1.55 "Nunito",system-ui,sans-serif}
 .pc-s1-case-reflection textarea:disabled{background:#edf2f5;color:#607382;cursor:not-allowed}.pc-s1-case-reflection textarea:focus{outline:4px solid rgba(201,147,36,.28);border-color:#087aa9}
 .pc-s1-case-reflection-actions{display:flex;align-items:center;justify-content:space-between;gap:16px}.pc-s1-case-reflection-actions>span{color:#526778;font:700 .8rem/1.3 "Source Code Pro",monospace}
 
@@ -20146,7 +20146,7 @@ body.pc-s1-reflection-analysis-active { overflow:hidden !important; }
 .pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-footer{border-color:#286c4b;background:#06170f}.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-footer>p{color:#8bc7a4}
 
 .pc-s1-week-planner{width:min(1420px,calc(100% - 24px));margin:20px auto 36px;color:#172334}.pc-s1-week-planner-hero{padding:clamp(24px,4vw,46px);border-radius:18px 18px 0 0;background:linear-gradient(135deg,#102b52,#075e8a);color:#fff}
-.pc-s1-week-planner-hero>span{color:#f7d77e;font:800 .75rem/1.3 "Source Code Pro",monospace;letter-spacing:.08em;text-transform:uppercase}.pc-s1-week-planner-hero h2{margin:8px 0 12px;color:#fff;font:800 clamp(1.8rem,4vw,3rem)/1.12 "Lora",Georgia,serif}.pc-s1-week-planner-hero p{max-width:1000px;margin:0;color:#eef8fc;font-size:1.05rem;line-height:1.55}
+.pc-s1-week-planner-hero>span{color:#f7d77e;font:800 .75rem/1.3 "Source Code Pro",monospace;letter-spacing:.08em;text-transform:uppercase}.pc-s1-week-planner-hero h2{margin:8px 0 12px;color:#fff;font:800 clamp(1.8rem,4vw,3rem)/1.12 "Fraunces",Georgia,serif}.pc-s1-week-planner-hero p{max-width:1000px;margin:0;color:#eef8fc;font-size:1.05rem;line-height:1.55}
 .pc-s1-week-planner-form,.pc-s1-week-plan-result{padding:clamp(20px,3vw,34px);border:2px solid #315b78;border-top:0;background:#fff}.pc-s1-week-planner-basics{display:grid;grid-template-columns:.7fr 1.3fr;gap:16px;margin-bottom:18px}.pc-s1-week-planner label{display:grid;gap:7px}.pc-s1-week-planner label>span{color:#112650;font-weight:850}
 .pc-s1-week-planner input,.pc-s1-week-planner textarea{width:100%;padding:12px 14px;border:1px solid #93a7b5;border-radius:9px;font:inherit;color:#172334}.pc-s1-week-planner :is(input,textarea):focus{outline:4px solid rgba(201,147,36,.25);border-color:#087aa9}
 .pc-s1-week-planner-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.pc-s1-week-category{align-content:start;padding:15px;border:1px solid #9fb1bd;border-top:5px solid #087aa9;border-radius:12px;background:#f8fbfd}.pc-s1-week-category>span{display:flex;gap:8px;align-items:center;font-family:"Source Code Pro",monospace}.pc-s1-week-category>span b{color:#a46b06}.pc-s1-week-category small{min-height:54px;color:#526778;line-height:1.4}.pc-s1-week-category textarea{min-height:128px;resize:vertical;background:#fff}
@@ -20459,7 +20459,7 @@ body.pc-s1-evidence-modal-active { overflow:hidden !important; }
   border-radius:9px;
   background:#fff;
   color:#143d2e;
-  font:800 .86rem/1.1 "Atkinson Hyperlegible",system-ui,sans-serif;
+  font:800 .86rem/1.1 "Nunito",system-ui,sans-serif;
   cursor:pointer;
 }
 .pc-s1-evidence-modal-zoom button.is-active {
@@ -22289,6 +22289,10 @@ html body.pc-s1-canvas-backdrop-active #vnOverlay.vn-overlay.active .vn-smartboa
   opacity: .48;
   cursor: not-allowed;
 }
+.pc-s1-transfer-reflection .pc-shell-primary:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+}
 .pc-s1-diagnosis-rationale,
 .pc-s1-transfer-reflection {
   display: grid;
@@ -23087,6 +23091,13 @@ html body #vnOverlay.pc-s1-clean-closing #babbageTerminalScene { display: none !
     position: sticky;
     top: 0;
   }
+}
+.pc-s1-response-status {
+  margin: 0;
+  color: #455f72;
+  font-size: .82rem;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 /* P579 — saved Course Guide reading surface.
@@ -28430,7 +28441,7 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
 /* v390 — S2 learning-loop puzzle. Replaces the quiz-like diagnosis sheet. */
 .s2-loop-puzzle{max-width:1040px;margin:0 auto;background:#fffdf9;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 18px 40px rgba(48,38,27,.08)}
 .s2-loop-header{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:18px 28px 14px;border-bottom:1px solid var(--border);background:#fbf5eb}
-.s2-loop-header h1{margin:3px 0 0;color:var(--forest-dark);font:700 clamp(25px,2.3vw,36px)/1.08 "Lora",Georgia,serif}
+.s2-loop-header h1{margin:3px 0 0;color:var(--forest-dark);font:700 clamp(25px,2.3vw,36px)/1.08 "Fraunces",Georgia,serif}
 
 
 .s2-learning-gap{padding:24px 28px 28px;background:linear-gradient(180deg,#fffdf9,#fbf5eb)}
@@ -28440,7 +28451,7 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
 
 .s2-gap-flow{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:center;gap:6px;margin-top:24px}
 .s2-flow-node{min-height:112px;padding:17px 18px;border:1px solid var(--border-strong);border-radius:12px;background:#fff;display:flex;flex-direction:column;justify-content:center;text-align:center}
-.s2-flow-node strong{display:block;margin:8px 0 5px;color:var(--forest-dark);font:700 clamp(18px,1.7vw,24px)/1.15 "Lora",Georgia,serif}.s2-flow-node small{color:var(--ink-light);line-height:1.3}
+.s2-flow-node strong{display:block;margin:8px 0 5px;color:var(--forest-dark);font:700 clamp(18px,1.7vw,24px)/1.15 "Fraunces",Georgia,serif}.s2-flow-node small{color:var(--ink-light);line-height:1.3}
 .s2-flow-node--missing{border:2px dashed var(--terracotta);background:#fff9ee}.s2-flow-node--missing strong{font-size:34px;color:var(--terracotta)}
 .s2-flow-node--missing.is-solved{border-style:solid;border-color:var(--forest);background:#edf7f0}.s2-flow-node--missing.is-solved strong{font-size:22px;color:var(--forest-dark)}
 .s2-flow-arrow{text-align:center;color:var(--forest);font-size:28px;font-weight:700}
@@ -28462,7 +28473,7 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
 .s2-loop-result small{color:var(--ink-light);white-space:nowrap}
 
 .s2-learning-gap{padding:18px 28px 22px}
-.s2-learning-gap>h2{margin:0;color:var(--forest-dark);font:700 clamp(20px,1.8vw,27px)/1.2 "Lora",Georgia,serif}
+.s2-learning-gap>h2{margin:0;color:var(--forest-dark);font:700 clamp(20px,1.8vw,27px)/1.2 "Fraunces",Georgia,serif}
 .s2-gap-flow{margin-top:16px}
 .s2-loop-puzzle>.pc-activity-task{padding-top:20px}
 @media(max-width:760px){.s2-loop-header{grid-template-columns:minmax(0,1fr) auto;padding:12px 16px;gap:10px}.s2-loop-result{grid-column:1;padding:5px 0 0;border-left:0;border-top:1px solid var(--border);justify-content:start}.s2-learning-gap{padding:16px}.s2-learning-gap>h2{font-size:20px}.s2-gap-flow{margin-top:12px}}
@@ -28501,7 +28512,7 @@ body[data-pc-viewport-family="compact-desktop"] .vn-overlay.active:is(.pc-predic
   line-height: 1;
 }
 .name-modal-brand-name {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 1.35rem;
   line-height: 1.05;
   font-weight: 800;
@@ -30615,7 +30626,7 @@ body[data-pc-scenario="metacognition"] .s2-jordan-quote {
   max-width: none !important;
   margin: 0 !important;
   color: var(--forest-dark) !important;
-  font: 600 clamp(24px, 2.15vw, 32px)/1.24 "Lora", Georgia, serif !important;
+  font: 600 clamp(24px, 2.15vw, 32px)/1.24 "Fraunces", Georgia, serif !important;
   text-align: center !important;
 }
 body[data-pc-scenario="metacognition"] .s2-quote-copy {
@@ -30629,7 +30640,7 @@ body[data-pc-scenario="metacognition"] .s2-quote-mark {
   width: auto !important;
   flex: 0 0 auto !important;
   color: var(--forest-dark) !important;
-  font: 700 2.55em/.7 "Lora", Georgia, serif !important;
+  font: 700 2.55em/.7 "Fraunces", Georgia, serif !important;
   opacity: .28 !important;
   transform: translateY(-.02em) !important;
 }
@@ -31064,7 +31075,7 @@ body[data-pc-scenario="metacognition"] .s2-evidence-panel .s2-jordan-quote {
   justify-content: center !important;
   gap: .2em !important;
   color: var(--forest-dark) !important;
-  font: 700 clamp(22px, 2vw, 30px)/1.2 "Lora", Georgia, serif !important;
+  font: 700 clamp(22px, 2vw, 30px)/1.2 "Fraunces", Georgia, serif !important;
   text-align: center !important;
   white-space: nowrap !important;
 }
@@ -31088,7 +31099,7 @@ body[data-pc-scenario="metacognition"] .s2-evidence-panel .s2-quote-mark {
   max-width: none !important;
   margin: 0 !important;
   color: var(--forest-dark) !important;
-  font: 700 3.9em/.52 "Lora", Georgia, serif !important;
+  font: 700 3.9em/.52 "Fraunces", Georgia, serif !important;
   line-height: .52 !important;
   opacity: .23 !important;
   transform: translateY(.13em) !important;
@@ -31405,7 +31416,7 @@ body[data-pc-scenario="metacognition"] .s2-evidence-panel .s2-jordan-quote {
   justify-content: center !important;
   gap: .18em !important;
   color: var(--forest-dark) !important;
-  font: 700 clamp(21px, 2.1vw, 30px)/1.2 "Lora", Georgia, serif !important;
+  font: 700 clamp(21px, 2.1vw, 30px)/1.2 "Fraunces", Georgia, serif !important;
   text-align: center !important;
   white-space: nowrap !important;
   border: 0 !important;
@@ -31429,7 +31440,7 @@ body[data-pc-scenario="metacognition"] .s2-evidence-panel .s2-quote-mark {
   width: auto !important;
   margin: 0 !important;
   color: var(--forest-dark) !important;
-  font: 700 4.35em/.48 "Lora", Georgia, serif !important;
+  font: 700 4.35em/.48 "Fraunces", Georgia, serif !important;
   line-height: .48 !important;
   opacity: .22 !important;
   transform: translateY(.12em) !important;
@@ -32188,7 +32199,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
   border: 0 !important;
   background: transparent !important;
   color: #eef9f1 !important;
-  font: 700 clamp(.98rem, 1.15vw, 1.12rem)/1.45 "Lora", Georgia, serif !important;
+  font: 700 clamp(.98rem, 1.15vw, 1.12rem)/1.45 "Fraunces", Georgia, serif !important;
   text-align: left !important;
 }
 
@@ -32206,7 +32217,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-
 
 body[data-pc-scenario="metacognition"] .pc-s2-babbage-draft .pc-s2-audit-jordan-quote-mark {
   color: #f4e5ba !important;
-  font: 700 2.1em/.8 "Lora", Georgia, serif !important;
+  font: 700 2.1em/.8 "Fraunces", Georgia, serif !important;
   opacity: .42 !important;
 }
 
@@ -32909,7 +32920,7 @@ html body #vnOverlay.vn-overlay.active.pc-s1-mission-board-image .vn-screen::bef
 }
 
 .pc-s1-intro-evidence-card > header strong {
-  font: 800 clamp(.9rem, 1.35vw, 1.25rem)/1.25 "Atkinson Hyperlegible", system-ui, sans-serif;
+  font: 800 clamp(.9rem, 1.35vw, 1.25rem)/1.25 "Nunito", system-ui, sans-serif;
 }
 
 .pc-s1-intro-evidence-picture {
@@ -33069,6 +33080,10 @@ html body.pc-s1-canvas-dialogue-active
    ══════════════════════════════════════════════════════ */
 
 :root {
+  --pc-font-body: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --pc-font-display: "Fraunces", Georgia, serif;
+  --pc-font-label: "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --pc-font-canvas: Lato, "Helvetica Neue", Arial, sans-serif;
   --gfc-navy: #112650;
   --gfc-navy-deep: #081a36;
   --gfc-blue: #086c9f;
@@ -34952,4 +34967,90 @@ html body.pc-dev-tools-visible > .dev-bar {
   max-width: 100vw !important;
   box-sizing: border-box !important;
   box-shadow: 0 -4px 18px rgba(0, 0, 0, .28) !important;
+}
+
+/* P594 — one typography hierarchy across the game.
+   Body copy and controls use Nunito, display headings use Fraunces, and small
+   navigational labels use uppercase Source Code Pro. Canvas replicas and
+   Babbage's CRT retain their native interface type so the simulation remains
+   legible and visually distinct. */
+html body,
+html body :is(button, input, textarea, select) {
+  font-family: var(--pc-font-body);
+}
+
+html body :is(h1, h2, h3, h4, h5, h6),
+html body :is(
+  .mission-title,
+  .pc-feedback-heading,
+  .pc-guided-repair-reference-title,
+  .name-modal-title,
+  .audio-setup-title,
+  .vn-speaker,
+  .vn-text
+) {
+  font-family: var(--pc-font-display);
+}
+
+html body :is(
+  .pc-main-menu-kicker,
+  .pc-menu-eyebrow,
+  .pc-menu-card-label,
+  .pc-menu-qr-kicker,
+  .mission-eyebrow,
+  .pc-activity-kicker,
+  .pc-shell-status,
+  .pc-s1-result-eyebrow,
+  .pc-s1-babbage-kicker,
+  .pc-guided-repair-label,
+  .pc-guided-repair-ingredients-heading,
+  .pc-guided-repair-preview-label,
+  .pc-guided-repair-problem-label,
+  .pc-progress-eyebrow,
+  .pc-progress-summary-kicker,
+  .analysis-label,
+  .growth-section-label,
+  .ingredient-heading,
+  .ref-eyebrow,
+  .ref-label,
+  .s1-clean-eyebrow,
+  .s1-clean-label,
+  .s1-result-eyebrow,
+  .pc-terminal-kicker,
+  .pc-s1-reflection-analysis-kicker
+) {
+  font-family: var(--pc-font-label);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+html body .pc-s1-learning-taskbar > div:first-child > span {
+  font-family: var(--pc-font-label);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+/* Intentional in-world exceptions. */
+html body .pc-s1-canvas-app,
+html body .pc-s1-canvas-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
+  font-family: var(--pc-font-canvas) !important;
+}
+
+html body :is(
+  .babbage-terminal-screen,
+  .pc-terminal,
+  .pc-s1-reflection-analysis--terminal,
+  .pc-s1-week-terminal
+),
+html body :is(
+  .babbage-terminal-screen,
+  .pc-terminal,
+  .pc-s1-reflection-analysis--terminal,
+  .pc-s1-week-terminal
+) :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
+  font-family: var(--pc-font-label) !important;
 }

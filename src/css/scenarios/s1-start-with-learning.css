@@ -1472,6 +1472,10 @@
   opacity: .48;
   cursor: not-allowed;
 }
+.pc-s1-transfer-reflection .pc-shell-primary:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+}
 .pc-s1-diagnosis-rationale,
 .pc-s1-transfer-reflection {
   display: grid;
@@ -2270,6 +2274,13 @@ html body #vnOverlay.pc-s1-clean-closing #babbageTerminalScene { display: none !
     position: sticky;
     top: 0;
   }
+}
+.pc-s1-response-status {
+  margin: 0;
+  color: #455f72;
+  font-size: .82rem;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 /* P579 — saved Course Guide reading surface.

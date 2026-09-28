@@ -94,7 +94,7 @@ body.s1-active:not(.s1-result-active) #chat {
   border: 2px dashed var(--border-strong);
   border-radius: 12px;
   padding: 13px 14px;
-  font-family: "Lora",serif;
+  font-family: "Fraunces",serif;
   color: var(--ink-mid);
   font-size: 1rem;
   line-height: 1.62;

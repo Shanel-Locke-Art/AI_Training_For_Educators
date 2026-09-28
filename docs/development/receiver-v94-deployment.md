@@ -1,6 +1,6 @@
 # Receiver V94 deployment and workbook operations
 
-The source file is `apps-script/PromptCraft_Receiver_V94_Start_With_Learning.js`. It expects application `PROMPTCRAFT_V429` and remains compatible with V121 payloads. Deploy it with browser Patch 593.
+The source file is `apps-script/PromptCraft_Receiver_V94_Start_With_Learning.js`. It expects application `PROMPTCRAFT_V429` and remains compatible with V121 payloads. Deploy it with browser Patch 595.
 
 ## Focused Scenario 1 evidence
 
@@ -49,7 +49,7 @@ If the receiver lock is occupied by research processing, a challenge-score updat
 1. Replace the bound Apps Script `Code.gs` contents with the V94 receiver source.
 2. Save and run `initializeWorkbookNow()` once from the editor.
 3. Open **Deploy > Manage deployments**, edit the current web-app deployment, select **New version**, and deploy. The existing web-app URL can remain unchanged.
-4. Deploy browser Patch 593.
+4. Deploy browser Patch 595.
 5. Complete a fresh S1 test and confirm the Overview reports Receiver V94 and `Current`.
 
 If all existing rows are disposable testing records, run `resetResearchDataNow()` before the fresh test. Google Sheets version history is the only recovery path after that reset.

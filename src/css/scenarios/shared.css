@@ -107,7 +107,7 @@ body.pc-scenario-activity-active #inputContainer {
 }
 
 .pc-activity-card h2{
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   color: var(--forest-dark);
   font-size: var(--pc-type-card-title);
   line-height: 1.25;
@@ -310,7 +310,7 @@ body.pc-scenario-activity-active #inputContainer {
 
 .pc-feedback-heading {
   color: var(--forest-dark);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-card-title);
   line-height: 1.3;
   font-weight: 800;
@@ -391,7 +391,7 @@ body.pc-scenario-activity-active #inputContainer {
 .pc-s1-preview-hero h2 {
   margin: 7px 0 12px;
   color: #fff;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-mission-title);
   line-height: 1.1;
 }
@@ -447,7 +447,7 @@ body.pc-scenario-activity-active #inputContainer {
 .pc-s1-preview-next h3 {
   margin: 6px 0 0;
   color: #112650;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-card-title);
   line-height: 1.25;
 }
@@ -486,7 +486,7 @@ body.pc-scenario-activity-active #inputContainer {
 .pc-s1-comparison-heading h3 {
   margin: 5px 0 15px;
   color: #112650;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-card-title);
   line-height: 1.25;
 }
@@ -603,7 +603,7 @@ body.pc-scenario-activity-active #inputContainer {
 .pc-s1-preview-task h3 {
   margin: 6px 0 0;
   color: #fff;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-card-title);
   line-height: 1.25;
 }
@@ -700,7 +700,7 @@ body.pc-scenario-activity-active #inputContainer {
 .pc-s1-evidence-heading h3 {
   margin: 7px 0 0;
   color: #112650;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-card-title);
   line-height: 1.25;
 }
@@ -1182,7 +1182,7 @@ body.pc-s1-ai-workspace-active {
   border-radius: 16px;
   background: #071a31;
   color: #f7d77e;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(24px, 3vw, 36px);
   font-weight: 850;
   box-shadow: inset 0 0 18px rgba(242, 193, 78, .12);
@@ -1205,7 +1205,7 @@ body.pc-s1-ai-workspace-active {
 }
 
 .pc-s1-ai-workspace-header h2 {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(24px, 3vw, 38px);
   line-height: 1.08;
 }
@@ -1397,7 +1397,7 @@ body.pc-s1-ai-workspace-active {
 .pc-s1-ai-workspace-step > h3 {
   margin: 0;
   color: #102b52;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(27px, 4vw, 43px);
   line-height: 1.12;
 }
@@ -1440,7 +1440,7 @@ body.pc-s1-ai-workspace-active {
 .pc-s1-ai-workspace-review-card h4 {
   margin: 0;
   color: #102b52;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(22px, 2.8vw, 32px);
   line-height: 1.2;
 }
@@ -1548,7 +1548,7 @@ body.pc-s1-ai-workspace-active {
   border-radius: 50%;
   background: #112650;
   color: #f7d77e;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: 24px;
   font-weight: 850;
 }
@@ -1840,7 +1840,7 @@ body.pc-s1-ai-workspace-active {
   max-width: 1050px;
   margin: 0 0 12px;
   color: #fff;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-mission-title);
   line-height: 1.1;
 }
@@ -1920,7 +1920,7 @@ body.pc-s1-ai-workspace-active {
 .pc-s1-rescue-intro h3 {
   margin: 6px 0 0;
   color: #102b52;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-card-title);
   line-height: 1.2;
 }
@@ -2046,7 +2046,7 @@ body.pc-s1-ai-workspace-active {
 .pc-s1-rescue-loading h2 {
   max-width: 820px;
   margin: 12px 0;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: var(--pc-type-mission-title);
 }
 
@@ -2130,7 +2130,7 @@ body.pc-s1-ai-workspace-active {
   display: block;
   margin: 8px 0;
   color: #075e8a;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(34px, 4vw, 58px);
 }
 
@@ -2233,7 +2233,7 @@ html body.pc-s1-canvas-smartboard-active
 
 .pc-s1-dialogue-question {
   color: #fff;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(18px, 1.45vw, 25px);
   line-height: 1.2;
 }
@@ -3518,7 +3518,7 @@ html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
   display: inline-block;
   max-width: 28ch;
   color: var(--gfc-navy-deep);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(20px, 2vw, 28px);
   font-weight: 700;
   line-height: 1.28;
@@ -3528,7 +3528,7 @@ html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
 .pc-student-evidence-quote-mark {
   flex: 0 0 auto;
   color: var(--gfc-gold);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(54px, 5vw, 78px);
   font-weight: 700;
   line-height: .6;
@@ -3561,7 +3561,7 @@ html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
 
 .pc-student-evidence-result > strong {
   color: var(--gfc-navy-deep);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(40px, 4vw, 56px);
   line-height: 1;
 }
@@ -3662,7 +3662,7 @@ html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
   display: block;
   margin: 3px 0 1px;
   color: #fff;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(38px, 5vw, 62px);
   line-height: 1;
 }
@@ -3743,7 +3743,7 @@ html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
 }
 .pc-drag-tray-head strong {
   color: var(--forest-dark);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(17px, 1.6vw, 21px);
 }
 .pc-drag-tray-head span {
@@ -3946,7 +3946,7 @@ html body .pc-guided-repair-layout--full-preview .pc-guided-repair-actions {
 .pc-drag-slot-heading h3 {
   margin: 0;
   color: var(--forest-dark);
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
   font-size: clamp(18px, 1.7vw, 22px);
   line-height: 1.25;
 }
@@ -4357,7 +4357,7 @@ body[data-pc-scenario="metacognition"] .pc-s2-case-brief .pc-case-brief-copy > d
 .pc-s1-after-reflection-form textarea {
   width:100%; min-height:112px; resize:vertical; padding:12px 14px;
   border:1px solid #69cfe8; border-radius:7px; background:rgba(255,255,255,.97);
-  color:#102a43; font:600 1rem/1.45 "Source Sans 3","Source Sans Pro",Arial,sans-serif;
+  color:#102a43; font:600 1rem/1.45 "Nunito",system-ui,sans-serif;
   box-shadow:inset 0 1px 3px rgba(0,0,0,.12);
 }
 .pc-s1-after-reflection-form textarea:focus { outline:3px solid rgba(244,179,0,.42); outline-offset:1px; }
@@ -4393,7 +4393,7 @@ body.pc-s1-reflection-analysis-active { overflow:hidden !important; }
   letter-spacing:.06em; text-transform:uppercase;
 }
 .pc-s1-reflection-analysis-header h2 {
-  margin-top:4px; color:#fff; font:800 clamp(1.7rem,3vw,2.45rem)/1.05 "Lora",Georgia,serif;
+  margin-top:4px; color:#fff; font:800 clamp(1.7rem,3vw,2.45rem)/1.05 "Fraunces",Georgia,serif;
 }
 .pc-s1-reflection-analysis-header h2:focus { outline:none; }
 .pc-s1-reflection-analysis-verdict {
@@ -4417,12 +4417,12 @@ body.pc-s1-reflection-analysis-active { overflow:hidden !important; }
   font:800 .74rem/1.2 "Source Code Pro",monospace; letter-spacing:.08em; text-transform:uppercase;
 }
 .pc-s1-reflection-response blockquote {
-  margin:0; color:#183b56; font:650 clamp(1rem,1.7vw,1.18rem)/1.5 "Lora",Georgia,serif;
+  margin:0; color:#183b56; font:650 clamp(1rem,1.7vw,1.18rem)/1.5 "Fraunces",Georgia,serif;
 }
 .pc-s1-reflection-feedback { margin-top:22px; }
 .pc-s1-reflection-feedback h3 {
   max-width:820px; margin:0; color:#102a43;
-  font:750 clamp(1.35rem,2.6vw,2rem)/1.18 "Lora",Georgia,serif;
+  font:750 clamp(1.35rem,2.6vw,2rem)/1.18 "Fraunces",Georgia,serif;
 }
 .pc-s1-reflection-feedback ol {
   display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px;
@@ -4481,8 +4481,8 @@ body.pc-s1-reflection-analysis-active { overflow:hidden !important; }
 .pc-s1-case-reflection{display:grid;gap:14px;width:100%;padding:clamp(18px,2.5vw,28px);border:2px solid #315b78;border-radius:14px;background:#f8fbfd}
 .pc-s1-case-reflection-head{display:flex;align-items:end;justify-content:space-between;gap:24px}.pc-s1-case-reflection-head>div:first-child{min-width:0}
 .pc-s1-case-reflection-head span,.pc-s1-case-reflection>label{color:#7b4e05;font:800 .78rem/1.3 "Source Code Pro",monospace;letter-spacing:.08em;text-transform:uppercase}
-.pc-s1-case-reflection-head h4{margin:6px 0 0;color:#112650;font:800 clamp(1.2rem,2vw,1.65rem)/1.25 "Lora",Georgia,serif}.pc-s1-case-reflection-status{margin:0;color:#526778}
-.pc-s1-case-reflection textarea{width:100%;min-height:130px;resize:vertical;padding:14px 16px;border:1px solid #8fa2b0;border-radius:10px;background:#fff;color:#172334;font:500 1rem/1.55 "Atkinson Hyperlegible",Arial,sans-serif}
+.pc-s1-case-reflection-head h4{margin:6px 0 0;color:#112650;font:800 clamp(1.2rem,2vw,1.65rem)/1.25 "Fraunces",Georgia,serif}.pc-s1-case-reflection-status{margin:0;color:#526778}
+.pc-s1-case-reflection textarea{width:100%;min-height:130px;resize:vertical;padding:14px 16px;border:1px solid #8fa2b0;border-radius:10px;background:#fff;color:#172334;font:500 1rem/1.55 "Nunito",system-ui,sans-serif}
 .pc-s1-case-reflection textarea:disabled{background:#edf2f5;color:#607382;cursor:not-allowed}.pc-s1-case-reflection textarea:focus{outline:4px solid rgba(201,147,36,.28);border-color:#087aa9}
 .pc-s1-case-reflection-actions{display:flex;align-items:center;justify-content:space-between;gap:16px}.pc-s1-case-reflection-actions>span{color:#526778;font:700 .8rem/1.3 "Source Code Pro",monospace}
 
@@ -4497,7 +4497,7 @@ body.pc-s1-reflection-analysis-active { overflow:hidden !important; }
 .pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-footer{border-color:#286c4b;background:#06170f}.pc-s1-reflection-analysis--terminal .pc-s1-reflection-analysis-footer>p{color:#8bc7a4}
 
 .pc-s1-week-planner{width:min(1420px,calc(100% - 24px));margin:20px auto 36px;color:#172334}.pc-s1-week-planner-hero{padding:clamp(24px,4vw,46px);border-radius:18px 18px 0 0;background:linear-gradient(135deg,#102b52,#075e8a);color:#fff}
-.pc-s1-week-planner-hero>span{color:#f7d77e;font:800 .75rem/1.3 "Source Code Pro",monospace;letter-spacing:.08em;text-transform:uppercase}.pc-s1-week-planner-hero h2{margin:8px 0 12px;color:#fff;font:800 clamp(1.8rem,4vw,3rem)/1.12 "Lora",Georgia,serif}.pc-s1-week-planner-hero p{max-width:1000px;margin:0;color:#eef8fc;font-size:1.05rem;line-height:1.55}
+.pc-s1-week-planner-hero>span{color:#f7d77e;font:800 .75rem/1.3 "Source Code Pro",monospace;letter-spacing:.08em;text-transform:uppercase}.pc-s1-week-planner-hero h2{margin:8px 0 12px;color:#fff;font:800 clamp(1.8rem,4vw,3rem)/1.12 "Fraunces",Georgia,serif}.pc-s1-week-planner-hero p{max-width:1000px;margin:0;color:#eef8fc;font-size:1.05rem;line-height:1.55}
 .pc-s1-week-planner-form,.pc-s1-week-plan-result{padding:clamp(20px,3vw,34px);border:2px solid #315b78;border-top:0;background:#fff}.pc-s1-week-planner-basics{display:grid;grid-template-columns:.7fr 1.3fr;gap:16px;margin-bottom:18px}.pc-s1-week-planner label{display:grid;gap:7px}.pc-s1-week-planner label>span{color:#112650;font-weight:850}
 .pc-s1-week-planner input,.pc-s1-week-planner textarea{width:100%;padding:12px 14px;border:1px solid #93a7b5;border-radius:9px;font:inherit;color:#172334}.pc-s1-week-planner :is(input,textarea):focus{outline:4px solid rgba(201,147,36,.25);border-color:#087aa9}
 .pc-s1-week-planner-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.pc-s1-week-category{align-content:start;padding:15px;border:1px solid #9fb1bd;border-top:5px solid #087aa9;border-radius:12px;background:#f8fbfd}.pc-s1-week-category>span{display:flex;gap:8px;align-items:center;font-family:"Source Code Pro",monospace}.pc-s1-week-category>span b{color:#a46b06}.pc-s1-week-category small{min-height:54px;color:#526778;line-height:1.4}.pc-s1-week-category textarea{min-height:128px;resize:vertical;background:#fff}
@@ -4810,7 +4810,7 @@ body.pc-s1-evidence-modal-active { overflow:hidden !important; }
   border-radius:9px;
   background:#fff;
   color:#143d2e;
-  font:800 .86rem/1.1 "Atkinson Hyperlegible",system-ui,sans-serif;
+  font:800 .86rem/1.1 "Nunito",system-ui,sans-serif;
   cursor:pointer;
 }
 .pc-s1-evidence-modal-zoom button.is-active {
