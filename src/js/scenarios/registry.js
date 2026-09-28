@@ -301,9 +301,10 @@ function updateMainMenuHome() {
   }
 
   if (guideButton) {
-    const guideAvailable = typeof pcHasSavedS1Guide === 'function' && pcHasSavedS1Guide();
-    guideButton.hidden = !guideAvailable;
-    guideButton.disabled = !guideAvailable;
+    const hasSavedGuide = typeof pcHasSavedS1Guide === 'function' && pcHasSavedS1Guide();
+    guideButton.hidden = false;
+    guideButton.disabled = false;
+    guideButton.textContent = hasSavedGuide ? 'Open My Course Guide' : 'My Course Guide';
   }
 }
 
@@ -476,7 +477,21 @@ pcExposeGlobals({
 });
 
 pcRegisterUIActions({
-  'open-main-menu': target => openMainMenu(target.dataset.pcPanel || 'home'),
+  'open-main-menu': target => {
+    // Saved S1 guides are rendered inside the normal app shell. Clear the
+    // guide-only surface state before opening the menu so the menu is not
+    // hidden behind guide hit-testing rules and the VN layer is not left inert.
+    if (document.body.classList.contains('pc-s1-guide-open')) {
+      document.body.classList.remove('pc-s1-guide-open');
+      const vnOverlay = document.getElementById('vnOverlay');
+      if (vnOverlay) {
+        vnOverlay.inert = false;
+        vnOverlay.removeAttribute('aria-hidden');
+        vnOverlay.style.removeProperty('pointer-events');
+      }
+    }
+    return openMainMenu(target.dataset.pcPanel || 'home');
+  },
   'close-main-menu': () => closeMainMenu(),
   'show-main-menu-panel': target => showMainMenuPanel(target.dataset.pcPanel || 'home'),
   'continue-main-menu': () => continueFromMainMenu(),

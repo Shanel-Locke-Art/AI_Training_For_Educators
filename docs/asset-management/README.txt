@@ -5,28 +5,35 @@ Use ASSET_NAMING_STANDARD.md as the filename quick reference for audio and visua
 
 Canonical trackers
 - PromptCraft_Production_Overview_Simplified.xlsx — the short production order and file guide.
-- PromptCraft_Visual_Asset_Tracker_Simplified.xlsx — S1 art check first, then all artwork and legacy captures.
-- PromptCraft_Voice_Recording_Tracker.xlsx — S1 spoken-line approval and recording queue first, then on-screen text and existing audio.
+- PromptCraft_Visual_Asset_Tracker_Simplified.xlsx — the required S1 artwork plan, target dimensions, and production status.
+- PromptCraft_Voice_Recording_Tracker.xlsx — the S1 spoken-line queue, on-screen quotes, and complete choices and feedback inventory.
 
 To produce S1 voice quickly, open S1 Record in the voice tracker. Approve the
 wording, record the proposed file, and mark the audio check in the same row.
-The yellow cells are the production decisions. Use S1 Artwork in the visual
-tracker to check framing or request a specific replacement.
+The yellow cells are production decisions. Use Artwork Plan in the visual
+tracker to create each required visual at the intended size.
+
+For a complete S1 text check, open S1 Choices & Feedback in the voice tracker.
+It contains fixed choices, branch responses, validation messages, fallback
+feedback, and dynamic templates. Live AI responses are documented by their
+required response fields because their exact wording depends on user input.
 
 Recording guides
 - Recording Scripts/S1_Professor_Pixel_Recording_Script.docx
 - Recording Scripts/S1_Maya_Recording_Script.docx
 
-Scenario 1 artwork lists
-- S1_ARTWORK_CURRENT.md — current S1 scene, portrait, and shared interface art.
-- S1_ARTWORK_LEGACY_REVIEW.md — older Content Avalanche captures kept for review.
+Printable asset specifications
+- S1_Asset_Production_Specifications.docx — exact artwork dimensions, export formats, destination folders, and code references.
+
+Scenario 1 artwork brief
+- S1_ARTWORK_PLAN.md — required S1 visuals, ideal dimensions, formats, and delivery checks.
 
 The active recording scripts cover Scenario 1 Start With the Learning only. They
-quote the current application source and distinguish spoken visual-novel lines
-from on-screen Maya quotes. On-screen quotes require a separate recording
-decision; conditional lines with placeholders are not recordable as written.
-The scripts include proposed audio filenames for spoken lines. These names are
-not approved or present in the runtime until the voice tracker and game are updated.
+quote the current application source and include source IDs and full asset paths.
+Maya's fixed optional lines have reserved filenames so they can be added later
+without renaming the main queue. The two templates with runtime values remain
+on-screen only. No production audio or artwork is marked complete in these
+documents.
 
 
-The trackers and guides were updated for PROMPTCRAFT_V429, Patch 580, and asset manifest v151. Do not create version-number copies for routine updates.
+The trackers and guides were updated for PROMPTCRAFT_V429, Patch 592, and asset manifest v151. Do not create version-number copies for routine updates.

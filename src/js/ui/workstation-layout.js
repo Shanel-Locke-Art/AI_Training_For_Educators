@@ -58,7 +58,16 @@ function pcSetVNOverlayState({ active = null, modes = [], preserve = [] } = {}) 
   PC_VN_OVERLAY_MODE_CLASSES.forEach(className => {
     if (!preserved.has(className)) overlay.classList.remove(className);
   });
-  if (active === true) overlay.classList.add('active');
+  if (active === true) {
+    // Reading surfaces such as My Course Guide intentionally remove this
+    // full-screen layer from focus and hit testing. Restore all three pieces
+    // of interactive state whenever dialogue opens again; otherwise the scene
+    // can look active while clicks, taps, and keyboard input are discarded.
+    overlay.inert = false;
+    overlay.removeAttribute('aria-hidden');
+    overlay.style.removeProperty('pointer-events');
+    overlay.classList.add('active');
+  }
   if (active === false) overlay.classList.remove('active');
   if (modes.length) overlay.classList.add(...modes);
   return overlay;

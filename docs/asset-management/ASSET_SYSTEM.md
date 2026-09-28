@@ -3,10 +3,10 @@
 ## Current baseline
 
 - Application: `PROMPTCRAFT_V429`
-- Browser patch: `580`
+- Browser patch: `592`
 - Asset manifest: `v151`
 - Research schema: `V121`
-- Receiver source: `V91`
+- Receiver source: `V93`
 
 This document is the current operating guide for visual, audio, reference, and production documentation assets. Historical release notes preserve the baseline that existed when each release was created and should not be rewritten as current guidance.
 
@@ -17,8 +17,8 @@ This document is the current operating guide for visual, audio, reference, and p
 | Asset role and lifecycle | `assets/asset-manifest.json` |
 | Runtime asset paths | `src/js/app/config-and-assets.js` and the manifest |
 | Actual files | `assets/` filesystem |
-| S1 artwork check and complete visual inventory | `PromptCraft_Visual_Asset_Tracker_Simplified.xlsx` |
-| S1 approval and recording queue, then existing audio | `PromptCraft_Voice_Recording_Tracker.xlsx` |
+| Required S1 artwork, dimensions, and status | `PromptCraft_Visual_Asset_Tracker_Simplified.xlsx` |
+| S1 approval, recording queue, and fixed branching text | `PromptCraft_Voice_Recording_Tracker.xlsx` |
 | Production order and file guide | `PromptCraft_Production_Overview_Simplified.xlsx` |
 | Filename patterns and codes | `ASSET_NAMING_STANDARD.md` |
 
@@ -26,11 +26,10 @@ This document is the current operating guide for visual, audio, reference, and p
 
 Every file must have one explicit role:
 
-1. **Runtime** — currently available to the application.
-2. **Planned** — reserved for a specific future implementation.
-3. **Reference** — concept or source material that must not be mistaken for production art.
-4. **Archived** — retained only for history or migration evidence.
-5. **Remove** — approved for deletion in a separate reviewed change.
+1. **Planned** — named and specified, but not started.
+2. **In progress** — production has begun but the file is not ready for review.
+3. **Ready for review** — exported and awaiting production approval.
+4. **Approved** — filename, quality, and responsive use are confirmed.
 
 A file that exists without one of these roles is an open classification problem. Do not create more files to work around it.
 
@@ -43,20 +42,16 @@ A file that exists without one of these roles is an open classification problem.
 - Keep current scenario scenes under `assets/images/scenes/`.
 - Keep voice files under `assets/audio/voice/<speaker>/<scenario>/`.
 - Use one stable line ID and one audio file for each approved spoken line.
-- Do not reuse a retired audio filename for new wording.
+- Keep one approved filename tied to one exact spoken line.
 
-Legacy folders and internal scenario numbers may remain where code, saved data, or receiver compatibility depends on them. Document that relationship instead of silently renaming files.
-
-## Current Scenario 1 boundary
-
-Scenario 1 is **Start With the Learning**. Maya is the current student character. The older Content Avalanche Canvas screenshots and Eli recording material remain legacy or dormant evidence; they do not describe the current player flow. Any future cleanup must decide whether those files are still needed by dormant modules or historical tests before moving or deleting them.
+Scenario 1 is **Start With the Learning**. Maya and Professor Pixel are the planned speakers. The production trackers contain only work required for the current route.
 
 ## Update workflow
 
 1. Add or change the file in the correct asset folder.
 2. Assign its lifecycle role in `assets/asset-manifest.json`.
 3. Update the runtime registry only when application code uses the file.
-4. Refresh the visual, audio, and production trackers from the manifest and filesystem.
+4. Update the visual, audio, and production trackers when an item moves to a new production status.
 5. Run `python tools/audit_assets.py`.
 6. Test the affected scenario at desktop, tablet, and phone widths.
 7. Package only the changed files and their updated documentation.
@@ -69,8 +64,9 @@ on-screen quotes. Review each spoken line against the current application,
 confirm its file name in the voice tracker, and mark it Approved to Record before
 recording. On-screen quotes need a separate voice decision. Conditional text
 containing placeholders must be resolved into exact lines first. The tracker
-owns the approved recording queue.
+owns the approved recording queue. Its S1 Choices & Feedback tab also preserves
+the fixed choices, branch responses, validation messages, fallback feedback, and
+dynamic templates that are not part of the spoken-line queue.
 
-The current S1 artwork list is `S1_ARTWORK_CURRENT.md`. Older Content Avalanche
-captures are inventoried in `S1_ARTWORK_LEGACY_REVIEW.md` because they remain
-registered in the manifest while the current S1 route does not use them.
+The S1 visual brief is `S1_ARTWORK_PLAN.md`. It lists every required visual with
+its ideal dimensions, aspect ratio, export format, and responsive-production notes.

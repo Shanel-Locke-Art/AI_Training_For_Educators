@@ -1,5 +1,5 @@
 /**
- * PromptCraft Google Apps Script receiver — START WITH LEARNING V91
+ * PromptCraft Google Apps Script receiver — START WITH LEARNING V93
  *
  * Live job:
  *   1. Receive PromptCraft payloads.
@@ -8,15 +8,15 @@
  *   4. Rebuild research-facing views only at meaningful completion points.
  *
  * Manual administration:
- *   - initializeWorkbookNow()  -> format raw headers and rebuild readable views;
- *                                 hide obsolete S1 result tabs without erasing them.
+ *   - initializeWorkbookNow()  -> format raw headers, rebuild readable views,
+ *                                 and remove retired scenario result tabs.
  *   - refreshResearchViewsNow()-> rebuild readable tabs from preserved raw rows.
  *   - inspectS1TrackingNow()    -> count received S1 event types without showing participant text.
  *   - verifyV84MigrationNow()  -> read-only row-count/header-fingerprint inventory for copied-workbook verification.
  *   - resetResearchDataNow()   -> clear testing records while preserving workbook structure.
  *
- * V91 preserves every raw V121 column and lossless payload archive. The S1
- * readable tab shows only Start With the Learning design checkpoints.
+ * V93 preserves every raw V121 column and lossless payload archive. The S1
+ * readable tab shows a compact Start With the Learning checkpoint summary.
  * Testing reset is enabled and rebuilds the formatted, empty research views.
  */
 
@@ -53,7 +53,7 @@ const SCENARIO_TAB_COLORS = Object.freeze({
   5: '#8A4B2A', 6: '#475569', 7: '#5C3D73', 8: '#0F6A63'
 });
 
-const PROMPTCRAFT_RECEIVER_VERSION = 'V91';
+const PROMPTCRAFT_RECEIVER_VERSION = 'V93';
 const EXPECTED_APP_SCHEMA_VERSION = 'V121';
 const EXPECTED_APP_BUILD = 'PROMPTCRAFT_V429';
 const SPREADSHEET_ID = '';
@@ -161,7 +161,7 @@ const PromptCraftReceiver = (() => {
       timestamp: new Date().toISOString(),
       expected_app_schema: EXPECTED_APP_SCHEMA_VERSION,
       expected_app_build: EXPECTED_APP_BUILD,
-      workflow: 'V91 Start With the Learning projections + participant-safe views + lossless raw archives'
+      workflow: 'V93 compact Start With the Learning projections + participant-safe views + lossless raw archives'
     });
   }
 
@@ -290,20 +290,17 @@ const PromptCraftReceiver = (() => {
     let current = ss.getSheetByName(currentName);
     const older = ss.getSheets().filter(sheet =>
       sheet.getName() !== currentName && LEGACY_S1_VIEW_NAME.test(sheet.getName()));
-    if (!current && older.length) {
-      current = older.shift();
-      current.setName(currentName);
-    }
-    older.forEach(sheet => sheet.hideSheet()); // Preserve old results and any manual cells.
+    if (!current) current = ss.insertSheet(currentName);
+    older.forEach(sheet => ss.deleteSheet(sheet));
   }
 
-  function hideLegacyScenarioTabs_() {
+  function removeLegacyScenarioTabs_() {
     const ss = getSpreadsheet_();
     const currentNames = Object.keys(SHEET_SCENARIO_TABS).map(key => SHEET_SCENARIO_TABS[key]);
-    ss.getSheets().forEach(sheet => {
+    ss.getSheets().slice().forEach(sheet => {
       const name = sheet.getName();
       if (/^0[2-9]\s*-\s*S[1-8]\b/i.test(name) && currentNames.indexOf(name) === -1) {
-        sheet.hideSheet();
+        ss.deleteSheet(sheet);
       }
     });
   }
@@ -1151,11 +1148,12 @@ const PromptCraftReceiver = (() => {
     if (/evidence statement|flagged claim|corrected claim|verification note|self-report|what worked|what fell short|why prompt|surprise|transfer/.test(h)) {
       return { min: 190, max: 285, wrap: true, align: 'left', narrative: true };
     }
-    if (/renamed activities/.test(h)) return { min: 220, max: 300, wrap: true, align: 'left', narrative: true };
-    if (/learning path|prepare\s*\/\s*practice\s*\/\s*evidence/.test(h)) return { min: 260, max: 340, wrap: true, align: 'left', narrative: true };
-    if (/oscqr references/.test(h)) return { min: 280, max: 380, wrap: true, align: 'left', narrative: true };
-    if (/checkpoint feedback/.test(h)) return { min: 300, max: 400, wrap: true, align: 'left', narrative: true };
-    if (/guide step added|guide completed|guide progress/.test(h)) return { min: 150, max: 190, wrap: true, align: 'left' };
+    if (/renamed activities/.test(h)) return { min: 190, max: 235, wrap: true, align: 'left', narrative: true };
+    if (/placement match/.test(h)) return { min: 105, max: 135, wrap: false, align: 'center' };
+    if (/latest checkpoint/.test(h)) return { min: 150, max: 190, wrap: true, align: 'left' };
+    if (/latest feedback/.test(h)) return { min: 210, max: 270, wrap: true, align: 'left', narrative: true };
+    if (/guide status/.test(h)) return { min: 120, max: 155, wrap: true, align: 'left' };
+    if (/my course activities/.test(h)) return { min: 105, max: 130, wrap: false, align: 'center' };
     if (/input|prompt|response|repair|revision|reflection|notes|growth narrative/.test(h)) return { min: 220, max: 320, wrap: true, align: 'left', narrative: true };
     if (/quality indicators/.test(h)) return { min: 180, max: 250, wrap: true, align: 'left' };
     if (/review source|provider|model|ai source/.test(h)) return { min: 125, max: 190, wrap: true, align: 'left' };
@@ -1257,7 +1255,7 @@ const PromptCraftReceiver = (() => {
         estimatedLines = Math.max(estimatedLines, lines);
       });
       const estimated = estimatedLines * 16 + 10;
-      const fitted = Math.max(30, Math.min(420, Math.max(measured, estimated)));
+      const fitted = Math.max(30, Math.min(120, Math.max(measured, estimated)));
       if (fitted !== measured) sheet.setRowHeight(r, fitted);
     }
   }
@@ -1426,7 +1424,7 @@ const PromptCraftReceiver = (() => {
     sheet.setFrozenRows(1);
     sheet.setFrozenColumns(Math.min(frozenColumns || 0, headers.length));
     if (rowCount > 0) {
-      sheet.getRange(2, 1, rowCount, headers.length).setVerticalAlignment('top').setFontSize(9);
+      sheet.getRange(2, 1, rowCount, headers.length).setVerticalAlignment('top').setFontSize(10);
       setAlternatingReadableRows_(sheet, 2, rowCount, headers.length);
     }
     headers.forEach((h, i) => formatReadableColumn_(sheet, i + 1, h, 2, rowCount + 1));
@@ -1473,7 +1471,7 @@ const PromptCraftReceiver = (() => {
 
   function organizeResearchTabs_() {
     const ss = getSpreadsheet_();
-    hideLegacyScenarioTabs_();
+    removeLegacyScenarioTabs_();
     const visible = [[SHEET_OVERVIEW, '#163F33'], [SHEET_SESSIONS, '#215C45']];
     Object.keys(SHEET_SCENARIO_TABS).forEach(n => {
       const sheet = getSheet_(SHEET_SCENARIO_TABS[n]);
@@ -2047,7 +2045,7 @@ const PromptCraftReceiver = (() => {
 
   function scenarioTabHeaders_(scenario) {
     const map = {
-      1: ['Timestamp','Participant ID','Session ID','Checkpoints','Best S1 Score (0–5)','Renamed Activities','Learning Path','Alignment Diagnosis','Guide Progress','Guide OSCQR References','Latest Checkpoint Feedback'],
+      1: ['Timestamp','Participant ID','Session ID','Checkpoints','Best S1 Score (0–5)','Renamed Activities','Placement Match','Alignment Diagnosis','Guide Status','My Course Activities','Latest Checkpoint','Latest Feedback'],
       2: ['Timestamp','Participant ID','Session ID','Attempts','Best Score','Activity Inputs','Diagnosis','Intervention','Thinking Move','Audit Choice','Audit Correct','Repair / Revised Reflection','AI Review Source','AI Provider','AI Model','Babbage Review','Quality Indicators'],
       3: ['Timestamp','Participant ID','Session ID','Attempts','Best Score','Assessment Inputs','Diagnosis','Evidence Choice','Audit Choice','Audit Correct','Repair / Revision','Evidence Statement','Babbage Response','Quality Indicators','AI Source'],
       4: ['Timestamp','Participant ID','Session ID','Attempts','Best Score','Course Inputs','Diagnosis','Function Choice','Audit Choice','Audit Correct','Async Repair','Evidence Statement','Babbage Response','Quality Indicators','AI Source'],
@@ -2078,35 +2076,33 @@ const PromptCraftReceiver = (() => {
         // renamed activities, placements, and the diagnosis visible.
         const s1Events = record.list.slice().reverse();
         const learningPath = {};
-        let oscqr = '';
         s1Events.forEach(event => {
           const eventDetail = event.detail || {};
           Object.assign(learningPath, parseJsonMaybe_(eventDetail.s1_learning_path_json, {}) || {});
-          if (eventDetail.s1_oscqr_standards) oscqr = eventDetail.s1_oscqr_standards;
         });
         const renamedTitles = Array.isArray(learningPath.renamedTitles) ? learningPath.renamedTitles : [];
         const renamed = renamedTitles.join('\n');
-        const organization = learningPath.organization && typeof learningPath.organization === 'object'
-          ? Object.keys(learningPath.organization).map((key, index) => {
-            const fallbackTitle = String(key || '').replace(/[-_]+/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase());
-            const title = renamedTitles[index] || fallbackTitle;
-            const purpose = String(learningPath.organization[key] || '').replace(/\b\w/g, letter => letter.toUpperCase());
-            return title + ': ' + purpose;
-          }).join('\n')
-          : '';
-        const guideProgress = [];
-        if (learningPath.guideStepAdded) guideProgress.push('Step 1 added');
-        if (record.list.some(event => event.eventType === 's1_course_guide_complete')) guideProgress.push('Guide completed');
-        if (learningPath.activityCount !== undefined) guideProgress.push(`${learningPath.activityCount} course activities`);
+        const organizedEvent = record.list.find(event => event.eventType === 's1_learning_path_organized');
+        const match = String(organizedEvent && organizedEvent.response || '').match(/\b(\d+\s+of\s+\d+)\b/i);
+        const placementMatch = match ? match[1] : '';
+        const guideComplete = record.list.some(event => event.eventType === 's1_course_guide_complete');
+        const guideStatus = guideComplete ? 'Complete' : learningPath.guideStepAdded ? 'Step 1 saved' : 'Not saved';
+        const checkpointLabels = {
+          s1_learning_path_organized: 'Learning path organized',
+          s1_alignment_diagnosis_complete: 'Alignment diagnosis',
+          s1_course_guide_step_added: 'Guide step saved',
+          s1_course_guide_complete: 'My Course review complete'
+        };
         rows.push([latest.timestamp,latest.participant,record.session,
-          maxResearchNumber_(record.list.map(event => event.attempts)),
+          record.list.map(event => event.eventType).filter((type, index, all) => all.indexOf(type) === index).length,
           maxResearchNumber_(record.list.map(event => event.bestScore)),
-          fullTextForView_(renamed, 620),
-          fullTextForView_(organization, 620),
+          excerptForView_(renamed, 360),
+          placementMatch,
           String(learningPath.diagnosisChoice || '').replace(/[-_]+/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase()),
-          guideProgress.join('\n'),
-          fullTextForView_(String(oscqr || latest.quality || '').replace(/\s*\|\s*/g, '\n'), 760),
-          fullTextForView_(latest.response, 720)]);
+          guideStatus,
+          learningPath.activityCount !== undefined ? learningPath.activityCount : '',
+          checkpointLabels[latest.eventType] || latest.eventType || '',
+          excerptForView_(latest.response, 280)]);
       }
 
       if (scenario === 2) {
@@ -2286,7 +2282,7 @@ const PromptCraftReceiver = (() => {
     const headers = data.headers.length ? data.headers : ['Timestamp','Participant ID','Session ID','Attempts','Best Score'];
     const rows = data.rows;
     if (rows.length) sheet.getRange(2, 1, rows.length, headers.length).setValues(rows.map(safeResearchRow_));
-    formatSimpleResearchTable_(sheet, headers, rows.length, scenario === 1 ? 2 : 3, SCENARIO_TAB_COLORS[scenario] || '#2E6A4E');
+    formatSimpleResearchTable_(sheet, headers, rows.length, 3, SCENARIO_TAB_COLORS[scenario] || '#2E6A4E');
     fitScenarioDataRows_(sheet, 2, rows.length);
     sheet.setTabColor(SCENARIO_TAB_COLORS[scenario] || '#2E6A4E');
     applyAiSourceRules_(sheet, headers, rows.length);
@@ -2390,7 +2386,7 @@ const PromptCraftReceiver = (() => {
     sheet.getRange('E9').setFormula('=' + fallbackParts.join('+'));
     sheet.getRange('E4:E6').setNumberFormat('0'); sheet.getRange('E7:E8').setNumberFormat('0.0'); sheet.getRange('E9').setNumberFormat('0');
 
-    sheet.getRange('A11:F11').setValues([['Scenario','Results Tab','Sessions','Avg Score','Avg Attempts','Fallback AI']])
+    sheet.getRange('A11:F11').setValues([['Scenario','Results Tab','Sessions','Avg Score','Avg Attempts / Checkpoints','Fallback AI']])
       .setBackground('#215C45').setFontColor('#FFFFFF').setFontWeight('bold').setHorizontalAlignment('center');
     Object.keys(SCENARIO_LABELS).forEach((n, idx) => {
       const scenario = Number(n);
@@ -2410,7 +2406,7 @@ const PromptCraftReceiver = (() => {
     sheet.getRange('C12:C19').setNumberFormat('0'); sheet.getRange('D12:E19').setNumberFormat('0.0'); sheet.getRange('F12:F19').setNumberFormat('0');
 
     sheet.getRange('A21:F22').merge().setValue(
-      'Normal research work should happen in 01 - Sessions and the eight scenario tabs (02–09). Raw technical sheets are hidden and retained only for troubleshooting.'
+      'Normal research work should happen in 01 - Sessions and the eight scenario tabs (02–09). For S1, the progress column reports completed design checkpoints; later scenarios report attempts. Raw technical sheets are hidden and retained only for troubleshooting.'
     ).setBackground('#EEF1F3').setFontColor('#475569').setFontStyle('italic').setWrap(true).setVerticalAlignment('middle');
 
     sheet.getRange('D24:E29').setValues([
@@ -2474,7 +2470,7 @@ const PromptCraftReceiver = (() => {
     SpreadsheetApp.flush();
     return jsonResponse({
       status: 'ok',
-      research_schema: EXPECTED_SCHEMA,
+      research_schema: EXPECTED_APP_SCHEMA_VERSION,
       receiver_workflow: 'Start With the Learning readable views + lossless raw archive',
       counts: counts,
       message: 'Readable tabs rebuilt from retained raw records. Current S1 guide checkpoints are excluded from automatic Ideas Wall candidacy.'
@@ -2527,7 +2523,7 @@ const PromptCraftReceiver = (() => {
   }
 
   function initializeWorkbookNow() {
-    const consolidated = { skipped: true, reason: 'Raw rows are preserved; the older derived S1 tab may be renamed.' };
+    const consolidated = { skipped: true, reason: 'Raw rows are preserved while retired derived scenario tabs are removed.' };
     ensureRawArchiveHeaders_(getSheet_(SHEET_RAW_ARCHIVE));
     ensureIncrementalHeaders(getSheet_(SHEET_INCREMENTAL));
     ensureFullResponseHeaders(getSheet_(SHEET_RESPONSES));
@@ -2538,11 +2534,11 @@ const PromptCraftReceiver = (() => {
     SpreadsheetApp.flush();
     return jsonResponse({
       status: 'ok',
-      research_schema: EXPECTED_SCHEMA,
+      research_schema: EXPECTED_APP_SCHEMA_VERSION,
       receiver_workflow: 'Start With the Learning readable views + lossless raw archive',
       counts: counts,
       consolidated: consolidated,
-      message: 'Readable research tabs rebuilt, empty future tabs hidden, and older S1 derived tab aligned to the current name. V121 raw rows were preserved.'
+      message: 'Readable research tabs rebuilt, empty future tabs hidden, and retired scenario-result tabs removed. V121 raw rows were preserved.'
     });
   }
 

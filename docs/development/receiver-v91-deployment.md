@@ -1,6 +1,6 @@
 # Receiver V91 deployment and workbook operations
 
-The source file is `apps-script/PromptCraft_Receiver_V91_Start_With_Learning.js`. It expects application `PROMPTCRAFT_V429` and V121 payloads. Browser patch 580 and asset manifest v151 are independent of the receiver version.
+The source file is `apps-script/PromptCraft_Receiver_V91_Start_With_Learning.js`. It expects application `PROMPTCRAFT_V429` and V121 payloads. Browser patch 587 and asset manifest v151 are independent of the receiver version.
 
 ## Collection and projections
 

@@ -257,6 +257,20 @@ function resetS2Dev() {
 function resetS1Dev() {
     resetScenarioRunState(SCENARIO_INDEX.CONTENT_AVALANCHE);
     pcResetTeachingProgress();
+    if (typeof window.pcClearS1LocalWorkspace === 'function') {
+      window.pcClearS1LocalWorkspace();
+    } else {
+      try {
+        [
+          'promptcraft_my_course_s1_v1',
+          'promptcraft_s1_course_guide_v1',
+          'promptcraft_my_course_s1_v2',
+          'promptcraft_s1_course_guide_v2',
+          'promptcraft_my_course_s1_v3',
+          'promptcraft_s1_course_guide_v3'
+        ].forEach(key => localStorage.removeItem(key));
+      } catch (_error) {}
+    }
 
     if (window.scenarioIntroTimer) {
       clearTimeout(window.scenarioIntroTimer);
@@ -299,7 +313,6 @@ function resetS1Dev() {
 
     loadScenario(SCENARIO_INDEX.CONTENT_AVALANCHE);
 
-    pcScheduleScenarioTask(() => window.pcFillS1StartLearningDev?.(), 120, SCENARIO_INDEX.CONTENT_AVALANCHE);
   }
 
 pcExposeGlobals({
@@ -707,7 +720,7 @@ function pcGetAnonymousChallengeId() {
 
 function pcCountLocalGuideSections() {
   try {
-    const guide = JSON.parse(localStorage.getItem('promptcraft_s1_course_guide_v1') || '{}');
+    const guide = JSON.parse(localStorage.getItem('promptcraft_s1_course_guide_v3') || '{}');
     return guide?.step1?.added ? 1 : 0;
   } catch (_error) { return 0; }
 }

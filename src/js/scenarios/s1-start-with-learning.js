@@ -107,8 +107,18 @@ const PC_S1_LEARNING_ITEMS = Object.freeze([
 const PC_S1_LEARNING_DEFAULT_QUOTE =
   'These file names do not tell me much about what I am supposed to do first. I would probably start clicking until something made sense.';
 
-const PC_S1_MY_COURSE_STORAGE_KEY = 'promptcraft_my_course_s1_v1';
-const PC_S1_GUIDE_STORAGE_KEY = 'promptcraft_s1_course_guide_v1';
+// P590 starts the production-ready local workspace after the guide test cycle.
+// Earlier generations contain prototype entries and must never populate a new run.
+const PC_S1_MY_COURSE_STORAGE_KEY = 'promptcraft_my_course_s1_v3';
+const PC_S1_GUIDE_STORAGE_KEY = 'promptcraft_s1_course_guide_v3';
+const PC_S1_RETIRED_STORAGE_KEYS = Object.freeze([
+  'promptcraft_my_course_s1_v1',
+  'promptcraft_s1_course_guide_v1',
+  'promptcraft_my_course_s1_v2',
+  'promptcraft_s1_course_guide_v2'
+]);
+
+try { PC_S1_RETIRED_STORAGE_KEYS.forEach(key => localStorage.removeItem(key)); } catch (_error) {}
 
 const PC_S1_SUGGESTED_PURPOSES = Object.freeze({
   'food-access-reading': 'prepare',
@@ -134,12 +144,15 @@ function pcS1OSCQRLabel() {
   return PC_S1_OSCQR_STANDARDS.map(item => `OSCQR ${item.number}: ${item.title}`).join(' | ');
 }
 
-function pcRenderS1OSCQRStandards() {
+function pcRenderS1OSCQRStandards({ concise = false } = {}) {
+  const standards = concise
+    ? PC_S1_OSCQR_STANDARDS.filter(item => [2, 9, 19, 45].includes(item.number))
+    : PC_S1_OSCQR_STANDARDS;
   return `<section class="pc-s1-guide-section pc-s1-oscqr-section" id="pcS1GuideStandards" aria-labelledby="pcS1OSCQRHeading">
     <span class="pc-s1-result-eyebrow">OSCQR 4.1 connections</span>
-    <h3 id="pcS1OSCQRHeading">Standards addressed in this guide</h3>
-    <p>These standards are the direct course-design connections for the work in Scenario 1.</p>
-    <div class="pc-s1-oscqr-grid">${PC_S1_OSCQR_STANDARDS.map(item => `<article><strong><span>OSCQR ${item.number}</span>${esc(item.title)}</strong><p>${esc(item.connection)}</p></article>`).join('')}</div>
+    <h3 id="pcS1OSCQRHeading">Standards connected to this review</h3>
+    <p>Use these connections as prompts for further inspection, not as a completed course review.</p>
+    <div class="pc-s1-oscqr-grid">${standards.map(item => `<article><strong><span>OSCQR ${item.number}</span>${esc(item.title)}</strong><p>${esc(item.connection)}</p></article>`).join('')}</div>
   </section>`;
 }
 
@@ -253,6 +266,26 @@ function pcSaveS1Guide(guide = pcS1LearningState?.guide) {
   }
 }
 
+function pcClearS1LocalWorkspace() {
+  const keys = [
+    ...PC_S1_RETIRED_STORAGE_KEYS,
+    PC_S1_MY_COURSE_STORAGE_KEY,
+    PC_S1_GUIDE_STORAGE_KEY
+  ];
+  try { keys.forEach(key => localStorage.removeItem(key)); } catch (_error) {}
+  if (typeof pcS1LearningState !== 'undefined' && pcS1LearningState) {
+    pcS1LearningState.myCourse = pcEmptyS1MyCourse();
+    pcS1LearningState.guide = pcLoadS1Guide();
+    pcS1LearningState.guideBabbageResponse = null;
+    pcS1LearningState.myCourseBabbageResponse = null;
+  }
+  if (typeof updateMainMenuHome === 'function') updateMainMenuHome();
+  if (document.body.classList.contains('pc-s1-guide-open') && typeof pcRenderCourseGuideOverview === 'function') {
+    pcRenderCourseGuideOverview();
+  }
+  return true;
+}
+
 let pcS1LearningState = {
   view: 'module',
   activeIndex: 0,
@@ -281,18 +314,50 @@ let pcS1GuideOpenedFromMenu = false;
 
 function pcPrepareS1GuideSurface(fromMenu = false) {
   pcS1GuideOpenedFromMenu = Boolean(fromMenu);
-  document.body.classList.remove('s1-active', 's1-result-active', 'pc-shared-result-active', 'pc-scenario-activity-active');
+  document.body.classList.remove(
+    's1-active',
+    's1-result-active',
+    'pc-shared-result-active',
+    'pc-scenario-activity-active',
+    'pc-main-menu-open',
+    'pc-audio-setup-open',
+    'pc-s1-ai-workspace-active',
+    'pc-s1-reflection-analysis-active',
+    'pc-s1-reflection-loading-active'
+  );
   document.body.classList.add('pc-s1-guide-open');
+  // A saved guide can be opened after a cancelled or interrupted modal. Clear
+  // those full-screen surfaces before rendering so an invisible layer cannot
+  // retain focus or swallow guide clicks and wheel input.
+  ['nameModalOverlay', 'audioSetupOverlay', 'mainMenuOverlay'].forEach(id => {
+    const modal = document.getElementById(id);
+    if (!modal) return;
+    modal.classList.remove('visible');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.inert = true;
+    modal.hidden = true;
+    modal.style.removeProperty('opacity');
+    modal.style.removeProperty('pointer-events');
+  });
   const overlay = pcSetVNOverlayState({ active: false });
-  if (overlay && fromMenu) {
+  if (overlay) {
     overlay.setAttribute('aria-hidden', 'true');
     overlay.inert = true;
+    // The guide is a normal reading surface, not a dialogue layer. Keep the
+    // retired VN surface out of hit testing as well as out of the tab order.
+    overlay.style.setProperty('pointer-events', 'none', 'important');
   }
 }
 
 function pcResetS1LearningState() {
   pcS1GuideOpenedFromMenu = false;
   document.body.classList.remove('pc-s1-guide-open');
+  const overlay = document.getElementById('vnOverlay');
+  if (overlay) {
+    overlay.inert = false;
+    overlay.removeAttribute('aria-hidden');
+    overlay.style.removeProperty('pointer-events');
+  }
   pcS1LearningState = {
     view: 'module',
     activeIndex: 0,
@@ -915,17 +980,20 @@ function pcGetS1GuideStep1Insight(response, input) {
 function pcRenderS1GuideInsight(insight) {
   const result = insight && typeof insight === 'object' ? insight : {};
   const strengths = Array.isArray(result.strengths) ? result.strengths.filter(Boolean) : [];
-  const sourceLabel = result.source === 'live' ? 'Live Babbage review' : 'Built-in review';
+  const sourceLabel = result.source === 'live' ? 'Personalized activity review' : 'Activity review';
   return `
-    <article class="pc-s1-my-course-findings pc-s1-guide-personalized-feedback">
+    <article class="pc-s1-guide-personalized-feedback">
       <span class="pc-s1-result-eyebrow">${sourceLabel}</span>
-      <h3>Feedback on the learning path you built</h3>
+      <h3>What your choices show</h3>
       <p>${esc(result.summary || 'Review the activity titles and placements against the purpose of each activity.')}</p>
       ${strengths.length ? `<ul>${strengths.map(item => `<li>${esc(item)}</li>`).join('')}</ul>` : ''}
       <div class="pc-s1-my-course-next-check"><h3>Check next</h3><p>${esc(result.watchFor || 'Confirm that each activity appears where students will expect to use it.')}</p></div>
       ${result.impact ? `<p><strong>Likely student impact:</strong> ${esc(result.impact)}</p>` : ''}
-    </article>
-    <div class="pc-s1-guide-reference-grid">
+    </article>`;
+}
+
+function pcRenderS1GuidePurposeReference() {
+  return `<div class="pc-s1-guide-reference-grid">
       <section>
         <span class="pc-s1-result-eyebrow">Prepare</span>
         <p>Students get what they need before trying the work.</p><ul><li>Readings and videos</li><li>Examples and demonstrations</li><li>Vocabulary and background</li></ul>
@@ -988,14 +1056,16 @@ function pcRenderS1GuideStep1({ fromMenu = pcS1GuideOpenedFromMenu } = {}) {
         <div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">${guide.added ? 'Saved to My Guide' : 'Guide preview'}</span>${fromMenu ? '<button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>' : ''}</div>
       </div>
       <div class="pc-s1-guide-paper" role="document" aria-label="Course Guide Step 1 preview">
-        <header class="pc-s1-guide-paper-header"><span>My PromptCraft Course Guide · Step 1</span><h2>Make the Learning Path Visible</h2><p>A Canvas building reference for your own course.</p></header>
         <section class="pc-s1-guide-section">
           <h3>Why this matters</h3>
           <p>Students should be able to tell what an item is, why it is there, and what comes next without opening every page first. Descriptive titles and text headers make the learning path visible at the module level.</p>
         </section>
-        <section class="pc-s1-guide-section pc-s1-guide-babbage-note">
+        <section class="pc-s1-guide-section pc-s1-guide-reference-section">
           <span class="pc-s1-result-eyebrow">Canvas building reference</span><h3>Choose text headers by learning purpose</h3>
           <p class="pc-s1-guide-reference-intro">The practice module used Prepare, Practice, and Evidence to make progression visible. Use the same idea in your own course, but choose labels that make sense for your students and discipline.</p>
+          ${pcRenderS1GuidePurposeReference()}
+        </section>
+        <section class="pc-s1-guide-section pc-s1-guide-feedback-section">
           ${pcRenderS1GuideInsight(insight)}
         </section>
         <section class="pc-s1-guide-section pc-s1-guide-tip-grid">
@@ -1010,7 +1080,7 @@ function pcRenderS1GuideStep1({ fromMenu = pcS1GuideOpenedFromMenu } = {}) {
             ? '<button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-print-guide">Print / Save PDF</button><button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>'
             : guide.added
             ? '<button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-view-guide-step1">View saved guide</button><button type="button" class="pc-shell-primary" data-pc-action="s1-learning-reflect-overview">Continue with Maya</button>'
-            : '<button type="button" class="pc-shell-primary" data-pc-action="s1-learning-add-guide-step1">Add to My Guide</button>'}
+            : '<button type="button" class="pc-shell-primary" data-pc-action="s1-learning-save-guide-step1-continue">Save to My Guide and Continue</button>'}
         </footer>
       </div>
     </section>`;
@@ -1046,7 +1116,7 @@ async function pcGenerateS1GuideStep1() {
   return pcRenderS1GuideStep1();
 }
 
-function pcAddS1GuideStep1() {
+function pcSaveS1GuideStep1AndContinue() {
   pcS1LearningState.guide.step1.added = true;
   pcSaveS1Guide();
   if (!pcS1LearningState.guideXPEarned && typeof awardS1PracticeXP === 'function') {
@@ -1056,7 +1126,7 @@ function pcAddS1GuideStep1() {
   const organizationScore = review.matchCount === review.total ? 2 : review.matchCount >= 3 ? 1 : 0;
   const diagnosisScore = pcS1LearningState.diagnosisChoice === 'evidence-gap' ? 2 : 1;
   pcRecordS1LearningProgress('s1_course_guide_step_added', Math.min(5, organizationScore + diagnosisScore + 1), 'Added learning-path guidance to My Course Guide', pcS1LearningState.guide?.step1?.personalizedInsight?.summary || 'Learning-path guidance saved.', { guideStepAdded: true });
-  return pcRenderS1GuideStep1();
+  return pcPlayS1OverviewReflection();
 }
 
 function pcViewS1GuideStep1() {
@@ -1672,6 +1742,22 @@ function pcAddS1MyCourseReviewToGuide() {
   return pcRenderS1FullGuide();
 }
 
+function pcCleanCourseGuideText(value) {
+  return String(value || '')
+    .replace(/([.!?])\1+/g, '$1')
+    .replace(/\s+([,.;:!?])/g, '$1')
+    .trim();
+}
+
+function pcRenderS1GuideTip(tip, index) {
+  const text = pcCleanCourseGuideText(tip);
+  const quotedActivity = text.match(/^For\s+[“\"]([^”\"]+)[”\"]\s*,?\s*(.+)$/i);
+  const heading = quotedActivity ? quotedActivity[1].replace(/[,;]\s*$/, '') : `Activity suggestion ${index + 1}`;
+  const detail = quotedActivity ? quotedActivity[2] : text;
+  const sentence = detail ? detail.charAt(0).toUpperCase() + detail.slice(1) : '';
+  return `<article><span aria-hidden="true">${index + 1}</span><div><h4>${esc(heading)}</h4><p>${esc(sentence)}</p></div></article>`;
+}
+
 function pcRenderS1FullGuide({ fromMenu = false } = {}) {
   pcPrepareS1GuideSurface(fromMenu);
   pcS1LearningState.view = 'full-guide';
@@ -1687,24 +1773,15 @@ function pcRenderS1FullGuide({ fromMenu = false } = {}) {
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
   area.innerHTML = `
     <section class="pc-s1-learning pc-scenario-stage pc-s1-full-guide" role="region" aria-labelledby="pcS1FullGuideTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar pc-s1-guide-taskbar"><div><span>My PromptCraft Course Guide · Scenario 1</span><h1 id="pcS1FullGuideTitle">Start with the learning</h1><p>Your reusable Canvas course-design reference.</p></div><div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">Saved to My Guide</span><button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button></div></div>
+      <div class="pc-s1-learning-taskbar pc-s1-guide-taskbar"><div><span>My PromptCraft Course Guide</span><h1 id="pcS1FullGuideTitle">${esc(course.moduleTitle || 'Saved course guidance')}</h1><p>Your saved course feedback and module notes.</p></div><div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">Saved to My Guide</span><button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button></div></div>
       <nav class="pc-s1-full-guide-nav" aria-label="Course guide sections">
-        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideStart">Start here</button>
-        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideFeedback">Course feedback</button>
-        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideModule">Visual module</button>
-        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuidePattern">Module pattern</button>
-        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideStandards">OSCQR</button>
-        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideChecklist">Checklist</button>
+        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideFeedback">Saved feedback</button>
+        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideModule">Module view</button>
         <button type="button" class="pc-s1-guide-print" data-pc-action="s1-learning-print-guide">Print / Save PDF</button>
       </nav>
       <div class="pc-s1-guide-paper pc-s1-full-guide-paper">
-        <header class="pc-s1-guide-paper-header"><span>My PromptCraft Course Guide</span><h2>Make the path visible, then check the evidence</h2><p>Use this page when building or revising a Canvas module.</p></header>
-        <section class="pc-s1-guide-section" id="pcS1GuideStart"><span class="pc-s1-result-eyebrow">Start here</span><h3>Choose headers by learning purpose</h3><p>Begin with the learning students need to do, then group the activities that prepare them, let them practice, and provide evidence.</p>${pcRenderS1GuideInsight(pcS1LearningState.guide?.step1?.personalizedInsight)}</section>
-        <section class="pc-s1-guide-section pc-s1-full-guide-personal" id="pcS1GuideFeedback"><span class="pc-s1-result-eyebrow">${feedback.source === 'live' ? 'Live Babbage suggestions for your course' : 'Built-in course review'}</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>${esc(feedback.clear || '')}</p><p><strong>Intended learning:</strong> ${esc(course.intendedLearning)}</p><section class="pc-s1-my-course-findings"><h3>What is clear</h3><ul>${(feedback.worked || []).map(item => `<li>${esc(item)}</li>`).join('')}</ul></section><section class="pc-s1-my-course-findings"><h3>What needs inspection</h3><p>${esc(feedback.unknown || '')}</p></section><div class="pc-s1-full-guide-tips">${(feedback.improvementIdeas || []).map((tip, index) => `<article><span>${index + 1}</span><p>${esc(tip)}</p></article>`).join('')}</div><div class="pc-s1-my-course-next-check"><h3>Next check</h3><p>${esc(feedback.next || '')}</p></div></section>
-        <section class="pc-s1-guide-section" id="pcS1GuideModule"><span class="pc-s1-result-eyebrow">Your visual module</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>This draft groups activities only when their titles show a clear purpose. Review every placement against your actual instructions; items with an unclear purpose need your decision.</p><div class="pc-s1-full-guide-module" aria-label="Visual example of the teacher's Canvas module">${pcRenderS1MyCourseMiniModule(course)}</div></section>
-        ${pcRenderS1WeeklyModulePattern()}
-        ${pcRenderS1OSCQRStandards()}
-        <section class="pc-s1-guide-section pc-s1-guide-tip-grid" id="pcS1GuideChecklist"><div><h3>Canvas build checklist</h3><ul><li>Name each item for the task students will open or complete.</li><li>Use short headers to show preparation, practice, and evidence.</li><li>Check the instructions and criteria, not only the activity titles.</li></ul></div><div><h3>Use AI effectively</h3><ul><li>Give AI your real titles and intended learning.</li><li>Ask for specific improvements instead of a generic course rewrite.</li><li>Verify every suggestion against your teaching intent and student needs.</li></ul></div></section>
+        <section class="pc-s1-guide-section pc-s1-full-guide-personal" id="pcS1GuideFeedback"><span class="pc-s1-result-eyebrow">Saved course feedback</span><h2>${esc(course.moduleTitle || 'Your module')}</h2><p>${esc(pcCleanCourseGuideText(feedback.clear))}</p><p><strong>Intended learning:</strong> ${esc(pcCleanCourseGuideText(course.intendedLearning))}</p><section class="pc-s1-my-course-findings"><h3>What is clear</h3><ul>${(feedback.worked || []).map(item => `<li>${esc(pcCleanCourseGuideText(item))}</li>`).join('')}</ul></section><section class="pc-s1-my-course-findings"><h3>What needs inspection</h3><p>${esc(pcCleanCourseGuideText(feedback.unknown))}</p></section><section class="pc-s1-guide-suggestions" aria-labelledby="pcS1GuideSuggestionsHeading"><h3 id="pcS1GuideSuggestionsHeading">Ways to improve the activities you entered</h3><div class="pc-s1-full-guide-tips">${(feedback.improvementIdeas || []).map(pcRenderS1GuideTip).join('')}</div></section><div class="pc-s1-my-course-next-check"><h3>Next check</h3><p>${esc(pcCleanCourseGuideText(feedback.next))}</p></div></section>
+        <section class="pc-s1-guide-section" id="pcS1GuideModule"><span class="pc-s1-result-eyebrow">Saved module view</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>This view uses the activity titles you provided to suggest each item’s likely role. Confirm every placement against the actual instructions and student work.</p><div class="pc-s1-full-guide-module" aria-label="Visual summary of the saved module">${pcRenderS1MyCourseMiniModule(course)}</div></section>
         <footer class="pc-s1-guide-actions"><button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-print-guide">Print / Save PDF</button>${fromMenu ? '<button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>' : '<button type="button" class="pc-shell-primary" data-pc-action="s1-learning-close-with-pixel">Continue with Professor Pixel</button>'}</footer>
       </div>
     </section>`;
@@ -1714,6 +1791,11 @@ function pcRenderS1FullGuide({ fromMenu = false } = {}) {
 
 function pcRenderS1MyCourseMiniModule(course) {
   const groups = { prepare: [], practice: [], evidence: [], unclear: [] };
+  const guideLabels = {
+    prepare: 'Resources and preparation',
+    practice: 'Practice and feedback',
+    evidence: 'Evidence of learning'
+  };
   course.activities.filter(Boolean).forEach(activity => {
     const text = String(activity);
     const lower = text.toLowerCase();
@@ -1728,7 +1810,7 @@ function pcRenderS1MyCourseMiniModule(course) {
   });
   const learningGroups = ['prepare', 'practice', 'evidence'].map(purpose => `
     <div class="pc-s1-guide-module-group">
-      <strong>${esc(PC_S1_PURPOSE_LABELS[purpose])}</strong>
+      <strong>${esc(guideLabels[purpose])}</strong>
       ${groups[purpose].length ? groups[purpose].map(activity => `<span>${esc(activity)}</span>`).join('') : '<span class="is-empty">No activity identified yet</span>'}
     </div>`).join('');
   return learningGroups + (groups.unclear.length
@@ -1739,6 +1821,12 @@ function pcRenderS1MyCourseMiniModule(course) {
 function pcPlayS1ClosingDialogue() {
   pcS1GuideOpenedFromMenu = false;
   document.body.classList.remove('pc-s1-guide-open');
+  const overlay = document.getElementById('vnOverlay');
+  if (overlay) {
+    overlay.inert = false;
+    overlay.removeAttribute('aria-hidden');
+    overlay.style.removeProperty('pointer-events');
+  }
   pcS1LearningState.view = 'closing-dialogue';
   try {
     clearTimeout(vnTypeTimer);
@@ -1860,6 +1948,12 @@ function pcCompleteS1LearningExplore() {
 function renderS1StartWithLearning({ preserveProgress = false } = {}) {
   pcS1GuideOpenedFromMenu = false;
   document.body.classList.remove('pc-s1-guide-open');
+  const overlay = document.getElementById('vnOverlay');
+  if (overlay) {
+    overlay.inert = false;
+    overlay.removeAttribute('aria-hidden');
+    overlay.style.removeProperty('pointer-events');
+  }
   const area = document.getElementById('chat');
   const container = document.getElementById('inputContainer');
   if (!area) return false;
@@ -1906,9 +2000,57 @@ function pcHasSavedS1Guide() {
   return Boolean(guide?.step1?.added || guide?.myCourseReview?.added);
 }
 
+function pcRenderCourseGuideOverview() {
+  pcPrepareS1GuideSurface(true);
+  pcS1LearningState.view = 'course-guide-overview';
+  if (typeof closeMainMenu === 'function') closeMainMenu({ force: true });
+  const area = document.getElementById('chat');
+  if (!area) return false;
+  area.innerHTML = `
+    <section class="pc-s1-learning pc-scenario-stage pc-s1-full-guide pc-course-guide-overview" role="region" aria-labelledby="pcCourseGuideOverviewTitle">
+      <header class="pc-s1-learning-taskbar pc-s1-guide-taskbar">
+        <div>
+          <span>My PromptCraft Course Guide</span>
+          <h1 id="pcCourseGuideOverviewTitle">Keep the ideas you want to use</h1>
+          <p>A personal reference that grows from the work you choose to save.</p>
+        </div>
+        <div class="pc-s1-guide-heading-actions">
+          <button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>
+        </div>
+      </header>
+      <div class="pc-s1-guide-paper pc-course-guide-overview-paper">
+        <div class="pc-course-guide-overview-copy">
+          <p class="pc-s1-result-eyebrow">Your reusable reference</p>
+          <h2>Bring useful course-design ideas together in one place.</h2>
+          <p>As you work through PromptCraft, you can save feedback, decisions, checklists, and examples that you want to revisit while building or revising a course.</p>
+        </div>
+        <div class="pc-course-guide-overview-grid">
+          <article>
+            <span aria-hidden="true">1</span>
+            <div><h3>Choose what belongs here</h3><p>Nothing is added automatically. Save only the material that is useful to you.</p></div>
+          </article>
+          <article>
+            <span aria-hidden="true">2</span>
+            <div><h3>Return when you need it</h3><p>Your saved ideas stay together so you do not have to reopen a completed scenario to find them.</p></div>
+          </article>
+        </div>
+        <aside class="pc-course-guide-empty-state" aria-label="Course Guide status">
+          <h3>Nothing has been saved yet</h3>
+          <p>Complete scenarios in any order. When you choose <strong>Add to My Course Guide</strong>, the saved material will appear here.</p>
+        </aside>
+        <footer class="pc-s1-guide-actions pc-course-guide-overview-actions">
+          <button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="scenarios">Choose a Scenario</button>
+          <button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>
+        </footer>
+      </div>
+    </section>`;
+  resetSectionScroll(area);
+  return true;
+}
+
 function pcOpenSavedS1Guide() {
   pcS1LearningState.guide = pcLoadS1Guide();
-  if (!pcHasSavedS1Guide()) return false;
+  if (!pcHasSavedS1Guide()) return pcRenderCourseGuideOverview();
   pcPrepareS1GuideSurface(true);
   if (typeof closeMainMenu === 'function') closeMainMenu({ force: true });
   return pcS1LearningState.guide?.myCourseReview?.added
@@ -1928,7 +2070,7 @@ pcRegisterUIActions({
   's1-learning-select-diagnosis': target => pcSelectS1Diagnosis(target.dataset.pcDiagnosisId),
   's1-learning-reflect-overview': () => pcPlayS1OverviewReflection(),
   's1-learning-build-guide-step1': () => pcGenerateS1GuideStep1(),
-  's1-learning-add-guide-step1': () => pcAddS1GuideStep1(),
+  's1-learning-save-guide-step1-continue': () => pcSaveS1GuideStep1AndContinue(),
   's1-learning-view-guide-step1': () => pcViewS1GuideStep1(),
   's1-learning-continue-diagnosis': () => pcRenderS1Diagnosis(),
   's1-learning-start-my-course': () => pcPlayS1MyCourseTransition(),
@@ -1947,4 +2089,4 @@ pcRegisterUIActions({
   's1-learning-prevent-link': () => false
 });
 
-pcExposeGlobals({ renderS1StartWithLearning, pcOpenS1LearningItem, pcShowS1LearningModule, pcStartS1Rename, pcStartS1Organize, pcRenderS1RevisedModuleOverview, pcRenderS1GuideStep1, pcGenerateS1GuideStep1, pcRenderS1Diagnosis, pcRenderS1DiagnosisResult, pcRenderS1MyCourseStep, pcRenderS1MyCourseFeedback, pcFillS1StartLearningDev, pcHasSavedS1Guide, pcOpenSavedS1Guide });
+pcExposeGlobals({ renderS1StartWithLearning, pcOpenS1LearningItem, pcShowS1LearningModule, pcStartS1Rename, pcStartS1Organize, pcRenderS1RevisedModuleOverview, pcRenderS1GuideStep1, pcGenerateS1GuideStep1, pcRenderS1Diagnosis, pcRenderS1DiagnosisResult, pcRenderS1MyCourseStep, pcRenderS1MyCourseFeedback, pcFillS1StartLearningDev, pcHasSavedS1Guide, pcOpenSavedS1Guide, pcRenderCourseGuideOverview, pcClearS1LocalWorkspace });
