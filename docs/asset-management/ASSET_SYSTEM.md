@@ -3,7 +3,7 @@
 ## Current baseline
 
 - Application: `PROMPTCRAFT_V429`
-- Browser patch: `595`
+- Browser patch: `597`
 - Asset manifest: `v151`
 - Research schema: `V121`
 - Receiver source: `V94`

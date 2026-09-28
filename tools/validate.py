@@ -201,6 +201,21 @@ def main() -> int:
     if "innerHTML = narrative.replace" in workbench_source:
         errors.append("AI growth narratives must be escaped before rendering.")
 
+    s1_source = (ROOT / "src/js/scenarios/s1-start-with-learning.js").read_text(encoding="utf-8")
+    s1_reset_guard_fragments = (
+        "function pcInvalidateS1AsyncWork()",
+        "pcInvalidateS1AsyncWork();\n  const keys = [",
+        "if (!pcS1AsyncWorkIsCurrent(workspaceEpoch)) return false;",
+        "data-pc-action=\"s1-learning-clear-guide\"",
+    )
+    missing_s1_reset_guards = [
+        fragment for fragment in s1_reset_guard_fragments if fragment not in s1_source
+    ]
+    if missing_s1_reset_guards or s1_source.count(
+        "if (!pcS1AsyncWorkIsCurrent(workspaceEpoch)) return false;"
+    ) < 3:
+        errors.append("Scenario 1 Course Guide reset and late-response guards are incomplete.")
+
     # Architecture guards: retired S4-S5 browser prototypes and provider-specific
     # UI terminology must not creep back into the shared runtime. S3 is now an intentional
     # shared-architecture implementation rather than a dormant prototype. The two legacy

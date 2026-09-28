@@ -4485,8 +4485,19 @@ const PC_S1_RETIRED_STORAGE_KEYS = Object.freeze([
   'promptcraft_my_course_s1_v2',
   'promptcraft_s1_course_guide_v2'
 ]);
+let pcS1WorkspaceEpoch = 0;
 
 try { PC_S1_RETIRED_STORAGE_KEYS.forEach(key => localStorage.removeItem(key)); } catch (_error) {}
+
+function pcInvalidateS1AsyncWork() {
+  pcS1WorkspaceEpoch += 1;
+  try { window.pcAbortScenarioBabbageRequests?.(); } catch (_error) {}
+  return pcS1WorkspaceEpoch;
+}
+
+function pcS1AsyncWorkIsCurrent(epoch) {
+  return Number(epoch) === pcS1WorkspaceEpoch;
+}
 
 const PC_S1_SUGGESTED_PURPOSES = Object.freeze({
   'food-access-reading': 'prepare',
@@ -4635,12 +4646,21 @@ function pcSaveS1Guide(guide = pcS1LearningState?.guide) {
 }
 
 function pcClearS1LocalWorkspace() {
+  // Invalidate first. Otherwise a Babbage request that began before reset can
+  // finish after localStorage is cleared and write the saved guide back.
+  pcInvalidateS1AsyncWork();
   const keys = [
     ...PC_S1_RETIRED_STORAGE_KEYS,
     PC_S1_MY_COURSE_STORAGE_KEY,
     PC_S1_GUIDE_STORAGE_KEY
   ];
-  try { keys.forEach(key => localStorage.removeItem(key)); } catch (_error) {}
+  let cleared = true;
+  try {
+    keys.forEach(key => localStorage.removeItem(key));
+    cleared = keys.every(key => localStorage.getItem(key) === null);
+  } catch (_error) {
+    cleared = false;
+  }
   if (typeof pcS1LearningState !== 'undefined' && pcS1LearningState) {
     pcS1LearningState.myCourse = pcEmptyS1MyCourse();
     pcS1LearningState.guide = pcLoadS1Guide();
@@ -4651,7 +4671,7 @@ function pcClearS1LocalWorkspace() {
   if (document.body.classList.contains('pc-s1-guide-open') && typeof pcRenderCourseGuideOverview === 'function') {
     pcRenderCourseGuideOverview();
   }
-  return true;
+  return cleared;
 }
 
 let pcS1LearningState = {
@@ -4721,6 +4741,7 @@ function pcPrepareS1GuideSurface(fromMenu = false) {
 }
 
 function pcResetS1LearningState() {
+  pcInvalidateS1AsyncWork();
   pcS1GuideOpenedFromMenu = false;
   document.body.classList.remove('pc-s1-guide-open');
   const overlay = document.getElementById('vnOverlay');
@@ -5451,7 +5472,7 @@ function pcRenderS1GuideStep1({ fromMenu = pcS1GuideOpenedFromMenu } = {}) {
         <section class="pc-s1-guide-section pc-s1-guide-ai-box"><h3>Try this with AI</h3><ul><li>Give AI a list of vague Canvas item names and ask for clearer student-facing alternatives, then verify each suggestion.</li><li>Ask AI to sort activities into Prepare, Practice, and Evidence, then check the classifications against your own intent.</li><li>Ask AI which titles still fail to reveal what students actually do.</li></ul></section>
         <footer class="pc-s1-guide-actions">
           ${fromMenu
-            ? '<button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-print-guide">Print / Save PDF</button><button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>'
+            ? '<button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-print-guide">Print / Save PDF</button><button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-clear-guide">Clear My Guide</button><button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>'
             : guide.added
             ? '<button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-view-guide-step1">View saved guide</button><button type="button" class="pc-shell-primary" data-pc-action="s1-learning-reflect-overview">Continue with Maya</button>'
             : '<button type="button" class="pc-shell-primary" data-pc-action="s1-learning-save-guide-step1-continue">Save to My Guide and Continue</button>'}
@@ -5463,6 +5484,7 @@ function pcRenderS1GuideStep1({ fromMenu = pcS1GuideOpenedFromMenu } = {}) {
 }
 
 async function pcGenerateS1GuideStep1() {
+  const workspaceEpoch = pcS1WorkspaceEpoch;
   const input = pcBuildS1GuideStep1Input();
   pcS1LearningState.view = 'guide-step1-babbage';
   showBabbageConsultOverlay('Course Guide · Step 1', {
@@ -5481,6 +5503,7 @@ async function pcGenerateS1GuideStep1() {
     console.warn('[PromptCraft] S1 Guide Step 1 generation failed before fallback rendering:', error);
     response = { mock: true, mockReason: 'scenario-error' };
   }
+  if (!pcS1AsyncWorkIsCurrent(workspaceEpoch)) return false;
   pcS1LearningState.guideBabbageResponse = response;
   const insight = pcGetS1GuideStep1Insight(response, input);
   pcS1LearningState.guide.step1.personalizedInsight = insight;
@@ -5692,6 +5715,7 @@ function pcBuildS1BabbageReportHTML(input, response = {}) {
 
 async function pcRunS1BabbageAnalysis() {
   if (PC_S1_LEARNING_ITEMS.some(item => !pcS1LearningState.organization?.[item.id])) return false;
+  const workspaceEpoch = pcS1WorkspaceEpoch;
   pcS1LearningState.view = 'babbage-structure';
   const input = pcBuildS1BabbageInput();
 
@@ -5714,6 +5738,8 @@ async function pcRunS1BabbageAnalysis() {
     console.warn('[PromptCraft] S1 Babbage organization review failed before fallback rendering:', error);
     response = { mock: true, mockReason: 'scenario-error' };
   }
+
+  if (!pcS1AsyncWorkIsCurrent(workspaceEpoch)) return false;
 
   pcS1LearningState.babbageInput = input;
   pcS1LearningState.babbageResponse = response;
@@ -6021,6 +6047,7 @@ function pcBuildS1MyCourseReport(data, response) {
 }
 
 async function pcReviewS1MyCourse(form) {
+  const workspaceEpoch = pcS1WorkspaceEpoch;
   const values = new FormData(form);
   const activities = Array.from({ length: 4 }, (_, index) => String(values.get(`activity${index}`) || '').trim());
   if (!activities[0] || !activities[1]) return false;
@@ -6044,6 +6071,7 @@ async function pcReviewS1MyCourse(form) {
     console.warn('[PromptCraft] My Course overview review failed before fallback rendering:', error);
     response = { mock: true, mockReason: 'scenario-error' };
   }
+  if (!pcS1AsyncWorkIsCurrent(workspaceEpoch)) return false;
   pcS1LearningState.myCourseBabbageResponse = response;
   pcSetVNOverlayState({ active: false });
   return pcRenderS1MyCourseFeedback();
@@ -6190,7 +6218,7 @@ function pcRenderS1FullGuide({ fromMenu = false } = {}) {
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
   area.innerHTML = `
     <section class="pc-s1-learning pc-scenario-stage pc-s1-full-guide" role="region" aria-labelledby="pcS1FullGuideTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar pc-s1-guide-taskbar"><div><span>My PromptCraft Course Guide</span><h1 id="pcS1FullGuideTitle">${esc(course.moduleTitle || 'Saved course guidance')}</h1><p>Your saved course feedback and module notes.</p></div><div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">Saved to My Guide</span><button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button></div></div>
+      <div class="pc-s1-learning-taskbar pc-s1-guide-taskbar"><div><span>My PromptCraft Course Guide</span><h1 id="pcS1FullGuideTitle">${esc(course.moduleTitle || 'Saved course guidance')}</h1><p>Your saved course feedback and module notes.</p></div><div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">Saved to My Guide</span><button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-clear-guide">Clear My Guide</button><button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button></div></div>
       <nav class="pc-s1-full-guide-nav" aria-label="Course guide sections">
         <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideFeedback">Saved feedback</button>
         <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideModule">Module view</button>
@@ -6453,6 +6481,17 @@ function pcPrintS1CourseGuide() {
   return false;
 }
 
+function pcConfirmClearS1Guide() {
+  const confirmed = window.confirm('Clear My Course Guide and the course information saved on this device? This cannot be undone.');
+  if (!confirmed) return false;
+  const cleared = pcClearS1LocalWorkspace();
+  if (!cleared) {
+    window.alert('PromptCraft could not clear the saved guide in this browser. Check whether site storage is blocked, then try again.');
+    return false;
+  }
+  return pcRenderCourseGuideOverview();
+}
+
 function pcHasSavedS1Guide() {
   const guide = pcLoadS1Guide();
   return Boolean(guide?.step1?.added || guide?.myCourseReview?.added);
@@ -6539,6 +6578,7 @@ pcRegisterUIActions({
   's1-learning-view-full-guide': () => pcRenderS1FullGuide(),
   's1-learning-guide-section': target => pcScrollS1GuideSection(target.dataset.pcGuideSection),
   's1-learning-print-guide': () => pcPrintS1CourseGuide(),
+  's1-learning-clear-guide': () => pcConfirmClearS1Guide(),
   's1-learning-review-section': target => pcScrollS1ReviewSection(target.dataset.pcReviewSection),
   's1-learning-close-with-pixel': () => pcPlayS1ClosingDialogue(),
   's1-my-course-step': target => pcRenderS1MyCourseStep(target.dataset.pcMyCourseStep || 'focus'),
