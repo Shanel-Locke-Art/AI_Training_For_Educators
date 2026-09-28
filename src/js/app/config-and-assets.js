@@ -292,7 +292,16 @@ document.documentElement.style.setProperty('--pc-app-background-legacy', 'none')
 // response, so the app reported success even when Apps Script returned an error.
 const PC_SHEETS_DEBUG = PC_RUNTIME_DEBUG;
 
-async function postToSheets(payload, label = 'PromptCraft data') {
+let pcSheetsPostQueue = Promise.resolve();
+
+function postToSheets(payload, label = 'PromptCraft data') {
+  const send = () => pcPostToSheetsNow(payload, label);
+  const queued = pcSheetsPostQueue.then(send, send);
+  pcSheetsPostQueue = queued.catch(() => false);
+  return queued;
+}
+
+async function pcPostToSheetsNow(payload, label = 'PromptCraft data') {
   if (SURVEY_MODE !== 'sheets' || !SHEETS_URL || SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
     console.warn('[PromptCraft] Sheets URL is not configured. Skipping:', label);
     return false;
@@ -351,7 +360,7 @@ window.testSheetsPing = function testSheetsPing() {
     timestamp: new Date().toISOString(),
     participant_id: 'browser-test',
     scenario_index: 1,
-    scenario_label: 'S1: The Content Avalanche',
+    scenario_label: 'S1: Start With the Learning',
     session_duration_min: 0,
     attempts: 1,
     current_score: 1,

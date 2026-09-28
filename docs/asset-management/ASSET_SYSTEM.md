@@ -3,10 +3,10 @@
 ## Current baseline
 
 - Application: `PROMPTCRAFT_V429`
-- Browser patch: `592`
+- Browser patch: `593`
 - Asset manifest: `v151`
 - Research schema: `V121`
-- Receiver source: `V93`
+- Receiver source: `V94`
 
 This document is the current operating guide for visual, audio, reference, and production documentation assets. Historical release notes preserve the baseline that existed when each release was created and should not be rewritten as current guidance.
 

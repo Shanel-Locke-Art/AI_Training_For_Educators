@@ -297,12 +297,15 @@ let pcS1LearningState = {
   organization: Object.fromEntries(PC_S1_LEARNING_ITEMS.map(item => [item.id, ''])),
   organizationNotice: '',
   diagnosisChoice: '',
+  diagnosisRationale: '',
+  diagnosisNotice: '',
   diagnosisConfirmed: false,
   organizationXPEarned: 0,
   diagnosisXPEarned: 0,
   guideXPEarned: 0,
   myCourseXPEarned: 0,
   transferXPEarned: 0,
+  transferReflection: '',
   guide: pcLoadS1Guide(),
   guideBabbageResponse: null,
   myCourseStep: 'focus',
@@ -369,12 +372,15 @@ function pcResetS1LearningState() {
     organization: Object.fromEntries(PC_S1_LEARNING_ITEMS.map(item => [item.id, ''])),
     organizationNotice: '',
     diagnosisChoice: '',
+    diagnosisRationale: '',
+    diagnosisNotice: '',
     diagnosisConfirmed: false,
     organizationXPEarned: 0,
     diagnosisXPEarned: 0,
     guideXPEarned: 0,
     myCourseXPEarned: 0,
     transferXPEarned: 0,
+    transferReflection: '',
     guide: pcLoadS1Guide(),
     guideBabbageResponse: null,
     myCourseStep: 'focus',
@@ -1227,7 +1233,7 @@ function pcRenderS1Diagnosis() {
       </div>
       <div class="pc-s1-learning-shell">
         <div class="pc-s1-learning-workspace">
-          <section class="pc-s1-diagnosis-card" aria-labelledby="pcS1DiagnosisQuestion">
+          <form class="pc-s1-diagnosis-card" data-pc-submit-action="s1-learning-submit-diagnosis" aria-labelledby="pcS1DiagnosisQuestion">
             <div class="pc-s1-diagnosis-purpose">
               <strong>Why you are doing this</strong>
               <p>You already made the module easier to follow. Now compare what the instructor wants Maya to do with what the current activities actually ask her to produce. The gap between those two is the design problem to solve next.</p>
@@ -1248,7 +1254,13 @@ function pcRenderS1Diagnosis() {
               <p class="pc-s1-diagnosis-help">Choose the single issue that matters most for whether this module demonstrates the intended learning.</p>
             </div>
             <div class="pc-s1-diagnosis-choices">${choices}</div>
-          </section>
+            ${selected ? `<div class="pc-s1-diagnosis-rationale">
+              <label for="pcS1DiagnosisRationale"><strong>What evidence led you to this diagnosis?</strong><span>Briefly connect the intended learning with what students currently produce.</span></label>
+              <textarea id="pcS1DiagnosisRationale" name="diagnosisRationale" rows="3" minlength="10" maxlength="500" required>${esc(pcS1LearningState.diagnosisRationale)}</textarea>
+              ${pcS1LearningState.diagnosisNotice ? `<p class="pc-s1-diagnosis-notice" role="alert">${esc(pcS1LearningState.diagnosisNotice)}</p>` : ''}
+              <button type="submit" class="pc-shell-primary pc-s1-diagnosis-submit">Use this diagnosis</button>
+            </div>` : ''}
+          </form>
           ${pcRenderS1MayaPanel('The module is clearer now. I can see what I am supposed to do. The question is whether any of this actually lets me show the performance the instructor cares about.')}
         </div>
       </div>
@@ -1260,8 +1272,9 @@ function pcRenderS1Diagnosis() {
 function pcSelectS1Diagnosis(id) {
   if (!PC_S1_DIAGNOSIS_CHOICES.some(choice => choice.id === id)) return false;
   pcS1LearningState.diagnosisChoice = id;
+  pcS1LearningState.diagnosisNotice = '';
   pcS1LearningState.diagnosisConfirmed = false;
-  return pcUseS1Diagnosis();
+  return pcRenderS1Diagnosis();
 }
 
 function pcGetS1DiagnosisChoice() {
@@ -1415,6 +1428,7 @@ function pcRenderS1DiagnosisResult() {
             <p>${correct
               ? 'That is the central alignment issue. Maya has reading, vocabulary, discussion, and recall work, but none of the current activities asks her to analyze a community food-access problem and recommend a response using evidence.'
               : 'This issue may affect the experience, but the instructor intent asks Maya to analyze a problem and recommend a response using evidence. The next design question is whether the current activities actually produce that evidence.'}</p>
+            <div class="pc-s1-diagnosis-result-reason"><strong>Your reasoning</strong><p>${esc(pcS1LearningState.diagnosisRationale)}</p></div>
             <div class="pc-s1-diagnosis-result-actions">
               <button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-continue-diagnosis">Review Diagnosis 1</button>
               <button type="button" class="pc-shell-primary" data-pc-action="s1-learning-start-my-course">Continue to My Course</button>
@@ -1673,6 +1687,19 @@ function pcRenderS1MyCourseFeedback() {
   const data = pcS1LearningState.myCourse;
   const feedback = pcGetS1MyCourseFeedback(pcS1LearningState.myCourseBabbageResponse, data);
   const added = Boolean(pcS1LearningState.guide?.myCourseReview?.added);
+  const transferActions = added
+    ? `<div class="pc-s1-my-course-actions">
+        <button type="button" class="pc-shell-secondary" data-pc-action="s1-my-course-step" data-pc-my-course-step="focus">Revise overview</button>
+        <button type="button" class="pc-shell-primary" data-pc-action="s1-learning-view-full-guide">View My Course Guide</button>
+      </div>`
+    : `<form class="pc-s1-transfer-reflection" data-pc-submit-action="s1-my-course-add-guide">
+        <label for="pcS1TransferReflection"><strong>What will you check or change first in your own course?</strong><span>This short reflection is included in the research record. Your module title, learning statement, and activity names stay on this device.</span></label>
+        <textarea id="pcS1TransferReflection" name="transferReflection" rows="3" minlength="10" maxlength="500" required>${esc(pcS1LearningState.transferReflection)}</textarea>
+        <div class="pc-s1-my-course-actions">
+          <button type="button" class="pc-shell-secondary" data-pc-action="s1-my-course-step" data-pc-my-course-step="focus">Revise overview</button>
+          <button type="submit" class="pc-shell-primary">Add to My Course Guide</button>
+        </div>
+      </form>`;
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
   area.innerHTML = `
     <section class="pc-s1-learning pc-scenario-stage pc-s1-my-course" role="region" aria-labelledby="pcS1MyCourseFeedbackTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
@@ -1693,11 +1720,8 @@ function pcRenderS1MyCourseFeedback() {
               <section class="pc-s1-my-course-next-check"><h3>Recommended course setup check</h3><p>${esc(feedback.next)}</p></section>
               <section id="pcS1ReviewImprovements"><h3>Ways to improve the activities you entered</h3><ul>${feedback.improvementIdeas.map(item => `<li>${esc(item)}</li>`).join('')}</ul></section>
               <section id="pcS1ReviewPattern"><h3>Suggested module pattern</h3><div class="pc-s1-guide-reference-grid"><div><strong>Prepare</strong><em>Readings, examples, demonstrations</em></div><div><strong>Practice</strong><em>Discussion, drafts, feedback</em></div><div><strong>Evidence</strong><em>Work that demonstrates the intended learning</em></div></div></section>
-              <div class="pc-s1-my-course-actions">
-                <button type="button" class="pc-shell-secondary" data-pc-action="s1-my-course-step" data-pc-my-course-step="focus">Revise overview</button>
-                ${added ? '<button type="button" class="pc-shell-primary" data-pc-action="s1-learning-view-full-guide">View My Course Guide</button>' : '<button type="button" class="pc-shell-primary" data-pc-action="s1-my-course-add-guide">Add to My Course Guide</button>'}
-              </div>
-              <p class="pc-s1-my-course-privacy">Your module text and this saved guidance remain local-first and outside V121 research tracking.</p>
+              ${transferActions}
+              <p class="pc-s1-my-course-privacy">Your module text and saved guidance stay on this device. Only the short transfer reflection and completion indicators are included in V121 research tracking.</p>
             </article>
           </div>
         </div>
@@ -1707,9 +1731,12 @@ function pcRenderS1MyCourseFeedback() {
   return true;
 }
 
-function pcAddS1MyCourseReviewToGuide() {
+function pcAddS1MyCourseReviewToGuide(form) {
   const data = pcS1LearningState.myCourse;
   const feedback = pcGetS1MyCourseFeedback(pcS1LearningState.myCourseBabbageResponse, data);
+  const transferReflection = String(form ? new FormData(form).get('transferReflection') : pcS1LearningState.transferReflection || '').trim();
+  if (transferReflection.length < 10) return false;
+  pcS1LearningState.transferReflection = transferReflection;
   pcS1LearningState.guide.myCourseReview = {
     added: true,
     moduleTitle: data.moduleTitle,
@@ -1717,6 +1744,7 @@ function pcAddS1MyCourseReviewToGuide() {
     activities: data.activities.filter(Boolean),
     feedback,
     source: feedback.source,
+    transferReflection,
     addedAt: new Date().toISOString()
   };
   pcSaveS1Guide();
@@ -1732,12 +1760,31 @@ function pcAddS1MyCourseReviewToGuide() {
   const organizationScore = review.matchCount === review.total ? 2 : review.matchCount >= 3 ? 1 : 0;
   const diagnosisScore = pcS1LearningState.diagnosisChoice === 'evidence-gap' ? 2 : 1;
   const finalScore = Math.min(5, organizationScore + diagnosisScore + (transferScore >= 4 ? 1 : 0));
-  pcRecordS1LearningProgress('s1_course_guide_complete', finalScore, 'Completed My Course Guide', 'Personal course guidance completed on this device.', {
+  const aiResponse = pcS1LearningState.myCourseBabbageResponse || {};
+  const scenarioRecord = scenarioData?.[SCENARIO_INDEX.CONTENT_AVALANCHE];
+  if (scenarioRecord) {
+    scenarioRecord.aiProvider = aiResponse.provider || (feedback.source === 'fallback' ? 'local-fallback' : '');
+    scenarioRecord.aiModel = aiResponse.model || '';
+    scenarioRecord.aiRequestId = aiResponse.requestId || aiResponse.request_id || '';
+    scenarioRecord.aiElapsedMs = aiResponse.elapsedMs || aiResponse.elapsed_ms || '';
+    scenarioRecord.aiUsage = aiResponse.usage || null;
+    scenarioRecord.structuredAnalysis = aiResponse.structured || null;
+  }
+  pcRecordS1LearningProgress('s1_course_guide_complete', finalScore, 'Completed Scenario 1', feedback.source === 'live' ? 'Live feedback delivered.' : 'Built-in feedback delivered.', {
     diagnosisChoice: pcS1LearningState.diagnosisChoice,
+    diagnosisCorrect: pcS1LearningState.diagnosisChoice === 'evidence-gap',
+    diagnosisRationale: pcS1LearningState.diagnosisRationale,
     activityCount: completedActivities,
     organization: pcS1LearningState.organization,
     renamedTitles: pcS1LearningState.renamedTitles,
-    oscqrStandards: PC_S1_OSCQR_STANDARDS.map(item => item.number)
+    placementMatches: review.matchCount,
+    placementTotal: review.total,
+    placementMismatches: review.mismatches.map(item => ({ id: item.id, title: item.title, placed: item.actual, suggested: item.suggested })),
+    guideSaved: true,
+    transferReflection,
+    feedbackSource: feedback.source,
+    aiRequestFailed: feedback.source !== 'live',
+    completionStatus: 'Completed'
   });
   return pcRenderS1FullGuide();
 }
@@ -1853,8 +1900,15 @@ function pcPlayS1ClosingDialogue() {
 }
 
 
-function pcUseS1Diagnosis() {
+function pcUseS1Diagnosis(form) {
   if (!pcS1LearningState.diagnosisChoice) return false;
+  const rationale = String(form ? new FormData(form).get('diagnosisRationale') : pcS1LearningState.diagnosisRationale || '').trim();
+  if (rationale.length < 10) {
+    pcS1LearningState.diagnosisNotice = 'Add a short explanation before continuing.';
+    return pcRenderS1Diagnosis();
+  }
+  pcS1LearningState.diagnosisRationale = rationale;
+  pcS1LearningState.diagnosisNotice = '';
   pcS1LearningState.diagnosisConfirmed = true;
   if (!pcS1LearningState.diagnosisXPEarned && typeof awardS1PracticeXP === 'function') {
     pcS1LearningState.diagnosisXPEarned = awardS1PracticeXP(1, pcS1LearningState.diagnosisChoice === 'evidence-gap' ? 3 : 1);
@@ -1862,7 +1916,7 @@ function pcUseS1Diagnosis() {
   const review = pcEvaluateS1Organization();
   const organizationScore = review.matchCount === review.total ? 2 : review.matchCount >= 3 ? 1 : 0;
   const correct = pcS1LearningState.diagnosisChoice === 'evidence-gap';
-  pcRecordS1LearningProgress('s1_alignment_diagnosis_complete', organizationScore + (correct ? 2 : 1), pcGetS1DiagnosisChoice()?.text || pcS1LearningState.diagnosisChoice, correct ? 'Identified the gap between preparation and evidence of the intended learning.' : 'Selected an alignment diagnosis and received corrective feedback.', { diagnosisChoice: pcS1LearningState.diagnosisChoice, diagnosisCorrect: correct });
+  pcRecordS1LearningProgress('s1_alignment_diagnosis_complete', organizationScore + (correct ? 2 : 1), 'Alignment diagnosis completed', correct ? 'Identified the gap between preparation and evidence of the intended learning.' : 'Selected an alignment diagnosis and received corrective feedback.', { diagnosisChoice: pcS1LearningState.diagnosisChoice, diagnosisCorrect: correct, diagnosisRationale: rationale });
   return pcRenderS1DiagnosisResult();
 }
 
@@ -1906,6 +1960,7 @@ function pcFillS1StartLearningDev() {
   }
   if (pcS1LearningState.view === 'diagnosis') {
     pcS1LearningState.diagnosisChoice = 'evidence-gap';
+    pcS1LearningState.diagnosisRationale = 'The activities prepare students and check recall, but none asks them to analyze the problem and recommend a response with evidence.';
     pcS1LearningState.diagnosisConfirmed = false;
     pcRenderS1Diagnosis();
     return true;
@@ -2068,13 +2123,14 @@ pcRegisterUIActions({
   's1-learning-save-rename': form => pcSaveS1Rename(form),
   's1-learning-start-organize': () => pcStartS1Organize(),
   's1-learning-select-diagnosis': target => pcSelectS1Diagnosis(target.dataset.pcDiagnosisId),
+  's1-learning-submit-diagnosis': form => pcUseS1Diagnosis(form),
   's1-learning-reflect-overview': () => pcPlayS1OverviewReflection(),
   's1-learning-build-guide-step1': () => pcGenerateS1GuideStep1(),
   's1-learning-save-guide-step1-continue': () => pcSaveS1GuideStep1AndContinue(),
   's1-learning-view-guide-step1': () => pcViewS1GuideStep1(),
   's1-learning-continue-diagnosis': () => pcRenderS1Diagnosis(),
   's1-learning-start-my-course': () => pcPlayS1MyCourseTransition(),
-  's1-my-course-add-guide': () => pcAddS1MyCourseReviewToGuide(),
+  's1-my-course-add-guide': form => pcAddS1MyCourseReviewToGuide(form),
   's1-learning-view-full-guide': () => pcRenderS1FullGuide(),
   's1-learning-guide-section': target => pcScrollS1GuideSection(target.dataset.pcGuideSection),
   's1-learning-print-guide': () => pcPrintS1CourseGuide(),

@@ -1,5 +1,16 @@
 # Scenario 1 Cleanup Log
 
+## 2026-09-28 — Patch 593 and Receiver V94 focused research evidence
+
+- Replaced S1 checkpoint scores and attempt counts in the readable workbook with placement decisions, alignment correctness, written rationale, transfer reflection, completion status, and feedback provenance.
+- Added one short alignment-rationale prompt and one transfer-reflection prompt to the S1 experience.
+- Kept personal module titles, learning statements, activities, and saved guide content on the participant device.
+- Removed repeated S1 OSCQR strings and duplicate Claude/Babbage/final-response payload text from new incremental events while retaining V121 compatibility.
+- Corrected the active raw scenario label to `S1: Start With the Learning`.
+- Serialized browser posts and deferred S1 readable-view rebuilding until the final checkpoint to prevent challenge-score updates from competing with research saves.
+- Hid redundant Process Log, Research Responses, Process Events, challenge, and raw tabs from the normal workbook view. Raw records remain available for troubleshooting.
+- Rebuilt the Overview, Sessions, S1 results, and Research Guide around relevant research evidence and set explicit readable column widths.
+
 ## 2026-09-28 — Receiver V93 schema-reference repair
 
 - Corrected two receiver status responses that referenced the nonexistent `EXPECTED_SCHEMA` variable instead of `EXPECTED_APP_SCHEMA_VERSION`.

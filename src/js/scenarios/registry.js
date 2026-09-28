@@ -26,7 +26,7 @@ const scenarios = [
 const SCENARIO_UI = [
   {
     key: 'content-avalanche',
-    dataLabel: 'S1: The Content Avalanche',
+    dataLabel: 'S1: Start With the Learning',
     tabLabel: 'S1: Start With the Learning',
     missionTitle: 'Start with what students are actually being asked to do.',
     missionCopy: 'Investigate Maya\'s existing Canvas module, improve its usability, and diagnose whether the activities actually provide evidence of the intended learning.',

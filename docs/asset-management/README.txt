@@ -36,4 +36,4 @@ on-screen only. No production audio or artwork is marked complete in these
 documents.
 
 
-The trackers and guides were updated for PROMPTCRAFT_V429, Patch 592, and asset manifest v151. Do not create version-number copies for routine updates.
+The trackers and guides remain aligned with PROMPTCRAFT_V429, Patch 593, and asset manifest v151. Do not create version-number copies for routine updates.

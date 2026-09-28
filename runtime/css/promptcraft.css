@@ -22289,6 +22289,53 @@ html body.pc-s1-canvas-backdrop-active #vnOverlay.vn-overlay.active .vn-smartboa
   opacity: .48;
   cursor: not-allowed;
 }
+.pc-s1-diagnosis-rationale,
+.pc-s1-transfer-reflection {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid #b9c9d6;
+  border-radius: 6px;
+  background: #f4f8fb;
+}
+.pc-s1-diagnosis-rationale label,
+.pc-s1-transfer-reflection label {
+  display: grid;
+  gap: 4px;
+  color: #0d2a4a;
+}
+.pc-s1-diagnosis-rationale label span,
+.pc-s1-transfer-reflection label span {
+  color: #526777;
+  font-size: .88rem;
+  line-height: 1.45;
+}
+.pc-s1-diagnosis-rationale textarea,
+.pc-s1-transfer-reflection textarea {
+  width: 100%;
+  min-height: 88px;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 2px solid #9eb2c2;
+  border-radius: 5px;
+  background: #fff;
+  color: #17364e;
+  font: inherit;
+  line-height: 1.45;
+  resize: vertical;
+}
+.pc-s1-diagnosis-rationale textarea:focus,
+.pc-s1-transfer-reflection textarea:focus {
+  border-color: #0875bd;
+  outline: 3px solid rgba(8, 117, 189, .16);
+}
+.pc-s1-diagnosis-result-reason {
+  margin: 14px 0;
+  padding: 14px 16px;
+  border-left: 4px solid #f0bd2b;
+  background: #fdf7e8;
+}
+.pc-s1-diagnosis-result-reason p { margin: 6px 0 0; line-height: 1.5; }
 .pc-s1-diagnosis-notice {
   margin: 0;
   color: #36556c;

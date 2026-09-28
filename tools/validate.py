@@ -210,7 +210,7 @@ def main() -> int:
         if "claude" in line.lower()
     ]
     allowed_legacy_provider_lines = {
-        "claude_response: s.finalResponse || '',",
+        "claude_response: '',",
         "claude_response: 'If this row appears, the deployed site can write to Sheets.',",
     }
     if set(legacy_provider_lines) != allowed_legacy_provider_lines or len(legacy_provider_lines) != 2:

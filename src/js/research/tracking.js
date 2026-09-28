@@ -255,11 +255,11 @@ function buildSessionPayload(formData) {
     presubmit_predictions: pcFormatAllPresubmitPredictions(),
 
     // S1
-    s1_attempts:          scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].attempts,
-    s1_best_score:        scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].bestScore,
-    s1_prompts:           scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].prompts.join(' | '),
-    s1_final_response:    scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].finalResponse,
-    s1_oscqr:             scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].oscqrLit,
+    s1_attempts:          '',
+    s1_best_score:        '',
+    s1_prompts:           '',
+    s1_final_response:    '',
+    s1_oscqr:             '',
     s1_section_reviews:   JSON.stringify(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].sectionReviews || []),
     s1_diagnosis_choice:  scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.diagnosisChoice || '',
     s1_learning_path_json: JSON.stringify({
@@ -269,13 +269,20 @@ function buildSessionPayload(formData) {
       placementTotal: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.placementTotal ?? '',
       diagnosisChoice: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.diagnosisChoice || '',
       diagnosisCorrect: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.diagnosisCorrect ?? '',
+      diagnosisRationale: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.diagnosisRationale || '',
       guideStepAdded: Boolean(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.guideStepAdded),
       activityCount: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.activityCount ?? '',
+      placementMismatches: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.placementMismatches || [],
+      guideSaved: Boolean(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.guideSaved),
+      transferReflection: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.transferReflection || '',
+      feedbackSource: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.feedbackSource || '',
+      aiRequestFailed: Boolean(scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.aiRequestFailed),
+      completionStatus: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.completionStatus || '',
       lastEvent: scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].s1LearningPath?.lastEvent || ''
     }),
     // Personal My Course wording remains local on the participant's device.
     s1_course_guide_json: '',
-    s1_oscqr_standards:   scenarioData[SCENARIO_INDEX.CONTENT_AVALANCHE].oscqrLit,
+    s1_oscqr_standards:   '',
 
     // Legacy receiver columns retained for the metacognition implementation,
     // which is now presented as Scenario 3 in the Canvas roadmap.
@@ -372,6 +379,7 @@ async function saveIncrementalData(scenarioIdx, eventType = 'scenario_complete')
     const activityId = pcTrackingActivityId(scenarioIdx, eventType, s);
     const scoreScaleMax = pcTrackingScoreScaleMax(scenarioIdx, eventType, s);
 
+    const isS1ResearchEvent = scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE;
     const payload = {
       type: 'incremental',
       schema_version: PC_APP_SCHEMA_VERSION,
@@ -388,17 +396,16 @@ async function saveIncrementalData(scenarioIdx, eventType = 'scenario_complete')
       session_duration_min: parseFloat(((Date.now() - sessionStart) / 60000).toFixed(1)),
       scenarios_completed: scenarioCompleted.filter(Boolean).length,
       total_xp: Math.round(xp),
-      total_attempts: scenarioData.reduce((sum, item) => sum + (item.attempts || 0), 0),
-      attempts: s.attempts || 0,
-      current_score: currentScore,
-      best_score: bestScore,
-      score_delta: scoreDelta,
-      prompt_text: lastPrompt || prompts.join(' | '),
-      prompts: prompts.join(' | '),
-      // Keep the legacy column key for the current Apps Script schema, while
-      // also logging provider-neutral Babbage metadata in the raw/audit payload.
-      claude_response: s.finalResponse || '',
-      babbage_response: s.finalResponse || '',
+      total_attempts: isS1ResearchEvent ? '' : scenarioData.reduce((sum, item) => sum + (item.attempts || 0), 0),
+      attempts: isS1ResearchEvent ? '' : (s.attempts || 0),
+      current_score: isS1ResearchEvent ? '' : currentScore,
+      best_score: isS1ResearchEvent ? '' : bestScore,
+      score_delta: isS1ResearchEvent ? '' : scoreDelta,
+      prompt_text: isS1ResearchEvent ? eventType : (lastPrompt || prompts.join(' | ')),
+      prompts: isS1ResearchEvent ? '' : prompts.join(' | '),
+      // One provider-neutral response field avoids storing the same text three times.
+      claude_response: '',
+      babbage_response: '',
       final_response: s.finalResponse || '',
       ai_provider: s.aiProvider || '',
       ai_model: s.aiModel || '',
@@ -415,13 +422,20 @@ async function saveIncrementalData(scenarioIdx, eventType = 'scenario_complete')
         placementTotal: s.s1LearningPath?.placementTotal ?? '',
         diagnosisChoice: s.s1LearningPath?.diagnosisChoice || '',
         diagnosisCorrect: s.s1LearningPath?.diagnosisCorrect ?? '',
+        diagnosisRationale: s.s1LearningPath?.diagnosisRationale || '',
         guideStepAdded: Boolean(s.s1LearningPath?.guideStepAdded),
         activityCount: s.s1LearningPath?.activityCount ?? '',
+        placementMismatches: s.s1LearningPath?.placementMismatches || [],
+        guideSaved: Boolean(s.s1LearningPath?.guideSaved),
+        transferReflection: s.s1LearningPath?.transferReflection || '',
+        feedbackSource: s.s1LearningPath?.feedbackSource || '',
+        aiRequestFailed: Boolean(s.s1LearningPath?.aiRequestFailed),
+        completionStatus: s.s1LearningPath?.completionStatus || '',
         lastEvent: s.s1LearningPath?.lastEvent || ''
       }) : '',
       // My Course wording stays on this device, as promised in the S1 interface.
       s1_course_guide_json: '',
-      s1_oscqr_standards: scenarioIdx === SCENARIO_INDEX.CONTENT_AVALANCHE ? (s.oscqrLit || '') : '',
+      s1_oscqr_standards: '',
       s2_evidence_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.evidenceAttempts || []) : '',
       s2_thinking_move: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? (s.thinkingMove || '') : '',
       s2_audit_json: scenarioIdx === SCENARIO_INDEX.METACOGNITION ? JSON.stringify(s.auditAttempts || []) : '',
@@ -450,8 +464,8 @@ async function saveIncrementalData(scenarioIdx, eventType = 'scenario_complete')
       s5_flagged_claim: scenarioIdx === SCENARIO_INDEX.HALLUCINATION ? (s.flaggedClaim || '') : '',
       s5_corrected_claim: scenarioIdx === SCENARIO_INDEX.HALLUCINATION ? (s.correctedClaim || '') : '',
       s5_verification_note: scenarioIdx === SCENARIO_INDEX.HALLUCINATION ? (s.verificationNote || '') : '',
-      quality_indicators_lit: s.oscqrLit || '',
-      oscqr_lit: s.oscqrLit || '',
+      quality_indicators_lit: isS1ResearchEvent ? '' : (s.oscqrLit || ''),
+      oscqr_lit: isS1ResearchEvent ? '' : (s.oscqrLit || ''),
       self_report_prediction: selfReportPrediction,
       self_report: s.selfReport || '',
       prediction: latestPredictionChoice,
