@@ -12,14 +12,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=596">
+<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=598">
 <!-- Production CSS is generated from src/css by tools/build.py. -->
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
-<script src="runtime/js/dialogue-data.js?v=149&amp;patch=596"></script>
-<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=596&amp;receiver=94&amp;connections=511"></script>
+<script src="runtime/js/dialogue-data.js?v=149&amp;patch=598"></script>
+<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=598&amp;receiver=94&amp;connections=513"></script>
 
 </head>
 
@@ -337,6 +337,7 @@
   <div class="pc-main-menu-shell" role="document">
     <div class="pc-main-menu-topbar">
       <div class="pc-main-menu-brand">
+        <span class="pc-main-menu-brand-mark" aria-hidden="true"><img src="assets/images/ui/ui_01_babbage_mark.svg" alt=""></span>
         <span class="pc-main-menu-kicker">PromptCraft</span>
         <h1 id="mainMenuTitle">The Prompt Lab</h1>
         <span class="pc-main-menu-affiliation">Great Falls College Montana State University</span>
@@ -580,7 +581,7 @@
 
     <div class="pc-main-menu-footer">
       <span id="mainMenuStatus">Select an option to begin.</span>
-    <span id="mainMenuVersion" data-pc-app-version>Version 429 · Patch 596</span>
+    <span id="mainMenuVersion" data-pc-app-version>Version 429 · Patch 598</span>
     </div>
   </div>
 </div>
@@ -788,7 +789,7 @@
            name="promptcraft-vn-navigation"
            data-pc-toggle-action="close-other-details">
     <summary class="pc-brand-summary" aria-label="Open PromptCraft menu">
-      <span class="logo-icon" aria-hidden="true">✦</span>
+      <span class="logo-icon pc-babbage-logo-icon" aria-hidden="true"><img src="assets/images/ui/ui_01_babbage_mark.svg" alt=""></span>
       <span class="logo-copy">
         <span class="logo-name">Prompt<span>Craft</span></span>
         <span class="logo-sub">The Prompt Lab · GFC MSU</span>

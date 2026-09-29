@@ -5447,7 +5447,7 @@ function pcRenderS1GuideStep1({ fromMenu = pcS1GuideOpenedFromMenu } = {}) {
   area.innerHTML = `
     <section class="pc-s1-learning pc-scenario-stage pc-s1-guide-preview" role="region" aria-labelledby="pcS1GuideStep1Title" style="--pc-s1-learning-bg:url('${sceneBg}')">
       <div class="pc-s1-learning-taskbar pc-s1-guide-taskbar">
-        <div><span>My PromptCraft Course Guide · Step 1</span><h1 id="pcS1GuideStep1Title">Make the Learning Path Visible</h1><p>A Canvas building reference for your own course.</p></div>
+        <div><img class="pc-s1-guide-brand-mark" src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="" aria-hidden="true"><span>My PromptCraft Course Guide · Step 1</span><h1 id="pcS1GuideStep1Title">Make the Learning Path Visible</h1><p>A Canvas building reference for your own course.</p></div>
         <div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">${guide.added ? 'Saved to My Guide' : 'Guide preview'}</span>${fromMenu ? '<button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>' : ''}</div>
       </div>
       <div class="pc-s1-guide-paper" role="document" aria-label="Course Guide Step 1 preview">
@@ -6218,7 +6218,7 @@ function pcRenderS1FullGuide({ fromMenu = false } = {}) {
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
   area.innerHTML = `
     <section class="pc-s1-learning pc-scenario-stage pc-s1-full-guide" role="region" aria-labelledby="pcS1FullGuideTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar pc-s1-guide-taskbar"><div><span>My PromptCraft Course Guide</span><h1 id="pcS1FullGuideTitle">${esc(course.moduleTitle || 'Saved course guidance')}</h1><p>Your saved course feedback and module notes.</p></div><div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">Saved to My Guide</span><button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-clear-guide">Clear My Guide</button><button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button></div></div>
+      <div class="pc-s1-learning-taskbar pc-s1-guide-taskbar"><div><img class="pc-s1-guide-brand-mark" src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="" aria-hidden="true"><span>My PromptCraft Course Guide</span><h1 id="pcS1FullGuideTitle">${esc(course.moduleTitle || 'Saved course guidance')}</h1><p>Your saved course feedback and module notes.</p></div><div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">Saved to My Guide</span><button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-clear-guide">Clear My Guide</button><button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button></div></div>
       <nav class="pc-s1-full-guide-nav" aria-label="Course guide sections">
         <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideFeedback">Saved feedback</button>
         <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideModule">Module view</button>
@@ -6507,6 +6507,7 @@ function pcRenderCourseGuideOverview() {
     <section class="pc-s1-learning pc-scenario-stage pc-s1-full-guide pc-course-guide-overview" role="region" aria-labelledby="pcCourseGuideOverviewTitle">
       <header class="pc-s1-learning-taskbar pc-s1-guide-taskbar">
         <div>
+          <img class="pc-s1-guide-brand-mark" src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="" aria-hidden="true">
           <span>My PromptCraft Course Guide</span>
           <h1 id="pcCourseGuideOverviewTitle">Keep the ideas you want to use</h1>
           <p>A personal reference that grows from the work you choose to save.</p>
