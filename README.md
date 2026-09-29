@@ -1,6 +1,6 @@
 # PromptCraft
 
-Current application: `PROMPTCRAFT_V429`, browser patch `598`, research schema `V121`, Apps Script receiver source `V94`, asset manifest `v151`.
+Current application: `PROMPTCRAFT_V429`, browser patch `599`, research schema `V121`, Apps Script receiver source `V94`, asset manifest `v151`.
 
 Scenario 1 is **Start With the Learning** with Maya and Professor Pixel. Its playable source is `src/js/scenarios/s1-start-with-learning.js`, selected by `src/js/scenarios/registry.js`. The internal `content-avalanche` scenario key remains for saved data and research compatibility.
 
@@ -18,4 +18,4 @@ Scenario 1 is **Start With the Learning** with Maya and Professor Pixel. Its pla
 - `docs/development/s1-removal-audit.md` records remaining legacy source dependencies.
 - `docs/asset-management/` contains the S1 artwork lists, recording scripts, and production trackers.
 
-Historical patch packages, test suites, and retired recording guides were removed from this working package. The original uploaded repository ZIP remains a separate backup. Deploy Patch 598 and Receiver V94 together, run `initializeWorkbookNow()`, reset disposable test records if desired, and complete a hosted S1 smoke pass before participant testing.
+Historical patch packages, test suites, and retired recording guides were removed from this working package. The original uploaded repository ZIP remains a separate backup. Deploy Patch 599 and Receiver V94 together, run `initializeWorkbookNow()`, reset disposable test records if desired, and complete a hosted S1 smoke pass before participant testing.

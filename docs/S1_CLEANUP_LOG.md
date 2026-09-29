@@ -1,5 +1,11 @@
 # Scenario 1 Cleanup Log
 
+## 2026-09-29 — Patch 599 consistent Continue controls
+
+- Replaced the remaining dark-green Continue buttons with the shared blue primary-action treatment.
+- Standardized Continue-button height, padding, radius, type, capitalization, wrapping, hover, focus, and disabled states.
+- Applied the shared control to Scenario 1, prediction results, Babbage return actions, completed results, the main menu, and narrow responsive layouts without changing navigation behavior.
+
 ## 2026-09-29 — Patch 598 shared blue-and-gold branding
 
 - Standardized shared PromptCraft surfaces on the Great Falls College navy, blue, sky, and gold palette.

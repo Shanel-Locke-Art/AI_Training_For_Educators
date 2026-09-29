@@ -2100,3 +2100,119 @@ html body .pc-s1-guide-brand-mark {
     print-color-adjust: exact;
   }
 }
+
+/* P599 — one Continue-button component across every gameplay surface.
+   Older scenario and terminal owners used several unrelated green buttons,
+   uppercase labels, and different corner radii. Keep layout positioning with
+   each screen, but give every forward action the same visual contract. */
+html body :is(
+  #audioSetupContinueBtn,
+  #menuContinueBtn,
+  button.continue-btn,
+  button.prediction-continue-btn,
+  button.pc-button--primary,
+  button.pc-primary-action,
+  button.audio-setup-primary,
+  button.pc-menu-action-primary,
+  .pc-s1-learning button.pc-shell-primary,
+  .pc-s1-canvas-prev-next button.pc-s1-canvas-continue,
+  button.vn-return-btn.terminal-return,
+  button[data-pc-action*="continue"],
+  button[data-pc-action="navigate-next"]
+),
+html body.s1-result-active .s1-result-controls button.continue-btn,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active button.prediction-continue-btn,
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active button.vn-return-btn.terminal-return {
+  appearance: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 160px !important;
+  min-height: 50px !important;
+  max-width: 100% !important;
+  padding: 12px 20px !important;
+  border: 2px solid rgba(117, 191, 225, .92) !important;
+  border-radius: 10px !important;
+  background: linear-gradient(180deg, #0b79ae 0%, var(--gfc-blue) 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 3px 0 rgba(8, 26, 54, .82), 0 7px 16px rgba(8, 38, 72, .18) !important;
+  font-family: var(--pc-font-body) !important;
+  font-size: clamp(.95rem, 1vw, 1.05rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  letter-spacing: .01em !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  white-space: normal !important;
+  text-shadow: none !important;
+  cursor: pointer !important;
+}
+
+html body :is(
+  #audioSetupContinueBtn,
+  #menuContinueBtn,
+  button.continue-btn,
+  button.prediction-continue-btn,
+  button.pc-button--primary,
+  button.pc-primary-action,
+  button.audio-setup-primary,
+  button.pc-menu-action-primary,
+  .pc-s1-learning button.pc-shell-primary,
+  .pc-s1-canvas-prev-next button.pc-s1-canvas-continue,
+  button.vn-return-btn.terminal-return,
+  button[data-pc-action*="continue"],
+  button[data-pc-action="navigate-next"]
+):is(:hover, :focus-visible):not(:disabled),
+html body.s1-result-active .s1-result-controls button.continue-btn:is(:hover, :focus-visible),
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active button.prediction-continue-btn:is(:hover, :focus-visible),
+html body #vnOverlay#vnOverlay#vnOverlay.vn-overlay.active button.vn-return-btn.terminal-return:is(:hover, :focus-visible) {
+  border-color: var(--gfc-gold) !important;
+  background: linear-gradient(180deg, #0a6696 0%, var(--gfc-navy) 100%) !important;
+  color: #fff !important;
+  outline: 3px solid rgba(230, 165, 29, .3) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 3px 0 rgba(8, 26, 54, .9), 0 0 0 4px rgba(89, 183, 227, .16), 0 8px 20px rgba(8, 38, 72, .22) !important;
+}
+
+html body :is(
+  #audioSetupContinueBtn,
+  #menuContinueBtn,
+  button.continue-btn,
+  button.prediction-continue-btn,
+  button.pc-button--primary,
+  button.pc-primary-action,
+  button.audio-setup-primary,
+  button.pc-menu-action-primary,
+  .pc-s1-learning button.pc-shell-primary,
+  .pc-s1-canvas-prev-next button.pc-s1-canvas-continue,
+  button.vn-return-btn.terminal-return,
+  button[data-pc-action*="continue"],
+  button[data-pc-action="navigate-next"]
+):disabled {
+  border-color: #718797 !important;
+  background: #91a4b1 !important;
+  color: #f8fbfd !important;
+  box-shadow: none !important;
+  opacity: .72 !important;
+  cursor: not-allowed !important;
+}
+
+@media screen and (max-width: 640px) {
+  html body :is(
+    #audioSetupContinueBtn,
+    #menuContinueBtn,
+    button.continue-btn,
+    button.prediction-continue-btn,
+    .pc-s1-learning button.pc-shell-primary,
+    .pc-s1-canvas-prev-next button.pc-s1-canvas-continue,
+    button.vn-return-btn.terminal-return,
+    button[data-pc-action*="continue"],
+    button[data-pc-action="navigate-next"]
+  ) {
+    min-height: 52px !important;
+    padding: 13px 16px !important;
+    border-radius: 9px !important;
+    font-size: 1rem !important;
+  }
+}
