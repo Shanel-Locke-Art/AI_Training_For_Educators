@@ -47,13 +47,14 @@ const SCENARIO_UI = [
     key: 'accessibility',
     dataLabel: 'S2: Access Is Part of the Design',
     tabLabel: 'S2: Access Is Part of the Design',
-    missionTitle: 'Find the barriers a polished course can hide.',
-    missionCopy: 'A polished Canvas course still creates barriers. Find the accessibility problems, connect them to current standards, and use AI to support—but not replace—an informed accessibility review.',
-    boardText: 'Scenario 2 is in development.',
-    rendererKey: 'development-shell', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
+    missionTitle: 'Use AI to repair the structure without changing the lesson.',
+    missionCopy: 'Help Lena use her learning materials. Inspect the page, ask Babbage to make real headings, and verify the repair in a practice Canvas HTML editor.',
+    boardText: 'Lena found the materials, but keeps losing her place. Repair the page structure while preserving the information.',
+    rendererKey: 'accessibility-preview', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, developmentStatus: 'Planned · In development',
-    plannedLoop: ['Inspect the Canvas experience', 'Connect barriers to standards', 'Repair with AI support', 'Verify with human review']
+    implemented: false, previewAvailable: true, previewIntroduction: false,
+    developmentStatus: 'Heading repair playable · First section preview',
+    plannedLoop: ['Inspect materials', 'Ask AI to repair headings', 'Preview and verify', 'Apply the repaired HTML']
   },
   {
     key: 'metacognition',
@@ -163,6 +164,7 @@ function pcUnlockScenarioTab(index) {
 
 const PC_SCENARIO_RENDERERS = Object.freeze({
   'start-with-learning': () => renderS1StartWithLearning(),
+  'accessibility-preview': () => pcRenderS2Accessibility(),
   'metacognition-opening': ({ container }) => renderS2Standby(container),
   'assessment-opening': ({ container }) => renderS3Standby(container),
   'development-shell': ({ index }) => renderScenarioPlaceholder(index)
@@ -199,6 +201,7 @@ function getMainMenuPanel(panelName) {
 
 function getScenarioMenuStatus(index) {
   const ui = getScenarioUI(index);
+  if (index === SCENARIO_INDEX.ACCESSIBILITY) return 'Heading repair preview';
   if (index > SCENARIO_INDEX.CONTENT_AVALANCHE) return 'Locked · New game loop in development';
   if (!ui.implemented) return ui.developmentStatus || 'In redesign';
   if (scenarioCompleted[index]) return 'Completed';
@@ -209,7 +212,7 @@ function getScenarioMenuStatus(index) {
 
 function isScenarioAvailableFromMenu(index) {
   const normalized = pcNormalizeScenarioIndex(index);
-  return normalized === SCENARIO_INDEX.CONTENT_AVALANCHE;
+  return normalized === SCENARIO_INDEX.CONTENT_AVALANCHE || normalized === SCENARIO_INDEX.ACCESSIBILITY;
 }
 
 
@@ -223,7 +226,7 @@ function renderScenarioMenu() {
       ? ' is-complete'
       : (pcScenarioHasLaunched && scenarioIndex === index ? ' is-current' : '');
     const shellClass = ui.implemented ? '' : ' is-development-shell';
-    const rebuildLocked = index > SCENARIO_INDEX.CONTENT_AVALANCHE;
+    const rebuildLocked = !isScenarioAvailableFromMenu(index);
 
     return `
       <button class="pc-menu-scenario-card${stateClass}${shellClass}${rebuildLocked ? ' is-rebuild-locked' : ''}"
@@ -439,6 +442,9 @@ function launchScenarioFromMenu(index, options = {}) {
 
 function continueFromMainMenu() {
   if (!pcScenarioHasLaunched) return launchScenarioFromMenu(SCENARIO_INDEX.CONTENT_AVALANCHE);
+  if (scenarioIndex === SCENARIO_INDEX.ACCESSIBILITY && !document.getElementById('pcS2AccessTitle')) {
+    pcRenderS2AccessScreen();
+  }
   return closeMainMenu({ force: true });
 }
 

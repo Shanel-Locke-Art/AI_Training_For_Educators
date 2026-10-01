@@ -420,54 +420,19 @@ function pcS1LearningProgressText() {
 }
 
 function pcRenderS1MayaPanel(quote = PC_S1_LEARNING_DEFAULT_QUOTE) {
-  return `
-    <aside class="pc-s1-maya-panel" aria-labelledby="pcS1MayaName">
-      <div class="pc-s1-maya-panel-inner">
-        <div class="pc-s1-maya-quote" aria-live="polite">
-          <span id="pcS1MayaName">Maya</span>
-          <p>${esc(quote)}</p>
-        </div>
-        <div class="pc-s1-maya-art-wrap">
-          <img class="pc-s1-maya-art" src="${ASSETS.images.students.maya.neutral}" alt="Maya" />
-        </div>
-      </div>
-    </aside>`;
+  return pcRenderCanvasStudentPanel({ name: 'Maya', portraitSrc: ASSETS.images.students.maya.neutral, quote, idPrefix: 'pcS1Maya' });
 }
 
 function pcRenderS1CanvasGlobalNav() {
-  return `
-    <nav class="pc-s1-canvas-global-nav" aria-label="Canvas global navigation">
-      <div class="pc-s1-canvas-global-brand" aria-hidden="true">
-        <img src="${PC_S1_MO_ASSET}" alt="" />
-      </div>
-      <a href="#" data-pc-action="s1-learning-prevent-link"><span class="pc-s1-canvas-global-dot" aria-hidden="true"></span><b>Account</b></a>
-      <a href="#" data-pc-action="s1-learning-prevent-link"><span class="pc-s1-canvas-global-glyph" aria-hidden="true">⌂</span><b>Dashboard</b></a>
-      <a href="#" class="is-active" data-pc-action="s1-learning-prevent-link"><span class="pc-s1-canvas-global-glyph" aria-hidden="true">▣</span><b>Courses</b></a>
-      <a href="#" data-pc-action="s1-learning-prevent-link"><span class="pc-s1-canvas-global-glyph" aria-hidden="true">□</span><b>Calendar</b></a>
-      <a href="#" data-pc-action="s1-learning-prevent-link"><span class="pc-s1-canvas-global-glyph" aria-hidden="true">▱</span><b>Inbox</b></a>
-      <a href="#" data-pc-action="s1-learning-prevent-link"><span class="pc-s1-canvas-global-glyph" aria-hidden="true">◷</span><b>History</b></a>
-      <a href="#" data-pc-action="s1-learning-prevent-link"><span class="pc-s1-canvas-global-glyph" aria-hidden="true">?</span><b>Help</b></a>
-    </nav>`;
+  return pcRenderCanvasGlobalNav();
 }
 
 function pcRenderS1CanvasCourseNav() {
-  return `
-    <nav class="pc-s1-canvas-course-nav" aria-label="Canvas course navigation">
-      <a href="#" data-pc-action="s1-learning-prevent-link">Home</a>
-      <a href="#" class="is-active" aria-current="page" data-pc-action="s1-learning-show-module">Modules</a>
-      <a href="#" data-pc-action="s1-learning-prevent-link">Grades</a>
-      <a href="#" data-pc-action="s1-learning-prevent-link">Panorama</a>
-      <a href="#" data-pc-action="s1-learning-prevent-link">Discussions</a>
-      <a href="#" data-pc-action="s1-learning-prevent-link">Assignments</a>
-    </nav>`;
+  return pcRenderCanvasCourseNav();
 }
 
 function pcRenderS1CanvasTopbar(context = 'Modules') {
-  return `
-    <div class="pc-s1-canvas-topbar">
-      <button type="button" class="pc-s1-canvas-hamburger" data-pc-action="s1-learning-prevent-link" aria-label="Canvas navigation menu"><span></span><span></span><span></span></button>
-      <div class="pc-s1-canvas-course-title">Community Health <span aria-hidden="true">›</span> <strong>${esc(context)}</strong></div>
-    </div>`;
+  return pcRenderCanvasTopbar({ context });
 }
 
 function pcRenderS1ModuleRows() {
@@ -487,17 +452,7 @@ function pcRenderS1ModuleRows() {
 }
 
 function pcRenderS1CanvasShell(mainHTML, context = 'Modules') {
-  return `
-    <div class="pc-s1-canvas-app" aria-label="Canvas course simulation">
-      ${pcRenderS1CanvasGlobalNav()}
-      <div class="pc-s1-canvas-course-shell">
-        ${pcRenderS1CanvasTopbar(context)}
-        <div class="pc-s1-canvas-course-body">
-          ${pcRenderS1CanvasCourseNav()}
-          <main class="pc-s1-canvas-main">${mainHTML}</main>
-        </div>
-      </div>
-    </div>`;
+  return pcRenderCanvasShell(mainHTML, { context });
 }
 
 function pcRenderS1CanvasModule() {

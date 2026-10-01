@@ -21,3 +21,5 @@
 @import url("responsive/prediction.css");
 @import url("responsive/final-overrides.css");
 @import url("ui/gfc-theme.css");
+
+@import url("scenarios/s2-accessibility.css");

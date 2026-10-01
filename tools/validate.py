@@ -150,22 +150,25 @@ def main() -> int:
             if value.startswith("${"):
                 # Dynamically interpolated action (e.g. data-pc-action="${esc(submitAction)}").
                 # The literal action name lives wherever the caller supplies the
-                # submitAction/backAction argument, not in this markup string, so
+                # submitAction/backAction or Canvas navigation argument, not in this markup string, so
                 # it's resolved separately below instead of being treated as a
                 # literal action name.
                 continue
             used_actions.add(value)
     used_actions.update(
         re.findall(
-            # Only submitAction/backAction feed data-pc-action attributes (see
-            # buildTransferLabInputHTML / buildTransferRevisionWorkbenchHTML in
-            # shared-components.js). afterIntroAction is a different dispatch
+            # Shared forms and Canvas navigation pass literal action arguments.
+            # afterIntroAction is a different dispatch
             # path (pcRunScenarioAfterIntroAction) and is not part of the
             # pcRegisterUIActions registry, so it's intentionally excluded here.
-            r'''\b(?:submitAction|backAction)\s*:\s*['"]([a-z0-9-]+)['"]''',
+            r'''\b(?:submitAction|backAction|preventAction|moduleAction)\s*:\s*['"]([a-z0-9-]+)['"]''',
             action_markup_text,
         )
     )
+
+    # The S2 button renderer receives literal action keys at its call sites.
+    # Resolve those calls rather than treating its template placeholder as a key.
+    used_actions.update(re.findall(r"pcS2AccessButton\(['\"]([a-z0-9-]+)['\"]", action_markup_text))
 
     registered_actions: set[str] = set()
     for source in source_paths:

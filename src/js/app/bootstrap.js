@@ -67,7 +67,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const inputContainer = document.getElementById('inputContainer');
 
-    if (!inputContainer || !inputContainer.textContent.trim()) {
+    if (!pcScenarioHasLaunched && !document.getElementById('chat')?.textContent.trim()) {
       console.warn('[PromptCraft] Startup watchdog repaired empty initial scenario render.');
       try {
         window.scenarioIntroEnabled = false;

@@ -375,8 +375,15 @@ const S5_REVIEW_SCHEMA = {
   }
 };
 
+const S2_ACCESSIBILITY_HEADING_SCHEMA = {
+  type: 'object', additionalProperties: false,
+  required: ['repaired_html', 'explanation'],
+  properties: { repaired_html: { type: 'string' }, explanation: { type: 'string' } }
+};
+
 function getAnalysisContract_(incoming) {
   const analysisType = String(incoming?.analysis_type || 'scenario1');
+  if (analysisType === 's2_accessibility_heading_repair') return { analysisType, schemaName: 'promptcraft_s2_accessibility_heading_repair', schemaVersion: 'promptcraft_s2_accessibility_heading_repair_v1', schema: S2_ACCESSIBILITY_HEADING_SCHEMA };
   if (analysisType === 's1_evidence_analysis') {
     return {
       analysisType,
@@ -531,7 +538,7 @@ exports.handler = async (event = {}) => {
         's1_evidence_analysis',
         's1_transfer_plan_analysis',
         's1_canvas_rescue',
-        's2_draft', 's2_review',
+        's2_draft', 's2_review', 's2_accessibility_heading_repair',
         's3_draft', 's3_review', 's3_evidence_analysis', 's3_transfer_assessment',
         's4_draft', 's4_review',
         's5_brief', 's5_review'

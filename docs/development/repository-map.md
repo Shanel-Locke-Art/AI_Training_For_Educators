@@ -1,11 +1,13 @@
 # PromptCraft source map
 
-Current identifiers: application `PROMPTCRAFT_V429`, patch `599`, research `V121`, receiver `V94`, asset manifest `v151`.
+Current identifiers: application `PROMPTCRAFT_V429`, patch `600`, research `V121`, receiver `V94`, asset manifest `v151`.
 
 | Area | Current owner |
 |---|---|
 | Scenario menu, current route, internal identifiers | `src/js/scenarios/registry.js` |
 | Playable Scenario 1 | `src/js/scenarios/s1-start-with-learning.js` and `src/css/scenarios/s1-start-with-learning.css` |
+| S2 accessibility section preview | `src/js/scenarios/s2-accessibility.js` and `src/css/scenarios/s2-accessibility.css` |
+| Shared Canvas simulation | `src/js/scenarios/canvas-simulation.js` (S1-compatible renderers used by S1 and S2) |
 | Shared scenario presentation | `src/js/scenarios/shared-shell.js`, `shared-components.js`, and `src/js/ui/visual-novel.js` |
 | Scenario 3 and 4 browser implementations | `src/js/scenarios/s2-metacognition.js` and `s3-authentic-assessment.js` (internal names retained for compatibility) |
 | App state, actions, and startup | `src/js/app/runtime-state.js`, `scenario-runtime.js`, `action-routing.js`, and `bootstrap.js` |
