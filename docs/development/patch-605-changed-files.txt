@@ -1,0 +1,11 @@
+# New or changed files relative to Patch 604. No deletion is required.
+README.md
+docs/development/S1_PRODUCTION_LOOP_AUDIT.md
+docs/development/patch-605-changed-files.txt
+docs/development/patch-605-s1-completion.md
+docs/development/repository-map.md
+index.html
+runtime/js/promptcraft.bundle.js
+src/js/app/scenario-runtime.js
+src/js/scenarios/registry.js
+tools/test_s1_learning_loop.cjs

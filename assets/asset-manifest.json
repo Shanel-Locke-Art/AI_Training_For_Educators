@@ -1,5 +1,5 @@
 {
-  "version": 151,
+  "version": 152,
   "runtime_images": {
     "bg_01_app.png": "assets/images/backgrounds/bg_01_app.png",
     "bg_02_classroom.png": "assets/images/backgrounds/bg_02_classroom.png",
@@ -60,7 +60,10 @@
     "legacy_s01_board_22_instructor_after_submit.png": "assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_22_instructor_after_submit.png",
     "legacy_s01_board_23_instructor_before_buried.png": "assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_23_instructor_before_buried.png",
     "legacy_s01_board_24_instructor_after_start_here.png": "assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_24_instructor_after_start_here.png",
-    "ui_04_mo_river_otter.png": "assets/images/ui/ui_04_mo_river_otter.png"
+    "ui_04_mo_river_otter.png": "assets/images/ui/ui_04_mo_river_otter.png",
+    "lena_neutral_draft.png": "assets/images/characters/students/lena/lena_neutral_draft.png",
+    "lena_thinking_draft.png": "assets/images/characters/students/lena/lena_thinking_draft.png",
+    "lena_confident_draft.png": "assets/images/characters/students/lena/lena_confident_draft.png"
   },
   "planned_runtime_images": {
     "s04_01_scene.png": "assets/images/scenes/scenario-04-sync-bias/s04_01_scene.png",

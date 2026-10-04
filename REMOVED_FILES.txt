@@ -1,6 +1,0 @@
-Renamed or replaced by this update:
-
-- apps-script/PromptCraft_Receiver_V92_Start_With_Learning.js
-- docs/development/receiver-v92-deployment.md
-
-Remove these older files when applying the changed-files package. Their V93 replacements are included.

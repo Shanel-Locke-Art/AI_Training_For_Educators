@@ -798,6 +798,11 @@ const ASSETS = Object.freeze({
       proud: pcProjectUrl('assets/images/characters/professor-pixel/pp_06_proud.png')
     }),
     students: Object.freeze({
+      lena: Object.freeze({
+        neutral: pcProjectUrl('assets/images/characters/students/lena/lena_neutral_draft.png'),
+        thinking: pcProjectUrl('assets/images/characters/students/lena/lena_thinking_draft.png'),
+        confident: pcProjectUrl('assets/images/characters/students/lena/lena_confident_draft.png')
+      }),
       jordan: Object.freeze({
         neutral: pcProjectUrl('assets/images/characters/students/jordan/jordan_01_neutral.png'),
         uncertain: pcProjectUrl('assets/images/characters/students/jordan/jordan_03_uncertain.png'),
@@ -4367,8 +4372,9 @@ pcExposeGlobals({ pcFillS1TransferDevTask });
 ;
 /* SOURCE: src/js/scenarios/canvas-simulation.js */
 /* Shared Canvas presentation. S1 wrappers retain the original DOM and actions. */
+const PC_CANVAS_MO_ASSET = 'assets/images/ui/ui_04_mo_river_otter.png';
 
-function pcRenderCanvasGlobalNav({ preventAction = 's1-learning-prevent-link', moAsset = PC_S1_MO_ASSET } = {}) {
+function pcRenderCanvasGlobalNav({ preventAction = 's1-learning-prevent-link', moAsset = PC_CANVAS_MO_ASSET } = {}) {
   return `
     <nav class="pc-s1-canvas-global-nav" aria-label="Canvas global navigation">
       <div class="pc-s1-canvas-global-brand" aria-hidden="true">
@@ -4404,7 +4410,7 @@ function pcRenderCanvasTopbar({ context = 'Modules', courseTitle = 'Community He
     </div>`;
 }
 
-function pcRenderCanvasShell(mainHTML, { context = 'Modules', courseTitle = 'Community Health', preventAction = 's1-learning-prevent-link', moduleAction = 's1-learning-show-module', moAsset = PC_S1_MO_ASSET } = {}) {
+function pcRenderCanvasShell(mainHTML, { context = 'Modules', courseTitle = 'Community Health', preventAction = 's1-learning-prevent-link', moduleAction = 's1-learning-show-module', moAsset = PC_CANVAS_MO_ASSET } = {}) {
   return `
     <div class="pc-s1-canvas-app" aria-label="Canvas course simulation">
       ${pcRenderCanvasGlobalNav({ preventAction, moAsset })}
@@ -4432,12 +4438,67 @@ function pcRenderCanvasStudentPanel({ name, portraitSrc = '', quote = '', idPref
       </div>
     </aside>`;
 }
-;
-/* SOURCE: src/js/scenarios/s1-start-with-learning.js */
-/* PROMPTCRAFT S1 — START WITH THE LEARNING
-   Rebuild slice 1: explore Maya's intentionally unclear Canvas module. */
 
-const PC_S1_MO_ASSET = 'assets/images/ui/ui_04_mo_river_otter.png';
+function pcRenderCanvasPage({ titleId, title = '', contentHTML = '', navigationHTML = '' } = {}) {
+  return `
+    <div class="pc-s1-canvas-item-header"><h1 id="${esc(titleId)}">${esc(title)}</h1></div>
+    <article class="pc-s1-canvas-content-page" aria-labelledby="${esc(titleId)}">
+      <div class="pc-s1-canvas-richtext">${contentHTML}</div>
+    </article>
+    ${navigationHTML}`;
+}
+;
+/* SOURCE: src/js/scenarios/learning-presentation.js */
+/* Shared learning-task presentation, extracted from the production S1 loop.
+   Keep pc-s1-* selector names as the existing theme/responsive compatibility API.
+   HTML slots accept trusted application templates only; never pass raw AI output. */
+
+function pcRenderLearningTaskbar({ label = '', titleId, title = '', instruction = '', status = '' } = {}) {
+  return `
+      <div class="pc-s1-learning-taskbar">
+        <div>
+          <span>${esc(label)}</span>
+          <h1 id="${esc(titleId)}">${esc(title)}</h1>
+          <p>${esc(instruction)}</p>
+        </div>
+        <div class="pc-s1-learning-task-status">${esc(status)}</div>
+      </div>`;
+}
+
+function pcRenderLearningStage({ className = '', titleId, background = '', taskbarHTML = '', bodyHTML = '' } = {}) {
+  const backgroundStyle = background ? ` style="--pc-s1-learning-bg:url('${esc(background)}')"` : '';
+  return `
+    <section class="pc-s1-learning pc-scenario-stage${className ? ` ${esc(className)}` : ''}" role="region" aria-labelledby="${esc(titleId)}"${backgroundStyle}>
+      ${taskbarHTML}
+      ${bodyHTML}
+    </section>`;
+}
+
+function pcRenderLearningWorkspace({ mainHTML = '', studentHTML = '' } = {}) {
+  return `
+      <div class="pc-s1-learning-shell">
+        <div class="pc-s1-learning-workspace">
+          ${mainHTML}
+          ${studentHTML}
+        </div>
+      </div>`;
+}
+
+function pcRenderLearningDiagnosisChoices({ choices = [], selected = '', action, choiceAttribute = 'data-pc-diagnosis-id' } = {}) {
+  return choices.map(choice => `
+    <button type="button" class="pc-s1-diagnosis-choice${selected === choice.id ? ' is-selected' : ''}"
+      data-pc-action="${esc(action)}" ${choiceAttribute}="${esc(choice.id)}"
+      aria-pressed="${selected === choice.id ? 'true' : 'false'}">
+      <span class="pc-s1-diagnosis-radio" aria-hidden="true"></span>
+      <span>${esc(choice.text)}</span>
+    </button>`).join('');
+}
+;
+/* SOURCE: src/js/scenarios/s1-learning-content.js */
+/* S1 example content and lesson configuration. */
+
+// Retained alias for callers that still use the S1 name.
+const PC_S1_MO_ASSET = PC_CANVAS_MO_ASSET;
 
 const PC_S1_LEARNING_ITEMS = Object.freeze([
   Object.freeze({
@@ -4543,6 +4604,62 @@ const PC_S1_LEARNING_ITEMS = Object.freeze([
 const PC_S1_LEARNING_DEFAULT_QUOTE =
   'These file names do not tell me much about what I am supposed to do first. I would probably start clicking until something made sense.';
 
+const PC_S1_SUGGESTED_PURPOSES = Object.freeze({
+  'food-access-reading': 'prepare',
+  'food-access-video': 'prepare',
+  'module-terms': 'prepare',
+  'discussion-3': 'practice',
+  'quiz-3': 'evidence'
+});
+
+const PC_S1_PURPOSE_LABELS = Object.freeze({ prepare: 'Prepare', practice: 'Practice', evidence: 'Evidence' });
+
+const PC_S1_OSCQR_STANDARDS = Object.freeze([
+  Object.freeze({ number: 2, title: 'Module overview and predictability', connection: 'Module overviews, activity names, and sequence make course work easier to find and anticipate.' }),
+  Object.freeze({ number: 9, title: 'Measurable alignment', connection: 'Objectives, learning activities, and assessments are checked against the same intended learning.' }),
+  Object.freeze({ number: 16, title: 'Logical, uncluttered navigation', connection: 'Related work is organized together with consistent structure and self-evident titles.' }),
+  Object.freeze({ number: 19, title: 'Clear instructions', connection: 'Students can tell what to do, what to produce, and what happens next.' }),
+  Object.freeze({ number: 21, title: 'Readable headings and structure', connection: 'Text headers and heading styles reveal the purpose and structure of the module.' }),
+  Object.freeze({ number: 45, title: 'Authentic evidence of mastery', connection: 'The module includes an appropriate way for students to demonstrate the intended learning.' }),
+  Object.freeze({ number: 46, title: 'Clear assessment criteria', connection: 'Students can see the criteria for the evidence they are expected to produce.' })
+]);
+
+const PC_S1_ORGANIZE_ZONES = Object.freeze([
+  Object.freeze({ id: 'prepare', label: 'Prepare', definition: 'Students learn or review information they will need.' }),
+  Object.freeze({ id: 'practice', label: 'Practice', definition: 'Students try the skill, think with the ideas, or get feedback.' }),
+  Object.freeze({ id: 'evidence', label: 'Evidence', definition: 'Students show what they can actually do for the intended learning.' })
+]);
+
+const PC_S1_DIAGNOSIS_CHOICES = Object.freeze([
+  Object.freeze({
+    id: 'more-content',
+    text: 'The module needs more content before Maya can learn the topic.'
+  }),
+  Object.freeze({
+    id: 'navigation-only',
+    text: 'The main problem is that Maya cannot tell where to start in the module.'
+  }),
+  Object.freeze({
+    id: 'evidence-gap',
+    text: 'The module gives Maya useful preparation, but it does not provide evidence that she can perform the intended learning.'
+  }),
+  Object.freeze({
+    id: 'quiz-length',
+    text: 'The quiz is too short to count as a meaningful assessment.'
+  })
+]);
+
+const PC_S1_DEV_RENAMES = Object.freeze([
+  'Food Access and Community Health Reading',
+  'Food Deserts and Community Barriers Video',
+  'Module 3 Food Access Terms',
+  'Discuss Community Food-Access Barriers',
+  'Module 3 Food Access Quiz'
+]);
+;
+/* SOURCE: src/js/scenarios/s1-learning-state.js */
+/* S1 local workspace, reset, scoring and asynchronous-work guards. */
+
 // P590 starts the production-ready local workspace after the guide test cycle.
 // Earlier generations contain prototype entries and must never populate a new run.
 const PC_S1_MY_COURSE_STORAGE_KEY = 'promptcraft_my_course_s1_v3';
@@ -4564,44 +4681,12 @@ function pcInvalidateS1AsyncWork() {
 }
 
 function pcS1AsyncWorkIsCurrent(epoch) {
-  return Number(epoch) === pcS1WorkspaceEpoch;
+  // Leaving S1 does not reset its local epoch. Also check scenario ownership
+  // so a late response cannot render a guide over the next scenario.
+  return Number(epoch) === pcS1WorkspaceEpoch && scenarioIndex === SCENARIO_INDEX.CONTENT_AVALANCHE;
 }
 
-const PC_S1_SUGGESTED_PURPOSES = Object.freeze({
-  'food-access-reading': 'prepare',
-  'food-access-video': 'prepare',
-  'module-terms': 'prepare',
-  'discussion-3': 'practice',
-  'quiz-3': 'evidence'
-});
 
-const PC_S1_PURPOSE_LABELS = Object.freeze({ prepare: 'Prepare', practice: 'Practice', evidence: 'Evidence' });
-
-const PC_S1_OSCQR_STANDARDS = Object.freeze([
-  Object.freeze({ number: 2, title: 'Module overview and predictability', connection: 'Module overviews, activity names, and sequence make course work easier to find and anticipate.' }),
-  Object.freeze({ number: 9, title: 'Measurable alignment', connection: 'Objectives, learning activities, and assessments are checked against the same intended learning.' }),
-  Object.freeze({ number: 16, title: 'Logical, uncluttered navigation', connection: 'Related work is organized together with consistent structure and self-evident titles.' }),
-  Object.freeze({ number: 19, title: 'Clear instructions', connection: 'Students can tell what to do, what to produce, and what happens next.' }),
-  Object.freeze({ number: 21, title: 'Readable headings and structure', connection: 'Text headers and heading styles reveal the purpose and structure of the module.' }),
-  Object.freeze({ number: 45, title: 'Authentic evidence of mastery', connection: 'The module includes an appropriate way for students to demonstrate the intended learning.' }),
-  Object.freeze({ number: 46, title: 'Clear assessment criteria', connection: 'Students can see the criteria for the evidence they are expected to produce.' })
-]);
-
-function pcS1OSCQRLabel() {
-  return PC_S1_OSCQR_STANDARDS.map(item => `OSCQR ${item.number}: ${item.title}`).join(' | ');
-}
-
-function pcRenderS1OSCQRStandards({ concise = false } = {}) {
-  const standards = concise
-    ? PC_S1_OSCQR_STANDARDS.filter(item => [2, 9, 19, 45].includes(item.number))
-    : PC_S1_OSCQR_STANDARDS;
-  return `<section class="pc-s1-guide-section pc-s1-oscqr-section" id="pcS1GuideStandards" aria-labelledby="pcS1OSCQRHeading">
-    <span class="pc-s1-result-eyebrow">OSCQR 4.1 connections</span>
-    <h3 id="pcS1OSCQRHeading">Standards connected to this review</h3>
-    <p>Use these connections as prompts for further inspection, not as a completed course review.</p>
-    <div class="pc-s1-oscqr-grid">${standards.map(item => `<article><strong><span>OSCQR ${item.number}</span>${esc(item.title)}</strong><p>${esc(item.connection)}</p></article>`).join('')}</div>
-  </section>`;
-}
 
 function pcRecordS1LearningProgress(eventType, score, promptText, responseText, detail = {}) {
   const data = scenarioData?.[SCENARIO_INDEX.CONTENT_AVALANCHE];
@@ -4683,7 +4768,6 @@ function pcSaveS1MyCourse(data = pcS1LearningState?.myCourse) {
   }
 }
 
-
 function pcLoadS1Guide() {
   const empty = { step1: { added: false, personalizedInsight: null, personalizedNote: '', generatedAt: '' }, myCourseReview: null };
   try {
@@ -4742,33 +4826,37 @@ function pcClearS1LocalWorkspace() {
   return cleared;
 }
 
-let pcS1LearningState = {
-  view: 'module',
-  activeIndex: 0,
-  opened: new Set(),
-  checkpoint: false,
-  renameIndex: 0,
-  renamedTitles: new Array(PC_S1_LEARNING_ITEMS.length).fill(''),
-  renameNotice: '',
-  organization: Object.fromEntries(PC_S1_LEARNING_ITEMS.map(item => [item.id, ''])),
-  organizationNotice: '',
-  diagnosisChoice: '',
-  diagnosisRationale: '',
-  diagnosisNotice: '',
-  diagnosisConfirmed: false,
-  organizationXPEarned: 0,
-  diagnosisXPEarned: 0,
-  guideXPEarned: 0,
-  myCourseXPEarned: 0,
-  transferXPEarned: 0,
-  transferReflection: '',
-  guide: pcLoadS1Guide(),
-  guideBabbageResponse: null,
-  myCourseStep: 'focus',
-  myCourse: pcLoadS1MyCourse(),
-  myCourseNotice: '',
-  myCourseBabbageResponse: null
-};
+function pcCreateS1LearningState() {
+  return {
+    view: 'module',
+    activeIndex: 0,
+    opened: new Set(),
+    checkpoint: false,
+    renameIndex: 0,
+    renamedTitles: new Array(PC_S1_LEARNING_ITEMS.length).fill(''),
+    renameNotice: '',
+    organization: Object.fromEntries(PC_S1_LEARNING_ITEMS.map(item => [item.id, ''])),
+    organizationNotice: '',
+    diagnosisChoice: '',
+    diagnosisRationale: '',
+    diagnosisNotice: '',
+    diagnosisConfirmed: false,
+    organizationXPEarned: 0,
+    diagnosisXPEarned: 0,
+    guideXPEarned: 0,
+    myCourseXPEarned: 0,
+    transferXPEarned: 0,
+    transferReflection: '',
+    guide: pcLoadS1Guide(),
+    guideBabbageResponse: null,
+    myCourseStep: 'focus',
+    myCourse: pcLoadS1MyCourse(),
+    myCourseNotice: '',
+    myCourseBabbageResponse: null
+  };
+}
+
+let pcS1LearningState = pcCreateS1LearningState();
 let pcS1GuideOpenedFromMenu = false;
 
 function pcPrepareS1GuideSurface(fromMenu = false) {
@@ -4818,33 +4906,7 @@ function pcResetS1LearningState() {
     overlay.removeAttribute('aria-hidden');
     overlay.style.removeProperty('pointer-events');
   }
-  pcS1LearningState = {
-    view: 'module',
-    activeIndex: 0,
-    opened: new Set(),
-    checkpoint: false,
-    renameIndex: 0,
-    renamedTitles: new Array(PC_S1_LEARNING_ITEMS.length).fill(''),
-    renameNotice: '',
-    organization: Object.fromEntries(PC_S1_LEARNING_ITEMS.map(item => [item.id, ''])),
-    organizationNotice: '',
-    diagnosisChoice: '',
-    diagnosisRationale: '',
-    diagnosisNotice: '',
-    diagnosisConfirmed: false,
-    organizationXPEarned: 0,
-    diagnosisXPEarned: 0,
-    guideXPEarned: 0,
-    myCourseXPEarned: 0,
-    transferXPEarned: 0,
-    transferReflection: '',
-    guide: pcLoadS1Guide(),
-    guideBabbageResponse: null,
-    myCourseStep: 'focus',
-    myCourse: pcLoadS1MyCourse(),
-    myCourseNotice: '',
-    myCourseBabbageResponse: null
-  };
+  pcS1LearningState = pcCreateS1LearningState();
 }
 
 function pcS1LearningAllOpened() {
@@ -4854,6 +4916,9 @@ function pcS1LearningAllOpened() {
 function pcS1LearningProgressText() {
   return `${pcS1LearningState.opened.size} of ${PC_S1_LEARNING_ITEMS.length} activities opened`;
 }
+;
+/* SOURCE: src/js/scenarios/s1-learning-workspace.js */
+/* S1 activity screens composed with shared learning presentation. */
 
 function pcRenderS1MayaPanel(quote = PC_S1_LEARNING_DEFAULT_QUOTE) {
   return pcRenderCanvasStudentPanel({ name: 'Maya', portraitSrc: ASSETS.images.students.maya.neutral, quote, idPrefix: 'pcS1Maya' });
@@ -4919,15 +4984,13 @@ function pcRenderS1CanvasItem(index) {
         ? '<button type="button" class="pc-s1-canvas-continue" data-pc-action="s1-learning-start-rename">Continue to rename ›</button>'
         : '<button type="button" data-pc-action="s1-learning-show-module">Back to Modules</button>')
     : '<button type="button" aria-label="Next" data-pc-action="s1-learning-next-item">Next ›</button>';
-  return pcRenderS1CanvasShell(`
-    <div class="pc-s1-canvas-item-header"><h1 id="pcS1CanvasItemTitle">${esc(item.pageTitle)}</h1></div>
-    <article class="pc-s1-canvas-content-page" aria-labelledby="pcS1CanvasItemTitle">
-      <div class="pc-s1-canvas-richtext">${item.contentHTML}</div>
-    </article>
-    <nav class="pc-s1-canvas-prev-next" aria-label="Canvas item navigation">
+  return pcRenderS1CanvasShell(pcRenderCanvasPage({
+    titleId: 'pcS1CanvasItemTitle', title: item.pageTitle, contentHTML: item.contentHTML,
+    navigationHTML: `<nav class="pc-s1-canvas-prev-next" aria-label="Canvas item navigation">
       <button type="button" aria-label="Previous" data-pc-action="s1-learning-prev-item" ${index <= 0 ? 'disabled aria-disabled="true"' : ''}>‹ Previous</button>
       ${nextControl}
-    </nav>`, item.moduleTitle);
+    </nav>`
+  }), item.moduleTitle);
 }
 
 function pcRenderS1ExploreWorkspace() {
@@ -4937,51 +5000,16 @@ function pcRenderS1ExploreWorkspace() {
   const item = isItem ? PC_S1_LEARNING_ITEMS[pcS1LearningState.activeIndex] : null;
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
 
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage" role="region" aria-labelledby="pcS1LearningTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar">
-        <div>
-          <span>Scenario 1 · Start With the Learning</span>
-          <h1 id="pcS1LearningTitle">Explore Maya's module</h1>
-          <p>Open all five activities and inspect what Maya is actually being asked to do.</p>
-        </div>
-        <div class="pc-s1-learning-task-status">${esc(pcS1LearningProgressText())}</div>
-      </div>
-      <div class="pc-s1-learning-shell">
-        <div class="pc-s1-learning-workspace">
-          <section class="pc-s1-canvas-frame" aria-label="Maya's Canvas course">${isItem ? pcRenderS1CanvasItem(pcS1LearningState.activeIndex) : pcRenderS1CanvasModule()}</section>
-          ${pcRenderS1MayaPanel(item ? item.mayaQuote : PC_S1_LEARNING_DEFAULT_QUOTE)}
-        </div>
-      </div>
-    </section>`;
+  area.innerHTML = pcRenderLearningStage({
+    className: '', titleId: 'pcS1LearningTitle',
+    background: sceneBg,
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1LearningTitle', label: `Scenario 1 · Start With the Learning`, title: `Explore Maya's module`, instruction: `Open all five activities and inspect what Maya is actually being asked to do.`, status: `${pcS1LearningProgressText()}` }),
+    bodyHTML: pcRenderLearningWorkspace({
+      mainHTML: `<section class="pc-s1-canvas-frame" aria-label="Maya's Canvas course">${isItem ? pcRenderS1CanvasItem(pcS1LearningState.activeIndex) : pcRenderS1CanvasModule()}</section>`,
+      studentHTML: pcRenderS1MayaPanel(item ? item.mayaQuote : PC_S1_LEARNING_DEFAULT_QUOTE)
+    })
+  });
   return true;
-}
-
-function pcOpenS1LearningItem(indexValue) {
-  const index = Number(indexValue);
-  if (!Number.isInteger(index) || !PC_S1_LEARNING_ITEMS[index]) return false;
-  pcS1LearningState.activeIndex = index;
-  pcS1LearningState.opened.add(index);
-  pcS1LearningState.view = 'item';
-  pcRenderS1ExploreWorkspace();
-  resetSectionScroll(document.getElementById('chat'));
-  return true;
-}
-
-function pcShowS1LearningModule() {
-  pcS1LearningState.view = 'module';
-  pcRenderS1ExploreWorkspace();
-  resetSectionScroll(document.getElementById('chat'));
-  return false;
-}
-
-function pcMoveS1LearningItem(delta) {
-  const next = Math.min(
-    PC_S1_LEARNING_ITEMS.length - 1,
-    Math.max(0, pcS1LearningState.activeIndex + Number(delta || 0))
-  );
-  if (next === pcS1LearningState.activeIndex) return false;
-  return pcOpenS1LearningItem(next);
 }
 
 function pcS1RenameProgressText() {
@@ -5044,72 +5072,17 @@ function pcRenderS1RenameWorkspace() {
   const index = pcS1LearningState.renameIndex;
   const item = PC_S1_LEARNING_ITEMS[index];
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage pc-s1-renaming" role="region" aria-labelledby="pcS1LearningTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar">
-        <div>
-          <span>Scenario 1 · Start With the Learning</span>
-          <h1 id="pcS1LearningTitle">Make the module easier to navigate</h1>
-          <p>Rename each activity so Maya can tell what it contains before opening it.</p>
-        </div>
-        <div class="pc-s1-learning-task-status">${esc(pcS1RenameProgressText())}</div>
-      </div>
-      <div class="pc-s1-learning-shell">
-        <div class="pc-s1-learning-workspace">
-          <section class="pc-s1-canvas-frame" aria-label="Rename Maya's Canvas module items">${pcRenderS1RenameCanvas()}</section>
-          ${pcRenderS1MayaPanel(item.mayaQuote)}
-        </div>
-      </div>
-    </section>`;
+  area.innerHTML = pcRenderLearningStage({
+    className: 'pc-s1-renaming', titleId: 'pcS1LearningTitle',
+    background: sceneBg,
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1LearningTitle', label: `Scenario 1 · Start With the Learning`, title: `Make the module easier to navigate`, instruction: `Rename each activity so Maya can tell what it contains before opening it.`, status: `${pcS1RenameProgressText()}` }),
+    bodyHTML: pcRenderLearningWorkspace({
+      mainHTML: `<section class="pc-s1-canvas-frame" aria-label="Rename Maya's Canvas module items">${pcRenderS1RenameCanvas()}</section>`,
+      studentHTML: pcRenderS1MayaPanel(item.mayaQuote)
+    })
+  });
   requestAnimationFrame(() => document.getElementById('pcS1RenameInput')?.focus());
   return true;
-}
-
-function pcStartS1Rename() {
-  if (!pcS1LearningAllOpened()) return false;
-  pcS1LearningState.view = 'rename';
-  pcS1LearningState.checkpoint = true;
-  const firstMissing = pcS1LearningState.renamedTitles.findIndex(title => !title);
-  pcS1LearningState.renameIndex = firstMissing >= 0 ? firstMissing : 0;
-  pcS1LearningState.renameNotice = '';
-  pcRenderS1RenameWorkspace();
-  resetSectionScroll(document.getElementById('chat'));
-  return true;
-}
-
-function pcSaveS1Rename(form) {
-  if (!form) return false;
-  const input = form.querySelector('#pcS1RenameInput');
-  const value = String(input?.value || '').trim().replace(/\s+/g, ' ');
-  const index = pcS1LearningState.renameIndex;
-  const original = PC_S1_LEARNING_ITEMS[index]?.moduleTitle || '';
-  if (!value) {
-    pcS1LearningState.renameNotice = 'Enter a title before saving.';
-    pcRenderS1RenameWorkspace();
-    return false;
-  }
-  if (value.toLowerCase() === original.toLowerCase()) {
-    pcS1LearningState.renameNotice = 'Try a title that gives Maya more information than the original name.';
-    pcRenderS1RenameWorkspace();
-    return false;
-  }
-  pcS1LearningState.renamedTitles[index] = value;
-  const nextMissing = pcS1LearningState.renamedTitles.findIndex((title, itemIndex) => itemIndex > index && !title);
-  if (nextMissing >= 0) {
-    pcS1LearningState.renameIndex = nextMissing;
-    pcS1LearningState.renameNotice = `Saved “${value}”. Moving to the next item.`;
-    pcRenderS1RenameWorkspace();
-    return false;
-  }
-  const anyMissing = pcS1LearningState.renamedTitles.findIndex(title => !title);
-  if (anyMissing >= 0) {
-    pcS1LearningState.renameIndex = anyMissing;
-    pcS1LearningState.renameNotice = `Saved “${value}”. One more title still needs attention.`;
-    pcRenderS1RenameWorkspace();
-    return false;
-  }
-  pcRenderS1RenameComplete();
-  return false;
 }
 
 function pcRenderS1RenameComplete() {
@@ -5119,39 +5092,25 @@ function pcRenderS1RenameComplete() {
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
   const rows = PC_S1_LEARNING_ITEMS.map((item, index) => `
     <li><span>${esc(item.moduleTitle)}</span><strong>${esc(pcS1LearningState.renamedTitles[index])}</strong></li>`).join('');
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage pc-s1-renaming" role="region" aria-labelledby="pcS1RenameCompleteTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar">
-        <div>
-          <span>Scenario 1 · Start With the Learning</span>
-          <h1 id="pcS1RenameCompleteTitle">The module names are clearer</h1>
-          <p>Now organize the activities so Maya can see how each one functions in the learning path.</p>
-        </div>
-        <div class="pc-s1-learning-task-status">5 of 5 titles renamed</div>
-      </div>
-      <div class="pc-s1-learning-shell">
-        <div class="pc-s1-learning-workspace">
-          <section class="pc-s1-rename-summary" aria-labelledby="pcS1RenameSummaryTitle">
+  area.innerHTML = pcRenderLearningStage({
+    className: 'pc-s1-renaming', titleId: 'pcS1RenameCompleteTitle',
+    background: sceneBg,
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1RenameCompleteTitle', label: `Scenario 1 · Start With the Learning`, title: `The module names are clearer`, instruction: `Now organize the activities so Maya can see how each one functions in the learning path.`, status: `5 of 5 titles renamed` }),
+    bodyHTML: pcRenderLearningWorkspace({
+      mainHTML: `<section class="pc-s1-rename-summary" aria-labelledby="pcS1RenameSummaryTitle">
             <h2 id="pcS1RenameSummaryTitle">Your renamed module</h2>
             <ul>${rows}</ul>
             <div class="pc-s1-rename-summary-actions">
               <button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-start-rename">Review or revise titles</button>
               <button type="button" class="pc-shell-primary" data-pc-action="s1-learning-start-organize">Organize activities</button>
             </div>
-          </section>
-          ${pcRenderS1MayaPanel('I can tell what these activities are now. Next I need to understand how they fit together, not just what they are called.')}
-        </div>
-      </div>
-    </section>`;
+          </section>`,
+      studentHTML: pcRenderS1MayaPanel('I can tell what these activities are now. Next I need to understand how they fit together, not just what they are called.')
+    })
+  });
   resetSectionScroll(area);
   return true;
 }
-
-const PC_S1_ORGANIZE_ZONES = Object.freeze([
-  Object.freeze({ id: 'prepare', label: 'Prepare', definition: 'Students learn or review information they will need.' }),
-  Object.freeze({ id: 'practice', label: 'Practice', definition: 'Students try the skill, think with the ideas, or get feedback.' }),
-  Object.freeze({ id: 'evidence', label: 'Evidence', definition: 'Students show what they can actually do for the intended learning.' })
-]);
 
 function pcS1OrganizeProgressText() {
   const placed = Object.values(pcS1LearningState.organization || {}).filter(Boolean).length;
@@ -5212,23 +5171,15 @@ function pcRenderS1OrganizeWorkspace() {
   const area = document.getElementById('chat');
   if (!area) return false;
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage pc-s1-organizing" role="region" aria-labelledby="pcS1OrganizeTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar">
-        <div>
-          <span>Scenario 1 · Start With the Learning</span>
-          <h1 id="pcS1OrganizeTitle">Organize the activities</h1>
-          <p>Use Canvas-style text headers to make the purpose of the learning path visible.</p>
-        </div>
-        <div class="pc-s1-learning-task-status">${esc(pcS1OrganizeProgressText())}</div>
-      </div>
-      <div class="pc-s1-learning-shell">
-        <div class="pc-s1-learning-workspace">
-          <section class="pc-s1-canvas-frame" aria-label="Organize Maya's Canvas activities">${pcRenderS1OrganizeCanvas()}</section>
-          ${pcRenderS1MayaPanel('These headings help me see the learning path. I need to decide whether each activity prepares me, lets me practice, or shows what I can actually do.')}
-        </div>
-      </div>
-    </section>`;
+  area.innerHTML = pcRenderLearningStage({
+    className: 'pc-s1-organizing', titleId: 'pcS1OrganizeTitle',
+    background: sceneBg,
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1OrganizeTitle', label: `Scenario 1 · Start With the Learning`, title: `Organize the activities`, instruction: `Use Canvas-style text headers to make the purpose of the learning path visible.`, status: `${pcS1OrganizeProgressText()}` }),
+    bodyHTML: pcRenderLearningWorkspace({
+      mainHTML: `<section class="pc-s1-canvas-frame" aria-label="Organize Maya's Canvas activities">${pcRenderS1OrganizeCanvas()}</section>`,
+      studentHTML: pcRenderS1MayaPanel('These headings help me see the learning path. I need to decide whether each activity prepares me, lets me practice, or shows what I can actually do.')
+    })
+  });
   requestAnimationFrame(() => {
     wireDragBoard({
       rootId: 'pcS1OrganizeBoard',
@@ -5250,15 +5201,6 @@ function pcRenderS1OrganizeWorkspace() {
   });
   return true;
 }
-
-function pcStartS1Organize() {
-  if (pcS1LearningState.renamedTitles.some(title => !title)) return pcStartS1Rename();
-  pcS1LearningState.organizationNotice = '';
-  pcRenderS1OrganizeWorkspace();
-  resetSectionScroll(document.getElementById('chat'));
-  return true;
-}
-
 
 function pcRenderS1RevisedModuleCanvas() {
   const placements = pcS1LearningState.organization || {};
@@ -5323,27 +5265,119 @@ function pcRenderS1RevisedModuleOverview() {
   const xpNote = pcS1LearningState.organizationXPEarned
     ? `Navigation repair complete · +${pcS1LearningState.organizationXPEarned} XP`
     : 'Navigation repair complete';
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage pc-s1-revised-overview" role="region" aria-labelledby="pcS1RevisedOverviewTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar">
-        <div>
-          <span>Scenario 1 · Start With the Learning</span>
-          <h1 id="pcS1RevisedOverviewTitle">See the module you rebuilt</h1>
-          <p>Your clearer titles and Canvas text headers are now shown together as Maya would encounter them.</p>
-        </div>
-        <div class="pc-s1-learning-task-status">${esc(xpNote)}</div>
-      </div>
-      <div class="pc-s1-learning-shell">
-        <div class="pc-s1-learning-workspace">
-          <section class="pc-s1-canvas-frame" aria-label="Revised Maya Canvas module">${pcRenderS1RevisedModuleCanvas()}</section>
-          ${pcRenderS1MayaPanel(pcEvaluateS1Organization().mayaQuote)}
-        </div>
-      </div>
-    </section>`;
+  area.innerHTML = pcRenderLearningStage({
+    className: 'pc-s1-revised-overview', titleId: 'pcS1RevisedOverviewTitle',
+    background: sceneBg,
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1RevisedOverviewTitle', label: `Scenario 1 · Start With the Learning`, title: `See the module you rebuilt`, instruction: `Your clearer titles and Canvas text headers are now shown together as Maya would encounter them.`, status: `${xpNote}` }),
+    bodyHTML: pcRenderLearningWorkspace({
+      mainHTML: `<section class="pc-s1-canvas-frame" aria-label="Revised Maya Canvas module">${pcRenderS1RevisedModuleCanvas()}</section>`,
+      studentHTML: pcRenderS1MayaPanel(pcEvaluateS1Organization().mayaQuote)
+    })
+  });
   resetSectionScroll(area);
   return true;
 }
 
+function pcRenderS1Diagnosis() {
+  pcS1LearningState.view = 'diagnosis';
+  const area = document.getElementById('chat');
+  if (!area) return false;
+  const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
+  const selected = pcS1LearningState.diagnosisChoice;
+  const choices = pcRenderLearningDiagnosisChoices({ choices: PC_S1_DIAGNOSIS_CHOICES, selected, action: 's1-learning-select-diagnosis' });
+
+  area.innerHTML = pcRenderLearningStage({
+    className: 'pc-s1-diagnosis', titleId: 'pcS1DiagnosisTitle',
+    background: sceneBg,
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1DiagnosisTitle', label: `Scenario 1 · Start With the Learning`, title: `Check whether the activities match the learning`, instruction: `Clear navigation helps Maya find the work. Alignment determines whether that work lets her demonstrate the intended learning.`, status: `Alignment check` }),
+    bodyHTML: pcRenderLearningWorkspace({
+      mainHTML: `<form class="pc-s1-diagnosis-card" data-pc-submit-action="s1-learning-submit-diagnosis" aria-labelledby="pcS1DiagnosisQuestion">
+            <div class="pc-s1-diagnosis-purpose">
+              <strong>Why you are doing this</strong>
+              <p>You already made the module easier to follow. Now compare what the instructor wants Maya to do with what the current activities actually ask her to produce. The gap between those two is the design problem to solve next.</p>
+            </div>
+            <div class="pc-s1-diagnosis-compare" aria-label="Alignment comparison">
+              <div class="pc-s1-diagnosis-context is-intent">
+                <span>Instructor intent</span>
+                <strong>Analyze a community food-access problem and use evidence to recommend an appropriate response.</strong>
+              </div>
+              <div class="pc-s1-diagnosis-context is-evidence">
+                <span>Current evidence</span>
+                <strong>Reading, video, vocabulary, a discussion describing a barrier, and a quiz checking terms and examples.</strong>
+              </div>
+            </div>
+            <div class="pc-s1-diagnosis-question-block">
+              <span class="pc-s1-result-eyebrow">Your decision</span>
+              <h2 id="pcS1DiagnosisQuestion">What is the main alignment problem?</h2>
+              <p class="pc-s1-diagnosis-help">Choose the single issue that matters most for whether this module demonstrates the intended learning.</p>
+            </div>
+            <div class="pc-s1-diagnosis-choices">${choices}</div>
+            ${selected ? `<div class="pc-s1-diagnosis-rationale">
+              <label for="pcS1DiagnosisRationale"><strong>Explain what you noticed before checking your decision</strong><span>Your explanation will appear beside the alignment feedback so you can compare it with your reasoning. A short de-identified copy is also included in the study record. Do not include names.</span></label>
+              <textarea id="pcS1DiagnosisRationale" name="diagnosisRationale" rows="3" minlength="10" maxlength="500" required aria-describedby="pcS1DiagnosisRationaleStatus" data-pc-input-action="s1-learning-update-diagnosis-rationale" placeholder="For example: The objective asks students to recommend a response, but the activities only check recall and description.">${esc(pcS1LearningState.diagnosisRationale)}</textarea>
+              <p class="pc-s1-response-status" id="pcS1DiagnosisRationaleStatus">${pcS1LearningState.diagnosisRationale.trim().length >= 10 ? 'Ready to compare with the alignment feedback.' : 'Required: enter at least 10 characters. This is about your reasoning, not polished writing.'}</p>
+              ${pcS1LearningState.diagnosisNotice ? `<p class="pc-s1-diagnosis-notice" role="alert">${esc(pcS1LearningState.diagnosisNotice)}</p>` : ''}
+              <button type="submit" class="pc-shell-primary pc-s1-diagnosis-submit"${pcS1LearningState.diagnosisRationale.trim().length >= 10 ? '' : ' disabled'}>Compare my reasoning</button>
+            </div>` : ''}
+          </form>`,
+      studentHTML: pcRenderS1MayaPanel('The module is clearer now. I can see what I am supposed to do. The question is whether any of this actually lets me show the performance the instructor cares about.')
+    })
+  });
+  resetSectionScroll(area);
+  return true;
+}
+
+function pcRenderS1DiagnosisResult() {
+  pcS1LearningState.view = 'diagnosis-result';
+  const area = document.getElementById('chat');
+  if (!area) return false;
+  const selected = pcGetS1DiagnosisChoice();
+  const correct = selected?.id === 'evidence-gap';
+  const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
+  area.innerHTML = pcRenderLearningStage({
+    className: 'pc-s1-diagnosis-result', titleId: 'pcS1DiagnosisResultTitle',
+    background: sceneBg,
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1DiagnosisResultTitle', label: `Scenario 1 · Start With the Learning`, title: `Diagnosis recorded`, instruction: `${correct ? 'You identified the difference between useful preparation and evidence of the intended performance.' : 'Your diagnosis is saved. Compare it with the intended performance before moving into the next S1 phase.'}`, status: `${pcS1LearningState.diagnosisXPEarned ? `Diagnosis complete · +${pcS1LearningState.diagnosisXPEarned} XP` : 'Diagnosis complete'}` }),
+    bodyHTML: pcRenderLearningWorkspace({
+      mainHTML: `<section class="pc-s1-checkpoint-card pc-s1-diagnosis-result-card">
+            <span class="pc-s1-result-eyebrow">Your diagnosis</span>
+            <h2>${esc(selected?.text || '')}</h2>
+            <p>${correct
+              ? 'That is the central alignment issue. Maya has reading, vocabulary, discussion, and recall work, but none of the current activities asks her to analyze a community food-access problem and recommend a response using evidence.'
+              : 'This issue may affect the experience, but the instructor intent asks Maya to analyze a problem and recommend a response using evidence. The next design question is whether the current activities actually produce that evidence.'}</p>
+            <div class="pc-s1-diagnosis-result-reason"><strong>Your reasoning</strong><p>${esc(pcS1LearningState.diagnosisRationale)}</p></div>
+            <div class="pc-s1-diagnosis-result-actions">
+              <button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-continue-diagnosis">Review Diagnosis 1</button>
+              <button type="button" class="pc-shell-primary" data-pc-action="s1-learning-start-my-course">Continue to My Course</button>
+            </div>
+          </section>`,
+      studentHTML: pcRenderS1MayaPanel(correct
+            ? 'That is the difference I was missing. The module is easier to navigate now, but I still need a chance to show that I can analyze a problem and recommend a response.'
+            : 'The module is clearer now. I still need to compare what I completed with what the instructor says I should actually be able to do.')
+    })
+  });
+  resetSectionScroll(area);
+  return true;
+}
+;
+/* SOURCE: src/js/scenarios/s1-learning-guide.js */
+/* S1 reusable course guide creation, saved reading surface and guide actions. */
+
+function pcS1OSCQRLabel() {
+  return PC_S1_OSCQR_STANDARDS.map(item => `OSCQR ${item.number}: ${item.title}`).join(' | ');
+}
+
+function pcRenderS1OSCQRStandards({ concise = false } = {}) {
+  const standards = concise
+    ? PC_S1_OSCQR_STANDARDS.filter(item => [2, 9, 19, 45].includes(item.number))
+    : PC_S1_OSCQR_STANDARDS;
+  return `<section class="pc-s1-guide-section pc-s1-oscqr-section" id="pcS1GuideStandards" aria-labelledby="pcS1OSCQRHeading">
+    <span class="pc-s1-result-eyebrow">OSCQR 4.1 connections</span>
+    <h3 id="pcS1OSCQRHeading">Standards connected to this review</h3>
+    <p>Use these connections as prompts for further inspection, not as a completed course review.</p>
+    <div class="pc-s1-oscqr-grid">${standards.map(item => `<article><strong><span>OSCQR ${item.number}</span>${esc(item.title)}</strong><p>${esc(item.connection)}</p></article>`).join('')}</div>
+  </section>`;
+}
 
 function pcBuildS1GuideStep1Input() {
   const placements = pcS1LearningState.organization || {};
@@ -5467,8 +5501,10 @@ function pcRenderS1GuideStep1({ fromMenu = pcS1GuideOpenedFromMenu } = {}) {
   const guide = pcS1LearningState.guide?.step1 || {};
   const insight = guide.personalizedInsight || pcGetS1GuideStep1Insight(pcS1LearningState.guideBabbageResponse, input);
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage pc-s1-guide-preview" role="region" aria-labelledby="pcS1GuideStep1Title" style="--pc-s1-learning-bg:url('${sceneBg}')">
+  area.innerHTML = pcRenderLearningStage({
+    className: 'pc-s1-guide-preview', titleId: 'pcS1GuideStep1Title',
+    background: sceneBg,
+    bodyHTML: `
       <div class="pc-s1-learning-taskbar pc-s1-guide-taskbar">
         <div><img class="pc-s1-guide-brand-mark" src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="" aria-hidden="true"><span>My PromptCraft Course Guide · Step 1</span><h1 id="pcS1GuideStep1Title">Make the Learning Path Visible</h1><p>A Canvas building reference for your own course.</p></div>
         <div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">${guide.added ? 'Saved to My Guide' : 'Guide preview'}</span>${fromMenu ? '<button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>' : ''}</div>
@@ -5501,7 +5537,8 @@ function pcRenderS1GuideStep1({ fromMenu = pcS1GuideOpenedFromMenu } = {}) {
             : '<button type="button" class="pc-shell-primary" data-pc-action="s1-learning-save-guide-step1-continue">Save to My Guide and Continue</button>'}
         </footer>
       </div>
-    </section>`;
+    `
+  });
   resetSectionScroll(area);
   return true;
 }
@@ -5561,342 +5598,180 @@ function pcReviseBeforeS1Guide() {
   return pcRenderS1RenameComplete();
 }
 
-const PC_S1_DIAGNOSIS_CHOICES = Object.freeze([
-  Object.freeze({
-    id: 'more-content',
-    text: 'The module needs more content before Maya can learn the topic.'
-  }),
-  Object.freeze({
-    id: 'navigation-only',
-    text: 'The main problem is that Maya cannot tell where to start in the module.'
-  }),
-  Object.freeze({
-    id: 'evidence-gap',
-    text: 'The module gives Maya useful preparation, but it does not provide evidence that she can perform the intended learning.'
-  }),
-  Object.freeze({
-    id: 'quiz-length',
-    text: 'The quiz is too short to count as a meaningful assessment.'
-  })
-]);
-
-function pcPlayS1OverviewReflection() {
-  pcS1GuideOpenedFromMenu = false;
-  document.body.classList.remove('pc-s1-guide-open');
-  pcS1LearningState.view = 'overview-dialogue';
-  const cast = [{ id: 'maya', slot: 'left' }, { id: 'pixel', slot: 'right' }];
-  // Guide/Babbage handoffs can leave VN typing state alive even when the overlay
-  // is closed. Reset the queue state explicitly so this button always starts
-  // the reflection instead of silently enqueueing dialogue behind a stale flag.
-  try {
-    clearTimeout(vnTypeTimer);
-    vnQueue = [];
-    vnTyping = false;
-    vnOnComplete = null;
-    vnFullText = '';
-    vnCurrentText = '';
-  } catch (_error) {}
-  pcPrepareS1ClassroomDialogueScene();
-  const sceneBackground = document.getElementById('vnSceneBg');
-  if (sceneBackground) pcSetImageSource(sceneBackground, ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom, LEGACY_ASSETS.images.backgrounds.classroom);
-  document.getElementById('vnOverlay')?.classList.add('pc-s1-guide-reflection');
-  loadSceneImage('', '');
-  const board = document.getElementById('vnBoardText');
-  if (board) board.textContent = 'Clear path → meaningful practice → evidence of learning';
-  document.querySelector('#vnOverlay .vn-smartboard')?.setAttribute('aria-hidden', 'false');
-  vnShow('neutral',
-    'This is much easier to follow. I can see the path before I start clicking, and the titles tell me what each activity is for.',
-    null,
-    { speaker: 'Maya', character: 'maya', cast }
-  );
-  vnShow('thinking',
-    'Good. You repaired the navigation problem. Now compare what Maya actually does with what the instructor says she should be able to do.',
-    () => {
-      document.getElementById('vnOverlay')?.classList.remove('pc-s1-guide-reflection');
-      pcSetVNOverlayState({ active: false });
-      pcRenderS1Diagnosis();
-    },
-    { speaker: 'Professor Pixel', character: 'pixel', cast }
-  );
-  return true;
+function pcCleanCourseGuideText(value) {
+  return String(value || '')
+    .replace(/([.!?])\1+/g, '$1')
+    .replace(/\s+([,.;:!?])/g, '$1')
+    .trim();
 }
 
-function pcRenderS1Diagnosis() {
-  pcS1LearningState.view = 'diagnosis';
+function pcRenderS1GuideTip(tip, index) {
+  const text = pcCleanCourseGuideText(tip);
+  const quotedActivity = text.match(/^For\s+[“\"]([^”\"]+)[”\"]\s*,?\s*(.+)$/i);
+  const heading = quotedActivity ? quotedActivity[1].replace(/[,;]\s*$/, '') : `Activity suggestion ${index + 1}`;
+  const detail = quotedActivity ? quotedActivity[2] : text;
+  const sentence = detail ? detail.charAt(0).toUpperCase() + detail.slice(1) : '';
+  return `<article><span aria-hidden="true">${index + 1}</span><div><h4>${esc(heading)}</h4><p>${esc(sentence)}</p></div></article>`;
+}
+
+function pcRenderS1FullGuide({ fromMenu = false } = {}) {
+  pcPrepareS1GuideSurface(fromMenu);
+  pcS1LearningState.view = 'full-guide';
   const area = document.getElementById('chat');
   if (!area) return false;
+  const savedReview = pcS1LearningState.guide?.myCourseReview;
+  const course = savedReview?.added ? {
+    moduleTitle: savedReview.moduleTitle || '',
+    intendedLearning: savedReview.intendedLearning || '',
+    activities: Array.isArray(savedReview.activities) ? savedReview.activities : []
+  } : pcS1LearningState.myCourse;
+  const feedback = savedReview?.feedback || pcGetS1MyCourseFeedback(pcS1LearningState.myCourseBabbageResponse, course);
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
-  const selected = pcS1LearningState.diagnosisChoice;
-  const choices = PC_S1_DIAGNOSIS_CHOICES.map(choice => `
-    <button type="button" class="pc-s1-diagnosis-choice${selected === choice.id ? ' is-selected' : ''}"
-      data-pc-action="s1-learning-select-diagnosis" data-pc-diagnosis-id="${esc(choice.id)}"
-      aria-pressed="${selected === choice.id ? 'true' : 'false'}">
-      <span class="pc-s1-diagnosis-radio" aria-hidden="true"></span>
-      <span>${esc(choice.text)}</span>
-    </button>`).join('');
-
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage pc-s1-diagnosis" role="region" aria-labelledby="pcS1DiagnosisTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar">
-        <div>
-          <span>Scenario 1 · Start With the Learning</span>
-          <h1 id="pcS1DiagnosisTitle">Check whether the activities match the learning</h1>
-          <p>Clear navigation helps Maya find the work. Alignment determines whether that work lets her demonstrate the intended learning.</p>
-        </div>
-        <div class="pc-s1-learning-task-status">Alignment check</div>
+  area.innerHTML = pcRenderLearningStage({
+    className: 'pc-s1-full-guide', titleId: 'pcS1FullGuideTitle',
+    background: sceneBg,
+    bodyHTML: `
+      <div class="pc-s1-learning-taskbar pc-s1-guide-taskbar"><div><img class="pc-s1-guide-brand-mark" src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="" aria-hidden="true"><span>My PromptCraft Course Guide</span><h1 id="pcS1FullGuideTitle">${esc(course.moduleTitle || 'Saved course guidance')}</h1><p>Your saved course feedback and module notes.</p></div><div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">Saved to My Guide</span><button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-clear-guide">Clear My Guide</button><button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button></div></div>
+      <nav class="pc-s1-full-guide-nav" aria-label="Course guide sections">
+        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideFeedback">Saved feedback</button>
+        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideModule">Module view</button>
+        <button type="button" class="pc-s1-guide-print" data-pc-action="s1-learning-print-guide">Print / Save PDF</button>
+      </nav>
+      <div class="pc-s1-guide-paper pc-s1-full-guide-paper">
+        <section class="pc-s1-guide-section pc-s1-full-guide-personal" id="pcS1GuideFeedback"><span class="pc-s1-result-eyebrow">Saved course feedback</span><h2>${esc(course.moduleTitle || 'Your module')}</h2><p>${esc(pcCleanCourseGuideText(feedback.clear))}</p><p><strong>Intended learning:</strong> ${esc(pcCleanCourseGuideText(course.intendedLearning))}</p><section class="pc-s1-my-course-findings"><h3>What is clear</h3><ul>${(feedback.worked || []).map(item => `<li>${esc(pcCleanCourseGuideText(item))}</li>`).join('')}</ul></section><section class="pc-s1-my-course-findings"><h3>What needs inspection</h3><p>${esc(pcCleanCourseGuideText(feedback.unknown))}</p></section><section class="pc-s1-guide-suggestions" aria-labelledby="pcS1GuideSuggestionsHeading"><h3 id="pcS1GuideSuggestionsHeading">Ways to improve the activities you entered</h3><div class="pc-s1-full-guide-tips">${(feedback.improvementIdeas || []).map(pcRenderS1GuideTip).join('')}</div></section><div class="pc-s1-my-course-next-check"><h3>Next check</h3><p>${esc(pcCleanCourseGuideText(feedback.next))}</p></div></section>
+        <section class="pc-s1-guide-section" id="pcS1GuideModule"><span class="pc-s1-result-eyebrow">Saved module view</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>This view uses the activity titles you provided to suggest each item’s likely role. Confirm every placement against the actual instructions and student work.</p><div class="pc-s1-full-guide-module" aria-label="Visual summary of the saved module">${pcRenderS1MyCourseMiniModule(course)}</div></section>
+        <footer class="pc-s1-guide-actions"><button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-print-guide">Print / Save PDF</button>${fromMenu ? '<button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>' : '<button type="button" class="pc-shell-primary" data-pc-action="s1-learning-close-with-pixel">Continue with Professor Pixel</button>'}</footer>
       </div>
-      <div class="pc-s1-learning-shell">
-        <div class="pc-s1-learning-workspace">
-          <form class="pc-s1-diagnosis-card" data-pc-submit-action="s1-learning-submit-diagnosis" aria-labelledby="pcS1DiagnosisQuestion">
-            <div class="pc-s1-diagnosis-purpose">
-              <strong>Why you are doing this</strong>
-              <p>You already made the module easier to follow. Now compare what the instructor wants Maya to do with what the current activities actually ask her to produce. The gap between those two is the design problem to solve next.</p>
-            </div>
-            <div class="pc-s1-diagnosis-compare" aria-label="Alignment comparison">
-              <div class="pc-s1-diagnosis-context is-intent">
-                <span>Instructor intent</span>
-                <strong>Analyze a community food-access problem and use evidence to recommend an appropriate response.</strong>
-              </div>
-              <div class="pc-s1-diagnosis-context is-evidence">
-                <span>Current evidence</span>
-                <strong>Reading, video, vocabulary, a discussion describing a barrier, and a quiz checking terms and examples.</strong>
-              </div>
-            </div>
-            <div class="pc-s1-diagnosis-question-block">
-              <span class="pc-s1-result-eyebrow">Your decision</span>
-              <h2 id="pcS1DiagnosisQuestion">What is the main alignment problem?</h2>
-              <p class="pc-s1-diagnosis-help">Choose the single issue that matters most for whether this module demonstrates the intended learning.</p>
-            </div>
-            <div class="pc-s1-diagnosis-choices">${choices}</div>
-            ${selected ? `<div class="pc-s1-diagnosis-rationale">
-              <label for="pcS1DiagnosisRationale"><strong>Explain what you noticed before checking your decision</strong><span>Your explanation will appear beside the alignment feedback so you can compare it with your reasoning. A short de-identified copy is also included in the study record. Do not include names.</span></label>
-              <textarea id="pcS1DiagnosisRationale" name="diagnosisRationale" rows="3" minlength="10" maxlength="500" required aria-describedby="pcS1DiagnosisRationaleStatus" data-pc-input-action="s1-learning-update-diagnosis-rationale" placeholder="For example: The objective asks students to recommend a response, but the activities only check recall and description.">${esc(pcS1LearningState.diagnosisRationale)}</textarea>
-              <p class="pc-s1-response-status" id="pcS1DiagnosisRationaleStatus">${pcS1LearningState.diagnosisRationale.trim().length >= 10 ? 'Ready to compare with the alignment feedback.' : 'Required: enter at least 10 characters. This is about your reasoning, not polished writing.'}</p>
-              ${pcS1LearningState.diagnosisNotice ? `<p class="pc-s1-diagnosis-notice" role="alert">${esc(pcS1LearningState.diagnosisNotice)}</p>` : ''}
-              <button type="submit" class="pc-shell-primary pc-s1-diagnosis-submit"${pcS1LearningState.diagnosisRationale.trim().length >= 10 ? '' : ' disabled'}>Compare my reasoning</button>
-            </div>` : ''}
-          </form>
-          ${pcRenderS1MayaPanel('The module is clearer now. I can see what I am supposed to do. The question is whether any of this actually lets me show the performance the instructor cares about.')}
-        </div>
-      </div>
-    </section>`;
+    `
+  });
   resetSectionScroll(area);
   return true;
 }
 
-function pcSelectS1Diagnosis(id) {
-  if (!PC_S1_DIAGNOSIS_CHOICES.some(choice => choice.id === id)) return false;
-  pcS1LearningState.diagnosisChoice = id;
-  pcS1LearningState.diagnosisNotice = '';
-  pcS1LearningState.diagnosisConfirmed = false;
-  return pcRenderS1Diagnosis();
-}
-
-function pcGetS1DiagnosisChoice() {
-  return PC_S1_DIAGNOSIS_CHOICES.find(choice => choice.id === pcS1LearningState.diagnosisChoice) || null;
-}
-
-function pcBuildS1BabbageInput() {
-  return {
-    scenario: 'Start With the Learning',
-    reviewType: 'module-organization',
-    activities: PC_S1_LEARNING_ITEMS.map((item, index) => ({
-      originalTitle: item.moduleTitle,
-      renamedTitle: pcS1LearningState.renamedTitles[index] || item.moduleTitle,
-      purpose: pcS1LearningState.organization?.[item.id] || 'unplaced',
-      type: item.typeLabel
-    }))
+function pcRenderS1MyCourseMiniModule(course) {
+  const groups = { prepare: [], practice: [], evidence: [], unclear: [] };
+  const guideLabels = {
+    prepare: 'Resources and preparation',
+    practice: 'Practice and feedback',
+    evidence: 'Evidence of learning'
   };
-}
-
-function pcBuildS1BabbageReportHTML(input, response = {}) {
-  const prepare = input.activities.filter(item => item.purpose === 'prepare').map(item => item.renamedTitle);
-  const practice = input.activities.filter(item => item.purpose === 'practice').map(item => item.renamedTitle);
-  const evidence = input.activities.filter(item => item.purpose === 'evidence').map(item => item.renamedTitle);
-  const sourceLabel = response?.mock ? 'Fallback review' : 'Live Babbage review';
-  const insight = pcGetS1GuideStep1Insight(response, pcBuildS1GuideStep1Input());
-  return `
-    <article class="pc-s1-babbage-report pc-s1-guide-plan-report" role="document" aria-label="Babbage Scenario 1 guide-plan review">
-      <header>
-        <span class="pc-s1-babbage-kicker">${esc(sourceLabel)}</span>
-        <h2>Step 1 guide plan</h2>
-      </header>
-      <section class="pc-s1-guide-plan-intro">
-        <h3>What Babbage will carry into your guide</h3>
-        <p>${esc(insight.summary)}</p>
-      </section>
-      <section class="pc-s1-guide-plan-grid">
-        <div><span class="pc-s1-result-eyebrow">Your revised learning path</span><p><strong>Prepare:</strong> ${esc(prepare.join(', ') || 'No activities')}</p><p><strong>Practice:</strong> ${esc(practice.join(', ') || 'No activities')}</p><p><strong>Evidence:</strong> ${esc(evidence.join(', ') || 'No activities')}</p></div>
-        <div><span class="pc-s1-result-eyebrow">Guide section will include</span><ul><li>Why clear Canvas names and text headers matter</li><li>A visual Canvas building reference with activity examples</li><li>Other useful text-header names</li><li>Canvas tips, course-design connections, and AI ideas</li></ul></div>
-      </section>
-      <section class="pc-s1-babbage-structure-note">
-        <h3>${pcEvaluateS1Organization().mismatches.length ? 'A placement to revisit' : 'One thing to keep checking'}</h3>
-        <p>${esc(insight.watchFor)}</p>
-      </section>
-    </article>`;
-}
-
-async function pcRunS1BabbageAnalysis() {
-  if (PC_S1_LEARNING_ITEMS.some(item => !pcS1LearningState.organization?.[item.id])) return false;
-  const workspaceEpoch = pcS1WorkspaceEpoch;
-  pcS1LearningState.view = 'babbage-structure';
-  const input = pcBuildS1BabbageInput();
-
-  showBabbageConsultOverlay('Scenario 1 organization review', {
-    speakerName: 'Professor Pixel',
-    heading: 'Babbage is reviewing the module structure you built.',
-    body: 'It is looking only at the activity titles you created and how you placed them under Prepare, Practice, and Evidence.'
+  course.activities.filter(Boolean).forEach(activity => {
+    const text = String(activity);
+    const lower = text.toLowerCase();
+    const purpose = /submit|quiz|test|project|presentation|recorded|final/.test(lower)
+      ? 'evidence'
+      : /practice|discuss|discussion|draft|peer|rehears/.test(lower)
+        ? 'practice'
+        : /read|watch|video|lecture|demonstration|example|lesson/.test(lower)
+          ? 'prepare'
+          : 'unclear';
+    groups[purpose].push(text);
   });
+  const learningGroups = ['prepare', 'practice', 'evidence'].map(purpose => `
+    <div class="pc-s1-guide-module-group">
+      <strong>${esc(guideLabels[purpose])}</strong>
+      ${groups[purpose].length ? groups[purpose].map(activity => `<span>${esc(activity)}</span>`).join('') : '<span class="is-empty">No activity identified yet</span>'}
+    </div>`).join('');
+  return learningGroups + (groups.unclear.length
+    ? `<div class="pc-s1-guide-module-group pc-s1-guide-module-unclear"><strong>Purpose to confirm</strong>${groups.unclear.map(activity => `<span>${esc(activity)}</span>`).join('')}</div>`
+    : '');
+}
 
-  let response = {};
-  try {
-    response = await requestBabbageAnalysis({
-      system: `You are Babbage, PromptCraft's course-organization reviewer. Analyze only the supplied Scenario 1 titles and Prepare / Practice / Evidence placements. Be specific about the learner's actual choices rather than praising every arrangement. Reading, video, and vocabulary usually function as Prepare in this example; discussion functions as Practice; the quiz functions as Evidence. If the learner placed an activity elsewhere, identify it as something to reconsider and explain the learning-purpose mismatch briefly. Focus on whether revised names make activity purpose easier to predict and whether the headers make the learning path easier to follow. Do not evaluate the later instructor-intent alignment problem yet. Do not invent course facts.`,
-      messages: [{
-        role: 'user',
-        content: `Review this learner-created module organization:\n${JSON.stringify(input, null, 2)}`
-      }]
-    }, 'main');
-  } catch (error) {
-    console.warn('[PromptCraft] S1 Babbage organization review failed before fallback rendering:', error);
-    response = { mock: true, mockReason: 'scenario-error' };
+function pcScrollS1GuideSection(sectionId) {
+  const section = document.getElementById(String(sectionId || ''));
+  const scroller = document.querySelector('.pc-s1-full-guide');
+  if (!section || !scroller) return false;
+  const targetTop = Math.max(0, section.offsetTop - 176);
+  scroller.scrollTo({ top: targetTop, behavior: 'smooth' });
+  section.setAttribute('tabindex', '-1');
+  window.setTimeout(() => section.focus({ preventScroll: true }), 280);
+  return true;
+}
+
+function pcPrintS1CourseGuide() {
+  window.print();
+  return false;
+}
+
+function pcConfirmClearS1Guide() {
+  const confirmed = window.confirm('Clear My Course Guide and the course information saved on this device? This cannot be undone.');
+  if (!confirmed) return false;
+  const cleared = pcClearS1LocalWorkspace();
+  if (!cleared) {
+    window.alert('PromptCraft could not clear the saved guide in this browser. Check whether site storage is blocked, then try again.');
+    return false;
   }
+  return pcRenderCourseGuideOverview();
+}
 
-  if (!pcS1AsyncWorkIsCurrent(workspaceEpoch)) return false;
+function pcHasSavedS1Guide() {
+  const guide = pcLoadS1Guide();
+  return Boolean(guide?.step1?.added || guide?.myCourseReview?.added);
+}
 
-  pcS1LearningState.babbageInput = input;
-  pcS1LearningState.babbageResponse = response;
-  const overlay = document.getElementById('vnOverlay');
-  overlay?.classList.add('pc-s1-structure-analysis');
-  return showBabbageTerminalReport({
-    reportHTML: pcBuildS1BabbageReportHTML(input, response),
-    terminalStateText: 'S1 MODULE ORGANIZATION REVIEW COMPLETE',
-    engineLabel: response?.mock ? 'BABBAGE FALLBACK' : 'BABBAGE ENGINE',
-    speakerName: 'Professor Pixel',
-    onClose: () => {
-      document.getElementById('vnOverlay')?.classList.remove('pc-s1-structure-analysis');
-      pcS1LearningState.diagnosisChoice = '';
-      pcS1LearningState.diagnosisConfirmed = false;
-      pcRenderS1RevisedModuleOverview();
-    },
-    readLabel: '',
-    printLabel: '',
-    continueLabel: 'Review revised module',
-    ariaLabel: 'Babbage Scenario 1 module-organization review',
-    closeHandoff: 'app'
+function pcRenderCourseGuideOverview() {
+  pcPrepareS1GuideSurface(true);
+  pcS1LearningState.view = 'course-guide-overview';
+  if (typeof closeMainMenu === 'function') closeMainMenu({ force: true });
+  const area = document.getElementById('chat');
+  if (!area) return false;
+  area.innerHTML = pcRenderLearningStage({
+    className: 'pc-s1-full-guide pc-course-guide-overview', titleId: 'pcCourseGuideOverviewTitle',
+    bodyHTML: `
+      <header class="pc-s1-learning-taskbar pc-s1-guide-taskbar">
+        <div>
+          <img class="pc-s1-guide-brand-mark" src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="" aria-hidden="true">
+          <span>My PromptCraft Course Guide</span>
+          <h1 id="pcCourseGuideOverviewTitle">Keep the ideas you want to use</h1>
+          <p>A personal reference that grows from the work you choose to save.</p>
+        </div>
+        <div class="pc-s1-guide-heading-actions">
+          <button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>
+        </div>
+      </header>
+      <div class="pc-s1-guide-paper pc-course-guide-overview-paper">
+        <div class="pc-course-guide-overview-copy">
+          <p class="pc-s1-result-eyebrow">Your reusable reference</p>
+          <h2>Bring useful course-design ideas together in one place.</h2>
+          <p>As you work through PromptCraft, you can save feedback, decisions, checklists, and examples that you want to revisit while building or revising a course.</p>
+        </div>
+        <div class="pc-course-guide-overview-grid">
+          <article>
+            <span aria-hidden="true">1</span>
+            <div><h3>Choose what belongs here</h3><p>Nothing is added automatically. Save only the material that is useful to you.</p></div>
+          </article>
+          <article>
+            <span aria-hidden="true">2</span>
+            <div><h3>Return when you need it</h3><p>Your saved ideas stay together so you do not have to reopen a completed scenario to find them.</p></div>
+          </article>
+        </div>
+        <aside class="pc-course-guide-empty-state" aria-label="Course Guide status">
+          <h3>Nothing has been saved yet</h3>
+          <p>Complete scenarios in any order. When you choose <strong>Add to My Course Guide</strong>, the saved material will appear here.</p>
+        </aside>
+        <footer class="pc-s1-guide-actions pc-course-guide-overview-actions">
+          <button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="scenarios">Choose a Scenario</button>
+          <button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>
+        </footer>
+      </div>
+    `
   });
-}
-
-function pcRenderS1BabbageComplete() {
-  pcS1LearningState.view = 'babbage-complete';
-  const area = document.getElementById('chat');
-  if (!area) return false;
-  const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage" role="region" aria-labelledby="pcS1BabbageCompleteTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar">
-        <div>
-          <span>Scenario 1 · Start With the Learning</span>
-          <h1 id="pcS1BabbageCompleteTitle">Babbage confirmed the evidence gap</h1>
-          <p>The example-course analysis is complete. Your renaming, organization, and diagnosis are still retained.</p>
-        </div>
-        <div class="pc-s1-learning-task-status">Analysis complete</div>
-      </div>
-      <div class="pc-s1-learning-shell">
-        <div class="pc-s1-learning-workspace">
-          <section class="pc-s1-checkpoint-card pc-s1-babbage-complete-card">
-            <h2>What matters</h2>
-            <p>Clearer names and a better learning path help Maya navigate the module, but organization alone cannot create evidence of the intended performance.</p>
-            <div class="pc-s1-babbage-complete-actions">
-              <button type="button" class="pc-shell-primary" data-pc-action="s1-learning-review-babbage">Review Babbage analysis</button>
-              <button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-show-module">Review Maya's module</button>
-            </div>
-          </section>
-          ${pcRenderS1MayaPanel('That makes sense. I can get through the module more easily now, but the quiz still does not show whether I can analyze a problem and recommend a response.')}
-        </div>
-      </div>
-    </section>`;
   resetSectionScroll(area);
   return true;
 }
 
-
-function pcRenderS1DiagnosisResult() {
-  pcS1LearningState.view = 'diagnosis-result';
-  const area = document.getElementById('chat');
-  if (!area) return false;
-  const selected = pcGetS1DiagnosisChoice();
-  const correct = selected?.id === 'evidence-gap';
-  const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage pc-s1-diagnosis-result" role="region" aria-labelledby="pcS1DiagnosisResultTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar">
-        <div>
-          <span>Scenario 1 · Start With the Learning</span>
-          <h1 id="pcS1DiagnosisResultTitle">Diagnosis recorded</h1>
-          <p>${correct ? 'You identified the difference between useful preparation and evidence of the intended performance.' : 'Your diagnosis is saved. Compare it with the intended performance before moving into the next S1 phase.'}</p>
-        </div>
-        <div class="pc-s1-learning-task-status">${esc(pcS1LearningState.diagnosisXPEarned ? `Diagnosis complete · +${pcS1LearningState.diagnosisXPEarned} XP` : 'Diagnosis complete')}</div>
-      </div>
-      <div class="pc-s1-learning-shell">
-        <div class="pc-s1-learning-workspace">
-          <section class="pc-s1-checkpoint-card pc-s1-diagnosis-result-card">
-            <span class="pc-s1-result-eyebrow">Your diagnosis</span>
-            <h2>${esc(selected?.text || '')}</h2>
-            <p>${correct
-              ? 'That is the central alignment issue. Maya has reading, vocabulary, discussion, and recall work, but none of the current activities asks her to analyze a community food-access problem and recommend a response using evidence.'
-              : 'This issue may affect the experience, but the instructor intent asks Maya to analyze a problem and recommend a response using evidence. The next design question is whether the current activities actually produce that evidence.'}</p>
-            <div class="pc-s1-diagnosis-result-reason"><strong>Your reasoning</strong><p>${esc(pcS1LearningState.diagnosisRationale)}</p></div>
-            <div class="pc-s1-diagnosis-result-actions">
-              <button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-continue-diagnosis">Review Diagnosis 1</button>
-              <button type="button" class="pc-shell-primary" data-pc-action="s1-learning-start-my-course">Continue to My Course</button>
-            </div>
-          </section>
-          ${pcRenderS1MayaPanel(correct
-            ? 'That is the difference I was missing. The module is easier to navigate now, but I still need a chance to show that I can analyze a problem and recommend a response.'
-            : 'The module is clearer now. I still need to compare what I completed with what the instructor says I should actually be able to do.')}
-        </div>
-      </div>
-    </section>`;
-  resetSectionScroll(area);
-  return true;
+function pcOpenSavedS1Guide() {
+  pcS1LearningState.guide = pcLoadS1Guide();
+  if (!pcHasSavedS1Guide()) return pcRenderCourseGuideOverview();
+  pcPrepareS1GuideSurface(true);
+  if (typeof closeMainMenu === 'function') closeMainMenu({ force: true });
+  return pcS1LearningState.guide?.myCourseReview?.added
+    ? pcRenderS1FullGuide({ fromMenu: true })
+    : pcRenderS1GuideStep1({ fromMenu: true });
 }
-
-function pcPlayS1MyCourseTransition() {
-  pcS1LearningState.view = 'my-course-dialogue';
-  const cast = [{ id: 'maya', slot: 'left' }, { id: 'pixel', slot: 'right' }];
-  try {
-    clearTimeout(vnTypeTimer);
-    vnQueue = [];
-    vnTyping = false;
-    vnOnComplete = null;
-    vnFullText = '';
-    vnCurrentText = '';
-  } catch (_error) {}
-  pcPrepareS1ClassroomDialogueScene();
-  const sceneBackground = document.getElementById('vnSceneBg');
-  if (sceneBackground) pcSetImageSource(sceneBackground, ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom, LEGACY_ASSETS.images.backgrounds.classroom);
-  document.getElementById('vnOverlay')?.classList.add('pc-s1-guide-reflection');
-  loadSceneImage('', '');
-  const board = document.getElementById('vnBoardText');
-  if (board) board.textContent = 'Navigation is clear. Now check alignment.';
-  document.querySelector('#vnOverlay .vn-smartboard')?.setAttribute('aria-hidden', 'false');
-  vnShow('neutral',
-    'The clearer names and headers helped me find my way. They did not change what the activities actually ask me to demonstrate.',
-    null,
-    { speaker: 'Maya', character: 'maya', cast }
-  );
-  vnShow('encouraging',
-    'Exactly. Now apply the same inspection to one of your own modules. We will build the overview in small pieces before Babbage reviews anything.',
-    () => {
-      document.getElementById('vnOverlay')?.classList.remove('pc-s1-guide-reflection');
-      pcSetVNOverlayState({ active: false });
-      pcRenderS1MyCourseStep('focus');
-    },
-    { speaker: 'Professor Pixel', character: 'pixel', cast }
-  );
-  return true;
-}
+;
+/* SOURCE: src/js/scenarios/s1-learning-my-course.js */
+/* S1 personal course overview, AI review and transfer reflection. */
 
 function pcS1MyCourseProgress(step) {
   return ({ focus: '1 of 3', intent: '2 of 3', activities: '3 of 3' })[step] || 'My Course';
@@ -5965,23 +5840,20 @@ function pcRenderS1MyCourseStep(step = 'focus') {
       </form>`;
   }
 
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage pc-s1-my-course" role="region" aria-labelledby="pcS1MyCourseTitleHeading" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar">
-        <div>
-          <span>Scenario 1 · My Course</span>
-          <h1 id="pcS1MyCourseTitleHeading">Build your module overview</h1>
-          <p>Give Babbage enough real course context to respond to your design instead of guessing.</p>
-        </div>
-        <div class="pc-s1-learning-task-status">${pcS1MyCourseProgress(step)}</div>
-      </div>
+  area.innerHTML = pcRenderLearningStage({
+    className: 'pc-s1-my-course', titleId: 'pcS1MyCourseTitleHeading',
+    background: sceneBg,
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1MyCourseTitleHeading', label: `Scenario 1 · My Course`, title: `Build your module overview`, instruction: `Give Babbage enough real course context to respond to your design instead of guessing.`, status: `${pcS1MyCourseProgress(step)}` }),
+    bodyHTML: `
+
       <div class="pc-s1-learning-shell">
         <div class="pc-s1-my-course-layout">
           ${taskHTML}
           ${pcRenderS1MyCourseSummary()}
         </div>
       </div>
-    </section>`;
+    `
+  });
   resetSectionScroll(area);
   return true;
 }
@@ -6122,12 +5994,12 @@ function pcRenderS1MyCourseFeedback() {
         </div>
       </form>`;
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage pc-s1-my-course" role="region" aria-labelledby="pcS1MyCourseFeedbackTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar">
-        <div><span>Scenario 1 · My Course</span><h1 id="pcS1MyCourseFeedbackTitle">Babbage’s course setup feedback</h1><p>Review the suggestions, then save them to your personal course guide.</p></div>
-        <div class="pc-s1-learning-task-status">${added ? 'Added to My Guide' : 'Ready to review'}</div>
-      </div>
+  area.innerHTML = pcRenderLearningStage({
+    className: 'pc-s1-my-course', titleId: 'pcS1MyCourseFeedbackTitle',
+    background: sceneBg,
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1MyCourseFeedbackTitle', label: `Scenario 1 · My Course`, title: `Babbage’s course setup feedback`, instruction: `Review the suggestions, then save them to your personal course guide.`, status: `${added ? 'Added to My Guide' : 'Ready to review'}` }),
+    bodyHTML: `
+
       <div class="pc-s1-learning-shell">
         <div class="pc-s1-my-course-review-canvas">
           <header class="pc-s1-my-course-canvas-bar"><span class="pc-s1-canvas-menu-mark" aria-hidden="true">☰</span><strong>My Course Guide</strong><span>Modules</span><span>${esc(data.moduleTitle)}</span></header>
@@ -6147,7 +6019,8 @@ function pcRenderS1MyCourseFeedback() {
           </div>
         </div>
       </div>
-    </section>`;
+    `
+  });
   resetSectionScroll(area);
   return true;
 }
@@ -6210,80 +6083,105 @@ function pcAddS1MyCourseReviewToGuide(form) {
   return pcRenderS1FullGuide();
 }
 
-function pcCleanCourseGuideText(value) {
-  return String(value || '')
-    .replace(/([.!?])\1+/g, '$1')
-    .replace(/\s+([,.;:!?])/g, '$1')
-    .trim();
+function pcUpdateS1TransferReflection(target) {
+  return pcUpdateS1RequiredResponse(
+    target,
+    'transferReflection',
+    'pcS1TransferReflectionStatus',
+    'Ready to save in My Course Guide.',
+    'Required to save: enter at least 10 characters.'
+  );
 }
 
-function pcRenderS1GuideTip(tip, index) {
-  const text = pcCleanCourseGuideText(tip);
-  const quotedActivity = text.match(/^For\s+[“\"]([^”\"]+)[”\"]\s*,?\s*(.+)$/i);
-  const heading = quotedActivity ? quotedActivity[1].replace(/[,;]\s*$/, '') : `Activity suggestion ${index + 1}`;
-  const detail = quotedActivity ? quotedActivity[2] : text;
-  const sentence = detail ? detail.charAt(0).toUpperCase() + detail.slice(1) : '';
-  return `<article><span aria-hidden="true">${index + 1}</span><div><h4>${esc(heading)}</h4><p>${esc(sentence)}</p></div></article>`;
+function pcScrollS1ReviewSection(sectionId) {
+  const section = document.getElementById(String(sectionId || ''));
+  const scroller = document.querySelector('.pc-s1-my-course-review-canvas');
+  if (!section || !scroller) return false;
+  const targetTop = Math.max(0, section.offsetTop - 118);
+  scroller.scrollTo({ top: targetTop, behavior: 'smooth' });
+  section.setAttribute('tabindex', '-1');
+  window.setTimeout(() => section.focus({ preventScroll: true }), 250);
+  return true;
 }
+;
+/* SOURCE: src/js/scenarios/s1-learning-dialogue.js */
+/* S1 reflection and closing dialogue handoffs. */
 
-function pcRenderS1FullGuide({ fromMenu = false } = {}) {
-  pcPrepareS1GuideSurface(fromMenu);
-  pcS1LearningState.view = 'full-guide';
-  const area = document.getElementById('chat');
-  if (!area) return false;
-  const savedReview = pcS1LearningState.guide?.myCourseReview;
-  const course = savedReview?.added ? {
-    moduleTitle: savedReview.moduleTitle || '',
-    intendedLearning: savedReview.intendedLearning || '',
-    activities: Array.isArray(savedReview.activities) ? savedReview.activities : []
-  } : pcS1LearningState.myCourse;
-  const feedback = savedReview?.feedback || pcGetS1MyCourseFeedback(pcS1LearningState.myCourseBabbageResponse, course);
-  const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage pc-s1-full-guide" role="region" aria-labelledby="pcS1FullGuideTitle" style="--pc-s1-learning-bg:url('${sceneBg}')">
-      <div class="pc-s1-learning-taskbar pc-s1-guide-taskbar"><div><img class="pc-s1-guide-brand-mark" src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="" aria-hidden="true"><span>My PromptCraft Course Guide</span><h1 id="pcS1FullGuideTitle">${esc(course.moduleTitle || 'Saved course guidance')}</h1><p>Your saved course feedback and module notes.</p></div><div class="pc-s1-guide-heading-actions"><span class="pc-s1-learning-task-status">Saved to My Guide</span><button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-clear-guide">Clear My Guide</button><button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button></div></div>
-      <nav class="pc-s1-full-guide-nav" aria-label="Course guide sections">
-        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideFeedback">Saved feedback</button>
-        <button type="button" data-pc-action="s1-learning-guide-section" data-pc-guide-section="pcS1GuideModule">Module view</button>
-        <button type="button" class="pc-s1-guide-print" data-pc-action="s1-learning-print-guide">Print / Save PDF</button>
-      </nav>
-      <div class="pc-s1-guide-paper pc-s1-full-guide-paper">
-        <section class="pc-s1-guide-section pc-s1-full-guide-personal" id="pcS1GuideFeedback"><span class="pc-s1-result-eyebrow">Saved course feedback</span><h2>${esc(course.moduleTitle || 'Your module')}</h2><p>${esc(pcCleanCourseGuideText(feedback.clear))}</p><p><strong>Intended learning:</strong> ${esc(pcCleanCourseGuideText(course.intendedLearning))}</p><section class="pc-s1-my-course-findings"><h3>What is clear</h3><ul>${(feedback.worked || []).map(item => `<li>${esc(pcCleanCourseGuideText(item))}</li>`).join('')}</ul></section><section class="pc-s1-my-course-findings"><h3>What needs inspection</h3><p>${esc(pcCleanCourseGuideText(feedback.unknown))}</p></section><section class="pc-s1-guide-suggestions" aria-labelledby="pcS1GuideSuggestionsHeading"><h3 id="pcS1GuideSuggestionsHeading">Ways to improve the activities you entered</h3><div class="pc-s1-full-guide-tips">${(feedback.improvementIdeas || []).map(pcRenderS1GuideTip).join('')}</div></section><div class="pc-s1-my-course-next-check"><h3>Next check</h3><p>${esc(pcCleanCourseGuideText(feedback.next))}</p></div></section>
-        <section class="pc-s1-guide-section" id="pcS1GuideModule"><span class="pc-s1-result-eyebrow">Saved module view</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>This view uses the activity titles you provided to suggest each item’s likely role. Confirm every placement against the actual instructions and student work.</p><div class="pc-s1-full-guide-module" aria-label="Visual summary of the saved module">${pcRenderS1MyCourseMiniModule(course)}</div></section>
-        <footer class="pc-s1-guide-actions"><button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-print-guide">Print / Save PDF</button>${fromMenu ? '<button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>' : '<button type="button" class="pc-shell-primary" data-pc-action="s1-learning-close-with-pixel">Continue with Professor Pixel</button>'}</footer>
-      </div>
-    </section>`;
-  resetSectionScroll(area);
+function pcPlayS1OverviewReflection() {
+  pcS1GuideOpenedFromMenu = false;
+  document.body.classList.remove('pc-s1-guide-open');
+  pcS1LearningState.view = 'overview-dialogue';
+  const cast = [{ id: 'maya', slot: 'left' }, { id: 'pixel', slot: 'right' }];
+  // Guide/Babbage handoffs can leave VN typing state alive even when the overlay
+  // is closed. Reset the queue state explicitly so this button always starts
+  // the reflection instead of silently enqueueing dialogue behind a stale flag.
+  try {
+    clearTimeout(vnTypeTimer);
+    vnQueue = [];
+    vnTyping = false;
+    vnOnComplete = null;
+    vnFullText = '';
+    vnCurrentText = '';
+  } catch (_error) {}
+  pcPrepareS1ClassroomDialogueScene();
+  const sceneBackground = document.getElementById('vnSceneBg');
+  if (sceneBackground) pcSetImageSource(sceneBackground, ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom, LEGACY_ASSETS.images.backgrounds.classroom);
+  document.getElementById('vnOverlay')?.classList.add('pc-s1-guide-reflection');
+  loadSceneImage('', '');
+  const board = document.getElementById('vnBoardText');
+  if (board) board.textContent = 'Clear path → meaningful practice → evidence of learning';
+  document.querySelector('#vnOverlay .vn-smartboard')?.setAttribute('aria-hidden', 'false');
+  vnShow('neutral',
+    'This is much easier to follow. I can see the path before I start clicking, and the titles tell me what each activity is for.',
+    null,
+    { speaker: 'Maya', character: 'maya', cast }
+  );
+  vnShow('thinking',
+    'Good. You repaired the navigation problem. Now compare what Maya actually does with what the instructor says she should be able to do.',
+    () => {
+      document.getElementById('vnOverlay')?.classList.remove('pc-s1-guide-reflection');
+      pcSetVNOverlayState({ active: false });
+      pcRenderS1Diagnosis();
+    },
+    { speaker: 'Professor Pixel', character: 'pixel', cast }
+  );
   return true;
 }
 
-function pcRenderS1MyCourseMiniModule(course) {
-  const groups = { prepare: [], practice: [], evidence: [], unclear: [] };
-  const guideLabels = {
-    prepare: 'Resources and preparation',
-    practice: 'Practice and feedback',
-    evidence: 'Evidence of learning'
-  };
-  course.activities.filter(Boolean).forEach(activity => {
-    const text = String(activity);
-    const lower = text.toLowerCase();
-    const purpose = /submit|quiz|test|project|presentation|recorded|final/.test(lower)
-      ? 'evidence'
-      : /practice|discuss|discussion|draft|peer|rehears/.test(lower)
-        ? 'practice'
-        : /read|watch|video|lecture|demonstration|example|lesson/.test(lower)
-          ? 'prepare'
-          : 'unclear';
-    groups[purpose].push(text);
-  });
-  const learningGroups = ['prepare', 'practice', 'evidence'].map(purpose => `
-    <div class="pc-s1-guide-module-group">
-      <strong>${esc(guideLabels[purpose])}</strong>
-      ${groups[purpose].length ? groups[purpose].map(activity => `<span>${esc(activity)}</span>`).join('') : '<span class="is-empty">No activity identified yet</span>'}
-    </div>`).join('');
-  return learningGroups + (groups.unclear.length
-    ? `<div class="pc-s1-guide-module-group pc-s1-guide-module-unclear"><strong>Purpose to confirm</strong>${groups.unclear.map(activity => `<span>${esc(activity)}</span>`).join('')}</div>`
-    : '');
+function pcPlayS1MyCourseTransition() {
+  pcS1LearningState.view = 'my-course-dialogue';
+  const cast = [{ id: 'maya', slot: 'left' }, { id: 'pixel', slot: 'right' }];
+  try {
+    clearTimeout(vnTypeTimer);
+    vnQueue = [];
+    vnTyping = false;
+    vnOnComplete = null;
+    vnFullText = '';
+    vnCurrentText = '';
+  } catch (_error) {}
+  pcPrepareS1ClassroomDialogueScene();
+  const sceneBackground = document.getElementById('vnSceneBg');
+  if (sceneBackground) pcSetImageSource(sceneBackground, ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom, LEGACY_ASSETS.images.backgrounds.classroom);
+  document.getElementById('vnOverlay')?.classList.add('pc-s1-guide-reflection');
+  loadSceneImage('', '');
+  const board = document.getElementById('vnBoardText');
+  if (board) board.textContent = 'Navigation is clear. Now check alignment.';
+  document.querySelector('#vnOverlay .vn-smartboard')?.setAttribute('aria-hidden', 'false');
+  vnShow('neutral',
+    'The clearer names and headers helped me find my way. They did not change what the activities actually ask me to demonstrate.',
+    null,
+    { speaker: 'Maya', character: 'maya', cast }
+  );
+  vnShow('encouraging',
+    'Exactly. Now apply the same inspection to one of your own modules. We will build the overview in small pieces before Babbage reviews anything.',
+    () => {
+      document.getElementById('vnOverlay')?.classList.remove('pc-s1-guide-reflection');
+      pcSetVNOverlayState({ active: false });
+      pcRenderS1MyCourseStep('focus');
+    },
+    { speaker: 'Professor Pixel', character: 'pixel', cast }
+  );
+  return true;
 }
 
 function pcPlayS1ClosingDialogue() {
@@ -6319,7 +6217,223 @@ function pcPlayS1ClosingDialogue() {
   }, { speaker: 'Professor Pixel', character: 'pixel', cast: [{ id: 'pixel', slot: 'right' }] });
   return true;
 }
+;
+/* SOURCE: src/js/scenarios/s1-learning-compatibility.js */
+/* Retained S1 review routes outside the normal production loop. See S1_PRODUCTION_LOOP_AUDIT.md. */
 
+function pcBuildS1BabbageInput() {
+  return {
+    scenario: 'Start With the Learning',
+    reviewType: 'module-organization',
+    activities: PC_S1_LEARNING_ITEMS.map((item, index) => ({
+      originalTitle: item.moduleTitle,
+      renamedTitle: pcS1LearningState.renamedTitles[index] || item.moduleTitle,
+      purpose: pcS1LearningState.organization?.[item.id] || 'unplaced',
+      type: item.typeLabel
+    }))
+  };
+}
+
+function pcBuildS1BabbageReportHTML(input, response = {}) {
+  const prepare = input.activities.filter(item => item.purpose === 'prepare').map(item => item.renamedTitle);
+  const practice = input.activities.filter(item => item.purpose === 'practice').map(item => item.renamedTitle);
+  const evidence = input.activities.filter(item => item.purpose === 'evidence').map(item => item.renamedTitle);
+  const sourceLabel = response?.mock ? 'Fallback review' : 'Live Babbage review';
+  const insight = pcGetS1GuideStep1Insight(response, pcBuildS1GuideStep1Input());
+  return `
+    <article class="pc-s1-babbage-report pc-s1-guide-plan-report" role="document" aria-label="Babbage Scenario 1 guide-plan review">
+      <header>
+        <span class="pc-s1-babbage-kicker">${esc(sourceLabel)}</span>
+        <h2>Step 1 guide plan</h2>
+      </header>
+      <section class="pc-s1-guide-plan-intro">
+        <h3>What Babbage will carry into your guide</h3>
+        <p>${esc(insight.summary)}</p>
+      </section>
+      <section class="pc-s1-guide-plan-grid">
+        <div><span class="pc-s1-result-eyebrow">Your revised learning path</span><p><strong>Prepare:</strong> ${esc(prepare.join(', ') || 'No activities')}</p><p><strong>Practice:</strong> ${esc(practice.join(', ') || 'No activities')}</p><p><strong>Evidence:</strong> ${esc(evidence.join(', ') || 'No activities')}</p></div>
+        <div><span class="pc-s1-result-eyebrow">Guide section will include</span><ul><li>Why clear Canvas names and text headers matter</li><li>A visual Canvas building reference with activity examples</li><li>Other useful text-header names</li><li>Canvas tips, course-design connections, and AI ideas</li></ul></div>
+      </section>
+      <section class="pc-s1-babbage-structure-note">
+        <h3>${pcEvaluateS1Organization().mismatches.length ? 'A placement to revisit' : 'One thing to keep checking'}</h3>
+        <p>${esc(insight.watchFor)}</p>
+      </section>
+    </article>`;
+}
+
+async function pcRunS1BabbageAnalysis() {
+  if (PC_S1_LEARNING_ITEMS.some(item => !pcS1LearningState.organization?.[item.id])) return false;
+  const workspaceEpoch = pcS1WorkspaceEpoch;
+  pcS1LearningState.view = 'babbage-structure';
+  const input = pcBuildS1BabbageInput();
+
+  showBabbageConsultOverlay('Scenario 1 organization review', {
+    speakerName: 'Professor Pixel',
+    heading: 'Babbage is reviewing the module structure you built.',
+    body: 'It is looking only at the activity titles you created and how you placed them under Prepare, Practice, and Evidence.'
+  });
+
+  let response = {};
+  try {
+    response = await requestBabbageAnalysis({
+      system: `You are Babbage, PromptCraft's course-organization reviewer. Analyze only the supplied Scenario 1 titles and Prepare / Practice / Evidence placements. Be specific about the learner's actual choices rather than praising every arrangement. Reading, video, and vocabulary usually function as Prepare in this example; discussion functions as Practice; the quiz functions as Evidence. If the learner placed an activity elsewhere, identify it as something to reconsider and explain the learning-purpose mismatch briefly. Focus on whether revised names make activity purpose easier to predict and whether the headers make the learning path easier to follow. Do not evaluate the later instructor-intent alignment problem yet. Do not invent course facts.`,
+      messages: [{
+        role: 'user',
+        content: `Review this learner-created module organization:\n${JSON.stringify(input, null, 2)}`
+      }]
+    }, 'main');
+  } catch (error) {
+    console.warn('[PromptCraft] S1 Babbage organization review failed before fallback rendering:', error);
+    response = { mock: true, mockReason: 'scenario-error' };
+  }
+
+  if (!pcS1AsyncWorkIsCurrent(workspaceEpoch)) return false;
+
+  pcS1LearningState.babbageInput = input;
+  pcS1LearningState.babbageResponse = response;
+  const overlay = document.getElementById('vnOverlay');
+  overlay?.classList.add('pc-s1-structure-analysis');
+  return showBabbageTerminalReport({
+    reportHTML: pcBuildS1BabbageReportHTML(input, response),
+    terminalStateText: 'S1 MODULE ORGANIZATION REVIEW COMPLETE',
+    engineLabel: response?.mock ? 'BABBAGE FALLBACK' : 'BABBAGE ENGINE',
+    speakerName: 'Professor Pixel',
+    onClose: () => {
+      document.getElementById('vnOverlay')?.classList.remove('pc-s1-structure-analysis');
+      pcS1LearningState.diagnosisChoice = '';
+      pcS1LearningState.diagnosisConfirmed = false;
+      pcRenderS1RevisedModuleOverview();
+    },
+    readLabel: '',
+    printLabel: '',
+    continueLabel: 'Review revised module',
+    ariaLabel: 'Babbage Scenario 1 module-organization review',
+    closeHandoff: 'app'
+  });
+}
+
+function pcRenderS1BabbageComplete() {
+  pcS1LearningState.view = 'babbage-complete';
+  const area = document.getElementById('chat');
+  if (!area) return false;
+  const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
+  area.innerHTML = pcRenderLearningStage({
+    className: '', titleId: 'pcS1BabbageCompleteTitle',
+    background: sceneBg,
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1BabbageCompleteTitle', label: `Scenario 1 · Start With the Learning`, title: `Babbage confirmed the evidence gap`, instruction: `The example-course analysis is complete. Your renaming, organization, and diagnosis are still retained.`, status: `Analysis complete` }),
+    bodyHTML: pcRenderLearningWorkspace({
+      mainHTML: `<section class="pc-s1-checkpoint-card pc-s1-babbage-complete-card">
+            <h2>What matters</h2>
+            <p>Clearer names and a better learning path help Maya navigate the module, but organization alone cannot create evidence of the intended performance.</p>
+            <div class="pc-s1-babbage-complete-actions">
+              <button type="button" class="pc-shell-primary" data-pc-action="s1-learning-review-babbage">Review Babbage analysis</button>
+              <button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-show-module">Review Maya's module</button>
+            </div>
+          </section>`,
+      studentHTML: pcRenderS1MayaPanel('That makes sense. I can get through the module more easily now, but the quiz still does not show whether I can analyze a problem and recommend a response.')
+    })
+  });
+  resetSectionScroll(area);
+  return true;
+}
+;
+/* SOURCE: src/js/scenarios/s1-start-with-learning.js */
+/* S1 production controller: learner actions, gates and transitions.
+   Content, state, workspace, guide, My Course and dialogue have separate owners. */
+
+function pcOpenS1LearningItem(indexValue) {
+  const index = Number(indexValue);
+  if (!Number.isInteger(index) || !PC_S1_LEARNING_ITEMS[index]) return false;
+  pcS1LearningState.activeIndex = index;
+  pcS1LearningState.opened.add(index);
+  pcS1LearningState.view = 'item';
+  pcRenderS1ExploreWorkspace();
+  resetSectionScroll(document.getElementById('chat'));
+  return true;
+}
+
+function pcShowS1LearningModule() {
+  pcS1LearningState.view = 'module';
+  pcRenderS1ExploreWorkspace();
+  resetSectionScroll(document.getElementById('chat'));
+  return false;
+}
+
+function pcMoveS1LearningItem(delta) {
+  const next = Math.min(
+    PC_S1_LEARNING_ITEMS.length - 1,
+    Math.max(0, pcS1LearningState.activeIndex + Number(delta || 0))
+  );
+  if (next === pcS1LearningState.activeIndex) return false;
+  return pcOpenS1LearningItem(next);
+}
+
+function pcStartS1Rename() {
+  if (!pcS1LearningAllOpened()) return false;
+  pcS1LearningState.view = 'rename';
+  pcS1LearningState.checkpoint = true;
+  const firstMissing = pcS1LearningState.renamedTitles.findIndex(title => !title);
+  pcS1LearningState.renameIndex = firstMissing >= 0 ? firstMissing : 0;
+  pcS1LearningState.renameNotice = '';
+  pcRenderS1RenameWorkspace();
+  resetSectionScroll(document.getElementById('chat'));
+  return true;
+}
+
+function pcSaveS1Rename(form) {
+  if (!form) return false;
+  const input = form.querySelector('#pcS1RenameInput');
+  const value = String(input?.value || '').trim().replace(/\s+/g, ' ');
+  const index = pcS1LearningState.renameIndex;
+  const original = PC_S1_LEARNING_ITEMS[index]?.moduleTitle || '';
+  if (!value) {
+    pcS1LearningState.renameNotice = 'Enter a title before saving.';
+    pcRenderS1RenameWorkspace();
+    return false;
+  }
+  if (value.toLowerCase() === original.toLowerCase()) {
+    pcS1LearningState.renameNotice = 'Try a title that gives Maya more information than the original name.';
+    pcRenderS1RenameWorkspace();
+    return false;
+  }
+  pcS1LearningState.renamedTitles[index] = value;
+  const nextMissing = pcS1LearningState.renamedTitles.findIndex((title, itemIndex) => itemIndex > index && !title);
+  if (nextMissing >= 0) {
+    pcS1LearningState.renameIndex = nextMissing;
+    pcS1LearningState.renameNotice = `Saved “${value}”. Moving to the next item.`;
+    pcRenderS1RenameWorkspace();
+    return false;
+  }
+  const anyMissing = pcS1LearningState.renamedTitles.findIndex(title => !title);
+  if (anyMissing >= 0) {
+    pcS1LearningState.renameIndex = anyMissing;
+    pcS1LearningState.renameNotice = `Saved “${value}”. One more title still needs attention.`;
+    pcRenderS1RenameWorkspace();
+    return false;
+  }
+  pcRenderS1RenameComplete();
+  return false;
+}
+
+function pcStartS1Organize() {
+  if (pcS1LearningState.renamedTitles.some(title => !title)) return pcStartS1Rename();
+  pcS1LearningState.organizationNotice = '';
+  pcRenderS1OrganizeWorkspace();
+  resetSectionScroll(document.getElementById('chat'));
+  return true;
+}
+
+function pcSelectS1Diagnosis(id) {
+  if (!PC_S1_DIAGNOSIS_CHOICES.some(choice => choice.id === id)) return false;
+  pcS1LearningState.diagnosisChoice = id;
+  pcS1LearningState.diagnosisNotice = '';
+  pcS1LearningState.diagnosisConfirmed = false;
+  return pcRenderS1Diagnosis();
+}
+
+function pcGetS1DiagnosisChoice() {
+  return PC_S1_DIAGNOSIS_CHOICES.find(choice => choice.id === pcS1LearningState.diagnosisChoice) || null;
+}
 
 function pcUseS1Diagnosis(form) {
   if (!pcS1LearningState.diagnosisChoice) return false;
@@ -6364,16 +6478,6 @@ function pcUpdateS1DiagnosisRationale(target) {
   );
 }
 
-function pcUpdateS1TransferReflection(target) {
-  return pcUpdateS1RequiredResponse(
-    target,
-    'transferReflection',
-    'pcS1TransferReflectionStatus',
-    'Ready to save in My Course Guide.',
-    'Required to save: enter at least 10 characters.'
-  );
-}
-
 function pcCompleteS1Organize() {
   const placements = pcS1LearningState.organization || {};
   if (PC_S1_LEARNING_ITEMS.some(item => !placements[item.id])) return false;
@@ -6388,14 +6492,6 @@ function pcCompleteS1Organize() {
   pcRecordS1LearningProgress('s1_learning_path_organized', score, pcS1LearningState.renamedTitles.join(' | '), `${review.matchCount} of ${review.total} activities match the suggested learning purpose.`, { organization: pcS1LearningState.organization, renamedTitles: pcS1LearningState.renamedTitles, placementMatches: review.matchCount, placementTotal: review.total });
   return pcRenderS1RevisedModuleOverview();
 }
-
-const PC_S1_DEV_RENAMES = Object.freeze([
-  'Food Access and Community Health Reading',
-  'Food Deserts and Community Barriers Video',
-  'Module 3 Food Access Terms',
-  'Discuss Community Food-Access Barriers',
-  'Module 3 Food Access Quiz'
-]);
 
 function pcFillS1StartLearningDev() {
   if (scenarioIndex !== SCENARIO_INDEX.CONTENT_AVALANCHE) return false;
@@ -6475,108 +6571,6 @@ function renderS1StartWithLearning({ preserveProgress = false } = {}) {
   const rendered = pcRenderS1ExploreWorkspace();
   resetSectionScroll(area, container);
   return rendered;
-}
-
-function pcScrollS1ReviewSection(sectionId) {
-  const section = document.getElementById(String(sectionId || ''));
-  const scroller = document.querySelector('.pc-s1-my-course-review-canvas');
-  if (!section || !scroller) return false;
-  const targetTop = Math.max(0, section.offsetTop - 118);
-  scroller.scrollTo({ top: targetTop, behavior: 'smooth' });
-  section.setAttribute('tabindex', '-1');
-  window.setTimeout(() => section.focus({ preventScroll: true }), 250);
-  return true;
-}
-
-function pcScrollS1GuideSection(sectionId) {
-  const section = document.getElementById(String(sectionId || ''));
-  const scroller = document.querySelector('.pc-s1-full-guide');
-  if (!section || !scroller) return false;
-  const targetTop = Math.max(0, section.offsetTop - 176);
-  scroller.scrollTo({ top: targetTop, behavior: 'smooth' });
-  section.setAttribute('tabindex', '-1');
-  window.setTimeout(() => section.focus({ preventScroll: true }), 280);
-  return true;
-}
-
-function pcPrintS1CourseGuide() {
-  window.print();
-  return false;
-}
-
-function pcConfirmClearS1Guide() {
-  const confirmed = window.confirm('Clear My Course Guide and the course information saved on this device? This cannot be undone.');
-  if (!confirmed) return false;
-  const cleared = pcClearS1LocalWorkspace();
-  if (!cleared) {
-    window.alert('PromptCraft could not clear the saved guide in this browser. Check whether site storage is blocked, then try again.');
-    return false;
-  }
-  return pcRenderCourseGuideOverview();
-}
-
-function pcHasSavedS1Guide() {
-  const guide = pcLoadS1Guide();
-  return Boolean(guide?.step1?.added || guide?.myCourseReview?.added);
-}
-
-function pcRenderCourseGuideOverview() {
-  pcPrepareS1GuideSurface(true);
-  pcS1LearningState.view = 'course-guide-overview';
-  if (typeof closeMainMenu === 'function') closeMainMenu({ force: true });
-  const area = document.getElementById('chat');
-  if (!area) return false;
-  area.innerHTML = `
-    <section class="pc-s1-learning pc-scenario-stage pc-s1-full-guide pc-course-guide-overview" role="region" aria-labelledby="pcCourseGuideOverviewTitle">
-      <header class="pc-s1-learning-taskbar pc-s1-guide-taskbar">
-        <div>
-          <img class="pc-s1-guide-brand-mark" src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="" aria-hidden="true">
-          <span>My PromptCraft Course Guide</span>
-          <h1 id="pcCourseGuideOverviewTitle">Keep the ideas you want to use</h1>
-          <p>A personal reference that grows from the work you choose to save.</p>
-        </div>
-        <div class="pc-s1-guide-heading-actions">
-          <button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>
-        </div>
-      </header>
-      <div class="pc-s1-guide-paper pc-course-guide-overview-paper">
-        <div class="pc-course-guide-overview-copy">
-          <p class="pc-s1-result-eyebrow">Your reusable reference</p>
-          <h2>Bring useful course-design ideas together in one place.</h2>
-          <p>As you work through PromptCraft, you can save feedback, decisions, checklists, and examples that you want to revisit while building or revising a course.</p>
-        </div>
-        <div class="pc-course-guide-overview-grid">
-          <article>
-            <span aria-hidden="true">1</span>
-            <div><h3>Choose what belongs here</h3><p>Nothing is added automatically. Save only the material that is useful to you.</p></div>
-          </article>
-          <article>
-            <span aria-hidden="true">2</span>
-            <div><h3>Return when you need it</h3><p>Your saved ideas stay together so you do not have to reopen a completed scenario to find them.</p></div>
-          </article>
-        </div>
-        <aside class="pc-course-guide-empty-state" aria-label="Course Guide status">
-          <h3>Nothing has been saved yet</h3>
-          <p>Complete scenarios in any order. When you choose <strong>Add to My Course Guide</strong>, the saved material will appear here.</p>
-        </aside>
-        <footer class="pc-s1-guide-actions pc-course-guide-overview-actions">
-          <button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="scenarios">Choose a Scenario</button>
-          <button type="button" class="pc-shell-secondary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>
-        </footer>
-      </div>
-    </section>`;
-  resetSectionScroll(area);
-  return true;
-}
-
-function pcOpenSavedS1Guide() {
-  pcS1LearningState.guide = pcLoadS1Guide();
-  if (!pcHasSavedS1Guide()) return pcRenderCourseGuideOverview();
-  pcPrepareS1GuideSurface(true);
-  if (typeof closeMainMenu === 'function') closeMainMenu({ force: true });
-  return pcS1LearningState.guide?.myCourseReview?.added
-    ? pcRenderS1FullGuide({ fromMenu: true })
-    : pcRenderS1GuideStep1({ fromMenu: true });
 }
 
 pcRegisterUIActions({
@@ -7537,10 +7531,12 @@ const SCENARIO_UI = [
     introCast: 'dual',
     introCharacters: [{ id: 'maya', slot: 'left' }, { id: 'pixel', slot: 'right' }],
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    // The production learning loop can complete while legacy prompt entry stays disabled.
     implemented: false,
+    completionAvailable: true,
     previewAvailable: true,
     previewIntroduction: true,
-    developmentStatus: 'Exploration playable · In development',
+    developmentStatus: 'Playable',
     plannedLoop: ['Explore Maya\'s module', 'Rename unclear items', 'Organize the activities', 'Diagnose the alignment gap', 'Review Babbage\'s analysis', 'Apply it to My Course']
   },
   {
@@ -7550,11 +7546,13 @@ const SCENARIO_UI = [
     missionTitle: 'Use AI to repair the structure without changing the lesson.',
     missionCopy: 'Help Lena use her learning materials. Inspect the page, ask Babbage to make real headings, and verify the repair in a practice Canvas HTML editor.',
     boardText: 'Lena found the materials, but keeps losing her place. Repair the page structure while preserving the information.',
-    rendererKey: 'accessibility-preview', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
+    rendererKey: 'accessibility-preview', workspaceMode: 'development', introLayout: 'standard', introCast: 'dual',
+    introCharacters: [{ id: 'lena', slot: 'left' }, { id: 'pixel', slot: 'right' }],
+    afterIntroAction: 's2-accessibility-explore',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, previewAvailable: true, previewIntroduction: false,
+    implemented: false, previewAvailable: true, previewIntroduction: true,
     developmentStatus: 'Heading repair playable · First section preview',
-    plannedLoop: ['Inspect materials', 'Ask AI to repair headings', 'Preview and verify', 'Apply the repaired HTML']
+    plannedLoop: ['Inspect one page', 'Identify the heading barrier', 'Ask Babbage', 'Review the repair', 'Insert into Canvas', 'Check and save']
   },
   {
     key: 'metacognition',
@@ -7671,6 +7669,7 @@ const PC_SCENARIO_RENDERERS = Object.freeze({
 });
 
 const PC_SCENARIO_AFTER_INTRO_ACTIONS = Object.freeze({
+  's2-accessibility-explore': () => pcRenderS2AccessScreen(),
   's2-diagnosis': () => renderS2DiagnosisActivity(),
   's3-diagnosis': () => renderS3DiagnosisActivity()
 });
@@ -7699,11 +7698,16 @@ function getMainMenuPanel(panelName) {
   return document.querySelector(`[data-menu-panel="${panelName}"]`);
 }
 
+function pcCanCompleteScenario(index = scenarioIndex) {
+  const ui = getScenarioUI(index);
+  return Boolean(ui.implemented || ui.completionAvailable);
+}
+
 function getScenarioMenuStatus(index) {
   const ui = getScenarioUI(index);
   if (index === SCENARIO_INDEX.ACCESSIBILITY) return 'Heading repair preview';
   if (index > SCENARIO_INDEX.CONTENT_AVALANCHE) return 'Locked · New game loop in development';
-  if (!ui.implemented) return ui.developmentStatus || 'In redesign';
+  if (!pcCanCompleteScenario(index)) return ui.developmentStatus || 'In redesign';
   if (scenarioCompleted[index]) return 'Completed';
   if (pcScenarioHasLaunched && scenarioIndex === index) return 'Current scenario';
   return 'Available';
@@ -7725,7 +7729,7 @@ function renderScenarioMenu() {
     const stateClass = scenarioCompleted[index]
       ? ' is-complete'
       : (pcScenarioHasLaunched && scenarioIndex === index ? ' is-current' : '');
-    const shellClass = ui.implemented ? '' : ' is-development-shell';
+    const shellClass = pcCanCompleteScenario(index) ? '' : ' is-development-shell';
     const rebuildLocked = !isScenarioAvailableFromMenu(index);
 
     return `
@@ -8161,8 +8165,9 @@ function setBabbageTerminalState(state = 'idle', title = 'BABBAGE ENGINE', outpu
 
 // ══════════════════════════════════════════════════════
 ;
-/* SOURCE: src/js/scenarios/s2-accessibility.js */
-/* S2 accessibility: first playable section. No legacy metacognition data or S1 guide writes. */
+/* SOURCE: src/js/scenarios/s2-accessibility-content.js */
+/* s2-accessibility-content.js — S2 accessibility production owner. */
+
 const PC_S2_ACCESS_STORAGE = 'promptcraft_s2_heading_repair_v1';
 const PC_S2_HEADING_REQUEST = 'Make these section titles real HTML headings beneath the existing Canvas page title. Keep every word, link, and requirement unchanged. Keep the main sections in order, with Before you submit as a subsection of Your task. Return repaired HTML and a short explanation. I do not know HTML, so explain the change in plain language.';
 const PC_S2_PAGE_HTML = `<p style="font-size:24px"><strong>What you will learn</strong></p>
@@ -8185,11 +8190,21 @@ function pcS2HeadingExample() {
   });
   return html;
 }
-let pcS2AccessState = { view: 'intro', resource: 'page', opened: new Set(), request: PC_S2_HEADING_REQUEST, draft: '', source: '', pasted: '', checked: new Set(), notice: '', busy: false, applied: '' };
-let pcS2AccessEpoch = 0;
 
-// AI markup is never rendered directly. Reject unsafe markup, changed content,
-// changed destinations, and an incorrect outline before rebuilding allowed DOM.
+const PC_S2_DIAGNOSIS_CHOICES = Object.freeze([
+  Object.freeze({ id: 'headings', text: 'Give the section titles real heading structure.' }),
+  Object.freeze({ id: 'shorten', text: 'Remove the evidence to make the page shorter.' }),
+  Object.freeze({ id: 'bold', text: 'Make every paragraph bold.' })
+]);
+const PC_S2_REPAIR_CHECKS = Object.freeze([
+  Object.freeze({ id: 'words', label: 'The wording and requirements are unchanged.' }),
+  Object.freeze({ id: 'outline', label: 'The sections and subsection are in the right order.' }),
+  Object.freeze({ id: 'links', label: 'The link still has the same label and destination.' })
+]);
+;
+/* SOURCE: src/js/scenarios/s2-accessibility-validation.js */
+/* s2-accessibility-validation.js — S2 accessibility production owner. */
+
 function pcValidateS2HeadingRepair(html) {
   if (typeof html !== 'string' || html.length > 20000) return { ok: false, message: 'The repair is missing or too long. Ask Babbage to repair only this page.' };
   const source = new DOMParser().parseFromString(PC_S2_PAGE_HTML, 'text/html');
@@ -8200,7 +8215,7 @@ function pcValidateS2HeadingRepair(html) {
     return { ok: false, message: 'This repair includes extra formatting or unsupported code. Ask for heading tags and ordinary paragraphs only, keeping the original links.' };
   }
   const text = root => [...root.children].map(node => node.textContent.replace(/\s+/g, ' ').trim()).join('\n');
-  if (text(source.body) !== text(doc.body)) return { ok: false, message: 'Some information or wording changed. Ask Babbage to restore every word and requirement from the original page.' };
+  if ([...doc.body.childNodes].some(node => node.nodeType === 3 && node.textContent.trim()) || text(source.body) !== text(doc.body)) return { ok: false, message: 'Some information or wording changed. Ask Babbage to restore every word and requirement from the original page.' };
   const links = root => [...root.querySelectorAll('a')].map(a => [a.textContent, a.getAttribute('href')]);
   if (JSON.stringify(links(source.body)) !== JSON.stringify(links(doc.body))) return { ok: false, message: 'A link changed. Ask Babbage to keep each original link label and destination.' };
   const headings = [...doc.body.querySelectorAll('h2,h3')].map(h => ({ level: Number(h.tagName.slice(1)), text: h.textContent.trim() }));
@@ -8216,12 +8231,44 @@ function pcValidateS2HeadingRepair(html) {
   [...doc.body.childNodes].forEach(node => copy(node, clean));
   return { ok: true, html: clean.innerHTML, headings };
 }
+;
+/* SOURCE: src/js/scenarios/s2-accessibility-state.js */
+/* s2-accessibility-state.js — S2 accessibility production owner. */
+
+function pcCreateS2AccessState() {
+  return {
+    view: 'explore', resource: 'page', opened: new Set(), diagnosis: '',
+    request: PC_S2_HEADING_REQUEST, draft: '', source: '', explanation: '', pasted: '',
+    editorMode: 'visual', editorHeading: '', checked: new Set(), notice: '', busy: false, applied: ''
+  };
+}
+let pcS2AccessState = pcCreateS2AccessState();
+let pcS2AccessEpoch = 0;
+
+function pcS2AccessChecksComplete() {
+  return PC_S2_REPAIR_CHECKS.every(check => pcS2AccessState.checked.has(check.id));
+}
+function pcSaveS2AccessRepair() {
+  const state = pcS2AccessState;
+  try {
+    localStorage.setItem(PC_S2_ACCESS_STORAGE, JSON.stringify({ html: state.applied, request: state.request, source: state.source }));
+    return true;
+  } catch (_error) { return false; }
+}
+function pcResetS2AccessPractice() {
+  if (scenarioIndex !== SCENARIO_INDEX.ACCESSIBILITY) return false;
+  try { localStorage.removeItem(PC_S2_ACCESS_STORAGE); }
+  catch (_error) { return pcS2AccessNotice('This browser could not clear the saved practice.'); }
+  pcS2AccessEpoch += 1;
+  pcS2AccessState = pcCreateS2AccessState();
+  return pcActivateScenario(SCENARIO_INDEX.ACCESSIBILITY);
+}
 
 function pcRenderS2Accessibility() {
   pcS2AccessEpoch += 1;
   pcS2AccessState.busy = false;
   pcS2AccessState.notice = '';
-  pcS2AccessState.view = pcS2AccessState.applied ? 'complete' : 'intro';
+  pcS2AccessState.view = pcS2AccessState.applied ? 'complete' : 'explore';
   if (!pcS2AccessState.applied) {
     try {
       const saved = JSON.parse(localStorage.getItem(PC_S2_ACCESS_STORAGE) || 'null');
@@ -8233,91 +8280,406 @@ function pcRenderS2Accessibility() {
   if (input) { input.innerHTML = ''; input.style.display = 'none'; }
   return pcRenderS2AccessScreen();
 }
-
+;
+/* SOURCE: src/js/scenarios/s2-accessibility-reader.js */
+/* Optional heading-navigation demonstration. Browser speech is an illustration,
+   not a screen reader or accessibility checker. Nothing plays automatically. */
+let pcS2ReaderPlayback = null;
+function pcRenderS2HeadingLesson(compact = false) {
+  if (compact) return `<section class="pc-s1-diagnosis-purpose pc-s2-heading-lesson" aria-labelledby="pcS2HeadingLessonTitle"><h3 id="pcS2HeadingLessonTitle">Headings help people find their way</h3><p>A heading names a section and marks it as part of the page’s structure. Bold, enlarged text can look like a heading without working as one.</p><p>A screen reader turns text into speech or braille. It can read the page in order or jump between real headings. Lena’s section titles are readable, but missing from that heading navigation.</p></section>`;
+  return `<section class="pc-s1-diagnosis-purpose pc-s2-heading-lesson" aria-labelledby="pcS2HeadingLessonTitle">
+    <h3 id="pcS2HeadingLessonTitle">What is a heading?</h3>
+    <p>A heading is a title that names a section. Choose a Heading style in your course editor so the title becomes part of the page’s structure. Making text bold or larger only changes its appearance.</p>
+    <p>A screen reader turns page content into speech or braille. It can read the text in order, or let someone jump from heading to heading to find a section. A bold paragraph is still readable, but it is missing from that heading navigation.</p>
+    <p>The page title is Heading 1. Main sections use Heading 2, and a section within one of those uses Heading 3. AI can add this structure while keeping the information the same.</p>
+  </section>`;
+}
+/* Canvas-inspired reading view. It reads the lesson, not the surrounding game UI. */
+let pcS2ReaderView = null;
+const pcS2ReaderPreferences = { rate: 1.25, size: 24, spacing: true, focus: true };
+function pcRenderS2ReaderDemo() {
+  return `<section class="pc-s2-reader-demo" aria-label="Reading support"><button type="button" class="pc-shell-secondary" data-pc-action="s2-reader-toggle">Open Immersive Reader</button><p class="pc-s2-reader-note">Listen and follow the words, or compare heading navigation before and after repair.</p></section>`;
+}
+function pcGetS2ReaderBlocks(mode = 'read') {
+  const title = 'Interpret a community survey';
+  if (mode === 'before') return [{level:1,text:`Heading level 1. ${title}.`},{level:0,text:'No more headings. The section titles are paragraphs, so heading navigation skips them.'}];
+  if (mode === 'after') return [{level:1,text:`Heading level 1. ${title}.`}, ...PC_S2_EXPECTED_HEADINGS.map(h=>({level:h.level,text:`Heading level ${h.level}. ${h.text}.`}))];
+  // Repaired text is accepted only after the existing strict validator succeeds.
+  const state = pcS2AccessState;
+  const candidate = ['verify','complete'].includes(state.view) ? (state.pasted || state.applied) : state.view === 'review' ? state.draft : '';
+  const checked = pcValidateS2HeadingRepair(candidate);
+  const doc = new DOMParser().parseFromString(checked.ok ? checked.html : PC_S2_PAGE_HTML, 'text/html');
+  return [{level:1,text:title}, ...Array.from(doc.body.children).map(node=>({level:/^H[23]$/.test(node.tagName)?Number(node.tagName[1]):0,text:node.textContent.trim()}))];
+}
+function pcGetS2ReaderTranscript(mode) {
+  return pcGetS2ReaderBlocks(mode).map(b=>b.text).join('\n');
+}
+function pcRenderS2ReaderWords(blocks) {
+  let offset = 0;
+  return blocks.map((block,index)=>{
+    const words = block.text.split(/(\s+)/).map(part=>{
+      const start=offset;offset+=part.length;
+      return /^\s+$/.test(part)?esc(part):`<span data-pc-reader-start="${start}" data-pc-reader-end="${offset}">${esc(part)}</span>`;
+    }).join('');
+    offset+=1; // Same newline used in the speech text.
+    const tag=block.level?`h${block.level}`:'p';
+    return `<${tag} data-pc-reader-block="${index}">${words}</${tag}>`;
+  }).join('');
+}
+function pcToggleS2ReaderDemo(button) { pcOpenS2ReaderView(button); }
+function pcOpenS2ReaderView(opener = document.activeElement) {
+  if (scenarioIndex !== SCENARIO_INDEX.ACCESSIBILITY) return;
+  pcCloseS2ReaderView(false);
+  const dialog = document.createElement('section');
+  dialog.id='pcS2ReaderPanel';dialog.className='pc-s2-immersive';dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-labelledby','pcS2ReaderHeading');
+  dialog.innerHTML=`<header class="pc-s2-immersive-top"><button type="button" data-pc-action="s2-reader-close"><span aria-hidden="true">←</span> Back to page</button><h2 id="pcS2ReaderHeading">Interpret a community survey</h2><span class="pc-s2-immersive-label">Reading view</span></header>
+    <div class="pc-s2-immersive-options"><label>Reading speed<select id="pcS2ReaderRate" data-pc-change-action="s2-reader-rate">${[.75,1,1.25,1.5,2,2.5].map(rate=>`<option value="${rate}"${rate===pcS2ReaderPreferences.rate?' selected':''}>${rate}×</option>`).join('')}</select></label>
+    <label>Text size<select data-pc-change-action="s2-reader-size">${[20,24,30,36].map(size=>`<option value="${size}"${size===pcS2ReaderPreferences.size?' selected':''}>${size}px</option>`).join('')}</select></label>
+    <label><input type="checkbox" data-pc-change-action="s2-reader-spacing"${pcS2ReaderPreferences.spacing?' checked':''}> More spacing</label>
+    <label><input type="checkbox" data-pc-change-action="s2-reader-focus"${pcS2ReaderPreferences.focus?' checked':''}> Focus on current passage</label></div>
+    <div class="pc-s2-immersive-scroll" id="pcS2ReaderScroll" tabindex="0" aria-label="Reading text"><article id="pcS2ReaderTranscript"></article></div>
+    <footer class="pc-s2-immersive-bottom"><div class="pc-s2-immersive-playback"><button type="button" class="pc-s2-immersive-play" data-pc-action="s2-reader-play" aria-label="Play reading"><span aria-hidden="true">▶</span> Play</button><button type="button" data-pc-action="s2-reader-stop" disabled>Stop</button>
+      <button type="button" data-pc-action="s2-reader-read">Read page</button><button type="button" data-pc-action="s2-reader-before">Headings: before</button><button type="button" data-pc-action="s2-reader-after">Headings: after</button></div>
+      <p id="pcS2ReaderStatus" role="status">Press Play to listen. You can also read the text here.</p><p class="pc-s2-immersive-note">Practice view modeled on Canvas Immersive Reader. Use Headings to try a separate screen reader navigation example.</p></footer>`;
+  const inertStates=[];
+  for(const child of document.body.children){
+    if(!['SCRIPT','STYLE','LINK'].includes(child.tagName)&&!child.hidden&&getComputedStyle(child).display!=='none'&&child.id!=='mainMenuOverlay') { inertStates.push([child,child.inert]);child.inert=true; }
+  }
+  const oldOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
+  document.body.appendChild(dialog);
+  const observer=new MutationObserver(()=>{
+    if(!opener?.isConnected||scenarioIndex!==SCENARIO_INDEX.ACCESSIBILITY||document.getElementById('mainMenuOverlay')?.classList.contains('visible')) pcCloseS2ReaderView(false);
+  });
+  observer.observe(document.getElementById('chat'),{childList:true,subtree:true});
+  const menu=document.getElementById('mainMenuOverlay');if(menu)observer.observe(menu,{attributes:true,attributeFilter:['class','hidden']});
+  const keydown=event=>{
+    if(event.key==='Escape'){event.preventDefault();event.stopPropagation();pcCloseS2ReaderView();return;}
+    if(event.key!=='Tab')return;
+    const controls=Array.from(dialog.querySelectorAll('button:not([disabled]),select,input,[tabindex="0"]')).filter(el=>el.getClientRects().length);
+    const first=controls[0],last=controls.at(-1);
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+  };
+  dialog.addEventListener('keydown',keydown);
+  pcS2ReaderView={dialog,opener,inertStates,oldOverflow,observer,mode:'read',text:'',cursor:0};
+  pcSetS2ReaderMode('read');pcApplyS2ReaderPreferences();dialog.querySelector('button').focus();
+}
+function pcCloseS2ReaderView(restoreFocus = true) {
+  pcStopS2ReaderDemo();
+  const view=pcS2ReaderView;if(!view)return;
+  pcS2ReaderView=null;view.observer.disconnect();view.dialog.remove();
+  for(const [element,inert] of view.inertStates)if(element.isConnected)element.inert=inert;
+  document.body.style.overflow=view.oldOverflow;
+  if(restoreFocus&&view.opener?.isConnected&&!view.opener.inert)pcFocusWithoutScroll(view.opener);
+}
+function pcApplyS2ReaderPreferences() {
+  const dialog=pcS2ReaderView?.dialog;if(!dialog)return;
+  dialog.style.setProperty('--pc-reader-size',`${pcS2ReaderPreferences.size}px`);
+  dialog.classList.toggle('has-spacing',pcS2ReaderPreferences.spacing);
+  dialog.classList.toggle('has-focus',pcS2ReaderPreferences.focus);
+}
+function pcSetS2ReaderMode(mode) {
+  const view=pcS2ReaderView;if(!view)return;
+  pcStopS2ReaderDemo();view.mode=mode;view.cursor=0;
+  const blocks=pcGetS2ReaderBlocks(mode);view.text=blocks.map(b=>b.text).join('\n');
+  view.dialog.querySelector('#pcS2ReaderTranscript').innerHTML=pcRenderS2ReaderWords(blocks);
+  view.dialog.querySelector('#pcS2ReaderScroll').scrollTop=0;
+  for(const button of view.dialog.querySelectorAll('[data-pc-action="s2-reader-read"],[data-pc-action="s2-reader-before"],[data-pc-action="s2-reader-after"]'))button.setAttribute('aria-pressed',String(button.dataset.pcAction===`s2-reader-${mode}`));
+}
+function pcHighlightS2ReaderWord(charIndex, exact = true) {
+  const view=pcS2ReaderView;if(!view)return;
+  const word=Array.from(view.dialog.querySelectorAll('[data-pc-reader-start]')).find(el=>Number(el.dataset.pcReaderStart)<=charIndex&&Number(el.dataset.pcReaderEnd)>charIndex);
+  if(!word)return;
+  for(const el of view.dialog.querySelectorAll('.is-current-word,.is-current-passage'))el.classList.remove('is-current-word','is-current-passage');
+  if(exact)word.classList.add('is-current-word');
+  const passage=word.closest('[data-pc-reader-block]');passage.classList.add('is-current-passage');view.cursor=Number(word.dataset.pcReaderStart);
+  // Scroll only the reader text, never the underlying game or the browser page.
+  const scroller=view.dialog.querySelector('#pcS2ReaderScroll'),w=word.getBoundingClientRect(),s=scroller.getBoundingClientRect();
+  if(w.top<s.top+24||w.bottom>s.bottom-24)scroller.scrollTop+=w.top-s.top-scroller.clientHeight/3;
+}
+function pcUpdateS2ReaderPlaybackControls(playing,paused=false) {
+  const dialog=pcS2ReaderView?.dialog;if(!dialog)return;
+  const button=dialog.querySelector('[data-pc-action="s2-reader-play"]');
+  button.innerHTML=playing&&!paused?'<span aria-hidden="true">Ⅱ</span> Pause':paused?'<span aria-hidden="true">▶</span> Resume':'<span aria-hidden="true">▶</span> Play';
+  button.setAttribute('aria-label',playing&&!paused?'Pause reading':paused?'Resume reading':'Play reading');
+  dialog.querySelector('[data-pc-action="s2-reader-stop"]').disabled=!playing;
+}
+function pcStopS2ReaderDemo() {
+  const playback=pcS2ReaderPlayback;if(!playback)return;
+  pcS2ReaderPlayback=null;
+  playback.utterance.onend=playback.utterance.onerror=playback.utterance.onboundary=playback.utterance.onstart=null;
+  window.speechSynthesis?.cancel();pcUpdateS2ReaderPlaybackControls(false);
+  const view=pcS2ReaderView;
+  if(view){view.dialog.classList.remove('is-speaking');view.dialog.querySelector('#pcS2ReaderStatus').textContent='Audio stopped. The text is still available.';}
+}
+function pcStartS2ReaderSpeech(start = 0) {
+  const view=pcS2ReaderView;if(!view)return;
+  pcStopS2ReaderDemo();
+  const status=view.dialog.querySelector('#pcS2ReaderStatus');
+  if(!window.speechSynthesis||typeof window.SpeechSynthesisUtterance!=='function'){status.textContent='Audio is unavailable in this browser. You can still read the examples.';return;}
+  // Short passages keep long readings responsive and provide an honest passage
+  // highlight even on voices that do not send word-boundary events.
+  const segments=[];let offset=0;
+  for(const text of view.text.split('\n')) { if(offset+text.length>start)segments.push({text:text.slice(Math.max(0,start-offset)),start:Math.max(start,offset)});offset+=text.length+1; }
+  if(!segments.length)return;
+  const playback={utterance:null,paused:false,start};pcS2ReaderPlayback=playback;
+  const finish=message=>{if(pcS2ReaderPlayback!==playback||pcS2ReaderView!==view)return;pcS2ReaderPlayback=null;pcUpdateS2ReaderPlaybackControls(false);view.dialog.classList.remove('is-speaking');status.textContent=message;};
+  const speakSegment=index=>{
+    if(pcS2ReaderPlayback!==playback||pcS2ReaderView!==view)return;
+    const segment=segments[index],utterance=new window.SpeechSynthesisUtterance(segment.text);
+    utterance.lang='en-US';utterance.rate=pcS2ReaderPreferences.rate;playback.utterance=utterance;
+    utterance.onstart=()=>{if(pcS2ReaderPlayback!==playback)return;view.dialog.classList.add('is-speaking');pcHighlightS2ReaderWord(segment.start,false);};
+    utterance.onboundary=event=>{if(pcS2ReaderPlayback!==playback||pcS2ReaderView!==view||playback.paused)return;pcHighlightS2ReaderWord(segment.start+event.charIndex,event.name!=='sentence');};
+    utterance.onend=()=>{if(pcS2ReaderPlayback!==playback||pcS2ReaderView!==view)return;if(index+1<segments.length)speakSegment(index+1);else{view.cursor=0;finish('Reading complete. Press Play to listen again.');}};
+    utterance.onerror=()=>finish('Audio could not play. The text is still available.');
+    try{window.speechSynthesis.speak(utterance);}catch(_error){finish('Audio could not play. The text is still available.');}
+  };
+  pcUpdateS2ReaderPlaybackControls(true);status.textContent='Reading. Follow the highlighted words or passage.';
+  try{window.speechSynthesis.cancel();window.speechSynthesis.resume?.();speakSegment(0);}catch(_error){finish('Audio could not play. The text is still available.');}
+}
+function pcToggleS2ReaderPlayback() {
+  if(!pcS2ReaderView)return;
+  const playback=pcS2ReaderPlayback;
+  if(!playback)return pcStartS2ReaderSpeech(pcS2ReaderView.cursor);
+  playback.paused=!playback.paused;
+  if(playback.paused)window.speechSynthesis.pause();else window.speechSynthesis.resume();
+  pcUpdateS2ReaderPlaybackControls(true,playback.paused);
+  pcS2ReaderView.dialog.querySelector('#pcS2ReaderStatus').textContent=playback.paused?'Reading paused.':'Reading resumed.';
+}
+function pcPlayS2ReaderDemo(mode) { if(!['read','before','after'].includes(mode))return;pcSetS2ReaderMode(mode);pcStartS2ReaderSpeech(); }
+function pcChangeS2ReaderRate(value) {
+  const rate=Number(value);if(![.75,1,1.25,1.5,2,2.5].includes(rate))return;
+  pcS2ReaderPreferences.rate=rate;
+  if(pcS2ReaderPlayback){const paused=pcS2ReaderPlayback.paused;pcStartS2ReaderSpeech(pcS2ReaderView.cursor);if(paused)pcToggleS2ReaderPlayback();}
+}
+;
+/* SOURCE: src/js/scenarios/s2-accessibility-editor.js */
+/* Focused Canvas editor practice: heading styles and the footer HTML toggle.
+   Visual rendering uses canonical lesson nodes; pasted code never goes directly into DOM. */
+function pcS2EditorVisualSource() {
+  const html=pcS2AccessState.pasted||PC_S2_PAGE_HTML;
+  const complete=pcValidateS2HeadingRepair(html);if(complete.ok)return complete.html;
+  // Allow partial heading-only edits made with this practice dropdown.
+  const doc=new DOMParser().parseFromString(html,'text/html'),original=new DOMParser().parseFromString(PC_S2_PAGE_HTML,'text/html');
+  if(doc.body.children.length!==original.body.children.length)return PC_S2_PAGE_HTML;
+  let result=PC_S2_PAGE_HTML;
+  const nodes=Array.from(doc.body.children);
+  for(const [index,node] of nodes.entries()){
+    if(node.textContent!==original.body.children[index].textContent)return PC_S2_PAGE_HTML;
+    const heading=PC_S2_EXPECTED_HEADINGS.find(h=>h.text===node.textContent.trim());
+    if(heading&&['H2','H3','H4'].includes(node.tagName)){
+      const old=original.body.children[index].outerHTML;
+      result=result.replace(old,`<${node.tagName.toLowerCase()}>${esc(heading.text)}</${node.tagName.toLowerCase()}>`);
+    }
+  }
+  return result; // Always rebuilt from trusted original, never returned raw pasted HTML.
+}
+function pcRenderS2CanvasEditor() {
+  const state=pcS2AccessState,htmlMode=state.editorMode==='html';
+  const doc=new DOMParser().parseFromString(pcS2EditorVisualSource(),'text/html');
+  const selected=PC_S2_EXPECTED_HEADINGS.find(h=>h.text===state.editorHeading);
+  const selectedNode=selected&&Array.from(doc.body.children).find(node=>node.textContent.trim()===selected.text);
+  const style=selectedNode&&/^H[234]$/.test(selectedNode.tagName)?selectedNode.tagName.toLowerCase():'p';
+  const visual=Array.from(doc.body.children).map(node=>{
+    const heading=PC_S2_EXPECTED_HEADINGS.find(h=>h.text===node.textContent.trim());
+    if(!heading)return node.outerHTML;
+    const button=`<button type="button" class="pc-s2-rce-title${state.editorHeading===heading.text?' is-selected':''}" data-pc-action="s2-editor-select-heading" data-pc-heading="${esc(heading.text)}">${esc(heading.text)}</button>`;
+    return /^H[234]$/.test(node.tagName)?`<${node.tagName.toLowerCase()}>${button}</${node.tagName.toLowerCase()}>`:`<p style="font-size:${heading.level===3?20:24}px"><strong>${button}</strong></p>`;
+  }).join('');
+  const words=new DOMParser().parseFromString(PC_S2_PAGE_HTML,'text/html').body.textContent.trim().split(/\s+/).length;
+  return `<section class="pc-s1-rename-editor pc-s2-access-editor pc-s2-rce" aria-label="Canvas editor practice">
+    <div class="pc-s2-rce-menu"><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Tools</span><span>Table</span></div>
+    <div class="pc-s2-rce-toolbar"${htmlMode?' hidden':''}><span>12pt</span><label class="pc-s2-rce-style-label">Text style<select id="pcS2HeadingStyle" data-pc-change-action="s2-editor-heading-style" aria-label="Paragraph or heading style">${[['p','Paragraph'],['h2','Heading 2'],['h3','Heading 3'],['h4','Heading 4']].map(([value,label])=>`<option value="${value}"${style===value?' selected':''}>${label}</option>`).join('')}</select></label><span class="pc-s2-rce-format" aria-hidden="true"><b>B</b><i>I</i><u>U</u></span></div>
+    <p class="pc-s2-rce-tip"${htmlMode?' hidden':''}>Select a section title to explore its heading style. To paste Babbage’s repair, use the <strong>&lt;/&gt;</strong> button below the editor.</p>
+    <div class="pc-s2-rce-visual pc-s1-canvas-richtext"${htmlMode?' hidden':''}>${visual}</div>
+    <div class="pc-s2-rce-html"${htmlMode?'':' hidden'}><label for="pcS2PastedHtml">Page HTML</label><textarea id="pcS2PastedHtml" class="pc-s2-access-code" rows="12" data-pc-input-action="s2-access-paste" spellcheck="false">${esc(state.pasted||PC_S2_PAGE_HTML)}</textarea></div>
+    <div class="pc-s2-rce-footer"><span>${words} words</span><button type="button" class="pc-s2-rce-html-toggle" data-pc-action="s2-editor-toggle-html" aria-label="${htmlMode?'Return to visual editor':'Open HTML editor'}" aria-pressed="${htmlMode}" aria-controls="pcS2PastedHtml">&lt;/&gt;</button></div>
+    <div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-insert','Insert repaired HTML',false,true)}${pcS2AccessButton('s2-access-preview-repair','Continue to preview',!state.pasted.trim())}${pcS2AccessButton('s2-access-review-draft','Review repair',false,true)}</div>
+    <p class="pc-s2-rce-tip">Practice editor: the heading menu and HTML button work here. The other toolbar labels show their location in Canvas.</p>
+  </section>`;
+}
+function pcSelectS2EditorHeading(text) {
+  if(!PC_S2_EXPECTED_HEADINGS.some(h=>h.text===text))return;
+  pcS2AccessState.editorHeading=text;pcRenderS2AccessScreen({focusTitle:false});
+  document.getElementById('pcS2HeadingStyle')?.focus();
+}
+function pcChangeS2EditorHeadingStyle(style) {
+  if(!['p','h2','h3','h4'].includes(style))return;
+  const state=pcS2AccessState,heading=PC_S2_EXPECTED_HEADINGS.find(h=>h.text===state.editorHeading);
+  if(!heading)return pcS2AccessNotice('Select a section title in the page before choosing its style.');
+  const doc=new DOMParser().parseFromString(pcS2EditorVisualSource(),'text/html');
+  const node=Array.from(doc.body.children).find(n=>n.textContent.trim()===heading.text);
+  if(!node)return;
+  const replacement=doc.createElement(style);
+  if(style==='p'){replacement.style.fontSize=`${heading.level===3?20:24}px`;const bold=doc.createElement('strong');bold.textContent=heading.text;replacement.appendChild(bold);}
+  else replacement.textContent=heading.text;
+  node.replaceWith(replacement);state.pasted=doc.body.innerHTML;state.checked.clear();pcRenderS2AccessScreen({focusTitle:false});
+  document.getElementById('pcS2HeadingStyle')?.focus();
+}
+function pcToggleS2EditorHTML() {
+  const state=pcS2AccessState;state.editorMode=state.editorMode==='html'?'visual':'html';
+  if(!state.pasted)state.pasted=PC_S2_PAGE_HTML;
+  pcRenderS2AccessScreen({focusTitle:false});
+  pcFocusWithoutScroll(state.editorMode==='html'?document.getElementById('pcS2PastedHtml'):document.querySelector('[data-pc-action="s2-editor-toggle-html"]'));
+}
+;
+/* SOURCE: src/js/scenarios/s2-accessibility-workspace.js */
+/* S2 screens composed with the production S1 task, Canvas, choice and student components. */
 function pcS2AccessCanvas(content, context = 'Modules') {
-  return pcRenderCanvasShell(content, { context, courseTitle: 'Community Survey', preventAction: 's2-access-noop', moduleAction: 's2-access-explore', moAsset: PC_S1_MO_ASSET });
+  return pcRenderCanvasShell(content, { context, courseTitle: 'Community Survey', preventAction: 's2-access-noop', moduleAction: 's2-access-explore' });
 }
 function pcS2AccessButton(action, label, disabled = false, secondary = false) {
-  return `<button type="button" class="${secondary ? 'pc-shell-secondary' : 'pc-shell-primary'}" data-pc-action="${action}" ${disabled ? 'disabled' : ''}>${label}</button>`;
+  return `<button type="button" class="${secondary ? 'pc-shell-secondary' : 'pc-shell-primary'}" data-pc-action="${esc(action)}" ${disabled ? 'disabled aria-disabled="true"' : ''}>${esc(label)}</button>`;
 }
 function pcS2AccessLena(quote) {
-  // Use the existing concept sheet as a labeled reference, without inventing final portraits.
-  return `<aside class="pc-s2-access-student" aria-labelledby="pcS2LenaName"><h2 id="pcS2LenaName">Lena</h2><p class="pc-s2-access-student-note">Dual-enrollment student</p><blockquote>${esc(quote)}</blockquote><details><summary>Meet Lena</summary><img src="${pcProjectUrl('assets/images/characters/students/lena/references/lena_ref_01_concept_sheet.png')}" alt="Lena character concept: a student wearing a purple hoodie and carrying books." /><p>Character reference artwork</p></details></aside>`;
+  const expression = pcS2AccessState.view === 'complete' ? 'confident' : ['resource', 'diagnosis', 'editor'].includes(pcS2AccessState.view) ? 'thinking' : 'neutral';
+  return pcRenderCanvasStudentPanel({ name: 'Lena', portraitSrc: ASSETS.images.students.lena[expression], quote, idPrefix: 'pcS2Lena' });
 }
 function pcS2AccessOutline(html) {
   const result = pcValidateS2HeadingRepair(html);
-  return result.ok ? `<ol class="pc-s2-access-outline"><li><strong>Page title:</strong> Interpret a community survey<ul>${result.headings.map(h => `<li${h.level === 3 ? ' class="is-subsection"' : ''}>${h.level === 3 ? 'Subsection: ' : 'Section: '}${esc(h.text)}</li>`).join('')}</ul></li></ol>` : '<p>This page has no real section headings. Its section titles are ordinary paragraphs made bold and larger.</p>';
+  return result.ok
+    ? `<ol class="pc-s2-access-outline"><li><strong>Page title:</strong> Interpret a community survey<ul>${result.headings.map(h => `<li${h.level === 3 ? ' class="is-subsection"' : ''}>${h.level === 3 ? 'Subsection: ' : 'Section: '}${esc(h.text)}</li>`).join('')}</ul></li></ol>`
+    : '<p>This page has no real section headings. Its section titles are ordinary paragraphs made bold and larger.</p>';
 }
-function pcRenderS2AccessScreen() {
+function pcS2AccessProgressText() {
+  const state = pcS2AccessState;
+  if (['explore', 'resource'].includes(state.view)) return `${state.opened.size} of 1 page opened`;
+  if (state.view === 'diagnosis') return state.diagnosis === 'headings' ? 'Repair identified' : 'Choose a repair';
+  if (state.view === 'verify') return `${state.checked.size} of 3 checks complete`;
+  return ({ editor: 'Prepare your request', review: 'Repair ready to review', paste: 'Practice HTML editor', complete: 'Repair saved' })[state.view] || '';
+}
+function pcS2AccessPage(contentHTML, navigationHTML = '') {
+  return pcRenderCanvasPage({ titleId: 'pcS2CanvasPageTitle', title: 'Interpret a community survey', contentHTML, navigationHTML });
+}
+function pcRenderS2AccessModule() {
+  const opened = pcS2AccessState.opened.has('page');
+  return {
+    title: 'Explore Lena’s learning page', help: 'Open the page and inspect the material Lena is trying to use.', context: 'Modules',
+    quote: 'I found the page, but I keep losing track of which part explains the idea and which part tells me what to do.',
+    content: `<div class="pc-s1-canvas-module-toolbar"><button type="button" data-pc-action="s2-access-noop">Collapse All</button></div>
+      <div class="pc-s1-canvas-jump"><span aria-hidden="true">▸</span><strong>Jump to Module</strong></div>
+      <section class="pc-s1-canvas-module" aria-labelledby="pcS2CanvasModuleTitle">
+        <div class="pc-s1-canvas-module-head"><span aria-hidden="true">⌄</span><h2 id="pcS2CanvasModuleTitle">Module 4: Community Survey</h2><span class="pc-s1-canvas-module-requirement">Complete all items</span></div>
+        <ul class="pc-s1-canvas-module-list"><li class="pc-s1-canvas-module-row${opened ? ' is-viewed' : ''}">
+          <span class="pc-s1-canvas-row-indent" aria-hidden="true"></span><span class="pc-s1-canvas-doc-icon" aria-hidden="true"></span>
+          <button type="button" class="pc-s1-canvas-item-link" data-pc-action="s2-access-open-resource" data-pc-resource="page"><span class="pc-s1-canvas-item-title">Interpret a community survey</span></button>
+          <span class="pc-s1-canvas-item-type">Page</span><span class="pc-s1-canvas-status" aria-label="${opened ? 'Viewed' : 'Not yet viewed'}">${opened ? '✓' : ''}</span>
+        </li></ul>
+      </section>
+      <div class="pc-s1-explore-footer"><div class="pc-s1-explore-progress" aria-live="polite"><strong>${esc(pcS2AccessProgressText())}</strong><span>${opened ? 'You have inspected Lena’s learning page.' : 'Open the page before choosing a repair.'}</span></div>${pcS2AccessButton('s2-access-identify', 'Continue', !opened)}</div>`
+  };
+}
+function pcRenderS2AccessResource() {
+  return {
+    title: 'Inspect the page Lena sees', help: 'Read the page, then check whether its section titles work as headings.', context: 'Learning page',
+    quote: 'The titles look different from the paragraphs, but my reading tool cannot jump between them.',
+    content: pcS2AccessPage(`${PC_S2_PAGE_HTML}${pcRenderS2HeadingLesson()}${pcRenderS2ReaderDemo()}<details><summary>Check the headings</summary>${pcS2AccessOutline('')}<p>A reading tool cannot use these titles to move between sections.</p></details>`,
+      `<nav class="pc-s1-canvas-prev-next" aria-label="Canvas item navigation">${pcS2AccessButton('s2-access-explore', 'Back to Modules', false, true)}${pcS2AccessButton('s2-access-identify', 'Continue')}</nav>`)
+  };
+}
+function pcRenderS2AccessDiagnosis() {
+  const selected = pcS2AccessState.diagnosis;
+  return {
+    title: 'Identify the accessibility barrier', help: 'Choose a repair that helps Lena navigate without changing the lesson.', canvas: false, className: 'pc-s1-diagnosis',
+    quote: 'I need a way to move between the sections. I still need the evidence and directions to complete the work.',
+    content: `<section class="pc-s1-diagnosis-card" aria-labelledby="pcS2DiagnosisQuestion">
+      ${pcRenderS2HeadingLesson(true)}${pcRenderS2ReaderDemo()}
+      <div class="pc-s1-diagnosis-question-block"><span class="pc-s1-result-eyebrow">Your decision</span><h2 id="pcS2DiagnosisQuestion">What would help Lena navigate this page?</h2><p class="pc-s1-diagnosis-help">Keep the information she needs to complete the learning task.</p></div>
+      <div class="pc-s1-diagnosis-choices">${pcRenderLearningDiagnosisChoices({ choices: PC_S2_DIAGNOSIS_CHOICES, selected, action: 's2-access-diagnose', choiceAttribute: 'data-pc-choice' })}</div>
+      <p id="pcS2DiagnosisFeedback" role="status">${selected === 'headings' ? 'Yes. Keep the information and make its structure usable by reading tools.' : selected ? 'That changes how the page looks or removes useful information. Look for a way to make the existing sections easier to navigate.' : ''}</p>
+      <div class="pc-s2-access-actions pc-s2-diagnosis-footer">${pcS2AccessButton('s2-access-open-page', 'Review page', false, true)}${pcS2AccessButton('s2-access-start-repair', 'Continue', selected !== 'headings')}</div>
+    </section>`
+  };
+}
+function pcRenderS2AccessRequest() {
+  const state = pcS2AccessState;
+  return {
+    title: 'Ask AI to repair the headings', help: 'Review the request. Babbage will handle the code.', context: 'Edit page', className: 'pc-s1-renaming',
+    quote: 'Please keep the information and directions. I need the sections to work as headings.',
+    content: `<div class="pc-s1-rename-instructions"><h1>Repair the learning page</h1><p>The page HTML is attached. You can describe the repair in ordinary language.</p></div>
+      <section class="pc-s1-rename-editor pc-s2-access-editor" aria-labelledby="pcS2RequestLabel">
+        <div class="pc-s1-rename-editor-heading"><span>Page to repair</span><strong>Interpret a community survey</strong></div>
+        <label id="pcS2RequestLabel" for="pcS2Request">Your request to Babbage</label><textarea id="pcS2Request" rows="5" data-pc-input-action="s2-access-request">${esc(state.request)}</textarea>
+        <details><summary>See the attached page HTML</summary><textarea id="pcS2SourceHtml" class="pc-s2-access-code" rows="8" readonly aria-label="Original page HTML">${esc(PC_S2_PAGE_HTML)}</textarea>${pcS2AccessButton('s2-access-copy-source', 'Copy page HTML', false, true)}</details>
+        <div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-generate', 'Ask Babbage', state.busy || !state.request.trim())}${pcS2AccessButton('s2-access-identify', 'Review decision', false, true)}</div>
+        <details><summary>Practice without a live AI response</summary><p>Use a prepared example to try the same repair steps.</p>${pcS2AccessButton('s2-access-example', 'Use example repair', state.busy, true)}</details>
+      </section>`
+  };
+}
+function pcRenderS2AccessReview() {
+  const state = pcS2AccessState;
+  return {
+    title: 'Review what changed', help: 'Compare the original structure with the repaired structure.', canvas: false, className: 'pc-s1-diagnosis-result',
+    quote: 'Real headings should help me move through the page. I still need you to check that all the information is there.',
+    content: `<section class="pc-s1-checkpoint-card pc-s1-diagnosis-result-card">
+      <span class="pc-s1-result-eyebrow">${state.source === 'live' ? 'Babbage repair' : 'Built-in example repair'}</span><h2>Same information. Clearer structure.</h2><p>${esc(state.explanation || 'The section titles now use real headings. Before you submit belongs under Your task.')}</p>
+      ${pcRenderS2ReaderDemo()}<div class="pc-s2-access-compare"><section><h3>Before</h3>${pcS2AccessOutline('')}</section><section><h3>After</h3>${pcS2AccessOutline(state.draft)}</section></div>
+      <details><summary>See the repaired HTML</summary><textarea id="pcS2DraftHtml" class="pc-s2-access-code" rows="8" readonly aria-label="Repaired page HTML">${esc(state.draft)}</textarea>${pcS2AccessButton('s2-access-copy-draft', 'Copy repaired HTML', false, true)}</details>
+      <div class="pc-s1-diagnosis-result-actions">${pcS2AccessButton('s2-access-revise', 'Revise request', false, true)}${pcS2AccessButton('s2-access-open-editor', 'Continue')}</div>
+    </section>`
+  };
+}
+function pcRenderS2AccessEditor() {
+  return {
+    title: 'Put the repair into Canvas', help: 'Replace the original code in the practice HTML editor.', context: 'Edit page', className: 'pc-s1-renaming',
+    quote: 'Keep my learning page intact while you put the repaired structure in place.',
+    content: `<div class="pc-s1-rename-instructions"><h1>Edit Interpret a community survey</h1><p>Use the &lt;/&gt; button below the editor to open the HTML view. Insert or paste Babbage’s repair, then return to the visual view and check the page.</p></div>${pcRenderS2CanvasEditor()}`
+  };
+}
+function pcRenderS2AccessVerify() {
+  const state = pcS2AccessState, result = pcValidateS2HeadingRepair(state.pasted);
+  return {
+    title: 'Check the page before saving', help: 'AI makes the repair. You check the result.', context: 'Page preview',
+    quote: 'Check that I can find the sections and still have the same evidence, directions, and link.',
+    content: pcS2AccessPage(result.ok ? result.html : '') + `<section class="pc-s2-access-checks"><h2>Check your repair</h2>
+      <details><summary>Compare with the original</summary><article class="pc-s1-canvas-richtext">${PC_S2_PAGE_HTML}</article></details>
+      <details><summary>Check the heading outline</summary>${pcS2AccessOutline(state.pasted)}</details>${pcRenderS2ReaderDemo()}
+      ${PC_S2_REPAIR_CHECKS.map(({ id, label }) => `<label><input type="checkbox" data-pc-change-action="s2-access-check" data-pc-check="${id}" ${state.checked.has(id) ? 'checked' : ''}> ${esc(label)}</label>`).join('')}
+      <div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-back-editor', 'Back to editor', false, true)}${pcS2AccessButton('s2-access-apply', 'Save checked page', !pcS2AccessChecksComplete())}</div></section>`
+  };
+}
+function pcRenderS2AccessComplete() {
+  return {
+    title: 'Heading repair complete', help: 'You kept the learning and removed a navigation barrier.', canvas: false, className: 'pc-s1-diagnosis-result',
+    quote: 'I can move between the sections now. It is easier to find the evidence and return to what I need to submit.',
+    content: `<section class="pc-s1-checkpoint-card pc-s1-diagnosis-result-card"><span class="pc-s1-result-eyebrow">Your checked repair</span><h2>A small repair makes a difference</h2><p>You used ${pcS2AccessState.source === 'live' ? 'Babbage' : 'a built-in example'} to turn visual titles into real headings, then checked the result before saving.</p>
+      <h3>Try this in your own course</h3><p>Open a Canvas page’s HTML editor, copy its HTML into an AI request, and ask for a heading repair. Paste the checked result back, preview the page, and run your available accessibility checker.</p>
+      <details><summary>Keep this request</summary><textarea id="pcS2ReusablePrompt" rows="5" readonly aria-label="Reusable AI request">${esc(pcS2AccessState.request)}</textarea></details>
+      <details><summary>Course-design connection</summary><p>OSCQR 21 and WCAG 2.1 1.3.1 and 2.4.6 connect this repair to readable, meaningful page structure. This is one accessibility improvement, not a full accessibility review.</p></details>
+      <div class="pc-s1-diagnosis-result-actions">${pcS2AccessButton('s2-access-revisit', 'Review repair', false, true)}${pcS2AccessButton('s2-access-reset', 'Practice again', false, true)}${pcS2AccessButton('open-main-menu', 'Return to Main Menu')}</div>
+    </section>`
+  };
+}
+function pcRenderS2AccessScreen({ focusTitle = true } = {}) {
   if (scenarioIndex !== SCENARIO_INDEX.ACCESSIBILITY) return false;
+  const area = document.getElementById('chat');
+  if (!area) return false;
   document.body.classList.remove('pc-s1-guide-open');
   ['nameModalOverlay', 'audioSetupOverlay'].forEach(id => {
     const modal = document.getElementById(id);
     if (modal?.hidden) { modal.inert = true; modal.style.pointerEvents = 'none'; }
   });
   const overlay = document.getElementById('vnOverlay');
-  if (overlay && !overlay.classList.contains('active')) {
-    overlay.inert = false;
-    overlay.removeAttribute('aria-hidden');
-    overlay.style.removeProperty('pointer-events');
-  }
-  const state = pcS2AccessState;
-  const area = document.getElementById('chat');
-  if (!area) return false;
-  let title = 'Meet Lena', content = '', quote = 'I read the page again, but I keep losing track of which part explains the idea and which part tells me what to do.';
-  if (state.view === 'intro') {
-    content = `<section class="pc-s2-access-card"><div class="pc-s2-access-kicker">Professor Pixel</div><h2>She found the materials. Using them is harder.</h2><p>Lena is trying to follow an organized Canvas module. She rereads the material but cannot explain why she keeps losing her place.</p><p>Inspect the materials, then use Babbage to repair the page without changing what it teaches. You do not need to write HTML.</p><p><strong>Your first repair:</strong> turn titles that only look like headings into real section headings.</p>${pcS2AccessButton('s2-access-explore', 'Open Lena’s module')}</section>`;
-  } else if (state.view === 'explore') {
-    title = 'Inspect the learning materials';
-    const inspected = state.opened.size;
-    content = pcS2AccessCanvas(`<h1>Module 4: Interpret a community survey</h1><p>Open each resource to see what Lena receives.</p><ul class="pc-s2-access-resources">${[['page','Learning page'],['handout','Survey handout'],['diagram','Survey diagram']].map(([id,label]) => `<li><button type="button" data-pc-action="s2-access-open-resource" data-pc-resource="${id}">${label}</button><span>${state.opened.has(id) ? 'Inspected' : 'Not yet inspected'}</span></li>`).join('')}</ul><p role="status">${inspected} of 3 materials inspected</p>${pcS2AccessButton('s2-access-start-repair','Repair the learning page', inspected < 3)}`);
-  } else if (state.view === 'resource') {
-    title = 'See what Lena receives';
-    let body;
-    if (state.resource === 'page') body = `<h1>Interpret a community survey</h1><article class="pc-s2-access-preview">${PC_S2_PAGE_HTML}</article><details><summary>Inspect the page structure</summary>${pcS2AccessOutline('')}</details>`;
-    else if (state.resource === 'handout') { quote = 'The handout looks like text, but I cannot select a sentence or use my reading tools on it.'; body = `<h1>Survey handout</h1><div class="pc-s2-access-paper" role="img" aria-label="Example image-only handout. The same information is available in the text version below."><strong>COMMUNITY SURVEY</strong><p>80 residents answered.</p><p>Driving: 40 · Bus: 24 · Walking: 16</p><p>Which travel option was most common?</p></div><details><summary>Read the text version</summary><p>80 residents answered: 40 chose driving, 24 chose the bus, and 16 chose walking. Which travel option was most common?</p></details><p>This handout repair will be a later activity. Today, start with the learning page.</p>`; }
-    else { quote = 'The picture shows the survey results, but there is no explanation connecting the numbers to the conclusion.'; body = `<h1>Survey diagram</h1><figure class="pc-s2-access-chart"><figcaption>Travel choices: 80 residents</figcaption><p>Driving <span style="width:100%">40</span></p><p>Bus <span style="width:60%">24</span></p><p>Walking <span style="width:40%">16</span></p></figure><p>The labels and numbers are available here so you can inspect this example. A future activity will add a useful explanation of the relationship.</p>`; }
-    content = pcS2AccessCanvas(`${body}<div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-explore','Back to Modules',false,true)}</div>`, state.resource === 'page' ? 'Learning page' : 'Learning resource');
-  } else if (state.view === 'editor') {
-    title = 'Let AI handle the HTML';
-    content = pcS2AccessCanvas(`<h1>Interpret a community survey</h1><div class="pc-s2-access-editor-tabs"><span>HTML editor</span>${pcS2AccessButton('s2-access-page-preview','View page',false,true)}</div><p>The bold, enlarged titles below look like headings, but their structure says “paragraph.” Copy the code as it is. Babbage can repair it.</p><label for="pcS2SourceHtml">Existing page HTML</label><textarea id="pcS2SourceHtml" class="pc-s2-access-code" rows="12" readonly>${esc(PC_S2_PAGE_HTML)}</textarea><div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-copy-source','Copy page HTML',false,true)}</div><label for="pcS2Request">Your request to Babbage</label><textarea id="pcS2Request" rows="5" data-pc-input-action="s2-access-request">${esc(state.request)}</textarea><p>Only this example page and your request go to Babbage. You can edit the request without writing code.</p><div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-generate','Ask Babbage to repair the headings',state.busy || !state.request.trim())}${pcS2AccessButton('s2-access-example','Try a built-in example',state.busy,true)}</div>`, 'Edit page');
-  } else if (state.view === 'review') {
-    title = 'Check the repair, then paste it into Canvas';
-    const result = pcValidateS2HeadingRepair(state.draft);
-    content = `<section class="pc-s2-access-card"><div class="pc-s2-access-kicker">${state.source === 'live' ? 'Live Babbage repair' : 'Built-in example repair'}</div><h2>The information stays. The structure changes.</h2><p>${esc(state.explanation || 'The main sections now use real headings. Before you submit is a subsection of Your task. The words, link, and requirements stay the same.')}</p><div class="pc-s2-access-compare"><section><h3>Original page structure</h3>${pcS2AccessOutline('')}<details><summary>Compare original wording</summary><article class="pc-s2-access-preview">${PC_S2_PAGE_HTML}</article></details></section><section><h3>Repaired heading outline</h3>${pcS2AccessOutline(state.draft)}</section></div><label for="pcS2DraftHtml">Babbage’s repaired HTML</label><textarea id="pcS2DraftHtml" class="pc-s2-access-code" rows="10" readonly>${esc(state.draft)}</textarea><div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-copy-draft','Copy repaired HTML',false,true)}${pcS2AccessButton('s2-access-revise','Change my request',false,true)}</div></section>`;
-    content += pcS2AccessCanvas(`<h1>Interpret a community survey</h1><div class="pc-s2-access-editor-tabs"><span>HTML editor</span></div><label for="pcS2PastedHtml">Replace the old page code with the repaired HTML</label><textarea id="pcS2PastedHtml" class="pc-s2-access-code" rows="10" data-pc-input-action="s2-access-paste">${esc(state.pasted)}</textarea><div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-insert','Insert repaired HTML',false,true)}${pcS2AccessButton('s2-access-preview-repair','Preview this page',!state.pasted.trim(),true)}</div><p>You can paste the copied code, or use Insert repaired HTML in this practice editor.</p>`, 'Edit page');
-    if (!result.ok) state.notice = result.message;
-  } else if (state.view === 'verify') {
-    title = 'Verify the page before applying it';
-    const result = pcValidateS2HeadingRepair(state.pasted);
-    content = pcS2AccessCanvas(`<h1>Interpret a community survey</h1><article class="pc-s2-access-preview">${result.ok ? result.html : ''}</article><section class="pc-s2-access-checks"><h2>Quick checks</h2>${[['words','The wording and requirements match the original.'],['outline','The headings describe the sections and the subsection belongs under Your task.'],['links','The original link label and destination are unchanged.']].map(([id,label]) => `<label><input type="checkbox" data-pc-change-action="s2-access-check" data-pc-check="${id}" ${state.checked.has(id) ? 'checked' : ''}> ${label}</label>`).join('')}<details><summary>Compare original page</summary><article class="pc-s2-access-preview">${PC_S2_PAGE_HTML}</article></details><details><summary>Review heading outline</summary>${pcS2AccessOutline(state.pasted)}</details><div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-apply','Apply verified repair',state.checked.size !== 3)}${pcS2AccessButton('s2-access-back-editor','Back to HTML editor',false,true)}</div></section>`, 'Page preview');
-  } else {
-    title = 'First accessibility repair complete';
-    quote = 'Now the page has sections I can move between. I can return to the evidence and then find exactly what I need to submit.';
-    content = `<section class="pc-s2-access-card"><h2>You preserved the lesson and repaired its structure.</h2><p>You used ${state.source === 'live' ? 'Babbage' : 'a clearly labeled built-in example'} to replace visual headings with real headings, then checked the content before applying the HTML.</p><p><strong>Try it in your course:</strong> open a small Canvas page’s HTML editor, copy its code, ask AI for a heading repair, paste back the checked version, and preview it. Run the available accessibility checker as an additional check.</p><label for="pcS2ReusablePrompt">Reusable request</label><textarea id="pcS2ReusablePrompt" rows="5" readonly>${esc(state.request)}</textarea><p><strong>Course-design connections:</strong> OSCQR 21; WCAG 2.1 1.3.1 and 2.4.6. This repair addresses heading structure, not every accessibility requirement.</p><p>Your practice repair is saved on this device separately from your S1 guide. Handout, diagram, and My Course guide-building activities will follow in later updates.</p><div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-revisit','Revisit the repaired page',false,true)}${pcS2AccessButton('s2-access-reset','Practice again',false,true)}${pcS2AccessButton('open-main-menu','Return to Main Menu')}</div></section>`;
-  }
-  area.innerHTML = `<section class="pc-s2-access" aria-labelledby="pcS2AccessTitle"><header class="pc-s2-access-header"><div><span>Scenario 2 · Access Is Part of the Design</span><h1 id="pcS2AccessTitle">${title}</h1><p>Inspect → Ask AI → Preview → Verify → Apply</p></div><span class="pc-s2-access-preview-badge">First section preview</span></header><div class="pc-s2-access-layout"><div class="pc-s2-access-main">${content}<p id="pcS2AccessNotice" role="status">${esc(state.notice)}</p></div>${pcS2AccessLena(quote)}</div></section>`;
+  if (overlay && !overlay.classList.contains('active')) { overlay.inert = false; overlay.removeAttribute('aria-hidden'); overlay.style.removeProperty('pointer-events'); }
+  pcCloseS2ReaderView(false);
+  const renderers = { explore: pcRenderS2AccessModule, resource: pcRenderS2AccessResource, diagnosis: pcRenderS2AccessDiagnosis, editor: pcRenderS2AccessRequest, review: pcRenderS2AccessReview, paste: pcRenderS2AccessEditor, verify: pcRenderS2AccessVerify, complete: pcRenderS2AccessComplete };
+  if (!renderers[pcS2AccessState.view]) pcS2AccessState.view = 'explore';
+  const screen = renderers[pcS2AccessState.view]();
+  const notice = `<p id="pcS2AccessNotice" role="status">${esc(pcS2AccessState.notice)}</p>`;
+  area.innerHTML = pcRenderLearningStage({
+    className: `pc-s2-access${screen.className ? ` ${screen.className}` : ''}`, titleId: 'pcS2AccessTitle', background: pcGetScenarioBackgroundAsset(SCENARIO_INDEX.ACCESSIBILITY),
+    taskbarHTML: pcRenderLearningTaskbar({ label: 'Scenario 2 · Access Is Part of the Design', titleId: 'pcS2AccessTitle', title: screen.title, instruction: screen.help, status: pcS2AccessProgressText() }),
+    bodyHTML: pcRenderLearningWorkspace({ mainHTML: screen.canvas === false ? screen.content.replace(/<\/section>$/, `${notice}</section>`) : `<section class="pc-s1-canvas-frame" aria-label="Lena’s Canvas course">${notice}${pcS2AccessCanvas(screen.content, screen.context)}</section>`, studentHTML: pcS2AccessLena(screen.quote) })
+  });
   resetSectionScroll(area);
-  pcScheduleScenarioTask(() => pcFocusWithoutScroll(document.getElementById('pcS2AccessTitle')), 80, SCENARIO_INDEX.ACCESSIBILITY);
-  document.getElementById('pcS2AccessTitle')?.setAttribute('tabindex','-1');
+  document.getElementById('pcS2AccessTitle')?.setAttribute('tabindex', '-1');
+  if (focusTitle) pcScheduleScenarioTask(() => { if (!document.getElementById('vnOverlay')?.classList.contains('active')) pcFocusWithoutScroll(document.getElementById('pcS2AccessTitle')); }, 80, SCENARIO_INDEX.ACCESSIBILITY);
   return true;
 }
+;
+/* SOURCE: src/js/scenarios/s2-accessibility-ai.js */
+/* s2-accessibility-ai.js — S2 accessibility production owner. */
 
-function pcS2AccessNotice(message) {
-  pcS2AccessState.notice = message;
-  const el = document.getElementById('pcS2AccessNotice'); if (el) el.textContent = message;
-}
-async function pcS2AccessCopy(id) {
-  const field = document.getElementById(id); if (!field) return;
-  try { await navigator.clipboard.writeText(field.value); pcS2AccessNotice('Copied. Paste this code into the HTML editor.'); }
-  catch (_error) { field.focus(); field.select(); pcS2AccessNotice('The code is selected. Use your device’s Copy command, then paste it into the HTML editor.'); }
-}
-function pcS2AccessUseDraft(html, source, explanation) {
-  const valid = pcValidateS2HeadingRepair(html);
-  if (!valid.ok) { pcS2AccessState.view = 'editor'; pcS2AccessState.notice = valid.message; pcRenderS2AccessScreen(); return false; }
-  Object.assign(pcS2AccessState, { draft: valid.html, source, explanation, pasted: '', checked: new Set(), view: 'review', notice: '' });
-  return pcRenderS2AccessScreen();
-}
 async function pcS2AccessGenerate() {
   const state = pcS2AccessState;
   if (state.busy || !state.request.trim() || scenarioIndex !== SCENARIO_INDEX.ACCESSIBILITY) return;
@@ -8342,36 +8704,116 @@ async function pcS2AccessGenerate() {
   const explanation = isExample ? 'Live Babbage was unavailable or example mode was selected. This built-in repair demonstrates the same steps: real headings, original wording, original link.' : response.analysis.explanation;
   showBabbageTerminalReport({reportHTML:`<article class="pc-s2-access-report"><span>${isExample ? 'BUILT-IN EXAMPLE REPAIR' : 'LIVE BABBAGE REPAIR'}</span><h2>Real headings. Same information.</h2><p>${esc(explanation)}</p><h3>What to check next</h3><p>Compare the information and heading outline before pasting the repaired HTML into the practice editor.</p></article>`, terminalStateText:'HEADING REPAIR READY', engineLabel:isExample?'BABBAGE EXAMPLE':'BABBAGE ENGINE', speakerName:'Professor Pixel', readLabel:'', printLabel:'', continueLabel:'Review repaired HTML', closeHandoff:'app', onClose:()=>{if(epoch===pcS2AccessEpoch && pcIsScenarioRunCurrent(run))pcS2AccessUseDraft(valid.html,isExample?'example':'live',explanation);}});
 }
+;
+/* SOURCE: src/js/scenarios/s2-accessibility.js */
+/* S2 controller: learner actions and transitions. No S1 guide or legacy research writes. */
+function pcS2AccessNotice(message) {
+  pcS2AccessState.notice = message;
+  const el = document.getElementById('pcS2AccessNotice');
+  if (el) el.textContent = message;
+}
+function pcShowS2AccessView(view) {
+  pcS2AccessState.view = view;
+  pcS2AccessState.notice = '';
+  return pcRenderS2AccessScreen();
+}
+function pcOpenS2AccessPage() {
+  pcS2AccessState.resource = 'page';
+  pcS2AccessState.opened.add('page');
+  return pcShowS2AccessView('resource');
+}
+function pcIdentifyS2AccessBarrier() {
+  if (!pcS2AccessState.opened.has('page')) return false;
+  return pcShowS2AccessView('diagnosis');
+}
+function pcSelectS2AccessDiagnosis(id) {
+  if (!PC_S2_DIAGNOSIS_CHOICES.some(choice => choice.id === id)) return false;
+  pcS2AccessState.diagnosis = id;
+  pcRenderS2AccessScreen({ focusTitle: false });
+  const selected = document.querySelector(`[data-pc-choice="${id}"]`);
+  pcFocusWithoutScroll(selected);
+  return true;
+}
+function pcUpdateS2AccessButton(action, ready) {
+  const button = document.querySelector(`[data-pc-action="${action}"]`);
+  if (!button) return;
+  button.disabled = !ready;
+  if (ready) button.removeAttribute('aria-disabled');
+  else button.setAttribute('aria-disabled', 'true');
+}
+async function pcS2AccessCopy(id) {
+  const field = document.getElementById(id);
+  if (!field) return;
+  try { await navigator.clipboard.writeText(field.value); pcS2AccessNotice('Copied. Paste this code into the HTML editor.'); }
+  catch (_error) { field.focus(); field.select(); pcS2AccessNotice('The code is selected. Use your device’s Copy command, then paste it into the HTML editor.'); }
+}
+function pcS2AccessUseDraft(html, source, explanation) {
+  const valid = pcValidateS2HeadingRepair(html);
+  if (!valid.ok) { pcS2AccessState.view = 'editor'; pcS2AccessState.notice = valid.message; pcRenderS2AccessScreen(); return false; }
+  Object.assign(pcS2AccessState, { draft: valid.html, source, explanation, pasted: '', checked: new Set(), view: 'review', notice: '' });
+  return pcRenderS2AccessScreen();
+}
+function pcPreviewS2AccessRepair() {
+  const check = pcValidateS2HeadingRepair(pcS2AccessState.pasted);
+  if (!check.ok) return pcS2AccessNotice(check.message);
+  return pcShowS2AccessView('verify');
+}
+function pcCheckS2AccessRepair(target) {
+  const id = target.dataset.pcCheck;
+  if (!PC_S2_REPAIR_CHECKS.some(check => check.id === id)) return false;
+  if (target.checked) pcS2AccessState.checked.add(id);
+  else pcS2AccessState.checked.delete(id);
+  pcUpdateS2AccessButton('s2-access-apply', pcS2AccessChecksComplete());
+  const progress = document.querySelector('.pc-s1-learning-task-status');
+  if (progress) progress.textContent = pcS2AccessProgressText();
+}
 function pcS2AccessApply() {
-  const state=pcS2AccessState, result=pcValidateS2HeadingRepair(state.pasted);
-  if (!result.ok || state.checked.size !== 3) return pcS2AccessNotice(result.message || 'Complete the three source checks before applying the repair.');
-  state.applied=result.html; state.view='complete'; state.notice='';
-  try {localStorage.setItem(PC_S2_ACCESS_STORAGE,JSON.stringify({html:result.html,request:state.request,source:state.source}));}
-  catch (_error) {state.notice='The repair is applied for this session, but this browser could not save it for your next visit.';}
-  // This preview deliberately does not emit legacy metacognition research events,
-  // complete S2, award full-scenario XP, or change the S1 Course Guide.
-  pcRenderS2AccessScreen();
+  const state = pcS2AccessState, result = pcValidateS2HeadingRepair(state.pasted);
+  if (!result.ok || !pcS2AccessChecksComplete()) return pcS2AccessNotice(result.message || 'Complete the three source checks before applying the repair.');
+  state.applied = result.html;
+  state.view = 'complete';
+  state.notice = pcSaveS2AccessRepair() ? '' : 'The repair is applied for this session, but this browser could not save it for your next visit.';
+  // This is a section preview. Completion/XP/research and the S1 guide remain separate.
+  return pcRenderS2AccessScreen();
 }
 pcRegisterUIActions({
-  's2-access-noop': (_target,event) => event?.preventDefault(),
-  's2-access-explore': () => {pcS2AccessState.view='explore';pcS2AccessState.notice='';pcRenderS2AccessScreen();},
-  's2-access-open-resource': target => {const id=target.dataset.pcResource;if(!['page','handout','diagram'].includes(id))return;pcS2AccessState.resource=id;pcS2AccessState.opened.add(id);pcS2AccessState.view='resource';pcRenderS2AccessScreen();},
-  's2-access-start-repair': () => {if(pcS2AccessState.opened.size<3)return;pcS2AccessState.view='editor';pcRenderS2AccessScreen();},
-  's2-access-page-preview': () => {pcS2AccessState.resource='page';pcS2AccessState.view='resource';pcRenderS2AccessScreen();},
+  's2-editor-toggle-html': () => pcToggleS2EditorHTML(),
+  's2-editor-select-heading': target => pcSelectS2EditorHeading(target.dataset.pcHeading),
+  's2-editor-heading-style': target => pcChangeS2EditorHeadingStyle(target.value),
+  's2-reader-close': () => pcCloseS2ReaderView(),
+  's2-reader-play': () => pcToggleS2ReaderPlayback(),
+  's2-reader-rate': target => pcChangeS2ReaderRate(target.value),
+  's2-reader-size': target => { if ([20,24,30,36].includes(Number(target.value))) pcS2ReaderPreferences.size = Number(target.value); pcApplyS2ReaderPreferences(); },
+  's2-reader-spacing': target => { pcS2ReaderPreferences.spacing = target.checked; pcApplyS2ReaderPreferences(); },
+  's2-reader-focus': target => { pcS2ReaderPreferences.focus = target.checked; pcApplyS2ReaderPreferences(); },
+  's2-reader-toggle': target => pcToggleS2ReaderDemo(target),
+  's2-reader-before': () => pcPlayS2ReaderDemo('before'),
+  's2-reader-after': () => pcPlayS2ReaderDemo('after'),
+  's2-reader-read': () => pcPlayS2ReaderDemo('read'),
+  's2-reader-stop': () => pcStopS2ReaderDemo(),
+  's2-access-noop': (_target, event) => event?.preventDefault(),
+  's2-access-explore': () => pcShowS2AccessView('explore'),
+  's2-access-open-resource': target => target.dataset.pcResource === 'page' && pcOpenS2AccessPage(),
+  's2-access-open-page': () => pcOpenS2AccessPage(),
+  's2-access-identify': () => pcIdentifyS2AccessBarrier(),
+  's2-access-diagnose': target => pcSelectS2AccessDiagnosis(target.dataset.pcChoice),
+  's2-access-open-editor': () => { if (!pcS2AccessState.pasted) pcS2AccessState.pasted = PC_S2_PAGE_HTML; return pcShowS2AccessView('paste'); },
+  's2-access-start-repair': () => pcS2AccessState.diagnosis === 'headings' && pcShowS2AccessView('editor'),
   's2-access-copy-source': () => pcS2AccessCopy('pcS2SourceHtml'),
   's2-access-copy-draft': () => pcS2AccessCopy('pcS2DraftHtml'),
-  's2-access-request': target => {pcS2AccessState.request=target.value;const button=document.querySelector('[data-pc-action="s2-access-generate"]');if(button)button.disabled=pcS2AccessState.busy || !target.value.trim();},
+  's2-access-request': target => { pcS2AccessState.request = target.value; pcUpdateS2AccessButton('s2-access-generate', !pcS2AccessState.busy && !!target.value.trim()); },
   's2-access-generate': () => pcS2AccessGenerate(),
-  's2-access-example': () => pcS2AccessUseDraft(pcS2HeadingExample(),'example','This is a built-in example, not a live AI response. The heading tags change while all wording and links stay the same.'),
-  's2-access-revise': () => {pcS2AccessState.view='editor';pcRenderS2AccessScreen();},
-  's2-access-paste': target => {pcS2AccessState.pasted=target.value;pcS2AccessState.checked.clear();const button=document.querySelector('[data-pc-action="s2-access-preview-repair"]');if(button)button.disabled=!target.value.trim();},
-  's2-access-insert': () => {pcS2AccessState.pasted=pcS2AccessState.draft;pcS2AccessState.checked.clear();pcRenderS2AccessScreen();},
-  's2-access-preview-repair': () => {const check=pcValidateS2HeadingRepair(pcS2AccessState.pasted);if(!check.ok)return pcS2AccessNotice(check.message);pcS2AccessState.view='verify';pcS2AccessState.notice='';pcRenderS2AccessScreen();},
-  's2-access-check': target => {if(target.checked)pcS2AccessState.checked.add(target.dataset.pcCheck);else pcS2AccessState.checked.delete(target.dataset.pcCheck);const button=document.querySelector('[data-pc-action="s2-access-apply"]');if(button)button.disabled=pcS2AccessState.checked.size!==3;},
+  's2-access-example': () => pcS2AccessUseDraft(pcS2HeadingExample(), 'example', 'This is a built-in example, not a live AI response. The heading tags change while all wording and links stay the same.'),
+  's2-access-revise': () => pcShowS2AccessView('editor'),
+  's2-access-paste': target => { pcS2AccessState.pasted = target.value; pcS2AccessState.checked.clear(); pcUpdateS2AccessButton('s2-access-preview-repair', !!target.value.trim()); },
+  's2-access-insert': () => { pcS2AccessState.pasted = pcS2AccessState.draft; pcS2AccessState.editorMode = 'html'; pcS2AccessState.checked.clear(); pcRenderS2AccessScreen(); },
+  's2-access-preview-repair': () => pcPreviewS2AccessRepair(),
+  's2-access-check': target => pcCheckS2AccessRepair(target),
   's2-access-apply': () => pcS2AccessApply(),
-  's2-access-back-editor': () => {pcS2AccessState.view='review';pcRenderS2AccessScreen();},
-  's2-access-revisit': () => {pcS2AccessState.draft=pcS2AccessState.applied;pcS2AccessState.pasted=pcS2AccessState.applied;pcS2AccessState.checked.clear();pcS2AccessState.view='verify';pcRenderS2AccessScreen();},
-  's2-access-reset': () => {pcS2AccessEpoch+=1;try{localStorage.removeItem(PC_S2_ACCESS_STORAGE);}catch(_error){return pcS2AccessNotice('This browser could not clear the saved practice.');}pcS2AccessState={view:'intro',resource:'page',opened:new Set(),request:PC_S2_HEADING_REQUEST,draft:'',source:'',pasted:'',checked:new Set(),notice:'',busy:false,applied:''};pcRenderS2AccessScreen();}
+  's2-access-back-editor': () => pcShowS2AccessView('paste'),
+  's2-access-review-draft': () => pcShowS2AccessView('review'),
+  's2-access-revisit': () => { pcS2AccessState.draft = pcS2AccessState.applied; pcS2AccessState.pasted = pcS2AccessState.applied; pcS2AccessState.checked.clear(); pcShowS2AccessView('verify'); },
+  's2-access-reset': () => pcResetS2AccessPractice()
 });
 ;
 /* SOURCE: src/js/scenarios/s2-metacognition.js */
@@ -14692,6 +15134,10 @@ pcRegisterVNCharacter('pixel', {
   expressions: () => EXPRESSIONS,
   legacyExpressions: () => LEGACY_ASSETS.images.professorPixel
 });
+pcRegisterVNCharacter('lena', {
+  label: 'Lena',
+  expressions: () => ASSETS.images.students.lena
+});
 pcRegisterVNCharacter('jordan', {
   label: 'Jordan',
   expressions: () => ASSETS.images.students.jordan,
@@ -15991,6 +16437,11 @@ function pcLoadProgressState() {
   try { stored = JSON.parse(localStorage.getItem(PC_PROGRESS_STORAGE_KEY) || '{}'); } catch (error) { stored = {}; }
   pcProgressState = pcNormalizeProgressState(stored);
   xp = pcProgressState.xp;
+  // Restore completion for production loops that explicitly opt in. A saved
+  // guide alone is not completion; only the existing closing-scene award counts.
+  SCENARIO_UI.forEach((ui, index) => {
+    if (ui.completionAvailable) scenarioCompleted[index] = Boolean(pcProgressState.completedAwards[index]);
+  });
   return pcProgressState;
 }
 
@@ -16188,7 +16639,7 @@ pcExposeGlobals({
 //  COMPLETION
 // ══════════════════════════════════════════════════════
 function markScenarioComplete() {
-  if (!getScenarioUI(scenarioIndex).implemented) return;
+  if (!pcCanCompleteScenario()) return;
   const wasComplete = Boolean(scenarioCompleted[scenarioIndex]);
   scenarioCompleted[scenarioIndex] = true;
   if (!wasComplete) awardScenarioCompletionXP(scenarioIndex);
@@ -16202,7 +16653,7 @@ function markScenarioComplete() {
   pixelBadgeSetExpr('encouraging');
   const div = document.createElement('div');
   div.className = 's1-scenario-complete-note';
-  div.innerHTML = `<p>Scenario 1 complete. The remaining scenarios are being rebuilt one at a time from clean development shells.</p>`;
+  div.innerHTML = `<p>${esc(getScenarioUI(scenarioIndex).tabLabel)} complete.</p>`;
   area.appendChild(div);
 }
 

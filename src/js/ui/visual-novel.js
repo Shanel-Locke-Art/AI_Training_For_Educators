@@ -39,6 +39,10 @@ pcRegisterVNCharacter('pixel', {
   expressions: () => EXPRESSIONS,
   legacyExpressions: () => LEGACY_ASSETS.images.professorPixel
 });
+pcRegisterVNCharacter('lena', {
+  label: 'Lena',
+  expressions: () => ASSETS.images.students.lena
+});
 pcRegisterVNCharacter('jordan', {
   label: 'Jordan',
   expressions: () => ASSETS.images.students.jordan,

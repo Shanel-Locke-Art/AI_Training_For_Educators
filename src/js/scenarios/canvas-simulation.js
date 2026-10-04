@@ -1,6 +1,7 @@
 /* Shared Canvas presentation. S1 wrappers retain the original DOM and actions. */
+const PC_CANVAS_MO_ASSET = 'assets/images/ui/ui_04_mo_river_otter.png';
 
-function pcRenderCanvasGlobalNav({ preventAction = 's1-learning-prevent-link', moAsset = PC_S1_MO_ASSET } = {}) {
+function pcRenderCanvasGlobalNav({ preventAction = 's1-learning-prevent-link', moAsset = PC_CANVAS_MO_ASSET } = {}) {
   return `
     <nav class="pc-s1-canvas-global-nav" aria-label="Canvas global navigation">
       <div class="pc-s1-canvas-global-brand" aria-hidden="true">
@@ -36,7 +37,7 @@ function pcRenderCanvasTopbar({ context = 'Modules', courseTitle = 'Community He
     </div>`;
 }
 
-function pcRenderCanvasShell(mainHTML, { context = 'Modules', courseTitle = 'Community Health', preventAction = 's1-learning-prevent-link', moduleAction = 's1-learning-show-module', moAsset = PC_S1_MO_ASSET } = {}) {
+function pcRenderCanvasShell(mainHTML, { context = 'Modules', courseTitle = 'Community Health', preventAction = 's1-learning-prevent-link', moduleAction = 's1-learning-show-module', moAsset = PC_CANVAS_MO_ASSET } = {}) {
   return `
     <div class="pc-s1-canvas-app" aria-label="Canvas course simulation">
       ${pcRenderCanvasGlobalNav({ preventAction, moAsset })}
@@ -63,4 +64,13 @@ function pcRenderCanvasStudentPanel({ name, portraitSrc = '', quote = '', idPref
         </div>
       </div>
     </aside>`;
+}
+
+function pcRenderCanvasPage({ titleId, title = '', contentHTML = '', navigationHTML = '' } = {}) {
+  return `
+    <div class="pc-s1-canvas-item-header"><h1 id="${esc(titleId)}">${esc(title)}</h1></div>
+    <article class="pc-s1-canvas-content-page" aria-labelledby="${esc(titleId)}">
+      <div class="pc-s1-canvas-richtext">${contentHTML}</div>
+    </article>
+    ${navigationHTML}`;
 }

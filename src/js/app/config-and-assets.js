@@ -126,6 +126,11 @@ const ASSETS = Object.freeze({
       proud: pcProjectUrl('assets/images/characters/professor-pixel/pp_06_proud.png')
     }),
     students: Object.freeze({
+      lena: Object.freeze({
+        neutral: pcProjectUrl('assets/images/characters/students/lena/lena_neutral_draft.png'),
+        thinking: pcProjectUrl('assets/images/characters/students/lena/lena_thinking_draft.png'),
+        confident: pcProjectUrl('assets/images/characters/students/lena/lena_confident_draft.png')
+      }),
       jordan: Object.freeze({
         neutral: pcProjectUrl('assets/images/characters/students/jordan/jordan_01_neutral.png'),
         uncertain: pcProjectUrl('assets/images/characters/students/jordan/jordan_03_uncertain.png'),

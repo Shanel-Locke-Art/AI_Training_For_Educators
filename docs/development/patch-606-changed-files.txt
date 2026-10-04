@@ -1,0 +1,24 @@
+# New or changed files relative to Patch 605. No deletion is required.
+README.md
+docs/development/patch-606-changed-files.txt
+docs/development/patch-606-s2-s1-alignment.md
+docs/development/repository-map.md
+index.html
+runtime/css/promptcraft.css
+runtime/js/promptcraft.bundle.js
+src/css/scenarios/s2-accessibility.css
+src/css/ui/gfc-theme.css
+src/js/manifest.json
+src/js/scenarios/canvas-simulation.js
+src/js/scenarios/learning-presentation.js
+src/js/scenarios/s1-learning-workspace.js
+src/js/scenarios/s2-accessibility-ai.js
+src/js/scenarios/s2-accessibility-content.js
+src/js/scenarios/s2-accessibility-state.js
+src/js/scenarios/s2-accessibility-validation.js
+src/js/scenarios/s2-accessibility-workspace.js
+src/js/scenarios/s2-accessibility.js
+tools/test_s1_s2_presentation.cjs
+tools/test_s2_accessibility.cjs
+tools/test_s2_accessibility_ai.cjs
+tools/validate.py

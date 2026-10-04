@@ -30,6 +30,28 @@ window.pixelDialogue = {
       "id": "p3"
     }
   ],
+  "scenarioStart_accessibility": [
+    {
+      "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging",
+      "text": "A clear learning path is a good start. Now let’s make sure students can use the materials along the way. Accessibility is part of good course design.",
+      "id": "p-s2-access-start-01"
+    },
+    {
+      "speaker": "Lena", "character": "lena", "expr": "thinking",
+      "text": "I keep rereading this page, but I lose track of what I’m supposed to do. I can see the section titles, but my reading tool won’t let me jump between them.",
+      "id": "l-s2-access-start-02"
+    },
+    {
+      "speaker": "Professor Pixel", "character": "pixel", "expr": "thinking",
+      "text": "Start by seeing the page Lena receives. Find the barrier, then ask Babbage to repair the headings while keeping the lesson intact. You won’t need to write the HTML yourself.",
+      "id": "p-s2-access-start-03"
+    },
+    {
+      "speaker": "Professor Pixel", "character": "pixel", "expr": "encouraging",
+      "text": "Open Lena’s learning page. After the repair, you’ll check that the information, directions, and link are still the same.",
+      "id": "p-s2-access-start-04"
+    }
+  ],
   "scenarioStart_content-avalanche": [
     {
       "speaker": "Professor Pixel",

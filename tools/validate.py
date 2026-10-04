@@ -169,6 +169,10 @@ def main() -> int:
     # The S2 button renderer receives literal action keys at its call sites.
     # Resolve those calls rather than treating its template placeholder as a key.
     used_actions.update(re.findall(r"pcS2AccessButton\(['\"]([a-z0-9-]+)['\"]", action_markup_text))
+    used_actions.update(re.findall(
+        r'''pcRenderLearningDiagnosisChoices\(\{[^}]*\baction\s*:\s*['"]([a-z0-9-]+)['"]''',
+        action_markup_text,
+    ))
 
     registered_actions: set[str] = set()
     for source in source_paths:
@@ -204,7 +208,11 @@ def main() -> int:
     if "innerHTML = narrative.replace" in workbench_source:
         errors.append("AI growth narratives must be escaped before rendering.")
 
-    s1_source = (ROOT / "src/js/scenarios/s1-start-with-learning.js").read_text(encoding="utf-8")
+    s1_source = "\n".join(
+        (ROOT / path).read_text(encoding="utf-8")
+        for path in JS_SOURCES
+        if str(path).startswith("src/js/scenarios/s1-")
+    )
     s1_reset_guard_fragments = (
         "function pcInvalidateS1AsyncWork()",
         "pcInvalidateS1AsyncWork();\n  const keys = [",

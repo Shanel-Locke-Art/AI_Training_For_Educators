@@ -1,0 +1,16 @@
+README.md
+docs/development/patch-608-canvas-reading-and-editor.md
+docs/development/patch-608-changed-files.txt
+docs/development/repository-map.md
+index.html
+runtime/css/promptcraft.css
+runtime/js/promptcraft.bundle.js
+src/css/scenarios/s2-accessibility.css
+src/js/manifest.json
+src/js/scenarios/s2-accessibility-editor.js
+src/js/scenarios/s2-accessibility-reader.js
+src/js/scenarios/s2-accessibility-state.js
+src/js/scenarios/s2-accessibility-workspace.js
+src/js/scenarios/s2-accessibility.js
+tools/test_s2_accessibility.cjs
+tools/test_s2_reader_demo.cjs

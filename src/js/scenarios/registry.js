@@ -37,10 +37,12 @@ const SCENARIO_UI = [
     introCast: 'dual',
     introCharacters: [{ id: 'maya', slot: 'left' }, { id: 'pixel', slot: 'right' }],
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
+    // The production learning loop can complete while legacy prompt entry stays disabled.
     implemented: false,
+    completionAvailable: true,
     previewAvailable: true,
     previewIntroduction: true,
-    developmentStatus: 'Exploration playable · In development',
+    developmentStatus: 'Playable',
     plannedLoop: ['Explore Maya\'s module', 'Rename unclear items', 'Organize the activities', 'Diagnose the alignment gap', 'Review Babbage\'s analysis', 'Apply it to My Course']
   },
   {
@@ -50,11 +52,13 @@ const SCENARIO_UI = [
     missionTitle: 'Use AI to repair the structure without changing the lesson.',
     missionCopy: 'Help Lena use her learning materials. Inspect the page, ask Babbage to make real headings, and verify the repair in a practice Canvas HTML editor.',
     boardText: 'Lena found the materials, but keeps losing her place. Repair the page structure while preserving the information.',
-    rendererKey: 'accessibility-preview', workspaceMode: 'development', introLayout: 'none', introCast: 'single',
+    rendererKey: 'accessibility-preview', workspaceMode: 'development', introLayout: 'standard', introCast: 'dual',
+    introCharacters: [{ id: 'lena', slot: 'left' }, { id: 'pixel', slot: 'right' }],
+    afterIntroAction: 's2-accessibility-explore',
     inputMode: 'placeholder', inputVisible: false, supportsPrompt: false,
-    implemented: false, previewAvailable: true, previewIntroduction: false,
+    implemented: false, previewAvailable: true, previewIntroduction: true,
     developmentStatus: 'Heading repair playable · First section preview',
-    plannedLoop: ['Inspect materials', 'Ask AI to repair headings', 'Preview and verify', 'Apply the repaired HTML']
+    plannedLoop: ['Inspect one page', 'Identify the heading barrier', 'Ask Babbage', 'Review the repair', 'Insert into Canvas', 'Check and save']
   },
   {
     key: 'metacognition',
@@ -171,6 +175,7 @@ const PC_SCENARIO_RENDERERS = Object.freeze({
 });
 
 const PC_SCENARIO_AFTER_INTRO_ACTIONS = Object.freeze({
+  's2-accessibility-explore': () => pcRenderS2AccessScreen(),
   's2-diagnosis': () => renderS2DiagnosisActivity(),
   's3-diagnosis': () => renderS3DiagnosisActivity()
 });
@@ -199,11 +204,16 @@ function getMainMenuPanel(panelName) {
   return document.querySelector(`[data-menu-panel="${panelName}"]`);
 }
 
+function pcCanCompleteScenario(index = scenarioIndex) {
+  const ui = getScenarioUI(index);
+  return Boolean(ui.implemented || ui.completionAvailable);
+}
+
 function getScenarioMenuStatus(index) {
   const ui = getScenarioUI(index);
   if (index === SCENARIO_INDEX.ACCESSIBILITY) return 'Heading repair preview';
   if (index > SCENARIO_INDEX.CONTENT_AVALANCHE) return 'Locked · New game loop in development';
-  if (!ui.implemented) return ui.developmentStatus || 'In redesign';
+  if (!pcCanCompleteScenario(index)) return ui.developmentStatus || 'In redesign';
   if (scenarioCompleted[index]) return 'Completed';
   if (pcScenarioHasLaunched && scenarioIndex === index) return 'Current scenario';
   return 'Available';
@@ -225,7 +235,7 @@ function renderScenarioMenu() {
     const stateClass = scenarioCompleted[index]
       ? ' is-complete'
       : (pcScenarioHasLaunched && scenarioIndex === index ? ' is-current' : '');
-    const shellClass = ui.implemented ? '' : ' is-development-shell';
+    const shellClass = pcCanCompleteScenario(index) ? '' : ' is-development-shell';
     const rebuildLocked = !isScenarioAvailableFromMenu(index);
 
     return `

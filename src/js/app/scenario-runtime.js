@@ -788,6 +788,11 @@ function pcLoadProgressState() {
   try { stored = JSON.parse(localStorage.getItem(PC_PROGRESS_STORAGE_KEY) || '{}'); } catch (error) { stored = {}; }
   pcProgressState = pcNormalizeProgressState(stored);
   xp = pcProgressState.xp;
+  // Restore completion for production loops that explicitly opt in. A saved
+  // guide alone is not completion; only the existing closing-scene award counts.
+  SCENARIO_UI.forEach((ui, index) => {
+    if (ui.completionAvailable) scenarioCompleted[index] = Boolean(pcProgressState.completedAwards[index]);
+  });
   return pcProgressState;
 }
 
@@ -985,7 +990,7 @@ pcExposeGlobals({
 //  COMPLETION
 // ══════════════════════════════════════════════════════
 function markScenarioComplete() {
-  if (!getScenarioUI(scenarioIndex).implemented) return;
+  if (!pcCanCompleteScenario()) return;
   const wasComplete = Boolean(scenarioCompleted[scenarioIndex]);
   scenarioCompleted[scenarioIndex] = true;
   if (!wasComplete) awardScenarioCompletionXP(scenarioIndex);
@@ -999,7 +1004,7 @@ function markScenarioComplete() {
   pixelBadgeSetExpr('encouraging');
   const div = document.createElement('div');
   div.className = 's1-scenario-complete-note';
-  div.innerHTML = `<p>Scenario 1 complete. The remaining scenarios are being rebuilt one at a time from clean development shells.</p>`;
+  div.innerHTML = `<p>${esc(getScenarioUI(scenarioIndex).tabLabel)} complete.</p>`;
   area.appendChild(div);
 }
 

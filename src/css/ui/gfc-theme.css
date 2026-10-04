@@ -2216,3 +2216,19 @@ html body :is(
     font-size: 1rem !important;
   }
 }
+
+/* P603 — S1 and S2 share the visual narrative palette; terminal scenes keep their CRT. */
+body:is([data-pc-scenario="content-avalanche"],[data-pc-scenario="accessibility"]) #vnOverlay.active:not(.babbage-consult):not(.babbage-terminal-consult):not(.babbage-terminal-textmode) .vn-board-text { background:#12355b !important; border:1px solid #efbc40 !important; color:#fff !important; text-shadow:none !important; }
+body:is([data-pc-scenario="content-avalanche"],[data-pc-scenario="accessibility"]) #vnOverlay.active:not(.babbage-consult):not(.babbage-terminal-consult):not(.babbage-terminal-textmode) .vn-dialogue { background:rgba(8,26,54,.96) !important; color:#fff !important; }
+body:is([data-pc-scenario="content-avalanche"],[data-pc-scenario="accessibility"]) #vnOverlay.active:not(.babbage-consult):not(.babbage-terminal-consult):not(.babbage-terminal-textmode) .vn-speaker { color:#efbc40 !important; }
+/* Shared learning-task secondary actions use the same college palette as Continue. */
+.pc-s1-learning .pc-shell-secondary {
+  border-color: #79a8c1;
+  background: #fffdfa;
+  color: #12355b;
+}
+.pc-s1-learning .pc-shell-secondary:hover {
+  border-color: #efbc40;
+  background: #eaf3fa;
+  color: #12355b;
+}
