@@ -4,6 +4,15 @@
    introductions. Prediction and terminal states keep their dedicated owners.
    ══════════════════════════════════════════════════════ */
 
+/* Shared portrait framing applies to every Pixel expression and either cast slot. */
+:root { --pc-character-pixel-portrait-offset: 24px; }
+@media screen and (max-width: 1024px) {
+  :root { --pc-character-pixel-portrait-offset: 18px; }
+}
+@media screen and (max-width: 640px) {
+  :root { --pc-character-pixel-portrait-offset: 12px; }
+}
+
 /* Stable dialogue typography at every non-phone width. */
 @media screen and (min-width: 701px) {
   html body #vnOverlay.vn-overlay.active:not(.babbage-terminal-textmode) #vnSpeaker,
@@ -124,4 +133,3 @@ html body #vnOverlay#vnOverlay#vnOverlay.active.scenario-intro-active:not(:is(.b
     max-height: 225px !important;
   }
 }
-

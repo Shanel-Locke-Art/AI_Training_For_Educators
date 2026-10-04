@@ -37,7 +37,8 @@ function pcGetVNCharacterImage(id = 'pixel', expression = 'neutral') {
 pcRegisterVNCharacter('pixel', {
   label: 'Professor Pixel',
   expressions: () => EXPRESSIONS,
-  legacyExpressions: () => LEGACY_ASSETS.images.professorPixel
+  legacyExpressions: () => LEGACY_ASSETS.images.professorPixel,
+  portraitOffsetVar: '--pc-character-pixel-portrait-offset'
 });
 pcRegisterVNCharacter('lena', {
   label: 'Lena',

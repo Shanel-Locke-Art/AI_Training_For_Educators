@@ -13,7 +13,9 @@
 @import url("ui/completed-analysis.css");
 @import url("scenarios/s1-engagement.css");
 @import url("scenarios/shared.css");
+@import url("scenarios/learning-presentation.css");
 @import url("scenarios/s1-start-with-learning.css");
+@import url("scenarios/learning-stage-responsive.css");
 @import url("responsive/intro.css");
 @import url("responsive/workbench.css");
 @import url("ui/brand-menu.css");
@@ -23,3 +25,6 @@
 @import url("ui/gfc-theme.css");
 
 @import url("scenarios/s2-accessibility.css");
+
+/* Final owner for all main-menu panels. */
+@import url("ui/main-menu.css");

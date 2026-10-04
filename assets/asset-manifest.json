@@ -1,17 +1,11 @@
 {
-  "version": 152,
+  "version": 156,
   "runtime_images": {
     "bg_01_app.png": "assets/images/backgrounds/bg_01_app.png",
     "bg_02_classroom.png": "assets/images/backgrounds/bg_02_classroom.png",
     "bg_s01_01_science_wing.jpg": "assets/images/backgrounds/gfc/bg_s01_01_science_wing.jpg",
     "bg_s02_01_study_lounge.jpg": "assets/images/backgrounds/gfc/bg_s02_01_study_lounge.jpg",
     "bg_03_desk_extension.png": "assets/images/backgrounds/bg_03_desk_extension.png",
-    "pp_01_neutral.png": "assets/images/characters/professor-pixel/pp_01_neutral.png",
-    "pp_02_thinking.png": "assets/images/characters/professor-pixel/pp_02_thinking.png",
-    "pp_03_excited.png": "assets/images/characters/professor-pixel/pp_03_excited.png",
-    "pp_04_encouraging.png": "assets/images/characters/professor-pixel/pp_04_encouraging.png",
-    "pp_05_skeptical.png": "assets/images/characters/professor-pixel/pp_05_skeptical.png",
-    "pp_06_proud.png": "assets/images/characters/professor-pixel/pp_06_proud.png",
     "s01_legacy_01_scene.png": "assets/images/scenes/scenario-01-engagement/s01_legacy_01_scene.png",
     "s02_01_scene.png": "assets/images/scenes/scenario-02-metacognition/s02_01_scene.png",
     "s05_01_scene.png": "assets/images/scenes/scenario-05-hallucination-hunt/s05_01_scene.png",
@@ -63,7 +57,14 @@
     "ui_04_mo_river_otter.png": "assets/images/ui/ui_04_mo_river_otter.png",
     "lena_neutral_draft.png": "assets/images/characters/students/lena/lena_neutral_draft.png",
     "lena_thinking_draft.png": "assets/images/characters/students/lena/lena_thinking_draft.png",
-    "lena_confident_draft.png": "assets/images/characters/students/lena/lena_confident_draft.png"
+    "lena_confident_draft.png": "assets/images/characters/students/lena/lena_confident_draft.png",
+    "pp_01_neutral_v3.png": "assets/images/characters/professor-pixel/pp_01_neutral_v3.png",
+    "pp_02_thinking_v3.png": "assets/images/characters/professor-pixel/pp_02_thinking_v3.png",
+    "pp_03_excited_v3.png": "assets/images/characters/professor-pixel/pp_03_excited_v3.png",
+    "pp_04_encouraging_v3.png": "assets/images/characters/professor-pixel/pp_04_encouraging_v3.png",
+    "pp_05_skeptical_v3.png": "assets/images/characters/professor-pixel/pp_05_skeptical_v3.png",
+    "pp_06_proud_v3.png": "assets/images/characters/professor-pixel/pp_06_proud_v3.png",
+    "shanel_profile_v2.png": "assets/images/ui/shanel_profile_v2.png"
   },
   "planned_runtime_images": {
     "s04_01_scene.png": "assets/images/scenes/scenario-04-sync-bias/s04_01_scene.png",
@@ -79,7 +80,20 @@
     "assets/images/characters/students/samira/references/samira_ref_01_concept_sheet.png",
     "assets/images/ui/ui_05_babbage_engine_plate.svg",
     "assets/images/scenes/scenario-01-content-avalanche/canvas/smartboard/legacy_s01_board_25_instructor_before_comparison_reference.png",
-    "assets/images/scenes/scenario-03-authentic-assessment/s03_01_scene.png"
+    "assets/images/scenes/scenario-03-authentic-assessment/s03_01_scene.png",
+    "assets/images/characters/professor-pixel/pp_01_neutral.png",
+    "assets/images/characters/professor-pixel/pp_02_thinking.png",
+    "assets/images/characters/professor-pixel/pp_03_excited.png",
+    "assets/images/characters/professor-pixel/pp_04_encouraging.png",
+    "assets/images/characters/professor-pixel/pp_05_skeptical.png",
+    "assets/images/characters/professor-pixel/pp_06_proud.png",
+    "assets/images/characters/professor-pixel/pp_01_neutral_v2.png",
+    "assets/images/characters/professor-pixel/pp_02_thinking_v2.png",
+    "assets/images/characters/professor-pixel/pp_03_excited_v2.png",
+    "assets/images/characters/professor-pixel/pp_04_encouraging_v2.png",
+    "assets/images/characters/professor-pixel/pp_05_skeptical_v2.png",
+    "assets/images/characters/professor-pixel/pp_06_proud_v2.png",
+    "assets/images/ui/shanel_profile.jpg"
   ],
   "runtime_audio": {
     "music_01_background.mp3": "assets/audio/music/music_01_background.mp3",
@@ -161,7 +175,8 @@
     "assets/images/characters/students/maya/README.md",
     "assets/images/characters/students/maya/references/README.md",
     "assets/images/characters/students/samira/README.md",
-    "assets/images/scenes/scenario-01-content-avalanche/canvas/README.md"
+    "assets/images/scenes/scenario-01-content-avalanche/canvas/README.md",
+    "assets/images/characters/professor-pixel/README.md"
   ],
   "retired_audio_names": [
     "s4-interrupt.mp3",

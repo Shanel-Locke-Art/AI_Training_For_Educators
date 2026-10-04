@@ -2728,3 +2728,12 @@ body #musicToggle.full-audio {
   .pc-progress-panel h2 { font-size: 1rem; }
   .pc-progress-note { padding: 8px 12px 10px; }
 }
+
+/* P610: prominent developer portrait on the About PromptCraft card. */
+.pc-menu-developer-intro { display:flex; flex-direction:column; align-items:flex-start; gap:20px; }
+.pc-menu-developer-intro > div { min-width:0; }
+.pc-menu-developer-photo { display:block; width:320px; max-width:100%; height:auto; align-self:center; flex:0 0 auto; border:3px solid #efbc40; border-radius:8px; }
+@media(max-width:680px) {
+  .pc-menu-developer-intro { flex-direction:column; align-items:flex-start; gap:14px; }
+  .pc-menu-developer-photo { width:240px; }
+}

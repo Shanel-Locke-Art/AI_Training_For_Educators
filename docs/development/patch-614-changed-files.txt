@@ -1,0 +1,15 @@
+README.md
+assets/asset-manifest.json
+assets/images/characters/professor-pixel/README.md
+assets/images/characters/professor-pixel/pp_01_neutral_v3.png
+assets/images/characters/professor-pixel/pp_02_thinking_v3.png
+assets/images/characters/professor-pixel/pp_03_excited_v3.png
+assets/images/characters/professor-pixel/pp_04_encouraging_v3.png
+assets/images/characters/professor-pixel/pp_05_skeptical_v3.png
+assets/images/characters/professor-pixel/pp_06_proud_v3.png
+assets/images/ui/shanel_profile_v2.png
+docs/development/patch-614-changed-files.txt
+docs/development/patch-614-natural-portraits.md
+index.html
+runtime/js/promptcraft.bundle.js
+src/js/app/config-and-assets.js

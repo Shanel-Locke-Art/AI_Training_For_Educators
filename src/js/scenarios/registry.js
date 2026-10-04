@@ -332,7 +332,14 @@ function showMainMenuPanel(panelName = 'home') {
     panel.hidden = panel !== requested;
   });
 
-  if (panelName === 'scenarios') renderScenarioMenu();
+  const activePanel = requested.dataset.menuPanel;
+  getMainMenuOverlay().querySelectorAll('.pc-menu-navigation [data-pc-panel]').forEach(button => {
+    if (button.dataset.pcPanel === activePanel) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
+  });
+  requested.scrollTop = 0;
+
+  if (activePanel === 'scenarios') renderScenarioMenu();
   if (panelName === 'home') updateMainMenuHome();
 
   const focusTarget = requested.querySelector('button:not([disabled]), a[href], input, textarea, [tabindex]:not([tabindex="-1"])');

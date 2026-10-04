@@ -598,6 +598,17 @@ html body .audio-setup-modal {
   border-color: #8ebdd4 !important;
   box-shadow: 0 24px 64px rgba(2,17,35,.45), 0 0 0 1px rgba(230,165,29,.22) !important;
 }
+/* Pixel sits inside the audio dialog, with a clear gap above her head and help text. */
+html body .audio-setup-pixel { top:20px; height:100px; }
+@media screen and (max-width:760px) {
+  html body .audio-setup-pixel { top:20px; height:96px; }
+}
+@media screen and (max-width:420px) {
+  html body .audio-setup-pixel { top:24px; height:82px; }
+}
+@media screen and (min-width:800px) and (max-height:650px) {
+  html body .audio-setup-pixel { top:12px; height:76px; }
+}
 html body .audio-setup-speaker { color: var(--gfc-blue) !important; }
 html body .audio-setup-title { color: var(--gfc-navy) !important; }
 html body .audio-setup-help {
@@ -2231,4 +2242,21 @@ body:is([data-pc-scenario="content-avalanche"],[data-pc-scenario="accessibility"
   border-color: #efbc40;
   background: #eaf3fa;
   color: #12355b;
+}
+
+/* P615: override inherited phone CRT accents only in S1/S2 story dialogue. */
+html body:is([data-pc-scenario="content-avalanche"],[data-pc-scenario="accessibility"])
+#vnOverlay#vnOverlay#vnOverlay#vnOverlay.active:not(:is(.babbage-consult,.babbage-terminal-consult,.babbage-terminal-textmode))
+#vnDialogue#vnDialogue {
+  background:rgba(8,26,54,.96)!important;
+  border-color:#59b7e3!important;
+  color:#fff!important;
+}
+html body:is([data-pc-scenario="content-avalanche"],[data-pc-scenario="accessibility"])
+#vnOverlay#vnOverlay#vnOverlay#vnOverlay.active:not(:is(.babbage-consult,.babbage-terminal-consult,.babbage-terminal-textmode))
+#vnDialogue#vnDialogue::before,
+html body:is([data-pc-scenario="content-avalanche"],[data-pc-scenario="accessibility"])
+#vnOverlay#vnOverlay#vnOverlay#vnOverlay.active:not(:is(.babbage-consult,.babbage-terminal-consult,.babbage-terminal-textmode))
+#vnDialogue#vnDialogue::after {
+  border-color:rgba(89,183,227,.62)!important;
 }

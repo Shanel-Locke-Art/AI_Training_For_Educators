@@ -118,12 +118,12 @@ const ASSETS = Object.freeze({
       })
     }),
     professorPixel: Object.freeze({
-      neutral: pcProjectUrl('assets/images/characters/professor-pixel/pp_01_neutral.png'),
-      thinking: pcProjectUrl('assets/images/characters/professor-pixel/pp_02_thinking.png'),
-      excited: pcProjectUrl('assets/images/characters/professor-pixel/pp_03_excited.png'),
-      encouraging: pcProjectUrl('assets/images/characters/professor-pixel/pp_04_encouraging.png'),
-      skeptical: pcProjectUrl('assets/images/characters/professor-pixel/pp_05_skeptical.png'),
-      proud: pcProjectUrl('assets/images/characters/professor-pixel/pp_06_proud.png')
+      neutral: pcProjectUrl('assets/images/characters/professor-pixel/pp_01_neutral_v3.png'),
+      thinking: pcProjectUrl('assets/images/characters/professor-pixel/pp_02_thinking_v3.png'),
+      excited: pcProjectUrl('assets/images/characters/professor-pixel/pp_03_excited_v3.png'),
+      encouraging: pcProjectUrl('assets/images/characters/professor-pixel/pp_04_encouraging_v3.png'),
+      skeptical: pcProjectUrl('assets/images/characters/professor-pixel/pp_05_skeptical_v3.png'),
+      proud: pcProjectUrl('assets/images/characters/professor-pixel/pp_06_proud_v3.png')
     }),
     students: Object.freeze({
       lena: Object.freeze({

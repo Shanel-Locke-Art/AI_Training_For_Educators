@@ -12,14 +12,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=608">
+<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=616">
 <!-- Production CSS is generated from src/css by tools/build.py. -->
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
-<script src="runtime/js/dialogue-data.js?v=149&amp;patch=608"></script>
-<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=608&amp;receiver=94&amp;connections=514"></script>
+<script src="runtime/js/dialogue-data.js?v=149&amp;patch=616"></script>
+<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=616&amp;receiver=94&amp;connections=514"></script>
 
 </head>
 
@@ -81,7 +81,7 @@
      aria-hidden="true" hidden>
   <div class="audio-setup-modal" role="document">
     <div class="audio-setup-pixel" aria-hidden="true">
-      <img data-pc-image="assets/images/characters/professor-pixel/pp_04_encouraging.png" data-pc-fallback="images/pixel-encouraging.png" alt="" />
+      <img data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral_v3.png" data-pc-fallback="images/pixel-neutral.png" alt="" />
     </div>
 
     <p class="audio-setup-speaker">Professor Pixel</p>
@@ -348,13 +348,22 @@
               aria-label="Close main menu">×</button>
     </div>
 
+    <nav class="pc-menu-navigation" aria-label="Main menu sections">
+      <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home" aria-controls="menuPanelHome" aria-current="page">Home</button>
+      <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="scenarios" aria-controls="menuPanelScenarios">Scenarios</button>
+      <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="how-to-play" aria-controls="menuPanelHowToPlay">How to Play</button>
+      <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="about" aria-controls="menuPanelAbout">About PromptCraft</button>
+      <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="babbage" aria-controls="menuPanelBabbage">Meet Babbage</button>
+      <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="research" aria-controls="menuPanelResearch">Research &amp; Privacy</button>
+    </nav>
+
     <section class="pc-menu-panel" id="menuPanelHome" data-menu-panel="home">
       <div class="pc-menu-hero">
         <div class="pc-menu-hero-main">
           <div class="pc-menu-home-copy">
             <p class="pc-menu-eyebrow">Faculty AI training game</p>
-            <h2>Practice better prompting without surrendering your judgment.</h2>
-            <p>Work through short teaching scenarios with Professor Pixel, consult Babbage, and revise your decisions as the consequences become visible.</p>
+            <h2>Build better courses with AI.</h2>
+            <p>Explore real teaching problems with Professor Pixel. Ask Babbage for help, check what AI produces, and practice improvements you can bring to your own course.</p>
           </div>
 
           <div class="pc-menu-primary-actions">
@@ -388,13 +397,6 @@
         </a>
       </div>
 
-      <div class="pc-menu-secondary-actions" aria-label="Menu information">
-        <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="how-to-play">How to Play</button>
-        <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="about">About PromptCraft</button>
-        <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="babbage">Meet Babbage</button>
-        <button type="button" data-pc-action="show-main-menu-panel" data-pc-panel="research">Research &amp; Privacy</button>
-      </div>
-
       <aside class="pc-menu-data-summary" aria-labelledby="menuDataSummaryTitle">
         <h3 id="menuDataSummaryTitle">Prototype data notice</h3>
         <p>PromptCraft records activity such as prompts, choices, revisions, scores, reflections, timestamps, and completion progress for development and potential research use. Do not enter student names or other confidential information.</p>
@@ -407,7 +409,7 @@
         <button class="pc-menu-back" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home">← Main Menu</button>
         <p class="pc-menu-eyebrow">Scenario Select</p>
         <h2>Choose a training scenario</h2>
-        <p>All scenarios are available here for development and review. Completion data is still recorded normally.</p>
+        <p>Start with Scenario 1, or explore the heading-repair preview in Scenario 2. Later scenarios are still in development.</p>
       </div>
       <div class="pc-menu-scenario-grid" id="mainMenuScenarioGrid" aria-live="polite"></div>
     </section>
@@ -446,23 +448,29 @@
       <div class="pc-menu-panel-heading">
         <button class="pc-menu-back" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home">← Main Menu</button>
         <p class="pc-menu-eyebrow">About PromptCraft</p>
-        <h2>A visual novel about using AI with intention.</h2>
+        <h2>Teaching, judgment, and thoughtful AI use.</h2>
         <p>PromptCraft combines scenario-based practice, reflective decision-making, and game-informed faculty development.</p>
       </div>
 
       <div class="pc-menu-profile-grid">
+        <article class="pc-menu-profile-card pc-menu-developer-card">
+          <div class="pc-menu-developer-intro">
+            <img class="pc-menu-developer-photo" src="assets/images/ui/shanel_profile_v2.png" alt="Portrait of Shanel Lara Locke." width="1170" height="1345" decoding="async">
+            <div class="pc-menu-developer-copy">
+              <p class="pc-menu-card-label">Developer</p>
+              <h3>Shanel Lara Locke, MFA</h3>
+          <p>Shanel is an instructional designer in the Teaching &amp; Learning Center at Great Falls College MSU. Her work supports faculty development, online course design, digital accessibility, course review, instructional technology, and thoughtful uses of AI in teaching and learning.</p>
+          <p><a href="https://www.gfcmsu.edu/campus-departments/tlc/" target="_blank" rel="noopener noreferrer">Visit the Great Falls College MSU Teaching &amp; Learning Center <span class="sr-only">(opens in a new tab)</span></a></p>
+            </div>
+          </div>
+        </article>
+
         <article class="pc-menu-profile-card">
           <p class="pc-menu-card-label">The project</p>
           <h3>PromptCraft</h3>
           <p>PromptCraft is a faculty-development experience focused on prompt design, course context, critical evaluation, and the limits of generative AI. Learners work through realistic teaching problems with Professor Pixel, consult Babbage, and revise their decisions using evidence and professional judgment.</p>
         </article>
 
-        <article class="pc-menu-profile-card">
-          <p class="pc-menu-card-label">Developer</p>
-          <h3>Shanel Lara Locke, MFA</h3>
-          <p>Shanel is an instructional designer in the Teaching &amp; Learning Center at Great Falls College MSU. Her work supports faculty development, online course design, digital accessibility, course review, instructional technology, and thoughtful uses of AI in teaching and learning.</p>
-          <p><a href="https://www.gfcmsu.edu/campus-departments/tlc/" target="_blank" rel="noopener noreferrer">Visit the Great Falls College MSU Teaching &amp; Learning Center <span class="sr-only">(opens in a new tab)</span></a></p>
-        </article>
 
         <article class="pc-menu-profile-card">
           <p class="pc-menu-card-label">Academic context</p>
@@ -581,7 +589,7 @@
 
     <div class="pc-main-menu-footer">
       <span id="mainMenuStatus">Select an option to begin.</span>
-    <span id="mainMenuVersion" data-pc-app-version>Version 429 · Patch 608</span>
+    <span id="mainMenuVersion" data-pc-app-version>Version 429 · Patch 616</span>
     </div>
   </div>
 </div>
@@ -629,7 +637,7 @@
      data-pc-keys="Enter Space">
   <!-- Real portrait — shown when images exist -->
   <img class="pixel-badge-portrait" id="pixelBadgeImg"
-       data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral.png" data-pc-fallback="images/pixel-neutral.png"
+       data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral_v3.png" data-pc-fallback="images/pixel-neutral.png"
        data-pc-fallback-element="pixelBadgeFallback"
        alt="Professor Pixel" />
   <!-- Fallback -->
@@ -640,7 +648,7 @@
 <!-- ── PROFESSOR PIXEL COACH CARD ──────────────────── -->
 <div class="pixel-coach-card" id="pixelCoachCard" role="status" aria-live="polite">
   <img class="pixel-coach-portrait" id="pixelCoachImg"
-       data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral.png" data-pc-fallback="images/pixel-neutral.png"
+       data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral_v3.png" data-pc-fallback="images/pixel-neutral.png"
        data-pc-fallback-element="pixelCoachFallback"
        alt="Professor Pixel" />
   <div class="pixel-coach-fallback" id="pixelCoachFallback" style="display:none;">🧑‍🏫</div>
@@ -733,7 +741,7 @@
         <text x="100" y="310" text-anchor="middle" font-family="sans-serif" font-size="9" fill="rgba(168,213,181,0.6)">[placeholder — replace with your art]</text>
       </svg>
 
-      <img id="vnPortrait" data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral.png" data-pc-fallback="images/pixel-neutral.png"
+      <img id="vnPortrait" data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral_v3.png" data-pc-fallback="images/pixel-neutral.png"
            alt=""
            aria-hidden="true"
            style="display:none;"

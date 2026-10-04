@@ -1,0 +1,10 @@
+README.md
+docs/development/patch-611-changed-files.txt
+docs/development/patch-611-menu-revamp.md
+index.html
+runtime/css/promptcraft.css
+runtime/js/promptcraft.bundle.js
+src/css/manifest.css
+src/css/ui/main-menu.css
+src/js/scenarios/registry.js
+tools/test_main_menu.cjs

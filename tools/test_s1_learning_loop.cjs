@@ -9,6 +9,7 @@ async function finishDialogue(page) {
     await page.locator('#vnDialogue').focus();await page.keyboard.press('Enter');await page.waitForTimeout(70);
   }
   assert.strictEqual(await page.locator('#vnOverlay.active').count(),0,'Dialogue must hand off to gameplay');
+  await page.waitForFunction(()=>Number(getComputedStyle(document.getElementById('vnOverlay')).opacity)===0);
 }
 (async()=>{
 const server=http.createServer((req,res)=>{const p=path.join(__dirname,'..',new URL(req.url,'http://localhost').pathname);res.setHeader('Content-Type',({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg'})[path.extname(p)]||'application/octet-stream');fs.readFile(p,(e,d)=>{res.statusCode=e?404:200;res.end(e?'missing':d);});});
