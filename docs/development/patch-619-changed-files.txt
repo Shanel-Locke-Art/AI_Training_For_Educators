@@ -1,0 +1,12 @@
+README.md
+docs/development/patch-619-changed-files.txt
+docs/development/patch-619-guided-next-step.md
+index.html
+runtime/css/promptcraft.css
+runtime/js/promptcraft.bundle.js
+src/css/scenarios/s1-start-with-learning.css
+src/js/scenarios/s1-learning-guide.js
+src/js/scenarios/s1-learning-my-course.js
+src/js/scenarios/s1-learning-state.js
+src/js/scenarios/s1-start-with-learning.js
+tools/test_s1_learning_loop.cjs

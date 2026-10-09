@@ -1,0 +1,6 @@
+README.md
+docs/development/patch-626-changed-files.txt
+docs/development/patch-626-favicon.md
+favicon.ico
+index.html
+wall.html

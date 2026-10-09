@@ -342,8 +342,10 @@ function showMainMenuPanel(panelName = 'home') {
   if (activePanel === 'scenarios') renderScenarioMenu();
   if (panelName === 'home') updateMainMenuHome();
 
-  const focusTarget = requested.querySelector('button:not([disabled]), a[href], input, textarea, [tabindex]:not([tabindex="-1"])');
-  setTimeout(() => focusTarget?.focus(), 20);
+  const heading = requested.querySelector('.pc-menu-panel-heading h2');
+  if (heading) heading.setAttribute('tabindex', '-1');
+  const focusTarget = heading || requested.querySelector('button:not([disabled]), a[href], input, textarea, [tabindex]:not([tabindex="-1"])');
+  setTimeout(() => focusTarget?.focus({ preventScroll: true }), 20);
 }
 
 function openMainMenu(panelName = 'home', options = {}) {

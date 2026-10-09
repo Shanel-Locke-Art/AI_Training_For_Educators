@@ -1,0 +1,15 @@
+/* A single course-interface family. Layered important declarations supersede legacy typography without duplicating layout rules. */
+@layer pcTypography {
+  body, body *, body *::before, body *::after { font-family: Arial, Helvetica, sans-serif !important; }
+  #mainMenuOverlay button { text-decoration: none !important; }
+  body pre, body pre *, body code, body code *, body .pc-s2-access-code,
+  body .babbage-terminal-screen, body .babbage-terminal-screen *,
+  body .babbage-terminal-title, body .babbage-terminal-output, body .babbage-terminal-output * {
+    font-family: Consolas, "Courier New", monospace !important;
+  }
+}
+#mainMenuOverlay .pc-menu-data-summary button {
+  padding: 8px 12px; border: 1px solid #b9cbd7; border-radius: 8px;
+  background: #e2edf4; text-decoration: none;
+}
+#mainMenuOverlay .pc-babbage-portrait-frame { height: 300px; background: #e9f5fb; }

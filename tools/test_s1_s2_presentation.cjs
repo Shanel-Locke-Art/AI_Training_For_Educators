@@ -26,6 +26,8 @@ for(const [name,w,h] of [['desktop',1909,984],['tablet',820,1180],['phone',390,8
  const bounds=await page.locator('.pc-s1-maya-art').boundingBox();assert(bounds.y<h && bounds.height>50,'Portrait must remain visible');
  if(process.env.PC_SCREENSHOTS){fs.mkdirSync(process.env.PC_SCREENSHOTS,{recursive:true});await page.screenshot({path:path.join(process.env.PC_SCREENSHOTS,`s${i+1}-module-${name}.png`)});}
  }
+ // Natural content height differs between the five-item S1 module and one-item S2 module.
+ if(w<=1050){for(const value of captures){assert.strictEqual(value.frame.overflow,'visible');delete value.workspace.height;delete value.frame.height;}}
  assert.deepStrictEqual(captures[1],captures[0]);
  const contentMetrics=kind=>page.evaluate(kind=>{
    const selectors=kind==='page'?['.pc-s1-canvas-item-header','.pc-s1-canvas-item-header h1','.pc-s1-canvas-content-page','.pc-s1-canvas-richtext']:['.pc-s1-diagnosis-card','.pc-s1-diagnosis-purpose','.pc-s1-diagnosis-choice','.pc-s1-diagnosis-radio'];

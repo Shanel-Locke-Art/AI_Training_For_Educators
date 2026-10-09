@@ -23727,6 +23727,38 @@ body.pc-s1-guide-open .pc-s1-guide-preview .pc-s1-guide-actions {
   .pc-s1-oscqr-grid article { grid-template-columns: 1fr; gap: 7px; }
 }
 
+
+/* P618: scaffold the S1 comparison without changing shared S2 diagnosis styles. */
+.pc-s1-diagnosis-guided { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-bottom:24px; }
+.pc-s1-diagnosis-guided > section { min-width:0; align-content:start; }
+.pc-s1-diagnosis-guided .pc-s1-diagnosis-context { margin:0; padding:12px; }
+.pc-s1-diagnosis-guided .pc-s1-diagnosis-context p { margin:0; color:#17364e; line-height:1.5; }
+.pc-s1-diagnosis-guided h2 { font-size:1.3rem; line-height:1.3; }
+.pc-s1-diagnosis-guided label { font-weight:800; }
+.pc-s1-diagnosis-guided .pc-s1-diagnosis-help { margin:0; }
+.pc-s1-diagnosis-submit-area { margin-top:16px; }
+.pc-s1-diagnosis-submit-area .pc-s1-diagnosis-notice:empty { display:none; }
+.pc-s1-diagnosis-result-reason p { white-space:pre-line; overflow-wrap:anywhere; }
+@media screen and (max-width:1100px) {
+  .pc-s1-diagnosis-guided { grid-template-columns:minmax(0,1fr); }
+}
+
+/* P619: guided next-step planning, scoped to S1 course feedback. */
+.pc-s1-transfer-intro h3 { margin:0 0 6px; color:#0d2a4a; }
+.pc-s1-transfer-intro p { margin:0; line-height:1.5; }
+.pc-s1-transfer-fields { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.pc-s1-transfer-field { display:grid; align-content:start; gap:10px; padding:14px; border-top:4px solid #f0bd2b; background:#fff; }
+.pc-s1-transfer-field label { min-height:104px; }
+.pc-s1-transfer-privacy { margin:0; color:#526777; font-size:.88rem; line-height:1.5; }
+@media (max-width:1100px) {
+  .pc-s1-transfer-fields { grid-template-columns:minmax(0,1fr); }
+  .pc-s1-transfer-field label { min-height:0; }
+}
+
+.pc-s1-saved-next-step dt { font-weight:800; color:#0d2a4a; }
+.pc-s1-saved-next-step dd { margin:4px 0 16px; line-height:1.5; overflow-wrap:anywhere; }
+.pc-s1-saved-next-step p { white-space:pre-line; }
+
 /* SOURCE: src/css/scenarios/learning-stage-responsive.css */
 /* P574 — canonical Scenario 1 stage and responsive system.
    One owner for workspace height, actor placement, and device breakpoints. */
@@ -33100,10 +33132,10 @@ html body.pc-s1-canvas-dialogue-active
    ══════════════════════════════════════════════════════ */
 
 :root {
-  --pc-font-body: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --pc-font-display: "Fraunces", Georgia, serif;
-  --pc-font-label: "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --pc-font-canvas: Lato, "Helvetica Neue", Arial, sans-serif;
+  --pc-font-body: Arial, Helvetica, sans-serif;
+  --pc-font-display: Arial, Helvetica, sans-serif;
+  --pc-font-label: Arial, Helvetica, sans-serif;
+  --pc-font-canvas: Arial, Helvetica, sans-serif;
   --gfc-navy: #112650;
   --gfc-navy-deep: #081a36;
   --gfc-blue: #086c9f;
@@ -35359,14 +35391,14 @@ html body:is([data-pc-scenario="content-avalanche"],[data-pc-scenario="accessibi
 /* SOURCE: src/css/scenarios/s2-accessibility.css */
 /* Activity-specific content only. S1 owns the shared workspace geometry. */
 .pc-s2-access .pc-s1-canvas-main { overflow-wrap:anywhere; }
-.pc-s2-access details { padding:12px 16px; margin:16px 0; border:1px solid #bfd3e3; border-radius:5px; background:#f6f9fc; }
-.pc-s2-access summary { color:#12355b; cursor:pointer; font-weight:800; }
-.pc-s2-access details[open] summary { margin-bottom:12px; }
+.pc-s2-access-visible-section { padding:16px; margin:20px 0; border:1px solid #bfd3e3; border-radius:5px; background:#f6f9fc; }
+.pc-s2-access .pc-s2-access-visible-section > h3 { margin:0 0 12px; color:#12355b; }
+.pc-s2-access-visible-section textarea + button { margin-top:12px; }
 .pc-s2-access-actions button { min-height:44px; }
 .pc-s2-access-actions { display:flex; flex-wrap:wrap; gap:12px; margin:20px 0; }
 .pc-s2-access button { max-width:100%; white-space:normal; }
 .pc-s2-access button:disabled { opacity:.55; cursor:not-allowed; }
-.pc-s2-access button:focus-visible, .pc-s2-access textarea:focus-visible, .pc-s2-access summary:focus-visible, .pc-s2-access input:focus-visible { outline:3px solid #efbc40; outline-offset:3px; }
+.pc-s2-access button:focus-visible, .pc-s2-access textarea:focus-visible, .pc-s2-access input:focus-visible { outline:3px solid #efbc40; outline-offset:3px; }
 .pc-s2-access textarea { display:block; width:100%; max-width:100%; padding:12px; border:1px solid #8eaec6; border-radius:5px; font:inherit; line-height:1.5; color:#243746; background:#fff; resize:vertical; }
 .pc-s2-access .pc-s2-access-code { font-family:"Source Code Pro",monospace; font-size:.9rem; white-space:pre-wrap; overflow-wrap:anywhere; }
 .pc-s2-access-compare { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:20px 0; }
@@ -35408,31 +35440,42 @@ html body:is([data-pc-scenario="content-avalanche"],[data-pc-scenario="accessibi
 .pc-s2-access.pc-s1-diagnosis .pc-s1-diagnosis-question-block { padding-bottom:0; }
 .pc-s2-access.pc-s1-diagnosis .pc-s1-diagnosis-help { margin-bottom:0; }
 /* P608: Canvas-inspired reader and the real editor control locations. */
-.pc-s2-immersive { position:fixed; inset:0; z-index:100000; display:grid; grid-template-rows:auto auto minmax(0,1fr) auto; background:#eceef1; color:#172d42; font-family:Lato,Nunito,Arial,sans-serif; }
+.pc-s2-immersive { position:fixed; inset:0; z-index:100000; display:grid; grid-template-rows:auto auto minmax(0,1fr) auto; background:#eaf3fa; color:#17364e; font-family:var(--pc-font-body); }
 .pc-s2-immersive * { box-sizing:border-box; }
-.pc-s2-immersive button,.pc-s2-immersive select { font:inherit; color:#12355b; border:1px solid #8eaec6; border-radius:5px; background:#fff; min-height:44px; padding:8px 12px; cursor:pointer; }
-.pc-s2-immersive button:focus-visible,.pc-s2-immersive select:focus-visible,.pc-s2-immersive input:focus-visible,.pc-s2-immersive-scroll:focus-visible { outline:3px solid #efbc40; outline-offset:2px; }
-.pc-s2-immersive button[aria-pressed="true"] { background:#fff6d9; border-color:#ad7800; }
+.pc-s2-immersive button,.pc-s2-immersive select { font-family:var(--pc-font-body); font-size:1rem; font-weight:800; line-height:1.25; color:#12355b; border:2px solid #79a8c1; border-radius:10px; background:#fffdfa; min-height:50px; padding:12px 16px; cursor:pointer; }
+.pc-s2-immersive button { white-space:normal; }
+.pc-s2-immersive button:hover:not(:disabled) { border-color:#efbc40; background:#eaf3fa; }
+.pc-s2-immersive button:focus-visible,.pc-s2-immersive select:focus-visible,.pc-s2-immersive input:focus-visible,.pc-s2-immersive-scroll:focus-visible { outline:3px solid #efbc40; outline-offset:3px; }
+.pc-s2-immersive button[aria-pressed="true"] { background:#12355b; color:#fff; border-color:#efbc40; box-shadow:inset 0 -3px 0 #efbc40; }
+.pc-s2-immersive button[aria-pressed="true"]:hover { background:#0d2a4a; color:#fff; }
 .pc-s2-immersive button:disabled { opacity:.55; cursor:default; }
-.pc-s2-immersive-top { display:flex; align-items:center; gap:20px; padding:12px 24px; background:#f7f8fa; border-bottom:1px solid #c8d2dc; }
-.pc-s2-immersive-top h2 { font:inherit; margin:0; flex:1; font-weight:700; }
-.pc-s2-immersive-label { font-size:.85rem; color:#526777; }
-.pc-s2-immersive-options { display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; padding:10px 20px; border-bottom:1px solid #c8d2dc; background:#f7f8fa; }
-.pc-s2-immersive-options label { display:flex; align-items:center; gap:8px; font-size:.9rem; }
+.pc-s2-immersive-top { display:flex; align-items:center; gap:20px; padding:16px 28px; background:#081a36; border-bottom:4px solid #efbc40; }
+.pc-s2-immersive-top > button { order:2; flex-shrink:0; }
+.pc-s2-reader-brand { order:1; flex:1; min-width:0; display:flex; align-items:center; gap:14px; }
+.pc-s2-reader-brand img { width:48px; height:48px; flex-shrink:0; }
+.pc-s2-reader-brand span { display:block; font-family:var(--pc-font-label); font-size:.8rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#efbc40; }
+.pc-s2-immersive .pc-s2-reader-brand h2 { font-family:var(--pc-font-display); font-size:clamp(1.25rem,2vw,1.75rem); line-height:1.25; margin:5px 0 0; color:#fff; }
+.pc-s2-immersive-options { display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; padding:12px 20px; border-bottom:1px solid #bfd3e3; background:#f4f8fb; }
+.pc-s2-immersive-options label { display:flex; align-items:center; gap:8px; font-size:.9rem; font-weight:700; }
+.pc-s2-immersive-options select { padding:8px 12px; min-height:44px; font-size:.95rem; }
 .pc-s2-immersive-options input { width:20px; height:20px; accent-color:#17679b; }
-.pc-s2-immersive-scroll { overflow:auto; min-height:0; overscroll-behavior:contain; padding:42px clamp(20px,5vw,90px); }
-#pcS2ReaderTranscript { max-width:1100px; margin:0 auto; font-size:var(--pc-reader-size,24px); line-height:1.9; color:#23394d; }
-#pcS2ReaderTranscript h1,#pcS2ReaderTranscript h2,#pcS2ReaderTranscript h3,#pcS2ReaderTranscript p { font-family:inherit; font-size:inherit; line-height:inherit; margin:0 0 1.4em; color:inherit; }
-#pcS2ReaderTranscript h1,#pcS2ReaderTranscript h2,#pcS2ReaderTranscript h3 { font-weight:800; }
-.pc-s2-immersive.has-spacing #pcS2ReaderTranscript { letter-spacing:.12em; word-spacing:.12em; }
-.pc-s2-immersive.has-focus.is-speaking #pcS2ReaderTranscript > :not(.is-current-passage) { color:#606b77; }
+.pc-s2-immersive-scroll { overflow:auto; min-height:0; overscroll-behavior:contain; padding:28px clamp(16px,4vw,64px); }
+#pcS2ReaderTranscript { max-width:1100px; margin:0 auto; padding:clamp(20px,4vw,48px); border:1px solid #bfd3e3; border-top:4px solid #efbc40; border-radius:6px; background:#fff; font-family:var(--pc-font-body); font-size:var(--pc-reader-size,24px); line-height:1.65; color:#17364e; }
+#pcS2ReaderTranscript h1,#pcS2ReaderTranscript h2,#pcS2ReaderTranscript h3,#pcS2ReaderTranscript p { font-size:inherit; line-height:inherit; margin:0 0 .75em; color:inherit; }
+#pcS2ReaderTranscript h1,#pcS2ReaderTranscript h2,#pcS2ReaderTranscript h3 { font-family:var(--pc-font-display); font-weight:800; }
+#pcS2ReaderTranscript > :last-child { margin-bottom:0; }
+.pc-s2-immersive.has-spacing #pcS2ReaderTranscript { letter-spacing:.045em; word-spacing:.1em; }
+.pc-s2-immersive.has-focus.is-speaking #pcS2ReaderTranscript > :not(.is-current-passage) { color:#36556c; }
 #pcS2ReaderTranscript .is-current-passage { color:#142739; }
-#pcS2ReaderTranscript .is-current-word { background:#fff; color:#071b2e; box-shadow:0 0 0 3px #efbc40; border-radius:2px; }
-.pc-s2-immersive-bottom { background:#f7f8fa; border-top:1px solid #c8d2dc; padding:12px 24px; text-align:center; }
-.pc-s2-immersive-playback { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-.pc-s2-immersive .pc-s2-immersive-play { background:#12355b; color:#fff; border:2px solid #efbc40; border-radius:24px; min-width:110px; }
-.pc-s2-immersive-bottom p { margin:8px 0 0; font-size:.88rem; line-height:1.4; }
-.pc-s2-immersive-note { color:#526777; }
+#pcS2ReaderTranscript .is-current-word { background:#fff8e5; color:#071b2e; box-shadow:0 0 0 3px #efbc40; border-radius:2px; }
+.pc-s2-immersive-bottom { background:#f4f8fb; border-top:2px solid #bfd3e3; padding:12px 24px; text-align:center; }
+.pc-s2-immersive-playback { display:flex; gap:24px; justify-content:center; flex-wrap:wrap; }
+.pc-s2-reader-control-group { min-width:0; }
+.pc-s2-reader-control-group > div { display:flex; gap:10px; }
+.pc-s2-reader-control-label { display:block; margin-bottom:7px; text-align:left; color:#12355b; font-family:var(--pc-font-label); font-size:.75rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+.pc-s2-immersive-bottom p { margin:10px 0 0; font-size:.95rem; line-height:1.45; }
+#pcS2ReaderStatus { font-weight:800; color:#12355b; }
+.pc-s2-immersive-note { color:#36556c; }
 .pc-s2-rce [hidden] { display:none !important; }
 .pc-s2-rce-menu,.pc-s2-rce-toolbar { display:flex; flex-wrap:wrap; gap:16px; align-items:center; padding:10px 12px; border-bottom:1px solid #c8d2dc; }
 .pc-s2-rce-menu { font-size:.9rem; }
@@ -35447,20 +35490,85 @@ html body:is([data-pc-scenario="content-avalanche"],[data-pc-scenario="accessibi
 .pc-s2-rce-html-toggle { font-family:"Source Code Pro",monospace; background:#fff; border:1px solid #8eaec6; border-radius:4px; padding:8px 12px; min-height:44px; color:#12355b; }
 .pc-s2-rce-html-toggle[aria-pressed="true"] { background:#eaf3fa; border-color:#17679b; }
 @media(max-width:680px) {
- .pc-s2-immersive-top { padding:10px; gap:10px; }
- .pc-s2-immersive-top h2 { font-size:.88rem; }
- .pc-s2-immersive-label { display:none; }
- .pc-s2-immersive-options { gap:8px 12px; padding:8px 10px; justify-content:flex-start; }
- .pc-s2-immersive-options label { font-size:.8rem; }
- .pc-s2-immersive-scroll { padding:24px 20px; }
- .pc-s2-immersive-bottom { padding:10px; }
- .pc-s2-immersive-playback { gap:6px; }
- .pc-s2-immersive-playback button { font-size:.82rem; padding:8px; }
  .pc-s2-rce-menu,.pc-s2-rce-toolbar { gap:10px; padding:8px 0; }
  .pc-s2-rce-visual { padding:12px; }
 }
-.pc-s2-immersive h1,.pc-s2-immersive h2,.pc-s2-immersive h3 { font-family:Lato,Nunito,Arial,sans-serif !important; }
 .pc-s2-rce-html textarea.pc-s2-access-code { font-family:"Source Code Pro",monospace !important; }
+
+/* P620: long address examples wrap within the reader at every text size. */
+#pcS2ReaderTranscript { overflow-wrap:anywhere; }
+
+/* P621: visible instruction and check panels, with no disclosure controls. */
+.pc-s2-page-inspection { margin-top:28px; padding-top:24px; border-top:2px solid #bfd3e3; }
+.pc-s2-access .pc-s2-page-inspection > h2 { margin:8px 0 20px; color:#0d2a4a; }
+.pc-s2-access .pc-s2-heading-explainer > h3 { margin:0 0 14px; color:#0d2a4a; }
+.pc-s2-heading-explainer-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.pc-s2-heading-explainer-grid > section { padding:16px; border-top:4px solid #f0bd2b; background:#f4f8fb; }
+.pc-s2-access .pc-s2-heading-explainer-grid h4 { margin:10px 0; color:#0d2a4a; font-size:1.05rem; line-height:1.4; }
+.pc-s2-heading-explainer-grid p { margin:0; line-height:1.6; }
+.pc-s2-heading-explainer-grid p + p { margin-top:12px; }
+.pc-s2-access .pc-s2-heading-check { border-left:4px solid #f0bd2b; background:#fff8e5; }
+.pc-s2-access .pc-s2-page-inspection .pc-s2-reader-demo { margin-top:20px; }
+.pc-s2-access .pc-s2-reader-note { margin:12px 0 0; }
+@media (max-width:1100px) {
+ .pc-s2-heading-explainer-grid { grid-template-columns:minmax(0,1fr); }
+}
+
+/* P622: keep every reading control visible without crowding the text on phones. */
+@media(max-width:680px) {
+ .pc-s2-immersive-top { padding:10px 12px; gap:10px; }
+ .pc-s2-reader-brand { gap:8px; }
+ .pc-s2-reader-brand img { width:32px; height:32px; }
+ .pc-s2-reader-brand span { font-size:.65rem; letter-spacing:.06em; }
+ .pc-s2-immersive .pc-s2-reader-brand h2 { font-size:1rem; }
+ .pc-s2-immersive-top > button { max-width:100px; padding:8px; min-height:44px; font-size:.8rem; }
+ .pc-s2-immersive-options { gap:6px 12px; padding:8px 12px; justify-content:flex-start; }
+ .pc-s2-immersive-options label { font-size:.78rem; }
+ .pc-s2-immersive-options select { padding:6px; }
+ .pc-s2-immersive-scroll { padding:16px 12px; }
+ #pcS2ReaderTranscript { padding:20px 16px; }
+ .pc-s2-immersive-bottom { padding:10px 12px; }
+ .pc-s2-immersive-playback { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+ .pc-s2-reader-control-group:first-child { grid-column:1 / -1; }
+ .pc-s2-reader-control-group > div { gap:6px; }
+ .pc-s2-reader-control-group button { flex:1; min-width:0; min-height:44px; font-size:.88rem; padding:8px; }
+ html body #pcS2ReaderPanel button.pc-button--primary { min-width:0 !important; padding:8px 12px !important; min-height:44px !important; font-size:.85rem !important; }
+ .pc-s2-reader-control-label { margin-bottom:4px; font-size:.75rem; }
+ .pc-s2-immersive-bottom p { font-size:.85rem; margin-top:7px; }
+}
+
+/* P623: stronger text hierarchy and consistent spacing in the S2 lesson. */
+.pc-s2-access .pc-s2-page-inspection { font-family:var(--pc-font-body); color:#17364e; }
+.pc-s2-access .pc-s2-page-inspection > h2 { font-size:clamp(1.4rem,1.7vw,1.7rem); line-height:1.3; margin:10px 0 24px; }
+.pc-s2-access .pc-s2-heading-explainer > h3 { font-size:1.25rem; line-height:1.4; margin-bottom:18px; }
+.pc-s2-access .pc-s2-page-inspection .pc-s1-result-eyebrow { color:#12355b; font-size:.82rem; line-height:1.4; }
+.pc-s2-heading-explainer-grid { gap:20px; }
+.pc-s2-heading-explainer-grid > section { padding:20px; }
+.pc-s2-access .pc-s2-heading-explainer-grid h4 { font-family:var(--pc-font-body); font-size:1.15rem; line-height:1.4; min-height:2.8em; margin:12px 0 14px; }
+.pc-s2-access .pc-s2-heading-explainer-grid p,.pc-s2-access .pc-s2-heading-check p { font-size:1rem; line-height:1.65; color:#17364e; }
+.pc-s2-access .pc-s2-heading-check { margin:24px 0; padding:20px; }
+.pc-s2-access .pc-s2-heading-check h3 { font-size:1.25rem; line-height:1.4; margin-bottom:14px; }
+.pc-s2-access .pc-s2-heading-check p { margin:0; }
+.pc-s2-access .pc-s2-heading-check p + p { margin-top:14px; }
+#pcS2ReaderTranscript h1 { font-size:calc(var(--pc-reader-size,24px) * 1.2); line-height:1.35; }
+#pcS2ReaderTranscript h2 { font-size:calc(var(--pc-reader-size,24px) * 1.1); line-height:1.4; }
+#pcS2ReaderTranscript h3 { line-height:1.4; }
+.pc-s2-immersive.has-focus.is-speaking #pcS2ReaderTranscript > :is(h1,h2,h3):not(.is-current-passage) { color:#12355b; }
+@media(max-width:1100px) {
+ .pc-s2-access .pc-s2-heading-explainer-grid h4 { min-height:0; }
+}
+@media(max-width:680px) {
+ .pc-s2-heading-explainer-grid > section,.pc-s2-access .pc-s2-heading-check { padding:16px; }
+ .pc-s2-immersive-options label { font-size:.85rem; }
+}
+
+@media(max-width:680px) {
+ .pc-s2-immersive-options { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+ .pc-s2-immersive-options label { min-width:0; line-height:1.3; }
+ .pc-s2-immersive-options select { flex-shrink:0; }
+ .pc-s2-immersive-options input { flex-shrink:0; }
+ .pc-s2-reader-control-group button { overflow-wrap:anywhere; }
+}
 
 /* SOURCE: src/css/ui/main-menu.css */
 /* Main menu presentation owner. Scoped to keep gameplay and the reader independent. */
@@ -35489,7 +35597,6 @@ html body:is([data-pc-scenario="content-avalanche"],[data-pc-scenario="accessibi
 #mainMenuOverlay .pc-menu-eyebrow,#mainMenuOverlay .pc-menu-card-label { font-family:'Source Code Pro',monospace; font-size:12px!important; line-height:1.5; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:#25638b!important; margin:0 0 8px; }
 #mainMenuOverlay .pc-menu-panel-heading { margin:0 0 24px; }
 #mainMenuOverlay .pc-menu-panel-heading > p:last-child { max-width:78ch; }
-#mainMenuOverlay .pc-menu-back { padding:4px 0; border:0; background:transparent; color:#205d87; font:700 14px/1.5 'Nunito',sans-serif; margin:0 0 14px; min-height:32px; }
 #mainMenuOverlay .pc-menu-hero { display:grid; grid-template-columns:minmax(0,1fr) 230px; gap:32px; align-items:center; margin:0 0 24px; }
 #mainMenuOverlay .pc-menu-hero-main { min-width:0; }
 #mainMenuOverlay .pc-menu-home-copy { margin-bottom:24px; }
@@ -35579,3 +35686,245 @@ html body:is([data-pc-scenario="content-avalanche"],[data-pc-scenario="accessibi
  #mainMenuOverlay .pc-babbage-hero { grid-template-columns:1fr!important; }
  #mainMenuOverlay .pc-babbage-portrait-card { max-width:200px!important; }
 }
+
+/* Menu interaction states retain flat surfaces and fixed geometry. The layer
+   takes precedence over inherited gameplay Continue-button effects. */
+@layer pcMenuInteraction {
+  #mainMenuOverlay button,
+  .pc-brand-menu-panel button,
+  .pc-compact-nav .mobile-dropdown-option {
+    background-image: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    text-shadow: none !important;
+  }
+  #mainMenuOverlay button:is(:hover,:focus),
+  .pc-brand-menu-panel button:is(:hover,:focus),
+  .pc-compact-nav .mobile-dropdown-option:is(:hover,:focus) {
+    box-shadow: none !important; transform: none !important;
+  }
+  #mainMenuOverlay .pc-menu-action-primary {
+    background: #185b8e !important; border-color: #185b8e !important; color: #fff !important;
+  }
+  #mainMenuOverlay .pc-menu-action-primary:hover:not(:disabled) {
+    background: #144e7b !important; border-color: #185b8e !important;
+  }
+  #mainMenuOverlay .pc-menu-action-primary:focus:not(:hover) {
+    background: #185b8e !important; border-color: #185b8e !important;
+  }
+  #mainMenuOverlay button:focus:not(:focus-visible),
+  .pc-brand-menu-panel button:focus:not(:focus-visible),
+  .pc-compact-nav .mobile-dropdown-option:focus:not(:focus-visible) { outline: none !important; }
+  #mainMenuOverlay :is(button,a):focus-visible {
+    outline: 3px solid #185b8e !important; outline-offset: 3px !important;
+  }
+  .pc-brand-menu-panel :is(button,a):focus-visible,
+  .pc-compact-nav .mobile-dropdown-option:focus-visible {
+    outline: 3px solid #efbc40 !important; outline-offset: 3px !important;
+  }
+}
+
+/* Give Babbage headroom while keeping the portrait inside its frame. */
+#mainMenuOverlay .pc-babbage-portrait-frame { height: 224px !important; padding: 24px 10px 10px !important; box-sizing: border-box; overflow: hidden; }
+#mainMenuOverlay .pc-babbage-portrait-frame img { height: 100% !important; aspect-ratio: auto !important; object-fit: contain !important; object-position: center bottom !important; }
+
+/* SOURCE: src/css/ui/task-focus.css */
+/* P624: task-first presentation for the current production S1/S2 loop.
+   Narrative scenes retain their artwork. Activity screens use a quiet surface.
+   Keep supporting guidance visible; only redundant progress chrome is reduced. */
+@media screen {
+  html body .pc-s1-learning {
+    width: min(calc(100% - 24px), 1440px);
+    padding: 16px;
+    background: #edf4f8;
+  }
+  html body .pc-s1-learning-taskbar {
+    background: #12355b;
+    padding: 16px 20px;
+    border: 0;
+    border-bottom: 3px solid #efbc40;
+  }
+  html body .pc-s1-learning-taskbar h1 {
+    font-size: clamp(1.45rem, 2.2vw, 2rem);
+    line-height: 1.2;
+  }
+  html body .pc-s1-learning-task-status {
+    padding: 4px 0;
+    background: transparent;
+    border: 0;
+    font-family: var(--pc-font-body);
+    font-size: .9rem;
+    color: #e0edf5;
+  }
+  html body .pc-s1-learning-shell {
+    background: #edf4f8;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  html body .pc-s1-learning-workspace { padding: 0; gap: 16px; }
+  html body .pc-s1-canvas-frame { border: 1px solid #b9cbd7; border-radius: 6px; box-shadow: none; }
+  html body .pc-s1-learning-workspace > .pc-s1-maya-panel {
+    background: #e2edf4;
+    border: 0;
+    border-radius: 6px;
+  }
+  html body .pc-s1-learning-workspace > .pc-s1-maya-panel .pc-s1-maya-panel-inner { background: transparent; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-quote {
+    border: 0;
+    border-left: 3px solid #79a8c1;
+    border-radius: 0;
+    padding: 10px 14px;
+    background: transparent;
+    box-shadow: none;
+  }
+  html body .pc-s1-learning-workspace .pc-s1-maya-quote span { color: #12355b; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-quote p { color: #243e52; }
+  html body :is(.pc-s1-checkpoint-card,.pc-s1-diagnosis-card) {
+    margin: 0;
+    border: 1px solid #b9cbd7;
+    box-shadow: none;
+    background: #fff;
+  }
+  html body .pc-s1-diagnosis-purpose {
+    border: 0;
+    border-bottom: 1px solid #d4e1e9;
+    padding: 0 0 16px;
+    background: transparent;
+  }
+  html body .pc-s1-diagnosis-guided { gap: 24px; }
+  html body .pc-s1-diagnosis-guided .pc-s1-diagnosis-rationale {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  html body .pc-s1-diagnosis-guided .pc-s1-diagnosis-context {
+    border: 0;
+    padding: 12px 14px;
+    background: #edf4f8;
+  }
+  html body .pc-s1-diagnosis-submit-area { border: 0; border-top: 1px solid #d4e1e9; background: transparent; padding: 18px 0 0; }
+  html body .pc-s1-my-course-layout { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 24px; padding: 0; }
+  html body .pc-s1-my-course-card { background: #fff; border: 1px solid #b9cbd7; box-shadow: none; }
+  html body .pc-s1-my-course-summary { background: transparent; border: 0; border-top: 1px solid #b9cbd7; box-shadow: none; padding: 20px 8px; }
+  html body .pc-s1-my-course-summary h2 { font-size: 1.15rem; }
+  html body .pc-s1-my-course-card label { font-size: 1rem; }
+  html body .pc-s1-transfer-reflection { background: #edf4f8; border: 0; padding: 20px; }
+  html body .pc-s1-transfer-field { border: 0; background: transparent; padding: 0; }
+  html body .pc-s1-transfer-field label { min-height: 104px; }
+  html body .pc-s1-learning :is(input[type="text"],textarea):not([readonly]) {
+    border: 2px solid #5483a3;
+    background: #fff;
+    color: #17364e;
+    font-size: 1rem;
+  }
+  html body .pc-s1-learning :is(input[type="text"],textarea)::placeholder { color: #516a7c; opacity: 1; font-style: normal; }
+  html body .pc-s1-learning :is(input[type="text"],textarea):focus-visible { outline: 3px solid #efbc40; outline-offset: 3px; }
+  html body .pc-s1-learning textarea[readonly] { background: #edf2f5; border: 1px solid #b9cbd7; color: #40586a; }
+  html body .pc-s2-access-visible-section { padding: 20px 0 0; border: 0; border-top: 1px solid #d4e1e9; border-radius: 0; background: transparent; }
+  html body .pc-s2-access .pc-s2-access-editor { border: 0; background: #fff; padding: 0; }
+  html body .pc-s2-access .pc-s2-request-actions { margin: 16px 0 28px; }
+  html body #pcS2RequestHelp { margin: 8px 0 12px; color: #40586a; line-height: 1.5; }
+  html body .pc-s2-reader-demo { border: 0; border-top: 1px solid #d4e1e9; background: transparent; padding: 16px 0; }
+  html body .pc-s2-heading-explainer-grid > section { background: transparent; border: 0; border-left: 2px solid #d4e1e9; border-radius: 0; padding: 0 16px; }
+  html body .pc-s2-access .pc-s2-heading-check { padding: 20px 0; margin: 24px 0; background: transparent; border-left: 0; }
+  html body .pc-s2-access-checks { padding: 20px 0; border: 0; border-top: 1px solid #b9cbd7; background: transparent; }
+  html body .pc-s2-access-checks > label { margin: 8px 0; padding: 12px; background: #edf4f8; border-radius: 5px; cursor: pointer; }
+  /* Reduce repeated navigation decoration without changing Canvas controls. */
+  html body .pc-s1-my-course-canvas-bar { background: #edf4f8; color: #12355b; border-bottom: 1px solid #b9cbd7; }
+  html body .pc-s1-my-course-canvas-bar strong,
+  html body .pc-s1-my-course-canvas-bar span:last-child { color: #12355b; }
+  html body .pc-s1-my-course-review-page h2 { font-size: clamp(1.4rem, 2vw, 1.8rem); max-width: 40ch; }
+  html body .pc-s1-my-course-review-page { max-width: 1120px; margin: 0 auto; }
+  html body .pc-s1-my-course-review-links .pc-s1-next-step-link { margin-left: auto; background: #e2edf4; border: 1px solid #79a8c1; text-decoration: none; }
+  html body #pcS1ReviewNextStep { scroll-margin-top: 120px; }
+  /* Keep level and earned XP visible; the separate leaderboard stays in progress details. */
+  html body .pc-app-header .pc-progress-menu .header-status {
+    min-height: 52px !important;
+    min-width: 0 !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    padding: 8px 12px !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  html body .pc-app-header .header-status :is(.pc-challenge-card,.pc-progress-summary-kicker,.pc-progress-view-label) { display: none !important; }
+  html body .pc-app-header .pc-progress-menu .level-tag { top: 0 !important; font-size: .9rem !important; }
+  html body .pc-app-header .pc-progress-menu .xp-track { height: 7px !important; min-width: 90px !important; }
+  html body .pc-app-header .pc-progress-menu .xp-group { grid-template-columns: minmax(90px,1fr) auto !important; }
+  html body .pc-app-header .pc-progress-level-badge { border: 0 !important; background: transparent !important; }
+  #mainMenuOverlay .pc-menu-action-utility { background: #e2edf4 !important; border: 1px solid #b9cbd7 !important; min-height: 44px; text-decoration: none !important; }
+  #mainMenuOverlay .pc-menu-action-utility:hover { background: #e3f1fa !important; }
+  #mainMenuOverlay .pc-menu-qr-card { border: 0; background: transparent !important; }
+  #mainMenuOverlay .pc-menu-data-summary { border: 0; border-left: 3px solid #efbc40; border-radius: 0; background: transparent !important; padding: 16px 20px; }
+  #mainMenuOverlay .pc-menu-info-grid article { border: 0 !important; border-top: 1px solid #cbdbe5 !important; border-radius: 0; background: transparent !important; }
+  /* The short S2 report was inheriting tiny terminal text despite ample space. */
+  html body #babbageTerminalOutput .pc-s2-access-report { padding: 16px; font-family: var(--pc-font-label); }
+  html body #babbageTerminalOutput .pc-s2-access-report :is(p,span) { font-size: 1rem !important; line-height: 1.6 !important; }
+  html body #babbageTerminalOutput .pc-s2-access-report h2 { font-size: 1.4rem !important; line-height: 1.35 !important; margin: 10px 0 16px; }
+  html body #babbageTerminalOutput .pc-s2-access-report h3 { font-size: 1.1rem !important; line-height: 1.4 !important; margin: 20px 0 8px; }
+}
+@media screen and (max-width: 1100px) {
+  html body .pc-s1-transfer-field label { min-height: 0; }
+}
+@media screen and (max-width: 1050px) {
+  html body .pc-s1-learning-workspace { height: auto; min-height: 0; max-height: none; overflow: visible; gap: 12px; }
+  html body .pc-s1-learning-workspace > .pc-s1-canvas-frame { height: auto; overflow: visible; flex: none; }
+  html body .pc-s1-learning-workspace .pc-s1-canvas-app,
+  html body .pc-s1-learning-workspace .pc-s1-canvas-course-body { min-height: 0; }
+  html body .pc-s1-learning-workspace > .pc-s1-maya-panel { flex: none; height: auto; }
+  html body .pc-s1-learning-workspace > .pc-s1-maya-panel .pc-s1-maya-panel-inner { height: auto; grid-template-columns: minmax(0,1fr) 72px; gap: 8px; padding: 8px 12px; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-art-wrap,
+  html body .pc-s1-learning-workspace .pc-s1-maya-art { height: 80px; max-height: 80px; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-quote { max-height: none; overflow: visible; padding: 4px 10px; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-quote p { font-size: .9rem; line-height: 1.45; }
+  html body .pc-s1-diagnosis-card { height: auto; overflow: visible; }
+  html body .pc-s1-my-course-layout { grid-template-columns: 1fr; }
+  html body .pc-s1-my-course-summary { order: 1; }
+}
+@media screen and (max-width: 640px) {
+  html body .pc-app-header { padding: 6px 10px !important; row-gap: 0 !important; }
+  html body .pc-app-header .pc-brand-summary { min-height: 48px !important; padding: 4px !important; }
+  html body .pc-app-header .pc-progress-menu { width: 100% !important; }
+  html body .pc-app-header .pc-progress-menu .header-status { min-height: 32px !important; padding: 4px 8px !important; }
+  html body .pc-app-header .pc-progress-summary-copy { display: flex !important; align-items: center !important; gap: 12px !important; }
+  html body .pc-app-header .pc-progress-menu .level-tag { width: auto !important; font-size: .8rem !important; }
+  html body .pc-app-header .pc-progress-menu .xp-group { display: block !important; }
+  html body .pc-app-header .pc-progress-menu .xp-track { display: none !important; }
+  html body .pc-s1-learning { width: 100%; padding: 8px; }
+  html body .pc-s1-learning-taskbar { padding: 12px 14px; gap: 4px; margin-bottom: 12px; }
+  html body .pc-s1-learning-taskbar > div:first-child > span { font-size: .7rem; letter-spacing: .05em; margin-bottom: 4px; }
+  html body .pc-s1-learning-taskbar h1 { font-size: 1.4rem; }
+  html body .pc-s1-learning-taskbar p { font-size: .9rem; line-height: 1.45; }
+  html body .pc-s1-learning-task-status { align-self: start; text-align: left; font-size: .8rem; }
+  html body .pc-s1-learning-workspace > .pc-s1-maya-panel .pc-s1-maya-panel-inner { grid-template-columns: minmax(0,1fr) 60px; padding: 8px; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-quote span { font-size: .85rem; margin-bottom: 2px; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-art-wrap,
+  html body .pc-s1-learning-workspace .pc-s1-maya-art { height: 72px; max-height: 72px; }
+  html body :is(.pc-s1-renaming,.pc-s1-diagnosis) .pc-s1-learning-workspace > .pc-s1-maya-panel { order: 1; }
+  html body .pc-s1-my-course-card { padding: 20px 16px; }
+  html body .pc-s1-my-course-summary { padding: 16px 8px; }
+  html body .pc-s1-transfer-reflection { padding: 16px; }
+  html body .pc-s1-diagnosis-guided { gap: 28px; }
+  html body .pc-s2-access .pc-s2-diagnosis-footer { position: static; }
+  html body .pc-s1-my-course-review-canvas { max-height: none; overflow: visible; }
+  html body .pc-s1-my-course-review-links .pc-s1-next-step-link { margin-left: 0; }
+  html body #pcS1ReviewNextStep { scroll-margin-top: 16px; }
+}
+
+/* SOURCE: src/css/ui/typography.css */
+/* A single course-interface family. Layered important declarations supersede legacy typography without duplicating layout rules. */
+@layer pcTypography {
+  body, body *, body *::before, body *::after { font-family: Arial, Helvetica, sans-serif !important; }
+  #mainMenuOverlay button { text-decoration: none !important; }
+  body pre, body pre *, body code, body code *, body .pc-s2-access-code,
+  body .babbage-terminal-screen, body .babbage-terminal-screen *,
+  body .babbage-terminal-title, body .babbage-terminal-output, body .babbage-terminal-output * {
+    font-family: Consolas, "Courier New", monospace !important;
+  }
+}
+#mainMenuOverlay .pc-menu-data-summary button {
+  padding: 8px 12px; border: 1px solid #b9cbd7; border-radius: 8px;
+  background: #e2edf4; text-decoration: none;
+}
+#mainMenuOverlay .pc-babbage-portrait-frame { height: 300px; background: #e9f5fb; }

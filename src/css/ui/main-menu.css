@@ -24,7 +24,6 @@
 #mainMenuOverlay .pc-menu-eyebrow,#mainMenuOverlay .pc-menu-card-label { font-family:'Source Code Pro',monospace; font-size:12px!important; line-height:1.5; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:#25638b!important; margin:0 0 8px; }
 #mainMenuOverlay .pc-menu-panel-heading { margin:0 0 24px; }
 #mainMenuOverlay .pc-menu-panel-heading > p:last-child { max-width:78ch; }
-#mainMenuOverlay .pc-menu-back { padding:4px 0; border:0; background:transparent; color:#205d87; font:700 14px/1.5 'Nunito',sans-serif; margin:0 0 14px; min-height:32px; }
 #mainMenuOverlay .pc-menu-hero { display:grid; grid-template-columns:minmax(0,1fr) 230px; gap:32px; align-items:center; margin:0 0 24px; }
 #mainMenuOverlay .pc-menu-hero-main { min-width:0; }
 #mainMenuOverlay .pc-menu-home-copy { margin-bottom:24px; }
@@ -114,3 +113,44 @@
  #mainMenuOverlay .pc-babbage-hero { grid-template-columns:1fr!important; }
  #mainMenuOverlay .pc-babbage-portrait-card { max-width:200px!important; }
 }
+
+/* Menu interaction states retain flat surfaces and fixed geometry. The layer
+   takes precedence over inherited gameplay Continue-button effects. */
+@layer pcMenuInteraction {
+  #mainMenuOverlay button,
+  .pc-brand-menu-panel button,
+  .pc-compact-nav .mobile-dropdown-option {
+    background-image: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    text-shadow: none !important;
+  }
+  #mainMenuOverlay button:is(:hover,:focus),
+  .pc-brand-menu-panel button:is(:hover,:focus),
+  .pc-compact-nav .mobile-dropdown-option:is(:hover,:focus) {
+    box-shadow: none !important; transform: none !important;
+  }
+  #mainMenuOverlay .pc-menu-action-primary {
+    background: #185b8e !important; border-color: #185b8e !important; color: #fff !important;
+  }
+  #mainMenuOverlay .pc-menu-action-primary:hover:not(:disabled) {
+    background: #144e7b !important; border-color: #185b8e !important;
+  }
+  #mainMenuOverlay .pc-menu-action-primary:focus:not(:hover) {
+    background: #185b8e !important; border-color: #185b8e !important;
+  }
+  #mainMenuOverlay button:focus:not(:focus-visible),
+  .pc-brand-menu-panel button:focus:not(:focus-visible),
+  .pc-compact-nav .mobile-dropdown-option:focus:not(:focus-visible) { outline: none !important; }
+  #mainMenuOverlay :is(button,a):focus-visible {
+    outline: 3px solid #185b8e !important; outline-offset: 3px !important;
+  }
+  .pc-brand-menu-panel :is(button,a):focus-visible,
+  .pc-compact-nav .mobile-dropdown-option:focus-visible {
+    outline: 3px solid #efbc40 !important; outline-offset: 3px !important;
+  }
+}
+
+/* Give Babbage headroom while keeping the portrait inside its frame. */
+#mainMenuOverlay .pc-babbage-portrait-frame { height: 224px !important; padding: 24px 10px 10px !important; box-sizing: border-box; overflow: hidden; }
+#mainMenuOverlay .pc-babbage-portrait-frame img { height: 100% !important; aspect-ratio: auto !important; object-fit: contain !important; object-position: center bottom !important; }

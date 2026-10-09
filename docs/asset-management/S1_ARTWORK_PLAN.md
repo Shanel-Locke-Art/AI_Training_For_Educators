@@ -17,7 +17,7 @@ For a printable version that also includes destination folders and code referenc
 | `pp_06_proud.png` | Professor Pixel — proud | 1200 × 1500 px | 4:5 | Transparent PNG | Use the same silhouette, margins, and baseline as the neutral portrait. |
 | `maya_01_neutral.png` | Maya — neutral | 1200 × 1500 px | 4:5 | Transparent PNG | Full figure. Match the crop, scale, lighting, and eye line across expressions. |
 | `maya_03_uncertain.png` | Maya — uncertain | 1200 × 1500 px | 4:5 | Transparent PNG | Use the same silhouette, margins, and baseline as the neutral portrait. |
-| `ui_01_babbage_mark.svg` | Babbage mark | 1200 × 1200 px artboard | 1:1 | SVG | Build as vector art and keep at least 10% clear space. |
+| `ui_01_babbage_mark.svg` | Babbage mark | 1200 × 1200 px artboard | 1:1 | SVG | Patch 625 uses a full-color generated portrait in the blue-and-gold seal, embedded as PNG in an SVG wrapper. |
 | `ui_02_babbage_engine.webp` | Babbage engine panel | 1200 × 1000 px | 6:5 | Transparent WebP | Keep the full object visible and preserve transparent edges. |
 | `ui_04_mo_river_otter.png` | Mo the river otter | 1200 × 1200 px | 1:1 | Transparent PNG | Center the character and allow 10% clear space for responsive cropping. |
 

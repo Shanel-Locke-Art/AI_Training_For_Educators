@@ -1,0 +1,12 @@
+README.md
+docs/development/patch-618-changed-files.txt
+docs/development/patch-618-guided-alignment-check.md
+index.html
+runtime/css/promptcraft.css
+runtime/js/promptcraft.bundle.js
+src/css/scenarios/s1-start-with-learning.css
+src/js/scenarios/s1-learning-content.js
+src/js/scenarios/s1-learning-state.js
+src/js/scenarios/s1-learning-workspace.js
+src/js/scenarios/s1-start-with-learning.js
+tools/test_s1_learning_loop.cjs

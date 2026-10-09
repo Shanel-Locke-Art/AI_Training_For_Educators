@@ -790,12 +790,13 @@ const ASSETS = Object.freeze({
       })
     }),
     professorPixel: Object.freeze({
-      neutral: pcProjectUrl('assets/images/characters/professor-pixel/pp_01_neutral_v3.png'),
-      thinking: pcProjectUrl('assets/images/characters/professor-pixel/pp_02_thinking_v3.png'),
-      excited: pcProjectUrl('assets/images/characters/professor-pixel/pp_03_excited_v3.png'),
-      encouraging: pcProjectUrl('assets/images/characters/professor-pixel/pp_04_encouraging_v3.png'),
+      neutral: pcProjectUrl('assets/images/characters/professor-pixel/pp_01_neutral_v4.png'),
+      thinking: pcProjectUrl('assets/images/characters/professor-pixel/pp_02_thinking_v4.png'),
+      excited: pcProjectUrl('assets/images/characters/professor-pixel/pp_03_excited_v4.png'),
+      encouraging: pcProjectUrl('assets/images/characters/professor-pixel/pp_04_encouraging_v4.png'),
       skeptical: pcProjectUrl('assets/images/characters/professor-pixel/pp_05_skeptical_v3.png'),
-      proud: pcProjectUrl('assets/images/characters/professor-pixel/pp_06_proud_v3.png')
+      proud: pcProjectUrl('assets/images/characters/professor-pixel/pp_06_proud_v4.png'),
+      listening: pcProjectUrl('assets/images/characters/professor-pixel/pp_07_listening_left_v4.png')
     }),
     students: Object.freeze({
       lena: Object.freeze({
@@ -4641,7 +4642,7 @@ const PC_S1_DIAGNOSIS_CHOICES = Object.freeze([
   }),
   Object.freeze({
     id: 'evidence-gap',
-    text: 'The module gives Maya useful preparation, but it does not provide evidence that she can perform the intended learning.'
+    text: 'The work helps Maya learn terms and describe barriers, but never asks her to recommend a response using evidence.'
   }),
   Object.freeze({
     id: 'quiz-length',
@@ -4839,6 +4840,8 @@ function pcCreateS1LearningState() {
     organizationNotice: '',
     diagnosisChoice: '',
     diagnosisRationale: '',
+    diagnosisGoal: '',
+    diagnosisEvidence: '',
     diagnosisNotice: '',
     diagnosisConfirmed: false,
     organizationXPEarned: 0,
@@ -4847,6 +4850,9 @@ function pcCreateS1LearningState() {
     myCourseXPEarned: 0,
     transferXPEarned: 0,
     transferReflection: '',
+    transferActivity: '',
+    transferChange: '',
+    transferEvidence: '',
     guide: pcLoadS1Guide(),
     guideBabbageResponse: null,
     myCourseStep: 'focus',
@@ -5289,38 +5295,49 @@ function pcRenderS1Diagnosis() {
   area.innerHTML = pcRenderLearningStage({
     className: 'pc-s1-diagnosis', titleId: 'pcS1DiagnosisTitle',
     background: sceneBg,
-    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1DiagnosisTitle', label: `Scenario 1 · Start With the Learning`, title: `Check whether the activities match the learning`, instruction: `Clear navigation helps Maya find the work. Alignment determines whether that work lets her demonstrate the intended learning.`, status: `Alignment check` }),
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1DiagnosisTitle', label: `Scenario 1 · Start With the Learning`, title: `Check whether the activities match the learning`, instruction: `Use the goal and current work below to make three small decisions.`, status: `Goal → Current work → Compare` }),
     bodyHTML: pcRenderLearningWorkspace({
       mainHTML: `<form class="pc-s1-diagnosis-card" data-pc-submit-action="s1-learning-submit-diagnosis" aria-labelledby="pcS1DiagnosisQuestion">
             <div class="pc-s1-diagnosis-purpose">
-              <strong>Why you are doing this</strong>
-              <p>You already made the module easier to follow. Now compare what the instructor wants Maya to do with what the current activities actually ask her to produce. The gap between those two is the design problem to solve next.</p>
+              <strong>Look for a chance to use the learning</strong>
+              <p>Use short phrases to compare the learning goal with Quiz 3. Then choose what is missing.</p>
             </div>
-            <div class="pc-s1-diagnosis-compare" aria-label="Alignment comparison">
-              <div class="pc-s1-diagnosis-context is-intent">
-                <span>Instructor intent</span>
-                <strong>Analyze a community food-access problem and use evidence to recommend an appropriate response.</strong>
-              </div>
-              <div class="pc-s1-diagnosis-context is-evidence">
-                <span>Current evidence</span>
-                <strong>Reading, video, vocabulary, a discussion describing a barrier, and a quiz checking terms and examples.</strong>
-              </div>
+            <div class="pc-s1-diagnosis-guided">
+              <section class="pc-s1-diagnosis-rationale" aria-labelledby="pcS1DiagnosisGoalHeading">
+                <h2 id="pcS1DiagnosisGoalHeading">1. What should Maya be able to do?</h2>
+                <div class="pc-s1-diagnosis-context is-intent">
+                  <span>The instructor's goal</span>
+                  <p>Analyze a community food-access problem and use evidence to recommend an appropriate response.</p>
+                </div>
+                <label for="pcS1DiagnosisGoal">Name the action Maya needs to show.</label>
+                <p id="pcS1DiagnosisGoalHelp" class="pc-s1-diagnosis-help">Use the goal above. What would Maya need to do, beyond remembering information?</p>
+                <textarea id="pcS1DiagnosisGoal" name="diagnosisGoal" rows="2" minlength="10" maxlength="220" required aria-describedby="pcS1DiagnosisGoalHelp" data-pc-input-action="s1-learning-update-diagnosis-rationale" placeholder="Maya needs to…">${esc(pcS1LearningState.diagnosisGoal)}</textarea>
+              </section>
+              <section class="pc-s1-diagnosis-rationale" aria-labelledby="pcS1DiagnosisEvidenceHeading">
+                <h2 id="pcS1DiagnosisEvidenceHeading">2. What does the current work check?</h2>
+                <div class="pc-s1-diagnosis-context is-evidence">
+                  <span>Maya's current module</span>
+                  <p>The reading and video introduce food-access barriers. The discussion asks Maya to describe one barrier. Quiz 3 checks terms and examples from the reading and video.</p>
+                </div>
+                <label for="pcS1DiagnosisEvidence">Name what Maya does in Quiz 3.</label>
+                <p id="pcS1DiagnosisEvidenceHelp" class="pc-s1-diagnosis-help">Use the quiz description above. Does Maya identify information, explain a choice, or make a recommendation?</p>
+                <textarea id="pcS1DiagnosisEvidence" name="diagnosisEvidence" rows="2" minlength="10" maxlength="220" required aria-describedby="pcS1DiagnosisEvidenceHelp" data-pc-input-action="s1-learning-update-diagnosis-rationale" placeholder="The quiz asks Maya to…">${esc(pcS1LearningState.diagnosisEvidence)}</textarea>
+              </section>
             </div>
             <div class="pc-s1-diagnosis-question-block">
-              <span class="pc-s1-result-eyebrow">Your decision</span>
-              <h2 id="pcS1DiagnosisQuestion">What is the main alignment problem?</h2>
-              <p class="pc-s1-diagnosis-help">Choose the single issue that matters most for whether this module demonstrates the intended learning.</p>
+              <span class="pc-s1-result-eyebrow">Compare your two observations</span>
+              <h2 id="pcS1DiagnosisQuestion">3. What is the main problem?</h2>
+              <p class="pc-s1-diagnosis-help">Does the current work give Maya a chance to show the action you named in Step 1? Choose the problem that best explains what is missing.</p>
             </div>
             <div class="pc-s1-diagnosis-choices">${choices}</div>
-            ${selected ? `<div class="pc-s1-diagnosis-rationale">
-              <label for="pcS1DiagnosisRationale"><strong>Explain what you noticed before checking your decision</strong><span>Your explanation will appear beside the alignment feedback so you can compare it with your reasoning. A short de-identified copy is also included in the study record. Do not include names.</span></label>
-              <textarea id="pcS1DiagnosisRationale" name="diagnosisRationale" rows="3" minlength="10" maxlength="500" required aria-describedby="pcS1DiagnosisRationaleStatus" data-pc-input-action="s1-learning-update-diagnosis-rationale" placeholder="For example: The objective asks students to recommend a response, but the activities only check recall and description.">${esc(pcS1LearningState.diagnosisRationale)}</textarea>
-              <p class="pc-s1-response-status" id="pcS1DiagnosisRationaleStatus">${pcS1LearningState.diagnosisRationale.trim().length >= 10 ? 'Ready to compare with the alignment feedback.' : 'Required: enter at least 10 characters. This is about your reasoning, not polished writing.'}</p>
-              ${pcS1LearningState.diagnosisNotice ? `<p class="pc-s1-diagnosis-notice" role="alert">${esc(pcS1LearningState.diagnosisNotice)}</p>` : ''}
-              <button type="submit" class="pc-shell-primary pc-s1-diagnosis-submit"${pcS1LearningState.diagnosisRationale.trim().length >= 10 ? '' : ' disabled'}>Compare my reasoning</button>
-            </div>` : ''}
+            <div class="pc-s1-diagnosis-rationale pc-s1-diagnosis-submit-area">
+              <p class="pc-s1-diagnosis-help">Your two observations will appear with the feedback so you can compare your decision. A short de-identified copy is included in the study record. Do not include names.</p>
+              <p class="pc-s1-response-status" id="pcS1DiagnosisRationaleStatus" role="status">${pcS1DiagnosisReady() ? 'Ready to compare your observations with the feedback.' : 'Add a short phrase for Steps 1 and 2, then choose the main problem in Step 3.'}</p>
+              <p class="pc-s1-diagnosis-notice" role="alert">${esc(pcS1LearningState.diagnosisNotice)}</p>
+              <button type="submit" class="pc-shell-primary pc-s1-diagnosis-submit"${pcS1DiagnosisReady() ? '' : ' disabled'}>Compare with feedback</button>
+            </div>
           </form>`,
-      studentHTML: pcRenderS1MayaPanel('The module is clearer now. I can see what I am supposed to do. The question is whether any of this actually lets me show the performance the instructor cares about.')
+      studentHTML: pcRenderS1MayaPanel('I can find the work now. Will it let me show that I can use evidence to recommend a response?')
     })
   });
   resetSectionScroll(area);
@@ -5337,17 +5354,17 @@ function pcRenderS1DiagnosisResult() {
   area.innerHTML = pcRenderLearningStage({
     className: 'pc-s1-diagnosis-result', titleId: 'pcS1DiagnosisResultTitle',
     background: sceneBg,
-    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1DiagnosisResultTitle', label: `Scenario 1 · Start With the Learning`, title: `Diagnosis recorded`, instruction: `${correct ? 'You identified the difference between useful preparation and evidence of the intended performance.' : 'Your diagnosis is saved. Compare it with the intended performance before moving into the next S1 phase.'}`, status: `${pcS1LearningState.diagnosisXPEarned ? `Diagnosis complete · +${pcS1LearningState.diagnosisXPEarned} XP` : 'Diagnosis complete'}` }),
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1DiagnosisResultTitle', label: `Scenario 1 · Start With the Learning`, title: `Compare your decision with the feedback`, instruction: `${correct ? 'You found a gap between learning the information and using it to recommend a response.' : 'Compare your choice with what Maya is expected to do.'}`, status: `${pcS1LearningState.diagnosisXPEarned ? `Comparison complete · +${pcS1LearningState.diagnosisXPEarned} XP` : 'Comparison complete'}` }),
     bodyHTML: pcRenderLearningWorkspace({
       mainHTML: `<section class="pc-s1-checkpoint-card pc-s1-diagnosis-result-card">
-            <span class="pc-s1-result-eyebrow">Your diagnosis</span>
+            <span class="pc-s1-result-eyebrow">Your decision</span>
             <h2>${esc(selected?.text || '')}</h2>
             <p>${correct
               ? 'That is the central alignment issue. Maya has reading, vocabulary, discussion, and recall work, but none of the current activities asks her to analyze a community food-access problem and recommend a response using evidence.'
               : 'This issue may affect the experience, but the instructor intent asks Maya to analyze a problem and recommend a response using evidence. The next design question is whether the current activities actually produce that evidence.'}</p>
-            <div class="pc-s1-diagnosis-result-reason"><strong>Your reasoning</strong><p>${esc(pcS1LearningState.diagnosisRationale)}</p></div>
+            <div class="pc-s1-diagnosis-result-reason"><strong>Your two observations</strong><p>${esc(pcS1LearningState.diagnosisRationale)}</p></div>
             <div class="pc-s1-diagnosis-result-actions">
-              <button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-continue-diagnosis">Review Diagnosis 1</button>
+              <button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-continue-diagnosis">Review this comparison</button>
               <button type="button" class="pc-shell-primary" data-pc-action="s1-learning-start-my-course">Continue to My Course</button>
             </div>
           </section>`,
@@ -5639,6 +5656,7 @@ function pcRenderS1FullGuide({ fromMenu = false } = {}) {
       </nav>
       <div class="pc-s1-guide-paper pc-s1-full-guide-paper">
         <section class="pc-s1-guide-section pc-s1-full-guide-personal" id="pcS1GuideFeedback"><span class="pc-s1-result-eyebrow">Saved course feedback</span><h2>${esc(course.moduleTitle || 'Your module')}</h2><p>${esc(pcCleanCourseGuideText(feedback.clear))}</p><p><strong>Intended learning:</strong> ${esc(pcCleanCourseGuideText(course.intendedLearning))}</p><section class="pc-s1-my-course-findings"><h3>What is clear</h3><ul>${(feedback.worked || []).map(item => `<li>${esc(pcCleanCourseGuideText(item))}</li>`).join('')}</ul></section><section class="pc-s1-my-course-findings"><h3>What needs inspection</h3><p>${esc(pcCleanCourseGuideText(feedback.unknown))}</p></section><section class="pc-s1-guide-suggestions" aria-labelledby="pcS1GuideSuggestionsHeading"><h3 id="pcS1GuideSuggestionsHeading">Ways to improve the activities you entered</h3><div class="pc-s1-full-guide-tips">${(feedback.improvementIdeas || []).map(pcRenderS1GuideTip).join('')}</div></section><div class="pc-s1-my-course-next-check"><h3>Next check</h3><p>${esc(pcCleanCourseGuideText(feedback.next))}</p></div></section>
+        ${savedReview?.transferReflection ? `<section class="pc-s1-guide-section pc-s1-saved-next-step"><span class="pc-s1-result-eyebrow">Your next step</span><h3>Your plan for this module</h3>${savedReview.transferPlan ? `<dl><dt>Activity to work on</dt><dd>${esc(savedReview.transferPlan.activity)}</dd><dt>Change or check</dt><dd>${esc(savedReview.transferPlan.change)}</dd><dt>What students should show</dt><dd>${esc(savedReview.transferPlan.evidence)}</dd></dl>` : `<p>${esc(savedReview.transferReflection)}</p>`}</section>` : ''}
         <section class="pc-s1-guide-section" id="pcS1GuideModule"><span class="pc-s1-result-eyebrow">Saved module view</span><h3>${esc(course.moduleTitle || 'Your module')}</h3><p>This view uses the activity titles you provided to suggest each item’s likely role. Confirm every placement against the actual instructions and student work.</p><div class="pc-s1-full-guide-module" aria-label="Visual summary of the saved module">${pcRenderS1MyCourseMiniModule(course)}</div></section>
         <footer class="pc-s1-guide-actions"><button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-print-guide">Print / Save PDF</button>${fromMenu ? '<button type="button" class="pc-shell-primary" data-pc-action="open-main-menu" data-pc-panel="home">Back to Main Menu</button>' : '<button type="button" class="pc-shell-primary" data-pc-action="s1-learning-close-with-pixel">Continue with Professor Pixel</button>'}</footer>
       </div>
@@ -5784,7 +5802,7 @@ function pcRenderS1MyCourseSummary() {
       <span class="pc-s1-result-eyebrow">Private My Course workspace</span>
       <h2>${esc(data.moduleTitle || 'Your module')}</h2>
       ${data.intendedLearning ? `<p><strong>Intended learning</strong><br>${esc(data.intendedLearning)}</p>` : '<p>Add the intended learning next.</p>'}
-      <p class="pc-s1-my-course-privacy">Saved locally on this device. This workspace is not added to V121 research tracking.</p>
+      <p class="pc-s1-my-course-privacy">Saved on this device. This overview is not added to the study record.</p>
     </aside>`;
 }
 
@@ -5804,7 +5822,7 @@ function pcRenderS1MyCourseStep(step = 'focus') {
         <h2>Choose one module or unit</h2>
         <p>Start small. Use one module you want to inspect rather than trying to repair an entire course at once.</p>
         <label for="pcS1MyCourseTitle">Module or unit name</label>
-        <input id="pcS1MyCourseTitle" name="moduleTitle" type="text" maxlength="120" value="${esc(data.moduleTitle)}" placeholder="Example: Week 4 — Informative Speech" required>
+        <input id="pcS1MyCourseTitle" name="moduleTitle" type="text" maxlength="120" value="${esc(data.moduleTitle)}" placeholder="Example: Week 4: Informative Speech" required>
         <div class="pc-s1-my-course-actions"><button type="submit" class="pc-shell-primary">Continue</button></div>
       </form>`;
   } else if (step === 'intent') {
@@ -5832,7 +5850,7 @@ function pcRenderS1MyCourseStep(step = 'focus') {
         <h2>What do students currently do?</h2>
         <p>List the activity names students see now. Babbage will review only this overview, not invent missing course details.</p>
         <div class="pc-s1-my-course-activities">${activityInputs}</div>
-        <div class="pc-s1-my-course-consent">When you choose <strong>Review with Babbage</strong>, only this module name, intended learning statement, and activity list are sent for feedback. They are not added to V121 research tracking.</div>
+        <div class="pc-s1-my-course-consent">When you choose <strong>Review with Babbage</strong>, only this module name, intended learning statement, and activity list are sent for feedback. They are not added to the study record.</div>
         <div class="pc-s1-my-course-actions">
           <button type="button" class="pc-shell-secondary" data-pc-action="s1-my-course-step" data-pc-my-course-step="intent">Back</button>
           <button type="submit" class="pc-shell-primary">Review with Babbage</button>
@@ -5984,13 +6002,20 @@ function pcRenderS1MyCourseFeedback() {
         <button type="button" class="pc-shell-secondary" data-pc-action="s1-my-course-step" data-pc-my-course-step="focus">Revise overview</button>
         <button type="button" class="pc-shell-primary" data-pc-action="s1-learning-view-full-guide">View My Course Guide</button>
       </div>`
-    : `<form class="pc-s1-transfer-reflection" data-pc-submit-action="s1-my-course-add-guide">
-        <label for="pcS1TransferReflection"><strong>Save one next step for your own course</strong><span>This becomes a personal reminder in My Course Guide. A short de-identified copy is also included in the study record. Your module title, learning statement, and activity names stay on this device.</span></label>
-        <textarea id="pcS1TransferReflection" name="transferReflection" rows="3" minlength="10" maxlength="500" required aria-describedby="pcS1TransferReflectionStatus" data-pc-input-action="s1-learning-update-transfer-reflection" placeholder="For example: Check whether my final activity actually demonstrates the stated learning objective.">${esc(pcS1LearningState.transferReflection)}</textarea>
-        <p class="pc-s1-response-status" id="pcS1TransferReflectionStatus">${pcS1LearningState.transferReflection.trim().length >= 10 ? 'Ready to save in My Course Guide.' : 'Required to save: enter at least 10 characters.'}</p>
+    : `<form id="pcS1ReviewNextStep" class="pc-s1-transfer-reflection" data-pc-submit-action="s1-my-course-add-guide">
+        <div class="pc-s1-transfer-intro"><h3>Plan one next step for your course</h3><p>Use the feedback above to choose one small change. Short phrases are enough.</p></div>
+        <div class="pc-s1-transfer-fields">
+          ${[
+            ['transferActivity', 'pcS1TransferActivity', '1. Which activity will you work on?', 'Choose one activity from your overview. Name it so you can find it later.', 'For example: Recorded Informative Speech'],
+            ['transferChange', 'pcS1TransferChange', '2. What will you change or check?', 'Use one suggestion from the feedback. Describe a small action you can take.', 'For example: Add a requirement to support the main points with credible sources.'],
+            ['transferEvidence', 'pcS1TransferEvidence', '3. What should students show?', 'Describe what you would look for in their work to see the intended learning.', 'For example: Students use credible evidence to support the main points of their speech.']
+          ].map(([name, id, title, help, example]) => `<div class="pc-s1-transfer-field"><label for="${id}"><strong>${title}</strong><span id="${id}Help">${help}</span></label><textarea id="${id}" name="${name}" rows="3" minlength="10" maxlength="140" required aria-describedby="${id}Help pcS1TransferReflectionStatus" data-pc-input-action="s1-learning-update-transfer-reflection" placeholder="${example}">${esc(pcS1LearningState[name] || '')}</textarea></div>`).join('')}
+        </div>
+        <p class="pc-s1-response-status" id="pcS1TransferReflectionStatus" role="status">${pcS1TransferReady() ? 'Ready to save your plan in My Course Guide.' : 'Add a short phrase of at least 10 characters for each step.'}</p>
+        <p class="pc-s1-transfer-privacy">Your three answers become one reminder in My Course Guide. A short de-identified copy is also included in the study record. Your module overview stays on this device.</p>
         <div class="pc-s1-my-course-actions">
           <button type="button" class="pc-shell-secondary" data-pc-action="s1-my-course-step" data-pc-my-course-step="focus">Revise overview</button>
-          <button type="submit" class="pc-shell-primary"${pcS1LearningState.transferReflection.trim().length >= 10 ? '' : ' disabled'}>Add to My Course Guide</button>
+          <button type="submit" class="pc-shell-primary"${pcS1TransferReady() ? '' : ' disabled'}>Add to My Course Guide</button>
         </div>
       </form>`;
   const sceneBg = ASSETS.images.backgrounds.scenarios?.[0] || ASSETS.images.backgrounds.classroom;
@@ -6002,8 +6027,8 @@ function pcRenderS1MyCourseFeedback() {
 
       <div class="pc-s1-learning-shell">
         <div class="pc-s1-my-course-review-canvas">
-          <header class="pc-s1-my-course-canvas-bar"><span class="pc-s1-canvas-menu-mark" aria-hidden="true">☰</span><strong>My Course Guide</strong><span>Modules</span><span>${esc(data.moduleTitle)}</span></header>
-          <nav class="pc-s1-my-course-review-links" aria-label="Jump to a course guidance section"><button type="button" data-pc-action="s1-learning-review-section" data-pc-review-section="pcS1ReviewFeedback">Babbage feedback</button><button type="button" data-pc-action="s1-learning-review-section" data-pc-review-section="pcS1ReviewImprovements">Activity suggestions</button><button type="button" data-pc-action="s1-learning-review-section" data-pc-review-section="pcS1ReviewPattern">Module pattern</button></nav>
+          <header class="pc-s1-my-course-canvas-bar"><strong>My Course Guide</strong><span>${esc(data.moduleTitle)}</span></header>
+          <nav class="pc-s1-my-course-review-links" aria-label="Jump to a course guidance section"><button type="button" data-pc-action="s1-learning-review-section" data-pc-review-section="pcS1ReviewFeedback">Babbage feedback</button><button type="button" data-pc-action="s1-learning-review-section" data-pc-review-section="pcS1ReviewImprovements">Activity suggestions</button><button type="button" data-pc-action="s1-learning-review-section" data-pc-review-section="pcS1ReviewPattern">Module pattern</button>${added ? '' : '<button type="button" class="pc-s1-next-step-link" data-pc-action="s1-learning-review-section" data-pc-review-section="pcS1ReviewNextStep">Fill in your next step</button>'}</nav>
           <div class="pc-s1-my-course-review-body">
             <article class="pc-s1-my-course-review-page">
               <span class="pc-s1-result-eyebrow">${feedback.source === 'live' ? 'Live Babbage review' : 'Built-in review'}</span>
@@ -6014,7 +6039,7 @@ function pcRenderS1MyCourseFeedback() {
               <section id="pcS1ReviewImprovements"><h3>Ways to improve the activities you entered</h3><ul>${feedback.improvementIdeas.map(item => `<li>${esc(item)}</li>`).join('')}</ul></section>
               <section id="pcS1ReviewPattern"><h3>Suggested module pattern</h3><div class="pc-s1-guide-reference-grid"><div><strong>Prepare</strong><em>Readings, examples, demonstrations</em></div><div><strong>Practice</strong><em>Discussion, drafts, feedback</em></div><div><strong>Evidence</strong><em>Work that demonstrates the intended learning</em></div></div></section>
               ${transferActions}
-              <p class="pc-s1-my-course-privacy">Your module text and saved guidance stay on this device. Only the short transfer reflection and completion indicators are included in V121 research tracking.</p>
+              <p class="pc-s1-my-course-privacy">Your module text and saved guidance stay on this device. Only the short transfer reflection and completion indicators are included in the study record.</p>
             </article>
           </div>
         </div>
@@ -6028,8 +6053,12 @@ function pcRenderS1MyCourseFeedback() {
 function pcAddS1MyCourseReviewToGuide(form) {
   const data = pcS1LearningState.myCourse;
   const feedback = pcGetS1MyCourseFeedback(pcS1LearningState.myCourseBabbageResponse, data);
-  const transferReflection = String(form ? new FormData(form).get('transferReflection') : pcS1LearningState.transferReflection || '').trim();
-  if (transferReflection.length < 10) return false;
+  if (form) {
+    const values = new FormData(form);
+    for (const name of PC_S1_TRANSFER_FIELDS) pcS1LearningState[name] = String(values.get(name) || '').trim();
+  }
+  if (!pcS1TransferReady()) return false;
+  const transferReflection = pcBuildS1TransferReflection();
   pcS1LearningState.transferReflection = transferReflection;
   pcS1LearningState.guide.myCourseReview = {
     added: true,
@@ -6039,6 +6068,7 @@ function pcAddS1MyCourseReviewToGuide(form) {
     feedback,
     source: feedback.source,
     transferReflection,
+    transferPlan: { activity: pcS1LearningState.transferActivity.trim(), change: pcS1LearningState.transferChange.trim(), evidence: pcS1LearningState.transferEvidence.trim() },
     addedAt: new Date().toISOString()
   };
   pcSaveS1Guide();
@@ -6083,22 +6113,35 @@ function pcAddS1MyCourseReviewToGuide(form) {
   return pcRenderS1FullGuide();
 }
 
+const PC_S1_TRANSFER_FIELDS = ['transferActivity', 'transferChange', 'transferEvidence'];
+
+function pcS1TransferReady() {
+  return PC_S1_TRANSFER_FIELDS.every(name => {
+    const length = String(pcS1LearningState[name] || '').trim().length;
+    return length >= 10 && length <= 140;
+  });
+}
+
+function pcBuildS1TransferReflection() {
+  return `Activity: ${String(pcS1LearningState.transferActivity || '').trim()}\nNext step: ${String(pcS1LearningState.transferChange || '').trim()}\nStudent work: ${String(pcS1LearningState.transferEvidence || '').trim()}`;
+}
+
 function pcUpdateS1TransferReflection(target) {
-  return pcUpdateS1RequiredResponse(
-    target,
-    'transferReflection',
-    'pcS1TransferReflectionStatus',
-    'Ready to save in My Course Guide.',
-    'Required to save: enter at least 10 characters.'
-  );
+  if (PC_S1_TRANSFER_FIELDS.includes(target?.name)) pcS1LearningState[target.name] = target.value;
+  pcS1LearningState.transferReflection = pcBuildS1TransferReflection();
+  const ready = pcS1TransferReady();
+  const submit = document.querySelector('.pc-s1-transfer-reflection button[type="submit"]');
+  if (submit) submit.disabled = !ready;
+  const status = document.getElementById('pcS1TransferReflectionStatus');
+  if (status) status.textContent = ready ? 'Ready to save your plan in My Course Guide.' : 'Add a short phrase of at least 10 characters for each step.';
+  return ready;
 }
 
 function pcScrollS1ReviewSection(sectionId) {
   const section = document.getElementById(String(sectionId || ''));
   const scroller = document.querySelector('.pc-s1-my-course-review-canvas');
   if (!section || !scroller) return false;
-  const targetTop = Math.max(0, section.offsetTop - 118);
-  scroller.scrollTo({ top: targetTop, behavior: 'smooth' });
+  section.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
   section.setAttribute('tabindex', '-1');
   window.setTimeout(() => section.focus({ preventScroll: true }), 250);
   return true;
@@ -6428,7 +6471,15 @@ function pcSelectS1Diagnosis(id) {
   pcS1LearningState.diagnosisChoice = id;
   pcS1LearningState.diagnosisNotice = '';
   pcS1LearningState.diagnosisConfirmed = false;
-  return pcRenderS1Diagnosis();
+  document.querySelectorAll('[data-pc-action="s1-learning-select-diagnosis"]').forEach(button => {
+    const chosen = button.dataset.pcDiagnosisId === id;
+    button.classList.toggle('is-selected', chosen);
+    button.setAttribute('aria-pressed', String(chosen));
+  });
+  const notice = document.querySelector('.pc-s1-diagnosis-notice');
+  if (notice) notice.textContent = '';
+  pcUpdateS1DiagnosisRationale(null);
+  return true;
 }
 
 function pcGetS1DiagnosisChoice() {
@@ -6437,11 +6488,16 @@ function pcGetS1DiagnosisChoice() {
 
 function pcUseS1Diagnosis(form) {
   if (!pcS1LearningState.diagnosisChoice) return false;
-  const rationale = String(form ? new FormData(form).get('diagnosisRationale') : pcS1LearningState.diagnosisRationale || '').trim();
-  if (rationale.length < 10) {
-    pcS1LearningState.diagnosisNotice = 'Add a short explanation before continuing.';
+  if (form) {
+    const fields = new FormData(form);
+    pcS1LearningState.diagnosisGoal = String(fields.get('diagnosisGoal') || '').trim();
+    pcS1LearningState.diagnosisEvidence = String(fields.get('diagnosisEvidence') || '').trim();
+  }
+  if (!pcS1DiagnosisReady()) {
+    pcS1LearningState.diagnosisNotice = 'Name the learning goal and what the quiz checks before comparing your decision.';
     return pcRenderS1Diagnosis();
   }
+  const rationale = pcBuildS1DiagnosisRationale();
   pcS1LearningState.diagnosisRationale = rationale;
   pcS1LearningState.diagnosisNotice = '';
   pcS1LearningState.diagnosisConfirmed = true;
@@ -6467,15 +6523,31 @@ function pcUpdateS1RequiredResponse(target, stateKey, statusId, readyText, pendi
   return ready;
 }
 
+function pcS1DiagnosisReady() {
+  return Boolean(pcS1LearningState.diagnosisChoice
+    && String(pcS1LearningState.diagnosisGoal || '').trim().length >= 10
+    && String(pcS1LearningState.diagnosisEvidence || '').trim().length >= 10);
+}
+
+function pcBuildS1DiagnosisRationale() {
+  return `Learning goal: ${String(pcS1LearningState.diagnosisGoal || '').trim()}\nCurrent work: ${String(pcS1LearningState.diagnosisEvidence || '').trim()}`;
+}
+
 function pcUpdateS1DiagnosisRationale(target) {
+  if (target?.name === 'diagnosisGoal') pcS1LearningState.diagnosisGoal = target.value;
+  if (target?.name === 'diagnosisEvidence') pcS1LearningState.diagnosisEvidence = target.value;
+  pcS1LearningState.diagnosisRationale = pcBuildS1DiagnosisRationale();
   pcS1LearningState.diagnosisNotice = '';
-  return pcUpdateS1RequiredResponse(
-    target,
-    'diagnosisRationale',
-    'pcS1DiagnosisRationaleStatus',
-    'Ready to compare with the alignment feedback.',
-    'Required: enter at least 10 characters. This is about your reasoning, not polished writing.'
-  );
+  const notice = document.querySelector('.pc-s1-diagnosis-notice');
+  if (notice) notice.textContent = '';
+  const ready = pcS1DiagnosisReady();
+  const submit = document.querySelector('.pc-s1-diagnosis-submit');
+  if (submit) submit.disabled = !ready;
+  const status = document.getElementById('pcS1DiagnosisRationaleStatus');
+  if (status) status.textContent = ready
+    ? 'Ready to compare your observations with the feedback.'
+    : 'Add a short phrase for Steps 1 and 2, then choose the main problem in Step 3.';
+  return ready;
 }
 
 function pcCompleteS1Organize() {
@@ -6510,7 +6582,9 @@ function pcFillS1StartLearningDev() {
   }
   if (pcS1LearningState.view === 'diagnosis') {
     pcS1LearningState.diagnosisChoice = 'evidence-gap';
-    pcS1LearningState.diagnosisRationale = 'The activities prepare students and check recall, but none asks them to analyze the problem and recommend a response with evidence.';
+    pcS1LearningState.diagnosisGoal = 'Analyze a problem and recommend a response using evidence.';
+    pcS1LearningState.diagnosisEvidence = 'Recall terms and recognize examples from the reading and video.';
+    pcS1LearningState.diagnosisRationale = pcBuildS1DiagnosisRationale();
     pcS1LearningState.diagnosisConfirmed = false;
     pcRenderS1Diagnosis();
     return true;
@@ -6525,7 +6599,13 @@ function pcFillS1StartLearningDev() {
     pcSaveS1MyCourse();
     return pcRenderS1MyCourseStep('activities');
   }
-  if (pcS1LearningState.view === 'my-course-feedback') return pcAddS1MyCourseReviewToGuide();
+  if (pcS1LearningState.view === 'my-course-feedback') {
+    pcS1LearningState.transferActivity = pcS1LearningState.myCourse.activities.filter(Boolean).at(-1) || 'Final module activity';
+    pcS1LearningState.transferChange = 'Check that the instructions ask students to demonstrate the intended learning.';
+    pcS1LearningState.transferEvidence = 'Student work demonstrates the learning statement using relevant evidence.';
+    pcS1LearningState.transferReflection = pcBuildS1TransferReflection();
+    return pcRenderS1MyCourseFeedback();
+  }
   if (pcS1LearningState.view === 'full-guide') return pcPlayS1ClosingDialogue();
   if (pcS1LearningState.view === 'organize') {
     pcS1LearningState.organization = {
@@ -7836,8 +7916,10 @@ function showMainMenuPanel(panelName = 'home') {
   if (activePanel === 'scenarios') renderScenarioMenu();
   if (panelName === 'home') updateMainMenuHome();
 
-  const focusTarget = requested.querySelector('button:not([disabled]), a[href], input, textarea, [tabindex]:not([tabindex="-1"])');
-  setTimeout(() => focusTarget?.focus(), 20);
+  const heading = requested.querySelector('.pc-menu-panel-heading h2');
+  if (heading) heading.setAttribute('tabindex', '-1');
+  const focusTarget = heading || requested.querySelector('button:not([disabled]), a[href], input, textarea, [tabindex]:not([tabindex="-1"])');
+  setTimeout(() => focusTarget?.focus({ preventScroll: true }), 20);
 }
 
 function openMainMenu(panelName = 'home', options = {}) {
@@ -8294,21 +8376,39 @@ function pcRenderS2Accessibility() {
 let pcS2ReaderPlayback = null;
 function pcRenderS2HeadingLesson(compact = false) {
   if (compact) return `<section class="pc-s1-diagnosis-purpose pc-s2-heading-lesson" aria-labelledby="pcS2HeadingLessonTitle"><h3 id="pcS2HeadingLessonTitle">Headings help people find their way</h3><p>A heading names a section and marks it as part of the page’s structure. Bold, enlarged text can look like a heading without working as one.</p><p>A screen reader turns text into speech or braille. It can read the page in order or jump between real headings. Lena’s section titles are readable, but missing from that heading navigation.</p></section>`;
-  return `<section class="pc-s1-diagnosis-purpose pc-s2-heading-lesson" aria-labelledby="pcS2HeadingLessonTitle">
+  return `<section class="pc-s2-heading-explainer" aria-labelledby="pcS2HeadingLessonTitle">
     <h3 id="pcS2HeadingLessonTitle">What is a heading?</h3>
-    <p>A heading is a title that names a section. Choose a Heading style in your course editor so the title becomes part of the page’s structure. Making text bold or larger only changes its appearance.</p>
-    <p>A screen reader turns page content into speech or braille. It can read the text in order, or let someone jump from heading to heading to find a section. A bold paragraph is still readable, but it is missing from that heading navigation.</p>
-    <p>The page title is Heading 1. Main sections use Heading 2, and a section within one of those uses Heading 3. AI can add this structure while keeping the information the same.</p>
+    <div class="pc-s2-heading-explainer-grid">
+      <section><span class="pc-s1-result-eyebrow">1 · Name the section</span><h4>A heading tells people what comes next</h4><p>“Read the evidence” names a section of this page. Bold or enlarged text can look like a heading, but appearance alone does not give it a place in the page’s structure.</p></section>
+      <section><span class="pc-s1-result-eyebrow">2 · Make it usable</span><h4>A real heading lets people jump to that section</h4><p>A screen reader turns content into speech or braille. It can read the page in order or navigate by real headings. Choose a Heading style in the course editor so the section title works that way.</p></section>
+      <section><span class="pc-s1-result-eyebrow">3 · Keep the order clear</span><h4>Use headings to show sections and subsections</h4><p>On this Canvas page, the page title is Heading 1. Main sections use Heading 2. “Before you submit” is part of “Your task,” so it uses Heading 3.</p><p>AI can add this structure while keeping the information the same.</p></section>
+    </div>
   </section>`;
 }
 /* Canvas-inspired reading view. It reads the lesson, not the surrounding game UI. */
 let pcS2ReaderView = null;
 const pcS2ReaderPreferences = { rate: 1.25, size: 24, spacing: true, focus: true };
 function pcRenderS2ReaderDemo() {
-  return `<section class="pc-s2-reader-demo" aria-label="Reading support"><button type="button" class="pc-shell-secondary" data-pc-action="s2-reader-toggle">Open Immersive Reader</button><p class="pc-s2-reader-note">Listen and follow the words, or compare heading navigation before and after repair.</p></section>`;
+  return `<section class="pc-s2-reader-demo" aria-label="Reading support"><button type="button" class="pc-shell-secondary" data-pc-action="s2-reader-toggle">Open Immersive Reader</button><p class="pc-s2-reader-note">Listen and follow the words, compare heading navigation, or hear a long web address beside a clear link label.</p></section>`;
 }
+// Fictional practice destination. Comparing labels never opens an external page.
+const PC_S2_LONG_LINK_URL = 'https://courses.example.org/resources/community-surveys/2026/module-04/downloads/community-survey-results-student-copy.pdf?course=community-studies-101&module=4&resource=survey-results&version=2026-09-15';
+const PC_S2_CLEAR_LINK_LABEL = 'Download the community survey results (PDF)';
+const PC_S2_READER_MODES = ['read', 'before', 'after', 'link-long', 'link-clear'];
 function pcGetS2ReaderBlocks(mode = 'read') {
   const title = 'Interpret a community survey';
+  if (mode === 'link-long') return [
+    {level:2,text:'When the address is the link text'},
+    {level:0,text:`Link. ${PC_S2_LONG_LINK_URL}`},
+    {level:0,text:'A long address can be hard to follow when heard aloud. Try Links: clear label to hear a more useful name for the same destination.'}
+  ];
+  if (mode === 'link-clear') return [
+    {level:2,text:'When the link has a clear label'},
+    {level:0,text:`Link. ${PC_S2_CLEAR_LINK_LABEL}.`},
+    {level:0,text:'The destination stays the same. The label tells students what they will open.'},
+    {level:2,text:'Try this with AI'},
+    {level:0,text:'Give AI the original link and ask: Change only the visible link text to Download the community survey results (PDF). Keep the web address exactly the same. Then check the label and destination before saving in Canvas.'}
+  ];
   if (mode === 'before') return [{level:1,text:`Heading level 1. ${title}.`},{level:0,text:'No more headings. The section titles are paragraphs, so heading navigation skips them.'}];
   if (mode === 'after') return [{level:1,text:`Heading level 1. ${title}.`}, ...PC_S2_EXPECTED_HEADINGS.map(h=>({level:h.level,text:`Heading level ${h.level}. ${h.text}.`}))];
   // Repaired text is accepted only after the existing strict validator succeeds.
@@ -8339,15 +8439,17 @@ function pcOpenS2ReaderView(opener = document.activeElement) {
   pcCloseS2ReaderView(false);
   const dialog = document.createElement('section');
   dialog.id='pcS2ReaderPanel';dialog.className='pc-s2-immersive';dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-labelledby','pcS2ReaderHeading');
-  dialog.innerHTML=`<header class="pc-s2-immersive-top"><button type="button" data-pc-action="s2-reader-close"><span aria-hidden="true">←</span> Back to page</button><h2 id="pcS2ReaderHeading">Interpret a community survey</h2><span class="pc-s2-immersive-label">Reading view</span></header>
+  dialog.innerHTML=`<header class="pc-s2-immersive-top"><button type="button" class="pc-shell-secondary" data-pc-action="s2-reader-close"><span aria-hidden="true">←</span> Back to page</button><div class="pc-s2-reader-brand"><img src="${pcProjectUrl('assets/images/ui/ui_01_babbage_mark.svg')}" alt="" aria-hidden="true"><div><span>PromptCraft · Reading view</span><h2 id="pcS2ReaderHeading">Interpret a community survey</h2></div></div></header>
     <div class="pc-s2-immersive-options"><label>Reading speed<select id="pcS2ReaderRate" data-pc-change-action="s2-reader-rate">${[.75,1,1.25,1.5,2,2.5].map(rate=>`<option value="${rate}"${rate===pcS2ReaderPreferences.rate?' selected':''}>${rate}×</option>`).join('')}</select></label>
     <label>Text size<select data-pc-change-action="s2-reader-size">${[20,24,30,36].map(size=>`<option value="${size}"${size===pcS2ReaderPreferences.size?' selected':''}>${size}px</option>`).join('')}</select></label>
     <label><input type="checkbox" data-pc-change-action="s2-reader-spacing"${pcS2ReaderPreferences.spacing?' checked':''}> More spacing</label>
     <label><input type="checkbox" data-pc-change-action="s2-reader-focus"${pcS2ReaderPreferences.focus?' checked':''}> Focus on current passage</label></div>
     <div class="pc-s2-immersive-scroll" id="pcS2ReaderScroll" tabindex="0" aria-label="Reading text"><article id="pcS2ReaderTranscript"></article></div>
-    <footer class="pc-s2-immersive-bottom"><div class="pc-s2-immersive-playback"><button type="button" class="pc-s2-immersive-play" data-pc-action="s2-reader-play" aria-label="Play reading"><span aria-hidden="true">▶</span> Play</button><button type="button" data-pc-action="s2-reader-stop" disabled>Stop</button>
-      <button type="button" data-pc-action="s2-reader-read">Read page</button><button type="button" data-pc-action="s2-reader-before">Headings: before</button><button type="button" data-pc-action="s2-reader-after">Headings: after</button></div>
-      <p id="pcS2ReaderStatus" role="status">Press Play to listen. You can also read the text here.</p><p class="pc-s2-immersive-note">Practice view modeled on Canvas Immersive Reader. Use Headings to try a separate screen reader navigation example.</p></footer>`;
+    <footer class="pc-s2-immersive-bottom"><div class="pc-s2-immersive-playback">
+      <div class="pc-s2-reader-control-group" role="group" aria-label="Playback"><span class="pc-s2-reader-control-label">Listen</span><div><button type="button" class="pc-button--primary pc-s2-immersive-play" data-pc-action="s2-reader-play" aria-label="Play reading"><span aria-hidden="true">▶</span> Play</button><button type="button" class="pc-shell-secondary" data-pc-action="s2-reader-stop" disabled>Stop</button><button type="button" class="pc-shell-secondary" data-pc-action="s2-reader-read">Read page</button></div></div>
+      <div class="pc-s2-reader-control-group" role="group" aria-label="Heading examples"><span class="pc-s2-reader-control-label">Headings</span><div><button type="button" class="pc-shell-secondary" data-pc-action="s2-reader-before" aria-label="Hear headings before repair">Before repair</button><button type="button" class="pc-shell-secondary" data-pc-action="s2-reader-after" aria-label="Hear headings after repair">After repair</button></div></div>
+      <div class="pc-s2-reader-control-group" role="group" aria-label="Link examples"><span class="pc-s2-reader-control-label">Links</span><div><button type="button" class="pc-shell-secondary" data-pc-action="s2-reader-link-long" aria-label="Hear the long web address">Long address</button><button type="button" class="pc-shell-secondary" data-pc-action="s2-reader-link-clear" aria-label="Hear the clear link label">Clear label</button></div></div>
+      </div><p id="pcS2ReaderStatus" role="status">Press Play to listen. You can also read the text here.</p><p class="pc-s2-immersive-note">Practice view modeled on Canvas Immersive Reader. Heading and link examples use your browser’s voice. Screen reader voices, speed, and punctuation vary.</p></footer>`;
   const inertStates=[];
   for(const child of document.body.children){
     if(!['SCRIPT','STYLE','LINK'].includes(child.tagName)&&!child.hidden&&getComputedStyle(child).display!=='none'&&child.id!=='mainMenuOverlay') { inertStates.push([child,child.inert]);child.inert=true; }
@@ -8386,12 +8488,12 @@ function pcApplyS2ReaderPreferences() {
   dialog.classList.toggle('has-focus',pcS2ReaderPreferences.focus);
 }
 function pcSetS2ReaderMode(mode) {
-  const view=pcS2ReaderView;if(!view)return;
+  const view=pcS2ReaderView;if(!view || !PC_S2_READER_MODES.includes(mode))return;
   pcStopS2ReaderDemo();view.mode=mode;view.cursor=0;
   const blocks=pcGetS2ReaderBlocks(mode);view.text=blocks.map(b=>b.text).join('\n');
   view.dialog.querySelector('#pcS2ReaderTranscript').innerHTML=pcRenderS2ReaderWords(blocks);
   view.dialog.querySelector('#pcS2ReaderScroll').scrollTop=0;
-  for(const button of view.dialog.querySelectorAll('[data-pc-action="s2-reader-read"],[data-pc-action="s2-reader-before"],[data-pc-action="s2-reader-after"]'))button.setAttribute('aria-pressed',String(button.dataset.pcAction===`s2-reader-${mode}`));
+  for(const button of view.dialog.querySelectorAll('[data-pc-action="s2-reader-read"],[data-pc-action="s2-reader-before"],[data-pc-action="s2-reader-after"],[data-pc-action="s2-reader-link-long"],[data-pc-action="s2-reader-link-clear"]'))button.setAttribute('aria-pressed',String(button.dataset.pcAction===`s2-reader-${mode}`));
 }
 function pcHighlightS2ReaderWord(charIndex, exact = true) {
   const view=pcS2ReaderView;if(!view)return;
@@ -8453,7 +8555,7 @@ function pcToggleS2ReaderPlayback() {
   pcUpdateS2ReaderPlaybackControls(true,playback.paused);
   pcS2ReaderView.dialog.querySelector('#pcS2ReaderStatus').textContent=playback.paused?'Reading paused.':'Reading resumed.';
 }
-function pcPlayS2ReaderDemo(mode) { if(!['read','before','after'].includes(mode))return;pcSetS2ReaderMode(mode);pcStartS2ReaderSpeech(); }
+function pcPlayS2ReaderDemo(mode) { if(!PC_S2_READER_MODES.includes(mode))return;pcSetS2ReaderMode(mode);pcStartS2ReaderSpeech(); }
 function pcChangeS2ReaderRate(value) {
   const rate=Number(value);if(![.75,1,1.25,1.5,2,2.5].includes(rate))return;
   pcS2ReaderPreferences.rate=rate;
@@ -8580,7 +8682,7 @@ function pcRenderS2AccessResource() {
   return {
     title: 'Inspect the page Lena sees', help: 'Read the page, then check whether its section titles work as headings.', context: 'Learning page',
     quote: 'The titles look different from the paragraphs, but my reading tool cannot jump between them.',
-    content: pcS2AccessPage(`${PC_S2_PAGE_HTML}${pcRenderS2HeadingLesson()}${pcRenderS2ReaderDemo()}<details><summary>Check the headings</summary>${pcS2AccessOutline('')}<p>A reading tool cannot use these titles to move between sections.</p></details>`,
+    content: pcS2AccessPage(`${PC_S2_PAGE_HTML}<section class="pc-s2-page-inspection" aria-labelledby="pcS2InspectionTitle"><span class="pc-s1-result-eyebrow">Inspect the page structure</span><h2 id="pcS2InspectionTitle">Why Lena cannot jump between sections</h2>${pcRenderS2HeadingLesson()}<section class="pc-s2-access-visible-section pc-s2-heading-check"><h3>What heading navigation finds on this page</h3>${pcS2AccessOutline('')}<p>Lena can hear the words, but she cannot use the section titles to jump straight to the evidence or directions.</p><p><strong>Your repair:</strong> Keep the wording and make the section titles real headings.</p></section>${pcRenderS2ReaderDemo()}</section>`,
       `<nav class="pc-s1-canvas-prev-next" aria-label="Canvas item navigation">${pcS2AccessButton('s2-access-explore', 'Back to Modules', false, true)}${pcS2AccessButton('s2-access-identify', 'Continue')}</nav>`)
   };
 }
@@ -8606,10 +8708,10 @@ function pcRenderS2AccessRequest() {
     content: `<div class="pc-s1-rename-instructions"><h1>Repair the learning page</h1><p>The page HTML is attached. You can describe the repair in ordinary language.</p></div>
       <section class="pc-s1-rename-editor pc-s2-access-editor" aria-labelledby="pcS2RequestLabel">
         <div class="pc-s1-rename-editor-heading"><span>Page to repair</span><strong>Interpret a community survey</strong></div>
-        <label id="pcS2RequestLabel" for="pcS2Request">Your request to Babbage</label><textarea id="pcS2Request" rows="5" data-pc-input-action="s2-access-request">${esc(state.request)}</textarea>
-        <details><summary>See the attached page HTML</summary><textarea id="pcS2SourceHtml" class="pc-s2-access-code" rows="8" readonly aria-label="Original page HTML">${esc(PC_S2_PAGE_HTML)}</textarea>${pcS2AccessButton('s2-access-copy-source', 'Copy page HTML', false, true)}</details>
-        <div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-generate', 'Ask Babbage', state.busy || !state.request.trim())}${pcS2AccessButton('s2-access-identify', 'Review decision', false, true)}</div>
-        <details><summary>Practice without a live AI response</summary><p>Use a prepared example to try the same repair steps.</p>${pcS2AccessButton('s2-access-example', 'Use example repair', state.busy, true)}</details>
+        <label id="pcS2RequestLabel" for="pcS2Request">Your request to Babbage</label><p id="pcS2RequestHelp">You can use this request as written or adjust it below.</p><textarea id="pcS2Request" rows="5" aria-describedby="pcS2RequestHelp" data-pc-input-action="s2-access-request">${esc(state.request)}</textarea>
+        <div class="pc-s2-access-actions pc-s2-request-actions">${pcS2AccessButton('s2-access-generate', 'Ask Babbage', state.busy || !state.request.trim())}${pcS2AccessButton('s2-access-identify', 'Review decision', false, true)}</div>
+        <section class="pc-s2-access-visible-section pc-s2-reference"><h3>Attached page HTML</h3><p>Already attached to your request. You do not need to edit this reference.</p><textarea id="pcS2SourceHtml" class="pc-s2-access-code" rows="5" readonly aria-label="Original page HTML, reference only">${esc(PC_S2_PAGE_HTML)}</textarea>${pcS2AccessButton('s2-access-copy-source', 'Copy page HTML', false, true)}</section>
+        <section class="pc-s2-access-visible-section"><h3>Practice without a live AI response</h3><p>Use a prepared example to try the same repair steps.</p>${pcS2AccessButton('s2-access-example', 'Use example repair', state.busy, true)}</section>
       </section>`
   };
 }
@@ -8621,7 +8723,7 @@ function pcRenderS2AccessReview() {
     content: `<section class="pc-s1-checkpoint-card pc-s1-diagnosis-result-card">
       <span class="pc-s1-result-eyebrow">${state.source === 'live' ? 'Babbage repair' : 'Built-in example repair'}</span><h2>Same information. Clearer structure.</h2><p>${esc(state.explanation || 'The section titles now use real headings. Before you submit belongs under Your task.')}</p>
       ${pcRenderS2ReaderDemo()}<div class="pc-s2-access-compare"><section><h3>Before</h3>${pcS2AccessOutline('')}</section><section><h3>After</h3>${pcS2AccessOutline(state.draft)}</section></div>
-      <details><summary>See the repaired HTML</summary><textarea id="pcS2DraftHtml" class="pc-s2-access-code" rows="8" readonly aria-label="Repaired page HTML">${esc(state.draft)}</textarea>${pcS2AccessButton('s2-access-copy-draft', 'Copy repaired HTML', false, true)}</details>
+      <section class="pc-s2-access-visible-section"><h3>See the repaired HTML</h3><textarea id="pcS2DraftHtml" class="pc-s2-access-code" rows="8" readonly aria-label="Repaired page HTML">${esc(state.draft)}</textarea>${pcS2AccessButton('s2-access-copy-draft', 'Copy repaired HTML', false, true)}</section>
       <div class="pc-s1-diagnosis-result-actions">${pcS2AccessButton('s2-access-revise', 'Revise request', false, true)}${pcS2AccessButton('s2-access-open-editor', 'Continue')}</div>
     </section>`
   };
@@ -8639,8 +8741,8 @@ function pcRenderS2AccessVerify() {
     title: 'Check the page before saving', help: 'AI makes the repair. You check the result.', context: 'Page preview',
     quote: 'Check that I can find the sections and still have the same evidence, directions, and link.',
     content: pcS2AccessPage(result.ok ? result.html : '') + `<section class="pc-s2-access-checks"><h2>Check your repair</h2>
-      <details><summary>Compare with the original</summary><article class="pc-s1-canvas-richtext">${PC_S2_PAGE_HTML}</article></details>
-      <details><summary>Check the heading outline</summary>${pcS2AccessOutline(state.pasted)}</details>${pcRenderS2ReaderDemo()}
+      <section class="pc-s2-access-visible-section"><h3>Compare with the original</h3><article class="pc-s1-canvas-richtext">${PC_S2_PAGE_HTML}</article></section>
+      <section class="pc-s2-access-visible-section"><h3>Check the heading outline</h3>${pcS2AccessOutline(state.pasted)}</section>${pcRenderS2ReaderDemo()}
       ${PC_S2_REPAIR_CHECKS.map(({ id, label }) => `<label><input type="checkbox" data-pc-change-action="s2-access-check" data-pc-check="${id}" ${state.checked.has(id) ? 'checked' : ''}> ${esc(label)}</label>`).join('')}
       <div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-back-editor', 'Back to editor', false, true)}${pcS2AccessButton('s2-access-apply', 'Save checked page', !pcS2AccessChecksComplete())}</div></section>`
   };
@@ -8651,8 +8753,8 @@ function pcRenderS2AccessComplete() {
     quote: 'I can move between the sections now. It is easier to find the evidence and return to what I need to submit.',
     content: `<section class="pc-s1-checkpoint-card pc-s1-diagnosis-result-card"><span class="pc-s1-result-eyebrow">Your checked repair</span><h2>A small repair makes a difference</h2><p>You used ${pcS2AccessState.source === 'live' ? 'Babbage' : 'a built-in example'} to turn visual titles into real headings, then checked the result before saving.</p>
       <h3>Try this in your own course</h3><p>Open a Canvas page’s HTML editor, copy its HTML into an AI request, and ask for a heading repair. Paste the checked result back, preview the page, and run your available accessibility checker.</p>
-      <details><summary>Keep this request</summary><textarea id="pcS2ReusablePrompt" rows="5" readonly aria-label="Reusable AI request">${esc(pcS2AccessState.request)}</textarea></details>
-      <details><summary>Course-design connection</summary><p>OSCQR 21 and WCAG 2.1 1.3.1 and 2.4.6 connect this repair to readable, meaningful page structure. This is one accessibility improvement, not a full accessibility review.</p></details>
+      <section class="pc-s2-access-visible-section"><h3>Keep this request</h3><textarea id="pcS2ReusablePrompt" rows="5" readonly aria-label="Reusable AI request">${esc(pcS2AccessState.request)}</textarea></section>
+      <section class="pc-s2-access-visible-section"><h3>Course-design connection</h3><p>OSCQR 21 and WCAG 2.1 1.3.1 and 2.4.6 connect this repair to readable, meaningful page structure. This is one accessibility improvement, not a full accessibility review.</p></section>
       <div class="pc-s1-diagnosis-result-actions">${pcS2AccessButton('s2-access-revisit', 'Review repair', false, true)}${pcS2AccessButton('s2-access-reset', 'Practice again', false, true)}${pcS2AccessButton('open-main-menu', 'Return to Main Menu')}</div>
     </section>`
   };
@@ -8796,6 +8898,8 @@ pcRegisterUIActions({
   's2-reader-toggle': target => pcToggleS2ReaderDemo(target),
   's2-reader-before': () => pcPlayS2ReaderDemo('before'),
   's2-reader-after': () => pcPlayS2ReaderDemo('after'),
+  's2-reader-link-long': () => pcPlayS2ReaderDemo('link-long'),
+  's2-reader-link-clear': () => pcPlayS2ReaderDemo('link-clear'),
   's2-reader-read': () => pcPlayS2ReaderDemo('read'),
   's2-reader-stop': () => pcStopS2ReaderDemo(),
   's2-access-noop': (_target, event) => event?.preventDefault(),
@@ -12129,6 +12233,9 @@ function pcCenterWideAnalysisActions() {
 
   const buttons = [...actionRow.querySelectorAll('button')];
   if (!buttons.length) return false;
+  // A single handoff needs enough room for its full label. Multiple actions
+  // retain the existing compact row, bounded by the viewport.
+  const singleAction = buttons.length === 1;
 
   pcSetImportantStyles(actionRow, [
     ['position', 'fixed'],
@@ -12156,9 +12263,9 @@ function pcCenterWideAnalysisActions() {
   ]);
 
   buttons.forEach((button) => pcSetImportantStyles(button, [
-    ['width', 'clamp(156px, 9vw, 176px)'],
+    ['width', singleAction ? 'min(320px, calc(100vw - 32px))' : 'clamp(156px, 9vw, 176px)'],
     ['min-width', '0'],
-    ['max-width', '176px'],
+    ['max-width', singleAction ? 'calc(100vw - 32px)' : '176px'],
     ['height', 'auto'],
     ['min-height', '46px'],
     ['max-height', 'none'],
@@ -15325,7 +15432,9 @@ function pcRenderVNCast({ cast = [], speaker = 'pixel', expression = 'neutral' }
     }
     const id = String(entry.id).trim().toLowerCase();
     const active = id === speakerId;
-    const slotExpression = active ? expression : (entry.expression || 'neutral');
+    const listensToStudent = id === 'pixel' && !active
+      && slotIndex === 0 && ['maya', 'lena'].includes(speakerId);
+    const slotExpression = listensToStudent ? 'listening' : (active ? expression : (entry.expression || 'neutral'));
     pcSetVNSlotCharacter(slotIndex, id, slotExpression, {
       active,
       side: entry.side || entry.slot || ''

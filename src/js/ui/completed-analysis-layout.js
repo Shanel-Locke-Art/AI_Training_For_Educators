@@ -32,6 +32,9 @@ function pcCenterWideAnalysisActions() {
 
   const buttons = [...actionRow.querySelectorAll('button')];
   if (!buttons.length) return false;
+  // A single handoff needs enough room for its full label. Multiple actions
+  // retain the existing compact row, bounded by the viewport.
+  const singleAction = buttons.length === 1;
 
   pcSetImportantStyles(actionRow, [
     ['position', 'fixed'],
@@ -59,9 +62,9 @@ function pcCenterWideAnalysisActions() {
   ]);
 
   buttons.forEach((button) => pcSetImportantStyles(button, [
-    ['width', 'clamp(156px, 9vw, 176px)'],
+    ['width', singleAction ? 'min(320px, calc(100vw - 32px))' : 'clamp(156px, 9vw, 176px)'],
     ['min-width', '0'],
-    ['max-width', '176px'],
+    ['max-width', singleAction ? 'calc(100vw - 32px)' : '176px'],
     ['height', 'auto'],
     ['min-height', '46px'],
     ['max-height', 'none'],

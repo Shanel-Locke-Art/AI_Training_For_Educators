@@ -142,30 +142,6 @@
     return `${SCENARIOS[scenario]?.short || 'PromptCraft'} Teaching Idea`;
   }
 
-  function extractSummary(value, title) {
-    const text = String(value || '').replace(/\r/g, '').trim();
-    if (!text) return 'An instructional idea shared from PromptCraft.';
-
-    const normalizedTitle = String(title || '').trim().toLowerCase();
-    const blocks = text.split(/\n\s*\n/).map(block => block.trim()).filter(Boolean);
-
-    for (const block of blocks) {
-      const plain = stripMarkdown(block).trim();
-      if (!plain) continue;
-      if (normalizedTitle && plain.toLowerCase() === normalizedTitle) continue;
-
-      const headingOnly = /^(?:#{1,6}\s+.+|\*\*[^*]+\*\*:?)$/.test(block);
-      if (headingOnly) continue;
-
-      // Use the complete first descriptive paragraph. The former 150-character
-      // excerpt was visually tidy but made the card description unreadable.
-      return plain;
-    }
-
-    const plain = stripMarkdown(text).replace(String(title || ''), '').trim();
-    return plain || 'An instructional idea shared from PromptCraft.';
-  }
-
   function normalizeIdea(raw) {
     const scenario = Number(raw.scenario || raw.scenarioIndex || raw.scenario_index || 0);
     return {
@@ -277,8 +253,11 @@
   function cardHtml(idea, index) {
     const scenario = SCENARIOS[idea.scenario] || { label: idea.scenarioLabel || 'PromptCraft', short: idea.scenarioLabel || 'PromptCraft', tag: 'tag-1' };
     const title = extractTitle(idea.idea, idea.scenario);
-    const summary = extractSummary(idea.idea, title);
-    const formatted = formatIdeaMarkdown(idea.idea);
+    const content = String(idea.idea || '').replace(/\r/g, '').trim();
+    const firstBlock = content.split(/\n\s*\n/)[0];
+    const headingOnly = /^(?:#{1,6}\s+.+|\*\*[^*]+\*\*:?)$/.test(firstBlock);
+    const repeatsTitle = headingOnly && stripMarkdown(firstBlock).replace(/:$/, '').trim().toLowerCase() === title.toLowerCase();
+    const formatted = formatIdeaMarkdown(repeatsTitle ? content.slice(firstBlock.length).trim() : content);
     const score = numericScore(idea.score);
     const scoreHtml = score >= 0 ? `<span class="score-chip">${escHtml(score)}/5</span>` : '';
     const date = formatDate(idea.timestamp);
@@ -291,17 +270,12 @@
             ${idea.isDemo ? '<span class="sample-badge">SAMPLE</span>' : scoreHtml}
           </div>
           <h2 class="idea-title">${escHtml(title)}</h2>
-          <p class="idea-summary">${escHtml(summary)}</p>
           <section class="idea-panel" aria-label="Shared teaching idea">
-            <div class="idea-panel-label">Shared Idea</div>
             <div class="idea-body" id="ideaBody${index}">${formatted}</div>
-            <div class="idea-fade" aria-hidden="true"></div>
-            <button class="expand-btn" type="button" data-expand-card aria-expanded="false" aria-controls="ideaBody${index}">View full idea</button>
           </section>
         </div>
         <div class="idea-meta">
           <span>Shared from: <strong>${escHtml(scenario.short)}</strong>${date ? ` · ${escHtml(date)}` : ''}</span>
-          ${idea.isDemo ? '' : scoreHtml}
         </div>
       </article>`;
   }
@@ -323,19 +297,6 @@
     }
 
     grid.innerHTML = ideas.map(cardHtml).join('');
-    requestAnimationFrame(updateExpandButtons);
-  }
-
-  function updateExpandButtons() {
-    document.querySelectorAll('.idea-card').forEach(card => {
-      const body = card.querySelector('.idea-body');
-      const button = card.querySelector('[data-expand-card]');
-      const fade = card.querySelector('.idea-fade');
-      if (!body || !button || !fade) return;
-      const needsExpand = body.scrollHeight > body.clientHeight + 8;
-      button.hidden = !needsExpand;
-      fade.hidden = !needsExpand;
-    });
   }
 
   function bindEvents() {
@@ -352,18 +313,7 @@
       render();
     });
 
-    document.getElementById('ideasGrid')?.addEventListener('click', event => {
-      const button = event.target.closest('[data-expand-card]');
-      if (!button) return;
-      const card = button.closest('.idea-card');
-      const expanded = !card.classList.contains('expanded');
-      card.classList.toggle('expanded', expanded);
-      button.setAttribute('aria-expanded', String(expanded));
-      button.textContent = expanded ? 'Show less' : 'View full idea';
-    });
-
     document.getElementById('refreshIdeasBtn')?.addEventListener('click', loadIdeas);
-    window.addEventListener('resize', () => requestAnimationFrame(updateExpandButtons), { passive: true });
     loadIdeas();
   }
 

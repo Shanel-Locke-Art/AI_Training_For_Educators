@@ -1,0 +1,11 @@
+README.md
+docs/development/patch-621-changed-files.txt
+docs/development/patch-621-visible-s2-guidance.md
+index.html
+runtime/css/promptcraft.css
+runtime/js/promptcraft.bundle.js
+src/css/scenarios/s2-accessibility.css
+src/js/scenarios/s2-accessibility-reader.js
+src/js/scenarios/s2-accessibility-workspace.js
+tools/test_s2_accessibility.cjs
+tools/test_s2_accessibility_ai.cjs

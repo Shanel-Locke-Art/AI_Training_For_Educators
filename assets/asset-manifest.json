@@ -1,5 +1,5 @@
 {
-  "version": 156,
+  "version": 158,
   "runtime_images": {
     "bg_01_app.png": "assets/images/backgrounds/bg_01_app.png",
     "bg_02_classroom.png": "assets/images/backgrounds/bg_02_classroom.png",
@@ -22,7 +22,7 @@
     "eli_02_thinking.png": "assets/images/characters/students/eli/eli_02_thinking.png",
     "eli_05_confident.png": "assets/images/characters/students/eli/eli_05_confident.png",
     "ui_01_babbage_mark.svg": "assets/images/ui/ui_01_babbage_mark.svg",
-    "ui_03_charles_babbage.png": "assets/images/ui/ui_03_charles_babbage.png",
+    "ui_03_charles_babbage.png": "assets/images/ui/ui_03_charles_babbage_v2.png",
     "ui_06_promptcraft_qr.png": "assets/ui/ui_06_promptcraft_qr.png",
     "ui_02_babbage_engine.webp": "assets/images/ui/ui_02_babbage_engine.webp",
     "maya_01_neutral.png": "assets/images/characters/students/maya/maya_01_neutral.png",
@@ -58,13 +58,14 @@
     "lena_neutral_draft.png": "assets/images/characters/students/lena/lena_neutral_draft.png",
     "lena_thinking_draft.png": "assets/images/characters/students/lena/lena_thinking_draft.png",
     "lena_confident_draft.png": "assets/images/characters/students/lena/lena_confident_draft.png",
-    "pp_01_neutral_v3.png": "assets/images/characters/professor-pixel/pp_01_neutral_v3.png",
-    "pp_02_thinking_v3.png": "assets/images/characters/professor-pixel/pp_02_thinking_v3.png",
-    "pp_03_excited_v3.png": "assets/images/characters/professor-pixel/pp_03_excited_v3.png",
-    "pp_04_encouraging_v3.png": "assets/images/characters/professor-pixel/pp_04_encouraging_v3.png",
     "pp_05_skeptical_v3.png": "assets/images/characters/professor-pixel/pp_05_skeptical_v3.png",
-    "pp_06_proud_v3.png": "assets/images/characters/professor-pixel/pp_06_proud_v3.png",
-    "shanel_profile_v2.png": "assets/images/ui/shanel_profile_v2.png"
+    "shanel_profile_v2.png": "assets/images/ui/shanel_profile_v2.png",
+    "pp_01_neutral_v4.png": "assets/images/characters/professor-pixel/pp_01_neutral_v4.png",
+    "pp_02_thinking_v4.png": "assets/images/characters/professor-pixel/pp_02_thinking_v4.png",
+    "pp_03_excited_v4.png": "assets/images/characters/professor-pixel/pp_03_excited_v4.png",
+    "pp_04_encouraging_v4.png": "assets/images/characters/professor-pixel/pp_04_encouraging_v4.png",
+    "pp_06_proud_v4.png": "assets/images/characters/professor-pixel/pp_06_proud_v4.png",
+    "pp_07_listening_left_v4.png": "assets/images/characters/professor-pixel/pp_07_listening_left_v4.png"
   },
   "planned_runtime_images": {
     "s04_01_scene.png": "assets/images/scenes/scenario-04-sync-bias/s04_01_scene.png",
@@ -93,7 +94,13 @@
     "assets/images/characters/professor-pixel/pp_04_encouraging_v2.png",
     "assets/images/characters/professor-pixel/pp_05_skeptical_v2.png",
     "assets/images/characters/professor-pixel/pp_06_proud_v2.png",
-    "assets/images/ui/shanel_profile.jpg"
+    "assets/images/ui/shanel_profile.jpg",
+    "assets/images/characters/professor-pixel/pp_01_neutral_v3.png",
+    "assets/images/characters/professor-pixel/pp_02_thinking_v3.png",
+    "assets/images/characters/professor-pixel/pp_03_excited_v3.png",
+    "assets/images/characters/professor-pixel/pp_04_encouraging_v3.png",
+    "assets/images/characters/professor-pixel/pp_06_proud_v3.png",
+    "assets/images/ui/ui_03_charles_babbage.png"
   ],
   "runtime_audio": {
     "music_01_background.mp3": "assets/audio/music/music_01_background.mp3",

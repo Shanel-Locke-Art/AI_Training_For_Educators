@@ -11,16 +11,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PromptCraft – The Prompt Lab</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=616">
+<link rel="stylesheet" href="runtime/css/promptcraft.css?v=429&patch=628">
 <!-- Production CSS is generated from src/css by tools/build.py. -->
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 <!-- PromptCraft game scripts -->
-<script src="runtime/js/dialogue-data.js?v=149&amp;patch=616"></script>
-<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=616&amp;receiver=94&amp;connections=514"></script>
+<script src="runtime/js/dialogue-data.js?v=149&amp;patch=628"></script>
+<script src="runtime/js/promptcraft.bundle.js?v=429&amp;patch=628&amp;receiver=95&amp;connections=514"></script>
 
+<link rel="icon" href="favicon.ico?v=628" type="image/x-icon">
 </head>
 
 <body>
@@ -81,7 +81,7 @@
      aria-hidden="true" hidden>
   <div class="audio-setup-modal" role="document">
     <div class="audio-setup-pixel" aria-hidden="true">
-      <img data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral_v3.png" data-pc-fallback="images/pixel-neutral.png" alt="" />
+      <img data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral_v4.png" data-pc-fallback="images/pixel-neutral.png" alt="" />
     </div>
 
     <p class="audio-setup-speaker">Professor Pixel</p>
@@ -374,10 +374,10 @@
             <button class="pc-menu-action" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="scenarios">
               Scenario Select
             </button>
-            <button class="pc-menu-action" type="button" data-pc-action="open-ideas-wall" aria-label="Open the Ideas Wall in a new tab">
+            <button class="pc-menu-action pc-menu-action-utility" type="button" data-pc-action="open-ideas-wall" aria-label="Open the Ideas Wall in a new tab">
               Ideas Wall
             </button>
-            <button class="pc-menu-action" id="menuCourseGuideBtn" type="button"
+            <button class="pc-menu-action pc-menu-action-utility" id="menuCourseGuideBtn" type="button"
                     data-pc-action="open-saved-course-guide">
               My Course Guide
             </button>
@@ -406,7 +406,7 @@
 
     <section class="pc-menu-panel" id="menuPanelScenarios" data-menu-panel="scenarios" hidden>
       <div class="pc-menu-panel-heading">
-        <button class="pc-menu-back" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home">← Main Menu</button>
+
         <p class="pc-menu-eyebrow">Scenario Select</p>
         <h2>Choose a training scenario</h2>
         <p>Start with Scenario 1, or explore the heading-repair preview in Scenario 2. Later scenarios are still in development.</p>
@@ -416,7 +416,7 @@
 
     <section class="pc-menu-panel" id="menuPanelHowToPlay" data-menu-panel="how-to-play" hidden>
       <div class="pc-menu-panel-heading">
-        <button class="pc-menu-back" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home">← Main Menu</button>
+
         <p class="pc-menu-eyebrow">How to Play</p>
         <h2>Observe, predict, test, and revise.</h2>
       </div>
@@ -446,7 +446,7 @@
 
     <section class="pc-menu-panel" id="menuPanelAbout" data-menu-panel="about" hidden>
       <div class="pc-menu-panel-heading">
-        <button class="pc-menu-back" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home">← Main Menu</button>
+
         <p class="pc-menu-eyebrow">About PromptCraft</p>
         <h2>Teaching, judgment, and thoughtful AI use.</h2>
         <p>PromptCraft combines scenario-based practice, reflective decision-making, and game-informed faculty development.</p>
@@ -489,7 +489,7 @@
 
     <section class="pc-menu-panel pc-menu-babbage-panel" id="menuPanelBabbage" data-menu-panel="babbage" hidden>
       <div class="pc-menu-panel-heading pc-babbage-panel-heading">
-        <button class="pc-menu-back" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home">← Main Menu</button>
+
         <p class="pc-menu-eyebrow">Meet Babbage</p>
         <h2>Meet the namesake behind the machine.</h2>
         <p>PromptCraft uses Babbage as the name of its analysis system. The name is a nod to Charles Babbage and the early history of programmable computing.</p>
@@ -498,7 +498,7 @@
       <div class="pc-babbage-hero">
         <figure class="pc-babbage-portrait-card">
           <div class="pc-babbage-portrait-frame">
-            <img src="assets/images/ui/ui_03_charles_babbage.png" alt="Stylized portrait of Charles Babbage.">
+            <img src="assets/images/ui/ui_03_charles_babbage_v2.png" alt="Full-color AI visualization of Charles Babbage.">
           </div>
           <figcaption>
             <strong>Charles Babbage</strong>
@@ -553,7 +553,7 @@
 
     <section class="pc-menu-panel" id="menuPanelResearch" data-menu-panel="research" hidden>
       <div class="pc-menu-panel-heading">
-        <button class="pc-menu-back" type="button" data-pc-action="show-main-menu-panel" data-pc-panel="home">← Main Menu</button>
+
         <p class="pc-menu-eyebrow">Research &amp; Privacy</p>
         <h2>Know what the prototype records.</h2>
         <p>This plain-language notice describes the current development build. It is not a substitute for formal informed consent.</p>
@@ -589,7 +589,7 @@
 
     <div class="pc-main-menu-footer">
       <span id="mainMenuStatus">Select an option to begin.</span>
-    <span id="mainMenuVersion" data-pc-app-version>Version 429 · Patch 616</span>
+    <span id="mainMenuVersion" data-pc-app-version>Version 429 · Patch 628</span>
     </div>
   </div>
 </div>
@@ -637,7 +637,7 @@
      data-pc-keys="Enter Space">
   <!-- Real portrait — shown when images exist -->
   <img class="pixel-badge-portrait" id="pixelBadgeImg"
-       data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral_v3.png" data-pc-fallback="images/pixel-neutral.png"
+       data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral_v4.png" data-pc-fallback="images/pixel-neutral.png"
        data-pc-fallback-element="pixelBadgeFallback"
        alt="Professor Pixel" />
   <!-- Fallback -->
@@ -648,7 +648,7 @@
 <!-- ── PROFESSOR PIXEL COACH CARD ──────────────────── -->
 <div class="pixel-coach-card" id="pixelCoachCard" role="status" aria-live="polite">
   <img class="pixel-coach-portrait" id="pixelCoachImg"
-       data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral_v3.png" data-pc-fallback="images/pixel-neutral.png"
+       data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral_v4.png" data-pc-fallback="images/pixel-neutral.png"
        data-pc-fallback-element="pixelCoachFallback"
        alt="Professor Pixel" />
   <div class="pixel-coach-fallback" id="pixelCoachFallback" style="display:none;">🧑‍🏫</div>
@@ -741,7 +741,7 @@
         <text x="100" y="310" text-anchor="middle" font-family="sans-serif" font-size="9" fill="rgba(168,213,181,0.6)">[placeholder — replace with your art]</text>
       </svg>
 
-      <img id="vnPortrait" data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral_v3.png" data-pc-fallback="images/pixel-neutral.png"
+      <img id="vnPortrait" data-pc-image="assets/images/characters/professor-pixel/pp_01_neutral_v4.png" data-pc-fallback="images/pixel-neutral.png"
            alt=""
            aria-hidden="true"
            style="display:none;"

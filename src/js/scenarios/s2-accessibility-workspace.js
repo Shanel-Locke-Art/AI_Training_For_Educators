@@ -47,7 +47,7 @@ function pcRenderS2AccessResource() {
   return {
     title: 'Inspect the page Lena sees', help: 'Read the page, then check whether its section titles work as headings.', context: 'Learning page',
     quote: 'The titles look different from the paragraphs, but my reading tool cannot jump between them.',
-    content: pcS2AccessPage(`${PC_S2_PAGE_HTML}${pcRenderS2HeadingLesson()}${pcRenderS2ReaderDemo()}<details><summary>Check the headings</summary>${pcS2AccessOutline('')}<p>A reading tool cannot use these titles to move between sections.</p></details>`,
+    content: pcS2AccessPage(`${PC_S2_PAGE_HTML}<section class="pc-s2-page-inspection" aria-labelledby="pcS2InspectionTitle"><span class="pc-s1-result-eyebrow">Inspect the page structure</span><h2 id="pcS2InspectionTitle">Why Lena cannot jump between sections</h2>${pcRenderS2HeadingLesson()}<section class="pc-s2-access-visible-section pc-s2-heading-check"><h3>What heading navigation finds on this page</h3>${pcS2AccessOutline('')}<p>Lena can hear the words, but she cannot use the section titles to jump straight to the evidence or directions.</p><p><strong>Your repair:</strong> Keep the wording and make the section titles real headings.</p></section>${pcRenderS2ReaderDemo()}</section>`,
       `<nav class="pc-s1-canvas-prev-next" aria-label="Canvas item navigation">${pcS2AccessButton('s2-access-explore', 'Back to Modules', false, true)}${pcS2AccessButton('s2-access-identify', 'Continue')}</nav>`)
   };
 }
@@ -73,10 +73,10 @@ function pcRenderS2AccessRequest() {
     content: `<div class="pc-s1-rename-instructions"><h1>Repair the learning page</h1><p>The page HTML is attached. You can describe the repair in ordinary language.</p></div>
       <section class="pc-s1-rename-editor pc-s2-access-editor" aria-labelledby="pcS2RequestLabel">
         <div class="pc-s1-rename-editor-heading"><span>Page to repair</span><strong>Interpret a community survey</strong></div>
-        <label id="pcS2RequestLabel" for="pcS2Request">Your request to Babbage</label><textarea id="pcS2Request" rows="5" data-pc-input-action="s2-access-request">${esc(state.request)}</textarea>
-        <details><summary>See the attached page HTML</summary><textarea id="pcS2SourceHtml" class="pc-s2-access-code" rows="8" readonly aria-label="Original page HTML">${esc(PC_S2_PAGE_HTML)}</textarea>${pcS2AccessButton('s2-access-copy-source', 'Copy page HTML', false, true)}</details>
-        <div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-generate', 'Ask Babbage', state.busy || !state.request.trim())}${pcS2AccessButton('s2-access-identify', 'Review decision', false, true)}</div>
-        <details><summary>Practice without a live AI response</summary><p>Use a prepared example to try the same repair steps.</p>${pcS2AccessButton('s2-access-example', 'Use example repair', state.busy, true)}</details>
+        <label id="pcS2RequestLabel" for="pcS2Request">Your request to Babbage</label><p id="pcS2RequestHelp">You can use this request as written or adjust it below.</p><textarea id="pcS2Request" rows="5" aria-describedby="pcS2RequestHelp" data-pc-input-action="s2-access-request">${esc(state.request)}</textarea>
+        <div class="pc-s2-access-actions pc-s2-request-actions">${pcS2AccessButton('s2-access-generate', 'Ask Babbage', state.busy || !state.request.trim())}${pcS2AccessButton('s2-access-identify', 'Review decision', false, true)}</div>
+        <section class="pc-s2-access-visible-section pc-s2-reference"><h3>Attached page HTML</h3><p>Already attached to your request. You do not need to edit this reference.</p><textarea id="pcS2SourceHtml" class="pc-s2-access-code" rows="5" readonly aria-label="Original page HTML, reference only">${esc(PC_S2_PAGE_HTML)}</textarea>${pcS2AccessButton('s2-access-copy-source', 'Copy page HTML', false, true)}</section>
+        <section class="pc-s2-access-visible-section"><h3>Practice without a live AI response</h3><p>Use a prepared example to try the same repair steps.</p>${pcS2AccessButton('s2-access-example', 'Use example repair', state.busy, true)}</section>
       </section>`
   };
 }
@@ -88,7 +88,7 @@ function pcRenderS2AccessReview() {
     content: `<section class="pc-s1-checkpoint-card pc-s1-diagnosis-result-card">
       <span class="pc-s1-result-eyebrow">${state.source === 'live' ? 'Babbage repair' : 'Built-in example repair'}</span><h2>Same information. Clearer structure.</h2><p>${esc(state.explanation || 'The section titles now use real headings. Before you submit belongs under Your task.')}</p>
       ${pcRenderS2ReaderDemo()}<div class="pc-s2-access-compare"><section><h3>Before</h3>${pcS2AccessOutline('')}</section><section><h3>After</h3>${pcS2AccessOutline(state.draft)}</section></div>
-      <details><summary>See the repaired HTML</summary><textarea id="pcS2DraftHtml" class="pc-s2-access-code" rows="8" readonly aria-label="Repaired page HTML">${esc(state.draft)}</textarea>${pcS2AccessButton('s2-access-copy-draft', 'Copy repaired HTML', false, true)}</details>
+      <section class="pc-s2-access-visible-section"><h3>See the repaired HTML</h3><textarea id="pcS2DraftHtml" class="pc-s2-access-code" rows="8" readonly aria-label="Repaired page HTML">${esc(state.draft)}</textarea>${pcS2AccessButton('s2-access-copy-draft', 'Copy repaired HTML', false, true)}</section>
       <div class="pc-s1-diagnosis-result-actions">${pcS2AccessButton('s2-access-revise', 'Revise request', false, true)}${pcS2AccessButton('s2-access-open-editor', 'Continue')}</div>
     </section>`
   };
@@ -106,8 +106,8 @@ function pcRenderS2AccessVerify() {
     title: 'Check the page before saving', help: 'AI makes the repair. You check the result.', context: 'Page preview',
     quote: 'Check that I can find the sections and still have the same evidence, directions, and link.',
     content: pcS2AccessPage(result.ok ? result.html : '') + `<section class="pc-s2-access-checks"><h2>Check your repair</h2>
-      <details><summary>Compare with the original</summary><article class="pc-s1-canvas-richtext">${PC_S2_PAGE_HTML}</article></details>
-      <details><summary>Check the heading outline</summary>${pcS2AccessOutline(state.pasted)}</details>${pcRenderS2ReaderDemo()}
+      <section class="pc-s2-access-visible-section"><h3>Compare with the original</h3><article class="pc-s1-canvas-richtext">${PC_S2_PAGE_HTML}</article></section>
+      <section class="pc-s2-access-visible-section"><h3>Check the heading outline</h3>${pcS2AccessOutline(state.pasted)}</section>${pcRenderS2ReaderDemo()}
       ${PC_S2_REPAIR_CHECKS.map(({ id, label }) => `<label><input type="checkbox" data-pc-change-action="s2-access-check" data-pc-check="${id}" ${state.checked.has(id) ? 'checked' : ''}> ${esc(label)}</label>`).join('')}
       <div class="pc-s2-access-actions">${pcS2AccessButton('s2-access-back-editor', 'Back to editor', false, true)}${pcS2AccessButton('s2-access-apply', 'Save checked page', !pcS2AccessChecksComplete())}</div></section>`
   };
@@ -118,8 +118,8 @@ function pcRenderS2AccessComplete() {
     quote: 'I can move between the sections now. It is easier to find the evidence and return to what I need to submit.',
     content: `<section class="pc-s1-checkpoint-card pc-s1-diagnosis-result-card"><span class="pc-s1-result-eyebrow">Your checked repair</span><h2>A small repair makes a difference</h2><p>You used ${pcS2AccessState.source === 'live' ? 'Babbage' : 'a built-in example'} to turn visual titles into real headings, then checked the result before saving.</p>
       <h3>Try this in your own course</h3><p>Open a Canvas page’s HTML editor, copy its HTML into an AI request, and ask for a heading repair. Paste the checked result back, preview the page, and run your available accessibility checker.</p>
-      <details><summary>Keep this request</summary><textarea id="pcS2ReusablePrompt" rows="5" readonly aria-label="Reusable AI request">${esc(pcS2AccessState.request)}</textarea></details>
-      <details><summary>Course-design connection</summary><p>OSCQR 21 and WCAG 2.1 1.3.1 and 2.4.6 connect this repair to readable, meaningful page structure. This is one accessibility improvement, not a full accessibility review.</p></details>
+      <section class="pc-s2-access-visible-section"><h3>Keep this request</h3><textarea id="pcS2ReusablePrompt" rows="5" readonly aria-label="Reusable AI request">${esc(pcS2AccessState.request)}</textarea></section>
+      <section class="pc-s2-access-visible-section"><h3>Course-design connection</h3><p>OSCQR 21 and WCAG 2.1 1.3.1 and 2.4.6 connect this repair to readable, meaningful page structure. This is one accessibility improvement, not a full accessibility review.</p></section>
       <div class="pc-s1-diagnosis-result-actions">${pcS2AccessButton('s2-access-revisit', 'Review repair', false, true)}${pcS2AccessButton('s2-access-reset', 'Practice again', false, true)}${pcS2AccessButton('open-main-menu', 'Return to Main Menu')}</div>
     </section>`
   };

@@ -196,7 +196,7 @@ def parse_rules(
         header = text[cursor:open_index].strip()
         body = text[open_index + 1 : close_index]
         normalized_header = normalize(header)
-        if header.startswith("@media") or header.startswith("@keyframes"):
+        if header.startswith("@media") or header.startswith("@keyframes") or header.startswith("@layer"):
             rules.extend(
                 parse_rules(
                     body,

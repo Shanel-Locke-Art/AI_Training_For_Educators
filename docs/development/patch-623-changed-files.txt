@@ -1,0 +1,8 @@
+README.md
+docs/development/patch-623-changed-files.txt
+docs/development/patch-623-s2-readability.md
+index.html
+runtime/css/promptcraft.css
+runtime/js/promptcraft.bundle.js
+src/css/scenarios/s2-accessibility.css
+src/js/scenarios/s2-accessibility-reader.js

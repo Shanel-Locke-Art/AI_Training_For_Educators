@@ -1,0 +1,182 @@
+/* P624: task-first presentation for the current production S1/S2 loop.
+   Narrative scenes retain their artwork. Activity screens use a quiet surface.
+   Keep supporting guidance visible; only redundant progress chrome is reduced. */
+@media screen {
+  html body .pc-s1-learning {
+    width: min(calc(100% - 24px), 1440px);
+    padding: 16px;
+    background: #edf4f8;
+  }
+  html body .pc-s1-learning-taskbar {
+    background: #12355b;
+    padding: 16px 20px;
+    border: 0;
+    border-bottom: 3px solid #efbc40;
+  }
+  html body .pc-s1-learning-taskbar h1 {
+    font-size: clamp(1.45rem, 2.2vw, 2rem);
+    line-height: 1.2;
+  }
+  html body .pc-s1-learning-task-status {
+    padding: 4px 0;
+    background: transparent;
+    border: 0;
+    font-family: var(--pc-font-body);
+    font-size: .9rem;
+    color: #e0edf5;
+  }
+  html body .pc-s1-learning-shell {
+    background: #edf4f8;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  html body .pc-s1-learning-workspace { padding: 0; gap: 16px; }
+  html body .pc-s1-canvas-frame { border: 1px solid #b9cbd7; border-radius: 6px; box-shadow: none; }
+  html body .pc-s1-learning-workspace > .pc-s1-maya-panel {
+    background: #e2edf4;
+    border: 0;
+    border-radius: 6px;
+  }
+  html body .pc-s1-learning-workspace > .pc-s1-maya-panel .pc-s1-maya-panel-inner { background: transparent; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-quote {
+    border: 0;
+    border-left: 3px solid #79a8c1;
+    border-radius: 0;
+    padding: 10px 14px;
+    background: transparent;
+    box-shadow: none;
+  }
+  html body .pc-s1-learning-workspace .pc-s1-maya-quote span { color: #12355b; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-quote p { color: #243e52; }
+  html body :is(.pc-s1-checkpoint-card,.pc-s1-diagnosis-card) {
+    margin: 0;
+    border: 1px solid #b9cbd7;
+    box-shadow: none;
+    background: #fff;
+  }
+  html body .pc-s1-diagnosis-purpose {
+    border: 0;
+    border-bottom: 1px solid #d4e1e9;
+    padding: 0 0 16px;
+    background: transparent;
+  }
+  html body .pc-s1-diagnosis-guided { gap: 24px; }
+  html body .pc-s1-diagnosis-guided .pc-s1-diagnosis-rationale {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  html body .pc-s1-diagnosis-guided .pc-s1-diagnosis-context {
+    border: 0;
+    padding: 12px 14px;
+    background: #edf4f8;
+  }
+  html body .pc-s1-diagnosis-submit-area { border: 0; border-top: 1px solid #d4e1e9; background: transparent; padding: 18px 0 0; }
+  html body .pc-s1-my-course-layout { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 24px; padding: 0; }
+  html body .pc-s1-my-course-card { background: #fff; border: 1px solid #b9cbd7; box-shadow: none; }
+  html body .pc-s1-my-course-summary { background: transparent; border: 0; border-top: 1px solid #b9cbd7; box-shadow: none; padding: 20px 8px; }
+  html body .pc-s1-my-course-summary h2 { font-size: 1.15rem; }
+  html body .pc-s1-my-course-card label { font-size: 1rem; }
+  html body .pc-s1-transfer-reflection { background: #edf4f8; border: 0; padding: 20px; }
+  html body .pc-s1-transfer-field { border: 0; background: transparent; padding: 0; }
+  html body .pc-s1-transfer-field label { min-height: 104px; }
+  html body .pc-s1-learning :is(input[type="text"],textarea):not([readonly]) {
+    border: 2px solid #5483a3;
+    background: #fff;
+    color: #17364e;
+    font-size: 1rem;
+  }
+  html body .pc-s1-learning :is(input[type="text"],textarea)::placeholder { color: #516a7c; opacity: 1; font-style: normal; }
+  html body .pc-s1-learning :is(input[type="text"],textarea):focus-visible { outline: 3px solid #efbc40; outline-offset: 3px; }
+  html body .pc-s1-learning textarea[readonly] { background: #edf2f5; border: 1px solid #b9cbd7; color: #40586a; }
+  html body .pc-s2-access-visible-section { padding: 20px 0 0; border: 0; border-top: 1px solid #d4e1e9; border-radius: 0; background: transparent; }
+  html body .pc-s2-access .pc-s2-access-editor { border: 0; background: #fff; padding: 0; }
+  html body .pc-s2-access .pc-s2-request-actions { margin: 16px 0 28px; }
+  html body #pcS2RequestHelp { margin: 8px 0 12px; color: #40586a; line-height: 1.5; }
+  html body .pc-s2-reader-demo { border: 0; border-top: 1px solid #d4e1e9; background: transparent; padding: 16px 0; }
+  html body .pc-s2-heading-explainer-grid > section { background: transparent; border: 0; border-left: 2px solid #d4e1e9; border-radius: 0; padding: 0 16px; }
+  html body .pc-s2-access .pc-s2-heading-check { padding: 20px 0; margin: 24px 0; background: transparent; border-left: 0; }
+  html body .pc-s2-access-checks { padding: 20px 0; border: 0; border-top: 1px solid #b9cbd7; background: transparent; }
+  html body .pc-s2-access-checks > label { margin: 8px 0; padding: 12px; background: #edf4f8; border-radius: 5px; cursor: pointer; }
+  /* Reduce repeated navigation decoration without changing Canvas controls. */
+  html body .pc-s1-my-course-canvas-bar { background: #edf4f8; color: #12355b; border-bottom: 1px solid #b9cbd7; }
+  html body .pc-s1-my-course-canvas-bar strong,
+  html body .pc-s1-my-course-canvas-bar span:last-child { color: #12355b; }
+  html body .pc-s1-my-course-review-page h2 { font-size: clamp(1.4rem, 2vw, 1.8rem); max-width: 40ch; }
+  html body .pc-s1-my-course-review-page { max-width: 1120px; margin: 0 auto; }
+  html body .pc-s1-my-course-review-links .pc-s1-next-step-link { margin-left: auto; background: #e2edf4; border: 1px solid #79a8c1; text-decoration: none; }
+  html body #pcS1ReviewNextStep { scroll-margin-top: 120px; }
+  /* Keep level and earned XP visible; the separate leaderboard stays in progress details. */
+  html body .pc-app-header .pc-progress-menu .header-status {
+    min-height: 52px !important;
+    min-width: 0 !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    padding: 8px 12px !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  html body .pc-app-header .header-status :is(.pc-challenge-card,.pc-progress-summary-kicker,.pc-progress-view-label) { display: none !important; }
+  html body .pc-app-header .pc-progress-menu .level-tag { top: 0 !important; font-size: .9rem !important; }
+  html body .pc-app-header .pc-progress-menu .xp-track { height: 7px !important; min-width: 90px !important; }
+  html body .pc-app-header .pc-progress-menu .xp-group { grid-template-columns: minmax(90px,1fr) auto !important; }
+  html body .pc-app-header .pc-progress-level-badge { border: 0 !important; background: transparent !important; }
+  #mainMenuOverlay .pc-menu-action-utility { background: #e2edf4 !important; border: 1px solid #b9cbd7 !important; min-height: 44px; text-decoration: none !important; }
+  #mainMenuOverlay .pc-menu-action-utility:hover { background: #e3f1fa !important; }
+  #mainMenuOverlay .pc-menu-qr-card { border: 0; background: transparent !important; }
+  #mainMenuOverlay .pc-menu-data-summary { border: 0; border-left: 3px solid #efbc40; border-radius: 0; background: transparent !important; padding: 16px 20px; }
+  #mainMenuOverlay .pc-menu-info-grid article { border: 0 !important; border-top: 1px solid #cbdbe5 !important; border-radius: 0; background: transparent !important; }
+  /* The short S2 report was inheriting tiny terminal text despite ample space. */
+  html body #babbageTerminalOutput .pc-s2-access-report { padding: 16px; font-family: var(--pc-font-label); }
+  html body #babbageTerminalOutput .pc-s2-access-report :is(p,span) { font-size: 1rem !important; line-height: 1.6 !important; }
+  html body #babbageTerminalOutput .pc-s2-access-report h2 { font-size: 1.4rem !important; line-height: 1.35 !important; margin: 10px 0 16px; }
+  html body #babbageTerminalOutput .pc-s2-access-report h3 { font-size: 1.1rem !important; line-height: 1.4 !important; margin: 20px 0 8px; }
+}
+@media screen and (max-width: 1100px) {
+  html body .pc-s1-transfer-field label { min-height: 0; }
+}
+@media screen and (max-width: 1050px) {
+  html body .pc-s1-learning-workspace { height: auto; min-height: 0; max-height: none; overflow: visible; gap: 12px; }
+  html body .pc-s1-learning-workspace > .pc-s1-canvas-frame { height: auto; overflow: visible; flex: none; }
+  html body .pc-s1-learning-workspace .pc-s1-canvas-app,
+  html body .pc-s1-learning-workspace .pc-s1-canvas-course-body { min-height: 0; }
+  html body .pc-s1-learning-workspace > .pc-s1-maya-panel { flex: none; height: auto; }
+  html body .pc-s1-learning-workspace > .pc-s1-maya-panel .pc-s1-maya-panel-inner { height: auto; grid-template-columns: minmax(0,1fr) 72px; gap: 8px; padding: 8px 12px; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-art-wrap,
+  html body .pc-s1-learning-workspace .pc-s1-maya-art { height: 80px; max-height: 80px; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-quote { max-height: none; overflow: visible; padding: 4px 10px; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-quote p { font-size: .9rem; line-height: 1.45; }
+  html body .pc-s1-diagnosis-card { height: auto; overflow: visible; }
+  html body .pc-s1-my-course-layout { grid-template-columns: 1fr; }
+  html body .pc-s1-my-course-summary { order: 1; }
+}
+@media screen and (max-width: 640px) {
+  html body .pc-app-header { padding: 6px 10px !important; row-gap: 0 !important; }
+  html body .pc-app-header .pc-brand-summary { min-height: 48px !important; padding: 4px !important; }
+  html body .pc-app-header .pc-progress-menu { width: 100% !important; }
+  html body .pc-app-header .pc-progress-menu .header-status { min-height: 32px !important; padding: 4px 8px !important; }
+  html body .pc-app-header .pc-progress-summary-copy { display: flex !important; align-items: center !important; gap: 12px !important; }
+  html body .pc-app-header .pc-progress-menu .level-tag { width: auto !important; font-size: .8rem !important; }
+  html body .pc-app-header .pc-progress-menu .xp-group { display: block !important; }
+  html body .pc-app-header .pc-progress-menu .xp-track { display: none !important; }
+  html body .pc-s1-learning { width: 100%; padding: 8px; }
+  html body .pc-s1-learning-taskbar { padding: 12px 14px; gap: 4px; margin-bottom: 12px; }
+  html body .pc-s1-learning-taskbar > div:first-child > span { font-size: .7rem; letter-spacing: .05em; margin-bottom: 4px; }
+  html body .pc-s1-learning-taskbar h1 { font-size: 1.4rem; }
+  html body .pc-s1-learning-taskbar p { font-size: .9rem; line-height: 1.45; }
+  html body .pc-s1-learning-task-status { align-self: start; text-align: left; font-size: .8rem; }
+  html body .pc-s1-learning-workspace > .pc-s1-maya-panel .pc-s1-maya-panel-inner { grid-template-columns: minmax(0,1fr) 60px; padding: 8px; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-quote span { font-size: .85rem; margin-bottom: 2px; }
+  html body .pc-s1-learning-workspace .pc-s1-maya-art-wrap,
+  html body .pc-s1-learning-workspace .pc-s1-maya-art { height: 72px; max-height: 72px; }
+  html body :is(.pc-s1-renaming,.pc-s1-diagnosis) .pc-s1-learning-workspace > .pc-s1-maya-panel { order: 1; }
+  html body .pc-s1-my-course-card { padding: 20px 16px; }
+  html body .pc-s1-my-course-summary { padding: 16px 8px; }
+  html body .pc-s1-transfer-reflection { padding: 16px; }
+  html body .pc-s1-diagnosis-guided { gap: 28px; }
+  html body .pc-s2-access .pc-s2-diagnosis-footer { position: static; }
+  html body .pc-s1-my-course-review-canvas { max-height: none; overflow: visible; }
+  html body .pc-s1-my-course-review-links .pc-s1-next-step-link { margin-left: 0; }
+  html body #pcS1ReviewNextStep { scroll-margin-top: 16px; }
+}

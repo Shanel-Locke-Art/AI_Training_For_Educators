@@ -676,3 +676,38 @@ body :is(
   .wall-brand-summary { width: 100%; }
   .wall-brand-panel { width: min(280px, calc(100vw - 24px)); }
 }
+
+/* P624: let the ideas, rather than statistics and nested panels, lead. */
+:root { --ink-900:#12355b; --ink-700:#344b5e; --ink-500:#516a7c; --line:#cbdbe5; }
+body { background:#f3f7fa; }
+.hero-inner { grid-template-columns:minmax(0,1fr); gap:24px; padding:28px 0; }
+.hero h1 { font-size:clamp(2rem,4vw,3rem); }
+.hero-copy p { color:#e0edf5; }
+.stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; max-width:780px; }
+.stat-card { min-height:0; display:block; padding:0 16px 0 0; background:transparent; border:0; border-right:1px solid #79a8c1; border-radius:0; box-shadow:none; }
+.stat-card:last-child { border-right:0; }
+.stat-icon,.stat-note { display:none; }
+.stat-value { font-size:1.2rem; }
+.stat-label { font-size:.8rem; line-height:1.4; color:#e0edf5; }
+.filter-btn,.sort-control select { font-size:.85rem; min-height:44px; }
+.sample-note { color:#40586a; font-size:.75rem; letter-spacing:.04em; text-align:center; border:0; background:transparent; }
+.idea-card { background:#fff; border-radius:8px; box-shadow:none; animation:none; }
+.idea-card:hover { transform:none; box-shadow:none; }
+.idea-panel { padding:0; background:transparent; border:0; border-radius:0; }
+.idea-body { max-height:none; overflow:visible; font-size:1rem; line-height:1.65; }
+.idea-title { font-size:1.3rem; margin-bottom:16px; }
+.scenario-tag { font-size:.7rem; letter-spacing:.04em; border:0; border-radius:4px; color:#12355b; background:#e2edf4; }
+.sample-badge { font-size:.7rem; color:#40586a; }
+.idea-meta { font-size:.8rem; color:#40586a; }
+.filter-btn:focus-visible,.sort-control select:focus-visible { outline:3px solid #efbc40; outline-offset:3px; }
+@media(max-width:680px) {
+ .hero-inner { padding:24px 0; gap:20px; }
+ .stats { gap:12px; }
+ .stat-card { padding-right:8px; }
+ .stat-value { font-size:1rem; }
+ .stat-label { font-size:.75rem; }
+ .filters { flex-wrap:wrap; overflow:visible; }
+ .filter-btn { padding:8px 12px; }
+}
+
+@layer pcTypography { body, body *, body *::before, body *::after { font-family: Arial, Helvetica, sans-serif !important; } }

@@ -5,10 +5,10 @@
    ══════════════════════════════════════════════════════ */
 
 :root {
-  --pc-font-body: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --pc-font-display: "Fraunces", Georgia, serif;
-  --pc-font-label: "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --pc-font-canvas: Lato, "Helvetica Neue", Arial, sans-serif;
+  --pc-font-body: Arial, Helvetica, sans-serif;
+  --pc-font-display: Arial, Helvetica, sans-serif;
+  --pc-font-label: Arial, Helvetica, sans-serif;
+  --pc-font-canvas: Arial, Helvetica, sans-serif;
   --gfc-navy: #112650;
   --gfc-navy-deep: #081a36;
   --gfc-blue: #086c9f;

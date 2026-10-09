@@ -1,0 +1,16 @@
+README.md
+assets/asset-manifest.json
+assets/images/characters/professor-pixel/README.md
+assets/images/characters/professor-pixel/pp_01_neutral_v4.png
+assets/images/characters/professor-pixel/pp_02_thinking_v4.png
+assets/images/characters/professor-pixel/pp_03_excited_v4.png
+assets/images/characters/professor-pixel/pp_04_encouraging_v4.png
+assets/images/characters/professor-pixel/pp_06_proud_v4.png
+assets/images/characters/professor-pixel/pp_07_listening_left_v4.png
+docs/development/patch-617-changed-files.txt
+docs/development/patch-617-pixel-eye-contact.md
+index.html
+runtime/js/promptcraft.bundle.js
+src/js/app/config-and-assets.js
+src/js/ui/visual-novel.js
+tools/test_story_formatting.cjs

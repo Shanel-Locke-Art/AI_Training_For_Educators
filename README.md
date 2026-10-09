@@ -1,6 +1,6 @@
 # PromptCraft
 
-Current application: `PROMPTCRAFT_V429`, browser patch `616`, research schema `V121`, Apps Script receiver source `V94`, asset manifest `v156`.
+Current application: `PROMPTCRAFT_V429`, browser patch `628`, research schema `V121`, Apps Script receiver source `V95`, asset manifest `v158`.
 
 Scenario 1 is **Start With the Learning** with Maya and Professor Pixel. Its controller is `src/js/scenarios/s1-start-with-learning.js`; production responsibilities live in `s1-learning-*.js`, selected by `src/js/scenarios/registry.js`. The internal `content-avalanche` scenario key remains for saved data and research compatibility.
 
@@ -10,7 +10,7 @@ Scenario 1 is **Start With the Learning** with Maya and Professor Pixel. Its con
 - Run `python tools/build.py` after source changes, then `python tools/build.py --check` to confirm the browser files match.
 - Run `python tools/audit_assets.py` and `python tools/audit_css.py` when changing assets or styles.
 - `index.html` opens the game; `wall.html` opens the Ideas Wall. `netlify/functions/babbage.js` owns the Babbage server contract.
-- `apps-script/PromptCraft_Receiver_V94_Start_With_Learning.js` is the retained receiver source. After deploying it as a new web-app version, run `initializeWorkbookNow()` once. V94 presents focused S1 evidence, hides redundant technical views, and preserves detailed recovery records in raw history. During testing, `resetResearchDataNow()` clears collected test records without removing headers or workbook structure. `inspectS1TrackingNow()` provides a privacy-safe count of the S1 event types received.
+- `apps-script/PromptCraft_Receiver_V95_Start_With_Learning.js` is the current receiver source. After deploying it as a new web-app version, run `initializeWorkbookNow()` once. V95 separates the guided S1 responses in the readable view while retaining original responses and raw history. See `docs/development/receiver-v95-deployment.md`. During testing, `resetResearchDataNow()` clears collected test records without removing headers or workbook structure. `inspectS1TrackingNow()` provides a privacy-safe count of the S1 event types received.
 
 ## Production references
 
@@ -18,7 +18,7 @@ Scenario 1 is **Start With the Learning** with Maya and Professor Pixel. Its con
 - `docs/development/s1-removal-audit.md` records remaining legacy source dependencies.
 - `docs/asset-management/` contains the S1 artwork lists, recording scripts, and production trackers.
 
-Historical patch packages, test suites, and retired recording guides were removed from this working package. The original uploaded repository ZIP remains a separate backup. Receiver V94 remains the existing S1 receiver. This patch does not change its deployment or initialization requirements. Complete a hosted S1 smoke pass before participant testing.
+Historical patch packages, test suites, and retired recording guides were removed from this working package. The original uploaded repository ZIP remains a separate backup. Receiver V94 remains available as the previous source. Use V95 with Patch 620 to display the new guided responses separately. Complete a hosted S1 smoke pass before participant testing.
 
 ## S2 heading-repair preview (Patch 603)
 
@@ -101,3 +101,5 @@ Paragraph/Heading dropdown to explore structure, or use the **</>** button below
 editor to paste Babbage’s HTML repair. Return to the visual view before checking the page.
 This is a focused practice recreation, not a live Canvas or Microsoft connection.
 Apply over Patch 607. See `docs/development/patch-608-canvas-reading-and-editor.md`.
+
+Patch 620 adds separate guided-response columns to receiver V95 and long-address/clear-label listening examples to S2. S2 remains a heading-repair practice preview with no new completion or research events.

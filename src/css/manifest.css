@@ -28,3 +28,9 @@
 
 /* Final owner for all main-menu panels. */
 @import url("ui/main-menu.css");
+
+/* Shared activity hierarchy and mobile task visibility. */
+@import url("ui/task-focus.css");
+
+/* Unified course-interface typography and Babbage portrait. */
+@import url("ui/typography.css");

@@ -369,38 +369,49 @@ function pcRenderS1Diagnosis() {
   area.innerHTML = pcRenderLearningStage({
     className: 'pc-s1-diagnosis', titleId: 'pcS1DiagnosisTitle',
     background: sceneBg,
-    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1DiagnosisTitle', label: `Scenario 1 · Start With the Learning`, title: `Check whether the activities match the learning`, instruction: `Clear navigation helps Maya find the work. Alignment determines whether that work lets her demonstrate the intended learning.`, status: `Alignment check` }),
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1DiagnosisTitle', label: `Scenario 1 · Start With the Learning`, title: `Check whether the activities match the learning`, instruction: `Use the goal and current work below to make three small decisions.`, status: `Goal → Current work → Compare` }),
     bodyHTML: pcRenderLearningWorkspace({
       mainHTML: `<form class="pc-s1-diagnosis-card" data-pc-submit-action="s1-learning-submit-diagnosis" aria-labelledby="pcS1DiagnosisQuestion">
             <div class="pc-s1-diagnosis-purpose">
-              <strong>Why you are doing this</strong>
-              <p>You already made the module easier to follow. Now compare what the instructor wants Maya to do with what the current activities actually ask her to produce. The gap between those two is the design problem to solve next.</p>
+              <strong>Look for a chance to use the learning</strong>
+              <p>Use short phrases to compare the learning goal with Quiz 3. Then choose what is missing.</p>
             </div>
-            <div class="pc-s1-diagnosis-compare" aria-label="Alignment comparison">
-              <div class="pc-s1-diagnosis-context is-intent">
-                <span>Instructor intent</span>
-                <strong>Analyze a community food-access problem and use evidence to recommend an appropriate response.</strong>
-              </div>
-              <div class="pc-s1-diagnosis-context is-evidence">
-                <span>Current evidence</span>
-                <strong>Reading, video, vocabulary, a discussion describing a barrier, and a quiz checking terms and examples.</strong>
-              </div>
+            <div class="pc-s1-diagnosis-guided">
+              <section class="pc-s1-diagnosis-rationale" aria-labelledby="pcS1DiagnosisGoalHeading">
+                <h2 id="pcS1DiagnosisGoalHeading">1. What should Maya be able to do?</h2>
+                <div class="pc-s1-diagnosis-context is-intent">
+                  <span>The instructor's goal</span>
+                  <p>Analyze a community food-access problem and use evidence to recommend an appropriate response.</p>
+                </div>
+                <label for="pcS1DiagnosisGoal">Name the action Maya needs to show.</label>
+                <p id="pcS1DiagnosisGoalHelp" class="pc-s1-diagnosis-help">Use the goal above. What would Maya need to do, beyond remembering information?</p>
+                <textarea id="pcS1DiagnosisGoal" name="diagnosisGoal" rows="2" minlength="10" maxlength="220" required aria-describedby="pcS1DiagnosisGoalHelp" data-pc-input-action="s1-learning-update-diagnosis-rationale" placeholder="Maya needs to…">${esc(pcS1LearningState.diagnosisGoal)}</textarea>
+              </section>
+              <section class="pc-s1-diagnosis-rationale" aria-labelledby="pcS1DiagnosisEvidenceHeading">
+                <h2 id="pcS1DiagnosisEvidenceHeading">2. What does the current work check?</h2>
+                <div class="pc-s1-diagnosis-context is-evidence">
+                  <span>Maya's current module</span>
+                  <p>The reading and video introduce food-access barriers. The discussion asks Maya to describe one barrier. Quiz 3 checks terms and examples from the reading and video.</p>
+                </div>
+                <label for="pcS1DiagnosisEvidence">Name what Maya does in Quiz 3.</label>
+                <p id="pcS1DiagnosisEvidenceHelp" class="pc-s1-diagnosis-help">Use the quiz description above. Does Maya identify information, explain a choice, or make a recommendation?</p>
+                <textarea id="pcS1DiagnosisEvidence" name="diagnosisEvidence" rows="2" minlength="10" maxlength="220" required aria-describedby="pcS1DiagnosisEvidenceHelp" data-pc-input-action="s1-learning-update-diagnosis-rationale" placeholder="The quiz asks Maya to…">${esc(pcS1LearningState.diagnosisEvidence)}</textarea>
+              </section>
             </div>
             <div class="pc-s1-diagnosis-question-block">
-              <span class="pc-s1-result-eyebrow">Your decision</span>
-              <h2 id="pcS1DiagnosisQuestion">What is the main alignment problem?</h2>
-              <p class="pc-s1-diagnosis-help">Choose the single issue that matters most for whether this module demonstrates the intended learning.</p>
+              <span class="pc-s1-result-eyebrow">Compare your two observations</span>
+              <h2 id="pcS1DiagnosisQuestion">3. What is the main problem?</h2>
+              <p class="pc-s1-diagnosis-help">Does the current work give Maya a chance to show the action you named in Step 1? Choose the problem that best explains what is missing.</p>
             </div>
             <div class="pc-s1-diagnosis-choices">${choices}</div>
-            ${selected ? `<div class="pc-s1-diagnosis-rationale">
-              <label for="pcS1DiagnosisRationale"><strong>Explain what you noticed before checking your decision</strong><span>Your explanation will appear beside the alignment feedback so you can compare it with your reasoning. A short de-identified copy is also included in the study record. Do not include names.</span></label>
-              <textarea id="pcS1DiagnosisRationale" name="diagnosisRationale" rows="3" minlength="10" maxlength="500" required aria-describedby="pcS1DiagnosisRationaleStatus" data-pc-input-action="s1-learning-update-diagnosis-rationale" placeholder="For example: The objective asks students to recommend a response, but the activities only check recall and description.">${esc(pcS1LearningState.diagnosisRationale)}</textarea>
-              <p class="pc-s1-response-status" id="pcS1DiagnosisRationaleStatus">${pcS1LearningState.diagnosisRationale.trim().length >= 10 ? 'Ready to compare with the alignment feedback.' : 'Required: enter at least 10 characters. This is about your reasoning, not polished writing.'}</p>
-              ${pcS1LearningState.diagnosisNotice ? `<p class="pc-s1-diagnosis-notice" role="alert">${esc(pcS1LearningState.diagnosisNotice)}</p>` : ''}
-              <button type="submit" class="pc-shell-primary pc-s1-diagnosis-submit"${pcS1LearningState.diagnosisRationale.trim().length >= 10 ? '' : ' disabled'}>Compare my reasoning</button>
-            </div>` : ''}
+            <div class="pc-s1-diagnosis-rationale pc-s1-diagnosis-submit-area">
+              <p class="pc-s1-diagnosis-help">Your two observations will appear with the feedback so you can compare your decision. A short de-identified copy is included in the study record. Do not include names.</p>
+              <p class="pc-s1-response-status" id="pcS1DiagnosisRationaleStatus" role="status">${pcS1DiagnosisReady() ? 'Ready to compare your observations with the feedback.' : 'Add a short phrase for Steps 1 and 2, then choose the main problem in Step 3.'}</p>
+              <p class="pc-s1-diagnosis-notice" role="alert">${esc(pcS1LearningState.diagnosisNotice)}</p>
+              <button type="submit" class="pc-shell-primary pc-s1-diagnosis-submit"${pcS1DiagnosisReady() ? '' : ' disabled'}>Compare with feedback</button>
+            </div>
           </form>`,
-      studentHTML: pcRenderS1MayaPanel('The module is clearer now. I can see what I am supposed to do. The question is whether any of this actually lets me show the performance the instructor cares about.')
+      studentHTML: pcRenderS1MayaPanel('I can find the work now. Will it let me show that I can use evidence to recommend a response?')
     })
   });
   resetSectionScroll(area);
@@ -417,17 +428,17 @@ function pcRenderS1DiagnosisResult() {
   area.innerHTML = pcRenderLearningStage({
     className: 'pc-s1-diagnosis-result', titleId: 'pcS1DiagnosisResultTitle',
     background: sceneBg,
-    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1DiagnosisResultTitle', label: `Scenario 1 · Start With the Learning`, title: `Diagnosis recorded`, instruction: `${correct ? 'You identified the difference between useful preparation and evidence of the intended performance.' : 'Your diagnosis is saved. Compare it with the intended performance before moving into the next S1 phase.'}`, status: `${pcS1LearningState.diagnosisXPEarned ? `Diagnosis complete · +${pcS1LearningState.diagnosisXPEarned} XP` : 'Diagnosis complete'}` }),
+    taskbarHTML: pcRenderLearningTaskbar({ titleId: 'pcS1DiagnosisResultTitle', label: `Scenario 1 · Start With the Learning`, title: `Compare your decision with the feedback`, instruction: `${correct ? 'You found a gap between learning the information and using it to recommend a response.' : 'Compare your choice with what Maya is expected to do.'}`, status: `${pcS1LearningState.diagnosisXPEarned ? `Comparison complete · +${pcS1LearningState.diagnosisXPEarned} XP` : 'Comparison complete'}` }),
     bodyHTML: pcRenderLearningWorkspace({
       mainHTML: `<section class="pc-s1-checkpoint-card pc-s1-diagnosis-result-card">
-            <span class="pc-s1-result-eyebrow">Your diagnosis</span>
+            <span class="pc-s1-result-eyebrow">Your decision</span>
             <h2>${esc(selected?.text || '')}</h2>
             <p>${correct
               ? 'That is the central alignment issue. Maya has reading, vocabulary, discussion, and recall work, but none of the current activities asks her to analyze a community food-access problem and recommend a response using evidence.'
               : 'This issue may affect the experience, but the instructor intent asks Maya to analyze a problem and recommend a response using evidence. The next design question is whether the current activities actually produce that evidence.'}</p>
-            <div class="pc-s1-diagnosis-result-reason"><strong>Your reasoning</strong><p>${esc(pcS1LearningState.diagnosisRationale)}</p></div>
+            <div class="pc-s1-diagnosis-result-reason"><strong>Your two observations</strong><p>${esc(pcS1LearningState.diagnosisRationale)}</p></div>
             <div class="pc-s1-diagnosis-result-actions">
-              <button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-continue-diagnosis">Review Diagnosis 1</button>
+              <button type="button" class="pc-shell-secondary" data-pc-action="s1-learning-continue-diagnosis">Review this comparison</button>
               <button type="button" class="pc-shell-primary" data-pc-action="s1-learning-start-my-course">Continue to My Course</button>
             </div>
           </section>`,
