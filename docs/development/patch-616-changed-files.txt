@@ -1,6 +1,0 @@
-README.md
-docs/development/patch-616-audio-portrait.md
-docs/development/patch-616-changed-files.txt
-index.html
-runtime/css/promptcraft.css
-src/css/ui/gfc-theme.css

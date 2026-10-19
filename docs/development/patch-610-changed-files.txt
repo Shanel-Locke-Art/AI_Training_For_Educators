@@ -1,6 +1,0 @@
-README.md
-docs/development/patch-610-changed-files.txt
-docs/development/patch-610-larger-about-portrait.md
-index.html
-runtime/css/promptcraft.css
-src/css/ui/components.css

@@ -1,105 +1,46 @@
-# PromptCraft
+# PromptCraft Next
 
-Current application: `PROMPTCRAFT_V429`, browser patch `628`, research schema `V121`, Apps Script receiver source `V95`, asset manifest `v158`.
+A discussion design module: explore the lemonade example, enter your teaching context, clarify the assignment with Babbage, revise and review your directions, and save an assignment guide. Professor Pixel closes the module with the learning takeaway.
 
-Scenario 1 is **Start With the Learning** with Maya and Professor Pixel. Its controller is `src/js/scenarios/s1-start-with-learning.js`; production responsibilities live in `s1-learning-*.js`, selected by `src/js/scenarios/registry.js`. The internal `content-avalanche` scenario key remains for saved data and research compatibility.
+## Run locally
 
-## Work on the application
+On Windows, open **start-local.cmd** and visit **http://127.0.0.1:3080** in Chrome. The launcher uses installed Node or VS Code's bundled runtime. With Node 22 or newer, use `npm start`. VS Code Live Server also works. There is no build step and no runtime package dependency.
 
-- Edit JavaScript and CSS under `src/`. `runtime/` is generated browser output.
-- Run `python tools/build.py` after source changes, then `python tools/build.py --check` to confirm the browser files match.
-- Run `python tools/audit_assets.py` and `python tools/audit_css.py` when changing assets or styles.
-- `index.html` opens the game; `wall.html` opens the Ideas Wall. `netlify/functions/babbage.js` owns the Babbage server contract.
-- `apps-script/PromptCraft_Receiver_V95_Start_With_Learning.js` is the current receiver source. After deploying it as a new web-app version, run `initializeWorkbookNow()` once. V95 separates the guided S1 responses in the readable view while retaining original responses and raw history. See `docs/development/receiver-v95-deployment.md`. During testing, `resetResearchDataNow()` clears collected test records without removing headers or workbook structure. `inspectS1TrackingNow()` provides a privacy-safe count of the S1 event types received.
+Progress saves in this browser under `promptcraft_next_opening_v1`. Existing saves remain compatible. Different browser addresses have separate saved progress.
 
-## Production references
+Use **Restart module** in the header to begin again. A confirmation lets you keep your work or clear the module's saved answers, assignment setup, draft, and conversation. Download your guide first if you want to keep it. Restart preserves your selected live or Dev testing mode.
 
-- `docs/README.md` maps the current production documents.
-- `docs/development/s1-removal-audit.md` records remaining legacy source dependencies.
-- `docs/asset-management/` contains the S1 artwork lists, recording scripts, and production trackers.
+## Babbage and Dev testing
 
-Historical patch packages, test suites, and retired recording guides were removed from this working package. The original uploaded repository ZIP remains a separate backup. Receiver V94 remains available as the previous source. Use V95 with Patch 620 to display the new guided responses separately. Complete a hosted S1 smoke pass before participant testing.
+The browser connects to the existing server at `https://promptcraft-test.netlify.app/.netlify/functions/babbage`. Its API key stays on that backend. No local key is needed; the local server only serves the app's static files. Private environment files are ignored and excluded from static serving.
 
-## S2 heading-repair preview (Patch 603)
+On the drafting step, select **Check assignment details**, answer clarification questions, then select **Generate revision**. Teacher context and answers are sent to the Babbage service and OpenAI when you send a turn. Suggestions enter your draft only when you choose **Use these directions in my draft**. Changes to the assignment invalidate outdated suggestions and approval.
 
-Scenario Select opens **S2: Access Is Part of the Design**. This focused activity uses S1’s task header, Canvas frame, character panel and shared button styles. Meet Lena, inspect one page, identify its heading barrier, ask Babbage, review the repair, insert it into the practice HTML editor, then check and save it. Each screen has one main task; unfinished handout and diagram activities are not in the playable section.
+Select **Use Dev testing fallback**, or open `?mockBabbage=1`, to test without AI calls. Results are labeled **Dev testing fallback — simulated Babbage; no API call**. Switching modes resets the conversation. Live errors never silently substitute simulated output.
 
-Lena has three replaceable transparent draft portraits: neutral, thinking and confident. See `assets/images/characters/students/lena/README.md` for filenames and replacement instructions. Asset manifest is now v152.
+The adapter uses the existing backend's `scenario1` request format. It maps `feedback_summary`, `input_quality`, `revised_discussion_prompt`, and `revision_review.why_these_changes` into the clarification and revision workflow. The original backend repository is separate and unchanged.
 
-Live Babbage still requires the `s2_accessibility_heading_repair` Netlify contract introduced in Patch 600. Patch 601 does not change that function. Built-in practice examples are labeled. S2 practice storage remains independent of S1; full scenario guide, My Course, XP and research integration are pending. Application V429, schema V121 and receiver V94 remain unchanged.
+## Guide and completion
 
-Patch 602 restores the S2 visual narrative introduction using the shared dialogue system, Professor Pixel and Lena’s draft portraits. The introduction hands off to Lena’s Canvas module. Practice again replays the opening. Text is draft dialogue; no final voice recordings are added.
+Review the before and after, complete the three assignment checks, and go to your assignment guide. Preview it at any time; downloading requires an approved current revision. The downloaded HTML includes its logo, illustrations, and styles, so it can be opened offline and printed or saved as PDF. Finish the module for Professor Pixel's recap.
 
-Patch 603 removes the remaining independent S2 layout rules. S2 inherits S1’s photographic stage, title treatment, module rows, character panel and workspace scrolling. S1 and S2 visual narrative colors now share the college theme. Use `node tools/test_s1_s2_presentation.cjs` to verify matching presentation at desktop, tablet and phone sizes.
+Desktop and tablet introductions fit the viewport, including their answer choices and navigation. Portrait tablets use a landscape-shaped smartboard with dialogue above the speaking character. Landscape tablets and Nest Hub displays place the board between the characters, matching the desktop classroom. Maya stays on the left and Pixel on the right. Phones show only the current speaker and scroll as needed. Text is at least 16px (12pt).
 
-## S1 production refactor (Patch 604)
+## Edit the project
 
-The complete S1 loop is mapped in `docs/development/S1_PRODUCTION_LOOP_AUDIT.md`.
-S1 now separates lesson content, saved state, workspace rendering, guides, My Course,
-dialogue, and retained compatibility reviews. S1 and S2 compose their taskbar, stage,
-and Canvas/student workspace through `learning-presentation.js`. Shared CSS has explicit
-owners and keeps the original cascade order.
+Use [the project map](docs/project-map.md) to find the file for a specific change. Source is organized by feature under `src/features`, reusable renderers under `src/shared`, and app navigation and persistence under `src/app`. Styles are grouped under `src/styles`.
 
-A late S1 AI reply can no longer replace a subsequently opened scenario. All storage,
-research and XP contracts remain in place. The inherited completion issue documented in that audit is resolved by Patch 605,
-which separates production completion from the legacy prompt-interface setting.
+## Checks and formatting
 
-Run `node tools/test_s1_learning_loop.cjs` for the full S1 walkthrough, plus the existing
-S2 flow, S2 AI, and S1/S2 presentation checks. The loop test supports optional pre-refactor
-DOM/style comparison through `PC_BASELINE_DIR`; use `PC_RECORD_BASELINE=1` only on the
-old version when recording a baseline. See `docs/development/patch-604-s1-production-refactor.md`.
+```sh
+npm test
+npm run test:browser
+```
 
-## S1 completion (Patch 605)
+Unit checks cover persistence, draft ownership, navigation, guide formatting, the active Babbage adapter, static server protection, and repository references. Browser checks cover the complete flow on desktop, short desktop, and phone. They mock Babbage and make no live AI calls. Browser tests use an installed Chrome; set `PC_CHROME_EXECUTABLE` to use another Chromium browser.
 
-S1 now marks itself Completed after the final Professor Pixel dialogue, awards the
-existing completion XP once, and restores its Completed menu status after a reload.
-Saving the guide alone does not complete the scenario. Starting a new practice run
-resets that run's progress, following the existing replay policy.
+Optional live check: set `RUN_LIVE_BABBAGE=1` and run `node tests/manual/babbage-smoke.cjs`. This sends fictional sample data to the deployed service and reports status and output lengths only.
 
-The registry's `completionAvailable` capability lets a production loop complete while
-older prompt entry remains disabled. S2 remains a heading-repair preview. Existing
-progress storage, research V121, receiver V94, and assets v152 are unchanged. See
-`docs/development/patch-605-s1-completion.md` for the change and verification.
+For consistent formatting, install development dependencies with `npm install`, then use `npm run format` or `npm run format:check`. Prettier is the only development dependency. Editor indentation is defined in `.editorconfig`.
 
-## S2 alignment with S1 (Patch 606)
-
-S2 now separates content, state/storage, HTML validation, workspace rendering, AI, and
-learner actions, matching S1's production organization. The existing heading-repair
-activity remains a section preview. Its visual introduction is retained.
-
-Inspection and diagnosis are separate tasks. The original and repaired pages use the
-same Canvas page renderer as S1; diagnosis choices use the same choice renderer.
-Request and HTML editing use S1's editor shell, while review and saved-repair feedback
-use S1's checkpoint cards. Progress reflects pages opened and checks completed.
-
-See `docs/development/patch-606-s2-s1-alignment.md`. Apply over Patch 605. S2 has no
-new full-scenario completion, XP, research events, or S1 guide writes.
-
-## S2 heading explanation and listening demo (Patch 607)
-
-The inspection page explains headings, screen readers, and heading levels before the
-AI repair. The decision screen adds a shorter reminder, evenly stacked choices, and
-navigation kept inside the card. An optional **Hear how headings help** panel compares
-heading navigation before and after repair, and reads the original text in order.
-Transcripts remain available when browser speech is unavailable. Audio never starts
-automatically and stops when the panel closes, a task changes, or the menu opens.
-
-This is a browser-voice simulation, not a recorded screen reader or an accessibility
-checker. Actual screen reader speech and controls vary. See
-`docs/development/patch-607-s2-headings-and-listening.md`. Apply over Patch 606.
-
-## Canvas-style reading and editing practice (Patch 608)
-
-S2 now opens a Canvas-inspired reading view directly in PromptCraft, using the learner’s
-lesson text. It includes play/pause/resume/stop, adjustable speed and text size, optional
-spacing and passage focus, and voice-timed word highlighting when available. Voices
-without word timing highlight the current passage. Original and repaired heading
-navigation remain separate examples. Nothing plays automatically.
-
-The practice editor starts in its visual view. Select a section title and use the
-Paragraph/Heading dropdown to explore structure, or use the **</>** button below the
-editor to paste Babbage’s HTML repair. Return to the visual view before checking the page.
-This is a focused practice recreation, not a live Canvas or Microsoft connection.
-Apply over Patch 607. See `docs/development/patch-608-canvas-reading-and-editor.md`.
-
-Patch 620 adds separate guided-response columns to receiver V95 and long-address/clear-label listening examples to S2. S2 remains a heading-repair practice preview with no new completion or research events.
+Generated screenshots and browser profiles belong in the ignored `artifacts/` directory. They are not app source and can be cleared after closing the test browser. API keys must never be added to browser code or committed files.
