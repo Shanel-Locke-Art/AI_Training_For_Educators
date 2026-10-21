@@ -42,3 +42,5 @@
  .maya-body { padding:10px 12px; }
  .maya-actions button { flex:1; }
 }
+
+.maya-dialog[data-speaker="babbage"] .maya-actor img { object-fit:contain; object-position:center; padding:24px; }

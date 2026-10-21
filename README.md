@@ -34,6 +34,8 @@ The early reply reflection is an optional prediction before drafting. The final 
 
 The adapter uses the existing backend's `scenario1` request format. It maps `feedback_summary`, `input_quality`, `revised_discussion_prompt`, and `revision_review.why_these_changes` into the clarification and revision workflow. The original backend repository is separate and unchanged.
 
+Clearly playful answers can receive a short, topic-specific dad joke from Babbage. In the Maya and Pixel dialogue, Babbage may appear first for a brief joke using his existing mark, followed by the student and teaching perspectives. Serious material keeps the normal dialogue. Humor does not change or approve assignment directions.
+
 ## Guide and completion
 
 Review the before and after, complete the three assignment checks, and go to your assignment guide. Preview it at any time; downloading requires an approved current revision. The downloaded HTML includes its logo, illustrations, and styles, so it can be opened offline and printed or saved as PDF. Finish the module for Professor Pixel's recap.

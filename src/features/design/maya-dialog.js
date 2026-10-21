@@ -50,9 +50,9 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null} 
     const beat = beats[beatIndex];
     dialog.dataset.speaker = beat.speaker;
     dialog.dataset.emotion = beat.emotion;
-    portrait.src = characterArt[beat.speaker][beat.emotion];
-    heading.textContent = beat.speaker === 'maya' ? 'Maya’s perspective' : 'Pixel’s perspective';
-    speaker.textContent = beat.speaker === 'maya' ? 'Maya' : 'Professor Pixel';
+    portrait.src = beat.speaker === 'babbage' ? 'assets/brand/babbage-mark.svg' : characterArt[beat.speaker][beat.emotion];
+    heading.textContent = beat.speaker === 'babbage' ? 'Babbage’s dad joke' : beat.speaker === 'maya' ? 'Maya’s perspective' : 'Pixel’s perspective';
+    speaker.textContent = beat.speaker === 'babbage' ? 'Babbage' : beat.speaker === 'maya' ? 'Maya' : 'Professor Pixel';
     response.querySelectorAll('[data-dialogue-beat]').forEach((el, index) => { el.hidden = index !== beatIndex; });
     back.disabled = beatIndex === 0;
     next.textContent = beatIndex === beats.length - 1 ? (onComplete ? 'Continue to design checks' : 'Return to your draft') : 'Next';

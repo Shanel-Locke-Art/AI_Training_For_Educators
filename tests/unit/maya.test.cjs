@@ -42,6 +42,20 @@ const assert = require('node:assert/strict');
     assert.throws(() => normalizeMayaScene(raw.replace('"emotion":"'+emotion+'"', '"emotion":"evil"'), revision), /unreadable/);
     assert.throws(() => normalizeMayaScene(raw.replace('invites comparison', 'invites comparison').replace('“Compare two t-test outputs” invites', '“Invented homework task” invites'), revision), /current directions/);
   }
+  const cameo = {version:1, babbage:{text:'That printer is really making an impression.'},
+    maya:{emotion:'amused',text:assignments[0].response},
+    pixel:{emotion:'thoughtful',text:'“Compare two t-test outputs” invites a closer look.'}};
+  const cameoScene = normalizeMayaScene(JSON.stringify(cameo), revision);
+  const cameoBeats = mayaSceneBeats(cameoScene);
+  assert.equal(cameoBeats[0].speaker, 'babbage');
+  assert.equal(cameoBeats[0].text, cameo.babbage.text);
+  assert.equal(cameoBeats[1].speaker, 'maya');
+  assert.equal(cameoBeats.at(-1).speaker, 'pixel');
+  for (const text of ['', 'x'.repeat(401), 42]) {
+    assert.throws(() => normalizeMayaScene(JSON.stringify({...cameo,babbage:{text}}),revision), /unreadable joke/);
+  }
+  const {babbage, ...seriousScene} = cameo;
+  assert(!mayaSceneBeats(normalizeMayaScene(JSON.stringify(seriousScene),revision)).some(beat=>beat.speaker==='babbage'));
   assert.equal(normalizeMayaScene(assignments[0].response, revision).maya.emotion, 'neutral', 'Legacy prose does not guess sentiment');
   assert.equal(normalizeMayaScene(assignments[0].response, revision).pixel, null, 'Legacy prose does not invent a pedagogy response');
   assert.throws(() => normalizeMayaScene('{bad json}', revision), /unreadable/);
