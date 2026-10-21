@@ -1,4 +1,4 @@
-# PromptCraft Next
+# New PromptCraft
 
 A discussion design module: explore the lemonade example, enter your teaching context, clarify the assignment with Babbage, revise and review your directions, and save an assignment guide. Professor Pixel closes the module with the learning takeaway.
 
