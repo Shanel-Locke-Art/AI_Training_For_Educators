@@ -22,7 +22,7 @@ Use **Restart module** in the header to begin again. A confirmation lets you kee
 
 Current development testing is not formal participant research. Live Babbage and Dev fallback select how AI assistance runs; neither enrolls a participant or records research consent. This checkout saves browser progress but has no participant research event logger. See the [gameplay and research audit](docs/gameplay-research-audit.md) for the preservation plan and study integration limits.
 
-The browser connects to the existing server at `https://promptcraft-test.netlify.app/.netlify/functions/babbage`. Its API key stays on that backend. No local key is needed; the local server only serves the app's static files. Private environment files are ignored and excluded from static serving.
+The browser connects to the existing server at `https://promptcraft-discussion.netlify.app/.netlify/functions/babbage`. Its API key stays on that backend. No local key is needed; the local server only serves the app's static files. Private environment files are ignored and excluded from static serving.
 
 On the drafting step, select **Check assignment details**, answer clarification questions, then select **Generate revision**. Teacher context and answers are sent to the Babbage service and OpenAI when you send a turn. Suggestions enter your draft only when you choose **Use these directions in my draft**. Changes to the assignment invalidate outdated suggestions and approval.
 

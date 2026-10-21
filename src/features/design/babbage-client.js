@@ -1,7 +1,7 @@
 import { instructions } from './babbage-prompt.js';
 import { workspaceInstructions } from '../workspace/prompt.js';
 import { findIdea } from '../idea-lab/ideas.js';
-export const BABBAGE_ENDPOINT = 'https://promptcraft-test.netlify.app/.netlify/functions/babbage';
+export const BABBAGE_ENDPOINT = 'https://promptcraft-discussion.netlify.app/.netlify/functions/babbage';
 export const conversationDefaults = () => ({
   context: '',
   history: [],

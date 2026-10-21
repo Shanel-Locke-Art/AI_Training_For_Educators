@@ -71,7 +71,7 @@ const assert = require('node:assert/strict');
     const response = await requestMayaResponse(state, [], {
       fetchImpl: async (url, options) => {
         assert.equal(JSON.parse(options.body).system, request.system);
-        assert.equal(new URL(url).hostname, 'promptcraft-test.netlify.app');
+        assert.equal(new URL(url).hostname, 'promptcraft-discussion.netlify.app');
         return { ok: true, json: async () => ({ analysis: { feedback_summary: assignment.response } }) };
       },
     });

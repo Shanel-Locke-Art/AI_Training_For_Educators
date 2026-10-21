@@ -275,7 +275,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await send('Runtime.enable');
     await send('Page.enable');
     await send('Page.addScriptToEvaluateOnNewDocument', {
-      source: `(()=>{const original=window.fetch.bind(window);window.fetch=(url,options)=>original(String(url).startsWith('https://promptcraft-test.netlify.app/.netlify/functions/babbage')?'/api/babbage':url,options);})()`,
+      source: `(()=>{const original=window.fetch.bind(window);window.fetch=(url,options)=>original(String(url).startsWith('https://promptcraft-discussion.netlify.app/.netlify/functions/babbage')?'/api/babbage':url,options);})()`,
     });
     const { initialState } = await import('../../src/app/storage.js'),
       { discussionOpening: scenario } = await import('../../src/features/opening/content.js');
