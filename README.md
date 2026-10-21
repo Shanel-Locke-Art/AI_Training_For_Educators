@@ -28,7 +28,7 @@ On the drafting step, select **Check assignment details**, answer clarification 
 
 Select **Use Dev testing fallback**, or open `?mockBabbage=1`, to test without AI calls. Results are labeled **Dev testing fallback — simulated Babbage; no API call**. Switching modes resets the conversation. Live errors never silently substitute simulated output.
 
-The rationale screen offers **Hear Maya’s first read (optional)**. Maya uses her approved student profile to read your original and revised directions, including relevant earlier readings in this session. Close her response to keep working; she never edits or approves your assignment. Readings are not saved across refresh. Dev mode and the explicit offline alternative show excerpts only, without AI interpretation. Live Maya calls use the same service as Babbage and share the assignment and design context as disclosed in the dialog.
+The rationale screen offers **Hear Maya’s perspective (optional)**. Maya uses her approved student profile to read your original and revised directions, including relevant earlier readings in this session. Close her response to keep working; she never edits or approves your assignment. Readings are not saved across refresh. Dev mode and the explicit offline alternative show excerpts only, without AI interpretation. Live Maya calls use the same service as Babbage and share the assignment and design context as disclosed in the dialog.
 
 The early reply reflection is an optional prediction before drafting. The final rationale explains the change you actually chose and what you will look for in student work. You can leave the prediction blank.
 

@@ -22,7 +22,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null} 
   const dialog = document.createElement('dialog');
   dialog.className = 'maya-dialog';
   dialog.setAttribute('aria-labelledby', 'maya-title');
-  dialog.innerHTML = `<header><div><h2 id="maya-title">Maya’s first read</h2></div><button type="button" data-maya-close aria-label="Close Maya’s response">${onComplete ? 'Back to draft' : 'Close'}</button></header><div class="maya-stage"><div class="maya-actor" aria-hidden="true" hidden><img data-maya-portrait src="${characterArt.maya.neutral}" alt=""></div><div class="maya-state"><h3 data-maya-state-title>Read your draft with Maya</h3><p data-maya-state-copy>Start a reading to hear Maya’s reaction and then Pixel’s teaching perspective.</p></div><section class="maya-dialogue" aria-label="Dialogue" hidden><h3 id="maya-speaker" data-maya-speaker>Maya’s first read</h3><div data-maya-response role="region" aria-labelledby="maya-speaker" aria-live="polite" aria-atomic="true" tabindex="-1"></div></section></div><div class="maya-body"><p class="sr-only" data-maya-status role="status" aria-live="polite" aria-atomic="true"></p><nav class="maya-scene-nav" aria-label="Dialogue navigation" hidden><button type="button" data-maya-back>Back</button><button type="button" class="primary" data-maya-next>Next</button></nav><div class="maya-actions"><button type="button" class="primary" data-maya-ask>${dev ? 'Preview assignment excerpts' : 'Ask Maya to read this draft'}</button>${dev || onComplete ? '' : '<button type="button" data-maya-preview>Preview excerpts without AI</button>'}</div><details class="maya-notice"><summary>About this reading</summary><p>This is a fictional perspective, not a grade or evidence of real student learning.</p><p>${dev ? 'Dev mode uses an excerpt preview only; no API call.' : 'Ask Maya sends your assignment, design notes, and up to two earlier readings from this session to the existing PromptCraft Babbage service and OpenAI.'} Readings are not saved across refresh. Your assignment is unchanged.</p></details></div>`;
+  dialog.innerHTML = `<header><div><h2 id="maya-title">Maya’s perspective</h2></div><button type="button" data-maya-close aria-label="Close Maya’s response">${onComplete ? 'Back to draft' : 'Close'}</button></header><div class="maya-stage"><div class="maya-actor" aria-hidden="true" hidden><img data-maya-portrait src="${characterArt.maya.neutral}" alt=""></div><div class="maya-state"><h3 data-maya-state-title>See the assignment through Maya’s eyes</h3><p data-maya-state-copy>Hear how Maya imagines doing the assignment, followed by Pixel’s teaching perspective.</p></div><section class="maya-dialogue" aria-label="Dialogue" hidden><h3 id="maya-speaker" data-maya-speaker>Maya’s perspective</h3><div data-maya-response role="region" aria-labelledby="maya-speaker" aria-live="polite" aria-atomic="true" tabindex="-1"></div></section></div><div class="maya-body"><p class="sr-only" data-maya-status role="status" aria-live="polite" aria-atomic="true"></p><nav class="maya-scene-nav" aria-label="Dialogue navigation" hidden><button type="button" data-maya-back>Back</button><button type="button" class="primary" data-maya-next>Next</button></nav><div class="maya-actions"><button type="button" class="primary" data-maya-ask>${dev ? 'Preview assignment excerpts' : 'Hear Maya’s perspective'}</button>${dev || onComplete ? '' : '<button type="button" data-maya-preview>Preview excerpts without AI</button>'}</div><details class="maya-notice"><summary>About this perspective</summary><p>This is a fictional perspective, not a grade or evidence of real student learning.</p><p>${dev ? 'Dev mode uses an excerpt preview only; no API call.' : 'Ask Maya sends your assignment, design notes, and up to two earlier readings from this session to the existing PromptCraft Babbage service and OpenAI.'} Readings are not saved across refresh. Your assignment is unchanged.</p></details></div>`;
   const portrait = dialog.querySelector('[data-maya-portrait]');
   const status = dialog.querySelector('[data-maya-status]');
   const response = dialog.querySelector('[data-maya-response]');
@@ -35,12 +35,12 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null} 
   const showState = (kind, title, message) => {
     dialog.dataset.state = kind;
     actor.hidden=true; dialogue.hidden=true; stateCard.hidden=false; navigation.hidden=true;
-    heading.textContent='Maya’s first read';
+    heading.textContent='Maya’s perspective';
     dialog.querySelector('[data-maya-state-title]').textContent=title;
     dialog.querySelector('[data-maya-state-copy]').textContent=message;
     status.textContent=message;
     ask.hidden=kind === 'loading';
-    if (kind === 'error') { ask.textContent='Retry reading'; ask.classList.add('primary'); }
+    if (kind === 'error') { ask.textContent='Try again'; ask.classList.add('primary'); }
   };
   const navigation = dialog.querySelector('.maya-scene-nav');
   const back = dialog.querySelector('[data-maya-back]');
@@ -51,7 +51,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null} 
     dialog.dataset.speaker = beat.speaker;
     dialog.dataset.emotion = beat.emotion;
     portrait.src = characterArt[beat.speaker][beat.emotion];
-    heading.textContent = beat.speaker === 'maya' ? 'Maya’s first read' : 'Pixel’s perspective';
+    heading.textContent = beat.speaker === 'maya' ? 'Maya’s perspective' : 'Pixel’s perspective';
     speaker.textContent = beat.speaker === 'maya' ? 'Maya' : 'Professor Pixel';
     response.querySelectorAll('[data-dialogue-beat]').forEach((el, index) => { el.hidden = index !== beatIndex; });
     back.disabled = beatIndex === 0;
@@ -68,7 +68,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null} 
     }));
     stateCard.hidden=true; actor.hidden=false; dialogue.hidden=false; navigation.hidden=false;
     dialog.dataset.state='dialogue'; ask.hidden=Boolean(onComplete);
-    ask.textContent = 'Read this draft again';
+    ask.textContent = 'Hear Maya again';
     ask.classList.remove('primary');
     response.tabIndex = 0;
     showBeat();
@@ -118,7 +118,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null} 
     ask.disabled = true;
     portrait.src = characterArt.maya.neutral;
     response.textContent = '';
-    showState('loading','Preparing Maya’s reading…','Your draft is being read. Maya’s dialogue will appear here when it is ready.');
+    showState('loading','Preparing Maya’s perspective…','Your draft is being read. Maya’s dialogue will appear here when it is ready.');
     delete dialog.dataset.emotion; delete dialog.dataset.speaker;
     response.tabIndex = -1;
     response.setAttribute('aria-busy', 'true');
@@ -143,7 +143,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null} 
       const message = error.name === 'TimeoutError'
         ? 'Maya took too long. Your draft is unchanged. Try again.'
         : error instanceof TypeError ? 'The AI connection is unavailable. Your draft is saved. Retry when the service is available, or return to your draft.' : error.message;
-      showState('error','Maya’s reading is unavailable',onComplete ? message.replace(' or use the excerpt preview','') : message);
+      showState('error','Maya’s perspective is unavailable',onComplete ? message.replace(' or use the excerpt preview','') : message);
     } finally {
       if (controller === requestController) {
         response.removeAttribute('aria-busy');

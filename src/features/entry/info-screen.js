@@ -16,7 +16,7 @@ export function renderInfoPage(view, index = 0) {
   const current = Math.max(0, Math.min(index, page.sections.length - 1));
   const section = page.sections[current];
   const groupStart = Math.floor(current / 3) * 3;
-  const shortTitle = title => ({ "Good company, different perspectives": "Maya’s view", "Institutional context": "College context", "Independent project": "Independence", "Academic context": "Graduate work", "Browsing and testing": "Browsing", "Resume and reset": "Resume &amp; reset", "About this prototype": "This prototype", "Meet the developer": "The developer", "External service privacy": "Service privacy", "Choose where to begin": "Where to begin", "Keep student information out": "Student privacy", "When you ask for AI help": "AI requests", "You make the decisions": "Your decisions", "Professor Pixel": "Professor Pixel", "A student’s first read": "Maya’s first read" }[title] || title);
+  const shortTitle = title => ({ "Good company, different perspectives": "Maya’s view", "Institutional context": "College context", "Independent project": "Independence", "Academic context": "Graduate work", "Browsing and testing": "Browsing", "Resume and reset": "Resume &amp; reset", "About this prototype": "This prototype", "Meet the developer": "The developer", "External service privacy": "Service privacy", "Choose where to begin": "Where to begin", "Keep student information out": "Student privacy", "When you ask for AI help": "AI requests", "You make the decisions": "Your decisions", "Professor Pixel": "Professor Pixel", "A student’s perspective": "Maya’s perspective" }[title] || title);
   const visual = topicVisuals[section.visual];
   const portrait = `<img src="${visual.src}" alt="${visual.alt}" class="info-portrait">`;
   const artwork = ['character', 'shanel'].includes(visual.kind)
@@ -72,7 +72,7 @@ const pages = {
       },
       {
         "title": "Evaluate",
-        "body": "<p>Read Babbage’s suggestion against your learning goal, course context, and original directions. Check assumptions, accuracy, workload, and whether students have a meaningful reason to interact.</p><p>Ask Maya for a simulated student’s first read. Use her questions to spot unclear expectations, then decide which concerns matter for your students.</p>",
+        "body": "<p>Read Babbage’s suggestion against your learning goal, course context, and original directions. Check assumptions, accuracy, workload, and whether students have a meaningful reason to interact.</p><p>Ask Maya for a simulated student’s perspective. Use her questions to spot unclear expectations, then decide which concerns matter for your students.</p>",
         "visual": "engine"
       },
       {
@@ -156,7 +156,7 @@ const pages = {
         "visual": "engine"
       },
       {
-        "title": "A student’s first read",
+        "title": "A student’s perspective",
         "body": "<p>Maya reads your actual assignment and revision as a simulated student. She can describe what seems clear, confusing, engaging, or difficult and reconsider when the directions change.</p><p>She is not an instructional-design expert or a stand-in for every learner. Her response is a prompt for reflection. Check it against your course knowledge and feedback from real students.</p>",
         "visual": "mayaSpeaking"
       },
@@ -187,12 +187,12 @@ const pages = {
       },
       {
         "title": "When you ask for AI help",
-        "body": "<p>Sending a Babbage message shares assignment context and your answers with the existing Babbage service and OpenAI.</p><p>Requesting Maya’s reading shares your original and revised directions, design context, and earlier readings with the same service. Use fictional examples and remove identifying information before requesting help.</p>",
+        "body": "<p>Sending a Babbage message shares assignment context and your answers with the existing Babbage service and OpenAI.</p><p>Requesting Maya’s perspective shares your original and revised directions, design context, and earlier readings with the same service. Use fictional examples and remove identifying information before requesting help.</p>",
         "visual": "engine"
       },
       {
         "title": "Browsing and testing",
-        "body": "<p>Reading these topic screens, browsing Idea Lab starters, and previewing a guide do not send your assignment to AI. Requests happen when you ask Babbage or request Maya’s reading.</p><p>Maya readings and unapplied suggestions do not persist across refresh. The development testing fallback is simulated and makes no AI call; it is used to test the interface.</p>",
+        "body": "<p>Reading these topic screens, browsing Idea Lab starters, and previewing a guide do not send your assignment to AI. Requests happen when you ask Babbage or request Maya’s perspective.</p><p>Maya readings and unapplied suggestions do not persist across refresh. The development testing fallback is simulated and makes no AI call; it is used to test the interface.</p>",
         "visual": "pixelThinking"
       },
       {

@@ -98,7 +98,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
           'Revise': '/assets/people/babbage-engine-repaired.png',
           'Professor Pixel': '/assets/characters/pixel/pixel_pleasant.png',
           'Maya': '/assets/characters/maya/maya_neutral.png',
-          'A student’s first read': '/assets/characters/maya/maya_explaining.png',
+          'A student’s perspective': '/assets/characters/maya/maya_explaining.png',
           'Meet the developer': '/assets/people/shanel-profile.png',
           'Institutional context': '/assets/brand/gfc-river-otters.png',
         };
@@ -250,7 +250,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     assert(await evaluate('document.querySelector(".maya-dialogue").hidden && document.querySelector(".maya-actor").hidden'), 'Connection errors are not presented as Maya dialogue');
     assert(await evaluate('!document.querySelector(".maya-state").hidden'), 'Error has its own status card');
     assert(!await evaluate('document.querySelector("[data-maya-preview]")'), 'Required reading has no misleading excerpt-preview option');
-    assert.equal(await evaluate('document.querySelector("[data-maya-ask]").textContent'),'Retry reading');
+    assert.equal(await evaluate('document.querySelector("[data-maya-ask]").textContent'),'Try again');
     await shot('lab-' + device + '-maya-unavailable');
 
     await closeMaya();
