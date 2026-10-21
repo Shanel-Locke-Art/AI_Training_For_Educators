@@ -7,8 +7,33 @@ const assert = require('node:assert/strict');
   const { starterDraft, removeRepeatedStarterExchanges } = await import(
     '../../src/features/design/content.js'
   );
+  const { instructions } = await import('../../src/features/design/babbage-prompt.js');
   const { teacherSetup } = await import('../../src/features/setup/content.js');
+  const { renderTeacherStep, renderTeacherSummary } = await import(
+    '../../src/features/setup/screen.js'
+  );
   assert.equal(teacherSetup.steps.length, 5);
+  const previewTeacher = {
+    ...initialState(scenario).teacher,
+    directions: '### First post\nDescribe your recommendation.',
+  };
+  const setupPreviews = teacherSetup.steps.map((_, index) =>
+    renderTeacherStep(teacherSetup, index, previewTeacher),
+  );
+  const summaryPreviews = teacherSetup.steps.map((_, index) =>
+    renderTeacherSummary(teacherSetup, previewTeacher, '', index),
+  );
+  for (const screen of [...setupPreviews, ...summaryPreviews]) {
+    assert.match(screen, /Discussion-board design/);
+    assert.match(screen, /not an all-in-one replacement/);
+    assert.match(screen, /data-setup-live-preview/);
+    assert.match(screen, /<h4>First post<\/h4>/);
+  }
+  assert.match(teacherSetup.steps[1].intro, /one focused forum component/);
+  assert.match(teacherSetup.steps[1].intro, /not replace it/);
+  assert.match(instructions, /one bounded discussion-board component within the larger assignment/);
+  assert.match(instructions, /distinctive, feasible forum mechanism that fits this course/);
+  assert.match(instructions, /not an all-in-one replacement/);
   const legacySetupRecords = new Map();
   const legacySetupStorage = {
     getItem: (key) => legacySetupRecords.get(key),
@@ -24,6 +49,21 @@ const assert = require('node:assert/strict');
   assert.equal(restoredSetup.setupStep, 3, 'Old limits screen maps to the shorter time screen');
   assert.equal(restoredSetup.teacher.directions, legacySetup.teacher.directions);
   const { createGuide, downloadGuide } = await import('../../src/features/design/guide.js');
+  const milestoneDesign = {
+    concern: 'Replies miss <evidence>',
+    revision: 'Compare a peer claim with course evidence.',
+    reason: 'I adapted the AI idea. I will look for evidence-based revisions.',
+    sourceDirections: 'Reply twice.',
+  };
+  const milestoneTeacher = { directions: 'Reply twice.', learningGoal: 'Evaluate claims & evidence' };
+  const milestone = createGuide(milestoneDesign, { teacher: milestoneTeacher });
+  assert(milestone.includes('Approved milestone'));
+  assert(milestone.includes('Replies miss &lt;evidence&gt;'));
+  assert(milestone.includes('Evaluate claims &amp; evidence'));
+  assert(milestone.includes(milestoneDesign.reason));
+  assert(milestone.includes('href="#revised-directions"'));
+  assert(createGuide(milestoneDesign, { teacher: milestoneTeacher, approved: false }).includes('Draft milestone · awaiting your approval'));
+  assert(createGuide({ revision: 'Legacy revision', reason: '' }, { teacher: milestoneTeacher }).includes('Not recorded in this saved version.'));
   const unrelated = {
     revision: teacherSetup.steps[1].example.directions,
     reason: 'Old example reason.',
@@ -36,7 +76,7 @@ const assert = require('node:assert/strict');
     'Guide excludes an unrelated earlier draft',
   );
   assert.ok(!protectedGuide.includes('Old example reason.'));
-  assert.ok(protectedGuide.includes('Your current assignment needs a revision'));
+  assert.ok(protectedGuide.includes('Your discussion-board component is still in progress'));
   assert.throws(() => downloadGuide(unrelated, { teacher: currentTeacher }), /current assignment/);
   const currentGuide = createGuide(
     {
@@ -73,6 +113,20 @@ const assert = require('node:assert/strict');
   assert.ok(report.includes('<strong>First post:</strong>'));
   assert.ok(report.includes('<br>Use your own output.'));
   assert.ok(!report.includes('<script>'));
+  const structuredDiscussion = renderAssignmentDirections(
+    'First post: Explain your recommendation.\n\nPeer reply:\nCompare the recommendation with course evidence.\n\nFollow-up: Revise or defend your choice.',
+  );
+  assert.ok(
+    structuredDiscussion.includes('<h4>First post</h4><p>Explain your recommendation.</p>'),
+  );
+  assert.ok(
+    structuredDiscussion.includes(
+      '<h4>Peer reply</h4><p>Compare the recommendation with course evidence.</p>',
+    ),
+  );
+  assert.ok(
+    structuredDiscussion.includes('<h4>Follow-up</h4><p>Revise or defend your choice.</p>'),
+  );
   const nestedReport = renderAssignmentDirections(
     'Week 8 Forum: Independent-Samples *t*-Test\nStep 1: Post your analysis plan\n1. Question\n2. Variable\n3. Groups\n4. Assumption check:\n- Independence\n- Output checks\n1. Current decision\n2. AI disclosure\nStep 2: Investigate a classmate',
   );
@@ -262,7 +316,7 @@ const assert = require('node:assert/strict');
   assert.equal(saved().designPanel, 'notes');
   input('notes', 'Use evidence to reconsider a choice.');
   click('design-next');
-  assert.match(app.innerHTML, /Draft one manageable change/);
+  assert.match(app.innerHTML, /Design one focused discussion-board activity/);
   click('use-starter');
   assert.match(saved().design.revision, /Compare a classmate/);
   assert.equal(
@@ -291,12 +345,12 @@ const assert = require('node:assert/strict');
   assert.equal(saved().designPanel, 'reason');
   click('design-next');
   assert.match(app.innerHTML, /Original assignment/);
-  assert.match(app.innerHTML, /Revised assignment/);
+  assert.match(app.innerHTML, /Discussion-board directions/);
   assert.match(app.innerHTML, /My edited draft/);
   assert.equal(saved().phase, 'design');
   assert.equal(saved().designStep, 3, 'Reload restores review and draft');
   click('design-next');
-  assert.match(app.innerHTML, /Check your assignment/);
+  assert.match(app.innerHTML, /Check your discussion-board component/);
   const check = (key, checked) =>
     handlers.change({
       target: {
@@ -372,6 +426,33 @@ const assert = require('node:assert/strict');
   assert.ok(loadState(scenario, blocked).saveNotice);
   saveState(state, blocked);
   assert.ok(state.saveNotice);
+  const { fillTestLesson, isTestLessonKeyword } = await import('../../src/shared/test-lesson.js');
+  assert(isTestLessonKeyword({name:'subject',value:' TEST '}));
+  assert(isTestLessonKeyword({name:'directions',value:'test'}));
+  assert(!isTestLessonKeyword({name:'directions',value:'A test of evidence'}));
+  assert(!isTestLessonKeyword({name:'reason',value:'test'}));
+  const sample = initialState(scenario);
+  sample.design.revision='Earlier draft'; sample.design.reason='Earlier reason';
+  sample.finalCheck.approved=true; sample.babbage.mode='dev';
+  fillTestLesson(sample);
+  assert.equal(sample.phase,'design'); assert.equal(sample.designPanel,'reason');
+  assert.equal(sample.babbage.mode,'live'); assert.equal(sample.finalCheck.approved,false);
+  assert.equal(sample.design.previousRevision,'Earlier draft');
+  assert.equal(sample.design.sourceDirections,sample.teacher.directions);
+  assert(sample.design.revision.includes('staffing schedules'));
+  assert(sample.teacher.learningGoal && sample.teacher.mustStay && sample.design.reason);
+  const variants = ['good', 'bad', 'joke'].map(keyword => {
+    assert(isTestLessonKeyword({name:'subject',value:keyword.toUpperCase()}));
+    const variant = initialState(scenario); fillTestLesson(variant, keyword);
+    assert.equal(variant.babbage.mode,'live'); assert(!variant.finalCheck.approved);
+    assert.equal(variant.design.sourceDirections, variant.teacher.directions);
+    return variant;
+  });
+  assert.equal(new Set(variants.map(variant => variant.design.revision)).size, 3);
+  assert(variants[1].design.revision.includes('Do not ask questions'));
+  assert(variants[2].design.revision.includes('Paper Jams'));
+  assert(!isTestLessonKeyword({name:'subject',value:'good management'}));
+  assert.throws(() => fillTestLesson(sample,'unknown'), /Unknown sample/);
   console.log(
     'PASS: design navigation, original preservation, starter append, edits, restore, legacy saves, validation, escaping, storage failures.',
   );

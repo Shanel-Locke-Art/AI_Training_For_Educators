@@ -56,7 +56,10 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
       ai.suggestion = null;
       app.querySelector('.ai-suggestion')?.remove();
       const panel = app.querySelector('.ai-panel');
-      if (panel) panel.outerHTML = renderAiPanel(state, ai, { compact: true });
+      if (panel) {
+        if (state.workspace) render();
+        else panel.outerHTML = renderAiPanel(state, ai, { compact: true });
+      }
     }
   }
 
@@ -181,7 +184,22 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
         ai.pending = false;
         ai.requestController = null;
         saveSafely();
-        if (state.phase === 'design' && state.designStep === 2) render();
+        if (state.phase === 'design' && state.designStep === 2) {
+          if (state.designPanel === 'revision') {
+            // A response must not replace the editor DOM while the educator is typing.
+            app.querySelector('.babbage-loading')?.remove();
+            const status = app.querySelector('.ai-status');
+            if (status) status.textContent = ai.error;
+            const next = app.querySelector('[data-action="design-next"]');
+            if (next) next.disabled = !state.design.revision.trim();
+            highlightNextAction(app, state, ai);
+            return;
+          }
+          const restoreFocus = app.contains?.(document.activeElement) || document.activeElement === document.body;
+          render();
+          if (restoreFocus && state.designPanel === 'babbage')
+            app.querySelector('[data-clarification-answer], [data-action="apply-ai"], [data-action="generate-ai"], [data-action="ask-ai"]')?.focus({ preventScroll: true });
+        }
       }
     }
   }
@@ -194,7 +212,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
     } catch {
       ai.configured = false;
     }
-    if (state.phase === 'design' && !ai.pending) render();
+    if (state === getState() && state.phase === 'design' && !ai.pending && (!state.workspace || state.designPanel === 'babbage')) render();
   }
   return { updateClarificationAnswer, moveQuestion, syncBabbage, askBabbage, refreshBabbageConnection };
 }

@@ -5,6 +5,7 @@ import { escapeHTML as e } from '../../shared/html.js';
 import { discussionOpening } from '../opening/content.js';
 import { lemonadeVisual, planVisuals } from '../../shared/lemonade-visuals.js';
 import { renderDesignEvidence, renderDesignRationale } from '../../shared/design-evidence.js';
+import { findIdea } from '../idea-lab/ideas.js';
 
 function lemonadeExample() {
   const scene = (id) => discussionOpening.scenes.find((item) => item.id === id);
@@ -30,7 +31,7 @@ export function loadGuideLogo() {
     .catch(() => null));
 }
 
-export function createGuide(design, { approved = true, logo = null, teacher = null } = {}) {
+export function createGuide(design, { approved = true, logo = null, teacher = null, workspace = null } = {}) {
   const example = teacherSetup.steps[1].example.directions;
   const stale =
     teacher &&
@@ -42,26 +43,39 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     design = { ...design, revision: '', reason: '' };
     approved = false;
   }
-  const sections = [
+  const sourceTitle = workspace?.sourceKind === 'idea' ? 'Your starting idea' : 'Your original assignment';
+  const chosenTitle = workspace ? 'Your chosen assignment design' : 'Your revised discussion board';
+  const milestoneTitle = workspace ? 'Your assignment design summary' : 'Scenario 1 · Start With the Learning';
+  const inspiration = workspace && findIdea(workspace.ideaId);
+  const sections = workspace ? [] : [
     { id: 'lemonade-example', title: 'Worked example: lemonade stand', body: lemonadeExample() },
   ];
+  if (inspiration) sections.push({ id: 'idea-inspiration', title: 'Idea Lab inspiration', body: `<section><h2>Idea Lab inspiration: ${e(inspiration.title)}</h2><p>Illustrative AI-assisted starter idea · not a faculty submission or tested intervention.</p><p>${e(inspiration.summary)}</p><p>The educator adapted this starting point; the final choices are their own.</p></section>` });
+  if (teacher && design.revision.trim())
+    sections.push({
+      id: 'decision-milestone',
+      title: milestoneTitle,
+      body: `<section><h2>${e(milestoneTitle)}</h2><p>${approved ? 'Approved milestone' : 'Draft milestone · awaiting your approval'}</p><h3>${workspace ? 'Design purpose or challenge' : 'Instructional challenge'}</h3><p>${e(design.concern || 'Not recorded in this saved version.')}</p><h3>Learning goal</h3><p>${e(teacher.learningGoal || 'Not recorded in this saved version.')}</p><h3>Chosen improvement</h3><p>Your complete chosen directions appear in <a href="#revised-directions">${e(chosenTitle)}</a>.</p><h3>Why I chose it and how I will recognize progress</h3>${design.reason?.trim() ? renderDesignRationale(design.reason) : '<p>Not recorded in this saved version.</p>'}<p>This is your design expectation. Look for evidence in student work when you try the activity; approval does not establish that learning improved.</p></section>`,
+    });
   if (teacher?.directions?.trim())
     sections.push({
       id: 'original-assignment',
-      title: 'Your original assignment',
-      body: `<section class="assignment"><div class="assignment-banner"><h2>Your original assignment</h2></div><div class="assignment-content"><p>The directions you supplied, kept separately from your revision.</p><div class="assignment-directions">${renderAssignmentDirections(teacher.directions)}</div></div></section>`,
+      title: sourceTitle,
+      body: `<section class="assignment"><div class="assignment-banner"><h2>${e(sourceTitle)}</h2></div><div class="assignment-content"><p>${workspace?.sourceKind === 'idea' ? 'The idea you supplied, kept separately from your completed design.' : 'The directions you supplied, kept separately from your revision.'}</p><div class="assignment-directions">${renderAssignmentDirections(teacher.directions)}</div></div></section>`,
     });
   if (teacher && !design.revision.trim())
     sections.push({
       id: 'assignment-pending',
-      title: 'Your assignment · revision needed',
-      body: '<section class="assignment"><div class="assignment-banner"><h2>Your current assignment needs a revision</h2></div><div class="assignment-content"><p>Return to Draft one manageable change. Write revised directions or generate a suggestion, then choose Use these directions in my draft. Review and approve that version before downloading your guide.</p></div></section>',
+      title: workspace ? 'Your assignment · design in progress' : 'Discussion-board component · design in progress',
+      body: workspace
+        ? '<section class="assignment"><div class="assignment-banner"><h2>Your assignment design is still in progress</h2></div><div class="assignment-content"><p>Use the Design tab to write directions, or collaborate with Babbage and choose a suggestion to edit. Return to Review &amp; Course Guide to explain and approve your design before downloading.</p></div></section>'
+        : '<section class="assignment"><div class="assignment-banner"><h2>Your discussion-board component is still in progress</h2></div><div class="assignment-content"><p>Return to Design one focused discussion-board activity. Write a bounded forum exchange that supports the larger assignment, or generate a suggestion to adapt. This component is not an all-in-one replacement. Review and approve your directions before downloading the guide.</p></div></section>',
     });
   if (design.revision.trim() || design.reason.trim())
     sections.push({
       id: 'your-assignment',
-      title: 'Your revised discussion board',
-      body: `<section class="assignment"><div class="assignment-banner"><span>Your course · ${approved ? 'Approved version' : 'Draft'}</span><h2>Your revised discussion board</h2></div><div class="assignment-content">${design.revision.trim() ? `<h3 id="revised-directions">Revised directions</h3><div class="assignment-directions">${renderAssignmentDirections(design.revision, { approved })}</div>` : ''}${design.reason.trim() ? `<aside class="rationale"><h3 id="change-reason">Why I made this change</h3><div class="design-rationale">${renderDesignRationale(design.reason)}</div></aside>` : ''}</div></section>`,
+      title: chosenTitle,
+      body: `<section class="assignment"><div class="assignment-banner"><span>Your course · ${approved ? 'Approved version' : 'Draft'}</span><h2>${e(chosenTitle)}</h2></div><div class="assignment-content">${design.revision.trim() ? `<h3 id="revised-directions">Discussion-board directions</h3><div class="assignment-directions">${renderAssignmentDirections(design.revision, { approved })}</div>` : ''}${design.reason.trim() ? `<aside class="rationale"><h3 id="change-reason">Why I made this change</h3><div class="design-rationale">${renderDesignRationale(design.reason)}</div></aside>` : ''}</div></section>`,
     });
   sections.push({
     id: 'design-sources',
@@ -71,7 +85,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
   const contents = sections
     .map(
       (section) =>
-        `<li><a href="#${section.id}">${e(section.title)}</a>${section.id === 'your-assignment' ? `<ul>${design.revision.trim() ? '<li><a href="#revised-directions">Revised directions</a></li>' : ''}${design.reason.trim() ? '<li><a href="#change-reason">Reason for the change</a></li>' : ''}</ul>` : ''}</li>`,
+        `<li><a href="#${section.id}">${e(section.title)}</a>${section.id === 'your-assignment' ? `<ul>${design.revision.trim() ? '<li><a href="#revised-directions">Discussion-board directions</a></li>' : ''}${design.reason.trim() ? '<li><a href="#change-reason">Reason for the change</a></li>' : ''}</ul>` : ''}</li>`,
     )
     .join('');
   return `<!doctype html>
@@ -79,7 +93,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
 <style>${guideStyles}</style></head>
 
 
-<body><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><h1>Assignment guide</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>Review the worked example, your original assignment, and your revision. Your original directions stay available while you develop the new version.</p></header><nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">Discussion boards</h2><p class="toc-topic">Give the discussion a job</p><ol>${contents}</ol></nav>${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
+<body><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><h1>${workspace ? 'Course Guide · Your discussion forum' : 'Discussion guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${workspace ? 'Your private record of the starting point, chosen forum design, and reasons behind your decisions.' : 'Review the worked example, your original discussion, and your revision. Your original directions stay available while you develop the new version.'}</p></header><nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">${workspace ? 'Your forum design' : 'Discussion boards'}</h2><p class="toc-topic">${workspace ? 'Create a Discussion Forum' : 'Give the discussion a job'}</p><ol>${contents}</ol></nav>${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
 }
 
 export function downloadGuide(design, options) {

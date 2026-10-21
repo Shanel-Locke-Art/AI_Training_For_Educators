@@ -17,7 +17,8 @@ export function renderBoard(board, { afterContent = '' } = {}) {
     content += `<${tag} class="service-flow${board.numbered === false ? ' service-flow--roles' : ''}" aria-label="${e(board.flowLabel || 'Plan in order')}">${board.nodes.map((n, i) => `<li>${board.visual === 'plan' ? planVisuals(board)[i] : ''}${board.numbered === false ? '' : `<span class="flow-number" aria-hidden="true">${i + 1}</span>`}<strong>${e(n.title)}</strong><span>${e(n.detail)}</span></li>`).join('')}</${tag}>`;
   }
   if (board.note) content += `<p class="board-note">${e(board.note)}</p>`;
-  return `<section class="smartboard" aria-labelledby="board-title"><div class="board-screen"><div class="board-heading"><div><span class="eyebrow">${e(board.label || 'On the smartboard')}</span><h2 id="board-title">${e(board.title)}</h2></div><span class="lemonade-icon">${lemonadeIcon}</span></div>${content}${afterContent}</div><div class="board-frame" aria-hidden="true"><span class="board-light"></span> PROMPTCRAFT</div></section>`;
+  const reading = (board.text || board.quote) && !board.visual && !board.nodes?.length && !board.facts?.length && !afterContent;
+  return `<section class="smartboard${reading ? ' smartboard--reading' : ''}" aria-labelledby="board-title"><div class="board-camera" aria-hidden="true"><span></span></div><div class="board-screen"><div class="board-heading"><div><span class="eyebrow">${e(board.label || 'On the smartboard')}</span><h2 id="board-title">${e(board.title)}</h2></div><span class="lemonade-icon">${lemonadeIcon}</span></div>${content}${afterContent}</div><div class="board-frame" aria-hidden="true"><span class="board-status"><span class="board-light"></span><span class="board-speaker"></span></span><span class="board-brand">PROMPTCRAFT</span><span class="board-power"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2v7m-4-5a7 7 0 1 0 8 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span></div><div class="board-pen-tray" aria-hidden="true"><span class="board-stylus"></span><span class="board-stylus board-stylus--gold"></span></div></section>`;
 }
 
 export function renderCharacter(character, active) {
@@ -39,21 +40,21 @@ export function renderScene(scenario, scene, state, index, options = {}) {
   const isLast = index === scenario.scenes.length - 1;
   const boardContent = options.boardContent ?? '';
   const nextAction = !showingBoard ? 'reveal-board' : scene.choice && !showingQuestion ? 'reveal-question' : isLast ? 'start-setup' : 'next';
-  const nextLabel = !showingBoard ? 'View smartboard' : scene.choice && !showingQuestion ? 'See the question' : isLast ? 'Set up my assignment' : 'Continue';
+  const nextLabel = !showingBoard ? 'View smartboard' : scene.choice && !showingQuestion ? 'See the question' : isLast ? 'Set up my discussion' : 'Continue';
   const cast = Object.values(scenario.characters).map((c) => ({
     ...c,
     src: scene.portraits?.[c.id] || c.src,
   }));
   const navigation =
     options.navigation ??
-    `<nav class="scene-actions" aria-label="Story navigation"><button type="button" class="nav-button nav-button--back" data-action="back"${index === 0 && !showingBoard ? ' disabled' : ''}><span aria-hidden="true">←</span><span>Back</span></button><span class="navigation-hint">${!showingBoard ? 'Read the dialogue, then continue to the board.' : !ready ? 'Choose a response, then use the feedback to reconsider.' : 'Continue when you are ready.'}</span><button type="button" class="primary nav-button nav-button--next" data-action="${nextAction}"${!ready ? ' disabled' : ''}><span>${nextLabel}</span><span aria-hidden="true">→</span></button></nav>`;
+    `<nav class="scene-actions" aria-label="Story navigation"><button type="button" class="nav-button nav-button--back" data-action="back"${index === 0 && !showingBoard ? ' disabled' : ''}><span>Back</span></button><span class="navigation-hint">${!showingBoard ? 'Read the dialogue, then continue to the board.' : !ready ? 'Choose a response, then use the feedback to reconsider.' : 'Continue when you are ready.'}</span><button type="button" class="primary nav-button nav-button--next" data-action="${nextAction}"${!ready ? ' disabled' : ''}><span>${nextLabel}</span></button></nav>`;
   const progressLabel =
     options.progressLabel ?? scene.part + ' · ' + (index + 1) + ' of ' + scenario.scenes.length;
   const speaker = cast.find((c) => c.id === scene.speaker);
   const content = showingQuestion
     ? renderBoard({ label: 'Think it through · Back returns to the plan', title: scene.board.title }, { afterContent: renderChoices(scene.choice, answer) })
     : showingBoard
-    ? renderBoard(scene.board, { afterContent: boardContent + (isLast && options.showHandoff !== false ? `<div class="handoff"><strong>Your assignment comes next</strong><p>${e(scenario.endNote)}</p></div>` : '') })
+    ? renderBoard(scene.board, { afterContent: boardContent + (isLast && options.showHandoff !== false ? `<div class="handoff"><strong>Your discussion design comes next</strong><p>${e(scenario.endNote)}</p></div>` : '') })
     : `<div class="speaker-panel"><div class="cast">${renderCharacter(speaker, true)}</div><section class="speech-bubble speech-bubble--${e(speaker.side)}" aria-labelledby="speaker-label"><span class="eyebrow">${e(scene.part)}</span><h2 id="speaker-label">${e(speaker.name)}</h2><p>${e(scene.dialogue)}</p></section></div>`;
   return `<section class="experience focused-scene focus--${e(stage)} camera--${e(speaker.side)}${options.className ? ' ' + e(options.className) : ''}" aria-label="${e(scenario.title)}"><div class="chapter-line"><span>${e(scenario.title)}</span><span>${e(progressLabel)} · ${showingQuestion ? 'Question' : showingBoard ? 'Smartboard' : 'Dialogue'}</span></div><h1 id="${e(options.titleId ?? 'scene-title')}" class="sr-only" tabindex="-1">${e(scene.title)}</h1><div class="classroom">${content}</div><section class="dialogue" aria-label="Story navigation">${navigation}</section>${options.designNotice ? '<p class="design-notice" role="status"></p>' : ''}<p class="save-notice" role="status">${e(state.saveNotice || '')}</p></section>`;
 }

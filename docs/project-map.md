@@ -16,6 +16,7 @@ Open `index.html` to run the app. Use this map to edit it.
 | Conversation lifecycle and stale-response protection        | `src/features/design/controller.js`                         |
 | Existing endpoint, request/response adapter, Dev simulation | `src/features/design/babbage-client.js`                     |
 | Instructions sent to Babbage                                | `src/features/design/babbage-prompt.js`                     |
+| Maya's grounded student prompt and optional reading dialog | `src/features/design/maya-client.js`, `maya-dialog.js`      |
 | Loading status and mechanical illustration                  | `src/features/design/loading.js`, `loading-illustration.js` |
 | Guide content and HTML download                             | `src/features/design/guide.js`                              |
 | Guide modal and its focus handling                          | `src/features/design/guide-preview.js`                      |
@@ -23,6 +24,10 @@ Open `index.html` to run the app. Use this map to edit it.
 | Professor Pixel's closing recap                             | `src/features/design/closing.js`                            |
 | App navigation, field edits, and user actions               | `src/app/app.js`                                            |
 | Saved progress, validation, and restoration                 | `src/app/storage.js`                                        |
+| Entry routing and Home choices                             | `src/app/entry.js`, `src/features/entry/screen.js`            |
+| Illustrative Idea Lab catalog, search, and details          | `src/features/idea-lab/ideas.js`, `screen.js`                 |
+| Private assignment workspace and isolated persistence      | `src/features/workspace/controller.js`, `screen.js`, `storage.js` |
+| Workspace-specific Babbage prompt                          | `src/features/workspace/prompt.js`                          |
 | Safe text and assignment formatting                         | `src/shared/html.js`, `directions.js`                       |
 | Lemonade illustrations                                      | `src/shared/lemonade-visuals.js`                            |
 | Local static hosting                                        | `server/index.js`                                           |
@@ -42,10 +47,13 @@ Open `index.html` to run the app. Use this map to edit it.
 
 The guide embeds its own styles because downloads must work offline.
 
+`idea-lab.css` adds the entry, gallery, and workspace layouts using existing colors and controls. The workspace reuses the design editor, AI controller/panel, Maya dialog, final checks, and guide exporter. Its state wrapper is separate from the original guided save. `docs/briefs/` preserves the original requests; `docs/idea-lab-implementation.md` records architecture, sharing plans, research boundaries, and actual validation results.
+
 `responsive.css` controls the phone classroom layout, with one portrait beside the dialogue and reachable navigation. `tablet-classroom.css` is imported last: portrait tablets show a landscape-shaped board with dialogue above the current speaker, while landscape tablets and Nest Hub displays use the desktop arrangement with the board between Maya and Pixel. Tablet opening scenes keep their questions and navigation within the viewport.
 
 ## Assets and supporting files
 
+- `docs/characters/maya.md`: approved Maya identity and dialogue rules; consult before changing her portrayal or implementing conversational feedback.
 - `assets/backgrounds/classroom.png`: active wide classroom background.
 - `assets/characters/maya/`, `assets/characters/pixel/`: used character expressions.
 - `assets/brand/babbage-mark.svg`: PromptCraft emblem, including the offline guide.

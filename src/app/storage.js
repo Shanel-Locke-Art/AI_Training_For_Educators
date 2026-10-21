@@ -36,7 +36,7 @@ export function initialState(scenario) {
     saveNotice: '',
   };
 }
-export function loadState(scenario, storage = window.localStorage) {
+export function loadState(scenario, storage = window.localStorage, workspace = null) {
   const fresh = initialState(scenario);
   try {
     const saved = JSON.parse(storage.getItem(STORAGE_KEY) || 'null');
@@ -107,7 +107,7 @@ export function loadState(scenario, storage = window.localStorage) {
       for (const key of ['instructions', 'learning', 'requirements'])
         finalCheck[key] = saved.finalCheck[key] === true;
       finalCheck.completed =
-        saved.finalCheck.completed === true && finalCheckReady({ teacher, design, finalCheck });
+        saved.finalCheck.completed === true && finalCheckReady({ teacher, design, finalCheck, ...(workspace ? { workspace } : {}) });
       finalCheck.approved = saved.finalCheck.approved === true && finalCheck.completed;
     }
     const designStep = Math.max(
@@ -124,9 +124,10 @@ export function loadState(scenario, storage = window.localStorage) {
       Math.min(teacherSetup.steps.length - 1, Number.isInteger(savedSetupStep) ? savedSetupStep : 0),
     );
     const babbage = conversationDefaults();
-    if (saved.babbage?.context === assignmentContext({ teacher, design })) {
+    // Mode is a preference, even when an outdated conversation must be discarded.
+    babbage.mode = saved.babbage?.mode === 'dev' ? 'dev' : 'live';
+    if (saved.babbage?.context === assignmentContext({ teacher, design, ...(workspace ? { workspace } : {}) })) {
       babbage.context = saved.babbage.context;
-      babbage.mode = saved.babbage.mode === 'dev' ? 'dev' : 'live';
       babbage.history = Array.isArray(saved.babbage.history)
         ? saved.babbage.history
             .filter(
@@ -187,6 +188,7 @@ export function loadState(scenario, storage = window.localStorage) {
       designReturnPanel: designPanels[designStep]?.includes(saved.designReturnPanel) ? saved.designReturnPanel : '',
       finalCheck,
       babbage,
+      ...(workspace ? { workspace } : {}),
     };
   } catch {
     return {

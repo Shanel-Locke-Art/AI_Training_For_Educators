@@ -1,3 +1,4 @@
+import { isTestLessonKeyword, fillTestLesson } from '../shared/test-lesson.js';
 import { createDesignController } from '../features/design/controller.js';
 import { openGuidePreview } from '../features/design/guide-preview.js';
 import { renderClosing } from '../features/design/closing.js';
@@ -25,9 +26,20 @@ import { openReferences } from '../shared/reference-dialog.js';
 import { highlightNextAction } from '../shared/next-action.js';
 import { renderAssignmentDirections } from '../shared/directions.js';
 import { serializeDirectionsEditor, formatDirectionsEditor } from '../shared/directions-editor.js';
+import { openMayaDialog } from '../features/design/maya-dialog.js';
 
 const app = document.getElementById('app');
 app.addEventListener('submit', (event) => event.preventDefault());
+app.addEventListener('keydown', (event) => {
+  const tab = event.target.closest('[data-summary-section]');
+  if (!tab || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const tabs = [...app.querySelectorAll('[data-summary-section]')];
+  const index = tabs.indexOf(tab);
+  const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+    : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+  tabs[next]?.click();
+});
 let state,
   summarySection = 0;
 const ai = { configured: null, pending: false, suggestion: null, error: '', context: '' };
@@ -81,6 +93,7 @@ restartButton?.addEventListener('click', async () => {
 });
 const index = () => scenario.scenes.findIndex((s) => s.id === state.sceneId);
 function render({ focus = false, choiceFocus = null } = {}) {
+  document.querySelector('.skip-link')?.setAttribute('href', state.phase === 'opening' ? '#scene-title' : '#setup-title');
   app.innerHTML =
     state.phase === 'closing'
       ? renderClosing(state)
@@ -186,6 +199,12 @@ app.addEventListener('change', (event) => {
   highlightNextAction(app, state, ai);
 });
 app.addEventListener('input', (event) => {
+  if (event.target.closest('[data-setup-form]') && isTestLessonKeyword(event.target)) {
+    ai.requestController?.abort();
+    fillTestLesson(state, event.target.value);
+    Object.assign(ai, {configured:null,pending:false,suggestion:null,error:'',context:''});
+    saveSafely(); render({focus:true}); refreshBabbageConnection(); return;
+  }
   const editor = event.target.closest('[data-assignment-editor]');
   if (editor) {
     updateDesignField({ name: 'revision', value: serializeDirectionsEditor(editor) });
@@ -237,6 +256,11 @@ function updateDesignField(control) {
   if (copy) copy.disabled = !state.design.revision.trim();
   const review = app.querySelector('[data-action="design-next"]');
   if (review && state.designStep === 2 && ['revision', 'reason'].includes(currentDesignPanel(state))) review.disabled = !state.design.revision.trim();
+  const livePreview = app.querySelector('[data-guided-live-preview]');
+  if (livePreview && control.name === 'revision')
+    livePreview.innerHTML = state.design.revision.trim()
+      ? renderAssignmentDirections(state.design.revision)
+      : '<p class="guided-preview-empty">Your formatted directions will appear here as you write.</p>';
   if (ai.suggestion && ai.context !== aiContext(state)) {
     ai.suggestion = null;
     ai.error = 'Your draft changed. Ask Babbage again to use the latest version.';
@@ -291,6 +315,11 @@ function updateTeacherField(control) {
   syncDraftAssignment(state.teacher, state.design);
   syncFinalCheck();
   syncBabbage();
+  const livePreview = app.querySelector('[data-setup-live-preview]');
+  if (livePreview && control.name === 'directions')
+    livePreview.innerHTML = state.teacher.directions.trim()
+      ? renderAssignmentDirections(state.teacher.directions)
+      : '<p class="setup-preview-empty">Your discussion directions will appear here as you enter them.</p>';
 }
 function syncFinalCheck() {
   const context = finalCheckContext(state.teacher, state.design);
@@ -384,6 +413,10 @@ app.addEventListener('click', async (event) => {
   else if (action === 'previous-question') moveQuestion(-1);
   else if (action === 'send-clarification') await askBabbage('clarify', true);
   else if (action === 'generate-ai') await askBabbage('revise');
+  else if (action === 'hear-maya') {
+    if (ai.pending || !state.design.revision.trim()) return;
+    openMayaDialog(state, event.target.closest('[data-action]'));
+  }
   else if (action === 'toggle-dev') {
     if (ai.pending) return;
     state.babbage = {
@@ -505,5 +538,6 @@ app.addEventListener('click', async (event) => {
   }
 });
 render();
+window.addEventListener?.('pagehide', () => ai.requestController?.abort());
 
 if (state.babbage.mode !== 'dev') refreshBabbageConnection();
